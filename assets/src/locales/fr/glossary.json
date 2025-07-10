@@ -1,0 +1,9 @@
+{
+    "welcome": {
+        "to": "Welcome to the Beef And Basil"
+    },
+    "sign_in":{
+        "failed": "Sign in failed",
+        "to_continue": "Sign in to continue"
+    }
+}

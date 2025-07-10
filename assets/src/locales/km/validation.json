@@ -1,0 +1,6 @@
+{
+    "required": {
+        "username": "Username is required",
+        "password": "Password is required"
+    }
+}
