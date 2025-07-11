@@ -62,7 +62,7 @@ readonly class UserProvider implements UserProviderInterface
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
 
-        if ($this->request->getCurrentRequest() === 'cafecrew_api_v1_login') {
+        if ($this->request->getCurrentRequest() === 'daily_brew_api_v1_login') {
             throw new UserNotFoundException('User not found');
         }
         if (null === $user = $this->userRepository->findByIdentifier($identifier)) {

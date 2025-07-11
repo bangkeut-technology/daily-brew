@@ -1,2 +1,2 @@
-cafecrew_api_login_check:
+daily_brew_api_login_check:
     path: /api/login_check

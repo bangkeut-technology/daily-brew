@@ -2,7 +2,7 @@ security:
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
     providers:
-        cafecrew_user_provider:
+        daily_brew_user_provider:
             id: App\Security\Provider\UserProvider
     role_hierarchy:
         ROLE_ADMIN:
@@ -14,10 +14,10 @@ security:
             pattern:   ^/api/login
             stateless: true
             json_login:
-                check_path:      cafecrew_api_login_check
+                check_path:      daily_brew_api_login_check
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
-            provider:  cafecrew_user_provider
+            provider:  daily_brew_user_provider
 
         api:
             pattern:     ^/api
@@ -25,17 +25,17 @@ security:
             jwt:         ~
             refresh_jwt:
                 check_path: gesdinet_jwt_refresh_token
-            provider:    cafecrew_user_provider
+            provider:    daily_brew_user_provider
             context:     'billandgo'
 
         console_area:
             pattern:  ^/console
-            provider: cafecrew_user_provider
+            provider: daily_brew_user_provider
             json_login:
-                check_path: cafecrew_security_login
+                check_path: daily_brew_security_login
             logout:
-                path:   cafecrew_security_logout
-                target: cafecrew_security_login
+                path:   daily_brew_security_logout
+                target: daily_brew_security_login
             context:  'billandgo'
             custom_authenticators:
                 - App\Security\JsonAuthenticator

@@ -14,7 +14,7 @@ if (!Encore.isRuntimeEnvironmentConfigured()) {
 Encore.setOutputPath('public/build/')
     .setPublicPath('/build')
     .setManifestKeyPrefix('build/')
-    .addEntry('cafecrew_application', './assets/src/main.tsx')
+    .addEntry('daily_brew_application', './assets/src/main.tsx')
     .splitEntryChunks()
     .enableSingleRuntimeChunk()
     .cleanupOutputBeforeBuild()

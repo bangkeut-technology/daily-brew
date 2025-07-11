@@ -49,7 +49,7 @@ abstract class AbstractJsonAuthenticator extends AbstractAuthenticator
      */
     public function supports(Request $request): ?bool
     {
-        return 'cafecrew_security_login' === $request->attributes->get('_route') && $request->isMethod('POST');
+        return 'daily_brew_security_login' === $request->attributes->get('_route') && $request->isMethod('POST');
     }
 
     /**

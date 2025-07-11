@@ -16,15 +16,15 @@
     <!-- Open Graph / Social Preview -->
     <meta property="og:title" content="CafeCrew – Staff KPI & Attendance Tracker for Cafés">
     <meta property="og:description" content="Manage your café team effortlessly with CafeCrew. Score performance, track attendance, handle leave requests, and export reports with ease.">
-    <meta property="og:image" content="https://cafecrew.app/og-cover.jpg"> <!-- Replace with your image -->
-    <meta property="og:url" content="https://cafecrew.app">
+    <meta property="og:image" content="https://dailybrew.app/og-cover.jpg"> <!-- Replace with your image -->
+    <meta property="og:url" content="https://dailybrew.app">
     <meta property="og:type" content="website">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="CafeCrew – Cafe Team Management System">
     <meta name="twitter:description" content="A simple, powerful tool to manage attendance, KPI, and leave for your café staff.">
-    <meta name="twitter:image" content="https://cafecrew.app/twitter-cover.jpg">
+    <meta name="twitter:image" content="https://dailybrew.app/twitter-cover.jpg">
     <title>{% block title %}Welcome!{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -34,11 +34,11 @@
     {#    <link rel="shortcut icon" href="{{ asset('images/favicon.ico') }}" type="image/x-icon" /> #}
     {#    <link rel="apple-touch-icon" href="{{ asset('images/icon-512.png') }}" /> #}
     {% block stylesheets %}
-        {{ encore_entry_link_tags('cafecrew_application') }}
+        {{ encore_entry_link_tags('daily_brew_application') }}
     {% endblock %}
 
     {% block javascripts %}
-        {{ encore_entry_script_tags('cafecrew_application') }}
+        {{ encore_entry_script_tags('daily_brew_application') }}
         <script type="text/javascript">
             function storeUserData(username) {
                 sessionStorage.setItem("username", username);

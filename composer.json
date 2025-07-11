@@ -1,7 +1,7 @@
 {
     "type": "project",
-    "name": "bangkeut-technology/bill-and-go",
-    "description": "Bill & Go is a web application that helps you manage your business finances. With its POS system, you can easily manage your sales and inventory.",
+    "name": "bangkeut-technology/daily-brew",
+    "description": "A KPI platform for small businesses",
     "license": "proprietary",
     "minimum-stability": "stable",
     "prefer-stable": true,
