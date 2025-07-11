@@ -45,9 +45,6 @@ class Store extends AbstractEntity
     #[Groups(['store:read'])]
     private ?string $identifier = null;
 
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $telegramChatId = null;
-
     /**
      * @var User|null
      */
@@ -114,24 +111,6 @@ class Store extends AbstractEntity
     public function setIdentifier(?string $identifier): Store
     {
         $this->identifier = $identifier;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getTelegramChatId(): ?string
-    {
-        return $this->telegramChatId;
-    }
-
-    /**
-     * @param string|null $telegramChatId
-     * @return Store
-     */
-    public function setTelegramChatId(?string $telegramChatId): Store
-    {
-        $this->telegramChatId = $telegramChatId;
         return $this;
     }
 

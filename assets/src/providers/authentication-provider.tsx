@@ -4,16 +4,16 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchCurrentUser } from '@/services/user';
 
 export const AuthenticationProvider = ({ children }: { children: React.ReactNode }) => {
-    const [username, setUsername] = React.useState(sessionStorage.getItem('username'));
+    const [email, setEmail] = React.useState(sessionStorage.getItem('email'));
 
     const { data } = useQuery({
         queryKey: ['me'],
-        enabled: !!username,
+        enabled: !!email,
         queryFn: fetchCurrentUser,
     });
 
     return (
-        <AuthenticationContext.Provider value={{ isAuthenticated: !!username, user: data, setUsername: setUsername }}>
+        <AuthenticationContext.Provider value={{ isAuthenticated: !!email, user: data, setEmail: setEmail }}>
             {children}
         </AuthenticationContext.Provider>
     );

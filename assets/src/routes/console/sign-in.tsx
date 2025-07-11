@@ -36,20 +36,20 @@ function SignIn() {
     const [showPassword, onToggle] = useBoolean(false);
     const { redirect } = Route.useSearch();
     const navigate = useNavigate();
-    const { user, setUsername } = useAuthentication();
+    const { user, setEmail } = useAuthentication();
     const form = useForm<SignInType>({
         resolver: yupResolver(signInSchema),
         defaultValues: {
-            username: '',
+            email: '',
             password: '',
         },
     });
     const { isPending, mutate } = useMutation({
         mutationFn: signIn,
         onSuccess: (data) => {
-            sessionStorage.setItem('username', data.user.username);
+            sessionStorage.setItem('email', data.user.email);
             sessionStorage.setItem('locale', data.user.locale || 'en');
-            setUsername(data.user.username);
+            setEmail(data.user.email);
         },
         onError: (data) => {
             const message = isAxiosError(data) ? data.response?.data.message : t('sign_in.failed', { ns: 'glossary' });
@@ -81,9 +81,9 @@ function SignIn() {
                                 <div className="space-y-4">
                                     <TextField
                                         control={form.control}
-                                        name="username"
-                                        label={t('username')}
-                                        autoComplete="username"
+                                        name="email"
+                                        label={t('email')}
+                                        autoComplete="email"
                                     />
                                     <TextField
                                         control={form.control}

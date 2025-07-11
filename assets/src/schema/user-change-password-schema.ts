@@ -1,5 +1,5 @@
 import { object, ObjectSchema, string } from 'yup';
-import { ChangePassword } from '@/types/User';
+import { ChangePassword } from '@/types/user';
 import i18next from '@/i18next';
 
 export const userChangePasswordSchema: ObjectSchema<ChangePassword> = object({

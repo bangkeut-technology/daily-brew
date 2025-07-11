@@ -38,7 +38,7 @@ class Employee extends AbstractEntity
 
     #[ORM\Column]
     #[Assert\NotNull]
-    private DateTimeImmutable $joinedAt;
+    private ?DateTimeImmutable $joinedAt = null;
 
     #[ORM\Column(type: 'string', enumType: EmployeeStatus::class)]
     private EmployeeStatus $status = EmployeeStatus::ACTIVE;
@@ -80,6 +80,96 @@ class Employee extends AbstractEntity
     public function setFirstName(string $firstName): Employee
     {
         $this->firstName = $firstName;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLastName(): string
+    {
+        return $this->lastName;
+    }
+
+    /**
+     * @param string $lastName
+     * @return Employee
+     */
+    public function setLastName(string $lastName): Employee
+    {
+        $this->lastName = $lastName;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPhoneNumber(): ?string
+    {
+        return $this->phoneNumber;
+    }
+
+    /**
+     * @param string|null $phoneNumber
+     * @return Employee
+     */
+    public function setPhoneNumber(?string $phoneNumber): Employee
+    {
+        $this->phoneNumber = $phoneNumber;
+        return $this;
+    }
+
+    /**
+     * @return DateTimeImmutable|null
+     */
+    public function getDob(): ?DateTimeImmutable
+    {
+        return $this->dob;
+    }
+
+    /**
+     * @param DateTimeImmutable|null $dob
+     * @return Employee
+     */
+    public function setDob(?DateTimeImmutable $dob): Employee
+    {
+        $this->dob = $dob;
+        return $this;
+    }
+
+    /**
+     * @return DateTimeImmutable|null
+     */
+    public function getJoinedAt(): ?DateTimeImmutable
+    {
+        return $this->joinedAt;
+    }
+
+    /**
+     * @param DateTimeImmutable|null $joinedAt
+     * @return Employee
+     */
+    public function setJoinedAt(?DateTimeImmutable $joinedAt): Employee
+    {
+        $this->joinedAt = $joinedAt;
+        return $this;
+    }
+
+    /**
+     * @return EmployeeStatus
+     */
+    public function getStatus(): EmployeeStatus
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param EmployeeStatus $status
+     * @return Employee
+     */
+    public function setStatus(EmployeeStatus $status): Employee
+    {
+        $this->status = $status;
         return $this;
     }
 

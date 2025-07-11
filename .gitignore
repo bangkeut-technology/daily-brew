@@ -34,3 +34,5 @@ yarn-error.log
 /public/images
 
 temp/*
+
+.tanstack

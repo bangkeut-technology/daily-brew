@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Form } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
-import { SignUpType } from '@/types/User';
+import { SignUp } from '@/types/user';
 import { TextField } from '@/components/fields/text-field';
 import { Icon } from '@iconify/react';
 import { useMutation } from '@tanstack/react-query';
@@ -18,7 +18,7 @@ import { signUpSchema } from '@/schema/sign-up-schema';
 import { signUp } from '@/services/auth';
 
 export const Route = createFileRoute('/console/sign-up')({
-    component: SignUp,
+    component: SignUpComponent,
     validateSearch: (search) => {
         return {
             redirect: search.redirect || '/console',
@@ -31,31 +31,29 @@ export const Route = createFileRoute('/console/sign-up')({
     },
 });
 
-function SignUp() {
+function SignUpComponent() {
     const { t } = useTranslation();
     const [showPassword, onToggle] = useBoolean(false);
     const [showConfirmPassword, onShowConfirmPassword] = useBoolean(false);
     const { redirect } = Route.useSearch();
     const navigate = useNavigate();
-    const { user, setUsername } = useAuthentication();
-    const form = useForm<SignUpType>({
+    const { user, setEmail } = useAuthentication();
+    const form = useForm<SignUp>({
         resolver: yupResolver(signUpSchema),
         defaultValues: {
-            username: '',
+            email: '',
             password: '',
             confirmPassword: '',
             firstName: '',
             lastName: '',
-            companyName: '',
         },
     });
     const { isPending, mutate } = useMutation({
         mutationFn: signUp,
         onSuccess: (data) => {
-            sessionStorage.setItem('username', data.user.username);
+            sessionStorage.setItem('email', data.user.email);
             sessionStorage.setItem('locale', data.user.locale || 'en');
-            sessionStorage.setItem('companyName', data.user.company.name || '');
-            setUsername(data.user.username);
+            setEmail(data.user.email);
         },
         onError: (data) => {
             const message = isAxiosError(data) ? data.response?.data.message : t('sign_up.failed', { ns: 'glossary' });
@@ -69,7 +67,7 @@ function SignUp() {
         }
     }, [navigate, redirect, user]);
 
-    const onSubmit = (data: SignUpType) => {
+    const onSubmit = (data: SignUp) => {
         mutate(data);
     };
 
@@ -87,9 +85,9 @@ function SignUp() {
                                 <div className="space-y-4">
                                     <TextField
                                         control={form.control}
-                                        name="username"
-                                        label={t('username')}
-                                        autoComplete="username"
+                                        name="email"
+                                        label={t('email')}
+                                        autoComplete="email"
                                     />
                                     <TextField
                                         control={form.control}
