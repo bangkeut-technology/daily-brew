@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\RoleRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -35,6 +37,17 @@ class Role extends AbstractEntity
      */
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
+
+    /**
+     * @var Collection<int, Employee>
+     */
+    #[ORM\ManyToMany(targetEntity: Employee::class, mappedBy: 'roles')]
+    private Collection $employees;
+
+    public function __construct()
+    {
+        $this->employees = new ArrayCollection();
+    }
 
     /**
      * @return string|null
@@ -87,6 +100,49 @@ class Role extends AbstractEntity
     public function setDescription(?string $description): Role
     {
         $this->description = $description;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Employee>
+     */
+    public function getEmployees(): Collection
+    {
+        return $this->employees;
+    }
+
+    /**
+     * @param Collection<int, Employee> $employees
+     * @return Role
+     */
+    public function setEmployees(Collection $employees): Role
+    {
+        $this->employees = $employees;
+        return $this;
+    }
+
+    /**
+     * @param Employee $employee
+     * @return Role
+     */
+    public function addEmployee(Employee $employee): Role
+    {
+        if (!$this->employees->contains($employee)) {
+            $this->employees->add($employee);
+            $employee->addRole($this);
+        }
+        return $this;
+    }
+
+    /**
+     * @param Employee $employee
+     * @return Role
+     */
+    public function removeEmployee(Employee $employee): Role
+    {
+        if ($this->employees->removeElement($employee)) {
+            $employee->removeRole($this);
+        }
         return $this;
     }
 }

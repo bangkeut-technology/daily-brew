@@ -33,8 +33,7 @@ class EvaluationCriteria extends AbstractEntity
     /**
      * @var Collection<int, EvaluationTemplateCriteria>
      */
-    #[ORM\ManyToMany(targetEntity: EvaluationTemplateCriteria::class, inversedBy: 'criteria')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\OneToMany(targetEntity: EvaluationTemplateCriteria::class, mappedBy: 'criteria', orphanRemoval: true)]
     private Collection $templates;
 
     public function __construct()

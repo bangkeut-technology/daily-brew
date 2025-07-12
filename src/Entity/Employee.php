@@ -68,6 +68,13 @@ class Employee extends AbstractEntity
     private ?User $user = null;
 
     /**
+     * @var Collection<int, Role>
+     */
+    #[ORM\ManyToMany(targetEntity: Role::class, inversedBy: 'employees')]
+    #[ORM\JoinTable(name: 'daily_brew_employee_roles')]
+    private Collection $roles;
+
+    /**
      * @var Collection<int, EvaluationTemplate>
      */
     #[ORM\ManyToMany(targetEntity: EvaluationTemplate::class, inversedBy: 'employees')]
@@ -76,6 +83,7 @@ class Employee extends AbstractEntity
 
     public function __construct()
     {
+        $this->roles = new ArrayCollection();
         $this->templates = new ArrayCollection();
     }
 
@@ -271,6 +279,39 @@ class Employee extends AbstractEntity
     {
         if ($this->templates->removeElement($template)) {
             $template->removeEmployee($this);
+        }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Role>
+     */
+    public function getRoles(): Collection
+    {
+        return $this->roles;
+    }
+
+    /**
+     * @param Role $role
+     * @return Employee
+     */
+    public function addRole(Role $role): Employee
+    {
+        if (!$this->roles->contains($role)) {
+            $this->roles->add($role);
+            $role->addEmployee($this);
+        }
+        return $this;
+    }
+
+    /**
+     * @param Role $role
+     * @return Employee
+     */
+    public function removeRole(Role $role): Employee
+    {
+        if ($this->roles->removeElement($role)) {
+            $role->removeEmployee($this);
         }
         return $this;
     }
