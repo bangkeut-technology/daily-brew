@@ -13,7 +13,7 @@ import { postEvaluationTemplate } from '@/services/evaluation-template';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
 
-export const Route = createLazyFileRoute('/console/_authenticated/_layout/evaluation-templates/new')({
+export const Route = createLazyFileRoute('/console/_authenticated/_layout/evaluations/templates/new')({
     component: NewEvaluationTemplate,
 });
 

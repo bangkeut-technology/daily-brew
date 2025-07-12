@@ -14,21 +14,7 @@ import {
     SidebarMenuSubButton,
     SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
-import {
-    ChevronRight,
-    ChevronUp,
-    FilePlus,
-    LayoutDashboard,
-    ListTodo,
-    LogOut,
-    PackageSearch,
-    Shapes,
-    Store,
-    Table,
-    TicketPercent,
-    User2,
-    Users,
-} from 'lucide-react';
+import { ChevronRight, ChevronUp, ClipboardList, LayoutDashboard, ListTodo, LogOut, User2 } from 'lucide-react';
 import { Link, useLocation } from '@tanstack/react-router';
 import {
     DropdownMenu,
@@ -55,45 +41,20 @@ const items: SidebarMenuItem[] = [
         icon: LayoutDashboard,
     },
     {
-        title: i18next.t('products'),
-        url: '/console/products',
-        icon: PackageSearch,
-    },
-    {
         title: i18next.t('evaluations'),
-        url: '/console/evaluation-templates',
         icon: ListTodo,
-    },
-    {
-        title: i18next.t('stores'),
-        url: '/console/stores',
-        icon: Store,
-    },
-    {
-        title: i18next.t('coupons'),
-        icon: TicketPercent,
         children: [
             {
-                title: i18next.t('new.title'),
-                url: '/console/coupons/new',
-                icon: FilePlus,
+                title: i18next.t('templates'),
+                url: '/console/evaluations/templates',
+                icon: ListTodo,
             },
             {
-                title: i18next.t('table'),
-                url: '/console/coupons',
-                icon: Table,
+                title: i18next.t('criterias'),
+                url: '/console/evaluation/criterias',
+                icon: ClipboardList,
             },
         ],
-    },
-    {
-        title: i18next.t('categories'),
-        url: '/console/categories',
-        icon: Shapes,
-    },
-    {
-        title: i18next.t('users'),
-        url: '/console/users',
-        icon: Users,
     },
 ];
 

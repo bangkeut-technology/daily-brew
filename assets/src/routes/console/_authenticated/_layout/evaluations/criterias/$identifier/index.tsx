@@ -2,7 +2,7 @@ import React from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import { fetchEvaluationTemplate } from '@/services/evaluation-template';
 
-export const Route = createFileRoute('/console/_authenticated/_layout/evaluation-templates/$identifier/')({
+export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/criterias/$identifier/')({
     component: EvaluationDetails,
     loader: ({ params: { identifier } }) => fetchEvaluationTemplate(identifier),
 });
