@@ -148,17 +148,17 @@ class EmployeeRepository extends AbstractRepository
     /**
      * Find employees by user.
      *
-     * @param User $getUser The user entity.
+     * @param User $user The user entity.
      *
      * @return Employee[] Returns the list of employee entities associated with the user.
      */
-    public function findByUser(User $getUser): array
+    public function findByUser(User $user): array
     {
         return $this->createQueryBuilder('e')
             ->select('e, s')
             ->innerJoin('e.store', 's')
             ->where('e.user = :user')
-            ->setParameter('user', $getUser)
+            ->setParameter('user', $user)
             ->getQuery()
             ->getResult();
     }

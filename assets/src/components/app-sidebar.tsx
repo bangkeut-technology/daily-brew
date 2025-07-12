@@ -41,6 +41,11 @@ const items: SidebarMenuItem[] = [
         icon: LayoutDashboard,
     },
     {
+        title: i18next.t('employees'),
+        url: '/console/employees',
+        icon: User2,
+    },
+    {
         title: i18next.t('evaluations'),
         icon: ListTodo,
         children: [
