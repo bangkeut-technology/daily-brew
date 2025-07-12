@@ -1,4 +1,4 @@
-import { User } from '@/types/User';
+import { User } from '@/types/user';
 import i18next from '@/i18next';
 
 export const currencyFormat = (value: number | string, currency: 'USD' | 'KHR' = 'USD') => {

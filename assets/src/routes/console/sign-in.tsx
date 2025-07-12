@@ -5,7 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { signInSchema } from '@/schema/sign-in-schema';
 import { Form } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
-import { SignInType } from '@/types/User';
+import { SignInType } from '@/types/user';
 import { TextField } from '@/components/fields/text-field';
 import { Icon } from '@iconify/react';
 import { useMutation } from '@tanstack/react-query';

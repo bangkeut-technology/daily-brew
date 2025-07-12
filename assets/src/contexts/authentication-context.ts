@@ -1,5 +1,5 @@
 import React from 'react';
-import { User } from '@/types/User';
+import { User } from '@/types/user';
 
 export interface AuthenticationContextValue {
     isAuthenticated: boolean;

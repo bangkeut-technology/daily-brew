@@ -3,7 +3,7 @@ import { createLazyFileRoute } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { evaluationTemplateSchema } from '@/schema/evaluation-template-schema';
-import { PartialEvaluationTemplate } from '@/types/EvaluationTemplate';
+import { PartialEvaluationTemplate } from '@/types/evaluation-template';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';

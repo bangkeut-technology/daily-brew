@@ -64,7 +64,6 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                                 selected={field.value}
                                 onSelect={field.onChange}
                                 disabled={disabledDate}
-                                initialFocus
                             />
                         </PopoverContent>
                     </Popover>

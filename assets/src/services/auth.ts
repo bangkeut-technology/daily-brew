@@ -1,4 +1,4 @@
-import { SignInType, SignUpType, User } from '@/types/User';
+import { SignInType, SignUpType, User } from '@/types/user';
 import axios from 'axios';
 
 export const signIn = async (signIn: SignInType) => {
