@@ -6,7 +6,7 @@ namespace App\Controller;
 
 
 use App\Entity\User;
-use App\Form\RegistrationForm;
+use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
 use Exception;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -72,7 +72,7 @@ class RegistrationController extends AbstractController
     public function register(Request $request, Security $security, UserRepository $userRepository): Response
     {
         $user = $userRepository->create();
-        $form = $this->createForm(RegistrationForm::class, $user);
+        $form = $this->createForm(RegistrationFormType::class, $user);
         $content = $request->getPayload()->all();
         $form->submit($content);
 

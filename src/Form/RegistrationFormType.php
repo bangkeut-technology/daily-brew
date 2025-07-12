@@ -18,12 +18,12 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class RegistrationForm
+ * Class RegistrationFormType
  *
  * @package App\Form
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-class RegistrationForm extends AbstractType
+class RegistrationFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
