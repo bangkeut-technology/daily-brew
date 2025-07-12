@@ -1,0 +1,6 @@
+not_found:
+    evaluation_template: "Evaluation template %identifier% not found."
+invalid:
+    user:          'Invalid user information'
+    user_password: 'The current password is incorrect.'
+    user_picture:  'The uploaded file is not a valid image.'

@@ -133,7 +133,7 @@ class UserController extends AbstractController
             return $this->createUserResponse(['message' => $this->translator->trans('updated.user'), 'user' => $user]);
         }
 
-        throw $this->createBadRequestException($this->translator->trans('invalid.user'));
+        throw $this->createBadRequestException($this->translator->trans('invalid.user', domain: 'errors'));
     }
 
     /**
@@ -308,7 +308,7 @@ class UserController extends AbstractController
             return $this->createUserResponse(['message' => $this->translator->trans('updated.user_password'), 'user' => $user]);
         }
 
-        throw $this->createBadRequestException($this->translator->trans('invalid.user_password'));
+        throw $this->createBadRequestException($this->translator->trans('invalid.user_password', domain: 'errors'));
     }
 
     /**
@@ -361,6 +361,6 @@ class UserController extends AbstractController
             return $this->createUserResponse(['message' => $this->translator->trans('updated.user_picture'), 'user' => $user]);
         }
 
-        throw $this->createBadRequestException($this->translator->trans('invalid.user_picture'));
+        throw $this->createBadRequestException($this->translator->trans('invalid.user_picture', domain: 'errors'));
     }
 }

@@ -78,7 +78,7 @@ class EvaluationTemplateRepository extends AbstractRepository
      * @param User   $user       The user associated with the evaluation template.
      * @return EvaluationTemplate|null
      */
-    public function findByIdentifierAndCompany(string $identifier, User $user): ?EvaluationTemplate
+    public function findByIdentifierAndUser(string $identifier, User $user): ?EvaluationTemplate
     {
         return $this->findOneBy([
             'identifier' => $identifier,
@@ -100,5 +100,20 @@ class EvaluationTemplateRepository extends AbstractRepository
                 ->setParameter('identifier', $identifier)
                 ->getQuery()
                 ->getSingleScalarResult() > 0;
+    }
+
+    /**
+     * Find all evaluation templates associated with a specific user.
+     *
+     * @param User $user The user whose evaluation templates to find.
+     * @return EvaluationTemplate[] Returns an array of EvaluationTemplate objects.
+     */
+    public function findByUser(User $user): array
+    {
+        return $this->createQueryBuilder('et')
+            ->where('et.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
     }
 }

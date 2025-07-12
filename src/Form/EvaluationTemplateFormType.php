@@ -25,9 +25,7 @@ class EvaluationTemplateFormType extends AbstractType
     {
         $builder
             ->add('name')
-            ->add('canonicalName')
             ->add('description')
-            ->add('active')
             ->add('employees', EntityType::class, [
                 'class' => Employee::class,
                 'choice_label' => 'id',

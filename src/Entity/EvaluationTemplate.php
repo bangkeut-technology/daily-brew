@@ -242,4 +242,9 @@ class EvaluationTemplate extends AbstractEntity
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return $this->getName() ?? '';
+    }
 }
