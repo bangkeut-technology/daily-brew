@@ -70,7 +70,7 @@ class Employee extends AbstractEntity
     /**
      * @var Collection<int, EvaluationTemplate>
      */
-    #[ORM\ManyToMany(targetEntity: EvaluationTemplate::class, mappedBy: 'employees')]
+    #[ORM\ManyToMany(targetEntity: EvaluationTemplate::class, inversedBy: 'employees')]
     #[ORM\JoinTable(name: 'daily_brew_employee_templates')]
     private Collection $templates;
 

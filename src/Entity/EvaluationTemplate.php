@@ -18,8 +18,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
  */
 #[ORM\Table(name: 'daily_brew_evaluation_templates')]
 #[ORM\Entity(repositoryClass: EvaluationTemplateRepository::class)]
-#[ORM\UniqueConstraint(name: 'UQ_EVALUATION_TEMPLATE_NAME', columns: ['name', 'user'])]
-#[ORM\UniqueConstraint(name: 'UQ_EVALUATION_TEMPLATE_CANONICAL_NAME', columns: ['canonical_name', 'user'])]
+#[ORM\UniqueConstraint(name: 'UQ_EVALUATION_TEMPLATE_NAME', columns: ['name', 'user_id'])]
+#[ORM\UniqueConstraint(name: 'UQ_EVALUATION_TEMPLATE_CANONICAL_NAME', columns: ['canonical_name', 'user_id'])]
 #[ORM\UniqueConstraint(name: 'UQ_EVALUATION_TEMPLATE_IDENTIFIER', columns: ['identifier'])]
 class EvaluationTemplate extends AbstractEntity
 {
@@ -56,7 +56,7 @@ class EvaluationTemplate extends AbstractEntity
     /**
      * @var Collection<int, Employee>
      */
-    #[ORM\ManyToMany(targetEntity: Employee::class, inversedBy: 'templates')]
+    #[ORM\ManyToMany(targetEntity: Employee::class, mappedBy: 'templates')]
     private Collection $employees;
 
     public function __construct()
