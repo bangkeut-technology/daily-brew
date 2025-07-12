@@ -94,6 +94,7 @@ function SignInComponent() {
                                         endIcon={
                                             <Button
                                                 variant="outline"
+                                                type="button"
                                                 size="icon"
                                                 onClick={() => {
                                                     onToggle();

@@ -1,5 +1,16 @@
+api_v1_controllers:
+    resource:
+        path:      ../src/ApiController/
+        namespace: App\ApiController
+    type:        attribute
+    name_prefix: daily_brew_api_v1_
+    prefix:      /api/v1/{_locale}
+    locale:      en
+    requirements:
+        _locale: en|fr|km
+
 controllers:
     resource:
-        path: ../src/Controller/
+        path:      ../src/Controller/
         namespace: App\Controller
     type: attribute

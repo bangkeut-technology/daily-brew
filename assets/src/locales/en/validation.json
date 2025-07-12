@@ -1,1 +1,10 @@
-{}
+{
+    "required": {
+        "first_name": "The first name is required.",
+        "last_name": "The last name is required.",
+        "password": "The password is required.",
+        "confirm_password": "The confirmation password is required.",
+        "email": "Email is required."
+    },
+    "passwords_match": "The password and confirmation password must match."
+}

@@ -119,7 +119,7 @@ export const AppSidebar = () => {
     return (
         <Sidebar>
             <SidebarHeader>
-                <h1 className="text-2xl font-bold">Beef & Basil</h1>
+                <h1 className="text-2xl font-bold">DailyBrew</h1>
                 <p className="text-sm text-gray-500">{t('admin_console')}</p>
             </SidebarHeader>
             <SidebarContent>
@@ -147,7 +147,7 @@ export const AppSidebar = () => {
                                         className="text-red-500 w-full flex flex-row space-x-2 items-center"
                                     >
                                         <LogOut className="text-red-500" />
-                                        <span>{t('logout')}</span>
+                                        <span>{t('sign_out')}</span>
                                     </a>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>

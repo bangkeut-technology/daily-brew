@@ -1,10 +1,14 @@
 {
     "sign_in": {
         "title": "Sign In",
-        "description": "Access your account to manage your employees KPI and performance."
+        "description": "Access your account to manage your employees KPI and performance.",
+        "failed": "Invalid email or password. Please try again."
     },
     "sign_up": {
         "title": "Sign Up",
-        "description": "Create a new account to start managing your employees KPI and performance."
-    }
+        "description": "Create a new account to start managing your employees KPI and performance.",
+        "failed": "An account with this email already exists. Please try a different email."
+    },
+    "no_account_yet": "Don't have an account yet?",
+    "have_account": "Already have an account?"
 }

@@ -107,7 +107,7 @@ function SignUpComponent() {
                                         control={form.control}
                                         name="confirmPassword"
                                         label={t('confirm_password')}
-                                        type={showPassword ? 'text' : 'password'}
+                                        type={showConfirmPassword ? 'text' : 'password'}
                                         autoComplete="current-password"
                                         endIcon={
                                             <Button

@@ -68,7 +68,7 @@ class RegistrationController extends AbstractController
             new OA\Property('message', type: 'string')
         ])
     )]
-    #[Route('/api/sign-up', name: 'daily_brew_sign_up', methods: ['POST'])]
+    #[Route('/console/sign-up', name: 'daily_brew_console_sign_up', methods: ['POST'])]
     public function register(Request $request, Security $security, UserRepository $userRepository): Response
     {
         $user = $userRepository->create();
@@ -83,7 +83,7 @@ class RegistrationController extends AbstractController
 
             $userRepository->updateUser($user);
 
-            $security->login($user, 'json_login', 'main');
+            $security->login($user, 'json_login', 'console_area');
 
             return $this->json([
                 'message' => 'You are now registered',
