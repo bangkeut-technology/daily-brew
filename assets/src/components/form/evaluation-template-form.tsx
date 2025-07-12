@@ -16,7 +16,7 @@ interface EvaluationTemplateFormProps {
     onSubmit?: (data: PartialEvaluationTemplate) => void;
 }
 
-export const EvaluationTemplateForm: React.FunctionComponent<EvaluationTemplateFormProps> = ({ form }) => {
+export const EvaluationTemplateForm: React.FunctionComponent<EvaluationTemplateFormProps> = ({ form, isPending }) => {
     const { t } = useTranslation();
     const { append, fields, remove } = useFieldArray({
         name: 'criterias',
@@ -43,6 +43,7 @@ export const EvaluationTemplateForm: React.FunctionComponent<EvaluationTemplateF
                                 name={`criterias.${index}.label`}
                                 label={t('criteria.label.label')}
                                 description={t('criteria.label.description')}
+                                disabled={isPending}
                             />
                             <SelectField
                                 control={form.control}
@@ -54,6 +55,7 @@ export const EvaluationTemplateForm: React.FunctionComponent<EvaluationTemplateF
                                     maximum: WEIGHT_MAXIMUM,
                                     minimum: WEIGHT_MINIMUM,
                                 })}
+                                disabled={isPending}
                             />
                         </div>
                         <TextAreaField
@@ -61,6 +63,7 @@ export const EvaluationTemplateForm: React.FunctionComponent<EvaluationTemplateF
                             name={`criterias.${index}.description`}
                             label={t('criteria.description.label')}
                             description={t('criteria.description.description')}
+                            disabled={isPending}
                         />
                     </div>
                     <Button variant="destructive" onClick={() => remove(index)}>
@@ -68,7 +71,7 @@ export const EvaluationTemplateForm: React.FunctionComponent<EvaluationTemplateF
                     </Button>
                 </div>
             )),
-        [fields, form.control, options, remove, t],
+        [fields, form.control, isPending, options, remove, t],
     );
 
     return (

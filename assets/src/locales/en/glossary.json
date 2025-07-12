@@ -11,11 +11,15 @@
     },
     "employees": {
         "title": "Employees",
-        "description": "Manage your employees' KPIs and performance metrics. You can have up to {{maximumEmployee}} employees.",
+        "description": "Manage your employees' KPIs and performance metrics. You can have up to {{maxFreeEmployees}} employees.",
         "add": "Add Employee",
         "edit": "Edit Employee",
         "delete": "Delete Employee",
-        "view_performance": "View Performance"
+        "view_performance": "View Performance",
+        "new": {
+            "title": "New Employee",
+            "description": "Add a new employee to manage their KPIs and performance."
+        }
     },
     "no_account_yet": "Don't have an account yet?",
     "have_account": "Already have an account?"
