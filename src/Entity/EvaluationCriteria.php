@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Class EvaluationCriteria
@@ -18,16 +19,29 @@ use Doctrine\ORM\Mapping as ORM;
  */
 #[ORM\Table(name: 'daily_brew_evaluation_criterias')]
 #[ORM\Entity(repositoryClass: EvaluationCriteriaRepository::class)]
+#[ORM\UniqueConstraint(name: 'UQ_EVALUATION_CRITERIA_IDENTIFIER', columns: ['identifier'])]
+#[ORM\UniqueConstraint(name: 'UQ_EVALUATION_CRITERIA_LABEL', columns: ['label', 'user_id'])]
+#[ORM\UniqueConstraint(name: 'UQ_EVALUATION_CRITERIA_CANONICAL_LABEL', columns: ['canonical_label', 'user_id'])]
 class EvaluationCriteria extends AbstractEntity
 {
+    #[ORM\Column]
+    #[Groups(['evaluation_criteria:read'])]
+    private ?string $identifier = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['evaluation_criteria:read'])]
     private ?string $label = null;
 
+    #[ORM\Column(length: 255)]
+    #[Groups(['evaluation_criteria:read'])]
+    private ?string $canonicalLabel = null;
+
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['evaluation_criteria:read'])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups(['evaluation_criteria:read'])]
     private int $weight = 1;
 
     /**
@@ -51,6 +65,24 @@ class EvaluationCriteria extends AbstractEntity
     /**
      * @return string|null
      */
+    public function getIdentifier(): ?string
+    {
+        return $this->identifier;
+    }
+
+    /**
+     * @param string|null $identifier
+     * @return EvaluationCriteria
+     */
+    public function setIdentifier(?string $identifier): EvaluationCriteria
+    {
+        $this->identifier = $identifier;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
     public function getLabel(): ?string
     {
         return $this->label;
@@ -63,6 +95,24 @@ class EvaluationCriteria extends AbstractEntity
     public function setLabel(?string $label): EvaluationCriteria
     {
         $this->label = $label;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCanonicalLabel(): ?string
+    {
+        return $this->canonicalLabel;
+    }
+
+    /**
+     * @param string|null $canonicalLabel
+     * @return EvaluationCriteria
+     */
+    public function setCanonicalLabel(?string $canonicalLabel): EvaluationCriteria
+    {
+        $this->canonicalLabel = $canonicalLabel;
         return $this;
     }
 

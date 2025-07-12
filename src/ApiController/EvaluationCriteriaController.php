@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace App\ApiController;
 
-use App\ApiController\Trait\EvaluationTemplateTrait;
+use App\ApiController\Trait\EvaluationCriteriaTrait;
 use App\Controller\AbstractController;
-use App\Entity\EvaluationTemplate;
+use App\Entity\EvaluationCriteria;
 use App\Entity\User;
-use App\Form\EvaluationTemplateFormType;
-use App\Repository\EvaluationTemplateRepository;
+use App\Form\EvaluationCriteriaFormType;
+use App\Repository\EvaluationCriteriaRepository;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Random\RandomException;
@@ -20,20 +20,20 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class EvaluationTemplateController
+ * Class EvaluationCriteriaController
  *
  * @package App\ApiController
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-#[Route(path: '/evaluation-templates', name: 'evaluation_templates_')]
-#[OA\Tag(name: 'Evaluation Template')]
-class EvaluationTemplateController extends AbstractController
+#[Route(path: '/evaluation-criterias', name: 'evaluation_criterias_')]
+#[OA\Tag(name: 'Evaluation Criteria')]
+class EvaluationCriteriaController extends AbstractController
 {
-    use EvaluationTemplateTrait;
+    use EvaluationCriteriaTrait;
 
     public function __construct(
         TranslatorInterface $translator,
-        private readonly EvaluationTemplateRepository $evaluationTemplateRepository
+        private readonly EvaluationCriteriaRepository $evaluationCriteriaRepository
     )
     {
         parent::__construct($translator);
@@ -49,7 +49,7 @@ class EvaluationTemplateController extends AbstractController
         description: 'Returns a list of evaluation templates.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: EvaluationTemplate::class, groups: ['evaluation_template:read']))
+            items: new OA\Items(ref: new Model(type: EvaluationCriteria::class, groups: ['evaluation_template:read']))
         )
     )]
     #[Route(name: 'gets', methods: ['GET'])]
@@ -58,9 +58,9 @@ class EvaluationTemplateController extends AbstractController
         User $user,
     ): JsonResponse
     {
-        $templates = $this->evaluationTemplateRepository->findByUser($user);
+        $templates = $this->evaluationCriteriaRepository->findByUser($user);
 
-        return $this->createTemplateResponse($templates);
+        return $this->createCriteriaResponse($templates);
     }
 
     /**
@@ -73,7 +73,7 @@ class EvaluationTemplateController extends AbstractController
     #[OA\Response(
         response: Response::HTTP_CREATED,
         description: 'Creates a new evaluation template.',
-        content: new OA\JsonContent(ref: new Model(type: EvaluationTemplate::class, groups: ['evaluation_template:read']))
+        content: new OA\JsonContent(ref: new Model(type: EvaluationCriteria::class, groups: ['evaluation_template:read']))
     )]
     #[OA\RequestBody(
         description: 'The evaluation template data to create.',
@@ -87,15 +87,15 @@ class EvaluationTemplateController extends AbstractController
     #[Route(name: 'post', methods: ['POST'])]
     public function post(Request $request): JsonResponse
     {
-        $template = $this->evaluationTemplateRepository->create();
-        $form = $this->createForm(EvaluationTemplateFormType::class, $template);
+        $template = $this->evaluationCriteriaRepository->create();
+        $form = $this->createForm(EvaluationCriteriaFormType::class, $template);
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
             $template->setUser($this->getUser());
-            $this->evaluationTemplateRepository->updateEvaluationTemplate($template);
+            $this->evaluationCriteriaRepository->updateEvaluationCriteria($template);
         }
 
-        return $this->createTemplateResponse($template, Response::HTTP_CREATED);
+        return $this->createCriteriaResponse($template, Response::HTTP_CREATED);
     }
 
     /**
@@ -132,11 +132,11 @@ class EvaluationTemplateController extends AbstractController
     #[Route('/{identifier}', name: 'delete', methods: ['DELETE'])]
     public function delete(string $identifier): JsonResponse
     {
-        $template = $this->getEvaluationTemplateByIdentifier($identifier);
+        $template = $this->getEvaluationCriteriaByIdentifier($identifier);
 
-        $this->evaluationTemplateRepository->remove($template);
+        $this->evaluationCriteriaRepository->remove($template);
 
-        return $this->createTemplateResponse([
+        return $this->createCriteriaResponse([
             'message' => $this->translator->trans('deleted.evaluation_template', ['%name%' => $template->getName()]),
         ]);
     }
@@ -157,7 +157,7 @@ class EvaluationTemplateController extends AbstractController
     #[OA\Response(
         response: Response::HTTP_OK,
         description: 'Returns an evaluation template by its identifier.',
-        content: new OA\JsonContent(ref: new Model(type: EvaluationTemplate::class, groups: ['evaluation_template:read']))
+        content: new OA\JsonContent(ref: new Model(type: EvaluationCriteria::class, groups: ['evaluation_template:read']))
     )]
     #[OA\Response(
         response: Response::HTTP_NOT_FOUND,
@@ -171,9 +171,9 @@ class EvaluationTemplateController extends AbstractController
     #[Route('/{identifier}', name: 'get', methods: ['GET'])]
     public function get(string $identifier): JsonResponse
     {
-        $template = $this->getEvaluationTemplateByIdentifier($identifier);
+        $template = $this->getEvaluationCriteriaByIdentifier($identifier);
 
-        return $this->createTemplateResponse($template);
+        return $this->createCriteriaResponse($template);
     }
 
     /**
@@ -194,7 +194,7 @@ class EvaluationTemplateController extends AbstractController
     #[OA\Response(
         response: Response::HTTP_OK,
         description: 'Updates an existing evaluation template.',
-        content: new OA\JsonContent(ref: new Model(type: EvaluationTemplate::class, groups: ['evaluation_template:read']))
+        content: new OA\JsonContent(ref: new Model(type: EvaluationCriteria::class, groups: ['evaluation_template:read']))
     )]
     #[OA\RequestBody(
         description: 'The evaluation template data to update.',
@@ -208,13 +208,13 @@ class EvaluationTemplateController extends AbstractController
     #[Route('/{identifier}', name: 'put', methods: ['PUT'])]
     public function put(Request $request, string $identifier): JsonResponse
     {
-        $template = $this->getEvaluationTemplateByIdentifier($identifier);
-        $form = $this->createForm(EvaluationTemplateFormType::class, $template);
+        $template = $this->getEvaluationCriteriaByIdentifier($identifier);
+        $form = $this->createForm(EvaluationCriteriaFormType::class, $template);
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->evaluationTemplateRepository->updateEvaluationTemplate($template);
+            $this->evaluationCriteriaRepository->updateEvaluationCriteria($template);
         }
 
-        return $this->createTemplateResponse($template);
+        return $this->createCriteriaResponse($template);
     }
 }

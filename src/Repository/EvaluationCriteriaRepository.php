@@ -1,8 +1,11 @@
 <?php
+declare(strict_types=1);
+
 
 namespace App\Repository;
 
 use App\Entity\EvaluationCriteria;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -25,5 +28,25 @@ class EvaluationCriteriaRepository extends AbstractRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, EvaluationCriteria::class);
+    }
+
+    /**
+     * Finds an EvaluationCriteria by its identifier and associated user.
+     *
+     * @param string $identifier The unique identifier of the evaluation criteria.
+     * @param User   $user       The user associated with the evaluation criteria.
+     *
+     * @return EvaluationCriteria|null The found evaluation criteria or null if not found.
+     */
+    public function findByIdentifierAndUser(string $identifier, User $user)
+    {
+        return $this->createQueryBuilder('ec')
+            ->andWhere('ec.identifier = :identifier')
+            ->andWhere('ec.user = :user')
+            ->setParameter('identifier', $identifier)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
     }
 }

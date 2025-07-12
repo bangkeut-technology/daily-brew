@@ -36,7 +36,7 @@ trait EvaluationTemplateTrait
     private function getEvaluationTemplateByIdentifier(string $identifier): EvaluationTemplate
     {
         if (null ===$template = $this->evaluationTemplateRepository->findByIdentifierAndUser($identifier, $this->getUser())) {
-            throw $this->createNotFoundException($this->translator->trans('not_found.evaluation_template', [], 'errors'));
+            throw $this->createNotFoundException($this->translator->trans('not_found.evaluation_template', ['%identifier%' => $identifier], 'errors'));
         }
 
         return $template;
