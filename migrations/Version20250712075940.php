@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250712061305 extends AbstractMigration
+final class Version20250712075940 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -25,7 +25,7 @@ final class Version20250712061305 extends AbstractMigration
         $this->addSql('CREATE TABLE daily_brew_employees (id INT UNSIGNED AUTO_INCREMENT NOT NULL, store_id INT UNSIGNED DEFAULT NULL, user_id INT UNSIGNED NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', updated_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', first_name VARCHAR(100) NOT NULL, last_name VARCHAR(100) NOT NULL, phone_number VARCHAR(20) DEFAULT NULL, dob DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', joined_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', status VARCHAR(255) NOT NULL, identifier VARCHAR(32) NOT NULL, INDEX IDX_370C3B6FB092A811 (store_id), UNIQUE INDEX UNIQ_370C3B6FA76ED395 (user_id), UNIQUE INDEX UNQ_EMPLOYEE_IDENTIFIER (identifier), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE daily_brew_employee_roles (employee_id INT UNSIGNED NOT NULL, role_id INT UNSIGNED NOT NULL, INDEX IDX_63052DE68C03F15C (employee_id), INDEX IDX_63052DE6D60322AC (role_id), PRIMARY KEY(employee_id, role_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE daily_brew_employee_templates (employee_id INT UNSIGNED NOT NULL, evaluation_template_id INT UNSIGNED NOT NULL, INDEX IDX_BFEBC2EF8C03F15C (employee_id), INDEX IDX_BFEBC2EF56839BCF (evaluation_template_id), PRIMARY KEY(employee_id, evaluation_template_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE daily_brew_evaluation_criterias (id INT UNSIGNED AUTO_INCREMENT NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', updated_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', label VARCHAR(255) NOT NULL, description LONGTEXT DEFAULT NULL, weight INT NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE daily_brew_evaluation_criterias (id INT UNSIGNED AUTO_INCREMENT NOT NULL, user_id INT UNSIGNED NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', updated_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', label VARCHAR(255) NOT NULL, description LONGTEXT DEFAULT NULL, weight INT NOT NULL, INDEX IDX_F5194DE7A76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE daily_brew_evaluation_template_criterias (id INT UNSIGNED AUTO_INCREMENT NOT NULL, template_id INT UNSIGNED DEFAULT NULL, criteria_id INT UNSIGNED DEFAULT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', updated_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', weight INT NOT NULL, INDEX IDX_AC46DABB5DA0FB8 (template_id), INDEX IDX_AC46DABB990BEA15 (criteria_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE daily_brew_evaluation_templates (id INT UNSIGNED AUTO_INCREMENT NOT NULL, user_id INT UNSIGNED NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', updated_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', identifier VARCHAR(255) NOT NULL, name VARCHAR(255) NOT NULL, canonical_name VARCHAR(255) NOT NULL, description LONGTEXT DEFAULT NULL, active TINYINT(1) NOT NULL, INDEX IDX_1B36534FA76ED395 (user_id), UNIQUE INDEX UQ_EVALUATION_TEMPLATE_NAME (name, user_id), UNIQUE INDEX UQ_EVALUATION_TEMPLATE_CANONICAL_NAME (canonical_name, user_id), UNIQUE INDEX UQ_EVALUATION_TEMPLATE_IDENTIFIER (identifier), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE daily_brew_refresh_tokens (id INT AUTO_INCREMENT NOT NULL, refresh_token VARCHAR(128) NOT NULL, username VARCHAR(255) NOT NULL, valid DATETIME NOT NULL, UNIQUE INDEX UNIQ_A69AE9B9C74F2195 (refresh_token), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
@@ -43,6 +43,7 @@ final class Version20250712061305 extends AbstractMigration
         $this->addSql('ALTER TABLE daily_brew_employee_roles ADD CONSTRAINT FK_63052DE6D60322AC FOREIGN KEY (role_id) REFERENCES daily_brew_roles (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE daily_brew_employee_templates ADD CONSTRAINT FK_BFEBC2EF8C03F15C FOREIGN KEY (employee_id) REFERENCES daily_brew_employees (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE daily_brew_employee_templates ADD CONSTRAINT FK_BFEBC2EF56839BCF FOREIGN KEY (evaluation_template_id) REFERENCES daily_brew_evaluation_templates (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE daily_brew_evaluation_criterias ADD CONSTRAINT FK_F5194DE7A76ED395 FOREIGN KEY (user_id) REFERENCES daily_brew_users (id)');
         $this->addSql('ALTER TABLE daily_brew_evaluation_template_criterias ADD CONSTRAINT FK_AC46DABB5DA0FB8 FOREIGN KEY (template_id) REFERENCES daily_brew_evaluation_templates (id)');
         $this->addSql('ALTER TABLE daily_brew_evaluation_template_criterias ADD CONSTRAINT FK_AC46DABB990BEA15 FOREIGN KEY (criteria_id) REFERENCES daily_brew_evaluation_criterias (id)');
         $this->addSql('ALTER TABLE daily_brew_evaluation_templates ADD CONSTRAINT FK_1B36534FA76ED395 FOREIGN KEY (user_id) REFERENCES daily_brew_users (id)');
@@ -63,6 +64,7 @@ final class Version20250712061305 extends AbstractMigration
         $this->addSql('ALTER TABLE daily_brew_employee_roles DROP FOREIGN KEY FK_63052DE6D60322AC');
         $this->addSql('ALTER TABLE daily_brew_employee_templates DROP FOREIGN KEY FK_BFEBC2EF8C03F15C');
         $this->addSql('ALTER TABLE daily_brew_employee_templates DROP FOREIGN KEY FK_BFEBC2EF56839BCF');
+        $this->addSql('ALTER TABLE daily_brew_evaluation_criterias DROP FOREIGN KEY FK_F5194DE7A76ED395');
         $this->addSql('ALTER TABLE daily_brew_evaluation_template_criterias DROP FOREIGN KEY FK_AC46DABB5DA0FB8');
         $this->addSql('ALTER TABLE daily_brew_evaluation_template_criterias DROP FOREIGN KEY FK_AC46DABB990BEA15');
         $this->addSql('ALTER TABLE daily_brew_evaluation_templates DROP FOREIGN KEY FK_1B36534FA76ED395');

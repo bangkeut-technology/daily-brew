@@ -31,6 +31,13 @@ class EvaluationCriteria extends AbstractEntity
     private int $weight = 1;
 
     /**
+     * @var User|null
+     */
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'criterias')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
+    /**
      * @var Collection<int, EvaluationTemplateCriteria>
      */
     #[ORM\OneToMany(targetEntity: EvaluationTemplateCriteria::class, mappedBy: 'criteria', orphanRemoval: true)]
@@ -126,4 +133,21 @@ class EvaluationCriteria extends AbstractEntity
         return $this;
     }
 
+    /**
+     * @return User|null
+     */
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param User|null $user
+     * @return EvaluationCriteria
+     */
+    public function setUser(?User $user): EvaluationCriteria
+    {
+        $this->user = $user;
+        return $this;
+    }
 }
