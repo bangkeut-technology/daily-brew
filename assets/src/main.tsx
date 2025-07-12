@@ -11,6 +11,7 @@ import '@/i18next';
 import './styles/globals.css';
 import { LanguageProvider } from '@/providers/language-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
+import { ApplicationProvider } from '@/providers/application-provider';
 
 const router = createRouter({
     routeTree,
@@ -42,11 +43,13 @@ if (rootElement && !rootElement.innerHTML) {
         <StrictMode>
             <QueryClientProvider client={queryClient}>
                 <ThemeProvider>
-                    <AuthenticationProvider>
-                        <LanguageProvider>
-                            <Application />
-                        </LanguageProvider>
-                    </AuthenticationProvider>
+                    <ApplicationProvider>
+                        <AuthenticationProvider>
+                            <LanguageProvider>
+                                <Application />
+                            </LanguageProvider>
+                        </AuthenticationProvider>
+                    </ApplicationProvider>
                 </ThemeProvider>
             </QueryClientProvider>
         </StrictMode>,

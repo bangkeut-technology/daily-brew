@@ -32,10 +32,18 @@ class PageController extends AbstractController
         defaults: ['route' => null],
         methods: ['GET']
     )]
-    public function index(#[CurrentUser] ?User $user): Response
+    public function index(
+        #[CurrentUser] ?User $user,
+        int $maxFreeEmployees,
+        int $maxFreeTemplates,
+        bool $storeAllowed
+    ): Response
     {
         return $this->render('page/index.html.twig', [
             'user' => $user,
+            'maxFreeEmployees' => $maxFreeEmployees,
+            'maxFreeTemplates' => $maxFreeTemplates,
+            'storeAllowed' => $storeAllowed,
         ]);
     }
 }
