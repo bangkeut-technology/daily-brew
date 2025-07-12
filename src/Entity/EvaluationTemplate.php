@@ -48,14 +48,21 @@ class EvaluationTemplate extends AbstractEntity
     private ?User $user = null;
 
     /**
-     * @var Collection<int, EvaluationCriteria>
+     * @var Collection<int, EvaluationTemplateCriteria>
      */
-    #[ORM\OneToMany(targetEntity: EvaluationCriteria::class, mappedBy: 'template', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: EvaluationTemplateCriteria::class, mappedBy: 'template', orphanRemoval: true)]
     private Collection $criterias;
+
+    /**
+     * @var Collection<int, Employee>
+     */
+    #[ORM\ManyToMany(targetEntity: Employee::class, inversedBy: 'templates')]
+    private Collection $employees;
 
     public function __construct()
     {
         $this->criterias = new ArrayCollection();
+        $this->employees = new ArrayCollection();
     }
 
     /**
@@ -161,7 +168,7 @@ class EvaluationTemplate extends AbstractEntity
     }
 
     /**
-     * @return Collection<int, EvaluationCriteria>
+     * @return Collection<int, EvaluationTemplateCriteria>
      */
     public function getCriterias(): Collection
     {
@@ -169,7 +176,7 @@ class EvaluationTemplate extends AbstractEntity
     }
 
     /**
-     * @param Collection<int, EvaluationCriteria> $criterias
+     * @param Collection<int, EvaluationTemplateCriteria> $criterias
      * @return EvaluationTemplate
      */
     public function setCriterias(Collection $criterias): EvaluationTemplate
@@ -179,7 +186,7 @@ class EvaluationTemplate extends AbstractEntity
         return $this;
     }
 
-    public function addCriteria(EvaluationCriteria $criteria): static
+    public function addCriteria(EvaluationTemplateCriteria $criteria): static
     {
         if (!$this->criterias->contains($criteria)) {
             $this->criterias->add($criteria);
@@ -189,13 +196,48 @@ class EvaluationTemplate extends AbstractEntity
         return $this;
     }
 
-    public function removeCriteria(EvaluationCriteria $criteria): static
+    public function removeCriteria(EvaluationTemplateCriteria $criteria): static
     {
-        if ($this->criterias->removeElement($criteria)) {
-            // set the owning side to null (unless already changed)
-            if ($criteria->getTemplate() === $this) {
-                $criteria->setTemplate(null);
-            }
+        if ($this->criterias->removeElement($criteria) && $criteria->getTemplate() === $this) {
+            $criteria->setTemplate(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Employee>
+     */
+    public function getEmployees(): Collection
+    {
+        return $this->employees;
+    }
+
+    /**
+     * @param Collection<int, Employee> $employees
+     * @return EvaluationTemplate
+     */
+    public function setEmployees(Collection $employees): EvaluationTemplate
+    {
+        $this->employees = $employees;
+
+        return $this;
+    }
+
+    public function addEmployee(Employee $employee): static
+    {
+        if (!$this->employees->contains($employee)) {
+            $this->employees->add($employee);
+            $employee->addTemplate($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEmployee(Employee $employee): static
+    {
+        if ($this->employees->removeElement($employee) && $employee->getTemplates()->contains($this)) {
+            $employee->removeTemplate($this);
         }
 
         return $this;

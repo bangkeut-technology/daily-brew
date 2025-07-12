@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\EvaluationCriteriaRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -18,9 +20,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: EvaluationCriteriaRepository::class)]
 class EvaluationCriteria extends AbstractEntity
 {
-    #[ORM\ManyToOne(inversedBy: 'criterias')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?EvaluationTemplate $template = null;
 
     #[ORM\Column(length: 255)]
     private ?string $label = null;
@@ -32,21 +31,15 @@ class EvaluationCriteria extends AbstractEntity
     private int $weight = 1;
 
     /**
-     * @return EvaluationTemplate|null
+     * @var Collection<int, EvaluationTemplateCriteria>
      */
-    public function getTemplate(): ?EvaluationTemplate
-    {
-        return $this->template;
-    }
+    #[ORM\ManyToMany(targetEntity: EvaluationTemplateCriteria::class, inversedBy: 'criteria')]
+    #[ORM\JoinColumn(nullable: false)]
+    private Collection $templates;
 
-    /**
-     * @param EvaluationTemplate|null $template
-     * @return EvaluationCriteria
-     */
-    public function setTemplate(?EvaluationTemplate $template): EvaluationCriteria
+    public function __construct()
     {
-        $this->template = $template;
-        return $this;
+        $this->templates = new ArrayCollection();
     }
 
     /**
@@ -102,4 +95,36 @@ class EvaluationCriteria extends AbstractEntity
         $this->weight = $weight;
         return $this;
     }
+    /**
+     * @return Collection<int, EvaluationTemplateCriteria>
+     */
+    public function getTemplates(): Collection
+    {
+        return $this->templates;
+    }
+
+    /**
+     * @param EvaluationTemplateCriteria $template
+     * @return EvaluationCriteria
+     */
+    public function addTemplate(EvaluationTemplateCriteria $template): EvaluationCriteria
+    {
+        if (!$this->templates->contains($template)) {
+            $this->templates[] = $template;
+        }
+        return $this;
+    }
+
+    /**
+     * @param EvaluationTemplateCriteria $template
+     * @return EvaluationCriteria
+     */
+    public function removeTemplate(EvaluationTemplateCriteria $template): EvaluationCriteria
+    {
+        if ($this->templates->contains($template)) {
+            $this->templates->removeElement($template);
+        }
+        return $this;
+    }
+
 }

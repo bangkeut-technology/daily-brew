@@ -7,6 +7,8 @@ use App\Enum\EmployeeStatus;
 use App\Repository\EmployeeRepository;
 use DateTimeImmutable;
 use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -54,7 +56,7 @@ class Employee extends AbstractEntity
      * @var Store|null
      */
     #[ORM\ManyToOne(targetEntity: Store::class, inversedBy: 'employees')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Store $store = null;
 
     /**
@@ -64,6 +66,18 @@ class Employee extends AbstractEntity
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['employee:read'])]
     private ?User $user = null;
+
+    /**
+     * @var Collection<int, EvaluationTemplate>
+     */
+    #[ORM\ManyToMany(targetEntity: EvaluationTemplate::class, mappedBy: 'employees')]
+    #[ORM\JoinTable(name: 'daily_brew_employee_templates')]
+    private Collection $templates;
+
+    public function __construct()
+    {
+        $this->templates = new ArrayCollection();
+    }
 
     /**
      * @return string
@@ -224,6 +238,40 @@ class Employee extends AbstractEntity
     public function setUser(?User $user): Employee
     {
         $this->user = $user;
+        return $this;
+    }
+
+
+    /**
+     * @return Collection<int, EvaluationTemplate>
+     */
+    public function getTemplates(): Collection
+    {
+        return $this->templates;
+    }
+
+    /**
+     * @param EvaluationTemplate $template
+     * @return Employee
+     */
+    public function addTemplate(EvaluationTemplate $template): Employee
+    {
+        if (!$this->templates->contains($template)) {
+            $this->templates[] = $template;
+            $template->addEmployee($this);
+        }
+        return $this;
+    }
+
+    /**
+     * @param EvaluationTemplate $template
+     * @return Employee
+     */
+    public function removeTemplate(EvaluationTemplate $template): Employee
+    {
+        if ($this->templates->removeElement($template)) {
+            $template->removeEmployee($this);
+        }
         return $this;
     }
 }
