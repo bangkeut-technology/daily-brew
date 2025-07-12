@@ -5,7 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Form } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { SignUp } from '@/types/user';
-import { TextField } from '@/components/fields/text-field';
+import { TextField } from '@/components/field/text-field';
 import { Icon } from '@iconify/react';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';

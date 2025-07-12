@@ -5,8 +5,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { signInSchema } from '@/schema/sign-in-schema';
 import { Form } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
-import { SignInType } from '@/types/user';
-import { TextField } from '@/components/fields/text-field';
+import { SignIn } from '@/types/user';
+import { TextField } from '@/components/field/text-field';
 import { Icon } from '@iconify/react';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -18,7 +18,7 @@ import { useBoolean } from 'react-use';
 import { signIn } from '@/services/auth';
 
 export const Route = createFileRoute('/console/sign-in')({
-    component: SignIn,
+    component: SignInComponent,
     validateSearch: (search) => {
         return {
             redirect: search.redirect || '/console',
@@ -31,13 +31,13 @@ export const Route = createFileRoute('/console/sign-in')({
     },
 });
 
-function SignIn() {
+function SignInComponent() {
     const { t } = useTranslation();
     const [showPassword, onToggle] = useBoolean(false);
     const { redirect } = Route.useSearch();
     const navigate = useNavigate();
     const { user, setEmail } = useAuthentication();
-    const form = useForm<SignInType>({
+    const form = useForm<SignIn>({
         resolver: yupResolver(signInSchema),
         defaultValues: {
             email: '',
@@ -63,7 +63,7 @@ function SignIn() {
         }
     }, [navigate, redirect, user]);
 
-    const onSubmit = (data: SignInType) => {
+    const onSubmit = (data: SignIn) => {
         mutate(data);
     };
 

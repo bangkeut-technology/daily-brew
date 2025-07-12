@@ -1,6 +1,6 @@
 import React from 'react';
 import { LanguageContext } from '@/contexts/language-context';
-import { Locale } from '@/types/Locale';
+import { Locale } from '@/types/locale';
 import i18next from '@/i18next';
 import { toast } from 'sonner';
 import { useAuthentication } from '@/hooks/use-authentication';

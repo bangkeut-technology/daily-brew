@@ -2,7 +2,7 @@ import React, { useId } from 'react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Control } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Option } from '@/components/select-field';
+import { Option } from '@/components/field/select-field';
 import { RovingFocusGroupProps } from '@radix-ui/react-roving-focus';
 
 interface RadioProps {

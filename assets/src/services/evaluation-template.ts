@@ -1,4 +1,4 @@
-import { EvaluationTemplate, PartialEvaluationTemplate } from '@/types/EvaluationTemplate';
+import { EvaluationTemplate, PartialEvaluationTemplate } from '@/types/evaluation-template';
 import { apiAxios } from '@/lib/apiAxios';
 
 export const fetchEvaluationTemplates = async () => {

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowDown, ArrowUp, Eye, ListPlus } from 'lucide-react';
 import { Table } from '@/components/table';
 import { createColumnHelper } from '@tanstack/table-core';
-import { EvaluationTemplate } from '@/types/EvaluationTemplate';
+import { EvaluationTemplate } from '@/types/evaluation-template';
 import { useTranslation } from 'react-i18next';
 import { RowSelectionState } from '@tanstack/react-table';
 import { EvaluationSwitch } from '@/components/switch/evaluations-switch';

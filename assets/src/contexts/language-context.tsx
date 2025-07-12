@@ -1,5 +1,5 @@
 import React from 'react';
-import { Locale } from '@/types/Locale';
+import { Locale } from '@/types/locale';
 
 type LanguageContextValue = {
     locale: Locale;
