@@ -25,7 +25,7 @@ function NewEvaluationTemplate() {
         onSuccess: (data) => {
             toast.success(data.message);
             navigate({
-                to: '/console/evaluation-templates/$identifier',
+                to: '/console/evaluations/templates/$identifier',
                 params: { identifier: data.evaluation.identifier },
             }).then();
         },

@@ -96,7 +96,7 @@ function SignUpComponent() {
                                         type={showPassword ? 'text' : 'password'}
                                         autoComplete="current-password"
                                         endIcon={
-                                            <Button variant="outline" size="icon" onClick={onToggle}>
+                                            <Button variant="outline" size="icon" type="button" onClick={onToggle}>
                                                 <Icon
                                                     icon={showPassword ? 'clarity:eye-solid' : 'clarity:eye-hide-solid'}
                                                 />
@@ -110,7 +110,12 @@ function SignUpComponent() {
                                         type={showPassword ? 'text' : 'password'}
                                         autoComplete="current-password"
                                         endIcon={
-                                            <Button variant="outline" size="icon" onClick={onShowConfirmPassword}>
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                type="button"
+                                                onClick={onShowConfirmPassword}
+                                            >
                                                 <Icon
                                                     icon={
                                                         showConfirmPassword
@@ -132,12 +137,6 @@ function SignUpComponent() {
                                         name="lastName"
                                         label={t('last_name')}
                                         autoComplete="family-name"
-                                    />
-                                    <TextField
-                                        control={form.control}
-                                        name="companyName"
-                                        label={t('company_name')}
-                                        autoComplete="organization-name"
                                     />
                                     <Button disabled={isPending} type="submit" className="w-full">
                                         {isPending ? <Icon icon="svg-spinners:blocks-shuffle-3" /> : t('sign_up')}

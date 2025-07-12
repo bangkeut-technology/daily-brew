@@ -1,1 +1,10 @@
-{}
+{
+    "sign_in": {
+        "title": "Sign In",
+        "description": "Access your account to manage your employees KPI and performance."
+    },
+    "sign_up": {
+        "title": "Sign Up",
+        "description": "Create a new account to start managing your employees KPI and performance."
+    }
+}

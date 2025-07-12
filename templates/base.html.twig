@@ -8,21 +8,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5"/>
 
     <!-- Meta Description -->
-    <meta name="description" content="DailyBrew is a simple HR tool for cafés and small restaurants. Track staff attendance, daily KPI scores, leave requests, and performance insights in one clean dashboard.">
+    <meta name="description" content="CafeCrew is a simple HR tool for cafés and small restaurants. Track staff attendance, daily KPI scores, leave requests, and performance insights in one clean dashboard.">
 
     <!-- Keywords -->
     <meta name="keywords" content="cafe staff management, staff KPI tracker, restaurant employee software, attendance tracking, leave management, daily KPI scoring, barista performance app, cafe shift tracker, F&B HR tool">
 
     <!-- Open Graph / Social Preview -->
-    <meta property="og:title" content="DailyBrew – Staff KPI & Attendance Tracker for Cafés">
-    <meta property="og:description" content="Manage your café team effortlessly with DailyBrew. Score performance, track attendance, handle leave requests, and export reports with ease.">
+    <meta property="og:title" content="CafeCrew – Staff KPI & Attendance Tracker for Cafés">
+    <meta property="og:description" content="Manage your café team effortlessly with CafeCrew. Score performance, track attendance, handle leave requests, and export reports with ease.">
     <meta property="og:image" content="https://dailybrew.app/og-cover.jpg"> <!-- Replace with your image -->
     <meta property="og:url" content="https://dailybrew.app">
     <meta property="og:type" content="website">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="DailyBrew – Cafe Team Management System">
+    <meta name="twitter:title" content="CafeCrew – Cafe Team Management System">
     <meta name="twitter:description" content="A simple, powerful tool to manage attendance, KPI, and leave for your café staff.">
     <meta name="twitter:image" content="https://dailybrew.app/twitter-cover.jpg">
     <title>{% block title %}Welcome!{% endblock %}</title>
@@ -51,7 +51,6 @@
             }
 
             storeLocale('{{ user ? user.locale : 'en' }}');
-            {% endif %}
         </script>
         <!-- Google tag (gtag.js) -->
         {#        <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga_tracking }}"></script> #}
@@ -65,7 +64,7 @@
     {% endblock %}
 </head>
 <body class="h-full w-full">
-<div id="{{ applicationId }}" class="h-full w-full"></div>
+<div id="daily_brew_application" class="h-full w-full"></div>
 {% block body %}{% endblock %}
 </body>
 </html>

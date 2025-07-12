@@ -1,1 +1,8 @@
-{}
+{
+    "email": "E-mail",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "password": "Password",
+    "confirm_password": "Confirm Password"
+
+}

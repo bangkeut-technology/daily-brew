@@ -29,7 +29,7 @@ function Evaluations() {
                 header: () => t('view'),
                 cell: ({ getValue }) => (
                     <Button size="icon" variant="ghost" asChild>
-                        <Link to={`/console/evaluation-templates/$identifier`} params={{ identifier: getValue() }}>
+                        <Link to={`/console/evaluations/criterias/$identifier`} params={{ identifier: getValue() }}>
                             <Eye />
                         </Link>
                     </Button>
@@ -70,7 +70,7 @@ function Evaluations() {
             <div className="py-4 border rounded-lg p-2 space-y-2 mb-2">
                 <div className="flex flex-row justify-center items-center space-x-2">
                     <Button asChild>
-                        <Link to="/console/evaluation-templates/new">
+                        <Link to="/console/evaluations/criterias/new">
                             <ListPlus /> {t('new.template.title', { ns: 'glossary' })}
                         </Link>
                     </Button>

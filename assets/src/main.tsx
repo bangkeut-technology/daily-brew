@@ -27,8 +27,6 @@ declare module '@tanstack/react-router' {
     }
 }
 
-const applicationId = sessionStorage.getItem('applicationId') || 'root';
-
 const Application = () => {
     const authentication = useAuthentication();
     return <RouterProvider router={router} context={{ authentication }} />;
@@ -37,7 +35,7 @@ const Application = () => {
 const queryClient = new QueryClient();
 
 // Render the app
-const rootElement = document.querySelector(`#${applicationId}`);
+const rootElement = document.querySelector('#daily_brew_application');
 if (rootElement && !rootElement.innerHTML) {
     const root = ReactDOM.createRoot(rootElement);
     root.render(
