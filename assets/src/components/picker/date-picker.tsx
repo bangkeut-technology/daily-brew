@@ -46,7 +46,6 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                                     className={cn(
                                         'w-full pl-3 text-left font-normal',
                                         !field.value && 'text-muted-foreground',
-                                        className,
                                     )}
                                 >
                                     {field.value ? (
@@ -67,8 +66,8 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                             />
                         </PopoverContent>
                     </Popover>
-                    <FormMessage />
                     {description && <FormDescription>{description}</FormDescription>}
+                    <FormMessage />
                 </FormItem>
             )}
         />
