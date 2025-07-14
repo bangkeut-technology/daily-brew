@@ -1,0 +1,84 @@
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { fetchRoles } from '@/services/role';
+import { createColumnHelper } from '@tanstack/table-core';
+import { Role } from '@/types/role';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Table } from '@/components/table';
+import { RowSelectionState } from '@tanstack/react-table';
+import { Control, useFieldArray } from 'react-hook-form';
+
+const columnHelper = createColumnHelper<Role>();
+
+interface RoleSelectProps {
+    control: Control<any>;
+    name: string;
+    title?: string;
+    description?: string;
+}
+
+export const RoleSelect: React.FunctionComponent<RoleSelectProps> = ({ control, name, title, description }) => {
+    const [roles, setRoles] = React.useState<RowSelectionState>({});
+    const { replace } = useFieldArray({
+        name,
+        control,
+    });
+    const { data = [] } = useQuery({
+        queryKey: ['roles'],
+        queryFn: () => fetchRoles(),
+    });
+
+    React.useEffect(() => {
+        const selectedRows = Object.keys(roles).map((value) => data[Number(value)]);
+        replace(selectedRows.map((role) => ({ value: role.id })));
+    }, [data, replace, roles]);
+
+    const columns = React.useMemo(
+        () => [
+            columnHelper.accessor('id', {
+                id: 'select',
+                header: ({ table }) => (
+                    <Checkbox
+                        checked={
+                            table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')
+                        }
+                        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                        aria-label="Select all"
+                    />
+                ),
+                cell: ({ row }) => (
+                    <Checkbox
+                        checked={row.getIsSelected()}
+                        onCheckedChange={(value) => row.toggleSelected(!!value)}
+                        aria-label="Select row"
+                    />
+                ),
+                enableSorting: false,
+                enableHiding: false,
+                meta: {
+                    style: {
+                        textAlign: 'center',
+                    },
+                },
+            }),
+            columnHelper.accessor('name', {
+                header: 'Role Name',
+                cell: (info) => info.getValue(),
+                meta: {
+                    style: {
+                        textAlign: 'center',
+                    },
+                },
+            }),
+        ],
+        [],
+    );
+
+    return (
+        <div className="flex flex-col space-y-4">
+            {title && <h3 className="text-lg font-semibold">{title}</h3>}
+            {description && <p className="text-sm text-muted-foreground">{description}</p>}
+            <Table data={data} columns={columns} rowSelection={roles} onRowSelectionChange={setRoles} />
+        </div>
+    );
+};

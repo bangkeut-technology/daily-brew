@@ -10,6 +10,7 @@ use App\Form\EmployeeFormType;
 use App\Repository\EmployeeRepository;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
+use Random\RandomException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -60,6 +61,75 @@ class EmployeeController extends AbstractController
         return $this->createEmployeeResponse($employees);
     }
 
+    /**
+     * Create a new employee for the current user
+     *
+     * @param Request $request
+     * @param User    $user
+     * @return JsonResponse
+     * @throws RandomException
+     */
+    #[OA\RequestBody(
+        description: 'Employee data',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'firstName',
+                    type: 'string',
+                    example: 'John'
+                ),
+                new OA\Property(
+                    property: 'lastName',
+                    type: 'string',
+                    example: 'Doe'
+                ),
+                new OA\Property(
+                    property: 'phoneNumber',
+                    type: 'string',
+                    example: '+1234567890'
+                ),
+                new OA\Property(
+                    property: 'dob',
+                    type: 'string',
+                    format: 'datetime'
+                ),
+                new OA\Property(
+                    property: 'joinedAt',
+                    type: 'string',
+                    format: 'datetime'
+                ),
+                new OA\Property(
+                    property: 'roles',
+                    type: 'array',
+                    items: new OA\Items(
+                        type: 'number',
+                        example: '1'
+                    ),
+                )
+            ],
+            type: 'object'
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_CREATED,
+        description: 'Creates a new employee for the current user',
+        content: new OA\JsonContent(ref: new Model(type: User::class, groups: ['employee:read']))
+    )]
+    #[OA\Response(
+        response: Response::HTTP_BAD_REQUEST,
+        description: 'Invalid input data',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'message',
+                    type: 'string',
+                    example: 'Invalid input data'
+                )
+            ],
+            type: 'object'
+        )
+    )]
+    #[Route(name: 'post', methods: ['POST'])]
     public function post(
         Request             $request,
         #[CurrentUser] User $user
@@ -70,10 +140,13 @@ class EmployeeController extends AbstractController
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
             $employee->setUser($user);
-            $this->employeeRepository->save($employee);
+            $this->employeeRepository->updateEmployee($employee);
             return $this->createEmployeeResponse($employee, Response::HTTP_CREATED);
         }
-        // This method is not implemented yet.
-        return new JsonResponse(['message' => 'Not implemented'], Response::HTTP_NOT_IMPLEMENTED);
+
+        return $this->json(
+            ['message' => $this->translator->trans('invalid.employee', domain: 'errors')],
+            Response::HTTP_BAD_REQUEST
+        );
     }
 }

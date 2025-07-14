@@ -18,8 +18,25 @@
         "view_performance": "View Performance",
         "new": {
             "title": "New Employee",
-            "description": "Add a new employee to manage their KPIs and performance."
+            "description": "Add a new employee to manage their KPIs and performance.",
+            "save": "Save Employee"
+        },
+        "roles": {
+            "title": "Employee Roles",
+            "description": "Define roles for your employees to categorize their responsibilities."
         }
+    },
+    "placeholder": {
+        "picker": {
+            "date": "Select a date"
+        }
+    },
+    "table": {
+        "of": "of",
+        "previous": "Previous",
+        "next": "Next",
+        "row_selected": "row(s) selected",
+        "no_data": "No data available"
     },
     "no_account_yet": "Don't have an account yet?",
     "have_account": "Already have an account?"

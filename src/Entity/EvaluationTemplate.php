@@ -43,7 +43,7 @@ class EvaluationTemplate extends AbstractEntity
     #[Groups(['evaluation_template:read'])]
     private bool $active = true;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'templates')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 

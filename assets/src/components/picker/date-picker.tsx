@@ -35,7 +35,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
             control={control}
             name={name}
             render={({ field }) => (
-                <FormItem className={cn('flex flex-col', className)}>
+                <FormItem className={cn('flex flex-col w-full', className)}>
                     {label && <FormLabel>{label}</FormLabel>}
                     <Popover>
                         <PopoverTrigger asChild>
@@ -44,7 +44,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                                     disabled={disabled}
                                     variant="outline"
                                     className={cn(
-                                        'w-[240px] pl-3 text-left font-normal',
+                                        'w-full pl-3 text-left font-normal',
                                         !field.value && 'text-muted-foreground',
                                         className,
                                     )}

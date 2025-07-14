@@ -14,5 +14,18 @@
     "sign_up": "Sign Up",
     "password": "Password",
     "confirm_password": "Confirm Password",
+    "day_of_week": {
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+    },
+    "day_of_birth": "Date of Birth",
+    "joined_at": "Joined At",
+    "roles": "Roles",
+    "role": "Role",
     "phone_number": "Phone Number"
 }

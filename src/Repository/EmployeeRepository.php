@@ -10,6 +10,7 @@ use App\Util\TokenGenerator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Random\RandomException;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class EmployeeRepository
@@ -35,15 +36,15 @@ class EmployeeRepository extends AbstractRepository
     /**
      * Finds an Employee entity based on the provided store and user identifiers.
      *
-     * @param Store|int    $store The store entity or its identifier.
-     * @param User|int $user The user entity or its identifier.
+     * @param Store|int $store The store entity or its identifier.
+     * @param User|int  $user  The user entity or its identifier.
      *
      * @return Employee|null Returns the Employee entity if found, otherwise null.
      */
     public function findByStoreAndUser(Store|int $store, User|int $user): ?Employee
     {
         return $this->findOneBy([
-            'store'    => $store,
+            'store' => $store,
             'user' => $user,
         ]);
     }
@@ -82,11 +83,11 @@ class EmployeeRepository extends AbstractRepository
     private function isIdentifierExist(string $identifier): bool
     {
         return $this->createQueryBuilder('e')
-            ->select('COUNT(e.id)')
-            ->where('e.identifier = :identifier')
-            ->setParameter('identifier', $identifier)
-            ->getQuery()
-            ->getSingleScalarResult() > 0;
+                ->select('COUNT(e.id)')
+                ->where('e.identifier = :identifier')
+                ->setParameter('identifier', $identifier)
+                ->getQuery()
+                ->getSingleScalarResult() > 0;
     }
 
     /**
@@ -141,7 +142,7 @@ class EmployeeRepository extends AbstractRepository
     {
         return $this->findOneBy([
             'identifier' => $identifier,
-            'store'      => $store,
+            'store' => $store,
         ]);
     }
 
@@ -163,4 +164,20 @@ class EmployeeRepository extends AbstractRepository
             ->getResult();
     }
 
+    /**
+     * Count the number of employees associated with a specific user.
+     *
+     * @param User|UserInterface $user The user entity or interface.
+     *
+     * @return int Returns the count of employees for the specified user.
+     */
+    public function countByUser(User|UserInterface $user): int
+    {
+        return $this->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->where('e.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

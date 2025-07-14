@@ -160,6 +160,24 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     private ?string $locale = 'en';
 
     /**
+     * @var Collection<int, EvaluationCriteria>
+     */
+    #[ORM\OneToMany(targetEntity: EvaluationCriteria::class, mappedBy: 'user', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $criterias;
+
+    /**
+     * @var Collection<int, EvaluationTemplate>
+     */
+    #[ORM\OneToMany(targetEntity: EvaluationTemplate::class, mappedBy: 'user', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $templates;
+
+    public function __construct()
+    {
+        $this->criterias = new ArrayCollection();
+        $this->templates = new ArrayCollection();
+    }
+
+    /**
      * @return string|null
      */
     public function getSecret(): ?string
@@ -645,6 +663,76 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         } else {
             $this->removeRole(RoleEnum::SUPER_ADMIN->value);
         }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, EvaluationCriteria>
+     */
+    public function getCriterias(): Collection
+    {
+        return $this->criterias;
+    }
+
+    /**
+     * @param EvaluationCriteria $criteria
+     * @return User
+     */
+    public function addCriteria(EvaluationCriteria $criteria): User
+    {
+        if (!$this->criterias->contains($criteria)) {
+            $this->criterias->add($criteria);
+            $criteria->setUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param EvaluationCriteria $criteria
+     * @return User
+     */
+    public function removeCriteria(EvaluationCriteria $criteria): User
+    {
+        if ($this->criterias->removeElement($criteria) && $criteria->getUser() === $this) {
+            $criteria->setUser(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, EvaluationTemplate>
+     */
+    public function getTemplates(): Collection
+    {
+        return $this->templates;
+    }
+
+    /**
+     * @param EvaluationTemplate $template
+     * @return User
+     */
+    public function addTemplate(EvaluationTemplate $template): User
+    {
+        if (!$this->templates->contains($template)) {
+            $this->templates->add($template);
+            $template->setUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param EvaluationTemplate $template
+     * @return User
+     */
+    public function removeTemplate(EvaluationTemplate $template): User
+    {
+        if ($this->templates->removeElement($template) && $template->getUser() === $this) {
+            $template->setUser(null);
+        }
+
         return $this;
     }
 }

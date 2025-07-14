@@ -5,10 +5,7 @@ import { Form } from '@/components/ui/form';
 import { TextField } from '@/components/field/text-field';
 import { useTranslation } from 'react-i18next';
 import { DatePicker } from '@/components/picker/date-picker';
-import { Option } from '@/components/field/select-field';
-import { useQuery } from '@tanstack/react-query';
-import { fetchRoles } from '@/services/role';
-import { MultipleSelectField } from '@/components/field/multiple-select-field';
+import { RoleSelect } from '@/components/select/role-select';
 
 interface EmployeeFormProps {
     form: UseFormReturn<PartialEmployee>;
@@ -17,15 +14,6 @@ interface EmployeeFormProps {
 
 export const EmployeeForm: React.FunctionComponent<EmployeeFormProps> = ({ form, isPending }) => {
     const { t } = useTranslation();
-    const { data = [] } = useQuery({
-        queryKey: ['roles'],
-        queryFn: () => fetchRoles(),
-    });
-
-    const options = React.useMemo<Option[]>(
-        () => data.map<Option>((item) => ({ label: item.name, value: item.id.toString() })),
-        [data],
-    );
 
     return (
         <Form {...form}>
@@ -41,12 +29,11 @@ export const EmployeeForm: React.FunctionComponent<EmployeeFormProps> = ({ form,
                 />
                 <DatePicker control={form.control} name="dob" label={t('date_of_birth')} disabled={isPending} />
                 <DatePicker control={form.control} name="joinedAt" label={t('joined_at')} disabled={isPending} />
-                <MultipleSelectField
+                <RoleSelect
                     control={form.control}
                     name="roles"
-                    label={t('roles')}
-                    disabled={isPending}
-                    options={options}
+                    title={t('glossary:employees.roles.title')}
+                    description={t('glossary:employees.roles.description')}
                 />
             </div>
         </Form>

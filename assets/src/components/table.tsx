@@ -93,7 +93,7 @@ export const Table = <T,>({
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    {t('no_data')}
+                                    {t('glossary:table.no_data')}
                                 </TableCell>
                             </TableRow>
                         )}
@@ -102,10 +102,10 @@ export const Table = <T,>({
             </div>
             <div className="flex items-center justify-end space-x-2 p-4">
                 <div className="flex-1 text-sm text-muted-foreground">
-                    {table.getFilteredSelectedRowModel().rows.length}&nbsp;{t('of')}&nbsp;
+                    {table.getFilteredSelectedRowModel().rows.length}&nbsp;{t('glossary:table.of')}&nbsp;
                     {table.getFilteredRowModel().rows.length}
                     &nbsp;
-                    {t('row_selected')}
+                    {t('glossary:table.row_selected')}
                 </div>
                 <div className="space-x-2">
                     <Button
@@ -114,7 +114,7 @@ export const Table = <T,>({
                         onClick={() => table.previousPage()}
                         disabled={!table.getCanPreviousPage()}
                     >
-                        {t('previous')}
+                        {t('glossary:table.previous')}
                     </Button>
                     <Button
                         variant="outline"
@@ -122,7 +122,7 @@ export const Table = <T,>({
                         onClick={() => table.nextPage()}
                         disabled={!table.getCanNextPage()}
                     >
-                        {t('next')}
+                        {t('glossary:table.next')}
                     </Button>
                 </div>
             </div>
