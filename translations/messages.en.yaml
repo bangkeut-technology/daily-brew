@@ -9,3 +9,5 @@ deleted:
     evaluation_template: 'Evaluation template %name% has been deleted successfully'
     evaluation_criteria: 'Evaluation criteria %label% has been deleted successfully'
     employee:            'Employee %name% has been deleted successfully'
+added:
+    evaluation_template: 'Evaluation template %template% has been added successfully'

@@ -4,14 +4,19 @@ declare(strict_types=1);
 namespace App\ApiController;
 
 use App\ApiController\Trait\EmployeeTrait;
+use App\ApiController\Trait\EvaluationTemplateTrait;
 use App\Controller\AbstractController;
 use App\Entity\Employee;
 use App\Entity\User;
 use App\Form\EmployeeFormType;
 use App\Repository\EmployeeRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
+use PHPUnit\Event\Dispatcher;
 use Random\RandomException;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,10 +35,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class EmployeeController extends AbstractController
 {
     use EmployeeTrait;
+    use EvaluationTemplateTrait;
 
     public function __construct(
-        TranslatorInterface                 $translator,
-        private readonly EmployeeRepository $employeeRepository,
+        TranslatorInterface                       $translator,
+        private readonly EmployeeRepository       $employeeRepository,
+        private readonly EventDispatcherInterface $dispatcher,
     )
     {
         parent::__construct($translator);
@@ -335,5 +342,19 @@ class EmployeeController extends AbstractController
         return new JsonResponse([
             'message' => $this->translator->trans('deleted.employee', ['%name%' => $employee], domain: 'messages')
         ], Response::HTTP_NO_CONTENT);
+    }
+
+    #[Route('/{identifier}/templates/{templateIdentifier}', name: 'post_templates', methods: ['GET'])]
+    public function postTemplate(string $identifier, string $templateIdentifier): JsonResponse
+    {
+        $employee = $this->getEmployeeByIdentifier($identifier);
+        $template = $this->getEvaluationTemplateByIdentifier($templateIdentifier);
+
+        $employee->setTemplates(new ArrayCollection([$template]));
+
+        return $this->createTemplateResponse([
+            'employee' => $employee,
+            $this->translator->trans('added.evaluation_template', ['%template%' => $template], 'messages')
+        ]);
     }
 }

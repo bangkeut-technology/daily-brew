@@ -267,6 +267,16 @@ class Employee extends AbstractEntity
     }
 
     /**
+     * @param Collection<int, EvaluationTemplate> $templates
+     * @return Employee
+     */
+    public function setTemplates(Collection $templates): static
+    {
+        $this->templates = $templates;
+        return $this;
+    }
+
+    /**
      * @param EvaluationTemplate $template
      * @return Employee
      */
