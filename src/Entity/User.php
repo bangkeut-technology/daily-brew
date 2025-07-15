@@ -166,6 +166,12 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     private Collection $criterias;
 
     /**
+     * @var Collection<int, Store>
+     */
+    #[ORM\OneToMany(targetEntity: Store::class, mappedBy: 'user', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $stores;
+
+    /**
      * @var Collection<int, EvaluationTemplate>
      */
     #[ORM\OneToMany(targetEntity: EvaluationTemplate::class, mappedBy: 'user', cascade: ['persist', 'remove'], orphanRemoval: true)]
@@ -174,6 +180,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function __construct()
     {
         $this->criterias = new ArrayCollection();
+        $this->stores = new ArrayCollection();
         $this->templates = new ArrayCollection();
     }
 
@@ -696,6 +703,41 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     {
         if ($this->criterias->removeElement($criteria) && $criteria->getUser() === $this) {
             $criteria->setUser(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Store>
+     */
+    public function getStores(): Collection
+    {
+        return $this->stores;
+    }
+
+    /**
+     * @param Store $store
+     * @return User
+     */
+    public function addStore(Store $store): User
+    {
+        if (!$this->stores->contains($store)) {
+            $this->stores->add($store);
+            $store->setUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Store $store
+     * @return User
+     */
+    public function removeStore(Store $store): User
+    {
+        if ($this->stores->removeElement($store) && $store->getUser() === $this) {
+            $store->setUser(null);
         }
 
         return $this;

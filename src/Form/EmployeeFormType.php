@@ -30,9 +30,12 @@ class EmployeeFormType extends AbstractType
             ->add('firstName')
             ->add('lastName')
             ->add('phoneNumber')
-            ->add('dob', DateTimeImmutableType::class)
-            ->add('joinedAt', DateTimeImmutableType::class)
-            ->add('status')
+            ->add('dob', DateTimeImmutableType::class, [
+                'required' => false,
+            ])
+            ->add('joinedAt', DateTimeImmutableType::class, [
+                'required' => false,
+            ])
             ->add('roles', EntityType::class, [
                 'class' => Role::class,
                 'choice_label' => 'id',

@@ -11,6 +11,9 @@ export const fetchEmployee = async (identifier: string) => {
 
 export const postEmployee = async ({ roles = [], ...data }: PartialEmployee) => {
     return apiAxios
-        .post<Employee>('/employees', { ...data, roles: roles.map((role) => role.value) })
+        .post<{
+            employee: Employee;
+            message: string;
+        }>('/employees', { ...data, roles: roles.map((role) => role.value) })
         .then((response) => response.data);
 };

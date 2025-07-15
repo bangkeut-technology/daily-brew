@@ -42,8 +42,7 @@ class Employee extends AbstractEntity
     #[Groups(['employee:read'])]
     private ?DateTimeImmutable $dob = null;
 
-    #[ORM\Column]
-    #[Assert\NotNull]
+    #[ORM\Column(nullable: true)]
     #[Groups(['employee:read'])]
     private ?DateTimeImmutable $joinedAt = null;
 
@@ -69,10 +68,14 @@ class Employee extends AbstractEntity
     /**
      * @var User|null
      */
-    #[ORM\OneToOne(targetEntity: User::class)]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['employee:read'])]
     private ?User $user = null;
+
+    #[ORM\OneToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?User $linkedUser = null;
 
     /**
      * @var Collection<int, Role>
@@ -257,6 +260,23 @@ class Employee extends AbstractEntity
         return $this;
     }
 
+    /**
+     * @return User|null
+     */
+    public function getLinkedUser(): ?User
+    {
+        return $this->linkedUser;
+    }
+
+    /**
+     * @param User|null $linkedUser
+     * @return Employee
+     */
+    public function setLinkedUser(?User $linkedUser): Employee
+    {
+        $this->linkedUser = $linkedUser;
+        return $this;
+    }
 
     /**
      * @return Collection<int, EvaluationTemplate>
