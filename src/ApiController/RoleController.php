@@ -53,6 +53,36 @@ class RoleController extends AbstractController
         return $this->json($roles, context: ['groups' => 'role:read']);
     }
 
+    /**
+     * Creates a new role.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    #[OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            ref: new Model(type: RoleFormType::class, groups: ['role:create'])
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_CREATED,
+        description: 'Role created successfully',
+        content: new OA\JsonContent(
+            ref: new Model(type: Role::class, groups: ['role:read'])
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_BAD_REQUEST,
+        description: 'Invalid role data',
+        content: new OA\JsonContent(
+            properties: [
+                'message' => new OA\Property(type: 'string', example: 'Invalid role data')
+            ],
+            type: 'object'
+        )
+    )]
+    #[Route(name: 'post', methods: ['POST'])]
     public function post(Request $request): JsonResponse
     {
         $role = $this->roleRepository->create();

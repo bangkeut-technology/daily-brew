@@ -9,6 +9,7 @@ use App\Controller\AbstractController;
 use App\Entity\Employee;
 use App\Entity\User;
 use App\Form\EmployeeFormType;
+use App\Form\RoleFormType;
 use App\Repository\EmployeeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Nelmio\ApiDocBundle\Attribute\Model;
@@ -80,42 +81,7 @@ class EmployeeController extends AbstractController
     #[OA\RequestBody(
         description: 'Employee data',
         content: new OA\JsonContent(
-            properties: [
-                new OA\Property(
-                    property: 'firstName',
-                    type: 'string',
-                    example: 'John'
-                ),
-                new OA\Property(
-                    property: 'lastName',
-                    type: 'string',
-                    example: 'Doe'
-                ),
-                new OA\Property(
-                    property: 'phoneNumber',
-                    type: 'string',
-                    example: '+1234567890'
-                ),
-                new OA\Property(
-                    property: 'dob',
-                    type: 'string',
-                    format: 'datetime'
-                ),
-                new OA\Property(
-                    property: 'joinedAt',
-                    type: 'string',
-                    format: 'datetime'
-                ),
-                new OA\Property(
-                    property: 'roles',
-                    type: 'array',
-                    items: new OA\Items(
-                        type: 'number',
-                        example: '1'
-                    ),
-                )
-            ],
-            type: 'object'
+            ref: new Model(type: EmployeeFormType::class),
         )
     )]
     #[OA\Response(
@@ -151,7 +117,7 @@ class EmployeeController extends AbstractController
             $this->employeeRepository->updateEmployee($employee);
             return $this->createEmployeeResponse([
                 'employee' => $employee,
-                'message'  => $this->translator->trans('created.employee', ['%name%' => $employee], 'messages')
+                'message' => $this->translator->trans('created.employee', ['%name%' => $employee], 'messages')
             ], Response::HTTP_CREATED);
         }
 
@@ -218,42 +184,7 @@ class EmployeeController extends AbstractController
     #[OA\RequestBody(
         description: 'Employee data',
         content: new OA\JsonContent(
-            properties: [
-                new OA\Property(
-                    property: 'firstName',
-                    type: 'string',
-                    example: 'John'
-                ),
-                new OA\Property(
-                    property: 'lastName',
-                    type: 'string',
-                    example: 'Doe'
-                ),
-                new OA\Property(
-                    property: 'phoneNumber',
-                    type: 'string',
-                    example: '+1234567890'
-                ),
-                new OA\Property(
-                    property: 'dob',
-                    type: 'string',
-                    format: 'datetime'
-                ),
-                new OA\Property(
-                    property: 'joinedAt',
-                    type: 'string',
-                    format: 'datetime'
-                ),
-                new OA\Property(
-                    property: 'roles',
-                    type: 'array',
-                    items: new OA\Items(
-                        type: 'number',
-                        example: '1'
-                    ),
-                )
-            ],
-            type: 'object'
+            ref: new Model(type: EmployeeFormType::class),
         )
     )]
     #[OA\Response(

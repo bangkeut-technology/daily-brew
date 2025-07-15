@@ -7,8 +7,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Table } from '@/components/table';
 import { RowSelectionState } from '@tanstack/react-table';
 import { Control, useFieldArray } from 'react-hook-form';
+import { NewRoleDialog } from '@/components/dialog/new-role-dialog';
 
 const columnHelper = createColumnHelper<Role>();
+const queryKey = ['daily-brew-roles'];
 
 interface RoleSelectProps {
     control: Control<any>;
@@ -24,7 +26,7 @@ export const RoleSelect: React.FunctionComponent<RoleSelectProps> = ({ control, 
         control,
     });
     const { data = [] } = useQuery({
-        queryKey: ['roles'],
+        queryKey,
         queryFn: () => fetchRoles(),
     });
 
@@ -76,7 +78,10 @@ export const RoleSelect: React.FunctionComponent<RoleSelectProps> = ({ control, 
 
     return (
         <div className="flex flex-col space-y-4">
-            {title && <h3 className="text-lg font-semibold">{title}</h3>}
+            <div className="flex flex-row space-x-4">
+                {title && <h3 className="text-lg font-semibold">{title}</h3>}
+                <NewRoleDialog queryKey={queryKey} />
+            </div>
             {description && <p className="text-sm text-muted-foreground">{description}</p>}
             <Table data={data} columns={columns} rowSelection={roles} onRowSelectionChange={setRoles} />
         </div>
