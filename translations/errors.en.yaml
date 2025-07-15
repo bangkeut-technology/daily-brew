@@ -1,6 +1,7 @@
 not_found:
     evaluation_template: "Evaluation template %identifier% not found."
     evaluation_criteria: "Evaluation criteria %identifier% not found."
+    employee:            'Employee %identifier% not found.'
 invalid:
     user:          'Invalid user information'
     user_password: 'The current password is incorrect.'

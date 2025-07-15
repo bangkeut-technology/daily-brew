@@ -180,4 +180,23 @@ class EmployeeRepository extends AbstractRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    /**
+     * Find an employee by identifier and user.
+     *
+     * @param string $identifier The employee identifier.
+     * @param User   $user       The user entity.
+     *
+     * @return Employee|null Returns the employee entity if found, otherwise null.
+     */
+    public function findByIdentifierAndUser(string $identifier, User $user): ?Employee
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.identifier = :identifier')
+            ->andWhere('e.user = :user')
+            ->setParameter('identifier', $identifier)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

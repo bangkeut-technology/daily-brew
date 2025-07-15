@@ -26,23 +26,29 @@ class Employee extends AbstractEntity
 {
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank]
+    #[Groups(['employee:read'])]
     private string $firstName;
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank]
+    #[Groups(['employee:read'])]
     private string $lastName;
 
     #[ORM\Column(length: 20, nullable: true)]
+    #[Groups(['employee:read'])]
     private ?string $phoneNumber = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['employee:read'])]
     private ?DateTimeImmutable $dob = null;
 
     #[ORM\Column]
     #[Assert\NotNull]
+    #[Groups(['employee:read'])]
     private ?DateTimeImmutable $joinedAt = null;
 
     #[ORM\Column(type: 'string', enumType: EmployeeStatus::class)]
+    #[Groups(['employee:read'])]
     private EmployeeStatus $status = EmployeeStatus::ACTIVE;
 
     /**
@@ -57,6 +63,7 @@ class Employee extends AbstractEntity
      */
     #[ORM\ManyToOne(targetEntity: Store::class, inversedBy: 'employees')]
     #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['employee:read'])]
     private ?Store $store = null;
 
     /**
@@ -72,6 +79,7 @@ class Employee extends AbstractEntity
      */
     #[ORM\ManyToMany(targetEntity: Role::class, inversedBy: 'employees')]
     #[ORM\JoinTable(name: 'daily_brew_employee_roles')]
+    #[Groups(['employee:read'])]
     private Collection $roles;
 
     /**
@@ -314,5 +322,15 @@ class Employee extends AbstractEntity
             $role->removeEmployee($this);
         }
         return $this;
+    }
+
+    /**
+     * Returns the full name of the employee.
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return sprintf('%s %s', $this->firstName, $this->lastName);
     }
 }

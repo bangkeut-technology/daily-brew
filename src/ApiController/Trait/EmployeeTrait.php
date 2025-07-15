@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\ApiController\Trait;
 
+use App\Entity\Employee;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,11 +20,27 @@ trait EmployeeTrait
      *
      * @param mixed $data    The data to return in the response.
      * @param int   $status  The status identifier of the response.
-     * @param array $context The context of the response. The default is ['groups' => ['employee:read', 'user:read']].
+     * @param array $context The context of the response. The default is ['groups' => ['employee:read', 'user:read', 'store:read', 'role:read']].
      * @return JsonResponse
      */
-    private function createEmployeeResponse(mixed $data, int $status = Response::HTTP_OK, array $context = ['groups' => ['employee:read', 'user:read']]): JsonResponse
+    private function createEmployeeResponse(mixed $data, int $status = Response::HTTP_OK, array $context = ['groups' => ['employee:read', 'user:read', 'store:read', 'role:read']]): JsonResponse
     {
         return $this->json($data, $status, context: $context);
+    }
+
+    /**
+     * Get employee by identifier and current user
+     *
+     * @param string $identifier The unique identifier of the employee
+     *
+     * @return Employee
+     */
+    private function getEmployeeByIdentifier(string $identifier): Employee
+    {
+        if (null === $employee = $this->employeeRepository->findByIdentifierAndUser($identifier, $this->getUser())) {
+            throw $this->createNotFoundException($this->translator->trans('not_found.employee', ['%identifier%' => $identifier], domain: 'errors'));
+        }
+
+        return $employee;
     }
 }

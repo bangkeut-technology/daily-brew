@@ -5,6 +5,7 @@ namespace App\ApiController;
 
 use App\ApiController\Trait\EmployeeTrait;
 use App\Controller\AbstractController;
+use App\Entity\Employee;
 use App\Entity\User;
 use App\Form\EmployeeFormType;
 use App\Repository\EmployeeRepository;
@@ -148,5 +149,191 @@ class EmployeeController extends AbstractController
             ['message' => $this->translator->trans('invalid.employee', domain: 'errors')],
             Response::HTTP_BAD_REQUEST
         );
+    }
+
+    /**
+     * Get employee details by identifier
+     *
+     * @param string $identifier The unique identifier of the employee
+     * @return JsonResponse
+     */
+    #[OA\Parameter(
+        name: 'identifier',
+        description: 'The unique identifier of the employee',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string', example: 'emp123')
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns employee details by identifier',
+        content: new OA\JsonContent(ref: new Model(type: User::class, groups: ['employee:read', 'user:read', 'store:read', 'role:read']))
+    )]
+    #[OA\Response(
+        response: Response::HTTP_NOT_FOUND,
+        description: 'Employee not found',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'message',
+                    type: 'string',
+                    example: 'Employee not found'
+                )
+            ],
+            type: 'object'
+        )
+    )]
+    #[Route('/{identifier}', name: 'get', methods: ['GET'])]
+    public function get(string $identifier): JsonResponse
+    {
+        $employee = $this->getEmployeeByIdentifier($identifier);
+        return $this->createEmployeeResponse($employee);
+    }
+
+    /**
+     * Update employee details by identifier
+     *
+     * @param Request $request
+     * @param string  $identifier The unique identifier of the employee
+     * @return JsonResponse
+     * @throws RandomException
+     */
+    #[OA\Parameter(
+        name: 'identifier',
+        description: 'The unique identifier of the employee',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string', example: 'emp123')
+    )]
+    #[OA\RequestBody(
+        description: 'Employee data',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'firstName',
+                    type: 'string',
+                    example: 'John'
+                ),
+                new OA\Property(
+                    property: 'lastName',
+                    type: 'string',
+                    example: 'Doe'
+                ),
+                new OA\Property(
+                    property: 'phoneNumber',
+                    type: 'string',
+                    example: '+1234567890'
+                ),
+                new OA\Property(
+                    property: 'dob',
+                    type: 'string',
+                    format: 'datetime'
+                ),
+                new OA\Property(
+                    property: 'joinedAt',
+                    type: 'string',
+                    format: 'datetime'
+                ),
+                new OA\Property(
+                    property: 'roles',
+                    type: 'array',
+                    items: new OA\Items(
+                        type: 'number',
+                        example: '1'
+                    ),
+                )
+            ],
+            type: 'object'
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Updates employee details by identifier',
+        content: new OA\JsonContent(ref: new Model(type: User::class, groups: ['employee:read']))
+    )]
+    #[OA\Response(
+        response: Response::HTTP_NOT_FOUND,
+        description: 'Employee not found',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'message',
+                    type: 'string',
+                    example: 'Employee not found'
+                )
+            ],
+            type: 'object'
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_BAD_REQUEST,
+        description: 'Invalid input data',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'message',
+                    type: 'string',
+                    example: 'Invalid input data'
+                )
+            ],
+            type: 'object'
+        )
+    )]
+    #[Route('/{identifier}', name: 'put', methods: ['PUT'])]
+    public function put(Request $request, string $identifier): JsonResponse
+    {
+        $employee = $this->getEmployeeByIdentifier($identifier);
+        $form = $this->createForm(EmployeeFormType::class, $employee);
+        $form->submit($request->getPayload()->all());
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->employeeRepository->updateEmployee($employee);
+            return $this->createEmployeeResponse($employee);
+        }
+
+        return $this->json(
+            ['message' => $this->translator->trans('invalid.employee', domain: 'errors')],
+            Response::HTTP_BAD_REQUEST
+        );
+    }
+
+    /**
+     * Delete employee by identifier
+     *
+     * @param string $identifier The unique identifier of the employee
+     * @return JsonResponse
+     */
+    #[OA\Parameter(
+        name: 'identifier',
+        description: 'The unique identifier of the employee',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string', example: 'emp123')
+    )]
+    #[OA\Response(
+        response: Response::HTTP_NO_CONTENT,
+        description: 'Deletes employee by identifier'
+    )]
+    #[OA\Response(
+        response: Response::HTTP_NOT_FOUND,
+        description: 'Employee not found',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'message',
+                    type: 'string',
+                    example: 'Employee not found'
+                )
+            ],
+            type: 'object'
+        )
+    )]
+    #[Route('/{identifier}', name: 'delete', methods: ['DELETE'])]
+    public function delete(string $identifier): JsonResponse
+    {
+        $employee = $this->getEmployeeByIdentifier($identifier);
+        $this->employeeRepository->delete($employee);
+        return new JsonResponse([
+            'message' => $this->translator->trans('deleted.employee', ['%name%' => $employee], domain: 'messages')
+        ], Response::HTTP_NO_CONTENT);
     }
 }
