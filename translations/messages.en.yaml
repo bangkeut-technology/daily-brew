@@ -11,3 +11,6 @@ deleted:
     employee:            'Employee %name% has been deleted successfully'
 added:
     evaluation_template: 'Evaluation template %template% has been added successfully'
+created:
+    employee: 'Employee %name% has been created successfully'
+    role:     'Role %name% has been created successfully'

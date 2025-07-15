@@ -27,5 +27,9 @@
     "joined_at": "Joined At",
     "roles": "Roles",
     "role": "Role",
-    "phone_number": "Phone Number"
+    "phone_number": "Phone Number",
+    "cancel": "Cancel",
+    "save": "Save",
+    "new_role": "New Role",
+    "saving": "Saving..."
 }

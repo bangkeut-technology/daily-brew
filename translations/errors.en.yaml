@@ -7,3 +7,4 @@ invalid:
     user_password: 'The current password is incorrect.'
     user_picture:  'The uploaded file is not a valid image.'
     employee:      'Invalid employee information.'
+    role:          'Invalid role information.'

@@ -149,7 +149,10 @@ class EmployeeController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $employee->setUser($user);
             $this->employeeRepository->updateEmployee($employee);
-            return $this->createEmployeeResponse($employee, Response::HTTP_CREATED);
+            return $this->createEmployeeResponse([
+                'employee' => $employee,
+                'message'  => $this->translator->trans('created.employee', ['%name%' => $employee], 'messages')
+            ], Response::HTTP_CREATED);
         }
 
         return $this->json(

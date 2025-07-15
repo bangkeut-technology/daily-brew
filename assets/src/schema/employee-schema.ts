@@ -10,7 +10,7 @@ export const employeeSchema: ObjectSchema<PartialEmployee> = object({
     joinedAt: date().optional(),
     roles: array().of(
         object().shape({
-            value: number().required(i18next.t('validation:required.role')),
+            value: number().required(i18next.t('validation:required.role.id')),
         }),
     ),
 });

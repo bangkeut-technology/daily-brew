@@ -4,3 +4,5 @@ export type Role = {
     canonicalName: string;
     description?: string;
 };
+
+export type PartialRole = Omit<Role, 'id' | 'canonicalName'>;

@@ -26,6 +26,14 @@
             "description": "Define roles for your employees to categorize their responsibilities."
         }
     },
+    "role": {
+        "new": {
+            "title": "New Role",
+            "description": "Create a new role to assign specific responsibilities to your employees."
+        },
+        "name": "Role Name",
+        "description": "Role Description"
+    },
     "placeholder": {
         "picker": {
             "date": "Select a date"
