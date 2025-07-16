@@ -71,7 +71,16 @@ export const EvaluationCriteriaSelect: React.FunctionComponent<EvaluationCriteri
                 },
             }),
             columnHelper.accessor('label', {
-                header: t('evaluation_criterias.label'),
+                header: t('evaluation_criterias.table.label', { ns: 'glossary' }),
+                cell: (info) => info.getValue(),
+                meta: {
+                    style: {
+                        textAlign: 'center',
+                    },
+                },
+            }),
+            columnHelper.accessor('weight', {
+                header: t('evaluation_criterias.table.weight', { ns: 'glossary' }),
                 cell: (info) => info.getValue(),
                 meta: {
                     style: {

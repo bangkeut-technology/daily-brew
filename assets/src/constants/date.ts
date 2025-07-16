@@ -6,13 +6,13 @@ export const DATE_FORMAT = 'dd/MM/yyyy';
 export const DATE_WITH_TIME_FORMAT = 'dd/MM/yyyy hh:mm';
 
 export const DAYS = [
-    i18next.t('days.sunday'),
-    i18next.t('days.monday'),
-    i18next.t('days.tuesday'),
-    i18next.t('days.wednesday'),
-    i18next.t('days.thursday'),
-    i18next.t('days.friday'),
-    i18next.t('days.saturday'),
+    i18next.t('day_of_week.sunday'),
+    i18next.t('day_of_week.monday'),
+    i18next.t('day_of_week.tuesday'),
+    i18next.t('day_of_week.wednesday'),
+    i18next.t('day_of_week.thursday'),
+    i18next.t('day_of_week.friday'),
+    i18next.t('day_of_week.saturday'),
 ];
 
 export const MONTHS = [

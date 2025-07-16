@@ -13,4 +13,5 @@ export const employeeSchema: ObjectSchema<PartialEmployee> = object({
             value: number().required(i18next.t('validation:required.roles.id')),
         }),
     ),
+    template: number().optional(),
 });

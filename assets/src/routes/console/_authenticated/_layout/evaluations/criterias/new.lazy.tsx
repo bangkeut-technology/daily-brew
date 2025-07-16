@@ -30,9 +30,7 @@ function NewEvaluationTemplate() {
             }).then();
         },
         onError: (error) => {
-            const message = isAxiosError(error)
-                ? error.response?.data.message
-                : t('error_occurred', { ns: 'glossary' });
+            const message = isAxiosError(error) ? error.response?.data.message : t('occurred', { ns: 'error' });
             toast.error(message);
         },
     });
@@ -58,7 +56,7 @@ function NewEvaluationTemplate() {
                     <EvaluationTemplateForm form={form} isPending={isPending} />
                     <div className="flex-row flex justify-between space-x-2">
                         <Button className="w-full" onClick={form.handleSubmit(handleCreate)} disabled={isPending}>
-                            {t('create.title')}
+                            {t('save')}
                         </Button>
                     </div>
                 </CardContent>

@@ -43,6 +43,7 @@ function NewEmployeeComponent() {
             dob: undefined,
             joinedAt: undefined,
             roles: [],
+            template: undefined,
         },
     });
 

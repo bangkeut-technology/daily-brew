@@ -23,6 +23,20 @@
         "saturday": "Saturday",
         "sunday": "Sunday"
     },
+    "months": {
+        "january": "January",
+        "february": "February",
+        "march": "March",
+        "april": "April",
+        "may": "May",
+        "june": "June",
+        "july": "July",
+        "august": "August",
+        "september": "September",
+        "october": "October",
+        "november": "November",
+        "december": "December"
+    },
     "date_of_birth": "Date of Birth",
     "joined_at": "Joined At",
     "roles": "Roles",
@@ -31,7 +45,18 @@
     "cancel": "Cancel",
     "save": "Save",
     "new_role": "New Role",
+    "enabled": "Enabled",
+    "remove": "Remove",
     "saving": "Saving...",
     "new_template": "New Template",
-    "new_criteria": "New Criteria"
+    "new_criteria": "New Criteria",
+    "view": "View",
+    "name": "Name",
+    "show": "Show",
+    "hide": "Hide",
+    "toggle_theme": "Toggle Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "active": "Active"
 }

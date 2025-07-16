@@ -16,6 +16,7 @@ export type PartialEmployee = Omit<Employee, 'id' | 'identifier' | 'dob' | 'join
     dob?: Date;
     joinedAt?: Date;
     roles?: Array<{ value: number }>;
+    template?: number;
 };
 
 export type EmployeeStatus = 'active' | 'on_leave' | 'suspended' | 'resigned' | 'probation';

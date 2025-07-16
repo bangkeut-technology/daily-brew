@@ -43,7 +43,7 @@ function DashboardLayout() {
                                                 {lastCrumb
                                                     ? lastCrumb
                                                     : name === 'new'
-                                                      ? t('new.title')
+                                                      ? t('new.title', { ns: 'glossary' })
                                                       : t(name as any)}
                                             </BreadcrumbPage>
                                         ) : (

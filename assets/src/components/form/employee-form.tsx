@@ -6,6 +6,7 @@ import { TextField } from '@/components/field/text-field';
 import { useTranslation } from 'react-i18next';
 import { DatePicker } from '@/components/picker/date-picker';
 import { RoleSelect } from '@/components/select/role-select';
+import { EvaluationTemplateSelect } from '@/components/select/evaluation-template-select';
 
 interface EmployeeFormProps {
     form: UseFormReturn<PartialEmployee>;
@@ -29,11 +30,17 @@ export const EmployeeForm: React.FunctionComponent<EmployeeFormProps> = ({ form,
                 />
                 <DatePicker control={form.control} name="dob" label={t('date_of_birth')} disabled={isPending} />
                 <DatePicker control={form.control} name="joinedAt" label={t('joined_at')} disabled={isPending} />
+                <EvaluationTemplateSelect
+                    name="template"
+                    control={form.control}
+                    label={t('evaluation_templates.title', { ns: 'glossary' })}
+                    description={t('evaluation_templates.description', { ns: 'glossary' })}
+                />
                 <RoleSelect
                     control={form.control}
                     name="roles"
-                    title={t('glossary:employees.roles.title')}
-                    description={t('glossary:employees.roles.description')}
+                    title={t('employees.roles.title', { ns: 'glossary' })}
+                    description={t('employees.roles.description', { ns: 'glossary' })}
                 />
             </div>
         </Form>

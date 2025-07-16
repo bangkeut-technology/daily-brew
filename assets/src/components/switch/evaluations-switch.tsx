@@ -29,9 +29,7 @@ export const EvaluationSwitch: React.FC<EvaluationSwitchProps> = ({
             });
         },
         onError: (error) => {
-            const message = isAxiosError(error)
-                ? error.response?.data.message
-                : t('error_occurred', { ns: 'glossary' });
+            const message = isAxiosError(error) ? error.response?.data.message : t('occurred', { ns: 'error' });
             toast.error(message);
         },
     });

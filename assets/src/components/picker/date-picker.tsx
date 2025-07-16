@@ -51,7 +51,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                                     {field.value ? (
                                         format(field.value, 'PPP')
                                     ) : (
-                                        <span>{t('glossary:placeholder.picker.date')}</span>
+                                        <span>{t('placeholder.picker.date', { ns: 'glossary' })}</span>
                                     )}
                                     <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                 </Button>
