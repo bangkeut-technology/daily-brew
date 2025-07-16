@@ -30,7 +30,7 @@ function NewEmployeeComponent() {
             }).then();
         },
         onError: (error) => {
-            const message = isAxiosError(error) ? error.response?.data.message : t('error:occurred');
+            const message = isAxiosError(error) ? error.response?.data.message : t('occurred', { ns: 'error' });
             toast.error(message);
         },
     });
@@ -55,8 +55,8 @@ function NewEmployeeComponent() {
 
     return (
         <div className="p-4">
-            <h1 className="text-2xl font-bold mb-4">{t('glossary:employees.new.title')}</h1>
-            <p>{t('glossary:employees.new.description')}</p>
+            <h1 className="text-2xl font-bold mb-4">{t('employees.new.title', { ns: 'glossary' })}</h1>
+            <p>{t('employees.new.description', { ns: 'glossary' })}</p>
             <div className="flex flex-col space-y-2 mt-4">
                 <EmployeeForm form={form} isPending={isPending} />
                 <Button
@@ -64,7 +64,7 @@ function NewEmployeeComponent() {
                     onClick={form.handleSubmit(onSubmit, (errors) => console.error(errors))}
                     disabled={isPending}
                 >
-                    {t('glossary:employees.new.save')} <Send />
+                    {t('employees.new.save', { ns: 'glossary' })} <Send />
                 </Button>
             </div>
         </div>

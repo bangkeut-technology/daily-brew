@@ -32,7 +32,7 @@ class EvaluationTemplateController extends AbstractController
     use EvaluationTemplateTrait;
 
     public function __construct(
-        TranslatorInterface $translator,
+        TranslatorInterface                           $translator,
         private readonly EvaluationTemplateRepository $evaluationTemplateRepository
     )
     {
@@ -93,9 +93,11 @@ class EvaluationTemplateController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $template->setUser($this->getUser());
             $this->evaluationTemplateRepository->updateEvaluationTemplate($template);
+
+            return $this->createTemplateResponse($template, Response::HTTP_CREATED);
         }
 
-        return $this->createTemplateResponse($template, Response::HTTP_CREATED);
+        return $this->createBadRequestResponse($this->translator->trans('invalid.evaluation_template', domain: 'errors'));
     }
 
     /**
@@ -179,7 +181,7 @@ class EvaluationTemplateController extends AbstractController
     /**
      * Updates an existing evaluation template.
      *
-     * @param Request $request The HTTP request containing the updated evaluation template data.
+     * @param Request $request    The HTTP request containing the updated evaluation template data.
      * @param string  $identifier The identifier of the evaluation template to update.
      * @return JsonResponse The JSON response containing the updated evaluation template.
      * @throws RandomException
@@ -213,8 +215,13 @@ class EvaluationTemplateController extends AbstractController
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
             $this->evaluationTemplateRepository->updateEvaluationTemplate($template);
+
+            return $this->createTemplateResponse([
+                'message' => $this->translator->trans('updated.evaluation_template', ['%name%' => $template->getName()]),
+                'template' => $template
+            ]);
         }
 
-        return $this->createTemplateResponse($template);
+        return $this->createBadRequestResponse($this->translator->trans('invalid.evaluation_template', domain: 'errors'));
     }
 }

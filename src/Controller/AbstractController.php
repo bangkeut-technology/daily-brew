@@ -8,6 +8,8 @@ use App\Entity\User;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as BaseAbstractController;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -85,6 +87,24 @@ abstract class AbstractController extends BaseAbstractController
     }
 
     /**
+     * Creates a JSON response with a bad request status.
+     *
+     * This method is used to generate a JSON response with a 400 Bad Request status code and a custom message.
+     *
+     * @param string $message Custom error message for the response. Defaults to 'Invalid Data'.
+     *
+     * @return JsonResponse The created JSON response.
+     */
+    protected function createBadRequestResponse(string $message = 'Invalid Data'): JsonResponse
+    {
+        return $this->json([
+            'message' => $message,
+        ],
+            Response::HTTP_BAD_REQUEST,
+        );
+    }
+
+    /**
      * Creates a new UnauthorizedHttpException.
      *
      * This method is used to generate an UnauthorizedHttpException with a custom message and an optional previous exception.
@@ -122,5 +142,19 @@ abstract class AbstractController extends BaseAbstractController
             }
         }
         return $errors;
+    }
+
+    /**
+     * Creates a JSON response with form errors.
+     *
+     * This method is used to generate a JSON response containing form errors with a 400 Bad Request status code.
+     *
+     * @param FormInterface $form The form object containing validation errors.
+     *
+     * @return JsonResponse The created JSON response with form errors.
+     */
+    protected function createFormErrorsResponse(FormInterface $form): JsonResponse
+    {
+        return $this->json($this->getFormErrors($form), Response::HTTP_BAD_REQUEST);
     }
 }

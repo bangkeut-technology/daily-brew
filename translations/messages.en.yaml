@@ -1,9 +1,10 @@
 updated:
-    user:          'Your information has been updated successfully'
-    user_locale:   'Your locale has been updated successfully'
-    user_email:    'Your email has been updated successfully'
-    user_password: 'Your password has been updated successfully'
-    user_picture:  'Your profile picture has been updated successfully'
+    user:                'Your information has been updated successfully'
+    user_locale:         'Your locale has been updated successfully'
+    user_email:          'Your email has been updated successfully'
+    user_password:       'Your password has been updated successfully'
+    user_picture:        'Your profile picture has been updated successfully'
+    evaluation_template: 'Evaluation template %name% has been updated successfully'
 deleted:
     user:                'User has been deleted successfully'
     evaluation_template: 'Evaluation template %name% has been deleted successfully'

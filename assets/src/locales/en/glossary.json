@@ -16,9 +16,15 @@
             "description": "Define roles for your employees to categorize their responsibilities."
         }
     },
+    "evaluation_criterias": {
+        "title": "Evaluation Criterias",
+        "description": "Define the criteria for evaluating employee performance. You can create multiple criteria for comprehensive evaluations.",
+        "label": "Evaluation Criteria Label"
+    },
     "evaluation_templates": {
         "title": "Evaluation Templates",
-        "description": "Create and manage templates for employee evaluations to standardize performance reviews.",
+        "description": "Evaluation Template Description",
+        "name": "Evaluation Template Name",
         "new": {
             "title": "New Template",
             "description": "Create a new evaluation template to use for employee performance reviews.",

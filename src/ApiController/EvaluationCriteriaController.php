@@ -32,7 +32,7 @@ class EvaluationCriteriaController extends AbstractController
     use EvaluationCriteriaTrait;
 
     public function __construct(
-        TranslatorInterface $translator,
+        TranslatorInterface                           $translator,
         private readonly EvaluationCriteriaRepository $evaluationCriteriaRepository
     )
     {
@@ -93,9 +93,9 @@ class EvaluationCriteriaController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $criteria->setUser($this->getUser());
             $this->evaluationCriteriaRepository->updateEvaluationCriteria($criteria);
+            return $this->createCriteriaResponse($criteria, Response::HTTP_CREATED);
         }
-
-        return $this->createCriteriaResponse($criteria, Response::HTTP_CREATED);
+        return $this->createBadRequestResponse($this->translator->trans('invalid.evaluation_criteria', domain: 'errors'));
     }
 
     /**
@@ -179,7 +179,7 @@ class EvaluationCriteriaController extends AbstractController
     /**
      * Updates an existing evaluation criteria.
      *
-     * @param Request $request The HTTP request containing the updated evaluation criteria data.
+     * @param Request $request    The HTTP request containing the updated evaluation criteria data.
      * @param string  $identifier The identifier of the evaluation criteria to update.
      * @return JsonResponse The JSON response containing the updated evaluation criteria.
      * @throws RandomException

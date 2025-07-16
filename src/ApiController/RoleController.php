@@ -97,10 +97,6 @@ class RoleController extends AbstractController
             ], context: ['groups' => 'role:read']);
         }
 
-        return $this->json([
-            'message' => $this->translator->trans('invalid.role', domain: 'errors'),
-        ],
-            Response::HTTP_BAD_REQUEST,
-        );
+        return $this->createBadRequestResponse($this->translator->trans('invalid.role', domain: 'errors'));
     }
 }

@@ -3,8 +3,10 @@ not_found:
     evaluation_criteria: "Evaluation criteria %identifier% not found."
     employee:            'Employee %identifier% not found.'
 invalid:
-    user:          'Invalid user information'
-    user_password: 'The current password is incorrect.'
-    user_picture:  'The uploaded file is not a valid image.'
-    employee:      'Invalid employee information.'
-    role:          'Invalid role information.'
+    user:                'Invalid user information'
+    user_password:       'The current password is incorrect.'
+    user_picture:        'The uploaded file is not a valid image.'
+    employee:            'Invalid employee information.'
+    role:                'Invalid role information.'
+    evaluation_criteria: 'Invalid evaluation criteria information.'
+    evaluation_template: 'Invalid evaluation template information.'

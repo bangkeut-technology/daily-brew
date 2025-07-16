@@ -1,14 +1,11 @@
 import React from 'react';
-import { Trash } from 'lucide-react';
 import { PartialEvaluationTemplate } from '@/types/evaluation-template';
 import { useFieldArray, UseFormReturn } from 'react-hook-form';
 import { TextField } from '@/components/field/text-field';
 import { TextAreaField } from '@/components/field/textarea-field';
 import { useTranslation } from 'react-i18next';
-import { SelectField } from '@/components/field/select-field';
-import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
-import { WEIGHT_MAXIMUM, WEIGHT_MINIMUM } from '@/constants/value';
+import { EvaluationCriteriaSelect } from '@/components/select/evaluation-criteria-select';
 
 interface EvaluationTemplateFormProps {
     form: UseFormReturn<PartialEvaluationTemplate>;
@@ -23,15 +20,6 @@ export const EvaluationTemplateForm: React.FunctionComponent<EvaluationTemplateF
         control: form.control,
     });
 
-    const options = React.useMemo(
-        () =>
-            Array.from({ length: WEIGHT_MAXIMUM }, (_, i) => {
-                const value = String(i + 1);
-                return { label: value, value };
-            }),
-        [],
-    );
-
     return (
         <Form {...form}>
             <TextField control={form.control} name="name" label={t('evaluation_templates.name', { ns: 'glossary' })} />
@@ -40,7 +28,12 @@ export const EvaluationTemplateForm: React.FunctionComponent<EvaluationTemplateF
                 name="description"
                 label={t('evaluation_templates.description', { ns: 'glossary' })}
             />
-            <EvaluationCriteriaSelect />
+            <EvaluationCriteriaSelect
+                control={form.control}
+                name="criterias"
+                title={t('evaluation_criterias.title', { ns: 'glossary' })}
+                description={t('evaluation_criterias.description', { ns: 'glossary' })}
+            />
         </Form>
     );
 };

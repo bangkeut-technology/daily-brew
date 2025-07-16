@@ -26,12 +26,12 @@ function Employees() {
     const { maxFreeEmployees } = useApplication();
     return (
         <div className="p-4">
-            <h1 className="text-2xl font-bold mb-4">{t('glossary:employees.title')}</h1>
-            <p>{t('glossary:employees.description', { maxFreeEmployees: maxFreeEmployees })}</p>
+            <h1 className="text-2xl font-bold mb-4">{t('employees.title', { ns: 'glossary' })}</h1>
+            <p>{t('employees.description', { maxFreeEmployees: maxFreeEmployees, ns: 'glossary' })}</p>
             <div className="mt-4 flex flex-row gap-4">
                 <CardButton asChild>
                     <Link to="/console/employees/new" className="flex items-center gap-2">
-                        {t('glossary:employees.add')} <UserPlus2 className="w-6 h-6" />
+                        {t('employees.add', { ns: 'glossary' })} <UserPlus2 className="w-6 h-6" />
                     </Link>
                 </CardButton>
             </div>
