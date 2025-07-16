@@ -34,7 +34,8 @@ export const EmployeeForm: React.FunctionComponent<EmployeeFormProps> = ({ form,
                     name="template"
                     control={form.control}
                     label={t('evaluation_templates.title', { ns: 'glossary' })}
-                    description={t('evaluation_templates.description', { ns: 'glossary' })}
+                    description={t('evaluation_templates.select.description', { ns: 'glossary' })}
+                    placeholder={t('evaluation_templates.select.placeholder', { ns: 'glossary' })}
                 />
                 <RoleSelect
                     control={form.control}

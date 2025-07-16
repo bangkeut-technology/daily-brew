@@ -62,7 +62,7 @@ export const NewEvaluationCriteriaDialog: React.FunctionComponent<NewEvaluationC
                 <DialogTrigger asChild>
                     <Button variant="outline">{t('new_criteria')}</Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-screen h-screen ">
+                <DialogContent className="sm:max-w-[425px]">
                     <DialogTitle>{t('evaluation_criterias.new.title', { ns: 'glossary' })}</DialogTitle>
                     <DialogDescription>
                         {t('evaluation_criterias.new.description', { ns: 'glossary' })}
@@ -101,3 +101,5 @@ export const NewEvaluationCriteriaDialog: React.FunctionComponent<NewEvaluationC
         </Dialog>
     );
 };
+
+NewEvaluationCriteriaDialog.displayName = 'NewEvaluationCriteriaDialog';

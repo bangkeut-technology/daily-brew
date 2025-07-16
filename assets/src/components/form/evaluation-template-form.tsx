@@ -39,3 +39,5 @@ export const EvaluationTemplateForm: React.FunctionComponent<EvaluationTemplateF
         </Form>
     );
 };
+
+EvaluationTemplateForm.displayName = 'EvaluationTemplateForm';

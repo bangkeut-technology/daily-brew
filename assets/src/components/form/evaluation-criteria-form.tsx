@@ -34,3 +34,5 @@ export const EvaluationCriteriaForm: React.FunctionComponent<EvaluationCriteriaF
         </Form>
     );
 };
+
+EvaluationCriteriaForm.displayName = 'EvaluationCriteriaForm';

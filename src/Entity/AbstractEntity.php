@@ -28,6 +28,7 @@ abstract class AbstractEntity
     #[ORM\Column(name: 'id', type: Types::INTEGER, nullable: false, options: ["unsigned" => true])]
     #[Groups([
         'user:read',
+        'evaluation_template:read',
         'role:read',
     ])]
     protected ?int $id = null;

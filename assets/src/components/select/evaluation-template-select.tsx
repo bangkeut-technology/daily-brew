@@ -12,6 +12,7 @@ interface EvaluationTemplateSelectProps {
     name: string;
     label?: string;
     description?: string;
+    placeholder?: string;
 }
 
 export const EvaluationTemplateSelect: React.FunctionComponent<EvaluationTemplateSelectProps> = ({
@@ -19,6 +20,7 @@ export const EvaluationTemplateSelect: React.FunctionComponent<EvaluationTemplat
     name,
     label,
     description,
+    placeholder,
 }) => {
     const { data = [] } = useQuery({
         queryKey: ['evaluation-templates'],
@@ -35,8 +37,15 @@ export const EvaluationTemplateSelect: React.FunctionComponent<EvaluationTemplat
     );
 
     return (
-        <div className="flex flex-row space-x-2">
-            <SelectField control={control} name={name} options={options} label={label} description={description} />
+        <div className="flex flex-row space-x-2 items-center">
+            <SelectField
+                control={control}
+                name={name}
+                options={options}
+                label={label}
+                description={description}
+                placeholder={placeholder}
+            />
             <NewEvaluationTemplateDialog queryKey={queryKey} />
         </div>
     );

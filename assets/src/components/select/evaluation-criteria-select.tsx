@@ -108,3 +108,5 @@ export const EvaluationCriteriaSelect: React.FunctionComponent<EvaluationCriteri
         </div>
     );
 };
+
+EvaluationCriteriaSelect.displayName = 'EvaluationCriteriaSelect';

@@ -39,7 +39,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
             render={({ field }) => (
                 <FormItem className={className}>
                     {label && <FormLabel>{label}</FormLabel>}
-                    <Select onValueChange={field.onChange} value={field.value.toString()}>
+                    <Select onValueChange={field.onChange} value={field.value?.toString()}>
                         <FormControl>
                             <SelectTrigger disabled={disabled} className="w-full">
                                 <SelectValue placeholder={placeholder} />
@@ -65,3 +65,5 @@ export const SelectField: React.FC<SelectFieldProps> = ({
         />
     </div>
 );
+
+SelectField.displayName = 'SelectField';

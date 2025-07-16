@@ -62,7 +62,7 @@ export const NewEvaluationTemplateDialog: React.FunctionComponent<NewEvaluationT
                 <DialogTrigger asChild>
                     <Button variant="outline">{t('new_template')}</Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-screen h-screen ">
+                <DialogContent className="w-screen h-screen ">
                     <DialogTitle>{t('evaluation_templates.new.title', { ns: 'glossary' })}</DialogTitle>
                     <DialogDescription>
                         {t('evaluation_templates.new.description', { ns: 'glossary' })}

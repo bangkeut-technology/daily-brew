@@ -41,6 +41,10 @@
         "title": "Evaluation Templates",
         "description": "Evaluation Template Description",
         "name": "Evaluation Template Name",
+        "select": {
+            "description": "Select an evaluation template to use for employee performance reviews.",
+            "placeholder": "Select an evaluation template"
+        },
         "new": {
             "title": "New Template",
             "description": "Create a new evaluation template to use for employee performance reviews.",
