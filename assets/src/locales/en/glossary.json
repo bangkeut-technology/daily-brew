@@ -31,6 +31,10 @@
             "title": "Evaluation Criteria Label",
             "description": "The label for the evaluation criteria, which will be used to assess employee performance."
         },
+        "weight": {
+            "title": "Weight",
+            "description": "The weight of the evaluation criteria, which determines its importance in the overall performance assessment."
+        },
         "new": {
             "title": "New Criteria",
             "description": "Create a new evaluation criteria to assess employee performance.",

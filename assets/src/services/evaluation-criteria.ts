@@ -5,8 +5,10 @@ export const fetchEvaluationCriterias = async (): Promise<EvaluationCriteria[]> 
     return apiAxios.get('/evaluation-criterias').then((response) => response.data);
 };
 
-export const postEvaluationCriteria = async (data: PartialEvaluationCriteria): Promise<{ message: string }> => {
-    return apiAxios.post('/evaluation-criterias', data).then((response) => response.data);
+export const postEvaluationCriteria = async (data: PartialEvaluationCriteria) => {
+    return apiAxios
+        .post<{ message: string; criteria: EvaluationCriteria }>('/evaluation-criterias', data)
+        .then((response) => response.data);
 };
 
 export const putEvaluationCriteria = async ({

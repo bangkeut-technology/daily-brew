@@ -93,7 +93,10 @@ class EvaluationCriteriaController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $criteria->setUser($this->getUser());
             $this->evaluationCriteriaRepository->updateEvaluationCriteria($criteria);
-            return $this->createCriteriaResponse($criteria, Response::HTTP_CREATED);
+            return $this->createCriteriaResponse([
+                'message' => $this->translator->trans('created.evaluation_criteria', ['%label%' => $criteria->getLabel()]),
+                "criteria" => $criteria
+            ], Response::HTTP_CREATED);
         }
         return $this->createBadRequestResponse($this->translator->trans('invalid.evaluation_criteria', domain: 'errors'));
     }

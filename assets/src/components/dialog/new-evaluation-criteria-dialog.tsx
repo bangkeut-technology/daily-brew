@@ -34,6 +34,12 @@ export const NewEvaluationCriteriaDialog: React.FunctionComponent<NewEvaluationC
         mutationFn: postEvaluationCriteria,
         onSuccess: (data) => {
             toast.success(data.message);
+            setOpen(false);
+            form.reset({
+                label: '',
+                description: '',
+                weight: 1,
+            });
         },
         onError: (error) => {
             const message = isAxiosError(error) ? error.response?.data.message : t('occurred', { ns: 'error' });
