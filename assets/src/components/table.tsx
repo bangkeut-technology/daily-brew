@@ -129,3 +129,5 @@ export const Table = <T,>({
         </React.Fragment>
     );
 };
+
+Table.displayName = 'Table';

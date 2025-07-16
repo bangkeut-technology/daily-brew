@@ -31,3 +31,5 @@ export const ThemeToggle = () => {
         </DropdownMenu>
     );
 };
+
+ThemeToggle.displayName = 'ThemeToggle';

@@ -101,3 +101,5 @@ export const NewEvaluationTemplateDialog: React.FunctionComponent<NewEvaluationT
         </Dialog>
     );
 };
+
+NewEvaluationTemplateDialog.displayName = 'NewEvaluationTemplateDialog';

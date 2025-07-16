@@ -87,3 +87,5 @@ export const RoleSelect: React.FunctionComponent<RoleSelectProps> = ({ control, 
         </div>
     );
 };
+
+RoleSelect.displayName = 'RoleSelect';

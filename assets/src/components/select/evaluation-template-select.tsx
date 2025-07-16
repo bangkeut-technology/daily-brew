@@ -41,3 +41,5 @@ export const EvaluationTemplateSelect: React.FunctionComponent<EvaluationTemplat
         </div>
     );
 };
+
+EvaluationTemplateSelect.displayName = 'EvaluationTemplateSelect';
