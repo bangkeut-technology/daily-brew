@@ -5,9 +5,12 @@ export const fetchEvaluationTemplates = async () => {
     const response = await apiAxios.get<EvaluationTemplate[]>(`/evaluation-templates`);
     return response.data;
 };
-export const postEvaluationTemplate = async (data: PartialEvaluationTemplate) => {
+export const postEvaluationTemplate = async ({ criterias = [], ...data }: PartialEvaluationTemplate) => {
     return await apiAxios
-        .post<{ evaluation: EvaluationTemplate; message: string }>('/evaluation-templates', data)
+        .post<{
+            evaluation: EvaluationTemplate;
+            message: string;
+        }>('/evaluation-templates', { ...data, criterias: criterias.map((criteria) => criteria.value) })
         .then((response) => response.data);
 };
 export const fetchEvaluationTemplate = async (identifier: string) => {

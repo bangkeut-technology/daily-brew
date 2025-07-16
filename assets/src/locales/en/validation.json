@@ -1,13 +1,26 @@
 {
     "required": {
-        "first_name": "The first name is required.",
-        "last_name": "The last name is required.",
-        "password": "The password is required.",
-        "confirm_password": "The confirmation password is required.",
-        "email": "Email is required.",
-        "role": {
+        "users": {
+            "first_name": "The first name is required.",
+            "last_name": "The last name is required.",
+            "password": "The password is required.",
+            "confirm_password": "The confirmation password is required.",
+            "email": "Email is required."
+        },
+        "employees": {
+            "first_name": "The first name is required.",
+            "last_name": "The last name is required."
+        },
+        "roles": {
             "id": "The role is required.",
             "name": "The role name is required."
+        },
+        "evaluation_templates": {
+            "name": "The template name is required.",
+            "description": "The template description is required."
+        },
+        "evaluation_criterias": {
+            "id": "The criteria is required."
         }
     },
     "passwords_match": "The password and confirmation password must match."

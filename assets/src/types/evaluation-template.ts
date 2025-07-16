@@ -18,5 +18,5 @@ export type EvaluationCriteria = {
 export type PartialEvaluationCriteria = Omit<EvaluationCriteria, 'id' | 'identifier'>;
 
 export type PartialEvaluationTemplate = Omit<EvaluationTemplate, 'id' | 'active' | 'identifier' | 'criterias'> & {
-    criterias: PartialEvaluationCriteria[];
+    criterias?: Array<{ value: number }>;
 };

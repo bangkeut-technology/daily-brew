@@ -89,10 +89,10 @@ class RoleController extends AbstractController
         $form = $this->createForm(RoleFormType::class, $role);
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->roleRepository->update($role);
+            $this->roleRepository->updateRole($role);
 
             return $this->json([
-                'message' => $this->translator->trans('created.role', ['%role%' => $role]),
+                'message' => $this->translator->trans('created.role', ['%name%' => $role]),
                 'role' => $role
             ], context: ['groups' => 'role:read']);
         }

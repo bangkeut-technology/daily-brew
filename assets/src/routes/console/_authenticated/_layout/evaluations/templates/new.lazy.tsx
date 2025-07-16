@@ -12,6 +12,7 @@ import { useMutation } from '@tanstack/react-query';
 import { postEvaluationTemplate } from '@/services/evaluation-template';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
+import { Loader2Icon, Save } from 'lucide-react';
 
 export const Route = createLazyFileRoute('/console/_authenticated/_layout/evaluations/templates/new')({
     component: NewEvaluationTemplate,
@@ -30,9 +31,7 @@ function NewEvaluationTemplate() {
             }).then();
         },
         onError: (error) => {
-            const message = isAxiosError(error)
-                ? error.response?.data.message
-                : t('error_occurred', { ns: 'glossary' });
+            const message = isAxiosError(error) ? error.response?.data.message : t('occurred', { ns: 'error' });
             toast.error(message);
         },
     });
@@ -58,7 +57,17 @@ function NewEvaluationTemplate() {
                     <EvaluationTemplateForm form={form} isPending={isPending} />
                     <div className="flex-row flex justify-between space-x-2">
                         <Button className="w-full" onClick={form.handleSubmit(handleCreate)} disabled={isPending}>
-                            {t('create.title')}
+                            {isPending ? (
+                                <React.Fragment>
+                                    <Loader2Icon className="animate-spin" />
+                                    {t('saving')}
+                                </React.Fragment>
+                            ) : (
+                                <React.Fragment>
+                                    <Save />
+                                    {t('save')}
+                                </React.Fragment>
+                            )}
                         </Button>
                     </div>
                 </CardContent>

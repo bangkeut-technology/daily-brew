@@ -31,5 +31,6 @@
     "cancel": "Cancel",
     "save": "Save",
     "new_role": "New Role",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "new_template": "New Template"
 }

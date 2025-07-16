@@ -1,14 +1,4 @@
 {
-    "sign_in": {
-        "title": "Sign In",
-        "description": "Access your account to manage your employees KPI and performance.",
-        "failed": "Invalid email or password. Please try again."
-    },
-    "sign_up": {
-        "title": "Sign Up",
-        "description": "Create a new account to start managing your employees KPI and performance.",
-        "failed": "An account with this email already exists. Please try a different email."
-    },
     "employees": {
         "title": "Employees",
         "description": "Manage your employees' KPIs and performance metrics. You can have up to {{maxFreeEmployees}} employees.",
@@ -26,6 +16,22 @@
             "description": "Define roles for your employees to categorize their responsibilities."
         }
     },
+    "evaluation_templates": {
+        "title": "Evaluation Templates",
+        "description": "Create and manage templates for employee evaluations to standardize performance reviews.",
+        "new": {
+            "title": "New Template",
+            "description": "Create a new evaluation template to use for employee performance reviews.",
+            "save": "Save Template"
+        }
+    },
+    "have_account": "Already have an account?",
+    "no_account_yet": "Don't have an account yet?",
+    "placeholder": {
+        "picker": {
+            "date": "Select a date"
+        }
+    },
     "role": {
         "new": {
             "title": "New Role",
@@ -34,10 +40,15 @@
         "name": "Role Name",
         "description": "Role Description"
     },
-    "placeholder": {
-        "picker": {
-            "date": "Select a date"
-        }
+    "sign_in": {
+        "title": "Sign In",
+        "description": "Access your account to manage your employees KPI and performance.",
+        "failed": "Invalid email or password. Please try again."
+    },
+    "sign_up": {
+        "title": "Sign Up",
+        "description": "Create a new account to start managing your employees KPI and performance.",
+        "failed": "An account with this email already exists. Please try a different email."
     },
     "table": {
         "of": "of",
@@ -45,7 +56,5 @@
         "next": "Next",
         "row_selected": "row(s) selected",
         "no_data": "No data available"
-    },
-    "no_account_yet": "Don't have an account yet?",
-    "have_account": "Already have an account?"
+    }
 }

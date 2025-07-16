@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Role;
+use App\Util\CanonicalizerInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -23,8 +24,25 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class RoleRepository extends AbstractRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private CanonicalizerInterface $canonicalizer;
+
+    public function __construct(ManagerRegistry $registry, CanonicalizerInterface $canonicalizer)
     {
         parent::__construct($registry, Role::class);
+        $this->canonicalizer = $canonicalizer;
+    }
+
+    /**
+     * Update and canicalize the role name.
+     *
+     * @param Role $role The role entity to update.
+     * @param bool $flush Whether to flush the changes to the database immediately.
+     */
+    public function updateRole(Role $role, bool $flush = true): void
+    {
+        $role->setCanonicalName($this->canonicalizer->canonicalizeString($role->getName()));
+
+        $this->update($role, $flush);;
+
     }
 }
