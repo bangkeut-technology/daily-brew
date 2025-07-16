@@ -43,9 +43,9 @@ export const NewEvaluationCriteriaDialog: React.FunctionComponent<NewEvaluationC
     const form = useForm<PartialEvaluationCriteria>({
         resolver: yupResolver(evaluationCriteriaSchema),
         defaultValues: {
-            name: '',
+            label: '',
             description: '',
-            criterias: [],
+            weight: 1,
         },
     });
 

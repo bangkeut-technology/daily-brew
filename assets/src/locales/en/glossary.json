@@ -17,9 +17,23 @@
         }
     },
     "evaluation_criterias": {
-        "title": "Evaluation Criterias",
-        "description": "Define the criteria for evaluating employee performance. You can create multiple criteria for comprehensive evaluations.",
-        "label": "Evaluation Criteria Label"
+        "table": {
+            "title": "Evaluation Criterias",
+            "description": "Manage the criteria used to evaluate employee performance. You can create multiple criteria for comprehensive evaluations."
+        },
+        "description": {
+            "title": "Evaluation Criteria Description",
+            "description": "Define the criteria for evaluating employee performance. You can create multiple criteria for comprehensive evaluations."
+        },
+        "label": {
+            "title": "Evaluation Criteria Label",
+            "description": "The label for the evaluation criteria, which will be used to assess employee performance."
+        },
+        "new": {
+            "title": "New Criteria",
+            "description": "Create a new evaluation criteria to assess employee performance.",
+            "save": "Save Criteria"
+        }
     },
     "evaluation_templates": {
         "title": "Evaluation Templates",

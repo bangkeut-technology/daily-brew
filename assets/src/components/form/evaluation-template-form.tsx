@@ -1,6 +1,6 @@
 import React from 'react';
 import { PartialEvaluationTemplate } from '@/types/evaluation-template';
-import { useFieldArray, UseFormReturn } from 'react-hook-form';
+import { UseFormReturn } from 'react-hook-form';
 import { TextField } from '@/components/field/text-field';
 import { TextAreaField } from '@/components/field/textarea-field';
 import { useTranslation } from 'react-i18next';
@@ -15,24 +15,26 @@ interface EvaluationTemplateFormProps {
 
 export const EvaluationTemplateForm: React.FunctionComponent<EvaluationTemplateFormProps> = ({ form, isPending }) => {
     const { t } = useTranslation();
-    const { fields } = useFieldArray({
-        name: 'criterias',
-        control: form.control,
-    });
 
     return (
         <Form {...form}>
-            <TextField control={form.control} name="name" label={t('evaluation_templates.name', { ns: 'glossary' })} />
+            <TextField
+                control={form.control}
+                name="name"
+                label={t('evaluation_templates.name', { ns: 'glossary' })}
+                disabled={isPending}
+            />
             <TextAreaField
                 control={form.control}
                 name="description"
                 label={t('evaluation_templates.description', { ns: 'glossary' })}
+                disabled={isPending}
             />
             <EvaluationCriteriaSelect
                 control={form.control}
                 name="criterias"
-                title={t('evaluation_criterias.title', { ns: 'glossary' })}
-                description={t('evaluation_criterias.description', { ns: 'glossary' })}
+                title={t('evaluation_criterias.table.title', { ns: 'glossary' })}
+                description={t('evaluation_criterias.table.description', { ns: 'glossary' })}
             />
         </Form>
     );

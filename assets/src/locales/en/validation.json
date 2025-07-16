@@ -20,7 +20,13 @@
             "description": "The template description is required."
         },
         "evaluation_criterias": {
+            "label": "The criteria label is required.",
             "id": "The criteria is required."
+        }
+    },
+    "maximum": {
+        "evaluation_criterias": {
+            "weight": "The weight must be a number between {{minimum}} and {{maximum}}."
         }
     },
     "passwords_match": "The password and confirmation password must match."
