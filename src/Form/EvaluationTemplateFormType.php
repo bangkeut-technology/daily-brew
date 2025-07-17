@@ -27,10 +27,11 @@ class EvaluationTemplateFormType extends AbstractType
         $builder
             ->add('name')
             ->add('description')
-            ->add('criterias', EntityType::class, [
+            ->add('criterias', null, [
                 'class' => EvaluationCriteria::class,
                 'choice_label' => 'id',
                 'multiple' => true,
+                'mapped' => false,
             ])
             ->add('employees', EntityType::class, [
                 'class' => Employee::class,

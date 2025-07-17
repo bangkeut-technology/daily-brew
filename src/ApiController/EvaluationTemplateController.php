@@ -92,7 +92,9 @@ class EvaluationTemplateController extends AbstractController
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
             $template->setUser($this->getUser());
-            $this->evaluationTemplateRepository->updateEvaluationTemplate($template);
+            $criteria = $form->get('criteria')->getData();
+            dump($criteria);
+//            $this->evaluationTemplateRepository->updateEvaluationTemplate($template);
 
             return $this->createTemplateResponse($template, Response::HTTP_CREATED);
         }
