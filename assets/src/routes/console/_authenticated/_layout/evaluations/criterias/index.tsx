@@ -3,7 +3,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { fetchEvaluationTemplates } from '@/services/evaluation-template';
 import { Button } from '@/components/ui/button';
 import { ArrowDown, ArrowUp, Eye, ListPlus } from 'lucide-react';
-import { Table } from '@/components/table';
+import { DataTable } from '@/components/data-table';
 import { createColumnHelper } from '@tanstack/table-core';
 import { EvaluationTemplate } from '@/types/evaluation-template';
 import { useTranslation } from 'react-i18next';
@@ -76,7 +76,12 @@ function Evaluations() {
                     </Button>
                 </div>
             </div>
-            <Table data={data} columns={columns} onRowSelectionChange={setRowSelection} rowSelection={rowSelection} />
+            <DataTable
+                data={data}
+                columns={columns}
+                onRowSelectionChange={setRowSelection}
+                rowSelection={rowSelection}
+            />
         </div>
     );
 }

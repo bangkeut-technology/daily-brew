@@ -4,7 +4,7 @@ import { fetchRoles } from '@/services/role';
 import { createColumnHelper } from '@tanstack/table-core';
 import { Role } from '@/types/role';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Table } from '@/components/table';
+import { DataTable } from '@/components/data-table';
 import { RowSelectionState } from '@tanstack/react-table';
 import { Control, useFieldArray } from 'react-hook-form';
 import { NewRoleDialog } from '@/components/dialog/new-role-dialog';
@@ -83,7 +83,7 @@ export const RoleSelect: React.FunctionComponent<RoleSelectProps> = ({ control, 
                 <NewRoleDialog queryKey={queryKey} />
             </div>
             {description && <p className="text-sm text-muted-foreground">{description}</p>}
-            <Table data={data} columns={columns} rowSelection={roles} onRowSelectionChange={setRoles} />
+            <DataTable data={data} columns={columns} rowSelection={roles} onRowSelectionChange={setRoles} />
         </div>
     );
 };

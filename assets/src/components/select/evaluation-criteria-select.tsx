@@ -4,7 +4,7 @@ import { fetchEvaluationCriterias } from '@/services/evaluation-criteria';
 import { createColumnHelper } from '@tanstack/table-core';
 import { EvaluationCriteria } from '@/types/evaluation-criteria';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Table } from '@/components/table';
+import { DataTable } from '@/components/data-table';
 import { RowSelectionState } from '@tanstack/react-table';
 import { Control, useFieldArray } from 'react-hook-form';
 import { NewEvaluationCriteriaDialog } from '@/components/dialog/new-evaluation-criteria-dialog';
@@ -99,7 +99,7 @@ export const EvaluationCriteriaSelect: React.FunctionComponent<EvaluationCriteri
                 <NewEvaluationCriteriaDialog queryKey={queryKey} />
             </div>
             {description && <p className="text-sm text-muted-foreground">{description}</p>}
-            <Table
+            <DataTable
                 data={data}
                 columns={columns}
                 rowSelection={evaluationCriterias}

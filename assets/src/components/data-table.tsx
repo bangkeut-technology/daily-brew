@@ -14,7 +14,7 @@ import {
     VisibilityState,
 } from '@tanstack/table-core';
 
-interface TableProps<T> {
+interface DataTableProps<T> {
     data: T[];
     columns: ColumnDef<T, any>[];
     rowSelection?: RowSelectionState;
@@ -27,7 +27,7 @@ interface TableProps<T> {
     onColumnVisibilityChange?: OnChangeFn<VisibilityState>;
 }
 
-export const Table = <T,>({
+export const DataTable = <T,>({
     data,
     columns,
     rowSelection,
@@ -38,7 +38,7 @@ export const Table = <T,>({
     onSortingChange,
     onColumnFiltersChange,
     onColumnVisibilityChange,
-}: TableProps<T>) => {
+}: DataTableProps<T>) => {
     const { t } = useTranslation();
 
     const table = useReactTable({
@@ -130,4 +130,4 @@ export const Table = <T,>({
     );
 };
 
-Table.displayName = 'Table';
+DataTable.displayName = 'DataTable';
