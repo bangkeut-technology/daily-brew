@@ -6,17 +6,14 @@ namespace App\ApiController;
 use App\ApiController\Trait\EmployeeTrait;
 use App\ApiController\Trait\EvaluationTemplateTrait;
 use App\Controller\AbstractController;
-use App\Entity\Employee;
 use App\Entity\User;
+use App\Event\Employee\CheckEmployeeLimitEvent;
 use App\Form\EmployeeFormType;
-use App\Form\RoleFormType;
 use App\Repository\EmployeeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
-use PHPUnit\Event\Dispatcher;
 use Random\RandomException;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -109,6 +106,7 @@ class EmployeeController extends AbstractController
         #[CurrentUser] User $user
     ): JsonResponse
     {
+        $this->dispatcher->dispatch(new CheckEmployeeLimitEvent($this->getUser()));
         $employee = $this->employeeRepository->create();
         $form = $this->createForm(EmployeeFormType::class, $employee);
         $form->submit($request->getPayload()->all());

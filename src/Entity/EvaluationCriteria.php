@@ -54,7 +54,7 @@ class EvaluationCriteria extends AbstractEntity
     /**
      * @var Collection<int, EvaluationTemplateCriteria>
      */
-    #[ORM\OneToMany(targetEntity: EvaluationTemplateCriteria::class, mappedBy: 'criteria', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: EvaluationTemplateCriteria::class, mappedBy: 'criteria', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $templates;
 
     public function __construct()

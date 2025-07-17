@@ -6,8 +6,8 @@ namespace App\EventSubscriber;
 use App\Event\Employee\CheckEmployeeLimitEvent;
 use App\Repository\EmployeeRepository;
 use LogicException;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class EmployeeSubscriber
@@ -19,8 +19,7 @@ readonly class EmployeeSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private EmployeeRepository $employeeRepository,
-        private Security           $security,
-        private int                $maxFreeEmployees,
+        private int                $maxFreeEmployees, private TranslatorInterface $translator,
     )
     {
     }
@@ -32,15 +31,14 @@ readonly class EmployeeSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function checkEmployeeLimitEvent(): void
+    public function checkEmployeeLimitEvent(CheckEmployeeLimitEvent $event): void
     {
-        $count = $this->employeeRepository->countByUser($this->security->getUser());
+        $count = $this->employeeRepository->countByUser($event->user);
 
         if ($count >= $this->maxFreeEmployees) {
-            throw new LogicException(sprintf(
-                'Free plan allows only %d employees.',
-                $this->maxFreeEmployees
-            ));
+            throw new LogicException(
+                $this->translator->trans('max_free_employees', ['%count%' => $this->maxFreeEmployees], domain: 'errors')
+            );
         }
     }
 }

@@ -14,3 +14,10 @@ services:
 
     App\:
         resource: '../src/'
+        exclude:
+            - '../src/Constant/'
+            - '../src/DTO/'
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Event/'
+            - '../src/Kernel.php'

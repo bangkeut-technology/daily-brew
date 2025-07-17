@@ -7,11 +7,14 @@ use App\ApiController\Trait\EvaluationTemplateTrait;
 use App\Controller\AbstractController;
 use App\Entity\EvaluationTemplate;
 use App\Entity\User;
+use App\Event\EvaluationTemplate\EvaluationTemplateCreatedEvent;
 use App\Form\EvaluationTemplateFormType;
+use App\Repository\EvaluationTemplateCriteriaRepository;
 use App\Repository\EvaluationTemplateRepository;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Random\RandomException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,8 +35,10 @@ class EvaluationTemplateController extends AbstractController
     use EvaluationTemplateTrait;
 
     public function __construct(
-        TranslatorInterface                           $translator,
-        private readonly EvaluationTemplateRepository $evaluationTemplateRepository
+        TranslatorInterface                                   $translator,
+        private readonly EvaluationTemplateRepository         $evaluationTemplateRepository,
+        private readonly EvaluationTemplateCriteriaRepository $evaluationTemplateCriteriaRepository,
+        private readonly EventDispatcherInterface $dispatcher
     )
     {
         parent::__construct($translator);
@@ -92,11 +97,14 @@ class EvaluationTemplateController extends AbstractController
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
             $template->setUser($this->getUser());
-            $criteria = $form->get('criteria')->getData();
-            dump($criteria);
-//            $this->evaluationTemplateRepository->updateEvaluationTemplate($template);
+            $this->evaluationTemplateRepository->updateEvaluationTemplate($template);
 
-            return $this->createTemplateResponse($template, Response::HTTP_CREATED);
+            $this->dispatcher->dispatch(new EvaluationTemplateCreatedEvent($template, $form->get('criterias')->getData()));
+
+            return $this->createTemplateResponse([
+                'message' => $this->translator->trans('created.evaluation_template', ['%name%' => $template->getName()]),
+                'template' => $template
+            ], Response::HTTP_CREATED);
         }
 
         return $this->createBadRequestResponse($this->translator->trans('invalid.evaluation_template', domain: 'errors'));

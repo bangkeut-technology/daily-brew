@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Event\Employee;
 
+use App\Entity\User;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -11,9 +12,10 @@ use Symfony\Contracts\EventDispatcher\Event;
  * @package App\Event\Employee
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-class CheckEmployeeLimitEvent extends Event
+final class CheckEmployeeLimitEvent extends Event
 {
     public function __construct(
+        public readonly User $user
     )
     {
     }
