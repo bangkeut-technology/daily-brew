@@ -6,6 +6,7 @@ namespace App\Form;
 
 
 use App\Entity\Employee;
+use App\Entity\EvaluationCriteria;
 use App\Entity\EvaluationTemplate;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -26,6 +27,11 @@ class EvaluationTemplateFormType extends AbstractType
         $builder
             ->add('name')
             ->add('description')
+            ->add('criterias', EntityType::class, [
+                'class' => EvaluationCriteria::class,
+                'choice_label' => 'id',
+                'multiple' => true,
+            ])
             ->add('employees', EntityType::class, [
                 'class' => Employee::class,
                 'choice_label' => 'id',

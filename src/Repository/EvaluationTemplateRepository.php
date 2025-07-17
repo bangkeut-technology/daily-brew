@@ -47,7 +47,7 @@ class EvaluationTemplateRepository extends AbstractRepository
      */
     public function updateEvaluationTemplate(EvaluationTemplate $evaluationTemplate, bool $andFlush = true): void
     {
-        $evaluationTemplate->setCanonicalName($this->canonicalizer->canonicalizeString($evaluationTemplate->getCanonicalName()));
+        $evaluationTemplate->setCanonicalName($this->canonicalizer->canonicalizeString($evaluationTemplate->getName()));
         if (null === $evaluationTemplate->getIdentifier()) {
             $string = TokenGenerator::getString(symbols: false);
             do {

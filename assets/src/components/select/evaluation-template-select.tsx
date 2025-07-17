@@ -23,7 +23,7 @@ export const EvaluationTemplateSelect: React.FunctionComponent<EvaluationTemplat
     placeholder,
 }) => {
     const { data = [] } = useQuery({
-        queryKey: ['evaluation-templates'],
+        queryKey,
         queryFn: () => fetchEvaluationTemplates(),
     });
 
