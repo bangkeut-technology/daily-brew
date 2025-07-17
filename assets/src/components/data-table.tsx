@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table as SDTable, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ColumnDef, flexRender, RowSelectionState, useReactTable } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
@@ -13,9 +13,11 @@ import {
     SortingState,
     VisibilityState,
 } from '@tanstack/table-core';
+import { Loader2Icon } from 'lucide-react';
 
 interface DataTableProps<T> {
     data: T[];
+    loading?: boolean;
     columns: ColumnDef<T, any>[];
     rowSelection?: RowSelectionState;
     sorting?: SortingState;
@@ -29,6 +31,7 @@ interface DataTableProps<T> {
 
 export const DataTable = <T,>({
     data,
+    loading,
     columns,
     rowSelection,
     sorting,
@@ -63,7 +66,7 @@ export const DataTable = <T,>({
     return (
         <React.Fragment>
             <div className="rounded-md border">
-                <SDTable>
+                <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
@@ -80,7 +83,16 @@ export const DataTable = <T,>({
                         ))}
                     </TableHeader>
                     <TableBody>
-                        {table.getRowModel().rows?.length ? (
+                        {loading ? (
+                            <TableRow>
+                                <TableCell colSpan={columns.length} className="h-24">
+                                    <div className="flex items-center justify-center space-x-2">
+                                        <Loader2Icon className="animate-spin mr-2" />
+                                        {t('table.loading', { ns: 'glossary' })}
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ) : table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                                     {row.getVisibleCells().map((cell) => (
@@ -98,7 +110,7 @@ export const DataTable = <T,>({
                             </TableRow>
                         )}
                     </TableBody>
-                </SDTable>
+                </Table>
             </div>
             <div className="flex items-center justify-end space-x-2 p-4">
                 <div className="flex-1 text-sm text-muted-foreground">

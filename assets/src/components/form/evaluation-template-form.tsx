@@ -13,7 +13,7 @@ interface EvaluationTemplateFormProps {
     onSubmit?: (data: PartialEvaluationTemplate) => void;
 }
 
-export const EvaluationTemplateForm: React.FunctionComponent<EvaluationTemplateFormProps> = ({ form, isPending }) => {
+export const EvaluationTemplateForm = React.memo<EvaluationTemplateFormProps>(({ form, isPending }) => {
     const { t } = useTranslation();
 
     return (
@@ -38,6 +38,6 @@ export const EvaluationTemplateForm: React.FunctionComponent<EvaluationTemplateF
             />
         </Form>
     );
-};
+});
 
 EvaluationTemplateForm.displayName = 'EvaluationTemplateForm';

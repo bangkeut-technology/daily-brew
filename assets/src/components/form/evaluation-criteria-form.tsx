@@ -13,7 +13,7 @@ interface EvaluationCriteriaFormProps {
     onSubmit?: (data: PartialEvaluationCriteria) => void;
 }
 
-export const EvaluationCriteriaForm: React.FunctionComponent<EvaluationCriteriaFormProps> = ({ form, isPending }) => {
+export const EvaluationCriteriaForm = React.memo<EvaluationCriteriaFormProps>(({ form, isPending }) => {
     const { t } = useTranslation();
 
     const options = React.useMemo(
@@ -50,6 +50,6 @@ export const EvaluationCriteriaForm: React.FunctionComponent<EvaluationCriteriaF
             />
         </Form>
     );
-};
+});
 
 EvaluationCriteriaForm.displayName = 'EvaluationCriteriaForm';

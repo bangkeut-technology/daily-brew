@@ -82,6 +82,8 @@
     },
     "table": {
         "of": "of",
+        "search": "Search",
+        "loading": "Loading...",
         "previous": "Previous",
         "next": "Next",
         "row_selected": "row(s) selected",

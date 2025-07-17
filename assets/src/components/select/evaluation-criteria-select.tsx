@@ -32,7 +32,7 @@ export const EvaluationCriteriaSelect: React.FunctionComponent<EvaluationCriteri
         name,
         control,
     });
-    const { data = [] } = useQuery({
+    const { data = [], isPending } = useQuery({
         queryKey,
         queryFn: () => fetchEvaluationCriterias(),
     });
@@ -104,6 +104,7 @@ export const EvaluationCriteriaSelect: React.FunctionComponent<EvaluationCriteri
                 columns={columns}
                 rowSelection={evaluationCriterias}
                 onRowSelectionChange={setEvaluationCriterias}
+                loading={isPending}
             />
         </div>
     );
