@@ -49,7 +49,7 @@ class EvaluationCriteriaController extends AbstractController
         description: 'Returns a list of evaluation criterias.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: EvaluationCriteria::class, groups: ['evaluation_criteria:read']))
+            items: new OA\Items(ref: new Model(type: EvaluationCriteria::class, groups: ['criteria:read']))
         )
     )]
     #[Route(name: 'gets', methods: ['GET'])]
@@ -73,7 +73,7 @@ class EvaluationCriteriaController extends AbstractController
     #[OA\Response(
         response: Response::HTTP_CREATED,
         description: 'Creates a new evaluation criteria.',
-        content: new OA\JsonContent(ref: new Model(type: EvaluationCriteria::class, groups: ['evaluation_criteria:read']))
+        content: new OA\JsonContent(ref: new Model(type: EvaluationCriteria::class, groups: ['criteria:read']))
     )]
     #[OA\RequestBody(
         description: 'The evaluation criteria data to create.',
@@ -160,7 +160,7 @@ class EvaluationCriteriaController extends AbstractController
     #[OA\Response(
         response: Response::HTTP_OK,
         description: 'Returns an evaluation criteria by its identifier.',
-        content: new OA\JsonContent(ref: new Model(type: EvaluationCriteria::class, groups: ['evaluation_criteria:read']))
+        content: new OA\JsonContent(ref: new Model(type: EvaluationCriteria::class, groups: ['criteria:read']))
     )]
     #[OA\Response(
         response: Response::HTTP_NOT_FOUND,
@@ -197,7 +197,7 @@ class EvaluationCriteriaController extends AbstractController
     #[OA\Response(
         response: Response::HTTP_OK,
         description: 'Updates an existing evaluation criteria.',
-        content: new OA\JsonContent(ref: new Model(type: EvaluationCriteria::class, groups: ['evaluation_criteria:read']))
+        content: new OA\JsonContent(ref: new Model(type: EvaluationCriteria::class, groups: ['criteria:read']))
     )]
     #[OA\RequestBody(
         description: 'The evaluation criteria data to update.',

@@ -20,10 +20,10 @@ trait EmployeeTrait
      *
      * @param mixed $data    The data to return in the response.
      * @param int   $status  The status identifier of the response.
-     * @param array $context The context of the response. The default is ['groups' => ['employee:read', 'user:read', 'store:read', 'role:read']].
+     * @param array $context The context of the response. The default is ['groups' => ['employee:read', 'user:read', 'store:read', 'role:read', 'template:read']].
      * @return JsonResponse
      */
-    private function createEmployeeResponse(mixed $data, int $status = Response::HTTP_OK, array $context = ['groups' => ['employee:read', 'user:read', 'store:read', 'role:read']]): JsonResponse
+    private function createEmployeeResponse(mixed $data, int $status = Response::HTTP_OK, array $context = ['groups' => ['employee:read', 'user:read', 'store:read', 'role:read', 'template:read']]): JsonResponse
     {
         return $this->json($data, $status, context: $context);
     }

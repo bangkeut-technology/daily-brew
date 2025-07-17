@@ -24,23 +24,23 @@ use Symfony\Component\Serializer\Attribute\Groups;
 class EvaluationTemplate extends AbstractEntity
 {
     #[ORM\Column]
-    #[Groups(['evaluation_template:read'])]
+    #[Groups(['template:read'])]
     private ?string $identifier = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['evaluation_template:read'])]
+    #[Groups(['template:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['evaluation_template:read'])]
+    #[Groups(['template:read'])]
     private ?string $canonicalName = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['evaluation_template:read'])]
+    #[Groups(['template:read'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['evaluation_template:read'])]
+    #[Groups(['template:read'])]
     private bool $active = true;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'templates')]

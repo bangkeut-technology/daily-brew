@@ -25,23 +25,23 @@ use Symfony\Component\Serializer\Attribute\Groups;
 class EvaluationCriteria extends AbstractEntity
 {
     #[ORM\Column]
-    #[Groups(['evaluation_criteria:read'])]
+    #[Groups(['criteria:read'])]
     private ?string $identifier = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['evaluation_criteria:read'])]
+    #[Groups(['criteria:read'])]
     private ?string $label = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['evaluation_criteria:read'])]
+    #[Groups(['criteria:read'])]
     private ?string $canonicalLabel = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['evaluation_criteria:read'])]
+    #[Groups(['criteria:read'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['evaluation_criteria:read'])]
+    #[Groups(['criteria:read'])]
     private int $weight = 1;
 
     /**

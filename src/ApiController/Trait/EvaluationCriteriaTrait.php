@@ -22,7 +22,7 @@ trait EvaluationCriteriaTrait
         return $this->json(
             $data,
             $statusCode,
-            context: ['groups' => ['evaluation_criteria:read']]
+            context: ['groups' => ['criteria:read']]
         );
     }
 

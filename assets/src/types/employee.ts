@@ -1,4 +1,5 @@
 import { Role } from '@/types/role';
+import { EvaluationTemplate } from '@/types/evaluation-template';
 
 export type Employee = {
     id: number;
@@ -10,9 +11,13 @@ export type Employee = {
     joinedAt?: string;
     status: EmployeeStatus;
     roles: Role[];
+    templates?: EvaluationTemplate[];
 };
 
-export type PartialEmployee = Omit<Employee, 'id' | 'identifier' | 'dob' | 'joinedAt' | 'roles' | 'status'> & {
+export type PartialEmployee = Omit<
+    Employee,
+    'id' | 'identifier' | 'dob' | 'joinedAt' | 'roles' | 'status' | 'templates'
+> & {
     dob?: Date;
     joinedAt?: Date;
     roles?: Array<{ value: number }>;

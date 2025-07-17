@@ -54,7 +54,7 @@ class EvaluationTemplateController extends AbstractController
         description: 'Returns a list of evaluation templates.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: EvaluationTemplate::class, groups: ['evaluation_template:read']))
+            items: new OA\Items(ref: new Model(type: EvaluationTemplate::class, groups: ['template:read']))
         )
     )]
     #[Route(name: 'gets', methods: ['GET'])]
@@ -78,7 +78,7 @@ class EvaluationTemplateController extends AbstractController
     #[OA\Response(
         response: Response::HTTP_CREATED,
         description: 'Creates a new evaluation template.',
-        content: new OA\JsonContent(ref: new Model(type: EvaluationTemplate::class, groups: ['evaluation_template:read']))
+        content: new OA\JsonContent(ref: new Model(type: EvaluationTemplate::class, groups: ['template:read']))
     )]
     #[OA\RequestBody(
         description: 'The evaluation template data to create.',
@@ -169,7 +169,7 @@ class EvaluationTemplateController extends AbstractController
     #[OA\Response(
         response: Response::HTTP_OK,
         description: 'Returns an evaluation template by its identifier.',
-        content: new OA\JsonContent(ref: new Model(type: EvaluationTemplate::class, groups: ['evaluation_template:read']))
+        content: new OA\JsonContent(ref: new Model(type: EvaluationTemplate::class, groups: ['template:read']))
     )]
     #[OA\Response(
         response: Response::HTTP_NOT_FOUND,
@@ -206,7 +206,7 @@ class EvaluationTemplateController extends AbstractController
     #[OA\Response(
         response: Response::HTTP_OK,
         description: 'Updates an existing evaluation template.',
-        content: new OA\JsonContent(ref: new Model(type: EvaluationTemplate::class, groups: ['evaluation_template:read']))
+        content: new OA\JsonContent(ref: new Model(type: EvaluationTemplate::class, groups: ['template:read']))
     )]
     #[OA\RequestBody(
         description: 'The evaluation template data to update.',

@@ -90,6 +90,7 @@ class Employee extends AbstractEntity
      */
     #[ORM\ManyToMany(targetEntity: EvaluationTemplate::class, inversedBy: 'employees')]
     #[ORM\JoinTable(name: 'daily_brew_employee_templates')]
+    #[Groups(['employee:read'])]
     private Collection $templates;
 
     public function __construct()
