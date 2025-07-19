@@ -31,8 +31,8 @@ function EmployeeDetails() {
                     </ul>
                 </CardContent>
             </Card>
-            <h1>{t('evaluation_templates.title', { ns: 'glossary' })}</h1>
-            <p>{t('evaluation_templates.description', { ns: 'glossary' })}</p>
+            <h1>{t('employee_evaluations.new.title', { ns: 'glossary' })}</h1>
+            <p>{t('employee_evaluations.new.description', { ns: 'glossary' })}</p>
             <EmployeeEvaluationTemplates employee={employee} />
         </div>
     );

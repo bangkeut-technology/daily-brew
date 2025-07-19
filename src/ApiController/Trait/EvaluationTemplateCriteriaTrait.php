@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\ApiController\Trait;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -13,7 +14,14 @@ use Symfony\Component\HttpFoundation\Response;
  */
 trait EvaluationTemplateCriteriaTrait
 {
-    private function createTemplateCriteriaResponse(mixed $data, int $statusCode = Response::HTTP_OK): array
+    /**
+     * Create a JSON response for evaluation template criteria.
+     *
+     * @param mixed $data The data to be included in the response.
+     * @param int $statusCode The HTTP status code for the response.
+     * @return JsonResponse
+     */
+    private function createTemplateCriteriaResponse(mixed $data, int $statusCode = Response::HTTP_OK): JsonResponse
     {
         return $this->json(
             $data,

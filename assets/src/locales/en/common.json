@@ -54,6 +54,7 @@
     "name": "Name",
     "show": "Show",
     "hide": "Hide",
+    "submit": "Submit",
     "toggle_theme": "Toggle Theme",
     "light": "Light",
     "dark": "Dark",

@@ -191,6 +191,16 @@ class EmployeeEvaluation extends AbstractEntity
         return $this->scores;
     }
 
+    /**
+     * @param Collection<int, EmployeeScore> $scores
+     * @return $this
+     */
+    public function setScores(Collection $scores): static
+    {
+        $this->scores = $scores;
+        return $this;
+    }
+
     public function addScore(EmployeeScore $score): static
     {
         if (!$this->scores->contains($score)) {

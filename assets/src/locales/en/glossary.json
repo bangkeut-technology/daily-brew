@@ -49,6 +49,7 @@
     },
     "evaluation_templates": {
         "title": "Evaluation Templates",
+        "subtitle": "Manage the templates used for employee performance reviews. You can create multiple templates for different evaluation purposes.",
         "description": "Evaluation Template Description",
         "name": "Evaluation Template Name",
         "select": {
@@ -66,6 +67,24 @@
     "placeholder": {
         "picker": {
             "date": "Select a date"
+        }
+    },
+    "evaluation_template_criterias": {
+        "title": "Evaluation Template Criterias",
+        "subtitle": "Manage the criteria included in your evaluation templates. You can add multiple criteria to each template.",
+        "score": "Score"
+    },
+    "employee_evaluations": {
+        "title": "Employee Evaluations",
+        "subtitle": "View and manage evaluations for your employees. You can create new evaluations based on selected templates.",
+        "new": {
+            "title": "New Evaluation",
+            "description": "Create a new evaluation for an employee using the selected template.",
+            "save": "Save Evaluation"
+        },
+        "view": {
+            "title": "View Evaluation",
+            "description": "View the details of the selected evaluation, including scores and comments."
         }
     },
     "role": {

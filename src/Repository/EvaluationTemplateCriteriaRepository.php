@@ -4,8 +4,11 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\EvaluationTemplateCriteria;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class EvaluationTemplateCriteriaRepository
@@ -26,5 +29,20 @@ class EvaluationTemplateCriteriaRepository extends AbstractRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, EvaluationTemplateCriteria::class);
+    }
+
+    /**
+     * Finds EvaluationTemplateCriteria by the associated user.
+     *
+     * @param UserInterface|User|null $user The user associated with the evaluation template criteria.
+     *
+     * @return QueryBuilder The query builder for fetching evaluation template criteria by user.
+     */
+    public function findByUserQueryBuilder(UserInterface|User|null $user): QueryBuilder
+    {
+        return $this->createQueryBuilder('ect')
+            ->innerJoin('ect.template', 't')
+            ->where('t.user = :user')
+            ->setParameter('user', $user);
     }
 }

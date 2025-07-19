@@ -9,8 +9,10 @@ use App\Entity\User;
 use App\Util\CanonicalizerInterface;
 use App\Util\TokenGenerator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Random\RandomException;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class EvaluationCriteriaRepository
@@ -90,5 +92,18 @@ class EvaluationCriteriaRepository extends AbstractRepository
                 ->setParameter('identifier', $identifier)
                 ->getQuery()
                 ->getSingleScalarResult() > 0;
+    }
+
+    /**
+     * Find evaluation criteria by user.
+     *
+     * @param UserInterface|User|null $user The user to filter by.
+     * @return QueryBuilder Returns a QueryBuilder instance for further query customization.
+     */
+    public function findByUserQueryBuilder(UserInterface|User|null $user): QueryBuilder
+    {
+        return $this->createQueryBuilder('ec')
+            ->andWhere('ec.user = :user')
+            ->setParameter('user', $user);
     }
 }

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\ApiController;
 
+use App\ApiController\Trait\EvaluationTemplateCriteriaTrait;
 use App\ApiController\Trait\EvaluationTemplateTrait;
 use App\Controller\AbstractController;
 use App\Entity\EvaluationTemplate;
