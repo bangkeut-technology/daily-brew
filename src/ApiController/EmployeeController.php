@@ -451,4 +451,49 @@ class EmployeeController extends AbstractController
         $evaluations = $this->employeeEvaluationRepository->findByPeriodAndEmployee(new DateTimeImmutable($from), new DateTimeImmutable($to), $employee);
         return $this->createEmployeeEvaluationResponse($evaluations);
     }
+
+    /**
+     * @throws Exception
+     */
+    #[OA\Parameter(
+        name: 'identifier',
+        description: 'The unique identifier of the employee',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string', example: 'emp123')
+    )]
+    #[OA\Parameter(
+        name: 'from',
+        description: 'The start date of the evaluation period in YYYY-MM-DD format',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'string', example: '2023-01-01')
+    )]
+    #[OA\Parameter(
+        name: 'to',
+        description: 'The end date of the evaluation period in YYYY-MM-DD format',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'string', example: '2023-12-31')
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns the average score of evaluations for the employee',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'averageScore', type: 'number', format: 'float', example: 85.5)
+            ],
+            type: 'object'
+        )
+    )]
+    #[Route('/{identifier}/evaluations/evaluations/average-score', name: 'get_evaluation_by_id', methods: ['GET'])]
+    public function getAverageScore(string $identifier, Request $request): JsonResponse
+    {
+        $from = new DateTimeImmutable($request->query->get('from', (new DateTimeImmutable())->format('Y-m-d')));
+        $to = new DateTimeImmutable($request->query->get('to', (new DateTimeImmutable())->format('Y-m-d')));
+
+        $average = $this->employeeEvaluationRepository->getAverageScoreForPeriod($id, $from, $to);
+
+        return $this->json(['averageScore' => $average]);
+}
 }
