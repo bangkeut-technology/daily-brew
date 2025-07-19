@@ -27,7 +27,7 @@ trait EmployeeEvaluationTrait
     private function createEmployeeEvaluationResponse(
         mixed $data,
         int $status = Response::HTTP_OK,
-        array $context = ['groups' => ['employee_evaluation:read', 'employee_criteria:read', 'employee:read', 'user:read', 'store:read', 'role:read', 'template:read']]
+        array $context = ['groups' => ['employee_evaluation:read', 'employee_score:read', 'employee:read', 'user:read', 'store:read', 'role:read', 'template:read']]
     ): JsonResponse
     {
         return $this->json($data, $status, context: $context);

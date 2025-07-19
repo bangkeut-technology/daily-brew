@@ -108,7 +108,7 @@ class EmployeeEvaluationRepository extends AbstractRepository
      *
      * @return EmployeeEvaluation[]
      */
-    public function findByPeriodAndEmployee(DateTimeImmutable $from, DateTimeImmutable $to, Employee $employee)
+    public function findByPeriodAndEmployee(DateTimeImmutable $from, DateTimeImmutable $to, Employee $employee): array
     {
         return $this->createQueryBuilder('ee')
             ->innerJoin('ee.scores', 'ees')

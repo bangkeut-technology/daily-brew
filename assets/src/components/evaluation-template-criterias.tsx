@@ -15,6 +15,7 @@ import { PartialEmployeeScore } from '@/types/EmployeeScore';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
 import { Employee } from '@/types/employee';
+import { fetchEmployeeEvaluation } from '@/services/employee';
 
 interface EvaluationTemplateCriteriasProps {
     employee: Employee;
@@ -32,7 +33,11 @@ export const EvaluationTemplateCriterias: React.FunctionComponent<EvaluationTemp
         isSuccess,
     } = useQuery({
         queryKey: ['evaluation-template-criterias', template.identifier],
-        queryFn: async () => fetchTemplateCriterias(template.identifier),
+        queryFn: () => fetchTemplateCriterias(template.identifier),
+    });
+    const { data: evaluation } = useQuery({
+        queryKey: ['employee-evaluation', employee.identifier],
+        queryFn: async () => fetchEmployeeEvaluation({ identifier: employee.identifier, date: new Date() }),
     });
     const { mutate } = useMutation({
         mutationFn: postEmployeeEvaluation,
@@ -61,9 +66,23 @@ export const EvaluationTemplateCriterias: React.FunctionComponent<EvaluationTemp
                 weight: criteria.weight,
                 score: '1',
             }));
+            if (evaluation) {
+                const existingScores = evaluation.scores.reduce(
+                    (acc, score) => {
+                        acc[score.criteria.id] = score.score.toString();
+                        return acc;
+                    },
+                    {} as Record<number, string>,
+                );
+                scores.forEach((score) => {
+                    if (existingScores[score.criteria]) {
+                        score.score = existingScores[score.criteria];
+                    }
+                });
+            }
             form.setValue('scores', scores);
         }
-    }, [data, form, isSuccess]);
+    }, [data, evaluation, form, isSuccess]);
 
     const options = React.useMemo(
         () =>
