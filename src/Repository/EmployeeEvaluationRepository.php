@@ -49,7 +49,7 @@ class EmployeeEvaluationRepository extends AbstractRepository
     {
         return $this->createQueryBuilder('ee')
             ->innerJoin('ee.scores', 'ees')
-            ->where('ee.evaluator = :date')
+            ->where('ee.evaluatedAt = :date')
             ->andWhere('ee.employee = :employee')
             ->setParameters(new ArrayCollection([
                 new Parameter('date', $date, Types::DATE_IMMUTABLE),
@@ -99,7 +99,27 @@ class EmployeeEvaluationRepository extends AbstractRepository
                 ->getSingleScalarResult() > 0;
     }
 
-    public function updateEvaluation(?EmployeeEvaluation $evaluation)
+    /**
+     * Find evaluations by period and employee.
+     *
+     * @param DateTimeImmutable $from     The start date of the period.
+     * @param DateTimeImmutable $to       The end date of the period.
+     * @param Employee          $employee The employee to filter evaluations by.
+     *
+     * @return EmployeeEvaluation[]
+     */
+    public function findByPeriodAndEmployee(DateTimeImmutable $from, DateTimeImmutable $to, Employee $employee)
     {
+        return $this->createQueryBuilder('ee')
+            ->innerJoin('ee.scores', 'ees')
+            ->where('ee.evaluatedAt BETWEEN :from AND :to')
+            ->andWhere('ee.employee = :employee')
+            ->setParameters(new ArrayCollection([
+                new Parameter('from', $from, Types::DATE_IMMUTABLE),
+                new Parameter('to', $to, Types::DATE_IMMUTABLE),
+                new Parameter('employee', $employee),
+            ]))
+            ->getQuery()
+            ->getResult();
     }
 }

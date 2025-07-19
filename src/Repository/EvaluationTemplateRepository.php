@@ -10,8 +10,10 @@ use App\Entity\User;
 use App\Util\CanonicalizerInterface;
 use App\Util\TokenGenerator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Random\RandomException;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class EvaluationTemplateRepository
@@ -115,5 +117,19 @@ class EvaluationTemplateRepository extends AbstractRepository
             ->setParameter('user', $user)
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Create a QueryBuilder to find evaluation templates by user.
+     *
+     * @param UserInterface|User|null $user The user whose evaluation templates to find.
+     * @return QueryBuilder Returns a QueryBuilder instance.
+     */
+    public function findByUserQueryBuilder(UserInterface|User|null $user): QueryBuilder
+    {
+        return $this->createQueryBuilder('et')
+            ->where('et.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('et.name', 'ASC');
     }
 }

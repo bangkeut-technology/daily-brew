@@ -62,7 +62,7 @@ class EmployeeEvaluation extends AbstractEntity
     /**
      * @var Collection<int, EmployeeScore>
      */
-    #[ORM\OneToMany(targetEntity: EmployeeScore::class, mappedBy: 'evaluation', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: EmployeeScore::class, mappedBy: 'evaluation', cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[Groups(['employee_evaluation:read'])]
     private Collection $scores;
 

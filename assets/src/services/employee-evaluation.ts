@@ -12,6 +12,14 @@ export const postEmployeeEvaluation = async ({
         .post<{
             message: string;
             evaluation: EmployeeEvaluation;
-        }>(`/employees/${identifier}/evaluations`, data)
+        }>(`/employees/${identifier}/evaluations`, {
+            template: data.template,
+            note: data.note,
+            scores: data.scores.map((score) => ({
+                score: score.score,
+                criteria: score.criteria,
+                comment: score.comment,
+            })),
+        })
         .then((response) => response.data);
 };

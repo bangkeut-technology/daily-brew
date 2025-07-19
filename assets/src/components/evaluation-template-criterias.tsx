@@ -10,18 +10,19 @@ import { Loader2Icon } from 'lucide-react';
 import { Form } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { postEmployeeEvaluation } from '@/services/employee-evaluation';
+import { PartialEmployeeEvaluation } from '@/types/employee-evaluation';
+import { PartialEmployeeScore } from '@/types/EmployeeScore';
+import { toast } from 'sonner';
+import { isAxiosError } from 'axios';
+import { Employee } from '@/types/employee';
 
 interface EvaluationTemplateCriteriasProps {
+    employee: Employee;
     template: EvaluationTemplate;
 }
 
-type Score = {
-    label: string;
-    id: number;
-    score: string;
-};
-
 export const EvaluationTemplateCriterias: React.FunctionComponent<EvaluationTemplateCriteriasProps> = ({
+    employee,
     template,
 }) => {
     const { t } = useTranslation();
@@ -35,26 +36,32 @@ export const EvaluationTemplateCriterias: React.FunctionComponent<EvaluationTemp
     });
     const { mutate } = useMutation({
         mutationFn: postEmployeeEvaluation,
-        onSuccess: (data) => {},
-        onError: (error) => {},
-    });
-    const form = useForm<{
-        criterias: Array<Score>;
-    }>({
-        defaultValues: {
-            criterias: [],
+        onSuccess: (data) => {
+            toast.success(data.message);
+        },
+        onError: (error) => {
+            const message = isAxiosError(error) ? error.response?.data.message : t('occurred', { ns: 'error' });
+            toast.error(message);
         },
     });
-    const { fields } = useFieldArray({ control: form.control, name: 'criterias' });
+    const form = useForm<PartialEmployeeEvaluation>({
+        defaultValues: {
+            template: template.id,
+            note: '',
+            scores: [],
+        },
+    });
+    const { fields } = useFieldArray({ control: form.control, name: 'scores' });
 
     React.useEffect(() => {
         if (isSuccess && data.length) {
-            const criterias = data.map<Score>((criteria) => ({
-                label: criteria.criteria.label,
-                id: criteria.id,
+            const scores = data.map<PartialEmployeeScore>((criteria) => ({
+                criteriaLabel: criteria.criteria.label,
+                criteria: criteria.id,
+                weight: criteria.weight,
                 score: '1',
             }));
-            form.reset({ criterias });
+            form.setValue('scores', scores);
         }
     }, [data, form, isSuccess]);
 
@@ -80,12 +87,12 @@ export const EvaluationTemplateCriterias: React.FunctionComponent<EvaluationTemp
         return fields.map((item, index) => (
             <div key={item.id}>
                 <div className="grid grid-cols-4 gap-4 items-center p-4">
-                    <p className="text-2xl col-span-2 font-semibold">{item.label}</p>
+                    <p className="text-2xl col-span-2 font-semibold">{item.criteriaLabel}</p>
                     <Separator orientation="vertical" />
                     <SelectField
                         className="w-full"
                         control={form.control}
-                        name={`criterias.${index}.score`}
+                        name={`scores.${index}.score`}
                         options={options}
                         label={label}
                     />
@@ -95,7 +102,12 @@ export const EvaluationTemplateCriterias: React.FunctionComponent<EvaluationTemp
         ));
     }, [fields, form.control, isPending, label, options]);
 
-    const onSubmit = React.useCallback(() => {}, []);
+    const onSubmit = React.useCallback(
+        (data: PartialEmployeeEvaluation) => {
+            mutate({ identifier: employee.identifier, data });
+        },
+        [employee.identifier, mutate],
+    );
 
     return (
         <div className="w-full h-full">

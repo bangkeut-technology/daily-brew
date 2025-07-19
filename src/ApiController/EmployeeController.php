@@ -10,12 +10,14 @@ use App\Controller\AbstractController;
 use App\Entity\EmployeeEvaluation;
 use App\Entity\User;
 use App\Event\Employee\CheckEmployeeLimitEvent;
+use App\Event\EmployeeEvaluation\FinalizeEmployeeEvaluationEvent;
 use App\Form\EmployeeEvaluationFormType;
 use App\Form\EmployeeFormType;
 use App\Repository\EmployeeEvaluationRepository;
 use App\Repository\EmployeeRepository;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
+use Exception;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Random\RandomException;
@@ -351,20 +353,10 @@ class EmployeeController extends AbstractController
         $form = $this->createForm(EmployeeEvaluationFormType::class, $evaluation);
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
-            $evaluation->setTemplateName($evaluation->getTemplate()->getName());
             $evaluation->setEmployee($employee);
-            $evaluation->setEvaluatedAt(new DateTimeImmutable());
-            $totalWeightedScore = 0;
-            $totalWeight = 0;
-            foreach ($evaluation->getScores() as $score) {
-                $criteria = $score->getCriteria();
-                $score->setCriteriaLabel($criteria->getCriteria()->getLabel());
-                $score->setWeight($criteria->getWeight());
-                $totalWeightedScore += $score->getScore() * $score->getWeight();
-                $totalWeight += $score->getWeight();
-            }
-            $averageScore = $totalWeight > 0 ? $totalWeightedScore / $totalWeight : null;
-            $evaluation->setAverageScore($averageScore);
+            $evaluation->setEvaluator($this->getUser());
+
+            $this->dispatcher->dispatch(new FinalizeEmployeeEvaluationEvent($evaluation));
 
             $this->employeeEvaluationRepository->updateEmployeeEvaluation($evaluation);
             return $this->createEmployeeEvaluationResponse([
@@ -372,6 +364,91 @@ class EmployeeController extends AbstractController
                 'evaluation' => $evaluation
             ], Response::HTTP_CREATED);
         }
+
         return $this->createBadRequestResponse($this->translator->trans('invalid.employee_evaluation', domain: 'errors'));
+    }
+
+    /**
+     * Get employee evaluation by identifier and date
+     *
+     * @param string  $identifier The unique identifier of the employee
+     * @param Request $request    The HTTP request containing the date parameter
+     * @return JsonResponse
+     * @throws Exception
+     */
+    #[OA\Parameter(
+        name: 'identifier',
+        description: 'The unique identifier of the employee',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string', example: 'emp123')
+    )]
+    #[OA\Parameter(
+        name: 'date',
+        description: 'The date of the evaluation in YYYY-MM-DD format',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'string', example: '2023-10-01')
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns the employee evaluation for the specified date',
+        content: new OA\JsonContent(ref: new Model(type: EmployeeEvaluation::class, groups: ['employee_evaluation:read', 'employee_criteria:read', 'employee:read', 'user:read', 'store:read', 'role:read', 'template:read']))
+    )]
+    #[Route('/{identifier}/evaluation', name: 'get_evaluation', methods: ['GET'])]
+    public function getEmployeeEvaluation(string $identifier, Request $request): JsonResponse
+    {
+        $employee = $this->getEmployeeByIdentifier($identifier);
+        $date = $request->query->get('date', (new DateTimeImmutable())->format('Y-m-d'));
+        $evaluation = $this->employeeEvaluationRepository->findByDateAndEmployee(new DateTimeImmutable($date), $employee);
+        return $this->createEmployeeEvaluationResponse($evaluation);
+    }
+
+    /**
+     * Get all evaluations for the employee by identifier and period
+     *
+     * @param string  $identifier The unique identifier of the employee
+     * @param Request $request    The HTTP request
+     * @return JsonResponse
+     * @throws Exception
+     */
+    #[OA\Parameter(
+        name: 'identifier',
+        description: 'The unique identifier of the employee',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string', example: 'emp123')
+    )]
+    #[OA\Parameter(
+        name: 'from',
+        description: 'The start date of the evaluation period in YYYY-MM-DD format',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'string', example: '2023-01-01')
+    )]
+    #[OA\Parameter(
+        name: 'to',
+        description: 'The end date of the evaluation period in YYYY-MM-DD format',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'string', example: '2023-12-31')
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns all evaluations for the employee',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: EmployeeEvaluation::class, groups: ['employee_evaluation:read', 'employee_criteria:read', 'employee:read', 'user:read', 'store:read', 'role:read', 'template:read']))
+        )
+    )]
+    #[Route('/{identifier}/evaluations', name: 'get_evaluations', methods: ['GET'])]
+    public function getEmployeeEvaluations(string $identifier, Request $request): JsonResponse
+    {
+        $employee = $this->getEmployeeByIdentifier($identifier);
+        $from = $request->query->get('from', (new DateTimeImmutable())->modify('-1 year')->format('Y-m-d'));
+        $to = $request->query->get('to', (new DateTimeImmutable())->format('Y-m-d'));
+
+        $evaluations = $this->employeeEvaluationRepository->findByPeriodAndEmployee(new DateTimeImmutable($from), new DateTimeImmutable($to), $employee);
+        return $this->createEmployeeEvaluationResponse($evaluations);
     }
 }

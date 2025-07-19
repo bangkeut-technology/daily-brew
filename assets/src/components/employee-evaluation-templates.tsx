@@ -15,7 +15,7 @@ export const EmployeeEvaluationTemplates: React.FunctionComponent<EmployeeEvalua
             <AccordionItem key={template.identifier} value={template.identifier}>
                 <AccordionTrigger>{template.name}</AccordionTrigger>
                 <AccordionContent>
-                    <EvaluationTemplateCriterias template={template} />
+                    <EvaluationTemplateCriterias employee={employee} template={template} />
                 </AccordionContent>
             </AccordionItem>
         ));

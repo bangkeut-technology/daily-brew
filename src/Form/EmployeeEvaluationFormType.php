@@ -11,6 +11,7 @@ use App\Entity\EvaluationTemplateCriteria;
 use App\Entity\User;
 use App\Repository\EvaluationCriteriaRepository;
 use App\Repository\EvaluationTemplateCriteriaRepository;
+use App\Repository\EvaluationTemplateRepository;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -43,7 +44,7 @@ class EmployeeEvaluationFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('notes', TextType::class, [
+            ->add('note', TextType::class, [
                 'documentation' => [
                     'type' => 'string',
                     'description' => 'Notes for the evaluation',
@@ -52,7 +53,7 @@ class EmployeeEvaluationFormType extends AbstractType
             ->add('template', EntityType::class, [
                 'class' => EvaluationTemplate::class,
                 'choice_label' => 'id',
-                'query_builder' => function (EvaluationCriteriaRepository $repository): QueryBuilder {
+                'query_builder' => function (EvaluationTemplateRepository $repository): QueryBuilder {
                     return $repository->findByUserQueryBuilder($this->user);
                 },
                 'documentation' => [
