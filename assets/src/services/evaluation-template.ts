@@ -1,5 +1,6 @@
 import { EvaluationTemplate, PartialEvaluationTemplate } from '@/types/evaluation-template';
 import { apiAxios } from '@/lib/apiAxios';
+import { EvaluationTemplateCriteria } from '@/types/evaluation-template-criterias';
 
 export const fetchEvaluationTemplates = async () => {
     const response = await apiAxios.get<EvaluationTemplate[]>(`/evaluation-templates`);
@@ -40,5 +41,11 @@ export const deleteEvaluationTemplate = async (identifier: string) => {
 export const patchEvaluationTemplate = async (identifier: string) => {
     return await apiAxios
         .patch<{ evaluation: EvaluationTemplate; message: string }>(`/evaluation-templates/${identifier}`)
+        .then((response) => response.data);
+};
+
+export const fetchTemplateCriterias = async (identifier: string) => {
+    return await apiAxios
+        .get<EvaluationTemplateCriteria[]>(`/evaluation-templates/${identifier}/criterias`)
         .then((response) => response.data);
 };

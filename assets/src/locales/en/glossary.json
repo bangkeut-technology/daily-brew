@@ -25,7 +25,9 @@
             "label": "Label",
             "weight": "Weight",
             "title": "Evaluation Criterias",
-            "description": "Manage the criteria used to evaluate employee performance. You can create multiple criteria for comprehensive evaluations."
+            "subtitle": "Manage the criteria used to evaluate employee performance. You can create multiple criteria for comprehensive evaluations.",
+            "description": "Description",
+            "score": "Score"
         },
         "description": {
             "title": "Evaluation Criteria Description",

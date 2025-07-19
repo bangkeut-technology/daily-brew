@@ -23,60 +23,126 @@ class EmployeeScore extends AbstractEntity
     private ?EmployeeEvaluation $evaluation = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?EvaluationCriteria $criteria = null;
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?EvaluationTemplateCriteria $criteria = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $criteriaLabel = null;
 
     #[ORM\Column]
     private ?int $score = null;
 
+    #[ORM\Column]
+    private ?int $weight = null;
+
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $comment = null;
 
+    /**
+     * @return EmployeeEvaluation|null
+     */
     public function getEvaluation(): ?EmployeeEvaluation
     {
         return $this->evaluation;
     }
 
-    public function setEvaluation(?EmployeeEvaluation $evaluation): static
+    /**
+     * @param EmployeeEvaluation|null $evaluation
+     * @return EmployeeScore
+     */
+    public function setEvaluation(?EmployeeEvaluation $evaluation): EmployeeScore
     {
         $this->evaluation = $evaluation;
-
         return $this;
     }
 
-    public function getCriteria(): ?EvaluationCriteria
+    /**
+     * @return EvaluationTemplateCriteria|null
+     */
+    public function getCriteria(): ?EvaluationTemplateCriteria
     {
         return $this->criteria;
     }
 
-    public function setCriteria(?EvaluationCriteria $criteria): static
+    /**
+     * @param EvaluationTemplateCriteria|null $criteria
+     * @return EmployeeScore
+     */
+    public function setCriteria(?EvaluationTemplateCriteria $criteria): EmployeeScore
     {
         $this->criteria = $criteria;
-
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
+    public function getCriteriaLabel(): ?string
+    {
+        return $this->criteriaLabel;
+    }
+
+    /**
+     * @param string|null $criteriaLabel
+     * @return EmployeeScore
+     */
+    public function setCriteriaLabel(?string $criteriaLabel): EmployeeScore
+    {
+        $this->criteriaLabel = $criteriaLabel;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
     public function getScore(): ?int
     {
         return $this->score;
     }
 
-    public function setScore(int $score): static
+    /**
+     * @param int|null $score
+     * @return EmployeeScore
+     */
+    public function setScore(?int $score): EmployeeScore
     {
         $this->score = $score;
-
         return $this;
     }
 
+    /**
+     * @return int|null
+     */
+    public function getWeight(): ?int
+    {
+        return $this->weight;
+    }
+
+    /**
+     * @param int|null $weight
+     * @return EmployeeScore
+     */
+    public function setWeight(?int $weight): EmployeeScore
+    {
+        $this->weight = $weight;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
     public function getComment(): ?string
     {
         return $this->comment;
     }
 
-    public function setComment(?string $comment): static
+    /**
+     * @param string|null $comment
+     * @return EmployeeScore
+     */
+    public function setComment(?string $comment): EmployeeScore
     {
         $this->comment = $comment;
-
         return $this;
     }
 }

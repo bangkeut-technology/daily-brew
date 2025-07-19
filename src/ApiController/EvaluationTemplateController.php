@@ -6,6 +6,7 @@ namespace App\ApiController;
 use App\ApiController\Trait\EvaluationTemplateTrait;
 use App\Controller\AbstractController;
 use App\Entity\EvaluationTemplate;
+use App\Entity\EvaluationTemplateCriteria;
 use App\Entity\User;
 use App\Event\EvaluationTemplate\EvaluationTemplateCreatedEvent;
 use App\Form\EvaluationTemplateFormType;
@@ -33,12 +34,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class EvaluationTemplateController extends AbstractController
 {
     use EvaluationTemplateTrait;
+    use EvaluationTemplateCriteriaTrait;
 
     public function __construct(
         TranslatorInterface                                   $translator,
         private readonly EvaluationTemplateRepository         $evaluationTemplateRepository,
         private readonly EvaluationTemplateCriteriaRepository $evaluationTemplateCriteriaRepository,
-        private readonly EventDispatcherInterface $dispatcher
+        private readonly EventDispatcherInterface             $dispatcher
     )
     {
         parent::__construct($translator);
@@ -233,5 +235,30 @@ class EvaluationTemplateController extends AbstractController
         }
 
         return $this->createBadRequestResponse($this->translator->trans('invalid.evaluation_template', domain: 'errors'));
+    }
+
+    /**
+     * Retrieves the criteria associated with the evaluation template.
+     *
+     * @param string $identifier The identifier of the evaluation template.
+     *
+     * @return JsonResponse The list of criteria associated with the evaluation template.
+     */
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns the criteria associated with the evaluation template.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: EvaluationTemplateCriteria::class, groups: ['criteria:read']))
+        )
+    )]
+    #[Route('/{identifier}/criterias', name: 'get_criterias', methods: ['GET'])]
+    public function getCriterias(string $identifier): JsonResponse
+    {
+        $template = $this->getEvaluationTemplateByIdentifier($identifier);
+
+        $criterias = $this->evaluationTemplateCriteriaRepository->findBy(['template' => $template]);
+
+        return $this->createTemplateCriteriaResponse($criterias);
     }
 }

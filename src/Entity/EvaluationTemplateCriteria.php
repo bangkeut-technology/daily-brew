@@ -5,6 +5,7 @@ namespace App\Entity;
 
 use App\Repository\EvaluationTemplateCriteriaRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Class EvaluationTemplateCriteria
@@ -17,12 +18,15 @@ use Doctrine\ORM\Mapping as ORM;
 class EvaluationTemplateCriteria extends AbstractEntity
 {
     #[ORM\Column]
+    #[Groups(['template_criteria:read'])]
     private ?int $weight = null;
 
     #[ORM\ManyToOne(targetEntity: EvaluationTemplate::class, inversedBy: 'criterias')]
+    #[Groups(['template_criteria:read'])]
     private ?EvaluationTemplate $template = null;
 
     #[ORM\ManyToOne(targetEntity: EvaluationCriteria::class, inversedBy: 'templates')]
+    #[Groups(['template_criteria:read'])]
     private ?EvaluationCriteria $criteria = null;
 
     /**
