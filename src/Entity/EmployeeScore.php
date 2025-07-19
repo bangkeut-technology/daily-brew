@@ -7,6 +7,7 @@ namespace App\Entity;
 use App\Repository\EmployeeScoreRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Class EmployeeScore
@@ -24,18 +25,23 @@ class EmployeeScore extends AbstractEntity
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    #[Groups(['employee_score:read'])]
     private ?EvaluationTemplateCriteria $criteria = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['employee_score:read'])]
     private ?string $criteriaLabel = null;
 
     #[ORM\Column]
+    #[Groups(['employee_score:read'])]
     private ?int $score = null;
 
     #[ORM\Column]
+    #[Groups(['employee_score:read'])]
     private ?int $weight = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['employee_score:read'])]
     private ?string $comment = null;
 
     /**

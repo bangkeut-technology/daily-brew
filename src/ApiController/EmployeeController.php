@@ -3,13 +3,18 @@ declare(strict_types=1);
 
 namespace App\ApiController;
 
+use App\ApiController\Trait\EmployeeEvaluationTrait;
 use App\ApiController\Trait\EmployeeTrait;
 use App\ApiController\Trait\EvaluationTemplateTrait;
 use App\Controller\AbstractController;
+use App\Entity\EmployeeEvaluation;
 use App\Entity\User;
 use App\Event\Employee\CheckEmployeeLimitEvent;
+use App\Form\EmployeeEvaluationFormType;
 use App\Form\EmployeeFormType;
+use App\Repository\EmployeeEvaluationRepository;
 use App\Repository\EmployeeRepository;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
@@ -33,12 +38,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class EmployeeController extends AbstractController
 {
     use EmployeeTrait;
+    use EmployeeEvaluationTrait;
     use EvaluationTemplateTrait;
 
     public function __construct(
-        TranslatorInterface                       $translator,
-        private readonly EmployeeRepository       $employeeRepository,
-        private readonly EventDispatcherInterface $dispatcher,
+        TranslatorInterface                           $translator,
+        private readonly EventDispatcherInterface     $dispatcher,
+        private readonly EmployeeRepository           $employeeRepository,
+        private readonly EmployeeEvaluationRepository $employeeEvaluationRepository,
     )
     {
         parent::__construct($translator);
@@ -288,5 +295,83 @@ class EmployeeController extends AbstractController
             'employee' => $employee,
             $this->translator->trans('added.evaluation_template', ['%template%' => $template], 'messages')
         ]);
+    }
+
+    /**
+     * Post an evaluation for the employee by identifier
+     *
+     * @param string  $identifier The unique identifier of the employee
+     * @param Request $request    The HTTP request containing the evaluation data
+     * @return JsonResponse
+     * @throws RandomException
+     */
+    #[OA\Parameter(
+        name: 'identifier',
+        description: 'The unique identifier of the employee',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string', example: 'emp123')
+    )]
+    #[OA\RequestBody(
+        description: 'Evaluation data',
+        content: new OA\JsonContent(
+            ref: new Model(type: EmployeeEvaluationFormType::class),
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_CREATED,
+        description: 'Creates a new evaluation for the employee',
+        content: new OA\JsonContent(ref: new Model(
+            type: EmployeeEvaluation::class,
+            groups: ['employee_evaluation:read', 'employee_criteria:read', 'employee:read', 'user:read', 'store:read', 'role:read', 'template:read']
+        ))
+    )]
+    #[OA\Response(
+        response: Response::HTTP_BAD_REQUEST,
+        description: 'Invalid input data',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'message',
+                    type: 'string',
+                    example: 'Invalid input data'
+                )
+            ],
+            type: 'object'
+        )
+    )]
+    #[Route('/{identifier}/evaluations', name: 'post_evaluations', methods: ['POST'])]
+    public function postEvaluation(string $identifier, Request $request): JsonResponse
+    {
+        $employee = $this->getEmployeeByIdentifier($identifier);
+        if (null === $evaluation = $this->employeeEvaluationRepository->findByDateAndEmployee(new DateTimeImmutable(), $employee)) {
+            $evaluation = $this->employeeEvaluationRepository->create();
+        }
+
+        $form = $this->createForm(EmployeeEvaluationFormType::class, $evaluation);
+        $form->submit($request->getPayload()->all());
+        if ($form->isSubmitted() && $form->isValid()) {
+            $evaluation->setTemplateName($evaluation->getTemplate()->getName());
+            $evaluation->setEmployee($employee);
+            $evaluation->setEvaluatedAt(new DateTimeImmutable());
+            $totalWeightedScore = 0;
+            $totalWeight = 0;
+            foreach ($evaluation->getScores() as $score) {
+                $criteria = $score->getCriteria();
+                $score->setCriteriaLabel($criteria->getCriteria()->getLabel());
+                $score->setWeight($criteria->getWeight());
+                $totalWeightedScore += $score->getScore() * $score->getWeight();
+                $totalWeight += $score->getWeight();
+            }
+            $averageScore = $totalWeight > 0 ? $totalWeightedScore / $totalWeight : null;
+            $evaluation->setAverageScore($averageScore);
+
+            $this->employeeEvaluationRepository->updateEmployeeEvaluation($evaluation);
+            return $this->createEmployeeEvaluationResponse([
+                'message' => $this->translator->trans('created.employee_evaluation'),
+                'evaluation' => $evaluation
+            ], Response::HTTP_CREATED);
+        }
+        return $this->createBadRequestResponse($this->translator->trans('invalid.employee_evaluation', domain: 'errors'));
     }
 }

@@ -1,13 +1,15 @@
 import React from 'react';
 import { EvaluationTemplate } from '@/types/evaluation-template';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { fetchTemplateCriterias } from '@/services/evaluation-template';
 import { SelectField } from '@/components/field/select-field';
 import { Separator } from '@/components/ui/separator';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { Loader2Icon } from 'lucide-react';
 import { Form } from '@/components/ui/form';
+import { Button } from '@/components/ui/button';
+import { postEmployeeEvaluation } from '@/services/employee-evaluation';
 
 interface EvaluationTemplateCriteriasProps {
     template: EvaluationTemplate;
@@ -30,6 +32,11 @@ export const EvaluationTemplateCriterias: React.FunctionComponent<EvaluationTemp
     } = useQuery({
         queryKey: ['evaluation-template-criterias', template.identifier],
         queryFn: async () => fetchTemplateCriterias(template.identifier),
+    });
+    const { mutate } = useMutation({
+        mutationFn: postEmployeeEvaluation,
+        onSuccess: (data) => {},
+        onError: (error) => {},
     });
     const form = useForm<{
         criterias: Array<Score>;
@@ -88,9 +95,14 @@ export const EvaluationTemplateCriterias: React.FunctionComponent<EvaluationTemp
         ));
     }, [fields, form.control, isPending, label, options]);
 
+    const onSubmit = React.useCallback(() => {}, []);
+
     return (
         <div className="w-full h-full">
             <Form {...form}>{renderItems()}</Form>
+            <Button onClick={form.handleSubmit(onSubmit)} className="w-full mt-4">
+                {t('employee_evaluations.new.save', { ns: 'glossary' })}
+            </Button>
         </div>
     );
 };

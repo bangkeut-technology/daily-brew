@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Class EmployeeEvaluation
@@ -20,36 +21,49 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'daily_brew_employee_evaluations')]
 #[ORM\Entity(repositoryClass: EmployeeEvaluationRepository::class)]
 #[ORM\UniqueConstraint(name: 'UQ_EMPLOYEE_EVALUATION', columns: ['evaluated_at', 'employee_id', 'template_name'])]
+#[ORM\UniqueConstraint(name: 'UQ_EMPLOYEE_EVALUATION_IDENTIFIER', columns: ['identifier'])]
 class EmployeeEvaluation extends AbstractEntity
 {
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['employee_evaluation:read'])]
     private ?Employee $employee = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['employee_evaluation:read'])]
     private ?User $evaluator = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    #[Groups(['employee_evaluation:read'])]
     private ?EvaluationTemplate $template = null;
 
     #[ORM\Column]
+    #[Groups(['employee_evaluation:read'])]
+    private ?string $identifier = null;
+
+    #[ORM\Column]
+    #[Groups(['employee_evaluation:read'])]
     private ?string $templateName = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: false)]
+    #[Groups(['employee_evaluation:read'])]
     private DateTimeImmutable $evaluatedAt;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $notes = null;
+    #[Groups(['employee_evaluation:read'])]
+    private ?string $note = null;
 
     #[ORM\Column]
-    private ?float $average = null;
+    #[Groups(['employee_evaluation:read'])]
+    private ?float $averageScore = null;
 
     /**
      * @var Collection<int, EmployeeScore>
      */
     #[ORM\OneToMany(targetEntity: EmployeeScore::class, mappedBy: 'evaluation', orphanRemoval: true)]
+    #[Groups(['employee_evaluation:read'])]
     private Collection $scores;
 
     public function __construct()
@@ -114,6 +128,24 @@ class EmployeeEvaluation extends AbstractEntity
     /**
      * @return string|null
      */
+    public function getIdentifier(): ?string
+    {
+        return $this->identifier;
+    }
+
+    /**
+     * @param string|null $identifier
+     * @return EmployeeEvaluation
+     */
+    public function setIdentifier(?string $identifier): EmployeeEvaluation
+    {
+        $this->identifier = $identifier;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
     public function getTemplateName(): ?string
     {
         return $this->templateName;
@@ -150,36 +182,36 @@ class EmployeeEvaluation extends AbstractEntity
     /**
      * @return string|null
      */
-    public function getNotes(): ?string
+    public function getNote(): ?string
     {
-        return $this->notes;
+        return $this->note;
     }
 
     /**
-     * @param string|null $notes
+     * @param string|null $note
      * @return EmployeeEvaluation
      */
-    public function setNotes(?string $notes): EmployeeEvaluation
+    public function setNote(?string $note): EmployeeEvaluation
     {
-        $this->notes = $notes;
+        $this->note = $note;
         return $this;
     }
 
     /**
      * @return float|null
      */
-    public function getAverage(): ?float
+    public function getAverageScore(): ?float
     {
-        return $this->average;
+        return $this->averageScore;
     }
 
     /**
-     * @param float|null $average
+     * @param float|null $averageScore
      * @return EmployeeEvaluation
      */
-    public function setAverage(?float $average): EmployeeEvaluation
+    public function setAverageScore(?float $averageScore): EmployeeEvaluation
     {
-        $this->average = $average;
+        $this->averageScore = $averageScore;
         return $this;
     }
 

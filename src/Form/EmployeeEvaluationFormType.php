@@ -16,6 +16,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -42,19 +43,49 @@ class EmployeeEvaluationFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('notes')
+            ->add('notes', TextType::class, [
+                'documentation' => [
+                    'type' => 'string',
+                    'description' => 'Notes for the evaluation',
+                ],
+            ])
             ->add('template', EntityType::class, [
                 'class' => EvaluationTemplate::class,
                 'choice_label' => 'id',
                 'query_builder' => function (EvaluationCriteriaRepository $repository): QueryBuilder {
                     return $repository->findByUserQueryBuilder($this->user);
                 },
+                'documentation' => [
+                    'type' => 'integer',
+                    'description' => 'Evaluation template ID',
+                ],
             ])
             ->add('scores', CollectionType::class, [
                 'entry_type' => EmployeeScoreFormType::class,
                 'allow_add' => true,
                 'allow_delete' => true,
                 'by_reference' => false,
+                'documentation' => [
+                    'type' => 'array',
+                    'description' => 'Scores for the evaluation criteria',
+                    'items' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'criteria' => [
+                                'type' => 'integer',
+                                'description' => 'ID of the evaluation criteria',
+                            ],
+                            'comment' => [
+                                'type' => 'string',
+                                'description' => 'Comment for the criteria',
+                            ],
+                            'score' => [
+                                'type' => 'number',
+                                'description' => 'Score given for the criteria',
+                            ],
+                        ],
+                    ],
+                ],
             ]);
     }
 

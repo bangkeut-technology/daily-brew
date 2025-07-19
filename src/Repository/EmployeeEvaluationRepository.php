@@ -4,9 +4,17 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Entity\Employee;
 use App\Entity\EmployeeEvaluation;
+use App\Entity\EvaluationTemplate;
+use App\Util\TokenGenerator;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\Persistence\ManagerRegistry;
+use Random\RandomException;
 
 /**
  * Class EmployeeEvaluationRepository
@@ -29,28 +37,69 @@ class EmployeeEvaluationRepository extends AbstractRepository
         parent::__construct($registry, EmployeeEvaluation::class);
     }
 
-    //    /**
-    //     * @return EmployeeEvaluation[] Returns an array of EmployeeEvaluation objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('e')
-    //            ->andWhere('e.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('e.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Find evaluations by date and employee.
+     *
+     * @param DateTimeImmutable $date
+     * @param Employee          $employee
+     *
+     * @return EmployeeEvaluation|null
+     */
+    public function findByDateAndEmployee(DateTimeImmutable $date, Employee $employee): ?EmployeeEvaluation
+    {
+        return $this->createQueryBuilder('ee')
+            ->innerJoin('ee.scores', 'ees')
+            ->where('ee.evaluator = :date')
+            ->andWhere('ee.employee = :employee')
+            ->setParameters(new ArrayCollection([
+                new Parameter('date', $date, Types::DATE_IMMUTABLE),
+                new Parameter('employee', $employee),
+            ]))
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 
-    //    public function findOneBySomeField($value): ?EmployeeEvaluation
-    //    {
-    //        return $this->createQueryBuilder('e')
-    //            ->andWhere('e.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * Update an employee evaluation.
+     *
+     * @param EmployeeEvaluation $employeeEvaluation The employee evaluation to update.
+     * @param bool               $andFlush           Whether to flush the changes (default true).
+     *
+     * @throws RandomException Throws an exception if the identifier already exists.
+     */
+    public function updateEmployeeEvaluation(EmployeeEvaluation $employeeEvaluation, bool $andFlush = true): void
+    {
+        if (null === $employeeEvaluation->getIdentifier()) {
+            $string = TokenGenerator::getString(symbols: false);
+            do {
+                $identifier = TokenGenerator::generateFromString($string);
+            } while ($this->isIdentifierExists($identifier));
+
+            $employeeEvaluation->setIdentifier($identifier);
+        }
+
+        $this->update($employeeEvaluation, $andFlush);
+    }
+
+
+    /**
+     * Check if an identifier already exists.
+     *
+     * @param string $identifier
+     *
+     * @return bool
+     */
+    public function isIdentifierExists(string $identifier): bool
+    {
+        return $this->createQueryBuilder('ee')
+                ->select('COUNT(ee.id)')
+                ->where('ee.identifier = :identifier')
+                ->setParameter('identifier', $identifier)
+                ->getQuery()
+                ->getSingleScalarResult() > 0;
+    }
+
+    public function updateEvaluation(?EmployeeEvaluation $evaluation)
+    {
+    }
 }

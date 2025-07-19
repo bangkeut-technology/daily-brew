@@ -31,6 +31,9 @@ abstract class AbstractEntity
         'criteria:read',
         'template:read',
         'role:read',
+        'employee:read',
+        'employee_evaluation:read',
+        'employee_score:read',
     ])]
     protected ?int $id = null;
 
