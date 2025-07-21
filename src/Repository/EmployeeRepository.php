@@ -157,7 +157,7 @@ class EmployeeRepository extends AbstractRepository
     {
         return $this->createQueryBuilder('e')
             ->select('e, s')
-            ->innerJoin('e.store', 's')
+            ->leftJoin('e.store', 's')
             ->where('e.user = :user')
             ->setParameter('user', $user)
             ->getQuery()

@@ -15,6 +15,7 @@ use App\Form\EmployeeEvaluationFormType;
 use App\Form\EmployeeFormType;
 use App\Repository\EmployeeEvaluationRepository;
 use App\Repository\EmployeeRepository;
+use App\Util\DateHelper;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Exception;
@@ -56,8 +57,10 @@ class EmployeeController extends AbstractController
     /**
      * Get employees by current user
      *
-     * @param User $user
+     * @param Request $request
+     * @param User    $user
      * @return JsonResponse
+     * @throws Exception
      */
     #[OA\Response(
         response: Response::HTTP_OK,
@@ -69,11 +72,27 @@ class EmployeeController extends AbstractController
     )]
     #[Route(name: 'gets', methods: ['GET'])]
     public function gets(
+        Request             $request,
         #[CurrentUser] User $user
     ): JsonResponse
     {
         $employees = $this->employeeRepository->findByUser($user);
-        return $this->createEmployeeResponse($employees);
+        $now = new DateTimeImmutable();
+        $from = new DateTimeImmutable($request->query->get('from', DateHelper::startOfMonth($now)->format('Y-m-d')));
+        $to = new DateTimeImmutable($request->query->get('to', DateHelper::endOfMonth($now)->format('Y-m-d')));
+        $listEmployees = [];
+        foreach ($employees as $employee) {
+            $listEmployees[$employee->getId()] = $employee;
+        }
+        if (count($listEmployees) > 0) {
+            $averageScores = $this->employeeEvaluationRepository->getAverageScoresForPeriod($employees, $from, $to);
+            foreach ($averageScores as $averageScore) {
+                if (null !== $listEmployees[$averageScore['employeeId']]) {
+                    $listEmployees[$averageScore['employeeId']]->averageScore = $averageScore['averageScore'] ?? 0;
+                }
+            }
+        }
+        return $this->createEmployeeResponse(array_values($listEmployees));
     }
 
     /**
@@ -137,8 +156,10 @@ class EmployeeController extends AbstractController
     /**
      * Get employee details by identifier
      *
-     * @param string $identifier The unique identifier of the employee
+     * @param string  $identifier The unique identifier of the employee
+     * @param Request $request
      * @return JsonResponse
+     * @throws Exception
      */
     #[OA\Parameter(
         name: 'identifier',
@@ -146,6 +167,20 @@ class EmployeeController extends AbstractController
         in: 'path',
         required: true,
         schema: new OA\Schema(type: 'string', example: 'emp123')
+    )]
+    #[OA\Parameter(
+        name: 'from',
+        description: 'The start date of the evaluation period in YYYY-MM-DD format',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'string', example: '2023-01-01')
+    )]
+    #[OA\Parameter(
+        name: 'to',
+        description: 'The end date of the evaluation period in YYYY-MM-DD format',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'string', example: '2023-12-31')
     )]
     #[OA\Response(
         response: Response::HTTP_OK,
@@ -167,9 +202,13 @@ class EmployeeController extends AbstractController
         )
     )]
     #[Route('/{identifier}', name: 'get', methods: ['GET'])]
-    public function get(string $identifier): JsonResponse
+    public function get(string $identifier, Request $request): JsonResponse
     {
         $employee = $this->getEmployeeByIdentifier($identifier);
+        $now = new DateTimeImmutable();
+        $from = new DateTimeImmutable($request->query->get('from', DateHelper::startOfMonth($now)->format('Y-m-d')));
+        $to = new DateTimeImmutable($request->query->get('to', DateHelper::endOfMonth($now)->format('Y-m-d')));
+        $employee->averageScore = $this->employeeEvaluationRepository->getAverageScoreForPeriod($employee, $from, $to);
         return $this->createEmployeeResponse($employee);
     }
 
@@ -489,11 +528,12 @@ class EmployeeController extends AbstractController
     #[Route('/{identifier}/evaluations/evaluations/average-score', name: 'get_evaluation_by_id', methods: ['GET'])]
     public function getAverageScore(string $identifier, Request $request): JsonResponse
     {
-        $from = new DateTimeImmutable($request->query->get('from', (new DateTimeImmutable())->format('Y-m-d')));
-        $to = new DateTimeImmutable($request->query->get('to', (new DateTimeImmutable())->format('Y-m-d')));
-
-        $average = $this->employeeEvaluationRepository->getAverageScoreForPeriod($id, $from, $to);
+        $now = new DateTimeImmutable();
+        $from = new DateTimeImmutable($request->query->get('from', DateHelper::startOfMonth($now)->format('Y-m-d')));
+        $to = new DateTimeImmutable($request->query->get('to', DateHelper::endOfMonth($now)->format('Y-m-d')));
+        $employee = $this->getEmployeeByIdentifier($identifier);
+        $average = $this->employeeEvaluationRepository->getAverageScoreForPeriod($employee, $from, $to);
 
         return $this->json(['averageScore' => $average]);
-}
+    }
 }

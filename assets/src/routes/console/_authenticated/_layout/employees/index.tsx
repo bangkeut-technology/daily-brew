@@ -1,24 +1,23 @@
 import React from 'react';
-import { createFileRoute, Link, redirect } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { fetchEmployees } from '@/services/employee';
 import { useTranslation } from 'react-i18next';
 import { useApplication } from '@/hooks/use-application';
 import { CardButton } from '@/components/button/card-button';
 import { UserPlus2 } from 'lucide-react';
+import { z } from 'zod';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/employees/')({
     component: Employees,
-    loader: () => fetchEmployees(),
-    validateSearch: (search) => {
-        return {
-            redirect: search.redirect || '/console',
-        };
-    },
-    beforeLoad: ({ context, search }) => {
-        if (!context.authentication?.isAuthenticated) {
-            throw redirect({ to: (search.redirect as any) || '/console/sign-in' });
-        }
-    },
+    loaderDeps: ({ search: { from, to } }) => ({
+        from,
+        to,
+    }),
+    loader: ({ deps: { from, to } }) => fetchEmployees({ from, to }),
+    validateSearch: z.object({
+        from: z.string(),
+        to: z.string(),
+    }),
 });
 
 function Employees() {

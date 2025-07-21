@@ -57,6 +57,9 @@ class Employee extends AbstractEntity
     #[Groups(['employee:read'])]
     private ?string $identifier = null;
 
+    #[Groups(['employee:read'])]
+    public float $averageScore = 0;
+
     /**
      * @var Store|null
      */
