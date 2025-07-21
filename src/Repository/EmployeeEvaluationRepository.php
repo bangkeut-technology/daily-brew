@@ -145,7 +145,7 @@ class EmployeeEvaluationRepository extends AbstractRepository
                 new Parameter('employee', $employee),
             ]));
 
-        return (float)$qb->getQuery()->getSingleScalarResult();
+        return (float) $qb->getQuery()->getSingleScalarResult();
     }
 
     /**
@@ -158,7 +158,7 @@ class EmployeeEvaluationRepository extends AbstractRepository
     public function getAverageScoresForPeriod(array $employees, DateTimeImmutable $from, DateTimeImmutable $to): array
     {
         $qb = $this->createQueryBuilder('ee')
-            ->select('ROUND(AVG(ees.score), 2) AS averageScore')
+            ->select('ROUND(AVG(ees.score), 2) AS averageScore', )
             ->addSelect('e.id as employeeId')
             ->innerJoin('ee.scores', 'ees')
             ->innerJoin('ee.employee', 'e')

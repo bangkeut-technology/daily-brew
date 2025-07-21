@@ -9,6 +9,7 @@ export type Employee = {
     phoneNumber?: string;
     dob?: string;
     joinedAt?: string;
+    averageScore: number;
     status: EmployeeStatus;
     roles: Role[];
     templates?: EvaluationTemplate[];
@@ -16,7 +17,7 @@ export type Employee = {
 
 export type PartialEmployee = Omit<
     Employee,
-    'id' | 'identifier' | 'dob' | 'joinedAt' | 'roles' | 'status' | 'templates'
+    'id' | 'identifier' | 'dob' | 'joinedAt' | 'roles' | 'status' | 'templates' | 'averageScore'
 > & {
     dob?: Date;
     joinedAt?: Date;

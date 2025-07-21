@@ -1,5 +1,5 @@
 import React from 'react';
-import { createLazyFileRoute } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { EmployeeForm } from '@/components/form/employee-form';
 import { useForm } from 'react-hook-form';
@@ -12,14 +12,25 @@ import { postEmployee } from '@/services/employee';
 import { Send } from 'lucide-react';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
+import { z } from 'zod';
+import { endOfMonth, format, startOfMonth } from 'date-fns';
 
-export const Route = createLazyFileRoute('/console/_authenticated/_layout/employees/new')({
+export const Route = createFileRoute('/console/_authenticated/_layout/employees/new')({
     component: NewEmployeeComponent,
+    validateSearch: z.object({
+        from: z.string().default(format(startOfMonth(new Date()), 'yyyy-MM-dd')),
+        to: z.string().default(format(endOfMonth(new Date()), 'yyyy-MM-dd')),
+    }),
+    loaderDeps: ({ search: { from, to } }) => ({
+        from,
+        to,
+    }),
 });
 
 function NewEmployeeComponent() {
     const { t } = useTranslation();
     const navigate = Route.useNavigate();
+    const { from, to } = Route.useSearch();
     const { mutate, isPending } = useMutation({
         mutationFn: postEmployee,
         onSuccess: (response) => {
@@ -27,6 +38,7 @@ function NewEmployeeComponent() {
             navigate({
                 to: '/console/employees/$identifier',
                 params: { identifier: response.employee.identifier },
+                search: { from, to },
             }).then();
         },
         onError: (error) => {

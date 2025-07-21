@@ -4,10 +4,19 @@ import { fetchEmployee } from '@/services/employee';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { EmployeeEvaluationTemplates } from '@/components/employee-evaluation-templates';
+import { z } from 'zod';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/employees/$identifier/')({
     component: EmployeeDetails,
+    loaderDeps: ({ search: { from, to } }) => ({
+        from,
+        to,
+    }),
     loader: ({ params }) => fetchEmployee(params.identifier),
+    validateSearch: z.object({
+        from: z.string(),
+        to: z.string(),
+    }),
 });
 
 function EmployeeDetails() {

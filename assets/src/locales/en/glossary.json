@@ -6,6 +6,8 @@
         "edit": "Edit Employee",
         "delete": "Delete Employee",
         "view_performance": "View Performance",
+        "current_month_score": "Current Month Score",
+        "kpi_score": "KPI Score",
         "new": {
             "title": "New Employee",
             "description": "Add a new employee to manage their KPIs and performance.",
