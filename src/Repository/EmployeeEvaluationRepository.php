@@ -135,7 +135,7 @@ class EmployeeEvaluationRepository extends AbstractRepository
     public function getAverageScoreForPeriod(Employee $employee, DateTimeImmutable $from, DateTimeImmutable $to): float
     {
         $qb = $this->createQueryBuilder('ee')
-            ->select('AVG(ees.score) AS averageScore')
+            ->select('ROUND(AVG(ees.score), 2) AS averageScore')
             ->innerJoin('ee.scores', 'ees')
             ->where('ee.evaluatedAt BETWEEN :from AND :to')
             ->andWhere('ee.employee = :employee')
@@ -158,7 +158,7 @@ class EmployeeEvaluationRepository extends AbstractRepository
     public function getAverageScoresForPeriod(array $employees, DateTimeImmutable $from, DateTimeImmutable $to): array
     {
         $qb = $this->createQueryBuilder('ee')
-            ->select('AVG(ees.score) AS averageScore')
+            ->select('ROUND(AVG(ees.score), 2) AS averageScore')
             ->addSelect('e.id as employeeId')
             ->innerJoin('ee.scores', 'ees')
             ->innerJoin('ee.employee', 'e')

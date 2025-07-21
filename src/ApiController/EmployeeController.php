@@ -86,9 +86,10 @@ class EmployeeController extends AbstractController
         }
         if (count($listEmployees) > 0) {
             $averageScores = $this->employeeEvaluationRepository->getAverageScoresForPeriod($employees, $from, $to);
+            dump($averageScores);
             foreach ($averageScores as $averageScore) {
                 if (null !== $listEmployees[$averageScore['employeeId']]) {
-                    $listEmployees[$averageScore['employeeId']]->averageScore = $averageScore['averageScore'] ?? 0;
+                    $listEmployees[$averageScore['employeeId']]->averageScore = (float) ($averageScore['averageScore'] ?? 0);
                 }
             }
         }
