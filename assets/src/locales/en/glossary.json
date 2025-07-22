@@ -8,6 +8,15 @@
         "view_performance": "View Performance",
         "current_month_score": "Current Month Score",
         "kpi_score": "KPI Score",
+        "evaluate": "Evaluate",
+        "view": "View",
+        "status": {
+            "active": "Active",
+            "on_leave": "On Leave",
+            "suspended": "Suspended",
+            "resigned": "Resigned",
+            "probation": "On Probation"
+        },
         "new": {
             "title": "New Employee",
             "description": "Add a new employee to manage their KPIs and performance.",

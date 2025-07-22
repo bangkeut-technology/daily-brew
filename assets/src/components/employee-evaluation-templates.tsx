@@ -23,7 +23,9 @@ export const EmployeeEvaluationTemplates: React.FunctionComponent<EmployeeEvalua
 
     return (
         <div className="w-full h-full">
-            <Accordion type="multiple">{renderItems()}</Accordion>
+            <Accordion type="multiple" defaultValue={employee.templates?.map((template) => template.identifier)}>
+                {renderItems()}
+            </Accordion>
         </div>
     );
 };

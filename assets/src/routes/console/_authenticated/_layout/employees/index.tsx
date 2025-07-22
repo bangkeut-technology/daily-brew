@@ -3,12 +3,11 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { fetchEmployees } from '@/services/employee';
 import { useTranslation } from 'react-i18next';
 import { useApplication } from '@/hooks/use-application';
-import { CardButton } from '@/components/button/card-button';
 import { UserPlus2 } from 'lucide-react';
 import { EmployeeCard } from '@/components/card/employee-card';
 import { z } from 'zod';
-import { Employee } from '@/types/employee';
 import { endOfMonth, format, startOfMonth } from 'date-fns';
+import { Button } from '@/components/ui/button';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/employees/')({
     component: Employees,
@@ -25,34 +24,24 @@ export const Route = createFileRoute('/console/_authenticated/_layout/employees/
 
 function Employees() {
     const { t } = useTranslation();
-    const navigate = Route.useNavigate();
     const { from, to } = Route.useSearch();
     const { maxFreeEmployees } = useApplication();
     const employees = Route.useLoaderData();
 
-    const handleClick = React.useCallback(
-        (employee: Employee) => {
-            navigate({
-                to: '/console/employees/$identifier',
-                params: { identifier: employee.identifier },
-                search: { from, to },
-            });
-        },
-        [from, navigate, to],
-    );
-
     return (
         <div className="p-4">
-            <h1 className="text-2xl font-bold mb-4">{t('employees.title', { ns: 'glossary' })}</h1>
-            <p>{t('employees.description', { maxFreeEmployees: maxFreeEmployees, ns: 'glossary' })}</p>
-            <div className="mt-4 flex flex-row gap-4">
-                <CardButton asChild>
+            <div className="flex gap-2">
+                <h1 className="text-2xl font-bold mb-4">{t('employees.title', { ns: 'glossary' })}</h1>
+                <Button variant="outline" asChild>
                     <Link to="/console/employees/new" className="flex items-center gap-2">
-                        {t('employees.add', { ns: 'glossary' })} <UserPlus2 className="w-6 h-6" />
+                        {t('employees.add', { ns: 'glossary' })} <UserPlus2 />
                     </Link>
-                </CardButton>
+                </Button>
+            </div>
+            <p>{t('employees.description', { maxFreeEmployees: maxFreeEmployees, ns: 'glossary' })}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
                 {employees.map((employee) => (
-                    <EmployeeCard employee={employee} onClick={handleClick} key={employee.identifier} />
+                    <EmployeeCard key={employee.identifier} employee={employee} from={from} to={to} />
                 ))}
             </div>
         </div>
