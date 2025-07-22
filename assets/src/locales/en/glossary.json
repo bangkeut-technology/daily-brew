@@ -12,7 +12,9 @@
         "information": "Employee Information",
         "phone_number": "Phone Number",
         "dob": "Date of Birth",
+        "loading": "Loading employees...",
         "joined_at": "Joined At",
+        "not_found": "Employee not found",
         "performance": {
             "view": "View Performance",
             "title": "Performance",

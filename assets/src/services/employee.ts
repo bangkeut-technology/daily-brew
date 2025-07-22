@@ -8,8 +8,9 @@ export const fetchEmployees = async ({ from, to }: { from: string; to: string })
     return apiAxios.get<Employee[]>(`/employees?${query}`).then((response) => response.data);
 };
 
-export const fetchEmployee = async (identifier: string) => {
-    return apiAxios.get<Employee>(`/employees/${identifier}`).then((response) => response.data);
+export const fetchEmployee = async ({ identifier, from, to }: { identifier: string; from: string; to: string }) => {
+    const query = new URLSearchParams({ from, to });
+    return apiAxios.get<Employee>(`/employees/${identifier}?${query}`).then((response) => response.data);
 };
 
 export const postEmployee = async ({ roles = [], template, ...data }: PartialEmployee) => {
