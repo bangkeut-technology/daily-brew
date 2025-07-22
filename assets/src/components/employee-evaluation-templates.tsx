@@ -5,17 +5,19 @@ import { EvaluationTemplateCriterias } from '@/components/evaluation-template-cr
 
 interface EmployeeEvaluationTemplatesProps {
     employee: Employee;
+    onSuccess?: () => void;
 }
 
 export const EmployeeEvaluationTemplates: React.FunctionComponent<EmployeeEvaluationTemplatesProps> = ({
     employee,
+    onSuccess,
 }) => {
     const renderItems = () => {
         return employee.templates?.map((template) => (
             <AccordionItem key={template.identifier} value={template.identifier}>
                 <AccordionTrigger>{template.name}</AccordionTrigger>
                 <AccordionContent>
-                    <EvaluationTemplateCriterias employee={employee} template={template} />
+                    <EvaluationTemplateCriterias employee={employee} template={template} onSuccess={onSuccess} />
                 </AccordionContent>
             </AccordionItem>
         ));

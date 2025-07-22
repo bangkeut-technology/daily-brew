@@ -11,9 +11,10 @@ interface EmployeeCardProps {
     employee: Employee;
     from: string;
     to: string;
+    onSuccess?: () => void;
 }
 
-export const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, from, to }) => {
+export const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, from, to, onSuccess }) => {
     const { t } = useTranslation('glossary');
     const navigate = useNavigate();
 
@@ -62,7 +63,7 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, from, to }
                     <Eye />
                     {t('employees.view')}
                 </Button>
-                <EmployeeEvaluationButton employee={employee} />
+                <EmployeeEvaluationButton employee={employee} onSuccess={onSuccess} />
             </div>
         </div>
     );

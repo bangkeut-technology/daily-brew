@@ -20,11 +20,15 @@ import { fetchEmployeeEvaluation } from '@/services/employee';
 interface EvaluationTemplateCriteriasProps {
     employee: Employee;
     template: EvaluationTemplate;
+    date?: Date;
+    onSuccess?: () => void;
 }
 
 export const EvaluationTemplateCriterias: React.FunctionComponent<EvaluationTemplateCriteriasProps> = ({
     employee,
     template,
+    date = new Date(),
+    onSuccess,
 }) => {
     const { t } = useTranslation();
     const {
@@ -36,13 +40,16 @@ export const EvaluationTemplateCriterias: React.FunctionComponent<EvaluationTemp
         queryFn: () => fetchTemplateCriterias(template.identifier),
     });
     const { data: evaluation } = useQuery({
-        queryKey: ['employee-evaluation', employee.identifier],
-        queryFn: async () => fetchEmployeeEvaluation({ identifier: employee.identifier, date: new Date() }),
+        queryKey: ['employee-evaluation', employee.identifier, template.identifier, date],
+        queryFn: async () => fetchEmployeeEvaluation({ identifier: employee.identifier, date }),
     });
     const { mutate } = useMutation({
         mutationFn: postEmployeeEvaluation,
         onSuccess: (data) => {
             toast.success(data.message);
+            if (onSuccess) {
+                onSuccess();
+            }
         },
         onError: (error) => {
             const message = isAxiosError(error) ? error.response?.data.message : t('occurred', { ns: 'error' });

@@ -8,16 +8,17 @@ import { useTranslation } from 'react-i18next';
 
 interface EmployeeEvaluationButtonProps {
     employee: Employee;
+    onSuccess?: () => void;
 }
 
-export const EmployeeEvaluationButton: React.FC<EmployeeEvaluationButtonProps> = ({ employee }) => {
+export const EmployeeEvaluationButton: React.FC<EmployeeEvaluationButtonProps> = ({ employee, onSuccess }) => {
     const { t } = useTranslation('glossary');
     const [open, setOpen] = React.useState(false);
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" className="w-full" size="sm">
+                <Button size="sm">
                     <ClipboardCheck />
                     {t('employees.evaluate')}
                 </Button>
@@ -28,7 +29,7 @@ export const EmployeeEvaluationButton: React.FC<EmployeeEvaluationButtonProps> =
                         {t('employees.evaluate')} {employee.firstName}
                     </DialogTitle>
                 </DialogHeader>
-                <EmployeeEvaluationTemplates employee={employee} />
+                <EmployeeEvaluationTemplates employee={employee} onSuccess={onSuccess} />
             </DialogContent>
         </Dialog>
     );
