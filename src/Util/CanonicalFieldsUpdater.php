@@ -1,9 +1,8 @@
 <?php
+
 declare(strict_types=1);
 
-
 namespace App\Util;
-
 
 use App\Entity\User;
 
@@ -16,8 +15,6 @@ readonly class CanonicalFieldsUpdater
 {
     /**
      * CanonicalFieldsUpdater constructor.
-     *
-     * @param CanonicalizerInterface $emailCanonicalizer
      */
     public function __construct(private CanonicalizerInterface $emailCanonicalizer)
     {
@@ -25,8 +22,6 @@ readonly class CanonicalFieldsUpdater
 
     /**
      * Canonicalizes a email.
-     *
-     * @param User $user
      */
     public function updateCanonicalFields(User $user): void
     {
@@ -35,10 +30,6 @@ readonly class CanonicalFieldsUpdater
 
     /**
      * Canonicalizes an email.
-     *
-     * @param string|null $email
-     *
-     * @return string|null
      */
     public function canonicalizeEmail(?string $email): ?string
     {

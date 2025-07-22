@@ -1,12 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Enum;
 
 /**
- * Class EmployeeStatus
+ * Class EmployeeStatus.
  *
- * @package App\Enum
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 enum EmployeeStatus: string

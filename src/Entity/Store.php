@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Entity;
@@ -11,9 +12,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Class Store
+ * Class Store.
  *
- * @package App\Entity
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 #[ORM\Table(name: 'daily_brew_stores')]
@@ -23,34 +23,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\UniqueConstraint(name: 'UNIQ_STORE_IDENTIFIER', fields: ['identifier'])]
 class Store extends AbstractEntity
 {
-    /**
-     * @var string|null
-     */
     #[ORM\Column(length: 255)]
     #[Groups(['store:read'])]
     #[Assert\NotBlank]
     private ?string $name = null;
 
-    /**
-     * @var string|null
-     */
     #[ORM\Column(length: 255)]
     #[Groups(['store:read'])]
     private ?string $canonicalName = null;
 
-    /**
-     * @var string|null
-     */
     #[ORM\Column(length: 32)]
     #[Groups(['store:read'])]
     private ?string $identifier = null;
 
-    /**
-     * @var User|null
-     */
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'stores')]
     private ?User $user = null;
-
 
     #[ORM\OneToMany(targetEntity: Employee::class, mappedBy: 'store', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $employees;
@@ -60,75 +47,51 @@ class Store extends AbstractEntity
         $this->employees = new ArrayCollection();
     }
 
-    /**
-     * @return string|null
-     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @param string|null $name
-     * @return Store
-     */
     public function setName(?string $name): Store
     {
         $this->name = $name;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getCanonicalName(): ?string
     {
         return $this->canonicalName;
     }
 
-    /**
-     * @param string|null $canonicalName
-     * @return Store
-     */
     public function setCanonicalName(?string $canonicalName): Store
     {
         $this->canonicalName = $canonicalName;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getIdentifier(): ?string
     {
         return $this->identifier;
     }
 
-    /**
-     * @param string|null $identifier
-     * @return Store
-     */
     public function setIdentifier(?string $identifier): Store
     {
         $this->identifier = $identifier;
+
         return $this;
     }
 
-    /**
-     * @return User|null
-     */
     public function getUser(): ?User
     {
         return $this->user;
     }
 
-    /**
-     * @param User|null $user
-     * @return Store
-     */
     public function setUser(?User $user): Store
     {
         $this->user = $user;
+
         return $this;
     }
 

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\ApiController;
@@ -24,9 +25,8 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class UserController
+ * Class UserController.
  *
- * @package App\ApiController
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 #[Route('/users', name: 'users_')]
@@ -39,14 +39,13 @@ class UserController extends AbstractController
     /**
      * Constructs a new instance of the class.
      *
-     * @param TranslatorInterface    $translator     The translator component.
-     * @param UserRepository         $userRepository The repository for user data.
+     * @param TranslatorInterface $translator     the translator component
+     * @param UserRepository      $userRepository the repository for user data
      */
     public function __construct(
-        TranslatorInterface             $translator,
+        TranslatorInterface $translator,
         private readonly UserRepository $userRepository, private readonly StoreRepository $storeRepository, private readonly EmployeeRepository $employeeRepository,
-    )
-    {
+    ) {
         parent::__construct($translator);
     }
 
@@ -57,8 +56,7 @@ class UserController extends AbstractController
      * with the user information is returned. If the user is not authenticated, a JSON response with a "null" value is
      * returned.
      *
-     * @param User $user The authenticated user.
-     * @return Response
+     * @param User $user the authenticated user
      */
     #[OA\Response(
         response: Response::HTTP_OK,
@@ -77,9 +75,10 @@ class UserController extends AbstractController
     /**
      * Updates a user.
      *
-     * @param Request $request The request object.
+     * @param Request $request the request object
      *
-     * @return Response The JSON response object with a message indicating the user has been updated.
+     * @return Response the JSON response object with a message indicating the user has been updated
+     *
      * @throws RandomException
      */
     #[OA\RequestBody(content: new OA\MediaType(
@@ -99,7 +98,7 @@ class UserController extends AbstractController
             mediaType: 'application/json',
             schema: new OA\Schema(properties: [
                 new OA\Property(property: 'message', description: 'A message indicating the user has been updated.', type: 'string'),
-                new OA\Property(property: 'user', ref: new Model(type: User::class, groups: ['user:read']), description: 'Updated user information')
+                new OA\Property(property: 'user', ref: new Model(type: User::class, groups: ['user:read']), description: 'Updated user information'),
             ], type: 'object')
         )
     )]
@@ -109,7 +108,7 @@ class UserController extends AbstractController
         content: new OA\MediaType(
             mediaType: 'application/json',
             schema: new OA\Schema(properties: [
-                new OA\Property(property: 'message', description: 'A message indicating the user has not been updated.', type: 'string')
+                new OA\Property(property: 'message', description: 'A message indicating the user has not been updated.', type: 'string'),
             ], type: 'object')
         )
     )]
@@ -119,7 +118,7 @@ class UserController extends AbstractController
         content: new OA\MediaType(
             mediaType: 'application/json',
             schema: new OA\Schema(properties: [
-                new OA\Property(property: 'message', description: 'A message indicating the user has not been updated.', type: 'string')
+                new OA\Property(property: 'message', description: 'A message indicating the user has not been updated.', type: 'string'),
             ], type: 'object')
         )
     )]
@@ -130,6 +129,7 @@ class UserController extends AbstractController
         $form->submit($request->getPayload()->all(), false);
         if ($form->isSubmitted() && $form->isValid()) {
             $this->userRepository->updateUser($user);
+
             return $this->createUserResponse(['message' => $this->translator->trans('updated.user'), 'user' => $user]);
         }
 
@@ -139,23 +139,24 @@ class UserController extends AbstractController
     /**
      * Updates the locale of the user.
      *
-     * @param Request $request The request object containing the payload data.
-     * @param User    $user    The current user, if authenticated, or null if not authenticated.
+     * @param Request $request the request object containing the payload data
+     * @param User    $user    the current user, if authenticated, or null if not authenticated
      *
-     * @return JsonResponse The JSON response object with a message indicating whether the locale has been updated or not.
+     * @return JsonResponse the JSON response object with a message indicating whether the locale has been updated or not
+     *
      * @throws RandomException
      */
     #[OA\RequestBody(content: new OA\MediaType(
         mediaType: 'application/json',
         schema: new OA\Schema(properties: [
-            new OA\Property(property: 'locale', description: 'The locale of the user.', type: 'string')
+            new OA\Property(property: 'locale', description: 'The locale of the user.', type: 'string'),
         ], type: 'object')
     ))]
     #[OA\Response(response: Response::HTTP_OK, description: 'Returns a message indicating the locale has been updated.', content: new OA\MediaType(
         mediaType: 'application/json',
         schema: new OA\Schema(properties: [
             new OA\Property(property: 'message', description: 'A message indicating the locale has been updated.', type: 'string'),
-            new OA\Property(property: 'user', ref: new Model(type: User::class, groups: ['user:read']), description: 'Updated user information')
+            new OA\Property(property: 'user', ref: new Model(type: User::class, groups: ['user:read']), description: 'Updated user information'),
         ], type: 'object')
     ))]
     #[Route(path: '/me/locale', name: 'patch_locale', methods: ['PATCH'])]
@@ -177,29 +178,31 @@ class UserController extends AbstractController
      * indicating that the password is not valid is returned. If the password is valid, the user's email is updated,
      * and a JSON response with an "OK" status code, a message, and the user data is returned.
      *
-     * @param Request $request The request object containing the payload with the new email and password.
+     * @param Request $request the request object containing the payload with the new email and password
      * @param User    $user    The user whose email is to be updated. If null, the authenticated user will be considered.
-     * @return Response The JSON response containing the result of the operation.
+     *
+     * @return Response the JSON response containing the result of the operation
+     *
      * @throws RandomException
      */
     #[OA\RequestBody(content: new OA\MediaType(
         mediaType: 'application/json',
         schema: new OA\Schema(properties: [
             new OA\Property(property: 'email', description: 'The new email of the user.', type: 'string', format: 'email'),
-            new OA\Property(property: 'password', description: 'The current password of the user.', type: 'string', format: 'password')
+            new OA\Property(property: 'password', description: 'The current password of the user.', type: 'string', format: 'password'),
         ], type: 'object')
     ))]
     #[OA\Response(response: Response::HTTP_OK, description: 'Returns a message indicating the email has been updated.', content: new OA\MediaType(
         mediaType: 'application/json',
         schema: new OA\Schema(properties: [
             new OA\Property(property: 'message', description: 'A message indicating the email has been updated.', type: 'string'),
-            new OA\Property(property: 'user', ref: new Model(type: User::class, groups: ['user:read']), description: 'Updated user information')
+            new OA\Property(property: 'user', ref: new Model(type: User::class, groups: ['user:read']), description: 'Updated user information'),
         ], type: 'object')
     ))]
     #[OA\Response(response: Response::HTTP_UNAUTHORIZED, description: 'Returns a message indicating the email has not been updated.', content: new OA\MediaType(
         mediaType: 'application/json',
         schema: new OA\Schema(properties: [
-            new OA\Property(property: 'message', description: 'A message indicating the email has not been updated.', type: 'string')
+            new OA\Property(property: 'message', description: 'A message indicating the email has not been updated.', type: 'string'),
         ], type: 'object')
     ))]
     #[Route(path: '/me/email', name: 'email', methods: ['PATCH'])]
@@ -215,6 +218,7 @@ class UserController extends AbstractController
         $user->setEmail($email);
 
         $this->userRepository->updateUser($user);
+
         return $this->createUserResponse(['message' => $this->translator->trans('updated.user_email'), 'user' => $user]);
     }
 
@@ -227,26 +231,27 @@ class UserController extends AbstractController
      * application and a JSON response with an "OK" status code and a message indicating that the user has been deleted
      * is returned.
      *
-     * @param Request $request The request object containing the payload with the password.
+     * @param Request $request the request object containing the payload with the password
      * @param User    $user    The user to delete. If null, the authenticated user will be deleted.
-     * @return Response The JSON response containing the result of the operation.
+     *
+     * @return Response the JSON response containing the result of the operation
      */
     #[OA\RequestBody(content: new OA\MediaType(
         mediaType: 'application/json',
         schema: new OA\Schema(properties: [
-            new OA\Property(property: 'password', description: '', type: 'string')
+            new OA\Property(property: 'password', description: '', type: 'string'),
         ], type: 'object'),
     ))]
     #[OA\Response(response: Response::HTTP_OK, description: 'Returns a message indicating the user has been deleted.', content: new OA\MediaType(
         mediaType: 'application/json',
         schema: new OA\Schema(properties: [
-            new OA\Property(property: 'message', description: 'A message indicating the user has been deleted.', type: 'string')
+            new OA\Property(property: 'message', description: 'A message indicating the user has been deleted.', type: 'string'),
         ], type: 'object')
     ))]
     #[OA\Response(response: Response::HTTP_UNAUTHORIZED, description: 'Returns a message indicating the user has not been updated.', content: new OA\MediaType(
         mediaType: 'application/json',
         schema: new OA\Schema(properties: [
-            new OA\Property(property: 'message', description: 'A message indicating the user has not been updated.', type: 'string')
+            new OA\Property(property: 'message', description: 'A message indicating the user has not been updated.', type: 'string'),
         ], type: 'object')
     ))]
     #[Route(path: '/me', name: 'deletes', methods: ['DELETE'])]
@@ -266,9 +271,11 @@ class UserController extends AbstractController
     /**
      * Change the password of a user.
      *
-     * @param Request $request The request object containing the payload data.
-     * @param User    $user    The current user, if authenticated, or null if not authenticated.
-     * @return Response The JSON response object with a message indicating whether the password has been updated or not.
+     * @param Request $request the request object containing the payload data
+     * @param User    $user    the current user, if authenticated, or null if not authenticated
+     *
+     * @return Response the JSON response object with a message indicating whether the password has been updated or not
+     *
      * @throws RandomException
      */
     #[OA\RequestBody(content: new OA\MediaType(
@@ -278,8 +285,8 @@ class UserController extends AbstractController
                 new OA\Property(property: 'currentPassword', description: 'The current password of the user.', type: 'string'),
                 new OA\Property(property: 'plainPassword', description: 'The new password of the user.', properties: [
                     new OA\Property(property: 'first', description: 'The new password of the user.', type: 'string'),
-                    new OA\Property(property: 'second', description: 'The new password confirmation of the user.', type: 'string')
-                ], type: 'object')
+                    new OA\Property(property: 'second', description: 'The new password confirmation of the user.', type: 'string'),
+                ], type: 'object'),
             ],
             type: 'object'
         )
@@ -287,13 +294,13 @@ class UserController extends AbstractController
     #[OA\Response(response: Response::HTTP_OK, description: 'Returns a message indicating whether the password has been updated or not.', content: new OA\MediaType(
         mediaType: 'application/json',
         schema: new OA\Schema(properties: [
-            new OA\Property(property: 'message', description: 'A message indicating whether the password has been updated or not.', type: 'string')
+            new OA\Property(property: 'message', description: 'A message indicating whether the password has been updated or not.', type: 'string'),
         ], type: 'object')
     ))]
     #[OA\Response(response: Response::HTTP_BAD_REQUEST, description: 'Returns a message indicating the password has not been updated.', content: new OA\MediaType(
         mediaType: 'application/json',
         schema: new OA\Schema(properties: [
-            new OA\Property(property: 'message', description: 'A message indicating the password has not been updated.', type: 'string')
+            new OA\Property(property: 'message', description: 'A message indicating the password has not been updated.', type: 'string'),
         ], type: 'object')
     ))]
     #[Route(path: '/me/change-password', name: 'change_password', methods: ['PUT'])]
@@ -302,7 +309,6 @@ class UserController extends AbstractController
         $form = $this->createForm(ChangePasswordFormType::class, $user);
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
-
             $this->userRepository->updatePassword($user);
 
             return $this->createUserResponse(['message' => $this->translator->trans('updated.user_password'), 'user' => $user]);
@@ -312,19 +318,20 @@ class UserController extends AbstractController
     }
 
     /**
-     * Upload user profile picture
+     * Upload user profile picture.
      *
-     * @param Request $request The request object containing the payload data.
-     * @param User    $user    The current user, if authenticated, or null if not authenticated.
+     * @param Request $request the request object containing the payload data
+     * @param User    $user    the current user, if authenticated, or null if not authenticated
      *
-     * @return Response The JSON response object with a message indicating whether the password has been updated or not.
+     * @return Response the JSON response object with a message indicating whether the password has been updated or not
+     *
      * @throws RandomException
      */
     #[OA\RequestBody(content: new OA\MediaType(
         mediaType: 'multipart/form-data',
         schema: new OA\Schema(
             properties: [
-                new OA\Property(property: 'imageFile', description: 'The profile picture of the user.', type: 'string', format: 'binary')
+                new OA\Property(property: 'imageFile', description: 'The profile picture of the user.', type: 'string', format: 'binary'),
             ],
             type: 'object'
         )
@@ -336,7 +343,7 @@ class UserController extends AbstractController
             mediaType: 'application/json',
             schema: new OA\Schema(properties: [
                 new OA\Property(property: 'message', description: 'A message indicating whether the profile picture has been updated or not.', type: 'string'),
-                new OA\Property(property: 'user', ref: new Model(type: User::class, groups: ['user:read']), description: 'Updated user information')
+                new OA\Property(property: 'user', ref: new Model(type: User::class, groups: ['user:read']), description: 'Updated user information'),
             ], type: 'object')
         )
     )]
@@ -346,7 +353,7 @@ class UserController extends AbstractController
         content: new OA\MediaType(
             mediaType: 'application/json',
             schema: new OA\Schema(properties: [
-                new OA\Property(property: 'message', description: 'A message indicating the profile picture has not been updated.', type: 'string')
+                new OA\Property(property: 'message', description: 'A message indicating the profile picture has not been updated.', type: 'string'),
             ], type: 'object')
         )
     )]

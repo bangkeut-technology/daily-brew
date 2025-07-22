@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Repository;
@@ -9,9 +10,8 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * Class RoleRepository
+ * Class RoleRepository.
  *
- * @package App\Repository
  * @author  Vandeth THO <thovandeth@gmail.com>
  *
  * @extends ServiceEntityRepository<Role>
@@ -35,14 +35,13 @@ class RoleRepository extends AbstractRepository
     /**
      * Update and canicalize the role name.
      *
-     * @param Role $role The role entity to update.
-     * @param bool $flush Whether to flush the changes to the database immediately.
+     * @param Role $role  the role entity to update
+     * @param bool $flush whether to flush the changes to the database immediately
      */
     public function updateRole(Role $role, bool $flush = true): void
     {
         $role->setCanonicalName($this->canonicalizer->canonicalizeString($role->getName()));
 
-        $this->update($role, $flush);;
-
+        $this->update($role, $flush);
     }
 }

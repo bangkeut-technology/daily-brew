@@ -1,9 +1,8 @@
 <?php
+
 declare(strict_types=1);
 
-
 namespace App\Repository;
-
 
 use App\Entity\User;
 use App\Util\CanonicalFieldsUpdater;
@@ -18,59 +17,41 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Class UserRepository
+ * Class UserRepository.
  *
- * @package App\Repository
  * @author  Vandeth THO <thovandeth@gmail.com>
  *
  * @extends ServiceEntityRepository<User>
  *
- * @method User create()
+ * @method User      create()
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
  * @method User|null findOneBy(array $criteria, array $orderBy = null)
- * @method User[] findAll()
- * @method User[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method User[]    findAll()
+ * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class UserRepository extends AbstractRepository implements PasswordUpgraderInterface
 {
     /**
      * UserRepository constructor.
-     *
-     * @param ManagerRegistry             $registry
-     * @param UserPasswordHasherInterface $passwordHasher
-     * @param CanonicalFieldsUpdater      $canonicalFieldsUpdater
      */
     public function __construct(
-        ManagerRegistry                              $registry,
+        ManagerRegistry $registry,
         private readonly UserPasswordHasherInterface $passwordHasher,
-        private readonly CanonicalFieldsUpdater      $canonicalFieldsUpdater
-    )
-    {
+        private readonly CanonicalFieldsUpdater $canonicalFieldsUpdater,
+    ) {
         parent::__construct($registry, User::class);
     }
 
-    /**
-     * @param array $criteria
-     * @return User|null
-     */
     public function findUserBy(array $criteria): ?User
     {
         return $this->findOneBy($criteria);
     }
 
-    /**
-     * @param string $secret
-     * @return User|null
-     */
     public function loadUserByIdentifier(string $secret): ?User
     {
         return $this->findByIdentifier($secret);
     }
 
-    /**
-     * @param string $email
-     * @return User|null
-     */
     public function findByIdentifier(string $email): ?User
     {
         return $this->findByEmail($email);
@@ -82,8 +63,9 @@ class UserRepository extends AbstractRepository implements PasswordUpgraderInter
      * This method queries the database for a user with the given email. The email is first passed
      * through the `canonicalizeEmail` method of the `canonicalFieldsUpdater` service to ensure consistency.
      *
-     * @param string $email The email of the user to find.
-     * @return User|null The user object if found, or `null` if not found.
+     * @param string $email the email of the user to find
+     *
+     * @return User|null the user object if found, or `null` if not found
      */
     public function findByEmail(string $email): ?User
     {
@@ -97,9 +79,11 @@ class UserRepository extends AbstractRepository implements PasswordUpgraderInter
      * has a plain password and hashes it if necessary. If the user has a null secret, a new
      * secret is generated for the user. The updated user object is then persisted to the database.
      *
-     * @param User|UserInterface $user     The user object to be updated.
+     * @param User|UserInterface $user     the user object to be updated
      * @param bool               $andFlush Whether to flush changes to the database. (optional, default: true)
-     * @return User The updated user object.
+     *
+     * @return User the updated user object
+     *
      * @throws RandomException
      */
     public function updateUser(User|UserInterface $user, bool $andFlush = true): User
@@ -137,8 +121,6 @@ class UserRepository extends AbstractRepository implements PasswordUpgraderInter
     }
 
     /**
-     * @param User $user
-     * @param bool $andFlush
      * @throws RandomException
      */
     public function updatePassword(User $user, bool $andFlush = true): void
@@ -146,19 +128,13 @@ class UserRepository extends AbstractRepository implements PasswordUpgraderInter
         $this->updateUser($user, $andFlush);
     }
 
-    /**
-     * @param User $user
-     * @return void
-     */
     public function updateCanonicalFields(User $user): void
     {
         $this->canonicalFieldsUpdater->updateCanonicalFields($user);
     }
 
     /**
-     * Hash user password
-     *
-     * @param User $user
+     * Hash user password.
      */
     private function hashPassword(User $user): void
     {
@@ -173,9 +149,10 @@ class UserRepository extends AbstractRepository implements PasswordUpgraderInter
      * returns false. Otherwise, it uses the passwordHasher service to check if the provided
      * password is valid for the user. The result is then returned as a boolean value.
      *
-     * @param User|null $user     The user object to check the password against.
-     * @param string    $password The password to validate.
-     * @return bool True if the password is valid for the user, false otherwise.
+     * @param User|null $user     the user object to check the password against
+     * @param string    $password the password to validate
+     *
+     * @return bool true if the password is valid for the user, false otherwise
      */
     public function isPasswordValid(?User $user, string $password): bool
     {
@@ -187,10 +164,7 @@ class UserRepository extends AbstractRepository implements PasswordUpgraderInter
     }
 
     /**
-     * Find a user by his/her id
-     *
-     * @param int $id
-     * @return User|null
+     * Find a user by his/her id.
      */
     public function findById(int $id): ?User
     {
@@ -200,8 +174,9 @@ class UserRepository extends AbstractRepository implements PasswordUpgraderInter
     /**
      * Checks if the user secret exists.
      *
-     * @param string $secret The identifier.
-     * @return bool Returns the generated identifier.
+     * @param string $secret the identifier
+     *
+     * @return bool returns the generated identifier
      */
     public function isSecretExists(string $secret): bool
     {

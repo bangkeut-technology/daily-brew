@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Util;
@@ -6,27 +7,19 @@ namespace App\Util;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 
 /**
- * Class Canonicalizer
+ * Class Canonicalizer.
  *
- * @package App\Utils
  * @author Vandeth Tho <thovandeth@gmail.com>
  */
 class Canonicalizer implements CanonicalizerInterface
 {
-    /**
-     * @var AsciiSlugger
-     */
     private AsciiSlugger $slugger;
 
     public function __construct()
     {
         $this->slugger = new AsciiSlugger();
-
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function canonicalize($string): ?string
     {
         if (null === $string) {
@@ -40,9 +33,6 @@ class Canonicalizer implements CanonicalizerInterface
             : mb_convert_case($string, MB_CASE_LOWER);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function canonicalizeString(?string $string): string
     {
         return $this->slugger->slug($string)->lower()->toString();

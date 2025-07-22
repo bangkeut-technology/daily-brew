@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Form;
@@ -13,15 +14,12 @@ use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class ChangePasswordFormType
- * @package App\Form
+ * Class ChangePasswordFormType.
+ *
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 class ChangePasswordFormType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $constraintsOptions = [
@@ -58,9 +56,6 @@ class ChangePasswordFormType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -69,9 +64,6 @@ class ChangePasswordFormType extends AbstractType
         ]);
     }
 
-    /**
-     * @return string
-     */
     public function getBlockPrefix(): string
     {
         return '';

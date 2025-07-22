@@ -1,6 +1,6 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace App\Entity;
 
@@ -11,9 +11,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
- * Class EvaluationTemplate
+ * Class EvaluationTemplate.
  *
- * @package App\Entity
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 #[ORM\Table(name: 'daily_brew_evaluation_templates')]
@@ -65,75 +64,51 @@ class EvaluationTemplate extends AbstractEntity
         $this->employees = new ArrayCollection();
     }
 
-    /**
-     * @return string|null
-     */
     public function getIdentifier(): ?string
     {
         return $this->identifier;
     }
 
-    /**
-     * @param string|null $identifier
-     * @return EvaluationTemplate
-     */
     public function setIdentifier(?string $identifier): EvaluationTemplate
     {
         $this->identifier = $identifier;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @param string|null $name
-     * @return EvaluationTemplate
-     */
     public function setName(?string $name): EvaluationTemplate
     {
         $this->name = $name;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getCanonicalName(): ?string
     {
         return $this->canonicalName;
     }
 
-    /**
-     * @param string|null $canonicalName
-     * @return EvaluationTemplate
-     */
     public function setCanonicalName(?string $canonicalName): EvaluationTemplate
     {
         $this->canonicalName = $canonicalName;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    /**
-     * @param string|null $description
-     * @return EvaluationTemplate
-     */
     public function setDescription(?string $description): EvaluationTemplate
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -149,21 +124,15 @@ class EvaluationTemplate extends AbstractEntity
         return $this;
     }
 
-    /**
-     * @return User|null
-     */
     public function getUser(): ?User
     {
         return $this->user;
     }
 
-    /**
-     * @param User|null $user
-     * @return EvaluationTemplate
-     */
     public function setUser(?User $user): EvaluationTemplate
     {
         $this->user = $user;
+
         return $this;
     }
 
@@ -177,7 +146,6 @@ class EvaluationTemplate extends AbstractEntity
 
     /**
      * @param Collection<int, EvaluationTemplateCriteria> $criterias
-     * @return EvaluationTemplate
      */
     public function setCriterias(Collection $criterias): EvaluationTemplate
     {
@@ -215,7 +183,6 @@ class EvaluationTemplate extends AbstractEntity
 
     /**
      * @param Collection<int, Employee> $employees
-     * @return EvaluationTemplate
      */
     public function setEmployees(Collection $employees): EvaluationTemplate
     {

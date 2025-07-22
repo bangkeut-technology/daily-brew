@@ -1,16 +1,13 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace App\Form;
 
 use App\Entity\Employee;
 use App\Entity\EvaluationTemplate;
 use App\Entity\Role;
-use App\Entity\Store;
-use App\Entity\User;
 use App\Form\Type\DateTimeImmutableType;
-use Doctrine\DBAL\Types\DateImmutableType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -18,9 +15,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class EmployeeFormType
+ * Class EmployeeFormType.
  *
- * @package App\Form
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 class EmployeeFormType extends AbstractType
@@ -34,7 +30,7 @@ class EmployeeFormType extends AbstractType
                     'description' => 'The first name of the employee.',
                     'type' => 'string',
                     'example' => 'John',
-                ]
+                ],
             ])
             ->add('lastName', TextType::class, [
                 'required' => true,
@@ -42,7 +38,7 @@ class EmployeeFormType extends AbstractType
                     'description' => 'The last name of the employee.',
                     'type' => 'string',
                     'example' => 'Doe',
-                ]
+                ],
             ])
             ->add('phoneNumber', TextType::class, [
                 'required' => false,
@@ -50,7 +46,7 @@ class EmployeeFormType extends AbstractType
                     'description' => 'The phone number of the employee.',
                     'type' => 'string',
                     'example' => '+1234567890',
-                ]
+                ],
             ])
             ->add('dob', DateTimeImmutableType::class, [
                 'required' => false,
@@ -59,7 +55,7 @@ class EmployeeFormType extends AbstractType
                     'type' => 'string',
                     'format' => 'date-time',
                     'example' => '1990-01-01T00:00:00Z',
-                ]
+                ],
             ])
             ->add('joinedAt', DateTimeImmutableType::class, [
                 'required' => false,
@@ -68,7 +64,7 @@ class EmployeeFormType extends AbstractType
                     'type' => 'string',
                     'format' => 'date-time',
                     'example' => '2020-01-01T00:00:00Z',
-                ]
+                ],
             ])
             ->add('roles', EntityType::class, [
                 'class' => Role::class,
@@ -81,7 +77,7 @@ class EmployeeFormType extends AbstractType
                         'type' => 'integer',
                         'example' => 1,
                     ],
-                ]
+                ],
             ])
             ->add('templates', EntityType::class, [
                 'class' => EvaluationTemplate::class,
@@ -94,7 +90,7 @@ class EmployeeFormType extends AbstractType
                         'type' => 'integer',
                         'example' => 1,
                     ],
-                ]
+                ],
             ])
         ;
     }

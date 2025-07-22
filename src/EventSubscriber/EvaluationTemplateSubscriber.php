@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\EventSubscriber;
@@ -8,17 +9,15 @@ use App\Repository\EvaluationTemplateCriteriaRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Class EvaluationTemplateSubscriber
+ * Class EvaluationTemplateSubscriber.
  *
- * @package App\EventSubscriber
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 readonly class EvaluationTemplateSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private EvaluationTemplateCriteriaRepository $templateCriteriaRepository,
-    )
-    {
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -30,8 +29,6 @@ readonly class EvaluationTemplateSubscriber implements EventSubscriberInterface
 
     /**
      * Handles the EvaluationTemplateCreatedEvent to create template criteria.
-     *
-     * @param EvaluationTemplateCreatedEvent $event
      */
     public function onEvaluationTemplateCreated(EvaluationTemplateCreatedEvent $event): void
     {
@@ -41,7 +38,7 @@ readonly class EvaluationTemplateSubscriber implements EventSubscriberInterface
             $templateCriteria->setCriteria($criteria);
             $templateCriteria->setWeight($criteria->getWeight());
             $this->templateCriteriaRepository->persist($templateCriteria);
-            if ($index % 20 === 0) {
+            if (0 === $index % 20) {
                 $this->templateCriteriaRepository->flush();
             }
         }

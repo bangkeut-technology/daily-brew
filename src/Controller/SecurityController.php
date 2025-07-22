@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Controller;
@@ -10,9 +11,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 /**
- * Class SecurityController
+ * Class SecurityController.
  *
- * @package App\Controller
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 class SecurityController extends AbstractController
@@ -22,7 +22,8 @@ class SecurityController extends AbstractController
      *
      * @param User|null $user The current user.
      *                        If the user is not authenticated, this parameter will be null.
-     * @return JsonResponse The rendered login page.
+     *
+     * @return JsonResponse the rendered login page
      */
     #[Route('/console/login', name: 'daily_brew_security_login', methods: ['POST'])]
     public function login(#[CurrentUser] ?User $user): JsonResponse

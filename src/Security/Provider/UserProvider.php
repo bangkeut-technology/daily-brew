@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Security\Provider;
@@ -12,9 +13,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
- * Class UserProvider
+ * Class UserProvider.
  *
- * @package App\Security\Provider
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 readonly class UserProvider implements UserProviderInterface
@@ -27,13 +27,9 @@ readonly class UserProvider implements UserProviderInterface
     public function __construct(
         private UserRepository $userRepository,
         private RequestStack $request,
-    )
-    {
+    ) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function refreshUser(UserInterface $user): UserInterface
     {
         if (!$user instanceof User) {
@@ -48,21 +44,14 @@ readonly class UserProvider implements UserProviderInterface
         return $reloadedUser;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function supportsClass(string $class): bool
     {
         return User::class === $class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
-
-        if ($this->request->getCurrentRequest() === 'daily_brew_api_v1_login') {
+        if ('daily_brew_api_v1_login' === $this->request->getCurrentRequest()) {
             throw new UserNotFoundException('User not found');
         }
         if (null === $user = $this->userRepository->findByIdentifier($identifier)) {

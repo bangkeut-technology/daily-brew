@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\ApiController;
@@ -20,9 +21,8 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class EvaluationCriteriaController
+ * Class EvaluationCriteriaController.
  *
- * @package App\ApiController
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 #[Route(path: '/evaluation-criterias', name: 'evaluation_criterias_')]
@@ -32,17 +32,16 @@ class EvaluationCriteriaController extends AbstractController
     use EvaluationCriteriaTrait;
 
     public function __construct(
-        TranslatorInterface                           $translator,
-        private readonly EvaluationCriteriaRepository $evaluationCriteriaRepository
-    )
-    {
+        TranslatorInterface $translator,
+        private readonly EvaluationCriteriaRepository $evaluationCriteriaRepository,
+    ) {
         parent::__construct($translator);
     }
 
     /**
      * Retrieves all evaluation criterias.
      *
-     * @return JsonResponse The JSON response containing the list of evaluation criterias.
+     * @return JsonResponse the JSON response containing the list of evaluation criterias
      */
     #[OA\Response(
         response: Response::HTTP_OK,
@@ -56,8 +55,7 @@ class EvaluationCriteriaController extends AbstractController
     public function gets(
         #[CurrentUser]
         User $user,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $criterias = $this->evaluationCriteriaRepository->findByUser($user);
 
         return $this->createCriteriaResponse($criterias);
@@ -66,8 +64,10 @@ class EvaluationCriteriaController extends AbstractController
     /**
      * Creates a new evaluation criteria.
      *
-     * @param Request $request The HTTP request containing the evaluation criteria data.
-     * @return JsonResponse The JSON response containing the created evaluation criteria.
+     * @param Request $request the HTTP request containing the evaluation criteria data
+     *
+     * @return JsonResponse the JSON response containing the created evaluation criteria
+     *
      * @throws RandomException
      */
     #[OA\Response(
@@ -93,19 +93,22 @@ class EvaluationCriteriaController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $criteria->setUser($this->getUser());
             $this->evaluationCriteriaRepository->updateEvaluationCriteria($criteria);
+
             return $this->createCriteriaResponse([
                 'message' => $this->translator->trans('created.evaluation_criteria', ['%label%' => $criteria->getLabel()]),
-                "criteria" => $criteria
+                'criteria' => $criteria,
             ], Response::HTTP_CREATED);
         }
+
         return $this->createBadRequestResponse($this->translator->trans('invalid.evaluation_criteria', domain: 'errors'));
     }
 
     /**
      * Deletes an evaluation criteria.
      *
-     * @param string $identifier The identifier of the evaluation criteria to delete.
-     * @return JsonResponse The JSON response indicating the deletion status.
+     * @param string $identifier the identifier of the evaluation criteria to delete
+     *
+     * @return JsonResponse the JSON response indicating the deletion status
      */
     #[OA\Parameter(
         name: 'identifier',
@@ -119,7 +122,7 @@ class EvaluationCriteriaController extends AbstractController
         description: 'Deletes an evaluation criteria.',
         content: new OA\JsonContent(
             properties: [
-                new OA\Property(property: 'message', description: 'Confirmation message after deletion', type: 'string')
+                new OA\Property(property: 'message', description: 'Confirmation message after deletion', type: 'string'),
             ]
         )
     )]
@@ -128,7 +131,7 @@ class EvaluationCriteriaController extends AbstractController
         description: 'Evaluation criteria not found.',
         content: new OA\JsonContent(
             properties: [
-                new OA\Property(property: 'message', description: 'Error message', type: 'string')
+                new OA\Property(property: 'message', description: 'Error message', type: 'string'),
             ]
         )
     )]
@@ -147,8 +150,9 @@ class EvaluationCriteriaController extends AbstractController
     /**
      * Retrieves an evaluation criteria by its identifier.
      *
-     * @param string $identifier The identifier of the evaluation criteria.
-     * @return JsonResponse The JSON response containing the evaluation criteria.
+     * @param string $identifier the identifier of the evaluation criteria
+     *
+     * @return JsonResponse the JSON response containing the evaluation criteria
      */
     #[OA\Parameter(
         name: 'identifier',
@@ -167,7 +171,7 @@ class EvaluationCriteriaController extends AbstractController
         description: 'Evaluation criteria not found.',
         content: new OA\JsonContent(
             properties: [
-                new OA\Property(property: 'message', description: 'Error message', type: 'string')
+                new OA\Property(property: 'message', description: 'Error message', type: 'string'),
             ]
         )
     )]
@@ -182,9 +186,11 @@ class EvaluationCriteriaController extends AbstractController
     /**
      * Updates an existing evaluation criteria.
      *
-     * @param Request $request    The HTTP request containing the updated evaluation criteria data.
-     * @param string  $identifier The identifier of the evaluation criteria to update.
-     * @return JsonResponse The JSON response containing the updated evaluation criteria.
+     * @param Request $request    the HTTP request containing the updated evaluation criteria data
+     * @param string  $identifier the identifier of the evaluation criteria to update
+     *
+     * @return JsonResponse the JSON response containing the updated evaluation criteria
+     *
      * @throws RandomException
      */
     #[OA\Parameter(

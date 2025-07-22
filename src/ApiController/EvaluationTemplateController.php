@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\ApiController;
@@ -25,9 +26,8 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class EvaluationTemplateController
+ * Class EvaluationTemplateController.
  *
- * @package App\ApiController
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 #[Route(path: '/evaluation-templates', name: 'evaluation_templates_')]
@@ -38,19 +38,18 @@ class EvaluationTemplateController extends AbstractController
     use EvaluationTemplateCriteriaTrait;
 
     public function __construct(
-        TranslatorInterface                                   $translator,
-        private readonly EvaluationTemplateRepository         $evaluationTemplateRepository,
+        TranslatorInterface $translator,
+        private readonly EvaluationTemplateRepository $evaluationTemplateRepository,
         private readonly EvaluationTemplateCriteriaRepository $evaluationTemplateCriteriaRepository,
-        private readonly EventDispatcherInterface             $dispatcher
-    )
-    {
+        private readonly EventDispatcherInterface $dispatcher,
+    ) {
         parent::__construct($translator);
     }
 
     /**
      * Retrieves all evaluation templates.
      *
-     * @return JsonResponse The JSON response containing the list of evaluation templates.
+     * @return JsonResponse the JSON response containing the list of evaluation templates
      */
     #[OA\Response(
         response: Response::HTTP_OK,
@@ -64,8 +63,7 @@ class EvaluationTemplateController extends AbstractController
     public function gets(
         #[CurrentUser]
         User $user,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $templates = $this->evaluationTemplateRepository->findByUser($user);
 
         return $this->createTemplateResponse($templates);
@@ -74,8 +72,10 @@ class EvaluationTemplateController extends AbstractController
     /**
      * Creates a new evaluation template.
      *
-     * @param Request $request The HTTP request containing the evaluation template data.
-     * @return JsonResponse The JSON response containing the created evaluation template.
+     * @param Request $request the HTTP request containing the evaluation template data
+     *
+     * @return JsonResponse the JSON response containing the created evaluation template
+     *
      * @throws RandomException
      */
     #[OA\Response(
@@ -106,7 +106,7 @@ class EvaluationTemplateController extends AbstractController
 
             return $this->createTemplateResponse([
                 'message' => $this->translator->trans('created.evaluation_template', ['%name%' => $template->getName()]),
-                'template' => $template
+                'template' => $template,
             ], Response::HTTP_CREATED);
         }
 
@@ -116,8 +116,9 @@ class EvaluationTemplateController extends AbstractController
     /**
      * Deletes an evaluation template.
      *
-     * @param string $identifier The identifier of the evaluation template to delete.
-     * @return JsonResponse The JSON response indicating the deletion status.
+     * @param string $identifier the identifier of the evaluation template to delete
+     *
+     * @return JsonResponse the JSON response indicating the deletion status
      */
     #[OA\Parameter(
         name: 'identifier',
@@ -131,7 +132,7 @@ class EvaluationTemplateController extends AbstractController
         description: 'Deletes an evaluation template.',
         content: new OA\JsonContent(
             properties: [
-                new OA\Property(property: 'message', description: 'Confirmation message after deletion', type: 'string')
+                new OA\Property(property: 'message', description: 'Confirmation message after deletion', type: 'string'),
             ]
         )
     )]
@@ -140,7 +141,7 @@ class EvaluationTemplateController extends AbstractController
         description: 'Evaluation template not found.',
         content: new OA\JsonContent(
             properties: [
-                new OA\Property(property: 'message', description: 'Error message', type: 'string')
+                new OA\Property(property: 'message', description: 'Error message', type: 'string'),
             ]
         )
     )]
@@ -159,8 +160,9 @@ class EvaluationTemplateController extends AbstractController
     /**
      * Retrieves an evaluation template by its identifier.
      *
-     * @param string $identifier The identifier of the evaluation template.
-     * @return JsonResponse The JSON response containing the evaluation template.
+     * @param string $identifier the identifier of the evaluation template
+     *
+     * @return JsonResponse the JSON response containing the evaluation template
      */
     #[OA\Parameter(
         name: 'identifier',
@@ -179,7 +181,7 @@ class EvaluationTemplateController extends AbstractController
         description: 'Evaluation template not found.',
         content: new OA\JsonContent(
             properties: [
-                new OA\Property(property: 'message', description: 'Error message', type: 'string')
+                new OA\Property(property: 'message', description: 'Error message', type: 'string'),
             ]
         )
     )]
@@ -194,9 +196,11 @@ class EvaluationTemplateController extends AbstractController
     /**
      * Updates an existing evaluation template.
      *
-     * @param Request $request    The HTTP request containing the updated evaluation template data.
-     * @param string  $identifier The identifier of the evaluation template to update.
-     * @return JsonResponse The JSON response containing the updated evaluation template.
+     * @param Request $request    the HTTP request containing the updated evaluation template data
+     * @param string  $identifier the identifier of the evaluation template to update
+     *
+     * @return JsonResponse the JSON response containing the updated evaluation template
+     *
      * @throws RandomException
      */
     #[OA\Parameter(
@@ -231,7 +235,7 @@ class EvaluationTemplateController extends AbstractController
 
             return $this->createTemplateResponse([
                 'message' => $this->translator->trans('updated.evaluation_template', ['%name%' => $template->getName()]),
-                'template' => $template
+                'template' => $template,
             ]);
         }
 
@@ -241,9 +245,9 @@ class EvaluationTemplateController extends AbstractController
     /**
      * Retrieves the criteria associated with the evaluation template.
      *
-     * @param string $identifier The identifier of the evaluation template.
+     * @param string $identifier the identifier of the evaluation template
      *
-     * @return JsonResponse The list of criteria associated with the evaluation template.
+     * @return JsonResponse the list of criteria associated with the evaluation template
      */
     #[OA\Response(
         response: Response::HTTP_OK,

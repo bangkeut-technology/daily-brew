@@ -7,10 +7,10 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * Class EmployeeScoreRepository
+ * Class EmployeeScoreRepository.
  *
- * @package App\Repository
  * @author  Vandeth THO <thovandeth@gmail.com>
+ *
  * @extends ServiceEntityRepository<EmployeeScore>
  *
  * @method EmployeeScore      create()

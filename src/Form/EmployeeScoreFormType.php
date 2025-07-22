@@ -1,9 +1,9 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Form;
 
-use App\Entity\EmployeeEvaluation;
 use App\Entity\EmployeeScore;
 use App\Entity\EvaluationTemplateCriteria;
 use App\Repository\EvaluationTemplateCriteriaRepository;
@@ -18,16 +18,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Class EmployeeScoreFormType
+ * Class EmployeeScoreFormType.
  *
- * @package App\Form
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 class EmployeeScoreFormType extends AbstractType
 {
-    /**
-     * @var UserInterface|null
-     */
     private readonly ?UserInterface $user;
 
     public function __construct(Security $security)

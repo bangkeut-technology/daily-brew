@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\ApiController\Trait;
@@ -12,10 +13,8 @@ trait EvaluationCriteriaTrait
     /**
      * Creates a criteria response.
      *
-     * @param mixed $data        The data to return in the response.
-     * @param int   $statusCode  The HTTP status code of the response.
-     *
-     * @return JsonResponse
+     * @param mixed $data       the data to return in the response
+     * @param int   $statusCode the HTTP status code of the response
      */
     private function createCriteriaResponse(mixed $data, int $statusCode = Response::HTTP_OK): JsonResponse
     {
@@ -29,13 +28,11 @@ trait EvaluationCriteriaTrait
     /**
      * Retrieves an evaluation criteria by its identifier.
      *
-     * @param string $identifier The identifier of the evaluation criteria.
-     *
-     * @return EvaluationCriteria
+     * @param string $identifier the identifier of the evaluation criteria
      */
     private function getEvaluationCriteriaByIdentifier(string $identifier): EvaluationCriteria
     {
-        if (null ===$criteria = $this->evaluationCriteriaRepository->findByIdentifierAndUser($identifier, $this->getUser())) {
+        if (null === $criteria = $this->evaluationCriteriaRepository->findByIdentifierAndUser($identifier, $this->getUser())) {
             throw $this->createNotFoundException($this->translator->trans('not_found.evaluation_criteria', ['%identifier%' => $identifier], 'errors'));
         }
 

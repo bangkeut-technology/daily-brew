@@ -1,6 +1,6 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace App\Repository;
 
@@ -15,10 +15,10 @@ use Doctrine\Persistence\ManagerRegistry;
 use Random\RandomException;
 
 /**
- * Class StoreRepository
+ * Class StoreRepository.
  *
- * @package App\Repository
  * @author  Vandeth THO <thovandeth@gmail.com>
+ *
  * @extends ServiceEntityRepository<Store>
  *
  * @method Store      create()
@@ -32,23 +32,21 @@ class StoreRepository extends AbstractRepository
     /**
      * StoreRepository constructor.
      *
-     * @param ManagerRegistry        $registry      The registry.
-     * @param CanonicalizerInterface $canonicalizer The canonicalizer.
+     * @param ManagerRegistry        $registry      the registry
+     * @param CanonicalizerInterface $canonicalizer the canonicalizer
      */
     public function __construct(
-        ManagerRegistry                         $registry,
+        ManagerRegistry $registry,
         private readonly CanonicalizerInterface $canonicalizer,
-    )
-    {
+    ) {
         parent::__construct($registry, Store::class);
     }
 
     /**
      * Retrieves a store by its canonical name and user.
      *
-     * @param string $canonicalName The canonical name of the store to retrieve.
-     * @param User   $user          The user associated with the store.
-     * @return Store|null
+     * @param string $canonicalName the canonical name of the store to retrieve
+     * @param User   $user          the user associated with the store
      */
     public function findByCanonicalNameAndUser(string $canonicalName, User $user): ?Store
     {
@@ -58,8 +56,8 @@ class StoreRepository extends AbstractRepository
     /**
      * Updates the store.
      *
-     * @param Store $store    The store to update.
-     * @param bool  $andFlush Whether to flush the changes (default true).
+     * @param Store $store    the store to update
+     * @param bool  $andFlush whether to flush the changes (default true)
      *
      * @throws RandomException
      */
@@ -81,7 +79,7 @@ class StoreRepository extends AbstractRepository
     /**
      * Finds all stores by user.
      *
-     * @param User|int $user The user.
+     * @param User|int $user the user
      *
      * @return Store[]
      */
@@ -93,7 +91,7 @@ class StoreRepository extends AbstractRepository
     /**
      * Finds all stores by user.
      *
-     * @param User|null $user The user.
+     * @param User|null $user the user
      *
      * @return Store[]
      */
@@ -105,8 +103,8 @@ class StoreRepository extends AbstractRepository
     /**
      * Finds all user stores that are not the givens.
      *
-     * @param User|null $user The user.
-     * @param Store[]      $stores  The stores.
+     * @param User|null $user   the user
+     * @param Store[]   $stores the stores
      *
      * @return Store[]
      */
@@ -118,7 +116,7 @@ class StoreRepository extends AbstractRepository
             ->setParameters(
                 new ArrayCollection([
                     new Parameter('user', $user),
-                    new Parameter('stores', $stores)
+                    new Parameter('stores', $stores),
                 ])
             )
             ->getQuery()
@@ -128,9 +126,9 @@ class StoreRepository extends AbstractRepository
     /**
      * Checks if the given identifier already exists in the database.
      *
-     * @param string|null $identifier The identifier to check for existence.
+     * @param string|null $identifier the identifier to check for existence
      *
-     * @return bool Returns true if the identifier exists, false otherwise.
+     * @return bool returns true if the identifier exists, false otherwise
      */
     public function isIdentifierExists(?string $identifier, ?User $user): bool
     {
@@ -140,7 +138,7 @@ class StoreRepository extends AbstractRepository
                 ->andWhere('s.user = :user')
                 ->setParameters(new ArrayCollection([
                     new Parameter('identifier', $identifier),
-                    new Parameter('user', $user)
+                    new Parameter('user', $user),
                 ]))
                 ->getQuery()
                 ->getSingleScalarResult() > 0;
@@ -149,8 +147,8 @@ class StoreRepository extends AbstractRepository
     /**
      * Finds stores by identifiers and user.
      *
-     * @param string[]     $stores     The store identifiers.
-     * @param User|null $getUser The user.
+     * @param string[]  $stores  the store identifiers
+     * @param User|null $getUser the user
      *
      * @return Store[]
      */
@@ -162,7 +160,7 @@ class StoreRepository extends AbstractRepository
             ->setParameters(
                 new ArrayCollection([
                     new Parameter('stores', $stores),
-                    new Parameter('user', $getUser)
+                    new Parameter('user', $getUser),
                 ])
             )
             ->getQuery()
@@ -172,10 +170,8 @@ class StoreRepository extends AbstractRepository
     /**
      * Finds a store by its identifier and user.
      *
-     * @param string  $identifier The identifier of the store to retrieve.
-     * @param User $user    The user.
-     *
-     * @return Store|null
+     * @param string $identifier the identifier of the store to retrieve
+     * @param User   $user       the user
      */
     public function findByIdentifierAndUser(string $identifier, User $user): ?Store
     {

@@ -1,16 +1,11 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace App\Hydrator;
 
-use DateTime;
-use DateTimeImmutable;
-use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Internal\Hydration\AbstractHydrator as BaseAbstractHydrator;
-use Exception;
-use JsonException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -19,33 +14,20 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
- * Class AbstractHydrator
+ * Class AbstractHydrator.
  *
- * @package App\Hydrators
  * @author Vandeth THO <thovandeth@gmail.com>
  */
 abstract class AbstractHydrator extends BaseAbstractHydrator
 {
-    /**
-     * @var PropertyAccessor
-     */
     protected PropertyAccessor $propertyAccessor;
 
-    /**
-     * @var PropertyInfoExtractor
-     */
     protected PropertyInfoExtractor $propertyInfo;
 
-    /**
-     * @var string|null
-     */
     protected ?string $dtoClass;
 
     /**
      * AbstractHydrator constructor.
-     *
-     * @param EntityManagerInterface $em
-     * @param string|null            $dtoClass
      */
     public function __construct(EntityManagerInterface $em, ?string $dtoClass = null)
     {
@@ -71,10 +53,7 @@ abstract class AbstractHydrator extends BaseAbstractHydrator
     }
 
     /**
-     * Find an object in an array
-     *
-     * @param array    $haystack
-     * @param int|null $id
+     * Find an object in an array.
      *
      * @return false|int|string
      */
@@ -90,28 +69,23 @@ abstract class AbstractHydrator extends BaseAbstractHydrator
     }
 
     /**
-     * @param string      $key
-     * @param mixed       $value
-     * @param string|null $dtoClass
-     * @return mixed
-     * @throws JsonException
+     * @throws \JsonException
      */
     protected function getValue(string $key, mixed $value, ?string $dtoClass = null): mixed
     {
         $types = $this->propertyInfo->getTypes($dtoClass, $key);
         if (is_array($types) && count($types) > 0) {
             if (
-                $types[0]->getBuiltinType() === Type::BUILTIN_TYPE_OBJECT
-                &&
-                in_array($types[0]->getClassName(), [
-                    DateTime::class,
-                    DateTimeImmutable::class,
+                Type::BUILTIN_TYPE_OBJECT === $types[0]->getBuiltinType()
+                && in_array($types[0]->getClassName(), [
+                    \DateTime::class,
+                    \DateTimeImmutable::class,
                 ], true)) {
                 $class = $types[0]->getClassName();
 
                 return new $class($value);
             }
-            if ($types[0]->getBuiltinType() === Type::BUILTIN_TYPE_ARRAY) {
+            if (Type::BUILTIN_TYPE_ARRAY === $types[0]->getBuiltinType()) {
                 return json_decode($value, true, 512, JSON_THROW_ON_ERROR);
             }
         }
@@ -119,12 +93,9 @@ abstract class AbstractHydrator extends BaseAbstractHydrator
         return $value;
     }
 
-
     /**
-     * @inheritDoc
-     * @return array
      * @throws \Doctrine\DBAL\Exception
-     * @throws Exception
+     * @throws \Exception
      */
     protected function hydrateAllData(): array
     {
@@ -136,12 +107,8 @@ abstract class AbstractHydrator extends BaseAbstractHydrator
         return $results;
     }
 
-
     /**
-     * @param array $row
-     * @param array $result
-     * @return void
-     * @throws Exception
+     * @throws \Exception
      */
     protected function hydrateRowData(array $row, array &$result): void
     {
@@ -151,7 +118,7 @@ abstract class AbstractHydrator extends BaseAbstractHydrator
             if (null !== $finalValue = $value) {
                 $properties = explode('_', $this->rsm->getScalarAlias($key));
                 if (count($properties) > 0) {
-                    if (count($properties) === 1) {
+                    if (1 === count($properties)) {
                         $property = $properties[0];
                         if ($this->propertyAccessor->isWritable($dto, $property)) {
                             $finalValue = $this->getValue($property, $finalValue, $this->dtoClass);
@@ -174,12 +141,12 @@ abstract class AbstractHydrator extends BaseAbstractHydrator
                         }
                         if (is_array($types)
                             && isset($types[0])
-                            && $types[0]->getBuiltinType() === Type::BUILTIN_TYPE_OBJECT
-                            && $this->propertyAccessor->getValue($dto, $path) === null
+                            && Type::BUILTIN_TYPE_OBJECT === $types[0]->getBuiltinType()
+                            && null === $this->propertyAccessor->getValue($dto, $path)
                             && !in_array($types[0]->getClassName(), [
-                                DateTimeInterface::class,
-                                DateTime::class,
-                                DateTimeImmutable::class,
+                                \DateTimeInterface::class,
+                                \DateTime::class,
+                                \DateTimeImmutable::class,
                             ], true)
                         ) {
                             $class = $types[0]->getClassName();

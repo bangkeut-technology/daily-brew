@@ -1,16 +1,15 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\EventSubscriber;
 
 use App\Event\EmployeeEvaluation\FinalizeEmployeeEvaluationEvent;
-use DateTimeImmutable;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Class EmployeeEvaluationSubscriber
+ * Class EmployeeEvaluationSubscriber.
  *
- * @package App\EventSubscriber
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 class EmployeeEvaluationSubscriber implements EventSubscriberInterface
@@ -27,7 +26,7 @@ class EmployeeEvaluationSubscriber implements EventSubscriberInterface
         $evaluation = $event->evaluation;
 
         $evaluation->setTemplateName($evaluation->getTemplate()?->getName());
-        $evaluation->setEvaluatedAt(new DateTimeImmutable());
+        $evaluation->setEvaluatedAt(new \DateTimeImmutable());
 
         $totalScore = 0;
         $totalWeight = 0;

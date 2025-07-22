@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\ApiController;
@@ -16,9 +17,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class RoleController
+ * Class RoleController.
  *
- * @package App\ApiController
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 #[Route('/roles', name: 'roles_')]
@@ -26,17 +26,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class RoleController extends AbstractController
 {
     public function __construct(
-        TranslatorInterface             $translator,
-        private readonly RoleRepository $roleRepository
-    )
-    {
+        TranslatorInterface $translator,
+        private readonly RoleRepository $roleRepository,
+    ) {
         parent::__construct($translator);
     }
 
     /**
      * Gets a list of roles.
-     *
-     * @return JsonResponse
      */
     #[OA\Response(
         response: Response::HTTP_OK,
@@ -50,14 +47,12 @@ class RoleController extends AbstractController
     public function gets(): JsonResponse
     {
         $roles = $this->roleRepository->findAll();
+
         return $this->json($roles, context: ['groups' => 'role:read']);
     }
 
     /**
      * Creates a new role.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     #[OA\RequestBody(
         required: true,
@@ -77,7 +72,7 @@ class RoleController extends AbstractController
         description: 'Invalid role data',
         content: new OA\JsonContent(
             properties: [
-                'message' => new OA\Property(type: 'string', example: 'Invalid role data')
+                'message' => new OA\Property(type: 'string', example: 'Invalid role data'),
             ],
             type: 'object'
         )
@@ -93,7 +88,7 @@ class RoleController extends AbstractController
 
             return $this->json([
                 'message' => $this->translator->trans('created.role', ['%name%' => $role]),
-                'role' => $role
+                'role' => $role,
             ], context: ['groups' => 'role:read']);
         }
 

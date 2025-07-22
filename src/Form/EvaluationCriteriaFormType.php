@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Form;
@@ -9,9 +10,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class EvaluationCriteriaFormType
+ * Class EvaluationCriteriaFormType.
  *
- * @package App\Form
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 class EvaluationCriteriaFormType extends AbstractType

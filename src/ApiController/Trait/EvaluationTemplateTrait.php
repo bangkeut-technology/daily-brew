@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\ApiController\Trait;
@@ -12,10 +13,8 @@ trait EvaluationTemplateTrait
     /**
      * Creates a template response.
      *
-     * @param mixed $data        The data to return in the response.
-     * @param int   $statusCode  The HTTP status code of the response.
-     *
-     * @return JsonResponse
+     * @param mixed $data       the data to return in the response
+     * @param int   $statusCode the HTTP status code of the response
      */
     private function createTemplateResponse(mixed $data, int $statusCode = Response::HTTP_OK): JsonResponse
     {
@@ -29,13 +28,11 @@ trait EvaluationTemplateTrait
     /**
      * Retrieves an evaluation template by its identifier.
      *
-     * @param string $identifier The identifier of the evaluation template.
-     *
-     * @return EvaluationTemplate
+     * @param string $identifier the identifier of the evaluation template
      */
     private function getEvaluationTemplateByIdentifier(string $identifier): EvaluationTemplate
     {
-        if (null ===$template = $this->evaluationTemplateRepository->findByIdentifierAndUser($identifier, $this->getUser())) {
+        if (null === $template = $this->evaluationTemplateRepository->findByIdentifierAndUser($identifier, $this->getUser())) {
             throw $this->createNotFoundException($this->translator->trans('not_found.evaluation_template', ['%identifier%' => $identifier], 'errors'));
         }
 

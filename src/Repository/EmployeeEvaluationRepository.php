@@ -1,14 +1,12 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace App\Repository;
 
 use App\Entity\Employee;
 use App\Entity\EmployeeEvaluation;
-use App\Entity\EvaluationTemplate;
 use App\Util\TokenGenerator;
-use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
@@ -17,9 +15,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use Random\RandomException;
 
 /**
- * Class EmployeeEvaluationRepository
+ * Class EmployeeEvaluationRepository.
  *
- * @package App\Repository
  * @author  Vandeth THO <thovandeth@gmail.com>
  *
  * @extends ServiceEntityRepository<EmployeeEvaluation>
@@ -39,13 +36,8 @@ class EmployeeEvaluationRepository extends AbstractRepository
 
     /**
      * Find evaluations by date and employee.
-     *
-     * @param DateTimeImmutable $date
-     * @param Employee          $employee
-     *
-     * @return EmployeeEvaluation|null
      */
-    public function findByDateAndEmployee(DateTimeImmutable $date, Employee $employee): ?EmployeeEvaluation
+    public function findByDateAndEmployee(\DateTimeImmutable $date, Employee $employee): ?EmployeeEvaluation
     {
         return $this->createQueryBuilder('ee')
             ->innerJoin('ee.scores', 'ees')
@@ -62,10 +54,10 @@ class EmployeeEvaluationRepository extends AbstractRepository
     /**
      * Update an employee evaluation.
      *
-     * @param EmployeeEvaluation $employeeEvaluation The employee evaluation to update.
-     * @param bool               $andFlush           Whether to flush the changes (default true).
+     * @param EmployeeEvaluation $employeeEvaluation the employee evaluation to update
+     * @param bool               $andFlush           whether to flush the changes (default true)
      *
-     * @throws RandomException Throws an exception if the identifier already exists.
+     * @throws RandomException throws an exception if the identifier already exists
      */
     public function updateEmployeeEvaluation(EmployeeEvaluation $employeeEvaluation, bool $andFlush = true): void
     {
@@ -81,13 +73,8 @@ class EmployeeEvaluationRepository extends AbstractRepository
         $this->update($employeeEvaluation, $andFlush);
     }
 
-
     /**
      * Check if an identifier already exists.
-     *
-     * @param string $identifier
-     *
-     * @return bool
      */
     public function isIdentifierExists(string $identifier): bool
     {
@@ -102,13 +89,13 @@ class EmployeeEvaluationRepository extends AbstractRepository
     /**
      * Find evaluations by period and employee.
      *
-     * @param DateTimeImmutable $from     The start date of the period.
-     * @param DateTimeImmutable $to       The end date of the period.
-     * @param Employee          $employee The employee to filter evaluations by.
+     * @param \DateTimeImmutable $from     the start date of the period
+     * @param \DateTimeImmutable $to       the end date of the period
+     * @param Employee           $employee the employee to filter evaluations by
      *
      * @return EmployeeEvaluation[]
      */
-    public function findByPeriodAndEmployee(DateTimeImmutable $from, DateTimeImmutable $to, Employee $employee): array
+    public function findByPeriodAndEmployee(\DateTimeImmutable $from, \DateTimeImmutable $to, Employee $employee): array
     {
         return $this->createQueryBuilder('ee')
             ->innerJoin('ee.scores', 'ees')
@@ -126,13 +113,13 @@ class EmployeeEvaluationRepository extends AbstractRepository
     /**
      * Get the average score for an employee over a specified period.
      *
-     * @param Employee          $employee The employee to calculate the average score for.
-     * @param DateTimeImmutable $from     The start date of the period.
-     * @param DateTimeImmutable $to       The end date of the period.
+     * @param Employee           $employee the employee to calculate the average score for
+     * @param \DateTimeImmutable $from     the start date of the period
+     * @param \DateTimeImmutable $to       the end date of the period
      *
-     * @return float The average score.
+     * @return float the average score
      */
-    public function getAverageScoreForPeriod(Employee $employee, DateTimeImmutable $from, DateTimeImmutable $to): float
+    public function getAverageScoreForPeriod(Employee $employee, \DateTimeImmutable $from, \DateTimeImmutable $to): float
     {
         $qb = $this->createQueryBuilder('ee')
             ->select('ROUND(AVG(ees.score), 2) AS averageScore')
@@ -149,16 +136,16 @@ class EmployeeEvaluationRepository extends AbstractRepository
     }
 
     /**
-     * Get the list of average scores for employees over a specified period
-     * @param Employee[]        $employees The employees to calculate the average score for.
-     * @param DateTimeImmutable $from      The start date of the period.
-     * @param DateTimeImmutable $to        The end date of the period.
-     * @return array
+     * Get the list of average scores for employees over a specified period.
+     *
+     * @param Employee[]         $employees the employees to calculate the average score for
+     * @param \DateTimeImmutable $from      the start date of the period
+     * @param \DateTimeImmutable $to        the end date of the period
      */
-    public function getAverageScoresForPeriod(array $employees, DateTimeImmutable $from, DateTimeImmutable $to): array
+    public function getAverageScoresForPeriod(array $employees, \DateTimeImmutable $from, \DateTimeImmutable $to): array
     {
         $qb = $this->createQueryBuilder('ee')
-            ->select('ROUND(AVG(ees.score), 2) AS averageScore', )
+            ->select('ROUND(AVG(ees.score), 2) AS averageScore')
             ->addSelect('e.id as employeeId')
             ->innerJoin('ee.scores', 'ees')
             ->innerJoin('ee.employee', 'e')

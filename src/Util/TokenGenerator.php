@@ -1,17 +1,13 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace App\Util;
 
-use Exception;
-use InvalidArgumentException;
 use Random\RandomException;
 
 /**
- * Class TokenGenerator
- *
- * @package App\Util
+ * Class TokenGenerator.
  *
  * @author  Vandeth Tho <thovandeth@gmail.com>
  */
@@ -19,16 +15,13 @@ readonly class TokenGenerator implements TokenGeneratorInterface
 {
     /**
      * TokenGenerator constructor.
-     *
-     * @param int $entropy
      */
     public function __construct(private int $entropy = 256)
     {
     }
 
     /**
-     * {@inheritDoc}
-     * @throws Exception
+     * @throws \Exception
      */
     public function generateToken(): string
     {
@@ -38,17 +31,13 @@ readonly class TokenGenerator implements TokenGeneratorInterface
     }
 
     /**
-     * {@inheritDoc}
-     * @throws Exception
+     * @throws \Exception
      */
     public function generateTokenWithoutUnderscore(): string
     {
         return bin2hex(random_bytes($this->entropy / 8));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function generateAlphanumericToken(): string
     {
         $data = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcefghijklmnopqrstuvwxyz';
@@ -59,12 +48,14 @@ readonly class TokenGenerator implements TokenGeneratorInterface
     /**
      * Generate a random token.
      *
-     * @param bool $numeric   The token will contain numeric characters.
-     * @param bool $majuscule The token will contain majuscule characters.
-     * @param bool $minuscule The token will contain minuscule characters.
-     * @param bool $symbols   The token will contain symbols characters.
-     * @param int  $length    The length of the token.
-     * @return string The generated token.
+     * @param bool $numeric   the token will contain numeric characters
+     * @param bool $majuscule the token will contain majuscule characters
+     * @param bool $minuscule the token will contain minuscule characters
+     * @param bool $symbols   the token will contain symbols characters
+     * @param int  $length    the length of the token
+     *
+     * @return string the generated token
+     *
      * @throws RandomException
      */
     public static function generate(
@@ -72,28 +63,25 @@ readonly class TokenGenerator implements TokenGeneratorInterface
         bool $majuscule = true,
         bool $minuscule = true,
         bool $symbols = true,
-        int  $length = 32
-    ): string
-    {
+        int $length = 32,
+    ): string {
         return self::generateFromString(self::getString($numeric, $majuscule, $minuscule, $symbols), $length);
     }
 
     /**
      * Get an alphanumeric string.
      *
-     * @param bool $numeric   The string will contain numeric characters.
-     * @param bool $majuscule The string will contain majuscule characters.
-     * @param bool $minuscule The string will contain minuscule characters.
-     * @param bool $symbols   The string will contain symbols characters.
-     * @return string
+     * @param bool $numeric   the string will contain numeric characters
+     * @param bool $majuscule the string will contain majuscule characters
+     * @param bool $minuscule the string will contain minuscule characters
+     * @param bool $symbols   the string will contain symbols characters
      */
     public static function getString(
         bool $numeric = true,
         bool $majuscule = true,
         bool $minuscule = true,
         bool $symbols = true,
-    ): string
-    {
+    ): string {
         $characters = [
             'numeric' => '1234567890',
             'majuscule' => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
@@ -116,7 +104,7 @@ readonly class TokenGenerator implements TokenGeneratorInterface
         }
 
         if (empty($data)) {
-            throw new InvalidArgumentException('At least one character set must be enabled.');
+            throw new \InvalidArgumentException('At least one character set must be enabled.');
         }
 
         return $data;
@@ -125,9 +113,11 @@ readonly class TokenGenerator implements TokenGeneratorInterface
     /**
      * Generate a random token from a string.
      *
-     * @param string $string The string to generate the token from.
-     * @param int    $length The length of the token.
-     * @return string The generated token.
+     * @param string $string the string to generate the token from
+     * @param int    $length the length of the token
+     *
+     * @return string the generated token
+     *
      * @throws RandomException
      */
     public static function generateFromString(string $string, int $length = 32): string
@@ -135,7 +125,7 @@ readonly class TokenGenerator implements TokenGeneratorInterface
         $token = '';
         $dataLength = strlen($string);
 
-        for ($i = 0; $i < $length; $i++) {
+        for ($i = 0; $i < $length; ++$i) {
             $token .= $string[random_int(0, $dataLength - 1)];
         }
 

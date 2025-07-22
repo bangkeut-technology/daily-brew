@@ -1,19 +1,15 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace App\Entity;
 
-
 use App\Enum\RoleEnum;
 use App\Repository\UserRepository;
-use DateTimeImmutable;
-use Deprecated;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Serializable;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -23,9 +19,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 /**
- * Class User
+ * Class User.
  *
- * @package App\Entity
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -35,31 +30,19 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL_SECRET', fields: ['secret'])]
 #[UniqueEntity(fields: ['emailCanonical'], message: 'There is already an account with this emailCanonical')]
 #[Vich\Uploadable]
-class User extends AbstractEntity implements UserInterface, PasswordAuthenticatedUserInterface, Serializable
+class User extends AbstractEntity implements UserInterface, PasswordAuthenticatedUserInterface, \Serializable
 {
-    /**
-     * @var string|null
-     */
     #[ORM\Column(length: 225)]
     private ?string $secret = null;
 
-    /**
-     * @var string|null
-     */
     #[ORM\Column(length: 180)]
     #[Groups(['user:read'])]
     private ?string $email = null;
 
-    /**
-     * @var string|null
-     */
     #[ORM\Column(name: 'email_canonical', length: 180)]
     #[Groups(['user:read'])]
     private ?string $emailCanonical = null;
 
-    /**
-     * @var string|null
-     */
     private ?string $plainPassword = null;
 
     /**
@@ -69,36 +52,21 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[Groups(['user:read'])]
     private array $roles = [RoleEnum::DEFAULT->value];
 
-    /**
-     * @var string|null
-     */
     #[ORM\Column(name: 'first_name', type: Types::STRING, length: 150, nullable: true)]
     #[Groups(['user:read'])]
     private ?string $firstName = null;
 
-    /**
-     * @var string|null
-     */
     #[ORM\Column(name: 'last_name', type: Types::STRING, length: 150, nullable: true)]
     #[Groups(['user:read'])]
     private ?string $lastName = null;
 
-    /**
-     * @var DateTimeImmutable|null
-     */
     #[ORM\Column(name: 'dob', type: Types::DATE_IMMUTABLE, nullable: true)]
     #[Groups(['user:read'])]
-    private ?DateTimeImmutable $dob = null;
+    private ?\DateTimeImmutable $dob = null;
 
-    /**
-     * @var string|null
-     */
     #[Groups(['user:read'])]
     public ?string $avatarUrl = null;
 
-    /**
-     * @var File|UploadedFile|null
-     */
     #[Vich\UploadableField(
         mapping: 'users',
         fileNameProperty: 'imageName',
@@ -109,27 +77,15 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     )]
     private UploadedFile|File|null $imageFile = null;
 
-    /**
-     * @var string|null
-     */
     #[ORM\Column(name: 'image_name', type: Types::STRING, length: 255, nullable: true)]
     private ?string $imageName = null;
 
-    /**
-     * @var int|null
-     */
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $fileSize = null;
 
-    /**
-     * @var string|null
-     */
     #[ORM\Column(type: 'string', nullable: true)]
     private ?string $originalName = null;
 
-    /**
-     * @var string|null
-     */
     #[ORM\Column(type: 'string', nullable: true)]
     private ?string $mimeType = null;
 
@@ -145,16 +101,10 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[ORM\Column]
     private ?string $password = null;
 
-    /**
-     * @var bool
-     */
     #[ORM\Column(type: 'boolean')]
     #[Groups(['user:read'])]
     private bool $enabled = true;
 
-    /**
-     * @var string|null
-     */
     #[ORM\Column(length: 5, nullable: true)]
     #[Groups(['user:read'])]
     private ?string $locale = 'en';
@@ -184,34 +134,24 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         $this->templates = new ArrayCollection();
     }
 
-    /**
-     * @return string|null
-     */
     public function getSecret(): ?string
     {
         return $this->secret;
     }
 
-    /**
-     * @param string|null $secret
-     * @return User
-     */
     public function setSecret(?string $secret): User
     {
         $this->secret = $secret;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getEmail(): ?string
     {
         return $this->email;
     }
 
     /**
-     * @param string $email
      * @return $this
      */
     public function setEmail(string $email): static
@@ -228,13 +168,13 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
      */
     public function getUserIdentifier(): string
     {
-        return (string)$this->email;
+        return (string) $this->email;
     }
 
     /**
      * @return list<string>
-     * @see UserInterface
      *
+     * @see UserInterface
      */
     public function getRoles(): array
     {
@@ -271,7 +211,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     }
 
     /**
-     * @param string $password
      * @return $this
      */
     public function setPassword(string $password): static
@@ -284,219 +223,155 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     /**
      * @see UserInterface
      */
-    #[Deprecated]
+    #[\Deprecated]
     public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here
         $this->plainPassword = null;
     }
 
-    /**
-     * @return string|null
-     */
     public function getEmailCanonical(): ?string
     {
         return $this->emailCanonical;
     }
 
     /**
-     * @param string|null $emailCanonical
      * @return $this
      */
     public function setEmailCanonical(?string $emailCanonical): User
     {
         $this->emailCanonical = $emailCanonical;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
     }
 
     /**
-     * @param string|null $plainPassword
      * @return $this
      */
     public function setPlainPassword(?string $plainPassword): User
     {
         $this->plainPassword = $plainPassword;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getFirstName(): ?string
     {
         return $this->firstName;
     }
 
-    /**
-     * @param string|null $firstName
-     * @return User
-     */
     public function setFirstName(?string $firstName): User
     {
         $this->firstName = $firstName;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getLastName(): ?string
     {
         return $this->lastName;
     }
 
-    /**
-     * @param string|null $lastName
-     * @return User
-     */
     public function setLastName(?string $lastName): User
     {
         $this->lastName = $lastName;
+
         return $this;
     }
 
-    /**
-     * @return DateTimeImmutable|null
-     */
-    public function getDob(): ?DateTimeImmutable
+    public function getDob(): ?\DateTimeImmutable
     {
         return $this->dob;
     }
 
-    /**
-     * @param DateTimeImmutable|null $dob
-     * @return User
-     */
-    public function setDob(?DateTimeImmutable $dob): User
+    public function setDob(?\DateTimeImmutable $dob): User
     {
         $this->dob = $dob;
+
         return $this;
     }
 
-    /**
-     * @return File|UploadedFile|null
-     */
     public function getImageFile(): File|UploadedFile|null
     {
         return $this->imageFile;
     }
 
-    /**
-     * @param File|UploadedFile|null $imageFile
-     * @return User
-     */
     public function setImageFile(File|UploadedFile|null $imageFile): User
     {
         $this->imageFile = $imageFile;
 
         if (null !== $imageFile) {
-            $this->updatedAt = new DateTimeImmutable();
+            $this->updatedAt = new \DateTimeImmutable();
         }
 
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getImageName(): ?string
     {
         return $this->imageName;
     }
 
-    /**
-     * @param string|null $imageName
-     * @return User
-     */
     public function setImageName(?string $imageName): User
     {
         $this->imageName = $imageName;
+
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
     public function getFileSize(): ?int
     {
         return $this->fileSize;
     }
 
-    /**
-     * @param int|null $fileSize
-     * @return User
-     */
     public function setFileSize(?int $fileSize): User
     {
         $this->fileSize = $fileSize;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getOriginalName(): ?string
     {
         return $this->originalName;
     }
 
-    /**
-     * @param string|null $originalName
-     * @return User
-     */
     public function setOriginalName(?string $originalName): User
     {
         $this->originalName = $originalName;
+
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getMimeType(): ?string
     {
         return $this->mimeType;
     }
 
-    /**
-     * @param string|null $mimeType
-     * @return User
-     */
     public function setMimeType(?string $mimeType): User
     {
         $this->mimeType = $mimeType;
+
         return $this;
     }
 
-    /**
-     * @return array|null
-     */
     public function getDimensions(): ?array
     {
         return $this->dimensions;
     }
 
-    /**
-     * @param array|null $dimensions
-     * @return User
-     */
     public function setDimensions(?array $dimensions): User
     {
         $this->dimensions = $dimensions;
+
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getFullName(): string
     {
         return sprintf('%s %s', $this->firstName, $this->lastName);
@@ -534,7 +409,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
 
         return $this;
     }
-
 
     /**
      * Removes a role from the list of roles associated with this user.
@@ -577,21 +451,18 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getLocale(): ?string
     {
         return $this->locale ?? 'en';
     }
 
     /**
-     * @param string|null $locale
      * @return User
      */
     public function setLocale(?string $locale): static
     {
         $this->locale = $locale;
+
         return $this;
     }
 
@@ -600,7 +471,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
      */
     public function __toString()
     {
-        return (string)$this->getEmail();
+        return (string) $this->getEmail();
     }
 
     public function __serialize(): array
@@ -659,7 +530,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     /**
      * Sets the user as a super admin.
      *
-     * @param bool $true If true, the user will be set as a super admin; if false, the super admin role will be removed.
+     * @param bool $true if true, the user will be set as a super admin; if false, the super admin role will be removed
      *
      * @return static The updated instance of the class
      */
@@ -670,6 +541,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         } else {
             $this->removeRole(RoleEnum::SUPER_ADMIN->value);
         }
+
         return $this;
     }
 
@@ -681,10 +553,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         return $this->criterias;
     }
 
-    /**
-     * @param EvaluationCriteria $criteria
-     * @return User
-     */
     public function addCriteria(EvaluationCriteria $criteria): User
     {
         if (!$this->criterias->contains($criteria)) {
@@ -695,10 +563,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         return $this;
     }
 
-    /**
-     * @param EvaluationCriteria $criteria
-     * @return User
-     */
     public function removeCriteria(EvaluationCriteria $criteria): User
     {
         if ($this->criterias->removeElement($criteria) && $criteria->getUser() === $this) {
@@ -716,10 +580,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         return $this->stores;
     }
 
-    /**
-     * @param Store $store
-     * @return User
-     */
     public function addStore(Store $store): User
     {
         if (!$this->stores->contains($store)) {
@@ -730,10 +590,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         return $this;
     }
 
-    /**
-     * @param Store $store
-     * @return User
-     */
     public function removeStore(Store $store): User
     {
         if ($this->stores->removeElement($store) && $store->getUser() === $this) {
@@ -751,10 +607,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         return $this->templates;
     }
 
-    /**
-     * @param EvaluationTemplate $template
-     * @return User
-     */
     public function addTemplate(EvaluationTemplate $template): User
     {
         if (!$this->templates->contains($template)) {
@@ -765,10 +617,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         return $this;
     }
 
-    /**
-     * @param EvaluationTemplate $template
-     * @return User
-     */
     public function removeTemplate(EvaluationTemplate $template): User
     {
         if ($this->templates->removeElement($template) && $template->getUser() === $this) {

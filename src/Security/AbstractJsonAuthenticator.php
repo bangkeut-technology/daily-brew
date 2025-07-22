@@ -1,11 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Security;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
-use JsonException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,9 +20,8 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 
 /**
- * Class AbstractJsonAuthenticator
+ * Class AbstractJsonAuthenticator.
  *
- * @package App\Security
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 abstract class AbstractJsonAuthenticator extends AbstractAuthenticator
@@ -30,16 +29,15 @@ abstract class AbstractJsonAuthenticator extends AbstractAuthenticator
     /**
      * JsonAuthenticator constructor.
      *
-     * @param UserRepository         $userRepository      User repository
-     * @param UploaderHelper         $uploaderHelper      Uploader helper
-     * @param RoleHierarchyInterface $roleHierarchy       Role hierarchy
+     * @param UserRepository         $userRepository User repository
+     * @param UploaderHelper         $uploaderHelper Uploader helper
+     * @param RoleHierarchyInterface $roleHierarchy  Role hierarchy
      */
     public function __construct(
-        private readonly UserRepository         $userRepository,
-        private readonly UploaderHelper         $uploaderHelper,
+        private readonly UserRepository $userRepository,
+        private readonly UploaderHelper $uploaderHelper,
         private readonly RoleHierarchyInterface $roleHierarchy,
-    )
-    {
+    ) {
     }
 
     /**
@@ -53,7 +51,7 @@ abstract class AbstractJsonAuthenticator extends AbstractAuthenticator
     }
 
     /**
-     * @throws JsonException
+     * @throws \JsonException
      */
     private function getCredentials(Request $request)
     {
@@ -61,12 +59,12 @@ abstract class AbstractJsonAuthenticator extends AbstractAuthenticator
     }
 
     /**
-     * @inheritDoc
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function authenticate(Request $request): Passport
     {
         $credentials = $this->getCredentials($request);
+
         return new Passport(
             new UserBadge($credentials['email'], function ($credential) {
                 if (null === $user = $this->userRepository->findByIdentifier($credential)) {
@@ -83,14 +81,12 @@ abstract class AbstractJsonAuthenticator extends AbstractAuthenticator
         );
     }
 
-    /**
-     * @inheritDoc
-     */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         /** @var User $user */
         $user = $token->getUser();
         $roles = $this->roleHierarchy->getReachableRoleNames($user->getRoles());
+
         return new JsonResponse([
             'message' => 'Authentication successful',
             'user' => [
@@ -107,9 +103,6 @@ abstract class AbstractJsonAuthenticator extends AbstractAuthenticator
         ]);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         $data = [

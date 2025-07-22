@@ -5,9 +5,7 @@ namespace App\Util;
 use App\Entity\User;
 
 /**
- * Interface HashingPasswordUpdaterInterface
- *
- * @package App\Utils
+ * Interface HashingPasswordUpdaterInterface.
  *
  * @author Vandeth Tho <thovandeth@gmail.com>
  */
@@ -18,9 +16,6 @@ interface HashingPasswordUpdaterInterface
      *
      * The implement should be a no-op in case there is no new password (it should not erase the
      * existing hash with a wrong one).
-     *
-     * @param User $user
-     * @return void
      */
     public function hashPassword(User $user): void;
 }

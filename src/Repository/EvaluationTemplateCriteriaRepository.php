@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Repository;
@@ -11,9 +12,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Class EvaluationTemplateCriteriaRepository
+ * Class EvaluationTemplateCriteriaRepository.
  *
- * @package App\Repository
  * @author  Vandeth THO <thovandeth@gmail.com>
  *
  * @extends ServiceEntityRepository<EvaluationTemplateCriteria>
@@ -34,9 +34,9 @@ class EvaluationTemplateCriteriaRepository extends AbstractRepository
     /**
      * Finds EvaluationTemplateCriteria by the associated user.
      *
-     * @param UserInterface|User|null $user The user associated with the evaluation template criteria.
+     * @param UserInterface|User|null $user the user associated with the evaluation template criteria
      *
-     * @return QueryBuilder The query builder for fetching evaluation template criteria by user.
+     * @return QueryBuilder the query builder for fetching evaluation template criteria by user
      */
     public function findByUserQueryBuilder(UserInterface|User|null $user): QueryBuilder
     {

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Repository;
@@ -13,9 +14,8 @@ use Random\RandomException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Class EmployeeRepository
+ * Class EmployeeRepository.
  *
- * @package App\Repository
  * @author  Vandeth THO <thovandeth@gmail.com>
  *
  * @extends ServiceEntityRepository<Employee>
@@ -36,10 +36,10 @@ class EmployeeRepository extends AbstractRepository
     /**
      * Finds an Employee entity based on the provided store and user identifiers.
      *
-     * @param Store|int $store The store entity or its identifier.
-     * @param User|int  $user  The user entity or its identifier.
+     * @param Store|int $store the store entity or its identifier
+     * @param User|int  $user  the user entity or its identifier
      *
-     * @return Employee|null Returns the Employee entity if found, otherwise null.
+     * @return Employee|null returns the Employee entity if found, otherwise null
      */
     public function findByStoreAndUser(Store|int $store, User|int $user): ?Employee
     {
@@ -53,10 +53,9 @@ class EmployeeRepository extends AbstractRepository
      * Update the employee entity with an auto-generated identifier.
      * If the identifier is not set, it will generate a new one.
      *
-     * @param Employee $employee The employee entity to update.
+     * @param Employee $employee the employee entity to update
      * @param bool     $andFlush Tell the manager whether the object needs to be flush or not.
      *                           Default is true.
-     * @return void
      *
      * @throws RandomException
      */
@@ -76,9 +75,9 @@ class EmployeeRepository extends AbstractRepository
     /**
      * Check if the identifier already exists in the database.
      *
-     * @param string $identifier The identifier to check.
+     * @param string $identifier the identifier to check
      *
-     * @return bool Returns true if the identifier is already existed, otherwise false.
+     * @return bool returns true if the identifier is already existed, otherwise false
      */
     private function isIdentifierExist(string $identifier): bool
     {
@@ -93,10 +92,10 @@ class EmployeeRepository extends AbstractRepository
     /**
      * Find employee by identifiers and store.
      *
-     * @param array $identifiers The list of employee identifiers.
-     * @param Store $store       The store entity.
+     * @param array $identifiers the list of employee identifiers
+     * @param Store $store       the store entity
      *
-     * @return Employee[] Returns the list of employee entities.
+     * @return Employee[] returns the list of employee entities
      */
     public function findByIdentifiersAndStore(array $identifiers, Store $store): array
     {
@@ -112,10 +111,11 @@ class EmployeeRepository extends AbstractRepository
     /**
      * Create a new employee entity.
      *
-     * @param User  $user  The user entity.
-     * @param Store $store The store entity.
+     * @param User  $user  the user entity
+     * @param Store $store the store entity
      *
-     * @return Employee Returns the created employee entity.
+     * @return Employee returns the created employee entity
+     *
      * @throws RandomException
      */
     public function createEmployee(User $user, Store $store): Employee
@@ -127,16 +127,15 @@ class EmployeeRepository extends AbstractRepository
         $this->updateEmployee($employee);
 
         return $employee;
-
     }
 
     /**
      * Find an employee by identifier and store.
      *
-     * @param string $identifier The employee identifier.
-     * @param Store  $store      The store entity.
+     * @param string $identifier the employee identifier
+     * @param Store  $store      the store entity
      *
-     * @return Employee|null Returns the employee entity if found, otherwise null.
+     * @return Employee|null returns the employee entity if found, otherwise null
      */
     public function findByIdentifierAndStore(string $identifier, Store $store): ?Employee
     {
@@ -149,9 +148,9 @@ class EmployeeRepository extends AbstractRepository
     /**
      * Find employees by user.
      *
-     * @param User $user The user entity.
+     * @param User $user the user entity
      *
-     * @return Employee[] Returns the list of employee entities associated with the user.
+     * @return Employee[] returns the list of employee entities associated with the user
      */
     public function findByUser(User $user): array
     {
@@ -167,9 +166,9 @@ class EmployeeRepository extends AbstractRepository
     /**
      * Count the number of employees associated with a specific user.
      *
-     * @param User|UserInterface $user The user entity or interface.
+     * @param User|UserInterface $user the user entity or interface
      *
-     * @return int Returns the count of employees for the specified user.
+     * @return int returns the count of employees for the specified user
      */
     public function countByUser(User|UserInterface $user): int
     {
@@ -184,10 +183,10 @@ class EmployeeRepository extends AbstractRepository
     /**
      * Find an employee by identifier and user.
      *
-     * @param string $identifier The employee identifier.
-     * @param User   $user       The user entity.
+     * @param string $identifier the employee identifier
+     * @param User   $user       the user entity
      *
-     * @return Employee|null Returns the employee entity if found, otherwise null.
+     * @return Employee|null returns the employee entity if found, otherwise null
      */
     public function findByIdentifierAndUser(string $identifier, User $user): ?Employee
     {

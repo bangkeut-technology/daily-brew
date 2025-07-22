@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Form\Type;
@@ -9,9 +10,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Image;
 
 /**
- * Class ImageType
+ * Class ImageType.
  *
- * @package App\Form\Type
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 class ImageType extends AbstractType

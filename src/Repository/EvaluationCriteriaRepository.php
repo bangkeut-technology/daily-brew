@@ -1,6 +1,6 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace App\Repository;
 
@@ -15,9 +15,8 @@ use Random\RandomException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Class EvaluationCriteriaRepository
+ * Class EvaluationCriteriaRepository.
  *
- * @package App\Repository
  * @author  Vandeth THO <thovandeth@gmail.com>
  *
  * @extends ServiceEntityRepository<EvaluationCriteria>
@@ -38,10 +37,10 @@ class EvaluationCriteriaRepository extends AbstractRepository
     /**
      * Finds an EvaluationCriteria by its identifier and associated user.
      *
-     * @param string $identifier The unique identifier of the evaluation criteria.
-     * @param User   $user       The user associated with the evaluation criteria.
+     * @param string $identifier the unique identifier of the evaluation criteria
+     * @param User   $user       the user associated with the evaluation criteria
      *
-     * @return EvaluationCriteria|null The found evaluation criteria or null if not found.
+     * @return EvaluationCriteria|null the found evaluation criteria or null if not found
      */
     public function findByIdentifierAndUser(string $identifier, User $user): ?EvaluationCriteria
     {
@@ -58,10 +57,10 @@ class EvaluationCriteriaRepository extends AbstractRepository
     /**
      * Update an evaluation criteria.
      *
-     * @param EvaluationCriteria $evaluationCriteria The evaluation criteria to update.
-     * @param bool               $andFlush           Whether to flush the changes (default true).
-     * @return void
-     * @throws RandomException Throws an exception if the identifier already exists.
+     * @param EvaluationCriteria $evaluationCriteria the evaluation criteria to update
+     * @param bool               $andFlush           whether to flush the changes (default true)
+     *
+     * @throws RandomException throws an exception if the identifier already exists
      */
     public function updateEvaluationCriteria(EvaluationCriteria $evaluationCriteria, bool $andFlush = true): void
     {
@@ -81,8 +80,9 @@ class EvaluationCriteriaRepository extends AbstractRepository
     /**
      * Check if an identifier already exists for an evaluation criteria.
      *
-     * @param string $identifier The identifier to check.
-     * @return bool Returns true if the identifier exists, false otherwise.
+     * @param string $identifier the identifier to check
+     *
+     * @return bool returns true if the identifier exists, false otherwise
      */
     public function isIdentifierExists(string $identifier): bool
     {
@@ -97,8 +97,9 @@ class EvaluationCriteriaRepository extends AbstractRepository
     /**
      * Find evaluation criteria by user.
      *
-     * @param UserInterface|User|null $user The user to filter by.
-     * @return QueryBuilder Returns a QueryBuilder instance for further query customization.
+     * @param UserInterface|User|null $user the user to filter by
+     *
+     * @return QueryBuilder returns a QueryBuilder instance for further query customization
      */
     public function findByUserQueryBuilder(UserInterface|User|null $user): QueryBuilder
     {

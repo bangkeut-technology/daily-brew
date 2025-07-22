@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Form;
@@ -11,16 +12,12 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class RoleFormType
+ * Class RoleFormType.
  *
- * @package App\Form
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 class RoleFormType extends AbstractType
 {
-    /**
-     * @inheritDoc
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -39,9 +36,6 @@ class RoleFormType extends AbstractType
             ]);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -50,12 +44,8 @@ class RoleFormType extends AbstractType
         ]);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getBlockPrefix(): string
     {
         return '';
     }
-
 }
