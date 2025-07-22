@@ -5,12 +5,21 @@
         "add": "Add Employee",
         "edit": "Edit Employee",
         "delete": "Delete Employee",
-        "view_performance": "View Performance",
         "current_month_score": "Current Month Score",
         "kpi_score": "KPI Score",
         "evaluate": "Evaluate",
         "view": "View",
+        "information": "Employee Information",
+        "phone_number": "Phone Number",
+        "dob": "Date of Birth",
+        "joined_at": "Joined At",
+        "performance": {
+            "view": "View Performance",
+            "title": "Performance",
+            "description": "View and manage the performance metrics of your employees. You can track their KPIs and evaluation history."
+        },
         "status": {
+            "title": "Employee Status",
             "active": "Active",
             "on_leave": "On Leave",
             "suspended": "Suspended",

@@ -2,11 +2,10 @@ import React from 'react';
 import { Employee } from '@/types/employee';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useNavigate } from '@tanstack/react-router';
-import { ClipboardCheck, Eye, UserCircle } from 'lucide-react';
+import { Eye, UserCircle } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import { EmployeeEvaluationTemplates } from '@/components/employee-evaluation-templates';
+import { EmployeeEvaluationButton } from '@/components/button/employee-evaluation-button';
 
 interface EmployeeCardProps {
     employee: Employee;
@@ -17,7 +16,6 @@ interface EmployeeCardProps {
 export const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, from, to }) => {
     const { t } = useTranslation('glossary');
     const navigate = useNavigate();
-    const [open, setOpen] = React.useState(false);
 
     const handleClick = React.useCallback(() => {
         navigate({
@@ -52,9 +50,7 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, from, to }
 
                     <div className="flex flex-col space-y-2 items-center justify-center">
                         <p className="text-sm text-muted-foreground">{t('employees.kpi_score')}</p>
-                        <div className="p-2 rounded-4xl bg-primary min-w-[69px] min-h-[69px] flex items-center justify-center">
-                            <h1 className="text-2xl font-bold text-foreground">{employee.averageScore.toFixed(2)}</h1>
-                        </div>
+                        <h1 className="text-4xl font-bold text-primary">{employee.averageScore}</h1>
                     </div>
                 </div>
             </div>
@@ -66,22 +62,7 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, from, to }
                     <Eye />
                     {t('employees.view')}
                 </Button>
-                <Dialog open={open} onOpenChange={setOpen}>
-                    <DialogTrigger asChild>
-                        <Button variant="outline" className="w-full" size="sm">
-                            <ClipboardCheck />
-                            {t('employees.evaluate')}
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>
-                                {t('employees.evaluate')} {employee.firstName}
-                            </DialogTitle>
-                        </DialogHeader>
-                        <EmployeeEvaluationTemplates employee={employee} />
-                    </DialogContent>
-                </Dialog>
+                <EmployeeEvaluationButton employee={employee} />
             </div>
         </div>
     );

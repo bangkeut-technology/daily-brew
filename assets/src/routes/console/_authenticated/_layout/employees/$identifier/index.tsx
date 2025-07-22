@@ -2,9 +2,12 @@ import React from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import { fetchEmployee } from '@/services/employee';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent } from '@/components/ui/card';
-import { EmployeeEvaluationTemplates } from '@/components/employee-evaluation-templates';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { z } from 'zod';
+import { Badge } from '@/components/ui/badge';
+import { format } from 'date-fns';
+import { EmployeeEvaluationButton } from '@/components/button/employee-evaluation-button';
+import { BackButton } from '@/components/button/back-button';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/employees/$identifier/')({
     component: EmployeeDetails,
@@ -24,25 +27,75 @@ function EmployeeDetails() {
     const employee = Route.useLoaderData();
 
     return (
-        <div className="w-full h-full">
-            <h1 className="text-2xl font-bold">{t('employees.details.title', { ns: 'glossary' })}</h1>
-            <p>{t('employees.details.description', { ns: 'glossary' })}</p>
-            <Card className="mt-4">
-                <CardContent className="space-y-2 p-6 space-x-2">
-                    <h2 className="text-xl font-semibold">
-                        {employee.lastName} {employee.firstName}
-                    </h2>
-                    <p className="">{t('employees.roles.title', { ns: 'glossary' })}</p>
-                    <ul>
-                        {employee.roles.map((role) => (
-                            <li key={role.id}>{role.name}</li>
-                        ))}
-                    </ul>
-                </CardContent>
-            </Card>
-            <h1>{t('employee_evaluations.new.title', { ns: 'glossary' })}</h1>
-            <p>{t('employee_evaluations.new.description', { ns: 'glossary' })}</p>
-            <EmployeeEvaluationTemplates employee={employee} />
+        <div className="w-full px-6 py-4 space-y-6">
+            <div className="space-y-2">
+                <BackButton />
+
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                    <h1 className="text-3xl font-bold">
+                        {employee.firstName} {employee.lastName}
+                    </h1>
+                    <EmployeeEvaluationButton employee={employee} />
+                </div>
+            </div>
+
+            <div className="flex flex-col gap-6 sm:grid sm:grid-cols-1 md:grid-cols-2">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{t('employees.information', { ns: 'glossary' })}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div>
+                            <span className="font-semibold">{t('employees.status.title', { ns: 'glossary' })}:</span>{' '}
+                            <Badge variant="outline">
+                                {t(`employees.status.${employee.status}`, { ns: 'glossary' })}
+                            </Badge>
+                        </div>
+                        {employee.phoneNumber && (
+                            <div>
+                                <span className="font-semibold">
+                                    {t('employees.phone_number', { ns: 'glossary' })}:
+                                </span>{' '}
+                                {employee.phoneNumber}
+                            </div>
+                        )}
+                        {employee.dob && (
+                            <div>
+                                <span className="font-semibold">{t('employees.dob', { ns: 'glossary' })}:</span>{' '}
+                                {format(employee.dob, 'PPP')}
+                            </div>
+                        )}
+                        {employee.joinedAt && (
+                            <div>
+                                <span className="font-semibold">{t('employees.joined_at', { ns: 'glossary' })}:</span>{' '}
+                                {format(new Date(employee.joinedAt), 'PPP')}
+                            </div>
+                        )}
+                        <div>
+                            <span className="font-semibold">{t('employees.roles.title', { ns: 'glossary' })}:</span>
+                            <div className="mt-1 flex flex-wrap gap-2">
+                                {employee.roles.map((role) => (
+                                    <Badge key={role.canonicalName} variant="secondary">
+                                        {role.name}
+                                    </Badge>
+                                ))}
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{t('employees.performance.title', { ns: 'glossary' })}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-center">
+                            <p className="text-muted-foreground">{t('employees.kpi_score', { ns: 'glossary' })}</p>
+                            <h2 className="text-4xl font-bold text-primary">{employee.averageScore ?? 'N/A'}</h2>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     );
 }
