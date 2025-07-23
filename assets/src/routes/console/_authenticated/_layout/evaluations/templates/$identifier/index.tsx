@@ -3,11 +3,11 @@ import { createFileRoute } from '@tanstack/react-router';
 import { fetchEvaluationTemplate } from '@/services/evaluation-template';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/templates/$identifier/')({
-    component: EvaluationDetails,
+    component: EvaluationTemplateDetails,
     loader: ({ params: { identifier } }) => fetchEvaluationTemplate(identifier),
 });
 
-function EvaluationDetails() {
+function EvaluationTemplateDetails() {
     const data = Route.useLoaderData();
     return (
         <div className="w-full h-full flex items-center justify-center">

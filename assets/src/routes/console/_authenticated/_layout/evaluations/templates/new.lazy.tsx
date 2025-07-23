@@ -24,11 +24,12 @@ function NewEvaluationTemplate() {
     const { mutate, isPending } = useMutation({
         mutationFn: postEvaluationTemplate,
         onSuccess: (data) => {
-            toast.success(data.message);
             navigate({
                 to: '/console/evaluations/templates/$identifier',
                 params: { identifier: data.evaluation.identifier },
-            }).then();
+            }).then(() => {
+                toast.success(data.message);
+            });
         },
         onError: (error) => {
             const message = isAxiosError(error) ? error.response?.data.message : t('occurred', { ns: 'error' });
@@ -38,6 +39,7 @@ function NewEvaluationTemplate() {
     const form = useForm<PartialEvaluationTemplate>({
         resolver: yupResolver(evaluationTemplateSchema),
         defaultValues: {
+            name: '',
             description: '',
             criterias: [],
         },

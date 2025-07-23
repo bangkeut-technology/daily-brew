@@ -1,25 +1,27 @@
 import React from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { fetchEvaluationTemplates } from '@/services/evaluation-template';
+import { fetchEvaluationCriterias } from '@/services/evaluation-criteria';
 import { Button } from '@/components/ui/button';
 import { ArrowDown, ArrowUp, Eye, ListPlus } from 'lucide-react';
 import { DataTable } from '@/components/data-table';
 import { createColumnHelper } from '@tanstack/table-core';
-import { EvaluationTemplate } from '@/types/evaluation-template';
+import { EvaluationCriteria } from '@/types/evaluation-criteria';
 import { useTranslation } from 'react-i18next';
 import { RowSelectionState } from '@tanstack/react-table';
-import { EvaluationSwitch } from '@/components/switch/evaluations-switch';
+import { useQuery } from '@tanstack/react-query';
 
-const columnHelper = createColumnHelper<EvaluationTemplate>();
+const columnHelper = createColumnHelper<EvaluationCriteria>();
 
 export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/criterias/')({
-    component: Evaluations,
-    loader: () => fetchEvaluationTemplates(),
+    component: EvaluationCriterias,
 });
 
-function Evaluations() {
+function EvaluationCriterias() {
     const { t } = useTranslation();
-    const data = Route.useLoaderData();
+    const { data = [], isPending } = useQuery({
+        queryKey: ['evaluation-criterias'],
+        queryFn: () => fetchEvaluationCriterias(),
+    });
     const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
     const columns = React.useMemo(
@@ -41,7 +43,7 @@ function Evaluations() {
                     },
                 },
             }),
-            columnHelper.accessor('name', {
+            columnHelper.accessor('label', {
                 header: ({ column }) => (
                     <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
                         {t('name')}
@@ -51,14 +53,14 @@ function Evaluations() {
                 cell: (info) => info.renderValue(),
                 footer: (info) => info.column.id,
             }),
-            columnHelper.accessor('active', {
+            columnHelper.accessor('weight', {
                 header: ({ column }) => (
                     <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-                        {t('active')}
+                        {t('evaluation_criterias.table.weight', { ns: 'glossary' })}
                         {column.getIsSorted() === 'asc' ? <ArrowUp /> : <ArrowDown />}
                     </Button>
                 ),
-                cell: (info) => <EvaluationSwitch evaluation={info.row.original} />,
+                cell: (info) => info.getValue(),
                 footer: (info) => info.column.id,
             }),
         ],
@@ -71,7 +73,7 @@ function Evaluations() {
                 <div className="flex flex-row justify-center items-center space-x-2">
                     <Button asChild>
                         <Link to="/console/evaluations/criterias/new">
-                            <ListPlus /> {t('new.evaluation_template.title', { ns: 'glossary' })}
+                            <ListPlus /> {t('evaluation_criterias.new.title', { ns: 'glossary' })}
                         </Link>
                     </Button>
                 </div>
@@ -81,6 +83,7 @@ function Evaluations() {
                 columns={columns}
                 onRowSelectionChange={setRowSelection}
                 rowSelection={rowSelection}
+                loading={isPending}
             />
         </div>
     );

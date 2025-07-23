@@ -136,12 +136,6 @@
         "row_selected": "row(s) selected",
         "no_data": "No data available"
     },
-    "new": {
-        "title": "New",
-        "evaluation_template": {
-            "title": "New Evaluation Template"
-        }
-    },
     "image": {
         "drop_click": "Drag and drop an image or click to browse",
         "drop_here": "Drop the files here ...",
