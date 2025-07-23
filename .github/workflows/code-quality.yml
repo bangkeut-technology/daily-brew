@@ -1,18 +1,43 @@
-name: DailyBrew Quality Checks
+name: Code Quality & Tests
 
-on: [push, pull_request]
+on:
+    pull_request:
+        branches:
+            - main
+    push:
+        branches:
+            - main
 
 jobs:
-    code-quality:
+    quality-check:
+        name:    Run Code Quality Checks
         runs-on: ubuntu-latest
+
         steps:
-            - uses: actions/checkout@v3
-            - name: Setup PHP
-              uses: shivammathur/setup-php@v2
-              with:
-                  php-version: '8.2'
-                  tools: composer
-            - run: composer install
-            - run: vendor/bin/php-cs-fixer fix --dry-run --diff
-            - run: vendor/bin/phpstan analyse
-            - run: php bin/phpunit
+            -
+                name: Checkout code
+                uses: actions/checkout@v3
+
+            -
+                name: Set up PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.2'
+                    extensions:  mbstring, xml, ctype, iconv, intl, pdo, sqlite
+                    tools:       composer
+
+            -
+                name: Install dependencies
+                run:  composer install --no-progress --prefer-dist --optimize-autoloader
+
+            -
+                name: Run PHP-CS-Fixer
+                run:  vendor/bin/php-cs-fixer fix --dry-run --diff
+
+            -
+                name: Run PHPStan
+                run:  vendor/bin/phpstan analyse
+
+            -
+                name: Run PHPUnit
+                run:  ./bin/phpunit --colors=always
