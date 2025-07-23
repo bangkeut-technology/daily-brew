@@ -38,11 +38,12 @@ class EvaluationTemplateController extends AbstractController
     use EvaluationTemplateCriteriaTrait;
 
     public function __construct(
-        TranslatorInterface $translator,
-        private readonly EvaluationTemplateRepository $evaluationTemplateRepository,
+        TranslatorInterface                                   $translator,
+        private readonly EvaluationTemplateRepository         $evaluationTemplateRepository,
         private readonly EvaluationTemplateCriteriaRepository $evaluationTemplateCriteriaRepository,
-        private readonly EventDispatcherInterface $dispatcher,
-    ) {
+        private readonly EventDispatcherInterface             $dispatcher,
+    )
+    {
         parent::__construct($translator);
     }
 
@@ -63,7 +64,8 @@ class EvaluationTemplateController extends AbstractController
     public function gets(
         #[CurrentUser]
         User $user,
-    ): JsonResponse {
+    ): JsonResponse
+    {
         $templates = $this->evaluationTemplateRepository->findByUser($user);
 
         return $this->createTemplateResponse($templates);
@@ -101,7 +103,7 @@ class EvaluationTemplateController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $template->setUser($this->getUser());
             $this->evaluationTemplateRepository->updateEvaluationTemplate($template);
-
+            dump($form->get('criterias')->getData());
             $this->dispatcher->dispatch(new EvaluationTemplateCreatedEvent($template, $form->get('criterias')->getData()));
 
             return $this->createTemplateResponse([

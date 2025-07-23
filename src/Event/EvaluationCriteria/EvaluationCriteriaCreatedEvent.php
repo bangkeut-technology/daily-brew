@@ -6,6 +6,7 @@ namespace App\Event\EvaluationCriteria;
 
 use App\Entity\EvaluationCriteria;
 use App\Entity\EvaluationTemplate;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -17,13 +18,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 final class EvaluationCriteriaCreatedEvent extends Event
 {
     /**
-     * @param EvaluationCriteria   $criteria
-     * @param EvaluationTemplate[] $templates
+     * @param EvaluationCriteria                                            $criteria
+     * @param EvaluationTemplate[]|ArrayCollection<int, EvaluationTemplate> $templates
      */
     public function __construct(
-        public readonly EvaluationCriteria $criteria,
-        public readonly array              $templates,
-    )
-    {
+        public readonly EvaluationCriteria    $criteria,
+        public readonly array|ArrayCollection $templates,
+    ) {
     }
 }

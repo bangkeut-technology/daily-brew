@@ -40,11 +40,11 @@ class Attendance extends AbstractEntity
     #[ORM\Column(enumType: AttendanceStatusEnum::class)]
     private AttendanceStatusEnum $status = AttendanceStatusEnum::PRESENT;
 
-    #[ORM\ManyToOne(inversedBy: 'attendances')]
+    #[ORM\ManyToOne(targetEntity: Employee::class, inversedBy: 'attendances')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Employee $employee = null;
 
-    #[ORM\ManyToOne(inversedBy: 'attendances')]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?User $user = null;
 
