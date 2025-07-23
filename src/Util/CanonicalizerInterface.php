@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 
 namespace App\Util;
 
@@ -9,10 +11,27 @@ namespace App\Util;
  */
 interface CanonicalizerInterface
 {
-    public function canonicalize($string): ?string;
+    /**
+     * Canonicalize the given string.
+     *
+     * This method should convert the string to a canonical form, which may include
+     * lowercasing, removing special characters, and replacing spaces with underscores.
+     *
+     * @param string|null $string The string to canonicalize.
+     *
+     * @return string|null The canonicalized string or null if the input is null.
+     */
+    public function canonicalize(?string $string): ?string;
 
     /**
-     * Lowercase and replace spaces with underscores in the given string.
+     * Canonicalize the given string to a specific format.
+     *
+     * This method should convert the string to a canonical form, which may include
+     * lowercasing, removing special characters, and replacing spaces with underscores.
+     *
+     * @param string|null $string The string to canonicalize.
+     *
+     * @return string|null The canonicalized string or null if the input is null.
      */
     public function canonicalizeString(?string $string): ?string;
 }

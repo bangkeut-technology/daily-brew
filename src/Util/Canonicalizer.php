@@ -13,6 +13,9 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
  */
 class Canonicalizer implements CanonicalizerInterface
 {
+    /**
+     * @var AsciiSlugger
+     */
     private AsciiSlugger $slugger;
 
     public function __construct()
@@ -20,6 +23,9 @@ class Canonicalizer implements CanonicalizerInterface
         $this->slugger = new AsciiSlugger();
     }
 
+    /**
+     * @inheritDoc
+     */
     public function canonicalize($string): ?string
     {
         if (null === $string) {
@@ -33,6 +39,9 @@ class Canonicalizer implements CanonicalizerInterface
             : mb_convert_case($string, MB_CASE_LOWER);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function canonicalizeString(?string $string): string
     {
         return $this->slugger->slug($string)->lower()->toString();
