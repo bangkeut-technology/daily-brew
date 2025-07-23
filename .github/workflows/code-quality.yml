@@ -17,14 +17,16 @@ jobs:
             -
                 name: Checkout code
                 uses: actions/checkout@v3
-
             -
-                name: Set up PHP
+                name: Setup PHP
                 uses: shivammathur/setup-php@v2
                 with:
-                    php-version: '8.2'
-                    extensions:  mbstring, xml, ctype, iconv, intl, pdo, sqlite
-                    tools:       composer
+                    php-version: ${{ matrix.php-versions }}
+                    extensions:  mbstring, intl, bcmath, gd, pdo, sqlite, xml, zip, curl, json, pcntl, tokenizer, ctype, iconv, session, simplexml, xmlwriter, xmlreader, dom, fileinfo, posix, pdo_sqlite, pdo_mysql
+                    ini-values:  post_max_size=20M, max_execution_time=180, upload_max_filesize=20M
+                    coverage:    xdebug
+                env:
+                    update: true
 
             -
                 name: Install dependencies
