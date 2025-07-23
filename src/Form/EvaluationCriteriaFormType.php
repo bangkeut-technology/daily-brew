@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Form;
 
 use App\Entity\EvaluationCriteria;
+use App\Entity\EvaluationTemplate;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -22,6 +23,12 @@ class EvaluationCriteriaFormType extends AbstractType
             ->add('label')
             ->add('description')
             ->add('weight')
+            ->add('templates', null, [
+                'class' => EvaluationTemplate::class,
+                'choice_label' => 'id',
+                'multiple' => true,
+                'mapped' => false,
+            ])
         ;
     }
 

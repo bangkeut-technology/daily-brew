@@ -23,22 +23,37 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\UniqueConstraint(name: 'UQ_EVALUATION_CRITERIA_CANONICAL_LABEL', columns: ['canonical_label', 'user_id'])]
 class EvaluationCriteria extends AbstractEntity
 {
+    /**
+     * @var string|null
+     */
     #[ORM\Column]
     #[Groups(['criteria:read'])]
     private ?string $identifier = null;
 
+    /**
+     * @var string|null
+     */
     #[ORM\Column(length: 255)]
     #[Groups(['criteria:read'])]
     private ?string $label = null;
 
+    /**
+     * @var string|null
+     */
     #[ORM\Column(length: 255)]
     #[Groups(['criteria:read'])]
     private ?string $canonicalLabel = null;
 
+    /**
+     * @var string|null
+     */
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['criteria:read'])]
     private ?string $description = null;
 
+    /**
+     * @var int
+     */
     #[ORM\Column]
     #[Groups(['criteria:read'])]
     private int $weight = 1;
@@ -124,6 +139,17 @@ class EvaluationCriteria extends AbstractEntity
     public function getTemplates(): Collection
     {
         return $this->templates;
+    }
+
+    /**
+     * @param Collection<int, EvaluationTemplateCriteria> $templates
+     * @return EvaluationCriteria
+     */
+    public function setTemplates(Collection $templates): EvaluationCriteria
+    {
+        $this->templates = $templates;
+
+        return $this;
     }
 
     public function addTemplate(EvaluationTemplateCriteria $template): EvaluationCriteria

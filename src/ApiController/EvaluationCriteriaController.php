@@ -8,11 +8,13 @@ use App\ApiController\Trait\EvaluationCriteriaTrait;
 use App\Controller\AbstractController;
 use App\Entity\EvaluationCriteria;
 use App\Entity\User;
+use App\Event\EvaluationCriteria\EvaluationCriteriaCreatedEvent;
 use App\Form\EvaluationCriteriaFormType;
 use App\Repository\EvaluationCriteriaRepository;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Random\RandomException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,9 +34,11 @@ class EvaluationCriteriaController extends AbstractController
     use EvaluationCriteriaTrait;
 
     public function __construct(
-        TranslatorInterface $translator,
+        TranslatorInterface                           $translator,
         private readonly EvaluationCriteriaRepository $evaluationCriteriaRepository,
-    ) {
+        private readonly EventDispatcherInterface     $dispatcher,
+    )
+    {
         parent::__construct($translator);
     }
 
@@ -55,7 +59,8 @@ class EvaluationCriteriaController extends AbstractController
     public function gets(
         #[CurrentUser]
         User $user,
-    ): JsonResponse {
+    ): JsonResponse
+    {
         $criterias = $this->evaluationCriteriaRepository->findByUser($user);
 
         return $this->createCriteriaResponse($criterias);
@@ -93,6 +98,8 @@ class EvaluationCriteriaController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $criteria->setUser($this->getUser());
             $this->evaluationCriteriaRepository->updateEvaluationCriteria($criteria);
+
+            $this->dispatcher->dispatch(new EvaluationCriteriaCreatedEvent($criteria, $form->get('templates')->getData()));
 
             return $this->createCriteriaResponse([
                 'message' => $this->translator->trans('created.evaluation_criteria', ['%label%' => $criteria->getLabel()]),

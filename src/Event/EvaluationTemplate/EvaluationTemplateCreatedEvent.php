@@ -15,9 +15,12 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 final class EvaluationTemplateCreatedEvent extends Event
 {
+    /**
+     * @param EvaluationTemplate $template
+     * @param EvaluationCriteria[] $criterias
+     */
     public function __construct(
         public readonly EvaluationTemplate $template,
-        /** @var EvaluationCriteria[] */
         public readonly array $criterias,
     ) {
     }
