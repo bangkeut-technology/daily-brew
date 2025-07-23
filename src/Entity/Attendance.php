@@ -19,6 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 #[ORM\Table(name: 'daily_brew_attendances')]
 #[ORM\Entity(repositoryClass: AttendanceRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQ_ATTENDANCE_EMPLOYEE_DATE', fields: ['employee', 'attendanceDate'])]
 class Attendance extends AbstractEntity
 {
     #[ORM\Column(length: 255)]
@@ -40,8 +41,12 @@ class Attendance extends AbstractEntity
     private AttendanceStatusEnum $status = AttendanceStatusEnum::PRESENT;
 
     #[ORM\ManyToOne(inversedBy: 'attendances')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Employee $employee = null;
+
+    #[ORM\ManyToOne(inversedBy: 'attendances')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?User $user = null;
 
     public function getIdentifier(): ?string
     {
@@ -123,6 +128,18 @@ class Attendance extends AbstractEntity
     public function setEmployee(?Employee $employee): static
     {
         $this->employee = $employee;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

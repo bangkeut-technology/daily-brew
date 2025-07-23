@@ -17,7 +17,11 @@ use Doctrine\Persistence\ManagerRegistry;
  *
  * @extends ServiceEntityRepository<Attendance>
  *
- * @method Attendance create()
+ * @method Attendance      create()
+ * @method Attendance|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Attendance|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Attendance[]    findAll()
+ * @method Attendance[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class AttendanceRepository extends AbstractRepository
 {

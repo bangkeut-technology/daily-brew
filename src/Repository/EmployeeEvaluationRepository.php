@@ -7,6 +7,7 @@ namespace App\Repository;
 use App\Entity\Employee;
 use App\Entity\EmployeeEvaluation;
 use App\Util\TokenGenerator;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
@@ -37,7 +38,7 @@ class EmployeeEvaluationRepository extends AbstractRepository
     /**
      * Find evaluations by date and employee.
      */
-    public function findByDateAndEmployee(\DateTimeImmutable $date, Employee $employee): ?EmployeeEvaluation
+    public function findByDateAndEmployee(DateTimeImmutable $date, Employee $employee): ?EmployeeEvaluation
     {
         return $this->createQueryBuilder('ee')
             ->innerJoin('ee.scores', 'ees')
@@ -89,13 +90,13 @@ class EmployeeEvaluationRepository extends AbstractRepository
     /**
      * Find evaluations by period and employee.
      *
-     * @param \DateTimeImmutable $from     the start date of the period
-     * @param \DateTimeImmutable $to       the end date of the period
+     * @param DateTimeImmutable $from     the start date of the period
+     * @param DateTimeImmutable $to       the end date of the period
      * @param Employee           $employee the employee to filter evaluations by
      *
      * @return EmployeeEvaluation[]
      */
-    public function findByPeriodAndEmployee(\DateTimeImmutable $from, \DateTimeImmutable $to, Employee $employee): array
+    public function findByPeriodAndEmployee(DateTimeImmutable $from, DateTimeImmutable $to, Employee $employee): array
     {
         return $this->createQueryBuilder('ee')
             ->innerJoin('ee.scores', 'ees')
@@ -114,12 +115,12 @@ class EmployeeEvaluationRepository extends AbstractRepository
      * Get the average score for an employee over a specified period.
      *
      * @param Employee           $employee the employee to calculate the average score for
-     * @param \DateTimeImmutable $from     the start date of the period
-     * @param \DateTimeImmutable $to       the end date of the period
+     * @param DateTimeImmutable $from     the start date of the period
+     * @param DateTimeImmutable $to       the end date of the period
      *
      * @return float the average score
      */
-    public function getAverageScoreForPeriod(Employee $employee, \DateTimeImmutable $from, \DateTimeImmutable $to): float
+    public function getAverageScoreForPeriod(Employee $employee, DateTimeImmutable $from, DateTimeImmutable $to): float
     {
         $qb = $this->createQueryBuilder('ee')
             ->select('ROUND(AVG(ees.score), 2) AS averageScore')
@@ -139,10 +140,10 @@ class EmployeeEvaluationRepository extends AbstractRepository
      * Get the list of average scores for employees over a specified period.
      *
      * @param Employee[]         $employees the employees to calculate the average score for
-     * @param \DateTimeImmutable $from      the start date of the period
-     * @param \DateTimeImmutable $to        the end date of the period
+     * @param DateTimeImmutable $from      the start date of the period
+     * @param DateTimeImmutable $to        the end date of the period
      */
-    public function getAverageScoresForPeriod(array $employees, \DateTimeImmutable $from, \DateTimeImmutable $to): array
+    public function getAverageScoresForPeriod(array $employees, DateTimeImmutable $from, DateTimeImmutable $to): array
     {
         $qb = $this->createQueryBuilder('ee')
             ->select('ROUND(AVG(ees.score), 2) AS averageScore')
