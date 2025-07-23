@@ -1,0 +1,87 @@
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { fetchEmployees } from '@/services/employee';
+import { createColumnHelper } from '@tanstack/table-core';
+import { Employee } from '@/types/employee';
+import { Checkbox } from '@/components/ui/checkbox';
+import { DataTable } from '@/components/data-table';
+import { RowSelectionState } from '@tanstack/react-table';
+import { Control, useFieldArray } from 'react-hook-form';
+
+const columnHelper = createColumnHelper<Employee>();
+const queryKey = ['daily-brew-employees'];
+
+interface EmployeeSelectProps {
+    control: Control<any>;
+    name: string;
+    title?: string;
+    description?: string;
+}
+
+export const EmployeeSelect: React.FunctionComponent<EmployeeSelectProps> = ({ control, name, title, description }) => {
+    const [employees, setEmployees] = React.useState<RowSelectionState>({});
+    const { replace } = useFieldArray({
+        name,
+        control,
+    });
+    const { data = [] } = useQuery({
+        queryKey,
+        queryFn: () => fetchEmployees({ from: new Date().toISOString(), to: new Date().toISOString() }),
+    });
+
+    React.useEffect(() => {
+        const selectedRows = Object.keys(employees).map((value) => data[Number(value)]);
+        replace(selectedRows.map((employee) => ({ value: employee.id })));
+    }, [data, replace, employees]);
+
+    const columns = React.useMemo(
+        () => [
+            columnHelper.accessor('id', {
+                id: 'select',
+                header: ({ table }) => (
+                    <Checkbox
+                        checked={
+                            table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')
+                        }
+                        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                        aria-label="Select all"
+                    />
+                ),
+                cell: ({ row }) => (
+                    <Checkbox
+                        checked={row.getIsSelected()}
+                        onCheckedChange={(value) => row.toggleSelected(!!value)}
+                        aria-label="Select row"
+                    />
+                ),
+                enableSorting: false,
+                enableHiding: false,
+                meta: {
+                    style: {
+                        textAlign: 'center',
+                    },
+                },
+            }),
+            columnHelper.accessor('identifier', {
+                header: 'Employee Name',
+                cell: ({ row: { original } }) => `${original.firstName} ${original.lastName}`,
+                meta: {
+                    style: {
+                        textAlign: 'center',
+                    },
+                },
+            }),
+        ],
+        [],
+    );
+
+    return (
+        <div className="flex flex-col space-y-4">
+            <div className="flex flex-row space-x-4">{title && <h3 className="text-lg font-semibold">{title}</h3>}</div>
+            {description && <p className="text-sm text-muted-foreground">{description}</p>}
+            <DataTable data={data} columns={columns} rowSelection={employees} onRowSelectionChange={setEmployees} />
+        </div>
+    );
+};
+
+EmployeeSelect.displayName = 'EmployeeSelect';

@@ -15,4 +15,5 @@ export type PartialEvaluationTemplate = Omit<
     'id' | 'canonicalName' | 'active' | 'identifier' | 'criterias'
 > & {
     criterias?: Array<{ value: number }>;
+    employees?: Array<{ value: number }>;
 };

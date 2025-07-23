@@ -42,6 +42,7 @@ function NewEvaluationTemplate() {
             name: '',
             description: '',
             criterias: [],
+            employees: [],
         },
     });
 
@@ -56,7 +57,7 @@ function NewEvaluationTemplate() {
         <div>
             <Card className="w-full">
                 <CardContent className="p-6 space-y-4">
-                    <EvaluationTemplateForm form={form} isPending={isPending} />
+                    <EvaluationTemplateForm form={form} isPending={isPending} withEmployees />
                     <div className="flex-row flex justify-between space-x-2">
                         <Button className="w-full" onClick={form.handleSubmit(handleCreate)} disabled={isPending}>
                             {isPending ? (

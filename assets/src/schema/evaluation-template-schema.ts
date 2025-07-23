@@ -10,4 +10,9 @@ export const evaluationTemplateSchema: ObjectSchema<PartialEvaluationTemplate> =
             value: number().required(i18next.t('validation:required.evaluation_criterias.id')),
         }),
     ),
+    employees: array().of(
+        object({
+            value: number().required(i18next.t('validation:required.employees.id')),
+        }),
+    ),
 });

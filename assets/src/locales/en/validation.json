@@ -9,7 +9,8 @@
         },
         "employees": {
             "first_name": "The first name is required.",
-            "last_name": "The last name is required."
+            "last_name": "The last name is required.",
+            "id": "The employee is required."
         },
         "roles": {
             "id": "The role is required.",

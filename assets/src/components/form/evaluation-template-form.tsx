@@ -6,14 +6,15 @@ import { TextAreaField } from '@/components/field/textarea-field';
 import { useTranslation } from 'react-i18next';
 import { Form } from '@/components/ui/form';
 import { EvaluationCriteriaSelect } from '@/components/select/evaluation-criteria-select';
+import { EmployeeSelect } from '@/components/select/employee-select';
 
 interface EvaluationTemplateFormProps {
     form: UseFormReturn<PartialEvaluationTemplate>;
     isPending?: boolean;
-    onSubmit?: (data: PartialEvaluationTemplate) => void;
+    withEmployees?: boolean;
 }
 
-export const EvaluationTemplateForm = React.memo<EvaluationTemplateFormProps>(({ form, isPending }) => {
+export const EvaluationTemplateForm = React.memo<EvaluationTemplateFormProps>(({ form, isPending, withEmployees }) => {
     const { t } = useTranslation();
 
     return (
@@ -36,6 +37,14 @@ export const EvaluationTemplateForm = React.memo<EvaluationTemplateFormProps>(({
                 title={t('evaluation_criterias.table.title', { ns: 'glossary' })}
                 description={t('evaluation_criterias.table.description', { ns: 'glossary' })}
             />
+            {withEmployees && (
+                <EmployeeSelect
+                    control={form.control}
+                    name="employees"
+                    title={t('employees.table.title', { ns: 'glossary' })}
+                    description={t('employees.table.description', { ns: 'glossary' })}
+                />
+            )}
         </Form>
     );
 });

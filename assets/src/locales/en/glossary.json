@@ -40,6 +40,10 @@
         "details": {
             "title": "Employee Details",
             "description": "View and edit the details of your employee, including their role, performance metrics, and evaluation history."
+        },
+        "table": {
+            "title": "Employee List",
+            "description": "Manage your employees by viewing their details, performance metrics, and evaluation history."
         }
     },
     "evaluation_criterias": {
