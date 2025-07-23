@@ -17,7 +17,8 @@
         },
         "evaluation_templates": {
             "name": "The template name is required.",
-            "description": "The template description is required."
+            "description": "The template description is required.",
+            "id": "The template is required."
         },
         "evaluation_criterias": {
             "label": "The criteria label is required.",

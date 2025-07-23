@@ -71,7 +71,7 @@ function Evaluations() {
                 <div className="flex flex-row justify-center items-center space-x-2">
                     <Button asChild>
                         <Link to="/console/evaluations/templates/new">
-                            <ListPlus /> {t('new.evaluation_template.title', { ns: 'glossary' })}
+                            <ListPlus /> {t('evaluation_templates.new.title', { ns: 'glossary' })}
                         </Link>
                     </Button>
                 </div>

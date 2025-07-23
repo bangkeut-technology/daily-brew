@@ -11,21 +11,21 @@ function EvaluationDetails() {
     const data = Route.useLoaderData();
     return (
         <div className="w-full h-full flex items-center justify-center">
-            <h1 className="text-2xl font-bold">Evaluation Criteria Details for {data.name}</h1>
+            <h1 className="text-2xl font-bold">Evaluation Criteria Details for {data.label}</h1>
             <div className="mt-4">
                 <p>
                     <strong>Description:</strong> {data.description}
                 </p>
                 <p>
-                    <strong>Active:</strong> {data.active ? 'Yes' : 'No'}
+                    <strong>Weight:</strong> {data.weight}
                 </p>
                 <p>
-                    <strong>Criterias:</strong>
+                    <strong>Templates:</strong>
                 </p>
                 <ul>
-                    {data.criterias.map((criteria, index) => (
+                    {data.templates.map((template, index) => (
                         <li key={index}>
-                            {criteria.label}: {criteria.description} (Weight: {criteria.weight})
+                            {template.name}: {template.description}
                         </li>
                     ))}
                 </ul>

@@ -11,6 +11,10 @@ export const postEvaluationCriteria = async (data: PartialEvaluationCriteria) =>
         .then((response) => response.data);
 };
 
+export const fetchEvaluationCriteria = async (identifier: string) => {
+    return apiAxios.get<EvaluationCriteria>(`/evaluation-criterias/${identifier}`).then((response) => response.data);
+};
+
 export const putEvaluationCriteria = async ({
     identifier,
     data,
