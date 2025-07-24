@@ -31,7 +31,6 @@ function NewEvaluationTemplate() {
             }).then();
         },
         onError: (error) => {
-            console.log({ error });
             const message = isAxiosError(error) ? error.response?.data.message : t('occurred', { ns: 'error' });
             toast.error(message);
         },

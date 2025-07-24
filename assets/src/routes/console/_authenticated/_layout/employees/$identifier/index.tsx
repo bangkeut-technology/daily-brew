@@ -30,7 +30,7 @@ function EmployeeDetails() {
 
     if (isPending) {
         return (
-            <div className="w-full h-full">
+            <div className="w-full h-full flex flex-col justify-center items-center">
                 <Loader2 className="animate-spin w-16 h-16 mb-4" />
                 <h4>{t('employees.loading', { ns: 'glossary' })}</h4>
             </div>

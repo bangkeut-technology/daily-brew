@@ -47,6 +47,7 @@
         }
     },
     "evaluation_criterias": {
+        "not_found": "Evaluation criteria not found",
         "table": {
             "label": "Label",
             "weight": "Weight",
@@ -74,6 +75,8 @@
         }
     },
     "evaluation_templates": {
+        "not_found": "Evaluation template not found",
+        "loading": "Loading evaluation templates...",
         "title": "Evaluation Templates",
         "subtitle": "Manage the templates used for employee performance reviews. You can create multiple templates for different evaluation purposes.",
         "description": "Evaluation Template Description",

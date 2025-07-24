@@ -74,13 +74,7 @@ export const NewEvaluationTemplateDialog: React.FunctionComponent<NewEvaluationT
                                 {t('cancel')}
                             </Button>
                         </DialogClose>
-                        <Button
-                            disabled={isPending}
-                            type="button"
-                            onClick={form.handleSubmit(onSubmit, (errors) => {
-                                console.error(errors);
-                            })}
-                        >
+                        <Button disabled={isPending} type="button" onClick={form.handleSubmit(onSubmit)}>
                             {isPending ? (
                                 <React.Fragment>
                                     <Loader2Icon className="animate-spin" />
