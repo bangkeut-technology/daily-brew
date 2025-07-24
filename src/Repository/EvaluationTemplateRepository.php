@@ -9,6 +9,8 @@ use App\Entity\User;
 use App\Util\CanonicalizerInterface;
 use App\Util\TokenGenerator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Random\RandomException;
@@ -129,5 +131,26 @@ class EvaluationTemplateRepository extends AbstractRepository
             ->where('et.user = :user')
             ->setParameter('user', $user)
             ->orderBy('et.name', 'ASC');
+    }
+
+    /**
+     * Find an evaluation template by its name and user.
+     *
+     * @param string $name the name of the evaluation template
+     * @param User   $user the user associated with the evaluation template
+     *
+     * @return EvaluationTemplate|null returns the found EvaluationTemplate or null if not found
+     */
+    public function findByNameAndUser(string $name, User $user): ?EvaluationTemplate
+    {
+        return $this->createQueryBuilder('et')
+            ->where('et.name = :name')
+            ->andWhere('et.user = :user')
+            ->setParameters(new ArrayCollection([
+                new Parameter('name', $this->canonicalizer->canonicalizeString($name)),
+                new Parameter('user', $user),
+            ]))
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

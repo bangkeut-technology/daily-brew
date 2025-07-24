@@ -101,9 +101,11 @@ class EvaluationTemplateController extends AbstractController
         $form = $this->createForm(EvaluationTemplateFormType::class, $template);
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($this->evaluationTemplateRepository->findByNameAndUser($template->getName(), $this->getUser())) {
+                return $this->createBadRequestResponse($this->translator->trans('existed.evaluation_template', ['%name%' => $template->getName()], domain: 'errors'));
+            }
             $template->setUser($this->getUser());
             $this->evaluationTemplateRepository->updateEvaluationTemplate($template);
-            dump($form->get('criterias')->getData());
             $this->dispatcher->dispatch(new EvaluationTemplateCreatedEvent($template, $form->get('criterias')->getData()));
 
             return $this->createTemplateResponse([
