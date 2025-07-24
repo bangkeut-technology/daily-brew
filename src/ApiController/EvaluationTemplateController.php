@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\ApiController;
 
+use App\ApiController\Trait\EmployeeTrait;
 use App\ApiController\Trait\EvaluationTemplateCriteriaTrait;
 use App\ApiController\Trait\EvaluationTemplateTrait;
 use App\Controller\AbstractController;
+use App\Entity\Employee;
 use App\Entity\EvaluationTemplate;
 use App\Entity\EvaluationTemplateCriteria;
 use App\Entity\User;
@@ -34,6 +36,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[OA\Tag(name: 'Evaluation Template')]
 class EvaluationTemplateController extends AbstractController
 {
+    use EmployeeTrait;
     use EvaluationTemplateTrait;
     use EvaluationTemplateCriteriaTrait;
 
@@ -253,6 +256,13 @@ class EvaluationTemplateController extends AbstractController
      *
      * @return JsonResponse the list of criteria associated with the evaluation template
      */
+    #[OA\Parameter(
+        name: 'identifier',
+        description: 'The identifier of the evaluation template to retrieve criteria for.',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string')
+    )]
     #[OA\Response(
         response: Response::HTTP_OK,
         description: 'Returns the criteria associated with the evaluation template.',
@@ -261,13 +271,60 @@ class EvaluationTemplateController extends AbstractController
             items: new OA\Items(ref: new Model(type: EvaluationTemplateCriteria::class, groups: ['criteria:read']))
         )
     )]
+    #[OA\Response(
+        response: Response::HTTP_NOT_FOUND,
+        description: 'Evaluation template not found.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'message', description: 'Error message', type: 'string'),
+            ]
+        )
+    )]
     #[Route('/{identifier}/criterias', name: 'get_criterias', methods: ['GET'])]
     public function getCriterias(string $identifier): JsonResponse
     {
         $template = $this->getEvaluationTemplateByIdentifier($identifier);
 
-        $criterias = $this->evaluationTemplateCriteriaRepository->findBy(['template' => $template]);
+        return $this->createTemplateCriteriaResponse($template->getCriterias());
+    }
 
-        return $this->createTemplateCriteriaResponse($criterias);
+    /**
+     * Retrieves the employees associated with the evaluation template.
+     *
+     * @param string $identifier the identifier of the evaluation template
+     *
+     * @return JsonResponse the list of employees associated with the evaluation template
+     */
+    #[OA\Parameter(
+        name: 'identifier',
+        description: 'The identifier of the evaluation template to retrieve criteria for.',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns the employees associated with the evaluation template.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Employee::class, groups: ['employee:read']))
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_NOT_FOUND,
+        description: 'Evaluation template not found.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'message', description: 'Error message', type: 'string'),
+            ]
+        )
+    )]
+    #[Route('/{identifier}/employees', name: 'get_employees', methods: ['GET'])]
+    public function getEmployees(string $identifier): JsonResponse
+    {
+        $template = $this->getEvaluationTemplateByIdentifier($identifier);
+
+        return $this->createEmployeeResponse($template->getEmployees());
+
     }
 }

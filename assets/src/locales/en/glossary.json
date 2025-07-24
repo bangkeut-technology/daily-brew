@@ -75,6 +75,9 @@
         }
     },
     "evaluation_templates": {
+        "information": "Evaluation Template Information",
+        "criteria": "Evaluation Template Criteria",
+        "linked_employees": "Linked Employees",
         "not_found": "Evaluation template not found",
         "loading": "Loading evaluation templates...",
         "title": "Evaluation Templates",

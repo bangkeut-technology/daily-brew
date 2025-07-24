@@ -3,6 +3,8 @@ import { EvaluationCriteria } from '@/types/evaluation-criteria';
 export type EvaluationTemplate = {
     id: number;
     identifier: string;
+    createdAt: string;
+    updatedAt: string;
     name: string;
     canonicalName: string;
     description?: string;

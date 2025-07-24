@@ -21,6 +21,7 @@ abstract class AbstractEntity
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id', type: Types::INTEGER, nullable: false, options: ['unsigned' => true])]
     #[Groups([
+        'attendance:read',
         'user:read',
         'criteria:read',
         'template:read',
@@ -32,11 +33,29 @@ abstract class AbstractEntity
     protected ?int $id = null;
 
     #[ORM\Column(name: 'created_at', type: Types::DATETIME_IMMUTABLE, nullable: false)]
-    #[Groups(['user:read'])]
+    #[Groups([
+        'attendance:read',
+        'user:read',
+        'criteria:read',
+        'template:read',
+        'role:read',
+        'employee:read',
+        'employee_evaluation:read',
+        'employee_score:read',
+    ])]
     protected ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(name: 'updated_at', type: Types::DATETIME_IMMUTABLE, nullable: false)]
-    #[Groups(['user:read'])]
+    #[Groups([
+        'attendance:read',
+        'user:read',
+        'criteria:read',
+        'template:read',
+        'role:read',
+        'employee:read',
+        'employee_evaluation:read',
+        'employee_score:read',
+    ])]
     protected ?\DateTimeImmutable $updatedAt = null;
 
     public function getId(): ?int

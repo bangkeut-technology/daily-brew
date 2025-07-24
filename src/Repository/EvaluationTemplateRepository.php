@@ -79,10 +79,19 @@ class EvaluationTemplateRepository extends AbstractRepository
      */
     public function findByIdentifierAndUser(string $identifier, User $user): ?EvaluationTemplate
     {
-        return $this->findOneBy([
-            'identifier' => $identifier,
-            'user' => $user,
-        ]);
+        return $this->createQueryBuilder('et')
+            ->select('et, e, u, etc')
+            ->innerJoin('et.user', 'u')
+            ->leftJoin('et.employees', 'e')
+            ->leftJoin('et.criterias', 'etc')
+            ->where('et.identifier = :identifier')
+            ->andWhere('et.user = :user')
+            ->setParameters(new ArrayCollection([
+                new Parameter('identifier', $identifier),
+                new Parameter('user', $user),
+            ]))
+            ->getQuery()
+            ->getResult();
     }
 
     /**
