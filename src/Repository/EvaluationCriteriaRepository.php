@@ -9,6 +9,8 @@ use App\Entity\User;
 use App\Util\CanonicalizerInterface;
 use App\Util\TokenGenerator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Random\RandomException;
@@ -50,8 +52,7 @@ class EvaluationCriteriaRepository extends AbstractRepository
             ->setParameter('identifier', $identifier)
             ->setParameter('user', $user)
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getOneOrNullResult();
     }
 
     /**
@@ -106,5 +107,29 @@ class EvaluationCriteriaRepository extends AbstractRepository
         return $this->createQueryBuilder('ec')
             ->andWhere('ec.user = :user')
             ->setParameter('user', $user);
+    }
+
+    /**
+     * Find evaluation criteria by label and user.
+     *
+     * @param string $label the label to filter by
+     * @param User   $user  the user to filter by
+     *
+     * @return EvaluationCriteria|null returns the found evaluation criteria or null if not found
+     */
+    public function findByLabelAndUser(string $label, User $user): ?EvaluationCriteria
+    {
+        return $this->createQueryBuilder('ec')
+            ->where('ec.canonicalLabel = :label')
+            ->andWhere('ec.user = :user')
+            ->setParameters(
+                new ArrayCollection([
+                    new Parameter('label', $this->canonicalizer->canonicalizeString($label)),
+                    new Parameter('user', $user),
+                ])
+            )
+            ->getQuery()
+            ->getOneOrNullResult();
+
     }
 }

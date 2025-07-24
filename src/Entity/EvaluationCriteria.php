@@ -181,4 +181,9 @@ class EvaluationCriteria extends AbstractEntity
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return $this->getLabel() ?? 'Evaluation Criteria';
+    }
 }

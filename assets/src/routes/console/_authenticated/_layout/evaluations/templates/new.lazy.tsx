@@ -24,14 +24,14 @@ function NewEvaluationTemplate() {
     const { mutate, isPending } = useMutation({
         mutationFn: postEvaluationTemplate,
         onSuccess: (data) => {
+            toast.success(data.message);
             navigate({
                 to: '/console/evaluations/templates/$identifier',
-                params: { identifier: data.evaluation.identifier },
-            }).then(() => {
-                toast.success(data.message);
-            });
+                params: { identifier: data.template.identifier },
+            }).then();
         },
         onError: (error) => {
+            console.log({ error });
             const message = isAxiosError(error) ? error.response?.data.message : t('occurred', { ns: 'error' });
             toast.error(message);
         },

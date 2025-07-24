@@ -9,7 +9,7 @@ export const fetchEvaluationTemplates = async () => {
 export const postEvaluationTemplate = async ({ criterias = [], ...data }: PartialEvaluationTemplate) => {
     return await apiAxios
         .post<{
-            evaluation: EvaluationTemplate;
+            template: EvaluationTemplate;
             message: string;
         }>('/evaluation-templates', { ...data, criterias: criterias.map((criteria) => criteria.value) })
         .then((response) => response.data);
@@ -28,7 +28,7 @@ export const putEvaluationTemplate = async ({
     data: PartialEvaluationTemplate;
 }) => {
     return await apiAxios
-        .put<{ evaluation: EvaluationTemplate; message: string }>(`/evaluation-templates/${identifier}`, data)
+        .put<{ template: EvaluationTemplate; message: string }>(`/evaluation-templates/${identifier}`, data)
         .then((response) => response.data);
 };
 
@@ -40,7 +40,7 @@ export const deleteEvaluationTemplate = async (identifier: string) => {
 
 export const patchEvaluationTemplate = async (identifier: string) => {
     return await apiAxios
-        .patch<{ evaluation: EvaluationTemplate; message: string }>(`/evaluation-templates/${identifier}`)
+        .patch<{ template: EvaluationTemplate; message: string }>(`/evaluation-templates/${identifier}`)
         .then((response) => response.data);
 };
 

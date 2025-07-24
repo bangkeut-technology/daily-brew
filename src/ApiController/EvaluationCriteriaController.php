@@ -37,8 +37,7 @@ class EvaluationCriteriaController extends AbstractController
         TranslatorInterface                           $translator,
         private readonly EvaluationCriteriaRepository $evaluationCriteriaRepository,
         private readonly EventDispatcherInterface     $dispatcher,
-    )
-    {
+    ) {
         parent::__construct($translator);
     }
 
@@ -59,8 +58,7 @@ class EvaluationCriteriaController extends AbstractController
     public function gets(
         #[CurrentUser]
         User $user,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $criterias = $this->evaluationCriteriaRepository->findByUser($user);
 
         return $this->createCriteriaResponse($criterias);
@@ -96,6 +94,9 @@ class EvaluationCriteriaController extends AbstractController
         $form = $this->createForm(EvaluationCriteriaFormType::class, $criteria);
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
+            if (null !== $this->evaluationCriteriaRepository->findByLabelAndUser($criteria->getLabel(), $this->getUser())) {
+                return $this->createBadRequestResponse($this->translator->trans('existed.evaluation_criteria', ['%label%' => $criteria->getLabel()], domain: 'errors'));
+            }
             $criteria->setUser($this->getUser());
             $this->evaluationCriteriaRepository->updateEvaluationCriteria($criteria);
 

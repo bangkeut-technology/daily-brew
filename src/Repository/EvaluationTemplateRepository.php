@@ -144,7 +144,7 @@ class EvaluationTemplateRepository extends AbstractRepository
     public function findByNameAndUser(string $name, User $user): ?EvaluationTemplate
     {
         return $this->createQueryBuilder('et')
-            ->where('et.name = :name')
+            ->where('et.canonicalName = :name')
             ->andWhere('et.user = :user')
             ->setParameters(new ArrayCollection([
                 new Parameter('name', $this->canonicalizer->canonicalizeString($name)),
