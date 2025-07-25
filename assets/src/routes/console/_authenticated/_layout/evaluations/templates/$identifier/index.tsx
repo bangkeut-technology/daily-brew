@@ -9,11 +9,13 @@ import { useQuery } from '@tanstack/react-query';
 import { Loading } from '@/components/loader/loading';
 import { useTranslation } from 'react-i18next';
 import { NotFound } from '@/components/not-found';
-import { ClipboardX } from 'lucide-react';
+import { ClipboardX, Edit } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { EvaluationTemplateCriteriaDataTable } from '@/components/data-table/evaluation-template-criteria-data-table';
 import { EmployeeDataTable } from '@/components/data-table/employee-data-table';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/templates/$identifier/')({
     component: EvaluationTemplateDetails,
@@ -51,9 +53,16 @@ function EvaluationTemplateDetails() {
 
     return (
         <div className="w-full px-6 py-4 space-y-6">
-            <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold">{data.name}</h1>
+            <div className="flex flex-wrap items-center">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">{data.name}</h1>
+                <Button variant="default" className="ml-2 mt-2 md:mt-0">
+                    <Edit />
+                    {t('edit')}
+                </Button>
             </div>
+
+            <Separator />
+            {data.description && <div className="text-muted-foreground">{data.description}</div>}
 
             <Card>
                 <CardHeader>
@@ -69,8 +78,18 @@ function EvaluationTemplateDetails() {
             </Card>
 
             <Card>
-                <CardHeader>
-                    <CardTitle>{t('evaluation_templates.criteria', { ns: 'glossary' })}</CardTitle>
+                <CardHeader className="flex flex-wrap items-center">
+                    <CardTitle className="text-base sm:text-lg md:text-xl">
+                        {t('evaluation_templates.criteria.title', { ns: 'glossary' })}
+                    </CardTitle>
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        className="ml-2 mt-2 md:mt-0"
+                        onClick={() => console.log('Add criteria')}
+                    >
+                        {t('evaluation_templates.criteria.add.title', { ns: 'glossary' })}
+                    </Button>
                 </CardHeader>
                 <CardContent>
                     <EvaluationTemplateCriteriaDataTable criterias={criterias} loading={isCriteriasPending} />
@@ -78,8 +97,18 @@ function EvaluationTemplateDetails() {
             </Card>
 
             <Card>
-                <CardHeader>
-                    <CardTitle>{t('evaluation_templates.linked_employees', { ns: 'glossary' })}</CardTitle>
+                <CardHeader className="flex flex-wrap items-center">
+                    <CardTitle className="text-base sm:text-lg md:text-xl">
+                        {t('evaluation_templates.employees.linked', { ns: 'glossary' })}
+                    </CardTitle>
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        className="ml-2 mt-2 md:mt-0"
+                        onClick={() => console.log('Add employee')}
+                    >
+                        {t('evaluation_templates.employees.add.title', { ns: 'glossary' })}
+                    </Button>
                 </CardHeader>
                 <CardContent>
                     <EmployeeDataTable employees={employees} loading={isEmployeesPending} />

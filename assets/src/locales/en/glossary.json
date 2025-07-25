@@ -82,8 +82,20 @@
     },
     "evaluation_templates": {
         "information": "Evaluation Template Information",
-        "criteria": "Evaluation Template Criteria",
-        "linked_employees": "Linked Employees",
+        "criteria": {
+            "title": "Evaluation Template Criteria",
+            "add": {
+                "title": "Add Criteria",
+                "description": "Add criteria to the evaluation template to assess employee performance.",
+                "save": "Save Criteria"
+            }
+        },
+        "employees": {
+            "linked": "Linked Employees",
+            "add": {
+                "title": "Add Employee"
+            }
+        },
         "not_found": "Evaluation template not found",
         "loading": "Loading evaluation templates...",
         "title": "Evaluation Templates",
