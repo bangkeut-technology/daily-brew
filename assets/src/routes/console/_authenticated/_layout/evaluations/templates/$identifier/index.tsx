@@ -5,17 +5,18 @@ import {
     fetchTemplateCriterias,
     fetchTemplateEmployees,
 } from '@/services/evaluation-template';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loading } from '@/components/loader/loading';
 import { useTranslation } from 'react-i18next';
 import { NotFound } from '@/components/not-found';
-import { ClipboardX, Edit } from 'lucide-react';
+import { ClipboardX } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { EvaluationTemplateCriteriaDataTable } from '@/components/data-table/evaluation-template-criteria-data-table';
 import { EmployeeDataTable } from '@/components/data-table/employee-data-table';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { EditEvaluationTemplateDialog } from '@/components/dialog/edit-evaluation-template-dialog';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/templates/$identifier/')({
     component: EvaluationTemplateDetails,
@@ -25,6 +26,7 @@ export const Route = createFileRoute('/console/_authenticated/_layout/evaluation
 function EvaluationTemplateDetails() {
     const { identifier } = Route.useParams();
     const { t } = useTranslation();
+    const queryClient = useQueryClient();
     const { data, isPending } = useQuery({
         queryKey: ['evaluation-template', identifier],
         queryFn: () => fetchEvaluationTemplate(identifier),
@@ -41,6 +43,12 @@ function EvaluationTemplateDetails() {
         enabled: data && !!data.identifier,
     });
 
+    const onEditSuccess = React.useCallback(() => {
+        queryClient.invalidateQueries({ queryKey: ['evaluation-template', identifier] });
+        queryClient.invalidateQueries({ queryKey: ['evaluation-template-criterias', identifier] });
+        queryClient.invalidateQueries({ queryKey: ['evaluation-template-employees', identifier] });
+    }, [identifier, queryClient]);
+
     if (isPending) {
         return <Loading loadingText={t('evaluation_templates.loading', { ns: 'glossary' })} />;
     }
@@ -55,13 +63,11 @@ function EvaluationTemplateDetails() {
         <div className="w-full px-6 py-4 space-y-6">
             <div className="flex flex-wrap items-center">
                 <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">{data.name}</h1>
-                <Button variant="default" className="ml-2 mt-2 md:mt-0">
-                    <Edit />
-                    {t('edit')}
-                </Button>
+                <EditEvaluationTemplateDialog className="ml-2 mt-2 md:mt-0" template={data} onSuccess={onEditSuccess} />
             </div>
 
             <Separator />
+
             {data.description && <div className="text-muted-foreground">{data.description}</div>}
 
             <Card>
