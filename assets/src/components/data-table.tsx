@@ -64,7 +64,7 @@ export const DataTable = <T,>({
     });
 
     return (
-        <React.Fragment>
+        <div>
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>
@@ -138,7 +138,7 @@ export const DataTable = <T,>({
                     </Button>
                 </div>
             </div>
-        </React.Fragment>
+        </div>
     );
 };
 

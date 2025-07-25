@@ -73,9 +73,7 @@ function EvaluationTemplateDetails() {
                     <CardTitle>{t('evaluation_templates.criteria', { ns: 'glossary' })}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <EvaluationTemplateCriteriaDataTable criterias={criterias} loading={isCriteriasPending} />
-                    </div>
+                    <EvaluationTemplateCriteriaDataTable criterias={criterias} loading={isCriteriasPending} />
                 </CardContent>
             </Card>
 
