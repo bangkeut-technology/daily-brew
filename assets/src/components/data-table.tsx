@@ -19,11 +19,11 @@ interface DataTableProps<T> {
     data: T[];
     loading?: boolean;
     columns: ColumnDef<T, any>[];
-    rowSelection?: RowSelectionState;
+    rowSelection: RowSelectionState;
     sorting?: SortingState;
     columnFilters?: ColumnFiltersState;
     columnVisibility?: VisibilityState;
-    onRowSelectionChange?: OnChangeFn<RowSelectionState>;
+    onRowSelectionChange: OnChangeFn<RowSelectionState>;
     onSortingChange?: OnChangeFn<SortingState>;
     onColumnFiltersChange?: OnChangeFn<ColumnFiltersState>;
     onColumnVisibilityChange?: OnChangeFn<VisibilityState>;
@@ -52,7 +52,7 @@ export const DataTable = <T,>({
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
+        getFilteredRowModel: rowSelection ? getFilteredRowModel() : undefined,
         onColumnVisibilityChange,
         onRowSelectionChange,
         state: {

@@ -1,6 +1,10 @@
 import React from 'react';
 import { createFileRoute } from '@tanstack/react-router';
-import { fetchEvaluationTemplate } from '@/services/evaluation-template';
+import {
+    fetchEvaluationTemplate,
+    fetchTemplateCriterias,
+    fetchTemplateEmployees,
+} from '@/services/evaluation-template';
 import { useQuery } from '@tanstack/react-query';
 import { Loading } from '@/components/loader/loading';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +12,8 @@ import { NotFound } from '@/components/not-found';
 import { ClipboardX } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format } from 'date-fns';
-import { Badge } from '@/components/ui/badge';
+import { EvaluationTemplateCriteriaDataTable } from '@/components/data-table/evaluation-template-criteria-data-table';
+import { EmployeeDataTable } from '@/components/data-table/employee-data-table';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/templates/$identifier/')({
     component: EvaluationTemplateDetails,
@@ -22,6 +27,16 @@ function EvaluationTemplateDetails() {
         queryKey: ['evaluation-template', identifier],
         queryFn: () => fetchEvaluationTemplate(identifier),
         refetchOnWindowFocus: false,
+    });
+    const { data: criterias = [], isPending: isCriteriasPending } = useQuery({
+        queryKey: ['evaluation-template-criterias', identifier],
+        queryFn: () => fetchTemplateCriterias(identifier),
+        enabled: data && !!data.identifier,
+    });
+    const { data: employees = [], isPending: isEmployeesPending } = useQuery({
+        queryKey: ['evaluation-template-employees', identifier],
+        queryFn: () => fetchTemplateEmployees(identifier),
+        enabled: data && !!data.identifier,
     });
 
     if (isPending) {
@@ -58,44 +73,20 @@ function EvaluationTemplateDetails() {
                     <CardTitle>{t('evaluation_templates.criteria', { ns: 'glossary' })}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                    <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <EvaluationTemplateCriteriaDataTable criterias={criterias} loading={isCriteriasPending} />
+                    </div>
                 </CardContent>
             </Card>
 
-            {/*<Card>*/}
-            {/*    <CardHeader>*/}
-            {/*        <CardTitle>{t('evaluation_templates.linked_employees', { ns: 'glossary' })}</CardTitle>*/}
-            {/*    </CardHeader>*/}
-            {/*    <CardContent>*/}
-            {/*        <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">*/}
-            {/*            {data.employees.map((employee) => (*/}
-            {/*                <div key={employee.id} className="border rounded-xl p-4 flex justify-between items-center">*/}
-            {/*                    <div>*/}
-            {/*                        <div className="font-semibold">*/}
-            {/*                            {employee.firstName} {employee.lastName}*/}
-            {/*                        </div>*/}
-            {/*                        {employee.averageScore && (*/}
-            {/*                            <div className="text-muted-foreground text-sm">*/}
-            {/*                                {t('employees.kpi_score')}: {employee.averageScore}*/}
-            {/*                            </div>*/}
-            {/*                        )}*/}
-            {/*                    </div>*/}
-            {/*                    <Button*/}
-            {/*                        size="sm"*/}
-            {/*                        onClick={() =>*/}
-            {/*                            router.navigate({*/}
-            {/*                                to: '/console/_authenticated/_layout/employees/$identifier/',*/}
-            {/*                                params: { identifier: employee.id },*/}
-            {/*                            })*/}
-            {/*                        }*/}
-            {/*                    >*/}
-            {/*                        {t('view')}*/}
-            {/*                    </Button>*/}
-            {/*                </div>*/}
-            {/*            ))}*/}
-            {/*        </div>*/}
-            {/*    </CardContent>*/}
-            {/*</Card>*/}
+            <Card>
+                <CardHeader>
+                    <CardTitle>{t('evaluation_templates.linked_employees', { ns: 'glossary' })}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <EmployeeDataTable employees={employees} loading={isEmployeesPending} />
+                </CardContent>
+            </Card>
         </div>
     );
 }

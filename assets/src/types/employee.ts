@@ -6,6 +6,7 @@ export type Employee = {
     identifier: string;
     firstName: string;
     lastName: string;
+    fullName: string;
     phoneNumber?: string;
     dob?: string;
     joinedAt?: string;
@@ -17,7 +18,7 @@ export type Employee = {
 
 export type PartialEmployee = Omit<
     Employee,
-    'id' | 'identifier' | 'dob' | 'joinedAt' | 'roles' | 'status' | 'templates' | 'averageScore'
+    'id' | 'identifier' | 'dob' | 'joinedAt' | 'roles' | 'status' | 'templates' | 'averageScore' | 'fullName'
 > & {
     dob?: Date;
     joinedAt?: Date;

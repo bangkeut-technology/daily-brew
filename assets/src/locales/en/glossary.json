@@ -43,7 +43,13 @@
         },
         "table": {
             "title": "Employee List",
-            "description": "Manage your employees by viewing their details, performance metrics, and evaluation history."
+            "description": "Manage your employees by viewing their details, performance metrics, and evaluation history.",
+            "roles": "Roles",
+            "kpi_score": "KPI Score",
+            "current_month_score": "Current Month Score",
+            "first_name": "First Name",
+            "last_name": "Last Name",
+            "full_name": "Full Name"
         }
     },
     "evaluation_criterias": {

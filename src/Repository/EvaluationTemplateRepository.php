@@ -91,7 +91,7 @@ class EvaluationTemplateRepository extends AbstractRepository
                 new Parameter('user', $user),
             ]))
             ->getQuery()
-            ->getResult();
+            ->getOneOrNullResult();
     }
 
     /**

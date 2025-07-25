@@ -1,6 +1,7 @@
 import { EvaluationTemplate, PartialEvaluationTemplate } from '@/types/evaluation-template';
 import { apiAxios } from '@/lib/apiAxios';
 import { EvaluationTemplateCriteria } from '@/types/evaluation-template-criterias';
+import { Employee } from '@/types/employee';
 
 export const fetchEvaluationTemplates = async () => {
     const response = await apiAxios.get<EvaluationTemplate[]>(`/evaluation-templates`);
@@ -47,5 +48,11 @@ export const patchEvaluationTemplate = async (identifier: string) => {
 export const fetchTemplateCriterias = async (identifier: string) => {
     return await apiAxios
         .get<EvaluationTemplateCriteria[]>(`/evaluation-templates/${identifier}/criterias`)
+        .then((response) => response.data);
+};
+
+export const fetchTemplateEmployees = async (identifier: string) => {
+    return await apiAxios
+        .get<Employee[]>(`/evaluation-templates/${identifier}/employees`)
         .then((response) => response.data);
 };

@@ -312,13 +312,21 @@ class Employee extends AbstractEntity
 
     public function removeAttendance(Attendance $attendance): static
     {
-        if ($this->attendances->removeElement($attendance)) {
-            // set the owning side to null (unless already changed)
-            if ($attendance->getEmployee() === $this) {
-                $attendance->setEmployee(null);
-            }
+        if ($this->attendances->removeElement($attendance) && $attendance->getEmployee() === $this) {
+            $attendance->setEmployee(null);
         }
 
         return $this;
+    }
+
+    /**
+     * Get the full name of the employee.
+     *
+     * @return string
+     */
+    #[Groups(['employee:read'])]
+    public function getFullName(): string
+    {
+        return sprintf('%s %s', $this->lastName, $this->firstName);
     }
 }

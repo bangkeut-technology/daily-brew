@@ -14,7 +14,7 @@ export type EvaluationTemplate = {
 
 export type PartialEvaluationTemplate = Omit<
     EvaluationTemplate,
-    'id' | 'canonicalName' | 'active' | 'identifier' | 'criterias'
+    'id' | 'canonicalName' | 'active' | 'identifier' | 'criterias' | 'createdAt' | 'updatedAt'
 > & {
     criterias?: Array<{ value: number }>;
     employees?: Array<{ value: number }>;
