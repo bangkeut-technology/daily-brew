@@ -51,6 +51,12 @@ export const fetchTemplateCriterias = async (identifier: string) => {
         .then((response) => response.data);
 };
 
+export const postTemplateCriterias = async ({ identifier, criterias }: { identifier: string; criterias: number[] }) => {
+    return await apiAxios
+        .post<{ message: string }>(`/evaluation-templates/${identifier}/criterias`, { criterias })
+        .then((response) => response.data);
+};
+
 export const fetchTemplateEmployees = async (identifier: string) => {
     return await apiAxios
         .get<Employee[]>(`/evaluation-templates/${identifier}/employees`)

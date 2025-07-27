@@ -12,10 +12,17 @@ export type EvaluationTemplate = {
     criterias: EvaluationCriteria[];
 };
 
+export type EvaluationTemplateCriterias = {
+    criterias: Array<{ value: number }>;
+};
+
+export type EvaluationTemplateEmployees = {
+    employees?: Array<{ value: number }>;
+};
+
 export type PartialEvaluationTemplate = Omit<
     EvaluationTemplate,
     'id' | 'canonicalName' | 'active' | 'identifier' | 'criterias' | 'createdAt' | 'updatedAt'
-> & {
-    criterias?: Array<{ value: number }>;
-    employees?: Array<{ value: number }>;
-};
+> &
+    EvaluationTemplateCriterias &
+    EvaluationTemplateEmployees;

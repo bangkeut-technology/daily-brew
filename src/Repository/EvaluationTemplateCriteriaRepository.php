@@ -45,4 +45,24 @@ class EvaluationTemplateCriteriaRepository extends AbstractRepository
             ->where('t.user = :user')
             ->setParameter('user', $user);
     }
+
+    /**
+     * Finds EvaluationTemplateCriteria by identifier and user.
+     *
+     * @param string $identifier the identifier of the evaluation template criteria
+     * @param User   $user       the user associated with the evaluation template criteria
+     *
+     * @return EvaluationTemplateCriteria|null the found evaluation template criteria or null if not found
+     */
+    public function findByIdentifierAndUser(string $identifier, User $user): ?EvaluationTemplateCriteria
+    {
+        return $this->createQueryBuilder('etc')
+            ->innerJoin('etc.template', 't')
+            ->where('etc.identifier = :identifier')
+            ->andWhere('t.user = :user')
+            ->setParameter('identifier', $identifier)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

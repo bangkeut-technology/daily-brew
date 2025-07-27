@@ -44,9 +44,9 @@ function EvaluationTemplateDetails() {
     });
 
     const onEditSuccess = React.useCallback(() => {
-        queryClient.invalidateQueries({ queryKey: ['evaluation-template', identifier] });
-        queryClient.invalidateQueries({ queryKey: ['evaluation-template-criterias', identifier] });
-        queryClient.invalidateQueries({ queryKey: ['evaluation-template-employees', identifier] });
+        queryClient.invalidateQueries({ queryKey: ['evaluation-template', identifier] }).then();
+        queryClient.invalidateQueries({ queryKey: ['evaluation-template-criterias', identifier] }).then();
+        queryClient.invalidateQueries({ queryKey: ['evaluation-template-employees', identifier] }).then();
     }, [identifier, queryClient]);
 
     if (isPending) {
@@ -68,18 +68,21 @@ function EvaluationTemplateDetails() {
 
             <Separator />
 
-            {data.description && <div className="text-muted-foreground">{data.description}</div>}
+            {data.description && (
+                <div className="text-sm md:text-base text-muted-foreground leading-relaxed">{data.description}</div>
+            )}
 
             <Card>
-                <CardHeader>
-                    <CardTitle>{t('evaluation_templates.information', { ns: 'glossary' })}</CardTitle>
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-lg md:text-xl">
+                        {t('evaluation_templates.information', { ns: 'glossary' })}
+                    </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2">
-                    {data.description && <p>{data.description}</p>}
-                    <p>
-                        <span className="font-semibold">{t('created_at')}:</span>{' '}
-                        {format(new Date(data.createdAt), 'PPP')}
-                    </p>
+                <CardContent className="text-sm md:text-base text-muted-foreground">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                        <span className="font-medium text-foreground">{t('created_at')}:</span>
+                        <span>{format(new Date(data.createdAt), 'PPP')}</span>
+                    </div>
                 </CardContent>
             </Card>
 
@@ -88,14 +91,6 @@ function EvaluationTemplateDetails() {
                     <CardTitle className="text-base sm:text-lg md:text-xl">
                         {t('evaluation_templates.criteria.title', { ns: 'glossary' })}
                     </CardTitle>
-                    <Button
-                        size="sm"
-                        variant="outline"
-                        className="ml-2 mt-2 md:mt-0"
-                        onClick={() => console.log('Add criteria')}
-                    >
-                        {t('evaluation_templates.criteria.add.title', { ns: 'glossary' })}
-                    </Button>
                 </CardHeader>
                 <CardContent>
                     <EvaluationTemplateCriteriaDataTable criterias={criterias} loading={isCriteriasPending} />

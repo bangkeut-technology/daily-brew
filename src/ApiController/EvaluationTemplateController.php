@@ -14,6 +14,7 @@ use App\Entity\EvaluationTemplateCriteria;
 use App\Entity\User;
 use App\Event\EvaluationTemplate\EvaluationTemplateCreatedEvent;
 use App\Form\EvaluationTemplateFormType;
+use App\Repository\EvaluationCriteriaRepository;
 use App\Repository\EvaluationTemplateCriteriaRepository;
 use App\Repository\EvaluationTemplateRepository;
 use Nelmio\ApiDocBundle\Attribute\Model;
@@ -45,6 +46,7 @@ class EvaluationTemplateController extends AbstractController
         private readonly EvaluationTemplateRepository         $evaluationTemplateRepository,
         private readonly EvaluationTemplateCriteriaRepository $evaluationTemplateCriteriaRepository,
         private readonly EventDispatcherInterface             $dispatcher,
+        private readonly EvaluationCriteriaRepository         $evaluationCriteriaRepository,
     )
     {
         parent::__construct($translator);
@@ -236,7 +238,7 @@ class EvaluationTemplateController extends AbstractController
     {
         $template = $this->getEvaluationTemplateByIdentifier($identifier);
         $form = $this->createForm(EvaluationTemplateFormType::class, $template);
-        $form->submit($request->getPayload()->all());
+        $form->submit($request->getPayload()->all(), false);
         if ($form->isSubmitted() && $form->isValid()) {
             $this->evaluationTemplateRepository->updateEvaluationTemplate($template);
 
@@ -286,6 +288,67 @@ class EvaluationTemplateController extends AbstractController
         $template = $this->getEvaluationTemplateByIdentifier($identifier);
 
         return $this->createTemplateCriteriaResponse($template->getCriterias());
+    }
+
+    /**
+     * Adds criteria to the evaluation template.
+     *
+     * @param Request $request    the HTTP request containing the criteria to add
+     * @param string  $identifier the identifier of the evaluation template to add criteria to
+     *
+     * @return JsonResponse the JSON response indicating the addition status
+     */
+    #[OA\Parameter(
+        name: 'identifier',
+        description: 'The identifier of the evaluation template to add criteria to.',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Adds criteria to the evaluation template.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'message', description: 'Confirmation message after adding criteria', type: 'string'),
+            ]
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_NOT_FOUND,
+        description: 'Evaluation template not found.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'message', description: 'Error message', type: 'string'),
+            ]
+        )
+    )]
+    #[OA\RequestBody(
+        description: 'The criteria to add to the evaluation template.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'criterias', type: 'array', items: new OA\Items(type: 'integer')),
+            ]
+        )
+    )]
+    #[Route('/{identifier}/criterias', name: 'post_criterias', methods: ['POST'])]
+    public function postCriterias(
+        Request $request,
+        string  $identifier,
+    ): JsonResponse
+    {
+        $template = $this->getEvaluationTemplateByIdentifier($identifier);
+        $criterias = $request->request->all('criterias');
+        if (count($criterias) > 0) {
+            $this->dispatcher->dispatch(new EvaluationTemplateCreatedEvent(
+                $template,
+                $this->evaluationCriteriaRepository->findByIdsAndUser($request->request->all('criterias'), $this->getUser())
+            ));
+        }
+
+        return $this->createTemplateCriteriaResponse([
+            'message' => $this->translator->trans('added.evaluation_template_criteria'),
+        ]);
     }
 
     /**

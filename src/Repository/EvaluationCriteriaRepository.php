@@ -132,4 +132,25 @@ class EvaluationCriteriaRepository extends AbstractRepository
             ->getOneOrNullResult();
 
     }
+
+    /**
+     * Find evaluation criteria by IDs and user.
+     *
+     * @param array $ids  the IDs of the evaluation criteria to find
+     * @param User  $user the user associated with the evaluation criteria
+     *
+     * @return EvaluationCriteria[] returns an array of found evaluation criteria
+     */
+    public function findByIdsAndUser(array $ids, User $user): array
+    {
+        return $this->createQueryBuilder('ec')
+            ->andWhere('ec.id IN (:ids)')
+            ->andWhere('ec.user = :user')
+            ->setParameters(new ArrayCollection([
+                new Parameter('ids', $ids),
+                new Parameter('user', $user),
+            ]))
+            ->getQuery()
+            ->getResult();
+    }
 }

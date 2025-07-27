@@ -1,5 +1,4 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import {
     Dialog,
     DialogClose,
@@ -10,39 +9,42 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { useBoolean } from 'react-use';
+import { useTranslation } from 'react-i18next';
+import { useForm } from 'react-hook-form';
+import { Form } from '@/components/ui/form';
+import { EvaluationCriteriaSelect } from '@/components/select/evaluation-criteria-select';
+import { Loader2Icon, Save } from 'lucide-react';
+import { evaluationTemplateCriteriasSchema } from '@/schema/evaluation-template-schema';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { EvaluationTemplate, EvaluationTemplateCriterias } from '@/types/evaluation-template';
 import { useMutation } from '@tanstack/react-query';
-import { putEvaluationTemplate } from '@/services/evaluation-template';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
-import { useForm } from 'react-hook-form';
-import { EvaluationTemplate, PartialEvaluationTemplate } from '@/types/evaluation-template';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { evaluationTemplateSchema } from '@/schema/evaluation-template-schema';
-import { Form } from '@/components/ui/form';
-import { FilePenLine, Loader2Icon, Save } from 'lucide-react';
-import { EvaluationTemplateForm } from '@/components/form/evaluation-template-form';
+import { postTemplateCriterias } from '@/services/evaluation-template';
 
-interface EditEvaluationTemplateDialogProps {
-    className?: string;
+interface AddEvaluationCriteriaDialogProps {
     template: EvaluationTemplate;
-    onSuccess?: (template: EvaluationTemplate) => void;
+    onSuccess?: () => void;
 }
 
-export const EditEvaluationTemplateDialog: React.FunctionComponent<EditEvaluationTemplateDialogProps> = ({
-    className,
+export const AddEvaluationCriteriaDialog: React.FunctionComponent<AddEvaluationCriteriaDialogProps> = ({
     template,
     onSuccess,
 }) => {
     const { t } = useTranslation();
-    const [open, setOpen] = useBoolean(false);
+    const form = useForm<EvaluationTemplateCriterias>({
+        resolver: yupResolver(evaluationTemplateCriteriasSchema),
+        defaultValues: {
+            criterias: [],
+        },
+    });
     const { mutate, isPending } = useMutation({
-        mutationFn: putEvaluationTemplate,
+        mutationFn: postTemplateCriterias,
         onSuccess: (data) => {
             toast.success(data.message);
-            setOpen(false);
+            form.reset();
             if (onSuccess) {
-                onSuccess(data.template);
+                onSuccess();
             }
         },
         onError: (error) => {
@@ -50,28 +52,22 @@ export const EditEvaluationTemplateDialog: React.FunctionComponent<EditEvaluatio
             toast.error(message);
         },
     });
-    const form = useForm<PartialEvaluationTemplate>({
-        resolver: yupResolver(evaluationTemplateSchema),
-        defaultValues: {
-            name: template.name,
-            description: template.description || '',
-        },
-    });
 
-    const onSubmit = React.useCallback(
-        (data: PartialEvaluationTemplate) => {
-            mutate({ identifier: template.identifier, data });
-        },
-        [mutate, template.identifier],
-    );
+    const onSubmit = React.useCallback((data: EvaluationTemplateCriterias) => {
+        mutate({ identifier: template.identifier, criterias: data.criterias.map((criteria) => criteria.value) });
+    }, []);
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog>
             <Form {...form}>
                 <DialogTrigger asChild>
-                    <Button className={className}>
-                        <FilePenLine />
-                        {t('edit')}
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        className="ml-2 mt-2 md:mt-0"
+                        onClick={() => console.log('Add criteria')}
+                    >
+                        {t('evaluation_templates.criteria.add.title', { ns: 'glossary' })}
                     </Button>
                 </DialogTrigger>
                 <DialogContent>
@@ -79,7 +75,12 @@ export const EditEvaluationTemplateDialog: React.FunctionComponent<EditEvaluatio
                     <DialogDescription>
                         {t('evaluation_templates.edit.description', { ns: 'glossary' })}
                     </DialogDescription>
-                    <EvaluationTemplateForm form={form} isPending={isPending} />
+                    <EvaluationCriteriaSelect
+                        control={form.control}
+                        name="criterias"
+                        title={t('evaluation_criterias.table.title', { ns: 'glossary' })}
+                        description={t('evaluation_criterias.table.description', { ns: 'glossary' })}
+                    />
                     <DialogFooter>
                         <DialogClose asChild>
                             <Button disabled={isPending} variant="outline">
@@ -105,5 +106,3 @@ export const EditEvaluationTemplateDialog: React.FunctionComponent<EditEvaluatio
         </Dialog>
     );
 };
-
-EditEvaluationTemplateDialog.displayName = 'EditEvaluationTemplateDialog';
