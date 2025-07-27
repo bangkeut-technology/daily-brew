@@ -13,7 +13,7 @@ export type EvaluationTemplate = {
 };
 
 export type EvaluationTemplateCriterias = {
-    criterias: Array<{ value: number }>;
+    criterias?: Array<{ value: number }>;
 };
 
 export type EvaluationTemplateEmployees = {

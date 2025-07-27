@@ -62,3 +62,21 @@ export const fetchTemplateEmployees = async (identifier: string) => {
         .get<Employee[]>(`/evaluation-templates/${identifier}/employees`)
         .then((response) => response.data);
 };
+
+export const postTemplateEmployees = async ({ identifier, employees }: { identifier: string; employees: number[] }) => {
+    return await apiAxios
+        .post<{ message: string }>(`/evaluation-templates/${identifier}/employees`, { employees })
+        .then((response) => response.data);
+};
+
+export const deleteTemplateEmployees = async ({
+    identifier,
+    employeeIdentifier,
+}: {
+    identifier: string;
+    employeeIdentifier: string;
+}) => {
+    return await apiAxios
+        .delete<{ message: string }>(`/evaluation-templates/${identifier}/employees/${employeeIdentifier}`)
+        .then((response) => response.data);
+};

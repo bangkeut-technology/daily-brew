@@ -17,6 +17,7 @@ import { EmployeeDataTable } from '@/components/data-table/employee-data-table';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { EditEvaluationTemplateDialog } from '@/components/dialog/edit-evaluation-template-dialog';
+import { AddEvaluationCriteriaDialog } from '@/components/dialog/add-evaluation-criteria-dialog';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/templates/$identifier/')({
     component: EvaluationTemplateDetails,
@@ -45,8 +46,11 @@ function EvaluationTemplateDetails() {
 
     const onEditSuccess = React.useCallback(() => {
         queryClient.invalidateQueries({ queryKey: ['evaluation-template', identifier] }).then();
-        queryClient.invalidateQueries({ queryKey: ['evaluation-template-criterias', identifier] }).then();
         queryClient.invalidateQueries({ queryKey: ['evaluation-template-employees', identifier] }).then();
+    }, [identifier, queryClient]);
+
+    const onRefreshCriterias = React.useCallback(() => {
+        queryClient.invalidateQueries({ queryKey: ['evaluation-template-criterias', identifier] }).then();
     }, [identifier, queryClient]);
 
     if (isPending) {
@@ -91,9 +95,14 @@ function EvaluationTemplateDetails() {
                     <CardTitle className="text-base sm:text-lg md:text-xl">
                         {t('evaluation_templates.criteria.title', { ns: 'glossary' })}
                     </CardTitle>
+                    <AddEvaluationCriteriaDialog template={data} onSuccess={onRefreshCriterias} />
                 </CardHeader>
                 <CardContent>
-                    <EvaluationTemplateCriteriaDataTable criterias={criterias} loading={isCriteriasPending} />
+                    <EvaluationTemplateCriteriaDataTable
+                        criterias={criterias}
+                        loading={isCriteriasPending}
+                        onRemoveCriteria={onRefreshCriterias}
+                    />
                 </CardContent>
             </Card>
 

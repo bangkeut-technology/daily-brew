@@ -60,7 +60,8 @@
             "title": "Evaluation Criterias",
             "subtitle": "Manage the criteria used to evaluate employee performance. You can create multiple criteria for comprehensive evaluations.",
             "description": "Description",
-            "score": "Score"
+            "score": "Score",
+            "actions": "Actions"
         },
         "description": {
             "title": "Evaluation Criteria Description",

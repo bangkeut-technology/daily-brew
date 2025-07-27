@@ -4,12 +4,14 @@ import { createColumnHelper } from '@tanstack/table-core';
 import { DataTable } from '@/components/data-table';
 import { EvaluationTemplateCriteria } from '@/types/evaluation-template-criterias';
 import { RowSelectionState } from '@tanstack/react-table';
+import { RemoveTemplateCriteriaButton } from '@/components/button/remove-template-criteria-button';
 
 const columnHelper = createColumnHelper<EvaluationTemplateCriteria>();
 
 interface EvaluationTemplateCriteriaDataTableProps {
     criterias: EvaluationTemplateCriteria[];
     loading: boolean;
+    onRemoveCriteria: (identifier: string) => void;
 }
 
 export const EvaluationTemplateCriteriaDataTable: React.FunctionComponent<EvaluationTemplateCriteriaDataTableProps> = ({
@@ -33,6 +35,15 @@ export const EvaluationTemplateCriteriaDataTable: React.FunctionComponent<Evalua
             columnHelper.accessor('weight', {
                 header: t('evaluation_criterias.table.weight'),
                 cell: (info) => info.getValue(),
+                meta: {
+                    style: {
+                        textAlign: 'center',
+                    },
+                },
+            }),
+            columnHelper.accessor('identifier', {
+                header: t('evaluation_criterias.table.actions'),
+                cell: (info) => <RemoveTemplateCriteriaButton identifier={info.getValue()} />,
                 meta: {
                     style: {
                         textAlign: 'center',
