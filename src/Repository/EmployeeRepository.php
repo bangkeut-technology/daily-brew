@@ -7,10 +7,8 @@ namespace App\Repository;
 use App\Entity\Employee;
 use App\Entity\Store;
 use App\Entity\User;
-use App\Util\TokenGenerator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Random\RandomException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -34,10 +32,10 @@ class EmployeeRepository extends AbstractRepository
     }
 
     /**
-     * Finds an Employee entity based on the provided store and user identifiers.
+     * Finds an Employee entity based on the provided store and user publicIds.
      *
-     * @param Store|int $store the store entity or its identifier
-     * @param User|int  $user  the user entity or its identifier
+     * @param Store|int $store the store entity or its publicId
+     * @param User|int  $user  the user entity or its publicId
      *
      * @return Employee|null returns the Employee entity if found, otherwise null
      */
@@ -50,77 +48,37 @@ class EmployeeRepository extends AbstractRepository
     }
 
     /**
-     * Update the employee entity with an auto-generated identifier.
-     * If the identifier is not set, it will generate a new one.
+     * Find employee by publicIds and store.
      *
-     * @param Employee $employee the employee entity to update
-     * @param bool     $andFlush Tell the manager whether the object needs to be flush or not.
-     *                           Default is true.
-     *
-     * @throws RandomException
-     */
-    public function updateEmployee(Employee $employee, bool $andFlush = true): void
-    {
-        if (null === $employee->getIdentifier()) {
-            $string = TokenGenerator::getString(symbols: false);
-            do {
-                $identifier = TokenGenerator::generateFromString($string);
-            } while ($this->isIdentifierExist($identifier));
-            $employee->setIdentifier($identifier);
-        }
-
-        $this->update($employee, $andFlush);
-    }
-
-    /**
-     * Check if the identifier already exists in the database.
-     *
-     * @param string $identifier the identifier to check
-     *
-     * @return bool returns true if the identifier is already existed, otherwise false
-     */
-    private function isIdentifierExist(string $identifier): bool
-    {
-        return $this->createQueryBuilder('e')
-                ->select('COUNT(e.id)')
-                ->where('e.identifier = :identifier')
-                ->setParameter('identifier', $identifier)
-                ->getQuery()
-                ->getSingleScalarResult() > 0;
-    }
-
-    /**
-     * Find employee by identifiers and store.
-     *
-     * @param array $identifiers the list of employee identifiers
+     * @param array $publicIds the list of employee publicIds
      * @param Store $store       the store entity
      *
      * @return Employee[] returns the list of employee entities
      */
-    public function findByIdentifiersAndStore(array $identifiers, Store $store): array
+    public function findByPublicIdsAndStore(array $publicIds, Store $store): array
     {
         return $this->createQueryBuilder('e')
-            ->where('e.identifier IN (:identifiers)')
+            ->where('e.publicId IN (:publicIds)')
             ->andWhere('e.store = :store')
-            ->setParameter('identifiers', $identifiers)
+            ->setParameter('publicIds', $publicIds)
             ->setParameter('store', $store)
             ->getQuery()
             ->getResult();
     }
 
     /**
-     * Find employee by identifiers and user.
+     * Find employee by publicIds and user.
      *
-     * @param array $identifiers the list of employee identifiers
+     * @param array $publicIds the list of employee publicIds
      * @param User  $user        the user entity
      * @return Employee[] returns the list of employee entities
      */
-    public function findByIdentifiersAndUser(array $identifiers, User $user): array
+    public function findByPublicIdsAndUser(array $publicIds, User $user): array
     {
         return $this->createQueryBuilder('e')
-            ->where('e.identifier IN (:identifiers)')
+            ->where('e.publicId IN (:publicIds)')
             ->andWhere('e.user = :user')
-            ->setParameter('identifiers', $identifiers)
+            ->setParameter('publicIds', $publicIds)
             ->setParameter('store', $user)
             ->getQuery()
             ->getResult();
@@ -133,8 +91,6 @@ class EmployeeRepository extends AbstractRepository
      * @param Store $store the store entity
      *
      * @return Employee returns the created employee entity
-     *
-     * @throws RandomException
      */
     public function createEmployee(User $user, Store $store): Employee
     {
@@ -142,23 +98,23 @@ class EmployeeRepository extends AbstractRepository
         $employee->setUser($user);
         $employee->setStore($store);
 
-        $this->updateEmployee($employee);
+        $this->update($employee);
 
         return $employee;
     }
 
     /**
-     * Find an employee by identifier and store.
+     * Find an employee by publicId and store.
      *
-     * @param string $identifier the employee identifier
+     * @param string $publicId the employee publicId
      * @param Store  $store      the store entity
      *
      * @return Employee|null returns the employee entity if found, otherwise null
      */
-    public function findByIdentifierAndStore(string $identifier, Store $store): ?Employee
+    public function findByPublicIdAndStore(string $publicId, Store $store): ?Employee
     {
         return $this->findOneBy([
-            'identifier' => $identifier,
+            'publicId' => $publicId,
             'store' => $store,
         ]);
     }
@@ -199,19 +155,19 @@ class EmployeeRepository extends AbstractRepository
     }
 
     /**
-     * Find an employee by identifier and user.
+     * Find an employee by publicId and user.
      *
-     * @param string $identifier the employee identifier
+     * @param string $publicId the employee publicId
      * @param User   $user       the user entity
      *
      * @return Employee|null returns the employee entity if found, otherwise null
      */
-    public function findByIdentifierAndUser(string $identifier, User $user): ?Employee
+    public function findByPublicIdAndUser(string $publicId, User $user): ?Employee
     {
         return $this->createQueryBuilder('e')
-            ->andWhere('e.identifier = :identifier')
+            ->andWhere('e.publicId = :publicId')
             ->andWhere('e.user = :user')
-            ->setParameter('identifier', $identifier)
+            ->setParameter('publicId', $publicId)
             ->setParameter('user', $user)
             ->getQuery()
             ->getOneOrNullResult();

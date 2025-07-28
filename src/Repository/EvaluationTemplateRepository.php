@@ -6,14 +6,12 @@ namespace App\Repository;
 
 use App\Entity\EvaluationTemplate;
 use App\Entity\User;
-use App\Util\CanonicalizerInterface;
-use App\Util\TokenGenerator;
+use App\Util\Canonicalizer;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use Random\RandomException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -33,82 +31,41 @@ class EvaluationTemplateRepository extends AbstractRepository
 {
     public function __construct(
         ManagerRegistry $registry,
-        private readonly CanonicalizerInterface $canonicalizer,
     ) {
         parent::__construct($registry, EvaluationTemplate::class);
     }
 
     /**
-     * Update an evaluation template.
+     * Find an evaluation template by its publicId.
      *
-     * @param EvaluationTemplate $evaluationTemplate the evaluation template to update
-     * @param bool               $andFlush           whether to flush the changes (default true)
-     *
-     * @throws RandomException throws an exception if the identifier is already exists
+     * @param string $publicId the publicId of the evaluation template
      */
-    public function updateEvaluationTemplate(EvaluationTemplate $evaluationTemplate, bool $andFlush = true): void
+    public function findByPublicId(string $publicId): ?EvaluationTemplate
     {
-        $evaluationTemplate->setCanonicalName($this->canonicalizer->canonicalizeString($evaluationTemplate->getName()));
-        if (null === $evaluationTemplate->getIdentifier()) {
-            $string = TokenGenerator::getString(symbols: false);
-            do {
-                $identifier = TokenGenerator::generateFromString($string);
-            } while ($this->isIdentifierExists($identifier));
-
-            $evaluationTemplate->setIdentifier($identifier);
-        }
-
-        $this->update($evaluationTemplate, $andFlush);
+        return $this->findOneBy(['publicId' => $publicId]);
     }
 
     /**
-     * Find an evaluation template by its identifier.
+     * Find an evaluation template by its publicId and user.
      *
-     * @param string $identifier the identifier of the evaluation template
-     */
-    public function findByIdentifier(string $identifier): ?EvaluationTemplate
-    {
-        return $this->findOneBy(['identifier' => $identifier]);
-    }
-
-    /**
-     * Find an evaluation template by its identifier and user.
-     *
-     * @param string $identifier the identifier of the evaluation template
+     * @param string $publicId the publicId of the evaluation template
      * @param User   $user       the user associated with the evaluation template
      */
-    public function findByIdentifierAndUser(string $identifier, User $user): ?EvaluationTemplate
+    public function findByPublicIdAndUser(string $publicId, User $user): ?EvaluationTemplate
     {
         return $this->createQueryBuilder('et')
             ->select('et, e, u, etc')
             ->innerJoin('et.user', 'u')
             ->leftJoin('et.employees', 'e')
             ->leftJoin('et.criterias', 'etc')
-            ->where('et.identifier = :identifier')
+            ->where('et.publicId = :publicId')
             ->andWhere('et.user = :user')
             ->setParameters(new ArrayCollection([
-                new Parameter('identifier', $identifier),
+                new Parameter('publicId', $publicId),
                 new Parameter('user', $user),
             ]))
             ->getQuery()
             ->getOneOrNullResult();
-    }
-
-    /**
-     * Check if an identifier already exists for an evaluation template.
-     *
-     * @param string $identifier the identifier to check
-     *
-     * @return bool returns true if the identifier exists, false otherwise
-     */
-    public function isIdentifierExists(string $identifier): bool
-    {
-        return $this->createQueryBuilder('et')
-                ->select('COUNT(et.id)')
-                ->where('et.identifier = :identifier')
-                ->setParameter('identifier', $identifier)
-                ->getQuery()
-                ->getSingleScalarResult() > 0;
     }
 
     /**
@@ -156,7 +113,7 @@ class EvaluationTemplateRepository extends AbstractRepository
             ->where('et.canonicalName = :name')
             ->andWhere('et.user = :user')
             ->setParameters(new ArrayCollection([
-                new Parameter('name', $this->canonicalizer->canonicalizeString($name)),
+                new Parameter('name', Canonicalizer::canonicalize($name)),
                 new Parameter('user', $user),
             ]))
             ->getQuery()

@@ -26,14 +26,14 @@ trait EvaluationCriteriaTrait
     }
 
     /**
-     * Retrieves an evaluation criteria by its identifier.
+     * Retrieves an evaluation criteria by its publicId.
      *
-     * @param string $identifier the identifier of the evaluation criteria
+     * @param string $publicId the publicId of the evaluation criteria
      */
-    private function getEvaluationCriteriaByIdentifier(string $identifier): EvaluationCriteria
+    private function getEvaluationCriteriaByPublicId(string $publicId): EvaluationCriteria
     {
-        if (null === $criteria = $this->evaluationCriteriaRepository->findByIdentifierAndUser($identifier, $this->getUser())) {
-            throw $this->createNotFoundException($this->translator->trans('not_found.evaluation_criteria', ['%identifier%' => $identifier], 'errors'));
+        if (null === $criteria = $this->evaluationCriteriaRepository->findByPublicIdAndUser($publicId, $this->getUser())) {
+            throw $this->createNotFoundException($this->translator->trans('not_found.evaluation_criteria', ['%publicId%' => $publicId], 'errors'));
         }
 
         return $criteria;

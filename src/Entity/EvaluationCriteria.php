@@ -18,18 +18,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
  */
 #[ORM\Table(name: 'daily_brew_evaluation_criterias')]
 #[ORM\Entity(repositoryClass: EvaluationCriteriaRepository::class)]
-#[ORM\UniqueConstraint(name: 'UQ_EVALUATION_CRITERIA_IDENTIFIER', columns: ['identifier'])]
 #[ORM\UniqueConstraint(name: 'UQ_EVALUATION_CRITERIA_LABEL', columns: ['label', 'user_id'])]
 #[ORM\UniqueConstraint(name: 'UQ_EVALUATION_CRITERIA_CANONICAL_LABEL', columns: ['canonical_label', 'user_id'])]
 class EvaluationCriteria extends AbstractEntity
 {
-    /**
-     * @var string|null
-     */
-    #[ORM\Column]
-    #[Groups(['criteria:read'])]
-    private ?string $identifier = null;
-
     /**
      * @var string|null
      */
@@ -71,18 +63,6 @@ class EvaluationCriteria extends AbstractEntity
     public function __construct()
     {
         $this->templates = new ArrayCollection();
-    }
-
-    public function getIdentifier(): ?string
-    {
-        return $this->identifier;
-    }
-
-    public function setIdentifier(?string $identifier): EvaluationCriteria
-    {
-        $this->identifier = $identifier;
-
-        return $this;
     }
 
     public function getLabel(): ?string

@@ -15,5 +15,8 @@ export type EvaluationTemplateCriterias = {
     templates?: Array<{ value: number }>;
 };
 
-export type PartialEvaluationCriteria = Omit<EvaluationCriteria, 'id' | 'identifier' | 'templates'> &
+export type PartialEvaluationCriteria = Omit<
+    EvaluationCriteria,
+    'id' | 'identifier' | 'templates' | 'createdAt' | 'updatedAt'
+> &
     EvaluationTemplateCriterias;

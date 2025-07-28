@@ -26,14 +26,14 @@ trait EvaluationTemplateTrait
     }
 
     /**
-     * Retrieves an evaluation template by its identifier.
+     * Retrieves an evaluation template by its publicId.
      *
-     * @param string $identifier the identifier of the evaluation template
+     * @param string $publicId the publicId of the evaluation template
      */
-    private function getEvaluationTemplateByIdentifier(string $identifier): EvaluationTemplate
+    private function getEvaluationTemplateByPublicId(string $publicId): EvaluationTemplate
     {
-        if (null === $template = $this->evaluationTemplateRepository->findByIdentifierAndUser($identifier, $this->getUser())) {
-            throw $this->createNotFoundException($this->translator->trans('not_found.evaluation_template', ['%identifier%' => $identifier], 'errors'));
+        if (null === $template = $this->evaluationTemplateRepository->findByPublicIdAndUser($publicId, $this->getUser())) {
+            throw $this->createNotFoundException($this->translator->trans('not_found.evaluation_template', ['%publicId%' => $publicId], 'errors'));
         }
 
         return $template;

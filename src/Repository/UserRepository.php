@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\User;
-use App\Util\CanonicalFieldsUpdater;
-use App\Util\TokenGenerator;
+use App\Util\Canonicalizer;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Random\RandomException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -37,21 +35,50 @@ class UserRepository extends AbstractRepository implements PasswordUpgraderInter
     public function __construct(
         ManagerRegistry $registry,
         private readonly UserPasswordHasherInterface $passwordHasher,
-        private readonly CanonicalFieldsUpdater $canonicalFieldsUpdater,
     ) {
         parent::__construct($registry, User::class);
     }
 
+    /**
+     * Finds a user by the given criteria.
+     *
+     * This method is used to find a user in the database based on the provided criteria.
+     * It calls the `findOneBy` method of the parent class to retrieve the user object.
+     *
+     * @param array $criteria an associative array of criteria to search for
+     *
+     * @return User|null the user object if found, or `null` if not found
+     */
     public function findUserBy(array $criteria): ?User
     {
         return $this->findOneBy($criteria);
     }
 
-    public function loadUserByIdentifier(string $secret): ?User
+    /**
+     * Loads a user by their identifier (email).
+     *
+     * This method is used to load a user by their identifier, which in this case is the user's email.
+     * It calls the `findByIdentifier` method to retrieve the user object based on the provided email.
+     *
+     * @param string $identifier the email of the user to load
+     *
+     * @return User|null the user object if found, or `null` if not found
+     */
+    public function loadUserByIdentifier(string $identifier): ?User
     {
-        return $this->findByIdentifier($secret);
+        return $this->findByIdentifier($identifier);
     }
 
+    /**
+     * Finds a user in the database by their identifier (email).
+     *
+     * This method is used to find a user by their identifier, which is the email in this case.
+     * It calls the `findByEmail` method to retrieve the user object based on the provided email.
+     *
+     * @param string $email the email of the user to find
+     *
+     * @return User|null the user object if found, or `null` if not found
+     */
     public function findByIdentifier(string $email): ?User
     {
         return $this->findByEmail($email);
@@ -69,7 +96,7 @@ class UserRepository extends AbstractRepository implements PasswordUpgraderInter
      */
     public function findByEmail(string $email): ?User
     {
-        return $this->findUserBy(['emailCanonical' => $this->canonicalFieldsUpdater->canonicalizeEmail($email)]);
+        return $this->findUserBy(['emailCanonical' => Canonicalizer::canonicalize($email)]);
     }
 
     /**
@@ -83,22 +110,12 @@ class UserRepository extends AbstractRepository implements PasswordUpgraderInter
      * @param bool               $andFlush Whether to flush changes to the database. (optional, default: true)
      *
      * @return User the updated user object
-     *
-     * @throws RandomException
      */
     public function updateUser(User|UserInterface $user, bool $andFlush = true): User
     {
         $this->updateCanonicalFields($user);
         if ($user->getPlainPassword()) {
             $this->hashPassword($user);
-        }
-
-        if (null === $user->getSecret()) {
-            $string = TokenGenerator::getString(symbols: false);
-            do {
-                $secret = TokenGenerator::generateFromString($string, 128);
-            } while ($this->isSecretExists($secret));
-            $user->setSecret($secret);
         }
 
         $this->update($user, $andFlush);
@@ -121,7 +138,13 @@ class UserRepository extends AbstractRepository implements PasswordUpgraderInter
     }
 
     /**
-     * @throws RandomException
+     * Updates the user's password and flushes changes to the database.
+     *
+     * This method is used to update the user's password. It calls the `updateUser` method
+     * with the user object and sets the `$andFlush` parameter to true by default.
+     *
+     * @param User $user      the user whose password is to be updated
+     * @param bool $andFlush  whether to flush changes to the database (optional, default: true)
      */
     public function updatePassword(User $user, bool $andFlush = true): void
     {
@@ -130,7 +153,7 @@ class UserRepository extends AbstractRepository implements PasswordUpgraderInter
 
     public function updateCanonicalFields(User $user): void
     {
-        $this->canonicalFieldsUpdater->updateCanonicalFields($user);
+        $user->setEmailCanonical(Canonicalizer::canonicalize($user->getEmail()));
     }
 
     /**
@@ -149,7 +172,7 @@ class UserRepository extends AbstractRepository implements PasswordUpgraderInter
      * returns false. Otherwise, it uses the passwordHasher service to check if the provided
      * password is valid for the user. The result is then returned as a boolean value.
      *
-     * @param User|null $user     the user object to check the password against
+     * @param User|null $user     the user objects to check the password against
      * @param string    $password the password to validate
      *
      * @return bool true if the password is valid for the user, false otherwise
@@ -174,9 +197,9 @@ class UserRepository extends AbstractRepository implements PasswordUpgraderInter
     /**
      * Checks if the user secret exists.
      *
-     * @param string $secret the identifier
+     * @param string $secret the publicId
      *
-     * @return bool returns the generated identifier
+     * @return bool returns the generated publicId
      */
     public function isSecretExists(string $secret): bool
     {

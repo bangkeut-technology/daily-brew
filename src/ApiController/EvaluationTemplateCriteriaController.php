@@ -50,14 +50,14 @@ class EvaluationTemplateCriteriaController extends AbstractController
     /**
      * Remove an evaluation template criteria.
      *
-     * @param string $identifier The identifier of the evaluation template criteria
+     * @param string $publicId The publicId of the evaluation template criteria
      *
      * @return JsonResponse
      */
     #[Route(name: 'deletes', methods: ['DELETE'])]
-    public function deletes(string $identifier): JsonResponse
+    public function deletes(string $publicId): JsonResponse
     {
-        $evaluationTemplateCriteria = $this->getEvaluationTemplateCriteriaByIdentifier($identifier);
+        $evaluationTemplateCriteria = $this->getEvaluationTemplateCriteriaByPublicId($publicId);
 
         $this->evaluationTemplateCriteriaRepository->delete($evaluationTemplateCriteria);
 

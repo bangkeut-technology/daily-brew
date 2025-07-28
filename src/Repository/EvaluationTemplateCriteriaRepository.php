@@ -47,20 +47,20 @@ class EvaluationTemplateCriteriaRepository extends AbstractRepository
     }
 
     /**
-     * Finds EvaluationTemplateCriteria by identifier and user.
+     * Finds EvaluationTemplateCriteria by publicId and user.
      *
-     * @param string $identifier the identifier of the evaluation template criteria
+     * @param string $publicId the publicId of the evaluation template criteria
      * @param User   $user       the user associated with the evaluation template criteria
      *
      * @return EvaluationTemplateCriteria|null the found evaluation template criteria or null if not found
      */
-    public function findByIdentifierAndUser(string $identifier, User $user): ?EvaluationTemplateCriteria
+    public function findByPublicIdAndUser(string $publicId, User $user): ?EvaluationTemplateCriteria
     {
         return $this->createQueryBuilder('etc')
             ->innerJoin('etc.template', 't')
-            ->where('etc.identifier = :identifier')
+            ->where('etc.publicId = :publicId')
             ->andWhere('t.user = :user')
-            ->setParameter('identifier', $identifier)
+            ->setParameter('publicId', $publicId)
             ->setParameter('user', $user)
             ->getQuery()
             ->getOneOrNullResult();

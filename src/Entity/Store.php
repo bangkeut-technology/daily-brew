@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\StoreRepository;
+use App\Util\Canonicalizer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -20,7 +21,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: StoreRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_STORE_NAME', fields: ['name', 'user'])]
 #[ORM\UniqueConstraint(name: 'UNIQ_STORE_CANONICAL_NAME', fields: ['canonicalName', 'user'])]
-#[ORM\UniqueConstraint(name: 'UNIQ_STORE_IDENTIFIER', fields: ['identifier'])]
 class Store extends AbstractEntity
 {
     #[ORM\Column(length: 255)]
@@ -31,10 +31,6 @@ class Store extends AbstractEntity
     #[ORM\Column(length: 255)]
     #[Groups(['store:read'])]
     private ?string $canonicalName = null;
-
-    #[ORM\Column(length: 32)]
-    #[Groups(['store:read'])]
-    private ?string $identifier = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'stores')]
     private ?User $user = null;
@@ -47,51 +43,57 @@ class Store extends AbstractEntity
         $this->employees = new ArrayCollection();
     }
 
+    /**
+     * @return string|null
+     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
+    /**
+     * @param string|null $name
+     * @return Store
+     */
     public function setName(?string $name): Store
     {
         $this->name = $name;
-
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getCanonicalName(): ?string
     {
         return $this->canonicalName;
     }
 
+    /**
+     * @param string|null $canonicalName
+     * @return Store
+     */
     public function setCanonicalName(?string $canonicalName): Store
     {
         $this->canonicalName = $canonicalName;
-
         return $this;
     }
 
-    public function getIdentifier(): ?string
-    {
-        return $this->identifier;
-    }
-
-    public function setIdentifier(?string $identifier): Store
-    {
-        $this->identifier = $identifier;
-
-        return $this;
-    }
-
+    /**
+     * @return User|null
+     */
     public function getUser(): ?User
     {
         return $this->user;
     }
 
+    /**
+     * @param User|null $user
+     * @return Store
+     */
     public function setUser(?User $user): Store
     {
         $this->user = $user;
-
         return $this;
     }
 
@@ -120,6 +122,16 @@ class Store extends AbstractEntity
         }
 
         return $this;
+    }
+
+    /**
+     * Canonicalize the store name before persisting it to the database.
+     */
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function canonicalize(): void
+    {
+        $this->canonicalName = Canonicalizer::canonicalize($this->name);
     }
 
     public function __toString(): string

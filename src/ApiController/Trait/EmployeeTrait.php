@@ -19,7 +19,7 @@ trait EmployeeTrait
      * This method is used to create an employee response.
      *
      * @param mixed $data    the data to return in the response
-     * @param int   $status  the status identifier of the response
+     * @param int   $status  the status publicId of the response
      * @param array $context The context of the response. The default is ['groups' => ['employee:read', 'user:read', 'store:read', 'role:read', 'template:read']].
      */
     private function createEmployeeResponse(mixed $data, int $status = Response::HTTP_OK, array $context = ['groups' => ['employee:read', 'user:read', 'store:read', 'role:read', 'template:read']]): JsonResponse
@@ -28,14 +28,14 @@ trait EmployeeTrait
     }
 
     /**
-     * Get employee by identifier and current user.
+     * Get employee by publicId and current user.
      *
-     * @param string $identifier The unique identifier of the employee
+     * @param string $publicId The unique publicId of the employee
      */
-    private function getEmployeeByIdentifier(string $identifier): Employee
+    private function getEmployeeByPublicId(string $publicId): Employee
     {
-        if (null === $employee = $this->employeeRepository->findByIdentifierAndUser($identifier, $this->getUser())) {
-            throw $this->createNotFoundException($this->translator->trans('not_found.employee', ['%identifier%' => $identifier], domain: 'errors'));
+        if (null === $employee = $this->employeeRepository->findByPublicIdAndUser($publicId, $this->getUser())) {
+            throw $this->createNotFoundException($this->translator->trans('not_found.employee', ['%publicId%' => $publicId], domain: 'errors'));
         }
 
         return $employee;

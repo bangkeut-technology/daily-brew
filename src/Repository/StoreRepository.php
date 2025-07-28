@@ -6,13 +6,10 @@ namespace App\Repository;
 
 use App\Entity\Store;
 use App\Entity\User;
-use App\Util\CanonicalizerInterface;
-use App\Util\TokenGenerator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\Persistence\ManagerRegistry;
-use Random\RandomException;
 
 /**
  * Class StoreRepository.
@@ -33,11 +30,9 @@ class StoreRepository extends AbstractRepository
      * StoreRepository constructor.
      *
      * @param ManagerRegistry        $registry      the registry
-     * @param CanonicalizerInterface $canonicalizer the canonicalizer
      */
     public function __construct(
         ManagerRegistry $registry,
-        private readonly CanonicalizerInterface $canonicalizer,
     ) {
         parent::__construct($registry, Store::class);
     }
@@ -52,30 +47,6 @@ class StoreRepository extends AbstractRepository
     {
         return $this->findOneBy(['canonicalName' => $canonicalName, 'user' => $user]);
     }
-
-    /**
-     * Updates the store.
-     *
-     * @param Store $store    the store to update
-     * @param bool  $andFlush whether to flush the changes (default true)
-     *
-     * @throws RandomException
-     */
-    public function updateStore(Store $store, bool $andFlush = true): void
-    {
-        $store->setCanonicalName($this->canonicalizer->canonicalizeString($store->getName()));
-
-        if (null === $store->getIdentifier()) {
-            $string = TokenGenerator::getString(symbols: false);
-            do {
-                $identifier = TokenGenerator::generateFromString($string);
-            } while ($this->isIdentifierExists($store->getIdentifier(), $store->getUser()));
-            $store->setIdentifier($identifier);
-        }
-
-        $this->update($store, $andFlush);
-    }
-
     /**
      * Finds all stores by user.
      *
@@ -124,38 +95,17 @@ class StoreRepository extends AbstractRepository
     }
 
     /**
-     * Checks if the given identifier already exists in the database.
+     * Finds stores by publicIds and user.
      *
-     * @param string|null $identifier the identifier to check for existence
-     *
-     * @return bool returns true if the identifier exists, false otherwise
-     */
-    public function isIdentifierExists(?string $identifier, ?User $user): bool
-    {
-        return $this->createQueryBuilder('s')
-                ->select('COUNT(s.id)')
-                ->where('s.identifier = :identifier')
-                ->andWhere('s.user = :user')
-                ->setParameters(new ArrayCollection([
-                    new Parameter('identifier', $identifier),
-                    new Parameter('user', $user),
-                ]))
-                ->getQuery()
-                ->getSingleScalarResult() > 0;
-    }
-
-    /**
-     * Finds stores by identifiers and user.
-     *
-     * @param string[]  $stores  the store identifiers
+     * @param string[]  $stores  the store publicIds
      * @param User|null $getUser the user
      *
      * @return Store[]
      */
-    public function findByIdentifiersAndUser(array $stores, ?User $getUser): array
+    public function findByPublicIdsAndUser(array $stores, ?User $getUser): array
     {
         return $this->createQueryBuilder('s')
-            ->where('s.identifier IN (:stores)')
+            ->where('s.publicId IN (:stores)')
             ->andWhere('s.user = :user')
             ->setParameters(
                 new ArrayCollection([
@@ -168,14 +118,14 @@ class StoreRepository extends AbstractRepository
     }
 
     /**
-     * Finds a store by its identifier and user.
+     * Finds a store by its publicId and user.
      *
-     * @param string $identifier the identifier of the store to retrieve
+     * @param string $publicId the publicId of the store to retrieve
      * @param User   $user       the user
      */
-    public function findByIdentifierAndUser(string $identifier, User $user): ?Store
+    public function findByPublicIdAndUser(string $publicId, User $user): ?Store
     {
-        return $this->findOneBy(['identifier' => $identifier, 'user' => $user]);
+        return $this->findOneBy(['publicId' => $publicId, 'user' => $user]);
     }
 
     public function findAsEmployee(User $user)

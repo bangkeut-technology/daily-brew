@@ -34,18 +34,18 @@ trait EvaluationTemplateCriteriaTrait
     }
 
     /**
-     * Get evaluation template criteria by identifier.
+     * Get evaluation template criteria by publicId.
      *
-     * @param string $identifier the identifier of the evaluation template criteria
+     * @param string $publicId the publicId of the evaluation template criteria
      *
      * @return EvaluationTemplateCriteria the found evaluation template criteria
      *
      * @throws NotFoundHttpException if not found
      */
-    private function getEvaluationTemplateCriteriaByIdentifier(string $identifier): EvaluationTemplateCriteria
+    private function getEvaluationTemplateCriteriaByPublicId(string $publicId): EvaluationTemplateCriteria
     {
-        if (null === $evaluationTemplateCriteria = $this->evaluationTemplateCriteriaRepository->findByIdentifierAndUser($identifier, $this->getUser())) {
-            throw $this->createNotFoundException($this->translator->trans('not_found.evaluation_template_criteria', ['%identifier%' => $identifier], 'errors'));
+        if (null === $evaluationTemplateCriteria = $this->evaluationTemplateCriteriaRepository->findByPublicIdAndUser($publicId, $this->getUser())) {
+            throw $this->createNotFoundException($this->translator->trans('not_found.evaluation_template_criteria', ['%publicId%' => $publicId], 'errors'));
         }
 
         return $evaluationTemplateCriteria;

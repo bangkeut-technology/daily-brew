@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\EmployeeEvaluationRepository;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -19,7 +20,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\Table(name: 'daily_brew_employee_evaluations')]
 #[ORM\Entity(repositoryClass: EmployeeEvaluationRepository::class)]
 #[ORM\UniqueConstraint(name: 'UQ_EMPLOYEE_EVALUATION', columns: ['evaluated_at', 'employee_id', 'template_name'])]
-#[ORM\UniqueConstraint(name: 'UQ_EMPLOYEE_EVALUATION_IDENTIFIER', columns: ['identifier'])]
 class EmployeeEvaluation extends AbstractEntity
 {
     #[ORM\ManyToOne]
@@ -39,15 +39,11 @@ class EmployeeEvaluation extends AbstractEntity
 
     #[ORM\Column]
     #[Groups(['employee_evaluation:read'])]
-    private ?string $identifier = null;
-
-    #[ORM\Column]
-    #[Groups(['employee_evaluation:read'])]
     private ?string $templateName = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: false)]
     #[Groups(['employee_evaluation:read'])]
-    private \DateTimeImmutable $evaluatedAt;
+    private DateTimeImmutable $evaluatedAt;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['employee_evaluation:read'])]
@@ -105,18 +101,6 @@ class EmployeeEvaluation extends AbstractEntity
         return $this;
     }
 
-    public function getIdentifier(): ?string
-    {
-        return $this->identifier;
-    }
-
-    public function setIdentifier(?string $identifier): EmployeeEvaluation
-    {
-        $this->identifier = $identifier;
-
-        return $this;
-    }
-
     public function getTemplateName(): ?string
     {
         return $this->templateName;
@@ -129,12 +113,12 @@ class EmployeeEvaluation extends AbstractEntity
         return $this;
     }
 
-    public function getEvaluatedAt(): \DateTimeImmutable
+    public function getEvaluatedAt(): DateTimeImmutable
     {
         return $this->evaluatedAt;
     }
 
-    public function setEvaluatedAt(\DateTimeImmutable $evaluatedAt): EmployeeEvaluation
+    public function setEvaluatedAt(DateTimeImmutable $evaluatedAt): EmployeeEvaluation
     {
         $this->evaluatedAt = $evaluatedAt;
 

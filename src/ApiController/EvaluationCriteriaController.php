@@ -117,13 +117,13 @@ class EvaluationCriteriaController extends AbstractController
     /**
      * Deletes an evaluation criteria.
      *
-     * @param string $identifier the identifier of the evaluation criteria to delete
+     * @param string $publicId the publicId of the evaluation criteria to delete
      *
      * @return JsonResponse the JSON response indicating the deletion status
      */
     #[OA\Parameter(
-        name: 'identifier',
-        description: 'The identifier of the evaluation criteria to delete.',
+        name: 'publicId',
+        description: 'The publicId of the evaluation criteria to delete.',
         in: 'path',
         required: true,
         schema: new OA\Schema(type: 'string')
@@ -146,10 +146,10 @@ class EvaluationCriteriaController extends AbstractController
             ]
         )
     )]
-    #[Route('/{identifier}', name: 'delete', methods: ['DELETE'])]
-    public function delete(string $identifier): JsonResponse
+    #[Route('/{publicId}', name: 'delete', methods: ['DELETE'])]
+    public function delete(string $publicId): JsonResponse
     {
-        $criteria = $this->getEvaluationCriteriaByIdentifier($identifier);
+        $criteria = $this->getEvaluationCriteriaByPublicId($publicId);
 
         $this->evaluationCriteriaRepository->remove($criteria);
 
@@ -159,22 +159,22 @@ class EvaluationCriteriaController extends AbstractController
     }
 
     /**
-     * Retrieves an evaluation criteria by its identifier.
+     * Retrieves an evaluation criteria by its publicId.
      *
-     * @param string $identifier the identifier of the evaluation criteria
+     * @param string $publicId the publicId of the evaluation criteria
      *
      * @return JsonResponse the JSON response containing the evaluation criteria
      */
     #[OA\Parameter(
-        name: 'identifier',
-        description: 'The identifier of the evaluation criteria to retrieve.',
+        name: 'publicId',
+        description: 'The publicId of the evaluation criteria to retrieve.',
         in: 'path',
         required: true,
         schema: new OA\Schema(type: 'string')
     )]
     #[OA\Response(
         response: Response::HTTP_OK,
-        description: 'Returns an evaluation criteria by its identifier.',
+        description: 'Returns an evaluation criteria by its publicId.',
         content: new OA\JsonContent(ref: new Model(type: EvaluationCriteria::class, groups: ['criteria:read']))
     )]
     #[OA\Response(
@@ -186,10 +186,10 @@ class EvaluationCriteriaController extends AbstractController
             ]
         )
     )]
-    #[Route('/{identifier}', name: 'get', methods: ['GET'])]
-    public function get(string $identifier): JsonResponse
+    #[Route('/{publicId}', name: 'get', methods: ['GET'])]
+    public function get(string $publicId): JsonResponse
     {
-        $criteria = $this->getEvaluationCriteriaByIdentifier($identifier);
+        $criteria = $this->getEvaluationCriteriaByPublicId($publicId);
 
         return $this->createCriteriaResponse($criteria);
     }
@@ -198,15 +198,15 @@ class EvaluationCriteriaController extends AbstractController
      * Updates an existing evaluation criteria.
      *
      * @param Request $request    the HTTP request containing the updated evaluation criteria data
-     * @param string  $identifier the identifier of the evaluation criteria to update
+     * @param string  $publicId the publicId of the evaluation criteria to update
      *
      * @return JsonResponse the JSON response containing the updated evaluation criteria
      *
      * @throws RandomException
      */
     #[OA\Parameter(
-        name: 'identifier',
-        description: 'The identifier of the evaluation criteria to update.',
+        name: 'publicId',
+        description: 'The publicId of the evaluation criteria to update.',
         in: 'path',
         required: true,
         schema: new OA\Schema(type: 'string')
@@ -225,10 +225,10 @@ class EvaluationCriteriaController extends AbstractController
             ]
         )
     )]
-    #[Route('/{identifier}', name: 'put', methods: ['PUT'])]
-    public function put(Request $request, string $identifier): JsonResponse
+    #[Route('/{publicId}', name: 'put', methods: ['PUT'])]
+    public function put(Request $request, string $publicId): JsonResponse
     {
-        $criteria = $this->getEvaluationCriteriaByIdentifier($identifier);
+        $criteria = $this->getEvaluationCriteriaByPublicId($publicId);
         $form = $this->createForm(EvaluationCriteriaFormType::class, $criteria);
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
@@ -241,13 +241,13 @@ class EvaluationCriteriaController extends AbstractController
     /**
      * Retrieves the templates associated with the evaluation criteria.
      *
-     * @param string $identifier the identifier of the evaluation criteria
+     * @param string $publicId the publicId of the evaluation criteria
      *
      * @return JsonResponse the list of template associated with the evaluation criteria
      */
     #[OA\Parameter(
-        name: 'identifier',
-        description: 'The identifier of the evaluation criteria to retrieve template for.',
+        name: 'publicId',
+        description: 'The publicId of the evaluation criteria to retrieve template for.',
         in: 'path',
         required: true,
         schema: new OA\Schema(type: 'string')
@@ -269,10 +269,10 @@ class EvaluationCriteriaController extends AbstractController
             ]
         )
     )]
-    #[Route('/{identifier}/templates', name: 'get_templates', methods: ['GET'])]
-    public function getTemplates(string $identifier): JsonResponse
+    #[Route('/{publicId}/templates', name: 'get_templates', methods: ['GET'])]
+    public function getTemplates(string $publicId): JsonResponse
     {
-        $criteria = $this->getEvaluationCriteriaByIdentifier($identifier);
+        $criteria = $this->getEvaluationCriteriaByPublicId($publicId);
 
         return $this->createTemplateCriteriaResponse($criteria->getTemplates());
     }

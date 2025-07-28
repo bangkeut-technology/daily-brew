@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Util\TokenGenerator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Exception\ORMException;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use Random\RandomException;
 
 /**
  * Class AbstractRepository.
@@ -45,7 +42,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
      * Delete an object from the database.
      *
      * @param T    $entity
-     * @param bool $andFlush tell the manager whether the object need to be flush or not
+     * @param bool $andFlush tell the manager whether the object needs to be flush or not
      */
     public function delete(mixed $entity, bool $andFlush = true): void
     {
@@ -93,36 +90,12 @@ abstract class AbstractRepository extends ServiceEntityRepository
     }
 
     /**
-     * Flushes all changes to object that have been queued up too now to the database.
+     * Flushes all changes to the object that have been queued up to now to the database.
      * This effectively synchronizes the in-memory state of managed objects with the
      * database.
      */
     public function flush(): void
     {
         $this->getEntityManager()->flush();
-    }
-
-    /**
-     * Creates a new QueryBuilder instance without an alias.
-     * The QueryBuilder provides an API for constructing and executing database queries.
-     */
-    public function createQueryBuilderWithoutAlias(): QueryBuilder
-    {
-        return $this->getEntityManager()->createQueryBuilder();
-    }
-
-    /**
-     * Generates a token string of specified length.
-     *
-     * @param int  $length  The length of the token string. Default is 128.
-     * @param bool $symbols Whether to include symbols in the token string. Default is false.
-     *
-     * @return string the generated token string
-     *
-     * @throws RandomException if an error occurs while generating the token
-     */
-    protected static function generateToken(int $length = 128, bool $symbols = false): string
-    {
-        return TokenGenerator::generate(symbols: $symbols, length: $length);
     }
 }

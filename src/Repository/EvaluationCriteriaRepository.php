@@ -6,14 +6,12 @@ namespace App\Repository;
 
 use App\Entity\EvaluationCriteria;
 use App\Entity\User;
-use App\Util\CanonicalizerInterface;
-use App\Util\TokenGenerator;
+use App\Util\Canonicalizer;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use Random\RandomException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -31,68 +29,28 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class EvaluationCriteriaRepository extends AbstractRepository
 {
-    public function __construct(ManagerRegistry $registry, private readonly CanonicalizerInterface $canonicalizer)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, EvaluationCriteria::class);
     }
 
     /**
-     * Finds an EvaluationCriteria by its identifier and associated user.
+     * Finds an EvaluationCriteria by its publicId and associated user.
      *
-     * @param string $identifier the unique identifier of the evaluation criteria
+     * @param string $publicId the unique publicId of the evaluation criteria
      * @param User   $user       the user associated with the evaluation criteria
      *
      * @return EvaluationCriteria|null the found evaluation criteria or null if not found
      */
-    public function findByIdentifierAndUser(string $identifier, User $user): ?EvaluationCriteria
+    public function findByPublicIdAndUser(string $publicId, User $user): ?EvaluationCriteria
     {
         return $this->createQueryBuilder('ec')
-            ->andWhere('ec.identifier = :identifier')
+            ->andWhere('ec.publicId = :publicId')
             ->andWhere('ec.user = :user')
-            ->setParameter('identifier', $identifier)
+            ->setParameter('publicId', $publicId)
             ->setParameter('user', $user)
             ->getQuery()
             ->getOneOrNullResult();
-    }
-
-    /**
-     * Update an evaluation criteria.
-     *
-     * @param EvaluationCriteria $evaluationCriteria the evaluation criteria to update
-     * @param bool               $andFlush           whether to flush the changes (default true)
-     *
-     * @throws RandomException throws an exception if the identifier already exists
-     */
-    public function updateEvaluationCriteria(EvaluationCriteria $evaluationCriteria, bool $andFlush = true): void
-    {
-        $evaluationCriteria->setCanonicalLabel($this->canonicalizer->canonicalizeString($evaluationCriteria->getLabel()));
-        if (null === $evaluationCriteria->getIdentifier()) {
-            $string = TokenGenerator::getString(symbols: false);
-            do {
-                $identifier = TokenGenerator::generateFromString($string);
-            } while ($this->isIdentifierExists($identifier));
-
-            $evaluationCriteria->setIdentifier($identifier);
-        }
-
-        $this->update($evaluationCriteria, $andFlush);
-    }
-
-    /**
-     * Check if an identifier already exists for an evaluation criteria.
-     *
-     * @param string $identifier the identifier to check
-     *
-     * @return bool returns true if the identifier exists, false otherwise
-     */
-    public function isIdentifierExists(string $identifier): bool
-    {
-        return $this->createQueryBuilder('ec')
-                ->select('COUNT(ec.id)')
-                ->where('ec.identifier = :identifier')
-                ->setParameter('identifier', $identifier)
-                ->getQuery()
-                ->getSingleScalarResult() > 0;
     }
 
     /**
@@ -124,7 +82,7 @@ class EvaluationCriteriaRepository extends AbstractRepository
             ->andWhere('ec.user = :user')
             ->setParameters(
                 new ArrayCollection([
-                    new Parameter('label', $this->canonicalizer->canonicalizeString($label)),
+                    new Parameter('label', Canonicalizer::canonicalize($label)),
                     new Parameter('user', $user),
                 ])
             )

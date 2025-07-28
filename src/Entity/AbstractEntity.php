@@ -1,17 +1,19 @@
 <?php
-
 declare(strict_types=1);
 
 namespace App\Entity;
 
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Uid\Uuid;
 
 /**
- * Class AbstractEntity.
+ * Class AbstractEntity
  *
- * @author  Vandeth Tho <thovandeth@gmail.com>
+ * @package App\Entity
+ * @author  Vandeth THO <thovandeth@gmail.com>
  */
 #[ORM\MappedSuperclass]
 #[ORM\HasLifecycleCallbacks]
@@ -32,6 +34,9 @@ abstract class AbstractEntity
     ])]
     protected ?int $id = null;
 
+    #[ORM\Column(type: 'string', length: 36, unique: true)]
+    protected string $publicId;
+
     #[ORM\Column(name: 'created_at', type: Types::DATETIME_IMMUTABLE, nullable: false)]
     #[Groups([
         'attendance:read',
@@ -43,7 +48,7 @@ abstract class AbstractEntity
         'employee_evaluation:read',
         'employee_score:read',
     ])]
-    protected ?\DateTimeImmutable $createdAt = null;
+    protected ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(name: 'updated_at', type: Types::DATETIME_IMMUTABLE, nullable: false)]
     #[Groups([
@@ -56,52 +61,80 @@ abstract class AbstractEntity
         'employee_evaluation:read',
         'employee_score:read',
     ])]
-    protected ?\DateTimeImmutable $updatedAt = null;
+    protected ?DateTimeImmutable $updatedAt = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    /**
+     * @return string
+     */
+    public function getPublicId(): string
+    {
+        return $this->publicId;
+    }
+
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTimeImmutable $createdAt): self
+    public function setCreatedAt(?DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): self
+    public function setUpdatedAt(?DateTimeImmutable $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 
         return $this;
     }
 
+    /**
+     * Pre-persist lifecycle callback to set the created and updated timestamps,
+     * and generate a public ID for the entity.
+     */
     #[ORM\PrePersist]
     public function prePersist(): void
     {
-        $this->createdAt = new \DateTimeImmutable();
-        $this->updatedAt = new \DateTimeImmutable();
-    }
-
-    #[ORM\PreUpdate]
-    public function preUpdate(): void
-    {
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
+        $this->generatePublicId();
     }
 
     /**
-     * @return void
+     * Generate a unique public ID for the entity if it is not already set.
+     * The public ID is a base58 encoded UUID.
+     */
+    public function generatePublicId(): void
+    {
+        if (empty($this->publicId)) {
+            $this->publicId = Uuid::v4()->toBase58();
+        }
+    }
+
+    /**
+     * Pre-update lifecycle callback to update the updated timestamp.
+     */
+    #[ORM\PreUpdate]
+    public function preUpdate(): void
+    {
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
+    /**
+     * Clone method to reset the ID when cloning the entity.
+     * This ensures that the cloned entity is treated as a new entity.
      */
     public function __clone()
     {

@@ -19,13 +19,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\Entity(repositoryClass: EvaluationTemplateRepository::class)]
 #[ORM\UniqueConstraint(name: 'UQ_EVALUATION_TEMPLATE_NAME', columns: ['name', 'user_id'])]
 #[ORM\UniqueConstraint(name: 'UQ_EVALUATION_TEMPLATE_CANONICAL_NAME', columns: ['canonical_name', 'user_id'])]
-#[ORM\UniqueConstraint(name: 'UQ_EVALUATION_TEMPLATE_IDENTIFIER', columns: ['identifier'])]
 class EvaluationTemplate extends AbstractEntity
 {
-    #[ORM\Column]
-    #[Groups(['template:read'])]
-    private ?string $identifier = null;
-
     #[ORM\Column(length: 255)]
     #[Groups(['template:read'])]
     private ?string $name = null;
@@ -64,78 +59,95 @@ class EvaluationTemplate extends AbstractEntity
         $this->employees = new ArrayCollection();
     }
 
-    public function getIdentifier(): ?string
-    {
-        return $this->identifier;
-    }
-
-    public function setIdentifier(?string $identifier): EvaluationTemplate
-    {
-        $this->identifier = $identifier;
-
-        return $this;
-    }
-
+    /**
+     * @return string|null
+     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
+    /**
+     * @param string|null $name
+     * @return EvaluationTemplate
+     */
     public function setName(?string $name): EvaluationTemplate
     {
         $this->name = $name;
-
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getCanonicalName(): ?string
     {
         return $this->canonicalName;
     }
 
+    /**
+     * @param string|null $canonicalName
+     * @return EvaluationTemplate
+     */
     public function setCanonicalName(?string $canonicalName): EvaluationTemplate
     {
         $this->canonicalName = $canonicalName;
-
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getDescription(): ?string
     {
         return $this->description;
     }
 
+    /**
+     * @param string|null $description
+     * @return EvaluationTemplate
+     */
     public function setDescription(?string $description): EvaluationTemplate
     {
         $this->description = $description;
-
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function isActive(): bool
     {
         return $this->active;
     }
 
-    public function setActive(bool $active): static
+    /**
+     * @param bool $active
+     * @return EvaluationTemplate
+     */
+    public function setActive(bool $active): EvaluationTemplate
     {
         $this->active = $active;
-
         return $this;
     }
 
+    /**
+     * @return User|null
+     */
     public function getUser(): ?User
     {
         return $this->user;
     }
 
+    /**
+     * @param User|null $user
+     * @return EvaluationTemplate
+     */
     public function setUser(?User $user): EvaluationTemplate
     {
         $this->user = $user;
-
         return $this;
     }
-
     /**
      * @return Collection<int, EvaluationTemplateCriteria>
      */

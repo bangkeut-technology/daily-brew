@@ -10,6 +10,7 @@ use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -47,12 +48,12 @@ class AttendanceRepository extends AbstractRepository
         return $this->createQueryBuilder('a')
             ->addSelect('e')
             ->where('a.user = :user')
-            ->andWhere('a.date >= :from OR :from IS NULL')
-            ->andWhere('a.date <= :to OR :to IS NULL')
+            ->andWhere('a.attendanceDate >= :from OR :from IS NULL')
+            ->andWhere('a.attendanceDate <= :to OR :to IS NULL')
             ->setParameters(new ArrayCollection([
                 new Parameter('user', $user),
-                new Parameter('from', $from),
-                new Parameter('to', $to),
+                new Parameter('from', $from, Types::DATE_IMMUTABLE),
+                new Parameter('to', $to, Types::DATE_IMMUTABLE),
             ]))
             ->getQuery()
             ->getResult();
@@ -73,4 +74,5 @@ class AttendanceRepository extends AbstractRepository
             ->getQuery()
             ->getResult();
     }
+
 }

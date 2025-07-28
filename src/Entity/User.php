@@ -6,16 +6,20 @@ namespace App\Entity;
 
 use App\Enum\RoleEnum;
 use App\Repository\UserRepository;
+use DateTimeImmutable;
+use Deprecated;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Serializable;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Uid\Uuid;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 /**
@@ -30,10 +34,10 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL_SECRET', fields: ['secret'])]
 #[UniqueEntity(fields: ['emailCanonical'], message: 'There is already an account with this emailCanonical')]
 #[Vich\Uploadable]
-class User extends AbstractEntity implements UserInterface, PasswordAuthenticatedUserInterface, \Serializable
+class User extends AbstractEntity implements UserInterface, PasswordAuthenticatedUserInterface, Serializable
 {
     #[ORM\Column(length: 225)]
-    private ?string $secret = null;
+    private ?Uuid $secret = null;
 
     #[ORM\Column(length: 180)]
     #[Groups(['user:read'])]
@@ -62,7 +66,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
 
     #[ORM\Column(name: 'dob', type: Types::DATE_IMMUTABLE, nullable: true)]
     #[Groups(['user:read'])]
-    private ?\DateTimeImmutable $dob = null;
+    private ?DateTimeImmutable $dob = null;
 
     #[Groups(['user:read'])]
     public ?string $avatarUrl = null;
@@ -134,12 +138,12 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         $this->templates = new ArrayCollection();
     }
 
-    public function getSecret(): ?string
+    public function getSecret(): ?Uuid
     {
         return $this->secret;
     }
 
-    public function setSecret(?string $secret): User
+    public function setSecret(?Uuid $secret): User
     {
         $this->secret = $secret;
 
@@ -223,7 +227,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     /**
      * @see UserInterface
      */
-    #[\Deprecated]
+    #[Deprecated]
     public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here
@@ -284,12 +288,12 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         return $this;
     }
 
-    public function getDob(): ?\DateTimeImmutable
+    public function getDob(): ?DateTimeImmutable
     {
         return $this->dob;
     }
 
-    public function setDob(?\DateTimeImmutable $dob): User
+    public function setDob(?DateTimeImmutable $dob): User
     {
         $this->dob = $dob;
 
@@ -306,7 +310,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         $this->imageFile = $imageFile;
 
         if (null !== $imageFile) {
-            $this->updatedAt = new \DateTimeImmutable();
+            $this->updatedAt = new DateTimeImmutable();
         }
 
         return $this;
@@ -457,6 +461,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     }
 
     /**
+     * @param string|null $locale
      * @return User
      */
     public function setLocale(?string $locale): static
@@ -624,5 +629,15 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         }
 
         return $this;
+    }
+
+    /**
+     * Automatically sets the secret UUID before persisting the user.
+     */
+    #[ORM\PrePersist]
+    public function prePersist(): void
+    {
+        parent::prePersist();
+        $this->secret = Uuid::v4();
     }
 }

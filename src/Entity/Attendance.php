@@ -7,6 +7,7 @@ namespace App\Entity;
 
 use App\Enum\AttendanceStatusEnum;
 use App\Repository\AttendanceRepository;
+use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -22,125 +23,187 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\UniqueConstraint(name: 'UNIQ_ATTENDANCE_EMPLOYEE_DATE', fields: ['employee', 'attendanceDate'])]
 class Attendance extends AbstractEntity
 {
-    #[ORM\Column(length: 255)]
-    private ?string $identifier = null;
-
+    /**
+     * The date of the attendance.
+     *
+     * @var DateTimeImmutable|null
+     */
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
-    private ?\DateTimeImmutable $attendanceDate = null;
+    private ?DateTimeImmutable $attendanceDate = null;
 
+    /**
+     * A note for the attendance.
+     *
+     * @var string|null
+     */
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $note = null;
 
+    /**
+     * The time the employee clocked in.
+     *
+     * @var DateTimeImmutable|null
+     */
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $clockIn = null;
+    private ?DateTimeImmutable $clockIn = null;
 
+    /**
+     * The time the employee clocked out.
+     *
+     * @var DateTimeImmutable|null
+     */
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $clockOut = null;
+    private ?DateTimeImmutable $clockOut = null;
 
+    /**
+     * The status of the attendance.
+     *
+     * @var AttendanceStatusEnum
+     */
     #[ORM\Column(enumType: AttendanceStatusEnum::class)]
     private AttendanceStatusEnum $status = AttendanceStatusEnum::PRESENT;
 
+    /**
+     * The employee associated with this attendance.
+     *
+     * @var Employee|null
+     */
     #[ORM\ManyToOne(targetEntity: Employee::class, inversedBy: 'attendances')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Employee $employee = null;
 
+    /**
+     * The user who created or modified this attendance record.
+     *
+     * @var User|null
+     */
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?User $user = null;
 
-    public function getIdentifier(): ?string
-    {
-        return $this->identifier;
-    }
-
-    public function setIdentifier(string $identifier): static
-    {
-        $this->identifier = $identifier;
-
-        return $this;
-    }
-
-    public function getAttendanceDate(): ?\DateTimeImmutable
+    /**
+     * @return DateTimeImmutable|null
+     */
+    public function getAttendanceDate(): ?DateTimeImmutable
     {
         return $this->attendanceDate;
     }
 
-    public function setAttendanceDate(\DateTimeImmutable $attendanceDate): static
+    /**
+     * @param DateTimeImmutable|null $attendanceDate
+     * @return Attendance
+     */
+    public function setAttendanceDate(?DateTimeImmutable $attendanceDate): Attendance
     {
         $this->attendanceDate = $attendanceDate;
-
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getNote(): ?string
     {
         return $this->note;
     }
 
-    public function setNote(?string $note): static
+    /**
+     * @param string|null $note
+     * @return Attendance
+     */
+    public function setNote(?string $note): Attendance
     {
         $this->note = $note;
-
         return $this;
     }
 
-    public function getClockIn(): ?\DateTimeImmutable
+    /**
+     * @return DateTimeImmutable|null
+     */
+    public function getClockIn(): ?DateTimeImmutable
     {
         return $this->clockIn;
     }
 
-    public function setClockIn(?\DateTimeImmutable $clockIn): static
+    /**
+     * @param DateTimeImmutable|null $clockIn
+     * @return Attendance
+     */
+    public function setClockIn(?DateTimeImmutable $clockIn): Attendance
     {
         $this->clockIn = $clockIn;
-
         return $this;
     }
 
-    public function getClockOut(): ?\DateTimeImmutable
+    /**
+     * @return DateTimeImmutable|null
+     */
+    public function getClockOut(): ?DateTimeImmutable
     {
         return $this->clockOut;
     }
 
-    public function setClockOut(?\DateTimeImmutable $clockOut): static
+    /**
+     * @param DateTimeImmutable|null $clockOut
+     * @return Attendance
+     */
+    public function setClockOut(?DateTimeImmutable $clockOut): Attendance
     {
         $this->clockOut = $clockOut;
-
         return $this;
     }
 
-    public function getStatus(): ?AttendanceStatusEnum
+    /**
+     * @return AttendanceStatusEnum
+     */
+    public function getStatus(): AttendanceStatusEnum
     {
         return $this->status;
     }
 
-    public function setStatus(AttendanceStatusEnum $status): static
+    /**
+     * @param AttendanceStatusEnum $status
+     * @return Attendance
+     */
+    public function setStatus(AttendanceStatusEnum $status): Attendance
     {
         $this->status = $status;
-
         return $this;
     }
 
+    /**
+     * @return Employee|null
+     */
     public function getEmployee(): ?Employee
     {
         return $this->employee;
     }
 
-    public function setEmployee(?Employee $employee): static
+    /**
+     * @param Employee|null $employee
+     * @return Attendance
+     */
+    public function setEmployee(?Employee $employee): Attendance
     {
         $this->employee = $employee;
-
         return $this;
     }
 
+    /**
+     * @return User|null
+     */
     public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUser(?User $user): static
+    /**
+     * @param User|null $user
+     * @return Attendance
+     */
+    public function setUser(?User $user): Attendance
     {
         $this->user = $user;
-
         return $this;
     }
 }

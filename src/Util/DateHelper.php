@@ -50,7 +50,7 @@ class DateHelper
      */
     public static function startOfDay(DateTimeInterface $date): DateTimeImmutable
     {
-        return self::toImmutable($date)->setTime(0, 0, 0);
+        return self::toImmutable($date)->setTime(0, 0);
     }
 
     /**

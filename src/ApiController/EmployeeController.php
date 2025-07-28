@@ -19,6 +19,7 @@ use App\Repository\EmployeeRepository;
 use App\Util\DateHelper;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
+use Exception;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Random\RandomException;
@@ -44,18 +45,19 @@ class EmployeeController extends AbstractController
     use EvaluationTemplateTrait;
 
     public function __construct(
-        TranslatorInterface $translator,
-        private readonly EventDispatcherInterface $dispatcher,
-        private readonly EmployeeRepository $employeeRepository,
+        TranslatorInterface                           $translator,
+        private readonly EventDispatcherInterface     $dispatcher,
+        private readonly EmployeeRepository           $employeeRepository,
         private readonly EmployeeEvaluationRepository $employeeEvaluationRepository,
-    ) {
+    )
+    {
         parent::__construct($translator);
     }
 
     /**
      * Get employees by current user.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     #[OA\Response(
         response: Response::HTTP_OK,
@@ -67,9 +69,10 @@ class EmployeeController extends AbstractController
     )]
     #[Route(name: 'gets', methods: ['GET'])]
     public function gets(
-        Request $request,
+        Request             $request,
         #[CurrentUser] User $user,
-    ): JsonResponse {
+    ): JsonResponse
+    {
         $employees = $this->employeeRepository->findByUser($user);
         $now = new DateTimeImmutable();
         $from = new DateTimeImmutable($request->query->get('from', DateHelper::startOfMonth($now)->format('Y-m-d')));
@@ -82,7 +85,7 @@ class EmployeeController extends AbstractController
             $averageScores = $this->employeeEvaluationRepository->getAverageScoresForPeriod($employees, $from, $to);
             foreach ($averageScores as $averageScore) {
                 if (null !== $listEmployees[$averageScore['employeeId']]) {
-                    $listEmployees[$averageScore['employeeId']]->averageScore = (float) ($averageScore['averageScore'] ?? 0);
+                    $listEmployees[$averageScore['employeeId']]->averageScore = (float)($averageScore['averageScore'] ?? 0);
                 }
             }
         }
@@ -93,7 +96,9 @@ class EmployeeController extends AbstractController
     /**
      * Create a new employee for the current user.
      *
-     * @throws RandomException
+     * @param Request $request The request object containing the employee data.
+     *
+     * @return JsonResponse The JSON response containing the created employee data or an error message.
      */
     #[OA\RequestBody(
         description: 'Employee data',
@@ -122,16 +127,16 @@ class EmployeeController extends AbstractController
     )]
     #[Route(name: 'post', methods: ['POST'])]
     public function post(
-        Request $request,
-        #[CurrentUser] User $user,
-    ): JsonResponse {
+        Request             $request,
+    ): JsonResponse
+    {
         $this->dispatcher->dispatch(new CheckEmployeeLimitEvent($this->getUser()));
         $employee = $this->employeeRepository->create();
         $form = $this->createForm(EmployeeFormType::class, $employee);
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
-            $employee->setUser($user);
-            $this->employeeRepository->updateEmployee($employee);
+            $employee->setUser($this->getUser());
+            $this->employeeRepository->update($employee);
 
             return $this->createEmployeeResponse([
                 'employee' => $employee,
@@ -146,15 +151,15 @@ class EmployeeController extends AbstractController
     }
 
     /**
-     * Get employee details by identifier.
+     * Get employee details by publicId.
      *
-     * @param string $identifier The unique identifier of the employee
+     * @param string $publicId The unique publicId of the employee
      *
-     * @throws \Exception
+     * @throws Exception
      */
     #[OA\Parameter(
-        name: 'identifier',
-        description: 'The unique identifier of the employee',
+        name: 'publicId',
+        description: 'The unique publicId of the employee',
         in: 'path',
         required: true,
         schema: new OA\Schema(type: 'string', example: 'emp123')
@@ -175,7 +180,7 @@ class EmployeeController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_OK,
-        description: 'Returns employee details by identifier',
+        description: 'Returns employee details by publicId',
         content: new OA\JsonContent(ref: new Model(type: User::class, groups: ['employee:read', 'user:read', 'store:read', 'role:read']))
     )]
     #[OA\Response(
@@ -192,10 +197,10 @@ class EmployeeController extends AbstractController
             type: 'object'
         )
     )]
-    #[Route('/{identifier}', name: 'get', methods: ['GET'])]
-    public function get(string $identifier, Request $request): JsonResponse
+    #[Route('/{publicId}', name: 'get', methods: ['GET'])]
+    public function get(string $publicId, Request $request): JsonResponse
     {
-        $employee = $this->getEmployeeByIdentifier($identifier);
+        $employee = $this->getEmployeeByPublicId($publicId);
         $now = new DateTimeImmutable();
         $from = new DateTimeImmutable($request->query->get('from', DateHelper::startOfMonth($now)->format('Y-m-d')));
         $to = new DateTimeImmutable($request->query->get('to', DateHelper::endOfMonth($now)->format('Y-m-d')));
@@ -205,15 +210,15 @@ class EmployeeController extends AbstractController
     }
 
     /**
-     * Update employee details by identifier.
+     * Update employee details by publicId.
      *
-     * @param string $identifier The unique identifier of the employee
+     * @param string $publicId The unique publicId of the employee
      *
      * @throws RandomException
      */
     #[OA\Parameter(
-        name: 'identifier',
-        description: 'The unique identifier of the employee',
+        name: 'publicId',
+        description: 'The unique publicId of the employee',
         in: 'path',
         required: true,
         schema: new OA\Schema(type: 'string', example: 'emp123')
@@ -226,7 +231,7 @@ class EmployeeController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_OK,
-        description: 'Updates employee details by identifier',
+        description: 'Updates employee details by publicId',
         content: new OA\JsonContent(ref: new Model(type: User::class, groups: ['employee:read']))
     )]
     #[OA\Response(
@@ -257,10 +262,10 @@ class EmployeeController extends AbstractController
             type: 'object'
         )
     )]
-    #[Route('/{identifier}', name: 'put', methods: ['PUT'])]
-    public function put(Request $request, string $identifier): JsonResponse
+    #[Route('/{publicId}', name: 'put', methods: ['PUT'])]
+    public function put(Request $request, string $publicId): JsonResponse
     {
-        $employee = $this->getEmployeeByIdentifier($identifier);
+        $employee = $this->getEmployeeByPublicId($publicId);
         $form = $this->createForm(EmployeeFormType::class, $employee);
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
@@ -276,20 +281,20 @@ class EmployeeController extends AbstractController
     }
 
     /**
-     * Delete employee by identifier.
+     * Delete employee by publicId.
      *
-     * @param string $identifier The unique identifier of the employee
+     * @param string $publicId The unique publicId of the employee
      */
     #[OA\Parameter(
-        name: 'identifier',
-        description: 'The unique identifier of the employee',
+        name: 'publicId',
+        description: 'The unique publicId of the employee',
         in: 'path',
         required: true,
         schema: new OA\Schema(type: 'string', example: 'emp123')
     )]
     #[OA\Response(
         response: Response::HTTP_NO_CONTENT,
-        description: 'Deletes employee by identifier'
+        description: 'Deletes employee by publicId'
     )]
     #[OA\Response(
         response: Response::HTTP_NOT_FOUND,
@@ -305,10 +310,10 @@ class EmployeeController extends AbstractController
             type: 'object'
         )
     )]
-    #[Route('/{identifier}', name: 'delete', methods: ['DELETE'])]
-    public function delete(string $identifier): JsonResponse
+    #[Route('/{publicId}', name: 'delete', methods: ['DELETE'])]
+    public function delete(string $publicId): JsonResponse
     {
-        $employee = $this->getEmployeeByIdentifier($identifier);
+        $employee = $this->getEmployeeByPublicId($publicId);
         $this->employeeRepository->delete($employee);
 
         return new JsonResponse([
@@ -316,11 +321,11 @@ class EmployeeController extends AbstractController
         ], Response::HTTP_NO_CONTENT);
     }
 
-    #[Route('/{identifier}/templates/{templateIdentifier}', name: 'post_templates', methods: ['GET'])]
-    public function postTemplate(string $identifier, string $templateIdentifier): JsonResponse
+    #[Route('/{publicId}/templates/{templatePublicId}', name: 'post_templates', methods: ['GET'])]
+    public function postTemplate(string $publicId, string $templatePublicId): JsonResponse
     {
-        $employee = $this->getEmployeeByIdentifier($identifier);
-        $template = $this->getEvaluationTemplateByIdentifier($templateIdentifier);
+        $employee = $this->getEmployeeByPublicId($publicId);
+        $template = $this->getEvaluationTemplateByPublicId($templatePublicId);
 
         $employee->setTemplates(new ArrayCollection([$template]));
 
@@ -331,16 +336,16 @@ class EmployeeController extends AbstractController
     }
 
     /**
-     * Post an evaluation for the employee by identifier.
+     * Post an evaluation for the employee by publicId.
      *
-     * @param string  $identifier The unique identifier of the employee
-     * @param Request $request    The HTTP request containing the evaluation data
+     * @param string  $publicId The unique publicId of the employee
+     * @param Request $request  The HTTP request containing the evaluation data
      *
      * @throws RandomException
      */
     #[OA\Parameter(
-        name: 'identifier',
-        description: 'The unique identifier of the employee',
+        name: 'publicId',
+        description: 'The unique publicId of the employee',
         in: 'path',
         required: true,
         schema: new OA\Schema(type: 'string', example: 'emp123')
@@ -373,10 +378,10 @@ class EmployeeController extends AbstractController
             type: 'object'
         )
     )]
-    #[Route('/{identifier}/evaluations', name: 'post_evaluations', methods: ['POST'])]
-    public function postEvaluation(string $identifier, Request $request): JsonResponse
+    #[Route('/{publicId}/evaluations', name: 'post_evaluations', methods: ['POST'])]
+    public function postEvaluation(string $publicId, Request $request): JsonResponse
     {
-        $employee = $this->getEmployeeByIdentifier($identifier);
+        $employee = $this->getEmployeeByPublicId($publicId);
         if (null === $evaluation = $this->employeeEvaluationRepository->findByDateAndEmployee(new DateTimeImmutable(), $employee)) {
             $evaluation = $this->employeeEvaluationRepository->create();
         }
@@ -401,16 +406,16 @@ class EmployeeController extends AbstractController
     }
 
     /**
-     * Get employee evaluation by identifier and date.
+     * Get employee evaluation by publicId and date.
      *
-     * @param string  $identifier The unique identifier of the employee
-     * @param Request $request    The HTTP request containing the date parameter
+     * @param string  $publicId The unique publicId of the employee
+     * @param Request $request  The HTTP request containing the date parameter
      *
-     * @throws \Exception
+     * @throws Exception
      */
     #[OA\Parameter(
-        name: 'identifier',
-        description: 'The unique identifier of the employee',
+        name: 'publicId',
+        description: 'The unique publicId of the employee',
         in: 'path',
         required: true,
         schema: new OA\Schema(type: 'string', example: 'emp123')
@@ -427,10 +432,10 @@ class EmployeeController extends AbstractController
         description: 'Returns the employee evaluation for the specified date',
         content: new OA\JsonContent(ref: new Model(type: EmployeeEvaluation::class, groups: ['employee_evaluation:read', 'employee_criteria:read', 'employee:read', 'user:read', 'store:read', 'role:read', 'template:read']))
     )]
-    #[Route('/{identifier}/evaluation', name: 'get_evaluation', methods: ['GET'])]
-    public function getEmployeeEvaluation(string $identifier, Request $request): JsonResponse
+    #[Route('/{publicId}/evaluation', name: 'get_evaluation', methods: ['GET'])]
+    public function getEmployeeEvaluation(string $publicId, Request $request): JsonResponse
     {
-        $employee = $this->getEmployeeByIdentifier($identifier);
+        $employee = $this->getEmployeeByPublicId($publicId);
         $date = $request->query->get('date', (new DateTimeImmutable())->format('Y-m-d'));
         $evaluation = $this->employeeEvaluationRepository->findByDateAndEmployee(new DateTimeImmutable($date), $employee);
 
@@ -438,16 +443,16 @@ class EmployeeController extends AbstractController
     }
 
     /**
-     * Get all evaluations for the employee by identifier and period.
+     * Get all evaluations for the employee by publicId and period.
      *
-     * @param string  $identifier The unique identifier of the employee
-     * @param Request $request    The HTTP request
+     * @param string  $publicId The unique publicId of the employee
+     * @param Request $request  The HTTP request
      *
-     * @throws \Exception
+     * @throws Exception
      */
     #[OA\Parameter(
-        name: 'identifier',
-        description: 'The unique identifier of the employee',
+        name: 'publicId',
+        description: 'The unique publicId of the employee',
         in: 'path',
         required: true,
         schema: new OA\Schema(type: 'string', example: 'emp123')
@@ -474,10 +479,10 @@ class EmployeeController extends AbstractController
             items: new OA\Items(ref: new Model(type: EmployeeEvaluation::class, groups: ['employee_evaluation:read', 'employee_criteria:read', 'employee:read', 'user:read', 'store:read', 'role:read', 'template:read']))
         )
     )]
-    #[Route('/{identifier}/evaluations', name: 'get_evaluations', methods: ['GET'])]
-    public function getEmployeeEvaluations(string $identifier, Request $request): JsonResponse
+    #[Route('/{publicId}/evaluations', name: 'get_evaluations', methods: ['GET'])]
+    public function getEmployeeEvaluations(string $publicId, Request $request): JsonResponse
     {
-        $employee = $this->getEmployeeByIdentifier($identifier);
+        $employee = $this->getEmployeeByPublicId($publicId);
         $from = $request->query->get('from', (new DateTimeImmutable())->modify('-1 year')->format('Y-m-d'));
         $to = $request->query->get('to', (new DateTimeImmutable())->format('Y-m-d'));
 
@@ -487,11 +492,11 @@ class EmployeeController extends AbstractController
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     #[OA\Parameter(
-        name: 'identifier',
-        description: 'The unique identifier of the employee',
+        name: 'publicId',
+        description: 'The unique publicId of the employee',
         in: 'path',
         required: true,
         schema: new OA\Schema(type: 'string', example: 'emp123')
@@ -520,13 +525,13 @@ class EmployeeController extends AbstractController
             type: 'object'
         )
     )]
-    #[Route('/{identifier}/evaluations/evaluations/average-score', name: 'get_evaluation_by_id', methods: ['GET'])]
-    public function getAverageScore(string $identifier, Request $request): JsonResponse
+    #[Route('/{publicId}/evaluations/evaluations/average-score', name: 'get_evaluation_by_id', methods: ['GET'])]
+    public function getAverageScore(string $publicId, Request $request): JsonResponse
     {
         $now = new DateTimeImmutable();
         $from = new DateTimeImmutable($request->query->get('from', DateHelper::startOfMonth($now)->format('Y-m-d')));
         $to = new DateTimeImmutable($request->query->get('to', DateHelper::endOfMonth($now)->format('Y-m-d')));
-        $employee = $this->getEmployeeByIdentifier($identifier);
+        $employee = $this->getEmployeeByPublicId($publicId);
         $average = $this->employeeEvaluationRepository->getAverageScoreForPeriod($employee, $from, $to);
 
         return $this->json(['averageScore' => $average]);

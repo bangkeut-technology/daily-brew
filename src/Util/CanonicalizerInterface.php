@@ -21,17 +21,5 @@ interface CanonicalizerInterface
      *
      * @return string|null The canonicalized string or null if the input is null.
      */
-    public function canonicalize(?string $string): ?string;
-
-    /**
-     * Canonicalize the given string to a specific format.
-     *
-     * This method should convert the string to a canonical form, which may include
-     * lowercasing, removing special characters, and replacing spaces with underscores.
-     *
-     * @param string|null $string The string to canonicalize.
-     *
-     * @return string|null The canonicalized string or null if the input is null.
-     */
-    public function canonicalizeString(?string $string): ?string;
+    public static function canonicalize(?string $string): ?string;
 }

@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use App\Enum\EmployeeStatus;
 use App\Repository\EmployeeRepository;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -19,7 +20,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 #[ORM\Table(name: 'daily_brew_employees')]
 #[ORM\Entity(repositoryClass: EmployeeRepository::class)]
-#[ORM\UniqueConstraint(name: 'UNQ_EMPLOYEE_IDENTIFIER', columns: ['identifier'])]
 class Employee extends AbstractEntity
 {
     #[ORM\Column(length: 100)]
@@ -38,19 +38,15 @@ class Employee extends AbstractEntity
 
     #[ORM\Column(nullable: true)]
     #[Groups(['employee:read'])]
-    private ?\DateTimeImmutable $dob = null;
+    private ?DateTimeImmutable $dob = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['employee:read'])]
-    private ?\DateTimeImmutable $joinedAt = null;
+    private ?DateTimeImmutable $joinedAt = null;
 
     #[ORM\Column(type: 'string', enumType: EmployeeStatus::class)]
     #[Groups(['employee:read'])]
     private EmployeeStatus $status = EmployeeStatus::ACTIVE;
-
-    #[ORM\Column(length: 32)]
-    #[Groups(['employee:read'])]
-    private ?string $identifier = null;
 
     #[Groups(['employee:read'])]
     public float $averageScore = 0;
@@ -134,24 +130,24 @@ class Employee extends AbstractEntity
         return $this;
     }
 
-    public function getDob(): ?\DateTimeImmutable
+    public function getDob(): ?DateTimeImmutable
     {
         return $this->dob;
     }
 
-    public function setDob(?\DateTimeImmutable $dob): Employee
+    public function setDob(?DateTimeImmutable $dob): Employee
     {
         $this->dob = $dob;
 
         return $this;
     }
 
-    public function getJoinedAt(): ?\DateTimeImmutable
+    public function getJoinedAt(): ?DateTimeImmutable
     {
         return $this->joinedAt;
     }
 
-    public function setJoinedAt(?\DateTimeImmutable $joinedAt): Employee
+    public function setJoinedAt(?DateTimeImmutable $joinedAt): Employee
     {
         $this->joinedAt = $joinedAt;
 
@@ -166,18 +162,6 @@ class Employee extends AbstractEntity
     public function setStatus(EmployeeStatus $status): Employee
     {
         $this->status = $status;
-
-        return $this;
-    }
-
-    public function getIdentifier(): ?string
-    {
-        return $this->identifier;
-    }
-
-    public function setIdentifier(?string $identifier): Employee
-    {
-        $this->identifier = $identifier;
 
         return $this;
     }

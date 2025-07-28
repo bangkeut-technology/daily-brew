@@ -6,14 +6,12 @@ namespace App\Repository;
 
 use App\Entity\Employee;
 use App\Entity\EmployeeEvaluation;
-use App\Util\TokenGenerator;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\Persistence\ManagerRegistry;
-use Random\RandomException;
 
 /**
  * Class EmployeeEvaluationRepository.
@@ -50,41 +48,6 @@ class EmployeeEvaluationRepository extends AbstractRepository
             ]))
             ->getQuery()
             ->getOneOrNullResult();
-    }
-
-    /**
-     * Update an employee evaluation.
-     *
-     * @param EmployeeEvaluation $employeeEvaluation the employee evaluation to update
-     * @param bool               $andFlush           whether to flush the changes (default true)
-     *
-     * @throws RandomException throws an exception if the identifier already exists
-     */
-    public function updateEmployeeEvaluation(EmployeeEvaluation $employeeEvaluation, bool $andFlush = true): void
-    {
-        if (null === $employeeEvaluation->getIdentifier()) {
-            $string = TokenGenerator::getString(symbols: false);
-            do {
-                $identifier = TokenGenerator::generateFromString($string);
-            } while ($this->isIdentifierExists($identifier));
-
-            $employeeEvaluation->setIdentifier($identifier);
-        }
-
-        $this->update($employeeEvaluation, $andFlush);
-    }
-
-    /**
-     * Check if an identifier already exists.
-     */
-    public function isIdentifierExists(string $identifier): bool
-    {
-        return $this->createQueryBuilder('ee')
-                ->select('COUNT(ee.id)')
-                ->where('ee.identifier = :identifier')
-                ->setParameter('identifier', $identifier)
-                ->getQuery()
-                ->getSingleScalarResult() > 0;
     }
 
     /**
