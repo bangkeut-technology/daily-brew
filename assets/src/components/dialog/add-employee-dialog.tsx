@@ -12,34 +12,31 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { Form } from '@/components/ui/form';
-import { EvaluationCriteriaSelect } from '@/components/select/evaluation-criteria-select';
+import { EmployeeSelect } from '@/components/select/employee-select';
 import { Loader2Icon, Save } from 'lucide-react';
-import { evaluationTemplateCriteriasSchema } from '@/schema/evaluation-template-schema';
+import { evaluationTemplateEmployeesSchema } from '@/schema/evaluation-template-schema';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { EvaluationTemplate, EvaluationTemplateCriterias } from '@/types/evaluation-template';
+import { EvaluationTemplate, EvaluationTemplateEmployees } from '@/types/evaluation-template';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
-import { postTemplateCriterias } from '@/services/evaluation-template';
+import { postTemplateEmployees } from '@/services/evaluation-template';
 
-interface AddEvaluationCriteriaDialogProps {
+interface AddEmployeeDialogProps {
     template: EvaluationTemplate;
     onSuccess?: () => void;
 }
 
-export const AddEvaluationCriteriaDialog: React.FunctionComponent<AddEvaluationCriteriaDialogProps> = ({
-    template,
-    onSuccess,
-}) => {
+export const AddEmployeeDialog: React.FunctionComponent<AddEmployeeDialogProps> = ({ template, onSuccess }) => {
     const { t } = useTranslation();
-    const form = useForm<EvaluationTemplateCriterias>({
-        resolver: yupResolver(evaluationTemplateCriteriasSchema),
+    const form = useForm<EvaluationTemplateEmployees>({
+        resolver: yupResolver(evaluationTemplateEmployeesSchema),
         defaultValues: {
-            criterias: [],
+            employees: [],
         },
     });
     const { mutate, isPending } = useMutation({
-        mutationFn: postTemplateCriterias,
+        mutationFn: postTemplateEmployees,
         onSuccess: (data) => {
             toast.success(data.message);
             form.reset();
@@ -54,10 +51,10 @@ export const AddEvaluationCriteriaDialog: React.FunctionComponent<AddEvaluationC
     });
 
     const onSubmit = React.useCallback(
-        (data: EvaluationTemplateCriterias) => {
+        (data: EvaluationTemplateEmployees) => {
             mutate({
                 identifier: template.identifier,
-                criterias: data.criterias?.map((criteria) => criteria.value) || [],
+                employees: data.employees?.map((employee) => employee.value) || [],
             });
         },
         [mutate, template.identifier],
@@ -68,7 +65,7 @@ export const AddEvaluationCriteriaDialog: React.FunctionComponent<AddEvaluationC
             <Form {...form}>
                 <DialogTrigger asChild>
                     <Button size="sm" variant="outline" className="ml-2 mt-2 md:mt-0">
-                        {t('evaluation_templates.criteria.add.title', { ns: 'glossary' })}
+                        {t('evaluation_templates.employees.add.title', { ns: 'glossary' })}
                     </Button>
                 </DialogTrigger>
                 <DialogContent>
@@ -76,11 +73,11 @@ export const AddEvaluationCriteriaDialog: React.FunctionComponent<AddEvaluationC
                     <DialogDescription>
                         {t('evaluation_templates.edit.description', { ns: 'glossary' })}
                     </DialogDescription>
-                    <EvaluationCriteriaSelect
+                    <EmployeeSelect
                         control={form.control}
-                        name="criterias"
-                        title={t('evaluation_criterias.table.title', { ns: 'glossary' })}
-                        description={t('evaluation_criterias.table.description', { ns: 'glossary' })}
+                        name="employees"
+                        title={t('employees.table.title', { ns: 'glossary' })}
+                        description={t('employees.table.description', { ns: 'glossary' })}
                     />
                     <DialogFooter>
                         <DialogClose asChild>
