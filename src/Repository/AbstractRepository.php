@@ -90,7 +90,7 @@ abstract class AbstractRepository extends ServiceEntityRepository
     }
 
     /**
-     * Flushes all changes to the object that have been queued up to now to the database.
+     * Flushes all changes to the object that have been queued up now to the database.
      * This effectively synchronizes the in-memory state of managed objects with the
      * database.
      */
