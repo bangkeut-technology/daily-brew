@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\EvaluationTemplateRepository;
+use App\Util\Canonicalizer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -225,5 +226,17 @@ class EvaluationTemplate extends AbstractEntity
     public function __toString(): string
     {
         return $this->getName() ?? '';
+    }
+
+    /**
+     * Canonicalizes the name of the evaluation template.
+     * This method should be called before persisting the entity to ensure
+     * that the canonical name is set correctly.
+     */
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function canonicalize(): void
+    {
+        $this->canonicalName = Canonicalizer::canonicalize($this->name);
     }
 }

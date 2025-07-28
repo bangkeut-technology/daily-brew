@@ -635,9 +635,8 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
      * Automatically sets the secret UUID before persisting the user.
      */
     #[ORM\PrePersist]
-    public function prePersist(): void
+    public function generateSecret(): void
     {
-        parent::prePersist();
         $this->secret = Uuid::v4();
     }
 }
