@@ -10,17 +10,22 @@ import { useTranslation } from 'react-i18next';
 interface RemoveEmployeeButtonProps {
     identifier: string;
     employeeIdentifier: string;
+    onRemove?: () => void;
 }
 
 export const RemoveEmployeeButton: React.FunctionComponent<RemoveEmployeeButtonProps> = ({
     identifier,
     employeeIdentifier,
+    onRemove,
 }) => {
     const { t } = useTranslation();
     const { mutate, isPending } = useMutation({
         mutationFn: deleteTemplateEmployees,
         onSuccess: (data) => {
             toast.success(data.message);
+            if (onRemove) {
+                onRemove();
+            }
         },
         onError: (error) => {
             const message = isAxiosError(error) ? error.response?.data.message : t('occurred', { ns: 'error' });

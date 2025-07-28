@@ -4,15 +4,23 @@ import { createColumnHelper } from '@tanstack/table-core';
 import { DataTable } from '@/components/data-table';
 import { Employee } from '@/types/employee';
 import { RowSelectionState } from '@tanstack/react-table';
+import { RemoveEmployeeButton } from '@/components/button/remove-employee-button';
 
 const columnHelper = createColumnHelper<Employee>();
 
 interface EmployeeDataTableProps {
+    identifier: string;
     employees: Employee[];
     loading: boolean;
+    onRemoveEmployee: () => void;
 }
 
-export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> = ({ employees, loading }) => {
+export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> = ({
+    employees,
+    loading,
+    identifier,
+    onRemoveEmployee,
+}) => {
     const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
     const { t } = useTranslation('glossary');
 
@@ -40,8 +48,23 @@ export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> 
                     },
                 },
             }),
+            columnHelper.accessor('identifier', {
+                header: t('employees.table.actions'),
+                cell: (info) => (
+                    <RemoveEmployeeButton
+                        identifier={identifier}
+                        employeeIdentifier={info.getValue()}
+                        onRemove={onRemoveEmployee}
+                    />
+                ),
+                meta: {
+                    style: {
+                        textAlign: 'center',
+                    },
+                },
+            }),
         ],
-        [t],
+        [identifier, onRemoveEmployee, t],
     );
 
     return (

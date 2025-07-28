@@ -11,12 +11,13 @@ const columnHelper = createColumnHelper<EvaluationTemplateCriteria>();
 interface EvaluationTemplateCriteriaDataTableProps {
     criterias: EvaluationTemplateCriteria[];
     loading: boolean;
-    onRemoveCriteria: (identifier: string) => void;
+    onRemoveCriteria: () => void;
 }
 
 export const EvaluationTemplateCriteriaDataTable: React.FunctionComponent<EvaluationTemplateCriteriaDataTableProps> = ({
     criterias,
     loading,
+    onRemoveCriteria,
 }) => {
     const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
     const { t } = useTranslation('glossary');
@@ -43,7 +44,9 @@ export const EvaluationTemplateCriteriaDataTable: React.FunctionComponent<Evalua
             }),
             columnHelper.accessor('identifier', {
                 header: t('evaluation_criterias.table.actions'),
-                cell: (info) => <RemoveTemplateCriteriaButton identifier={info.getValue()} />,
+                cell: (info) => (
+                    <RemoveTemplateCriteriaButton identifier={info.getValue()} onRemove={onRemoveCriteria} />
+                ),
                 meta: {
                     style: {
                         textAlign: 'center',
@@ -51,7 +54,7 @@ export const EvaluationTemplateCriteriaDataTable: React.FunctionComponent<Evalua
                 },
             }),
         ],
-        [t],
+        [onRemoveCriteria, t],
     );
 
     return (

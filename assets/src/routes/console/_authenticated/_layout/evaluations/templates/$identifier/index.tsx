@@ -46,11 +46,14 @@ function EvaluationTemplateDetails() {
 
     const onEditSuccess = React.useCallback(() => {
         queryClient.invalidateQueries({ queryKey: ['evaluation-template', identifier] }).then();
-        queryClient.invalidateQueries({ queryKey: ['evaluation-template-employees', identifier] }).then();
     }, [identifier, queryClient]);
 
     const onRefreshCriterias = React.useCallback(() => {
         queryClient.invalidateQueries({ queryKey: ['evaluation-template-criterias', identifier] }).then();
+    }, [identifier, queryClient]);
+
+    const onRefreshEmployees = React.useCallback(() => {
+        queryClient.invalidateQueries({ queryKey: ['evaluation-template-employees', identifier] }).then();
     }, [identifier, queryClient]);
 
     if (isPending) {
@@ -121,7 +124,12 @@ function EvaluationTemplateDetails() {
                     </Button>
                 </CardHeader>
                 <CardContent>
-                    <EmployeeDataTable employees={employees} loading={isEmployeesPending} />
+                    <EmployeeDataTable
+                        identifier={identifier}
+                        employees={employees}
+                        loading={isEmployeesPending}
+                        onRemoveEmployee={onRefreshEmployees}
+                    />
                 </CardContent>
             </Card>
         </div>

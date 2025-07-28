@@ -9,16 +9,21 @@ import { useTranslation } from 'react-i18next';
 
 interface RemoveTemplateCriteriaButtonProps {
     identifier: string;
+    onRemove?: () => void;
 }
 
 export const RemoveTemplateCriteriaButton: React.FunctionComponent<RemoveTemplateCriteriaButtonProps> = ({
     identifier,
+    onRemove,
 }) => {
     const { t } = useTranslation();
     const { mutate, isPending } = useMutation({
         mutationFn: deleteTemplateCriteria,
         onSuccess: (data) => {
             toast.success(data.message);
+            if (onRemove) {
+                onRemove();
+            }
         },
         onError: (error) => {
             const message = isAxiosError(error) ? error.response?.data.message : t('occurred', { ns: 'error' });
