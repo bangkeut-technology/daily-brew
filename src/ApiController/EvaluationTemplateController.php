@@ -14,6 +14,7 @@ use App\Entity\EvaluationTemplateCriteria;
 use App\Entity\User;
 use App\Event\EvaluationTemplate\EvaluationTemplateCreatedEvent;
 use App\Form\EvaluationTemplateFormType;
+use App\Repository\EmployeeRepository;
 use App\Repository\EvaluationCriteriaRepository;
 use App\Repository\EvaluationTemplateCriteriaRepository;
 use App\Repository\EvaluationTemplateRepository;
@@ -46,7 +47,7 @@ class EvaluationTemplateController extends AbstractController
         private readonly EvaluationTemplateRepository         $evaluationTemplateRepository,
         private readonly EvaluationTemplateCriteriaRepository $evaluationTemplateCriteriaRepository,
         private readonly EventDispatcherInterface             $dispatcher,
-        private readonly EvaluationCriteriaRepository         $evaluationCriteriaRepository,
+        private readonly EvaluationCriteriaRepository         $evaluationCriteriaRepository, private readonly EmployeeRepository $employeeRepository,
     )
     {
         parent::__construct($translator);
@@ -388,6 +389,121 @@ class EvaluationTemplateController extends AbstractController
         $template = $this->getEvaluationTemplateByIdentifier($identifier);
 
         return $this->createEmployeeResponse($template->getEmployees());
+    }
 
+    /**
+     * Adds employees to the evaluation template.
+     *
+     * @param Request $request    the HTTP request containing the employees to add
+     * @param string  $identifier the identifier of the evaluation template to add employees to
+     *
+     * @return JsonResponse the JSON response indicating the addition status
+     * @throws RandomException
+     */
+    #[OA\Parameter(
+        name: 'identifier',
+        description: 'The identifier of the evaluation template to add employees to.',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Adds employees to the evaluation template.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'message', description: 'Confirmation message after adding employees', type: 'string'),
+            ]
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_NOT_FOUND,
+        description: 'Evaluation template not found.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'message', description: 'Error message', type: 'string'),
+            ]
+        )
+    )]
+    #[OA\RequestBody(
+        description: 'The employees to add to the evaluation template.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'employees', type: 'array', items: new OA\Items(type: 'integer')),
+            ]
+        )
+    )]
+    #[Route('/{identifier}/employees', name: 'post_employees', methods: ['POST'])]
+    public function postEmployees(
+        Request $request,
+        string  $identifier,
+    ): JsonResponse
+    {
+        $template = $this->getEvaluationTemplateByIdentifier($identifier);
+        $employees = $request->request->all('employees');
+
+        if (count($employees) > 0) {
+            foreach ($this->employeeRepository->findByIdentifiersAndUser($employees, $this->getUser()) as $employee) {
+                $template->addEmployee($employee);
+            }
+            $this->evaluationTemplateRepository->updateEvaluationTemplate($template);
+        }
+
+        return $this->createEmployeeResponse([
+            'message' => $this->translator->trans('added.evaluation_template_employees', ['%template%' => $template]),
+        ]);
+    }
+
+    /**
+     * Deletes an employee from the evaluation template.
+     *
+     * @param string $identifier the identifier of the evaluation template
+     *
+     * @return JsonResponse the JSON response indicating the deletion status
+     * @throws RandomException
+     */
+    #[OA\Parameter(
+        name: 'identifier',
+        description: 'The identifier of the evaluation template to delete an employee from.',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Parameter(
+        name: 'employeeIdentifier',
+        description: 'The identifier of the employee to delete from the evaluation template.',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Deletes an employee from the evaluation template.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'message', description: 'Confirmation message after deletion', type: 'string'),
+            ]
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_NOT_FOUND,
+        description: 'Evaluation template or employee not found.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'message', description: 'Error message', type: 'string'),
+            ]
+        )
+    )]
+    #[Route('/{identifier}/employees/{employeeIdentifier}', name: 'delete_employee', methods: ['DELETE'])]
+    public function deleteEmployee(string $identifier, string $employeeIdentifier): JsonResponse
+    {
+        $template = $this->getEvaluationTemplateByIdentifier($identifier);
+        if (null === $employee = $this->employeeRepository->findByIdentifierAndUser($employeeIdentifier, $this->getUser())) {
+            $template->removeEmployee($employee);
+        }
+        $this->evaluationTemplateRepository->updateEvaluationTemplate($template);
+        return $this->createEmployeeResponse([
+            'message' => $this->translator->trans('deleted.evaluation_template_employee', ['%template%' => $template]),
+        ]);
     }
 }

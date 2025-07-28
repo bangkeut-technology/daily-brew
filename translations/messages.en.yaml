@@ -11,9 +11,11 @@ deleted:
     evaluation_criteria:          'Evaluation criteria %label% has been deleted successfully'
     employee:                     'Employee %name% has been deleted successfully'
     evaluation_template_criteria: 'Evaluation criteria %criteria% has been deleted successfully from template %template%'
+    evaluation_template_employee: 'Employees have been removed successfully from evaluation template %template%'
 added:
     evaluation_template:          'Evaluation template %template% has been added successfully'
-    evaluation_template_criteria: 'Evaluation criteria %criteria% has been added successfully to template %template%'
+    evaluation_template_criteria:  'Evaluation criteria %criteria% has been added successfully to template %template%'
+    evaluation_template_employees: 'Employees have been added successfully to evaluation template %template%'
 created:
     employee:            'Employee %name% has been created successfully'
     role:                'Role %name% has been created successfully'

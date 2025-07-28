@@ -109,6 +109,24 @@ class EmployeeRepository extends AbstractRepository
     }
 
     /**
+     * Find employee by identifiers and user.
+     *
+     * @param array $identifiers the list of employee identifiers
+     * @param User  $user        the user entity
+     * @return Employee[] returns the list of employee entities
+     */
+    public function findByIdentifiersAndUser(array $identifiers, User $user): array
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.identifier IN (:identifiers)')
+            ->andWhere('e.user = :user')
+            ->setParameter('identifiers', $identifiers)
+            ->setParameter('store', $user)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * Create a new employee entity.
      *
      * @param User  $user  the user entity
