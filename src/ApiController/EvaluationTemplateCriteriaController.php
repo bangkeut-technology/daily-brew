@@ -4,28 +4,12 @@ declare(strict_types=1);
 
 namespace App\ApiController;
 
-use App\ApiController\Trait\EmployeeTrait;
 use App\ApiController\Trait\EvaluationTemplateCriteriaTrait;
-use App\ApiController\Trait\EvaluationTemplateTrait;
 use App\Controller\AbstractController;
-use App\Entity\Employee;
-use App\Entity\EvaluationTemplate;
-use App\Entity\EvaluationTemplateCriteria;
-use App\Entity\User;
-use App\Event\EvaluationTemplate\EvaluationTemplateCreatedEvent;
-use App\Form\EvaluationTemplateFormType;
-use App\Repository\EvaluationCriteriaRepository;
 use App\Repository\EvaluationTemplateCriteriaRepository;
-use App\Repository\EvaluationTemplateRepository;
-use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
-use Random\RandomException;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**

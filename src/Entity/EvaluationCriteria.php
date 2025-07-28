@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\EvaluationCriteriaRepository;
+use App\Util\Canonicalizer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -65,51 +66,75 @@ class EvaluationCriteria extends AbstractEntity
         $this->templates = new ArrayCollection();
     }
 
+    /**
+     * @return string|null
+     */
     public function getLabel(): ?string
     {
         return $this->label;
     }
 
+    /**
+     * @param string|null $label
+     * @return EvaluationCriteria
+     */
     public function setLabel(?string $label): EvaluationCriteria
     {
         $this->label = $label;
-
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getCanonicalLabel(): ?string
     {
         return $this->canonicalLabel;
     }
 
+    /**
+     * @param string|null $canonicalLabel
+     * @return EvaluationCriteria
+     */
     public function setCanonicalLabel(?string $canonicalLabel): EvaluationCriteria
     {
         $this->canonicalLabel = $canonicalLabel;
-
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getDescription(): ?string
     {
         return $this->description;
     }
 
+    /**
+     * @param string|null $description
+     * @return EvaluationCriteria
+     */
     public function setDescription(?string $description): EvaluationCriteria
     {
         $this->description = $description;
-
         return $this;
     }
 
+    /**
+     * @return int
+     */
     public function getWeight(): int
     {
         return $this->weight;
     }
 
+    /**
+     * @param int $weight
+     * @return EvaluationCriteria
+     */
     public function setWeight(int $weight): EvaluationCriteria
     {
         $this->weight = $weight;
-
         return $this;
     }
 
@@ -150,20 +175,44 @@ class EvaluationCriteria extends AbstractEntity
         return $this;
     }
 
+    /**
+     * @return User|null
+     */
     public function getUser(): ?User
     {
         return $this->user;
     }
 
+    /**
+     * @param User|null $user
+     * @return EvaluationCriteria
+     */
     public function setUser(?User $user): EvaluationCriteria
     {
         $this->user = $user;
-
         return $this;
     }
 
+    /**
+     * Returns a string representation of the EvaluationCriteria.
+     *
+     * @return string
+     */
     public function __toString(): string
     {
         return $this->getLabel() ?? 'Evaluation Criteria';
+    }
+
+    /**
+     * Canonicalizes the label of the criteria.
+     * This method should be implemented to convert the label into a canonical form.
+     *
+     * @return void
+     */
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function canonicalize(): void
+    {
+        $this->canonicalLabel = Canonicalizer::canonicalize($this->label);
     }
 }

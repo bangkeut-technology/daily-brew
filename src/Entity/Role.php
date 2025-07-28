@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\RoleRepository;
+use App\Util\Canonicalizer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -116,6 +117,17 @@ class Role extends AbstractEntity
         }
 
         return $this;
+    }
+
+    /**
+     * Canonicalize the role name.
+     * This method can be used to ensure that the canonical name is set based on the role name.
+     */
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function canonicalize(): void
+    {
+        $this->canonicalName = Canonicalizer::canonicalize($this->name);
     }
 
     public function __toString(): string

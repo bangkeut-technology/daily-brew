@@ -269,7 +269,7 @@ class EmployeeController extends AbstractController
         $form = $this->createForm(EmployeeFormType::class, $employee);
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->employeeRepository->updateEmployee($employee);
+            $this->employeeRepository->update($employee);
 
             return $this->createEmployeeResponse($employee);
         }
@@ -394,7 +394,7 @@ class EmployeeController extends AbstractController
 
             $this->dispatcher->dispatch(new FinalizeEmployeeEvaluationEvent($evaluation));
 
-            $this->employeeEvaluationRepository->updateEmployeeEvaluation($evaluation);
+            $this->employeeEvaluationRepository->update($evaluation);
 
             return $this->createEmployeeEvaluationResponse([
                 'message' => $this->translator->trans('created.employee_evaluation'),

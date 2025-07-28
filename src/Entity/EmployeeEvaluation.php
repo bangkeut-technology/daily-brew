@@ -65,87 +65,129 @@ class EmployeeEvaluation extends AbstractEntity
         $this->scores = new ArrayCollection();
     }
 
+    /**
+     * @return Employee|null
+     */
     public function getEmployee(): ?Employee
     {
         return $this->employee;
     }
 
+    /**
+     * @param Employee|null $employee
+     * @return EmployeeEvaluation
+     */
     public function setEmployee(?Employee $employee): EmployeeEvaluation
     {
         $this->employee = $employee;
-
         return $this;
     }
 
+    /**
+     * @return User|null
+     */
     public function getEvaluator(): ?User
     {
         return $this->evaluator;
     }
 
+    /**
+     * @param User|null $evaluator
+     * @return EmployeeEvaluation
+     */
     public function setEvaluator(?User $evaluator): EmployeeEvaluation
     {
         $this->evaluator = $evaluator;
-
         return $this;
     }
 
+    /**
+     * @return EvaluationTemplate|null
+     */
     public function getTemplate(): ?EvaluationTemplate
     {
         return $this->template;
     }
 
+    /**
+     * @param EvaluationTemplate|null $template
+     * @return EmployeeEvaluation
+     */
     public function setTemplate(?EvaluationTemplate $template): EmployeeEvaluation
     {
         $this->template = $template;
-
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getTemplateName(): ?string
     {
         return $this->templateName;
     }
 
+    /**
+     * @param string|null $templateName
+     * @return EmployeeEvaluation
+     */
     public function setTemplateName(?string $templateName): EmployeeEvaluation
     {
         $this->templateName = $templateName;
-
         return $this;
     }
 
+    /**
+     * @return DateTimeImmutable
+     */
     public function getEvaluatedAt(): DateTimeImmutable
     {
         return $this->evaluatedAt;
     }
 
+    /**
+     * @param DateTimeImmutable $evaluatedAt
+     * @return EmployeeEvaluation
+     */
     public function setEvaluatedAt(DateTimeImmutable $evaluatedAt): EmployeeEvaluation
     {
         $this->evaluatedAt = $evaluatedAt;
-
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getNote(): ?string
     {
         return $this->note;
     }
 
+    /**
+     * @param string|null $note
+     * @return EmployeeEvaluation
+     */
     public function setNote(?string $note): EmployeeEvaluation
     {
         $this->note = $note;
-
         return $this;
     }
 
+    /**
+     * @return float|null
+     */
     public function getAverageScore(): ?float
     {
         return $this->averageScore;
     }
 
+    /**
+     * @param float|null $averageScore
+     * @return EmployeeEvaluation
+     */
     public function setAverageScore(?float $averageScore): EmployeeEvaluation
     {
         $this->averageScore = $averageScore;
-
         return $this;
     }
 

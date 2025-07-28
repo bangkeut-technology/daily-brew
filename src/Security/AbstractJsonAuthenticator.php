@@ -6,6 +6,7 @@ namespace App\Security;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use JsonException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,7 +52,7 @@ abstract class AbstractJsonAuthenticator extends AbstractAuthenticator
     }
 
     /**
-     * @throws \JsonException
+     * @throws JsonException
      */
     private function getCredentials(Request $request)
     {
@@ -59,7 +60,7 @@ abstract class AbstractJsonAuthenticator extends AbstractAuthenticator
     }
 
     /**
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function authenticate(Request $request): Passport
     {

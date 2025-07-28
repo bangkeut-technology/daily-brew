@@ -1,10 +1,11 @@
 <?php
+declare(strict_types=1);
+
 
 namespace App\Form;
 
 use App\Entity\Attendance;
 use App\Entity\Employee;
-use App\Entity\User;
 use App\Form\Type\DateTimeImmutableType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;

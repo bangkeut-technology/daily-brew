@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Form\DataTransformer;
 
+use DateTimeImmutable;
+use Exception;
 use Symfony\Component\Form\DataTransformerInterface;
 
 /**
@@ -29,10 +31,10 @@ class DateTimeImmutableTransformer implements DataTransformerInterface
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
-    public function reverseTransform($value): ?\DateTimeImmutable
+    public function reverseTransform($value): ?DateTimeImmutable
     {
-        return null === $value ? $value : new \DateTimeImmutable($value);
+        return null === $value ? $value : new DateTimeImmutable($value);
     }
 }
