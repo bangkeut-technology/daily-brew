@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\ApiController;
 
 use App\ApiController\Trait\EvaluationCriteriaTrait;
+use App\ApiController\Trait\EvaluationTemplateCriteriaTrait;
 use App\Controller\AbstractController;
 use App\Entity\EvaluationCriteria;
+use App\Entity\EvaluationTemplateCriteria;
 use App\Entity\User;
 use App\Event\EvaluationCriteria\EvaluationCriteriaCreatedEvent;
 use App\Form\EvaluationCriteriaFormType;
@@ -32,6 +34,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class EvaluationCriteriaController extends AbstractController
 {
     use EvaluationCriteriaTrait;
+    use EvaluationTemplateCriteriaTrait;
 
     public function __construct(
         TranslatorInterface                           $translator,
@@ -233,5 +236,44 @@ class EvaluationCriteriaController extends AbstractController
         }
 
         return $this->createCriteriaResponse($criteria);
+    }
+
+    /**
+     * Retrieves the templates associated with the evaluation criteria.
+     *
+     * @param string $identifier the identifier of the evaluation criteria
+     *
+     * @return JsonResponse the list of template associated with the evaluation criteria
+     */
+    #[OA\Parameter(
+        name: 'identifier',
+        description: 'The identifier of the evaluation criteria to retrieve template for.',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns the templates associated with the evaluation criteria.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: EvaluationTemplateCriteria::class, groups: ['template:read']))
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_NOT_FOUND,
+        description: 'Evaluation criteria not found.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'message', description: 'Error message', type: 'string'),
+            ]
+        )
+    )]
+    #[Route('/{identifier}/templates', name: 'get_templates', methods: ['GET'])]
+    public function getTemplates(string $identifier): JsonResponse
+    {
+        $criteria = $this->getEvaluationCriteriaByIdentifier($identifier);
+
+        return $this->createTemplateCriteriaResponse($criteria->getTemplates());
     }
 }

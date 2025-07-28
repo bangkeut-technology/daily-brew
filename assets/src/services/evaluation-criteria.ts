@@ -1,5 +1,6 @@
 import { apiAxios } from '@/lib/apiAxios';
 import { EvaluationCriteria, PartialEvaluationCriteria } from '@/types/evaluation-criteria';
+import { EvaluationTemplateCriteria } from '@/types/evaluation-template-criterias';
 
 export const fetchEvaluationCriterias = async (): Promise<EvaluationCriteria[]> => {
     return apiAxios.get('/evaluation-criterias').then((response) => response.data);
@@ -21,7 +22,7 @@ export const putEvaluationCriteria = async ({
 }: {
     identifier: string;
     data: PartialEvaluationCriteria;
-}): Promise<{ message: string }> => {
+}): Promise<{ message: string; criteria: EvaluationCriteria }> => {
     return apiAxios.put(`/evaluation-criterias/${identifier}`, data).then((response) => response.data);
 };
 
@@ -31,4 +32,22 @@ export const deleteEvaluationCriteria = async (identifier: string): Promise<{ me
 
 export const getEvaluationCriteria = async (identifier: string): Promise<EvaluationCriteria> => {
     return apiAxios.get(`/evaluation-criterias/${identifier}`).then((response) => response.data);
+};
+
+export const fetchTemplateCriterias = async (identifier: string) => {
+    return await apiAxios
+        .get<EvaluationTemplateCriteria[]>(`/evaluation-criterias/${identifier}/templates`)
+        .then((response) => response.data);
+};
+
+export const postCriteriaTemplates = async ({
+    identifier,
+    templates = [],
+}: {
+    identifier: string;
+    templates: number[];
+}) => {
+    return await apiAxios
+        .post<{ message: string }>(`/evaluation-criterias/${identifier}/templates`, { templates })
+        .then((response) => response.data);
 };

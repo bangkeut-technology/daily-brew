@@ -55,6 +55,16 @@
     },
     "evaluation_criterias": {
         "not_found": "Evaluation criteria not found",
+        "information": "Evaluation Criteria Information",
+        "loading": "Loading evaluation criteria...",
+        "template": {
+            "title": "Evaluation Template Criteria",
+            "add": {
+                "title": "Add Template",
+                "description": "Add template to the evaluation criteria to assess employee performance.",
+                "save": "Save Template"
+            }
+        },
         "table": {
             "label": "Label",
             "weight": "Weight",
@@ -80,6 +90,10 @@
             "title": "New Criteria",
             "description": "Create a new evaluation criteria to assess employee performance.",
             "save": "Save Criteria"
+        },
+        "edit": {
+            "title": "Edit Criteria",
+            "description": "Edit the selected evaluation criteria to update its details or template."
         }
     },
     "evaluation_templates": {
@@ -107,6 +121,12 @@
         "select": {
             "description": "Select an evaluation template to use for employee performance reviews.",
             "placeholder": "Select an evaluation template"
+        },
+        "table": {
+            "name": "Name",
+            "description": "Description",
+            "created_at": "Created At",
+            "actions": "Actions"
         },
         "new": {
             "title": "New Template",

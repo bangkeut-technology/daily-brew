@@ -1,5 +1,5 @@
 import { array, number, object, ObjectSchema, string } from 'yup';
-import { PartialEvaluationCriteria } from '@/types/evaluation-criteria';
+import { EvaluationTemplateCriterias, PartialEvaluationCriteria } from '@/types/evaluation-criteria';
 import { WEIGHT_MAXIMUM, WEIGHT_MINIMUM } from '@/constants/value';
 import i18next from '@/i18next';
 
@@ -28,5 +28,13 @@ export const evaluationCriteriaSchema: ObjectSchema<PartialEvaluationCriteria> =
         object({
             value: number().required(i18next.t('validation:required.evaluation_templates.id')),
         }),
+    ),
+});
+
+export const evaluationTemplateCriteriasSchema: ObjectSchema<EvaluationTemplateCriterias> = object({
+    templates: array().of(
+        object({
+            value: number().required(i18next.t('validation:required.evaluation_templates.id')),
+        }).required(),
     ),
 });
