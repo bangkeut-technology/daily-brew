@@ -35,15 +35,15 @@ export const EvaluationSwitch: React.FC<EvaluationSwitchProps> = ({
     });
 
     const handleChange = React.useCallback(() => {
-        mutate(evaluation.identifier);
-    }, [mutate, evaluation.identifier]);
+        mutate(evaluation.publicId);
+    }, [mutate, evaluation.publicId]);
 
     return withLabel ? (
         <div className="flex items-center space-x-2">
-            <Label htmlFor={evaluation.identifier}>{t('enabled')}</Label>
-            <Switch id={evaluation.identifier} checked={evaluation.active} onCheckedChange={handleChange} />
+            <Label htmlFor={evaluation.publicId}>{t('enabled')}</Label>
+            <Switch id={evaluation.publicId} checked={evaluation.active} onCheckedChange={handleChange} />
         </div>
     ) : (
-        <Switch id={evaluation.identifier} checked={evaluation.active} onCheckedChange={handleChange} />
+        <Switch id={evaluation.publicId} checked={evaluation.active} onCheckedChange={handleChange} />
     );
 };

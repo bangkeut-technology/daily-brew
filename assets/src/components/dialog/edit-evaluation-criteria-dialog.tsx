@@ -60,9 +60,9 @@ export const EditEvaluationCriteriaDialog: React.FunctionComponent<EditEvaluatio
 
     const onSubmit = React.useCallback(
         (data: PartialEvaluationCriteria) => {
-            mutate({ identifier: criteria.identifier, data });
+            mutate({ publicId: criteria.publicId, data });
         },
-        [mutate, criteria.identifier],
+        [mutate, criteria.publicId],
     );
 
     return (

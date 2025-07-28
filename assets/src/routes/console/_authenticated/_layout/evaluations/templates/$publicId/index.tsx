@@ -19,42 +19,42 @@ import { Separator } from '@/components/ui/separator';
 import { EditEvaluationTemplateDialog } from '@/components/dialog/edit-evaluation-template-dialog';
 import { AddEvaluationCriteriaDialog } from '@/components/dialog/add-evaluation-criteria-dialog';
 
-export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/templates/$identifier/')({
+export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/templates/$publicId/')({
     component: EvaluationTemplateDetails,
-    loader: ({ params: { identifier } }) => fetchEvaluationTemplate(identifier),
+    loader: ({ params: { publicId } }) => fetchEvaluationTemplate(publicId),
 });
 
 function EvaluationTemplateDetails() {
-    const { identifier } = Route.useParams();
+    const { publicId } = Route.useParams();
     const { t } = useTranslation();
     const queryClient = useQueryClient();
     const { data, isPending } = useQuery({
-        queryKey: ['evaluation-template', identifier],
-        queryFn: () => fetchEvaluationTemplate(identifier),
+        queryKey: ['evaluation-template', publicId],
+        queryFn: () => fetchEvaluationTemplate(publicId),
         refetchOnWindowFocus: false,
     });
     const { data: criterias = [], isPending: isCriteriasPending } = useQuery({
-        queryKey: ['evaluation-template-criterias', identifier],
-        queryFn: () => fetchTemplateCriterias(identifier),
-        enabled: data && !!data.identifier,
+        queryKey: ['evaluation-template-criterias', publicId],
+        queryFn: () => fetchTemplateCriterias(publicId),
+        enabled: data && !!data.publicId,
     });
     const { data: employees = [], isPending: isEmployeesPending } = useQuery({
-        queryKey: ['evaluation-template-employees', identifier],
-        queryFn: () => fetchTemplateEmployees(identifier),
-        enabled: data && !!data.identifier,
+        queryKey: ['evaluation-template-employees', publicId],
+        queryFn: () => fetchTemplateEmployees(publicId),
+        enabled: data && !!data.publicId,
     });
 
     const onEditSuccess = React.useCallback(() => {
-        queryClient.invalidateQueries({ queryKey: ['evaluation-template', identifier] }).then();
-    }, [identifier, queryClient]);
+        queryClient.invalidateQueries({ queryKey: ['evaluation-template', publicId] }).then();
+    }, [publicId, queryClient]);
 
     const onRefreshCriterias = React.useCallback(() => {
-        queryClient.invalidateQueries({ queryKey: ['evaluation-template-criterias', identifier] }).then();
-    }, [identifier, queryClient]);
+        queryClient.invalidateQueries({ queryKey: ['evaluation-template-criterias', publicId] }).then();
+    }, [publicId, queryClient]);
 
     const onRefreshEmployees = React.useCallback(() => {
-        queryClient.invalidateQueries({ queryKey: ['evaluation-template-employees', identifier] }).then();
-    }, [identifier, queryClient]);
+        queryClient.invalidateQueries({ queryKey: ['evaluation-template-employees', publicId] }).then();
+    }, [publicId, queryClient]);
 
     if (isPending) {
         return <Loading loadingText={t('evaluation_templates.loading', { ns: 'glossary' })} />;
@@ -125,7 +125,7 @@ function EvaluationTemplateDetails() {
                 </CardHeader>
                 <CardContent>
                     <EmployeeDataTable
-                        identifier={identifier}
+                        publicId={publicId}
                         employees={employees}
                         loading={isEmployeesPending}
                         onRemoveEmployee={onRefreshEmployees}

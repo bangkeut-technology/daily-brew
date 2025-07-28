@@ -14,7 +14,7 @@ export const EmployeeEvaluationTemplates: React.FunctionComponent<EmployeeEvalua
 }) => {
     const renderItems = () => {
         return employee.templates?.map((template) => (
-            <AccordionItem key={template.identifier} value={template.identifier}>
+            <AccordionItem key={template.publicId} value={template.publicId}>
                 <AccordionTrigger>{template.name}</AccordionTrigger>
                 <AccordionContent>
                     <EvaluationTemplateCriterias employee={employee} template={template} onSuccess={onSuccess} />
@@ -25,7 +25,7 @@ export const EmployeeEvaluationTemplates: React.FunctionComponent<EmployeeEvalua
 
     return (
         <div className="w-full h-full">
-            <Accordion type="multiple" defaultValue={employee.templates?.map((template) => template.identifier)}>
+            <Accordion type="multiple" defaultValue={employee.templates?.map((template) => template.publicId)}>
                 {renderItems()}
             </Accordion>
         </div>

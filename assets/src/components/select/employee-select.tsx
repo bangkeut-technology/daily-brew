@@ -62,7 +62,7 @@ export const EmployeeSelect: React.FunctionComponent<EmployeeSelectProps> = ({ c
                     },
                 },
             }),
-            columnHelper.accessor('identifier', {
+            columnHelper.accessor('publicId', {
                 header: 'Employee Name',
                 cell: ({ row: { original } }) => `${original.firstName} ${original.lastName}`,
                 meta: {

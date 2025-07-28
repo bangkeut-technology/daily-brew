@@ -36,12 +36,12 @@ export const EvaluationTemplateCriterias: React.FunctionComponent<EvaluationTemp
         isPending,
         isSuccess,
     } = useQuery({
-        queryKey: ['evaluation-template-criterias', template.identifier],
-        queryFn: () => fetchTemplateCriterias(template.identifier),
+        queryKey: ['evaluation-template-criterias', template.publicId],
+        queryFn: () => fetchTemplateCriterias(template.publicId),
     });
     const { data: evaluation } = useQuery({
-        queryKey: ['employee-evaluation', employee.identifier, template.identifier, date],
-        queryFn: async () => fetchEmployeeEvaluation({ identifier: employee.identifier, date }),
+        queryKey: ['employee-evaluation', employee.publicId, template.publicId, date],
+        queryFn: async () => fetchEmployeeEvaluation({ publicId: employee.publicId, date }),
     });
     const { mutate } = useMutation({
         mutationFn: postEmployeeEvaluation,
@@ -130,9 +130,9 @@ export const EvaluationTemplateCriterias: React.FunctionComponent<EvaluationTemp
 
     const onSubmit = React.useCallback(
         (data: PartialEmployeeEvaluation) => {
-            mutate({ identifier: employee.identifier, data });
+            mutate({ publicId: employee.publicId, data });
         },
-        [employee.identifier, mutate],
+        [employee.publicId, mutate],
     );
 
     return (

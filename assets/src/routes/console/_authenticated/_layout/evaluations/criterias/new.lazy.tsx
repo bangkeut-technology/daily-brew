@@ -25,8 +25,8 @@ function NewEvaluationCriteria() {
         onSuccess: (data) => {
             toast.success(data.message);
             navigate({
-                to: '/console/evaluations/criterias/$identifier',
-                params: { identifier: data.criteria.identifier },
+                to: '/console/evaluations/criterias/$publicId',
+                params: { publicId: data.criteria.publicId },
             }).then();
         },
         onError: (error) => {

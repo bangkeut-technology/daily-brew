@@ -14,9 +14,9 @@ export const fetchEmployees = async ({ from, to }: { from: string; to: string })
         .then((response) => response.data);
 };
 
-export const fetchEmployee = async ({ identifier, from, to }: { identifier: string; from: string; to: string }) => {
+export const fetchEmployee = async ({ publicId, from, to }: { publicId: string; from: string; to: string }) => {
     return apiAxios
-        .get<Employee>(`/employees/${identifier}`, {
+        .get<Employee>(`/employees/${publicId}`, {
             params: {
                 from,
                 to,
@@ -34,15 +34,9 @@ export const postEmployee = async ({ roles = [], template, ...data }: PartialEmp
         .then((response) => response.data);
 };
 
-export const fetchEmployeeEvaluation = async ({
-    identifier,
-    date = new Date(),
-}: {
-    identifier: string;
-    date: Date;
-}) => {
+export const fetchEmployeeEvaluation = async ({ publicId, date = new Date() }: { publicId: string; date: Date }) => {
     return apiAxios
-        .get<EmployeeEvaluation | null>(`/employees/${identifier}/evaluation`, {
+        .get<EmployeeEvaluation | null>(`/employees/${publicId}/evaluation`, {
             params: { date: formatISO(date) },
         })
         .then((response) => response.data);

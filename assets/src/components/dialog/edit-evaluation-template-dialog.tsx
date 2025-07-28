@@ -60,9 +60,9 @@ export const EditEvaluationTemplateDialog: React.FunctionComponent<EditEvaluatio
 
     const onSubmit = React.useCallback(
         (data: PartialEvaluationTemplate) => {
-            mutate({ identifier: template.identifier, data });
+            mutate({ publicId: template.publicId, data });
         },
-        [mutate, template.identifier],
+        [mutate, template.publicId],
     );
 
     return (

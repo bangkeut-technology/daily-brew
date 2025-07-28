@@ -13,32 +13,32 @@ import { AddEvaluationTemplateDialog } from '@/components/dialog/add-evaluation-
 import { EditEvaluationCriteriaDialog } from '@/components/dialog/edit-evaluation-criteria-dialog';
 import { EvaluationTemplateCriteriaDataTable } from '@/components/data-table/evaluation-template-criteria-data-table';
 
-export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/criterias/$identifier/')({
+export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/criterias/$publicId/')({
     component: EvaluationTemplateDetails,
 });
 
 function EvaluationTemplateDetails() {
-    const { identifier } = Route.useParams();
+    const { publicId } = Route.useParams();
     const { t } = useTranslation();
     const queryClient = useQueryClient();
     const { data, isPending } = useQuery({
-        queryKey: ['evaluation-criteria', identifier],
-        queryFn: () => fetchEvaluationCriteria(identifier),
+        queryKey: ['evaluation-criteria', publicId],
+        queryFn: () => fetchEvaluationCriteria(publicId),
         refetchOnWindowFocus: false,
     });
     const { data: criterias = [], isPending: isCriteriasPending } = useQuery({
-        queryKey: ['evaluation-criteria-criterias', identifier],
-        queryFn: () => fetchTemplateCriterias(identifier),
-        enabled: data && !!data.identifier,
+        queryKey: ['evaluation-criteria-criterias', publicId],
+        queryFn: () => fetchTemplateCriterias(publicId),
+        enabled: data && !!data.publicId,
     });
 
     const onEditSuccess = React.useCallback(() => {
-        queryClient.invalidateQueries({ queryKey: ['evaluation-criteria', identifier] }).then();
-    }, [identifier, queryClient]);
+        queryClient.invalidateQueries({ queryKey: ['evaluation-criteria', publicId] }).then();
+    }, [publicId, queryClient]);
 
     const onRefreshCriterias = React.useCallback(() => {
-        queryClient.invalidateQueries({ queryKey: ['evaluation-criteria-criterias', identifier] }).then();
-    }, [identifier, queryClient]);
+        queryClient.invalidateQueries({ queryKey: ['evaluation-criteria-criterias', publicId] }).then();
+    }, [publicId, queryClient]);
 
     if (isPending) {
         return <Loading loadingText={t('evaluation_criterias.loading', { ns: 'glossary' })} />;

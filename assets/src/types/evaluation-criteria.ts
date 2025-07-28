@@ -2,7 +2,7 @@ import { EvaluationTemplate } from '@/types/evaluation-template';
 
 export type EvaluationCriteria = {
     id: number;
-    identifier: string;
+    publicId: string;
     createdAt: string;
     updatedAt: string;
     label: string;
@@ -17,6 +17,6 @@ export type EvaluationTemplateCriterias = {
 
 export type PartialEvaluationCriteria = Omit<
     EvaluationCriteria,
-    'id' | 'identifier' | 'templates' | 'createdAt' | 'updatedAt'
+    'id' | 'publicId' | 'templates' | 'createdAt' | 'updatedAt'
 > &
     EvaluationTemplateCriterias;

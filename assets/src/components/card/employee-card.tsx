@@ -20,11 +20,11 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, from, to, 
 
     const handleClick = React.useCallback(() => {
         navigate({
-            to: '/console/employees/$identifier',
-            params: { identifier: employee.identifier },
+            to: '/console/employees/$publicId',
+            params: { publicId: employee.publicId },
             search: { from, to },
         }).then();
-    }, [employee.identifier, from, navigate, to]);
+    }, [employee.publicId, from, navigate, to]);
 
     return (
         <div className="flex flex-col p-4 border rounded-lg hover:bg-primary/5 space-y-2">

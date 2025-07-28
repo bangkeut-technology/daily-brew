@@ -2,17 +2,17 @@ import { apiAxios } from '@/lib/apiAxios';
 import { EmployeeEvaluation, PartialEmployeeEvaluation } from '@/types/employee-evaluation';
 
 export const postEmployeeEvaluation = async ({
-    identifier,
+    publicId,
     data,
 }: {
-    identifier: string;
+    publicId: string;
     data: PartialEmployeeEvaluation;
 }) => {
     return apiAxios
         .post<{
             message: string;
             evaluation: EmployeeEvaluation;
-        }>(`/employees/${identifier}/evaluations`, {
+        }>(`/employees/${publicId}/evaluations`, {
             template: data.template,
             note: data.note,
             scores: data.scores.map((score) => ({

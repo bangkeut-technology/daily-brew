@@ -5,7 +5,7 @@ import { EmployeeScore, PartialEmployeeScore } from '@/types/EmployeeScore';
 
 export type EmployeeEvaluation = {
     id: number;
-    identifier: string;
+    publicId: string;
     note?: string;
     averageScore?: number;
     templateName: string;
@@ -19,7 +19,7 @@ export type EmployeeEvaluation = {
 export type PartialEmployeeEvaluation = Omit<
     EmployeeEvaluation,
     | 'id'
-    | 'identifier'
+    | 'publicId'
     | 'templateName'
     | 'evaluatedAt'
     | 'template'

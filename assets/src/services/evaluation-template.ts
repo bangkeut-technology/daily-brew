@@ -15,68 +15,68 @@ export const postEvaluationTemplate = async ({ criterias = [], ...data }: Partia
         }>('/evaluation-templates', { ...data, criterias: criterias.map((criteria) => criteria.value) })
         .then((response) => response.data);
 };
-export const fetchEvaluationTemplate = async (identifier: string) => {
+export const fetchEvaluationTemplate = async (publicId: string) => {
     return await apiAxios
-        .get<EvaluationTemplate>(`/evaluation-templates/${identifier}`)
+        .get<EvaluationTemplate>(`/evaluation-templates/${publicId}`)
         .then((response) => response.data);
 };
 
 export const putEvaluationTemplate = async ({
-    identifier,
+    publicId,
     data,
 }: {
-    identifier: string;
+    publicId: string;
     data: PartialEvaluationTemplate;
 }) => {
     return await apiAxios
-        .put<{ template: EvaluationTemplate; message: string }>(`/evaluation-templates/${identifier}`, data)
+        .put<{ template: EvaluationTemplate; message: string }>(`/evaluation-templates/${publicId}`, data)
         .then((response) => response.data);
 };
 
-export const deleteEvaluationTemplate = async (identifier: string) => {
+export const deleteEvaluationTemplate = async (publicId: string) => {
     return await apiAxios
-        .delete<{ message: string }>(`/evaluation-templates/${identifier}`)
+        .delete<{ message: string }>(`/evaluation-templates/${publicId}`)
         .then((response) => response.data);
 };
 
-export const patchEvaluationTemplate = async (identifier: string) => {
+export const patchEvaluationTemplate = async (publicId: string) => {
     return await apiAxios
-        .patch<{ template: EvaluationTemplate; message: string }>(`/evaluation-templates/${identifier}`)
+        .patch<{ template: EvaluationTemplate; message: string }>(`/evaluation-templates/${publicId}`)
         .then((response) => response.data);
 };
 
-export const fetchTemplateCriterias = async (identifier: string) => {
+export const fetchTemplateCriterias = async (publicId: string) => {
     return await apiAxios
-        .get<EvaluationTemplateCriteria[]>(`/evaluation-templates/${identifier}/criterias`)
+        .get<EvaluationTemplateCriteria[]>(`/evaluation-templates/${publicId}/criterias`)
         .then((response) => response.data);
 };
 
-export const postTemplateCriterias = async ({ identifier, criterias }: { identifier: string; criterias: number[] }) => {
+export const postTemplateCriterias = async ({ publicId, criterias }: { publicId: string; criterias: number[] }) => {
     return await apiAxios
-        .post<{ message: string }>(`/evaluation-templates/${identifier}/criterias`, { criterias })
+        .post<{ message: string }>(`/evaluation-templates/${publicId}/criterias`, { criterias })
         .then((response) => response.data);
 };
 
-export const fetchTemplateEmployees = async (identifier: string) => {
+export const fetchTemplateEmployees = async (publicId: string) => {
     return await apiAxios
-        .get<Employee[]>(`/evaluation-templates/${identifier}/employees`)
+        .get<Employee[]>(`/evaluation-templates/${publicId}/employees`)
         .then((response) => response.data);
 };
 
-export const postTemplateEmployees = async ({ identifier, employees }: { identifier: string; employees: number[] }) => {
+export const postTemplateEmployees = async ({ publicId, employees }: { publicId: string; employees: number[] }) => {
     return await apiAxios
-        .post<{ message: string }>(`/evaluation-templates/${identifier}/employees`, { employees })
+        .post<{ message: string }>(`/evaluation-templates/${publicId}/employees`, { employees })
         .then((response) => response.data);
 };
 
 export const deleteTemplateEmployees = async ({
-    identifier,
-    employeeIdentifier,
+    publicId,
+    employeePublicId,
 }: {
-    identifier: string;
-    employeeIdentifier: string;
+    publicId: string;
+    employeePublicId: string;
 }) => {
     return await apiAxios
-        .delete<{ message: string }>(`/evaluation-templates/${identifier}/employees/${employeeIdentifier}`)
+        .delete<{ message: string }>(`/evaluation-templates/${publicId}/employees/${employeePublicId}`)
         .then((response) => response.data);
 };

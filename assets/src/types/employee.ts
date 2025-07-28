@@ -3,7 +3,7 @@ import { EvaluationTemplate } from '@/types/evaluation-template';
 
 export type Employee = {
     id: number;
-    identifier: string;
+    publicId: string;
     firstName: string;
     lastName: string;
     fullName: string;
@@ -18,7 +18,7 @@ export type Employee = {
 
 export type PartialEmployee = Omit<
     Employee,
-    'id' | 'identifier' | 'dob' | 'joinedAt' | 'roles' | 'status' | 'templates' | 'averageScore' | 'fullName'
+    'id' | 'publicId' | 'dob' | 'joinedAt' | 'roles' | 'status' | 'templates' | 'averageScore' | 'fullName'
 > & {
     dob?: Date;
     joinedAt?: Date;

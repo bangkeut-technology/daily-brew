@@ -9,7 +9,7 @@ import { RemoveEmployeeButton } from '@/components/button/remove-employee-button
 const columnHelper = createColumnHelper<Employee>();
 
 interface EmployeeDataTableProps {
-    identifier: string;
+    publicId: string;
     employees: Employee[];
     loading: boolean;
     onRemoveEmployee: () => void;
@@ -18,7 +18,7 @@ interface EmployeeDataTableProps {
 export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> = ({
     employees,
     loading,
-    identifier,
+    publicId,
     onRemoveEmployee,
 }) => {
     const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
@@ -48,12 +48,12 @@ export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> 
                     },
                 },
             }),
-            columnHelper.accessor('identifier', {
+            columnHelper.accessor('publicId', {
                 header: t('employees.table.actions'),
                 cell: (info) => (
                     <RemoveEmployeeButton
-                        identifier={identifier}
-                        employeeIdentifier={info.getValue()}
+                        publicId={publicId}
+                        employeePublicId={info.getValue()}
                         onRemove={onRemoveEmployee}
                     />
                 ),
@@ -64,7 +64,7 @@ export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> 
                 },
             }),
         ],
-        [identifier, onRemoveEmployee, t],
+        [publicId, onRemoveEmployee, t],
     );
 
     return (

@@ -11,7 +11,7 @@ import { BackButton } from '@/components/button/back-button';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2, UserRoundX } from 'lucide-react';
 
-export const Route = createFileRoute('/console/_authenticated/_layout/employees/$identifier/')({
+export const Route = createFileRoute('/console/_authenticated/_layout/employees/$publicId/')({
     component: EmployeeDetails,
     validateSearch: z.object({
         from: z.string(),
@@ -21,11 +21,11 @@ export const Route = createFileRoute('/console/_authenticated/_layout/employees/
 
 function EmployeeDetails() {
     const { t } = useTranslation();
-    const { identifier } = Route.useParams();
+    const { publicId } = Route.useParams();
     const { from, to } = Route.useSearch();
     const { data: employee, isPending } = useQuery({
-        queryKey: ['employee', identifier, from, to],
-        queryFn: () => fetchEmployee({ identifier, from, to }),
+        queryKey: ['employee', publicId, from, to],
+        queryFn: () => fetchEmployee({ publicId, from, to }),
     });
 
     if (isPending) {

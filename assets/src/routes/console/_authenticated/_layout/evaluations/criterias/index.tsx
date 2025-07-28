@@ -26,12 +26,12 @@ function EvaluationCriterias() {
 
     const columns = React.useMemo(
         () => [
-            columnHelper.accessor('identifier', {
+            columnHelper.accessor('publicId', {
                 id: 'view',
                 header: () => t('view'),
                 cell: ({ getValue }) => (
                     <Button size="icon" variant="ghost" asChild>
-                        <Link to={`/console/evaluations/criterias/$identifier`} params={{ identifier: getValue() }}>
+                        <Link to={`/console/evaluations/criterias/$publicId`} params={{ publicId: getValue() }}>
                             <Eye />
                         </Link>
                     </Button>

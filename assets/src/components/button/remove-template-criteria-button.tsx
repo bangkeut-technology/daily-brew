@@ -8,12 +8,12 @@ import { deleteTemplateCriteria } from '@/services/evaluation-template-criteria'
 import { useTranslation } from 'react-i18next';
 
 interface RemoveTemplateCriteriaButtonProps {
-    identifier: string;
+    publicId: string;
     onRemove?: () => void;
 }
 
 export const RemoveTemplateCriteriaButton: React.FunctionComponent<RemoveTemplateCriteriaButtonProps> = ({
-    identifier,
+    publicId,
     onRemove,
 }) => {
     const { t } = useTranslation();
@@ -32,7 +32,7 @@ export const RemoveTemplateCriteriaButton: React.FunctionComponent<RemoveTemplat
     });
 
     const handleRemove = () => {
-        mutate(identifier);
+        mutate(publicId);
     };
 
     return (

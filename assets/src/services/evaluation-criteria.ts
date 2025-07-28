@@ -12,42 +12,42 @@ export const postEvaluationCriteria = async (data: PartialEvaluationCriteria) =>
         .then((response) => response.data);
 };
 
-export const fetchEvaluationCriteria = async (identifier: string) => {
-    return apiAxios.get<EvaluationCriteria>(`/evaluation-criterias/${identifier}`).then((response) => response.data);
+export const fetchEvaluationCriteria = async (publicId: string) => {
+    return apiAxios.get<EvaluationCriteria>(`/evaluation-criterias/${publicId}`).then((response) => response.data);
 };
 
 export const putEvaluationCriteria = async ({
-    identifier,
+    publicId,
     data,
 }: {
-    identifier: string;
+    publicId: string;
     data: PartialEvaluationCriteria;
 }): Promise<{ message: string; criteria: EvaluationCriteria }> => {
-    return apiAxios.put(`/evaluation-criterias/${identifier}`, data).then((response) => response.data);
+    return apiAxios.put(`/evaluation-criterias/${publicId}`, data).then((response) => response.data);
 };
 
-export const deleteEvaluationCriteria = async (identifier: string): Promise<{ message: string }> => {
-    return apiAxios.delete(`/evaluation-criterias/${identifier}`).then((response) => response.data);
+export const deleteEvaluationCriteria = async (publicId: string): Promise<{ message: string }> => {
+    return apiAxios.delete(`/evaluation-criterias/${publicId}`).then((response) => response.data);
 };
 
-export const getEvaluationCriteria = async (identifier: string): Promise<EvaluationCriteria> => {
-    return apiAxios.get(`/evaluation-criterias/${identifier}`).then((response) => response.data);
+export const getEvaluationCriteria = async (publicId: string): Promise<EvaluationCriteria> => {
+    return apiAxios.get(`/evaluation-criterias/${publicId}`).then((response) => response.data);
 };
 
-export const fetchTemplateCriterias = async (identifier: string) => {
+export const fetchTemplateCriterias = async (publicId: string) => {
     return await apiAxios
-        .get<EvaluationTemplateCriteria[]>(`/evaluation-criterias/${identifier}/templates`)
+        .get<EvaluationTemplateCriteria[]>(`/evaluation-criterias/${publicId}/templates`)
         .then((response) => response.data);
 };
 
 export const postCriteriaTemplates = async ({
-    identifier,
+    publicId,
     templates = [],
 }: {
-    identifier: string;
+    publicId: string;
     templates: number[];
 }) => {
     return await apiAxios
-        .post<{ message: string }>(`/evaluation-criterias/${identifier}/templates`, { templates })
+        .post<{ message: string }>(`/evaluation-criterias/${publicId}/templates`, { templates })
         .then((response) => response.data);
 };

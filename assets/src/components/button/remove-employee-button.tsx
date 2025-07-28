@@ -8,14 +8,14 @@ import { deleteTemplateEmployees } from '@/services/evaluation-template';
 import { useTranslation } from 'react-i18next';
 
 interface RemoveEmployeeButtonProps {
-    identifier: string;
-    employeeIdentifier: string;
+    publicId: string;
+    employeePublicId: string;
     onRemove?: () => void;
 }
 
 export const RemoveEmployeeButton: React.FunctionComponent<RemoveEmployeeButtonProps> = ({
-    identifier,
-    employeeIdentifier,
+    publicId,
+    employeePublicId,
     onRemove,
 }) => {
     const { t } = useTranslation();
@@ -34,7 +34,7 @@ export const RemoveEmployeeButton: React.FunctionComponent<RemoveEmployeeButtonP
     });
 
     const handleRemove = () => {
-        mutate({ identifier, employeeIdentifier });
+        mutate({ publicId, employeePublicId });
     };
 
     return (

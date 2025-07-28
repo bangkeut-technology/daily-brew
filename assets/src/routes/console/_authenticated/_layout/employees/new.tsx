@@ -36,8 +36,8 @@ function NewEmployeeComponent() {
         onSuccess: (response) => {
             toast.success(response.message);
             navigate({
-                to: '/console/employees/$identifier',
-                params: { identifier: response.employee.identifier },
+                to: '/console/employees/$publicId',
+                params: { publicId: response.employee.publicId },
                 search: { from, to },
             }).then();
         },

@@ -53,11 +53,11 @@ export const AddEmployeeDialog: React.FunctionComponent<AddEmployeeDialogProps> 
     const onSubmit = React.useCallback(
         (data: EvaluationTemplateEmployees) => {
             mutate({
-                identifier: template.identifier,
+                publicId: template.publicId,
                 employees: data.employees?.map((employee) => employee.value) || [],
             });
         },
-        [mutate, template.identifier],
+        [mutate, template.publicId],
     );
 
     return (

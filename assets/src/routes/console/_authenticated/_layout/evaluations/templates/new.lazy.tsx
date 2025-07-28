@@ -26,8 +26,8 @@ function NewEvaluationTemplate() {
         onSuccess: (data) => {
             toast.success(data.message);
             navigate({
-                to: '/console/evaluations/templates/$identifier',
-                params: { identifier: data.template.identifier },
+                to: '/console/evaluations/templates/$publicId',
+                params: { publicId: data.template.publicId },
             }).then();
         },
         onError: (error) => {

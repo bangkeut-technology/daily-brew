@@ -56,11 +56,11 @@ export const AddEvaluationCriteriaDialog: React.FunctionComponent<AddEvaluationC
     const onSubmit = React.useCallback(
         (data: EvaluationTemplateCriterias) => {
             mutate({
-                identifier: template.identifier,
+                publicId: template.publicId,
                 criterias: data.criterias?.map((criteria) => criteria.value) || [],
             });
         },
-        [mutate, template.identifier],
+        [mutate, template.publicId],
     );
 
     return (
