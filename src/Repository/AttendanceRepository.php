@@ -6,7 +6,11 @@ namespace App\Repository;
 
 
 use App\Entity\Attendance;
+use App\Entity\User;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -30,28 +34,43 @@ class AttendanceRepository extends AbstractRepository
         parent::__construct($registry, Attendance::class);
     }
 
-    //    /**
-    //     * @return Attendance[] Returns an array of Attendance objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('a.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Find attendances by period and user.
+     *
+     * @param DateTimeImmutable|null $from The start date of the period, or null for no start limit.
+     * @param DateTimeImmutable|null $to   The end date of the period, or null for no end limit.
+     * @param User                   $user The user for whom to find attendances.
+     * @return Attendance[]
+     */
+    public function findByPeriodAndUser(?DateTimeImmutable $from, ?DateTimeImmutable $to, User $user): array
+    {
+        return $this->createQueryBuilder('a')
+            ->addSelect('e')
+            ->where('a.user = :user')
+            ->andWhere('a.date >= :from OR :from IS NULL')
+            ->andWhere('a.date <= :to OR :to IS NULL')
+            ->setParameters(new ArrayCollection([
+                new Parameter('user', $user),
+                new Parameter('from', $from),
+                new Parameter('to', $to),
+            ]))
+            ->getQuery()
+            ->getResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Attendance
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * Find attendances by user.
+     *
+     * @param User $user The user for whom to find attendances.
+     * @return Attendance[]
+     */
+    public function findByUser(User $user): array
+    {
+        return $this->createQueryBuilder('a')
+            ->addSelect('e')
+            ->where('a.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
+    }
 }

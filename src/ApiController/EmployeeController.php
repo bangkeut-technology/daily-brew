@@ -17,6 +17,7 @@ use App\Form\EmployeeFormType;
 use App\Repository\EmployeeEvaluationRepository;
 use App\Repository\EmployeeRepository;
 use App\Util\DateHelper;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
@@ -70,9 +71,9 @@ class EmployeeController extends AbstractController
         #[CurrentUser] User $user,
     ): JsonResponse {
         $employees = $this->employeeRepository->findByUser($user);
-        $now = new \DateTimeImmutable();
-        $from = new \DateTimeImmutable($request->query->get('from', DateHelper::startOfMonth($now)->format('Y-m-d')));
-        $to = new \DateTimeImmutable($request->query->get('to', DateHelper::endOfMonth($now)->format('Y-m-d')));
+        $now = new DateTimeImmutable();
+        $from = new DateTimeImmutable($request->query->get('from', DateHelper::startOfMonth($now)->format('Y-m-d')));
+        $to = new DateTimeImmutable($request->query->get('to', DateHelper::endOfMonth($now)->format('Y-m-d')));
         $listEmployees = [];
         foreach ($employees as $employee) {
             $listEmployees[$employee->getId()] = $employee;
@@ -195,9 +196,9 @@ class EmployeeController extends AbstractController
     public function get(string $identifier, Request $request): JsonResponse
     {
         $employee = $this->getEmployeeByIdentifier($identifier);
-        $now = new \DateTimeImmutable();
-        $from = new \DateTimeImmutable($request->query->get('from', DateHelper::startOfMonth($now)->format('Y-m-d')));
-        $to = new \DateTimeImmutable($request->query->get('to', DateHelper::endOfMonth($now)->format('Y-m-d')));
+        $now = new DateTimeImmutable();
+        $from = new DateTimeImmutable($request->query->get('from', DateHelper::startOfMonth($now)->format('Y-m-d')));
+        $to = new DateTimeImmutable($request->query->get('to', DateHelper::endOfMonth($now)->format('Y-m-d')));
         $employee->averageScore = $this->employeeEvaluationRepository->getAverageScoreForPeriod($employee, $from, $to);
 
         return $this->createEmployeeResponse($employee);
@@ -376,7 +377,7 @@ class EmployeeController extends AbstractController
     public function postEvaluation(string $identifier, Request $request): JsonResponse
     {
         $employee = $this->getEmployeeByIdentifier($identifier);
-        if (null === $evaluation = $this->employeeEvaluationRepository->findByDateAndEmployee(new \DateTimeImmutable(), $employee)) {
+        if (null === $evaluation = $this->employeeEvaluationRepository->findByDateAndEmployee(new DateTimeImmutable(), $employee)) {
             $evaluation = $this->employeeEvaluationRepository->create();
         }
 
@@ -430,8 +431,8 @@ class EmployeeController extends AbstractController
     public function getEmployeeEvaluation(string $identifier, Request $request): JsonResponse
     {
         $employee = $this->getEmployeeByIdentifier($identifier);
-        $date = $request->query->get('date', (new \DateTimeImmutable())->format('Y-m-d'));
-        $evaluation = $this->employeeEvaluationRepository->findByDateAndEmployee(new \DateTimeImmutable($date), $employee);
+        $date = $request->query->get('date', (new DateTimeImmutable())->format('Y-m-d'));
+        $evaluation = $this->employeeEvaluationRepository->findByDateAndEmployee(new DateTimeImmutable($date), $employee);
 
         return $this->createEmployeeEvaluationResponse($evaluation);
     }
@@ -477,10 +478,10 @@ class EmployeeController extends AbstractController
     public function getEmployeeEvaluations(string $identifier, Request $request): JsonResponse
     {
         $employee = $this->getEmployeeByIdentifier($identifier);
-        $from = $request->query->get('from', (new \DateTimeImmutable())->modify('-1 year')->format('Y-m-d'));
-        $to = $request->query->get('to', (new \DateTimeImmutable())->format('Y-m-d'));
+        $from = $request->query->get('from', (new DateTimeImmutable())->modify('-1 year')->format('Y-m-d'));
+        $to = $request->query->get('to', (new DateTimeImmutable())->format('Y-m-d'));
 
-        $evaluations = $this->employeeEvaluationRepository->findByPeriodAndEmployee(new \DateTimeImmutable($from), new \DateTimeImmutable($to), $employee);
+        $evaluations = $this->employeeEvaluationRepository->findByPeriodAndEmployee(new DateTimeImmutable($from), new DateTimeImmutable($to), $employee);
 
         return $this->createEmployeeEvaluationResponse($evaluations);
     }
@@ -522,9 +523,9 @@ class EmployeeController extends AbstractController
     #[Route('/{identifier}/evaluations/evaluations/average-score', name: 'get_evaluation_by_id', methods: ['GET'])]
     public function getAverageScore(string $identifier, Request $request): JsonResponse
     {
-        $now = new \DateTimeImmutable();
-        $from = new \DateTimeImmutable($request->query->get('from', DateHelper::startOfMonth($now)->format('Y-m-d')));
-        $to = new \DateTimeImmutable($request->query->get('to', DateHelper::endOfMonth($now)->format('Y-m-d')));
+        $now = new DateTimeImmutable();
+        $from = new DateTimeImmutable($request->query->get('from', DateHelper::startOfMonth($now)->format('Y-m-d')));
+        $to = new DateTimeImmutable($request->query->get('to', DateHelper::endOfMonth($now)->format('Y-m-d')));
         $employee = $this->getEmployeeByIdentifier($identifier);
         $average = $this->employeeEvaluationRepository->getAverageScoreForPeriod($employee, $from, $to);
 

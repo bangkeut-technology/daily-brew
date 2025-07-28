@@ -19,12 +19,17 @@ class DateHelper
     /**
      * Converts a DateTimeInterface to DateTimeImmutable.
      *
-     * @param DateTimeInterface $date the date to convert
+     * @param DateTimeInterface|null $date the date to convert. If null, returns the current date and time.
      *
+     * @return DateTimeImmutable
      * @throws Exception
      */
-    public static function toImmutable(DateTimeInterface $date): DateTimeImmutable
+    public static function toImmutable(?DateTimeInterface $date): DateTimeImmutable
     {
+        if ($date === null) {
+            return new DateTimeImmutable();
+        }
+
         if ($date instanceof DateTimeImmutable) {
             return $date;
         }
@@ -97,11 +102,12 @@ class DateHelper
     /**
      * Returns the start and end of the current year.
      *
-     * @param DateTimeInterface $date the date to use for the year
+     * @param DateTimeInterface|null $date the date to use for the year. If null, use the current date.
      *
+     * @return DateTimeImmutable
      * @throws Exception
      */
-    public static function startOfMonth(DateTimeInterface $date): DateTimeImmutable
+    public static function startOfMonth(?DateTimeInterface $date = null): DateTimeImmutable
     {
         return self::startOfDay(
             self::toImmutable($date)->modify('first day of this month')
@@ -111,11 +117,12 @@ class DateHelper
     /**
      * Returns the end of the month for a given date.
      *
-     * @param DateTimeInterface $date the date to use for the month
+     * @param DateTimeInterface|null $date the date to use for the month. If null, use the current date.
      *
+     * @return DateTimeImmutable
      * @throws Exception
      */
-    public static function endOfMonth(DateTimeInterface $date): DateTimeImmutable
+    public static function endOfMonth(?DateTimeInterface $date = null): DateTimeImmutable
     {
         return self::endOfDay(
             self::toImmutable($date)->modify('last day of this month')
@@ -152,5 +159,35 @@ class DateHelper
             self::startOfDay($fromDate),
             self::endOfDay($toDate),
         ];
+    }
+
+    /**
+     * Returns the start of the year for a given date.
+     *
+     * @param DateTimeInterface|null $date the date to use for the year. If null, use the current date.
+     *
+     * @return DateTimeImmutable
+     * @throws Exception
+     */
+    public static function startOfYear(?DateTimeInterface $date = null): DateTimeImmutable
+    {
+        return self::startOfDay(
+            self::toImmutable($date)->modify('first day of January this year')
+        );
+    }
+
+    /**
+     * Returns the end of the year for a given date.
+     *
+     * @param DateTimeInterface|null $date the date to use for the year. If null, use the current date.
+     *
+     * @return DateTimeImmutable
+     * @throws Exception
+     */
+    public static function endOfYear(?DateTimeInterface $date = null): DateTimeImmutable
+    {
+        return self::endOfDay(
+            self::toImmutable($date)->modify('last day of December this year')
+        );
     }
 }
