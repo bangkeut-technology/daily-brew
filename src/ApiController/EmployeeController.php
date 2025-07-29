@@ -286,6 +286,68 @@ class EmployeeController extends AbstractController
     }
 
     /**
+     * Get attendances for the employee by publicId and period.
+     *
+     * @param string  $publicId The unique publicId of the employee
+     * @param Request $request  The HTTP request
+     *
+     * @throws Exception
+     */
+    #[OA\Parameter(
+        name: 'publicId',
+        description: 'The unique publicId of the employee',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string', example: 'emp123')
+    )]
+    #[OA\Parameter(
+        name: 'from',
+        description: 'The start date of the attendance period in YYYY-MM-DD format',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'string', example: '2023-01-01')
+    )]
+    #[OA\Parameter(
+        name: 'to',
+        description: 'The end date of the attendance period in YYYY-MM-DD format',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'string', example: '2023-12-31')
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns all attendances for the employee',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Attendance::class, groups: ['attendance:read']))
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_NOT_FOUND,
+        description: 'Employee not found',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'message',
+                    type: 'string',
+                    example: 'Employee not found'
+                ),
+            ],
+            type: 'object'
+        )
+    )]
+    #[Route('/{publicId}/attendance', name: 'get_attendances', methods: ['GET'])]
+    public function getAttendances(string $publicId, Request $request): JsonResponse
+    {
+        $employee = $this->getEmployeeByPublicId($publicId);
+        $from = new DateTimeImmutable($request->query->get('from', DateHelper::startOfMonth()->format('Y-m-d')));
+        $to = new DateTimeImmutable($request->query->get('to', DateHelper::endOfMonth()->format('Y-m-d')));
+        $attendances = $this->attendanceRepository->findByEmployeeAndPeriod($employee, $from, $to);
+
+        return $this->createAttendanceResponse($attendances);
+    }
+
+    /**
      * Post attendance for the employee by publicId.
      *
      * @param string  $publicId The unique publicId of the employee

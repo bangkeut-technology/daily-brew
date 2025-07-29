@@ -6,6 +6,7 @@ namespace App\Repository;
 
 
 use App\Entity\Attendance;
+use App\Entity\Employee;
 use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -71,6 +72,30 @@ class AttendanceRepository extends AbstractRepository
             ->addSelect('e')
             ->where('a.user = :user')
             ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Find attendances by employee and period.
+     *
+     * @param Employee $employee The employee for whom to find attendances.
+     * @param DateTimeImmutable $from The start date of the period.
+     * @param DateTimeImmutable $to The end date of the period.
+     * @return Attendance[]
+     */
+    public function findByEmployeeAndPeriod(Employee $employee, DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        return $this->createQueryBuilder('a')
+            ->addSelect('e')
+            ->where('a.employee = :employee')
+            ->andWhere('a.attendanceDate >= :from')
+            ->andWhere('a.attendanceDate <= :to')
+            ->setParameters(new ArrayCollection([
+                new Parameter('employee', $employee),
+                new Parameter('from', $from, Types::DATE_IMMUTABLE),
+                new Parameter('to', $to, Types::DATE_IMMUTABLE),
+            ]))
             ->getQuery()
             ->getResult();
     }

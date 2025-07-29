@@ -38,13 +38,18 @@ class UserController extends AbstractController
     /**
      * Constructs a new instance of the class.
      *
-     * @param TranslatorInterface $translator     the translator component
-     * @param UserRepository      $userRepository the repository for user data
+     * @param TranslatorInterface $translator         the translator component
+     * @param UserRepository      $userRepository     the repository for user data
+     * @param StoreRepository     $storeRepository    the repository for store data
+     * @param EmployeeRepository  $employeeRepository the repository for employee data
      */
     public function __construct(
-        TranslatorInterface $translator,
-        private readonly UserRepository $userRepository, private readonly StoreRepository $storeRepository, private readonly EmployeeRepository $employeeRepository,
-    ) {
+        TranslatorInterface                 $translator,
+        private readonly UserRepository     $userRepository,
+        private readonly StoreRepository    $storeRepository,
+        private readonly EmployeeRepository $employeeRepository,
+    )
+    {
         parent::__construct($translator);
     }
 
