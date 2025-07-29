@@ -86,6 +86,10 @@
             "title": "Weight",
             "description": "The weight of the evaluation criteria, which determines its importance in the overall performance assessment."
         },
+        "templates": {
+            "title": "Evaluation Templates",
+            "description": "Select the templates that will be used for this evaluation criteria. You can link multiple templates to a single criteria."
+        },
         "new": {
             "title": "New Criteria",
             "description": "Create a new evaluation criteria to assess employee performance.",

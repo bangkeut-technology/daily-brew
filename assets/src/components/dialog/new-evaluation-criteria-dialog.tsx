@@ -74,7 +74,7 @@ export const NewEvaluationCriteriaDialog: React.FunctionComponent<NewEvaluationC
                         {t('evaluation_criterias.new.description', { ns: 'glossary' })}
                     </DialogDescription>
                     <div className="grid gap-4">
-                        <EvaluationCriteriaForm form={form} isPending={isPending} onSubmit={onSubmit} />
+                        <EvaluationCriteriaForm form={form} isPending={isPending} />
                     </div>
                     <DialogFooter>
                         <DialogClose asChild>

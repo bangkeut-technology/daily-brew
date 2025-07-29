@@ -56,7 +56,7 @@ const items: SidebarMenuItem[] = [
             },
             {
                 title: i18next.t('criterias'),
-                url: '/console/evaluation/criterias',
+                url: '/console/evaluations/criterias',
                 icon: ClipboardList,
             },
         ],

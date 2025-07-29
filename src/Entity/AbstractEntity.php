@@ -35,6 +35,16 @@ abstract class AbstractEntity
     protected ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 36, unique: true)]
+    #[Groups([
+        'attendance:read',
+        'user:read',
+        'criteria:read',
+        'template:read',
+        'role:read',
+        'employee:read',
+        'employee_evaluation:read',
+        'employee_score:read',
+    ])]
     protected string $publicId;
 
     #[ORM\Column(name: 'created_at', type: Types::DATETIME_IMMUTABLE, nullable: false)]

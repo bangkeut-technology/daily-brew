@@ -8,7 +8,10 @@ export const fetchEvaluationCriterias = async (): Promise<EvaluationCriteria[]> 
 
 export const postEvaluationCriteria = async (data: PartialEvaluationCriteria) => {
     return apiAxios
-        .post<{ message: string; criteria: EvaluationCriteria }>('/evaluation-criterias', data)
+        .post<{
+            message: string;
+            criteria: EvaluationCriteria;
+        }>('/evaluation-criterias', { ...data, templates: data.templates?.map((template) => template.value) || [] })
         .then((response) => response.data);
 };
 

@@ -11,12 +11,12 @@ import { EmployeeSelect } from '@/components/select/employee-select';
 interface EvaluationTemplateFormProps {
     form: UseFormReturn<PartialEvaluationTemplate>;
     isPending?: boolean;
-    withCriteria?: boolean;
+    withCriterias?: boolean;
     withEmployees?: boolean;
 }
 
 export const EvaluationTemplateForm = React.memo<EvaluationTemplateFormProps>(
-    ({ form, isPending, withCriteria, withEmployees }) => {
+    ({ form, isPending, withCriterias, withEmployees }) => {
         const { t } = useTranslation();
 
         return (
@@ -33,7 +33,7 @@ export const EvaluationTemplateForm = React.memo<EvaluationTemplateFormProps>(
                     label={t('evaluation_templates.description', { ns: 'glossary' })}
                     disabled={isPending}
                 />
-                {withCriteria && (
+                {withCriterias && (
                     <EvaluationCriteriaSelect
                         control={form.control}
                         name="criterias"

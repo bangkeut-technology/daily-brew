@@ -67,7 +67,7 @@ export const NewEvaluationTemplateDialog: React.FunctionComponent<NewEvaluationT
                     <DialogDescription>
                         {t('evaluation_templates.new.description', { ns: 'glossary' })}
                     </DialogDescription>
-                    <EvaluationTemplateForm form={form} isPending={isPending} withCriteria />
+                    <EvaluationTemplateForm form={form} isPending={isPending} withCriterias />
                     <DialogFooter>
                         <DialogClose asChild>
                             <Button disabled={isPending} variant="outline">

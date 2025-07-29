@@ -6,14 +6,15 @@ import { TextAreaField } from '@/components/field/textarea-field';
 import { useTranslation } from 'react-i18next';
 import { Form } from '@/components/ui/form';
 import { SelectField } from '@/components/field/select-field';
+import { EvaluationTemplateMultiSelect } from '@/components/select/evaluation-template-multi-select';
 
 interface EvaluationCriteriaFormProps {
     form: UseFormReturn<PartialEvaluationCriteria>;
     isPending?: boolean;
-    onSubmit?: (data: PartialEvaluationCriteria) => void;
+    withTemplates?: boolean;
 }
 
-export const EvaluationCriteriaForm = React.memo<EvaluationCriteriaFormProps>(({ form, isPending }) => {
+export const EvaluationCriteriaForm = React.memo<EvaluationCriteriaFormProps>(({ form, isPending, withTemplates }) => {
     const { t } = useTranslation();
 
     const options = React.useMemo(
@@ -48,6 +49,14 @@ export const EvaluationCriteriaForm = React.memo<EvaluationCriteriaFormProps>(({
                 label={t('evaluation_criterias.weight.title', { ns: 'glossary' })}
                 description={t('evaluation_criterias.weight.description', { ns: 'glossary' })}
             />
+            {withTemplates && (
+                <EvaluationTemplateMultiSelect
+                    control={form.control}
+                    name="templates"
+                    description={t('evaluation_criterias.templates.description', { ns: 'glossary' })}
+                    title={t('evaluation_criterias.templates.title', { ns: 'glossary' })}
+                />
+            )}
         </Form>
     );
 });

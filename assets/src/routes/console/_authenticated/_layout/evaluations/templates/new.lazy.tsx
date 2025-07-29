@@ -53,27 +53,25 @@ function NewEvaluationTemplate() {
     );
 
     return (
-        <div>
-            <Card className="w-full">
-                <CardContent className="p-6 space-y-4">
-                    <EvaluationTemplateForm form={form} isPending={isPending} withEmployees withCriteria />
-                    <div className="flex-row flex justify-between space-x-2">
-                        <Button className="w-full" onClick={form.handleSubmit(handleCreate)} disabled={isPending}>
-                            {isPending ? (
-                                <React.Fragment>
-                                    <Loader2Icon className="animate-spin" />
-                                    {t('saving')}
-                                </React.Fragment>
-                            ) : (
-                                <React.Fragment>
-                                    <Save />
-                                    {t('save')}
-                                </React.Fragment>
-                            )}
-                        </Button>
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
+        <Card className="w-full">
+            <CardContent className="p-6 space-y-4">
+                <EvaluationTemplateForm form={form} isPending={isPending} withEmployees withCriterias />
+                <div className="flex-row flex justify-between space-x-2">
+                    <Button className="w-full" onClick={form.handleSubmit(handleCreate)} disabled={isPending}>
+                        {isPending ? (
+                            <React.Fragment>
+                                <Loader2Icon className="animate-spin" />
+                                {t('saving')}
+                            </React.Fragment>
+                        ) : (
+                            <React.Fragment>
+                                <Save />
+                                {t('save')}
+                            </React.Fragment>
+                        )}
+                    </Button>
+                </div>
+            </CardContent>
+        </Card>
     );
 }
