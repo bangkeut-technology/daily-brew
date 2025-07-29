@@ -55,6 +55,7 @@ export const EditEvaluationCriteriaDialog: React.FunctionComponent<EditEvaluatio
         defaultValues: {
             label: criteria.label,
             description: criteria.description || '',
+            weight: criteria.weight,
         },
     });
 
