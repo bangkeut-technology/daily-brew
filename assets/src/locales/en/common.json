@@ -14,6 +14,17 @@
     "sign_up": "Sign Up",
     "password": "Password",
     "confirm_password": "Confirm Password",
+    "attendance_date": "Attendance Date",
+    "attendance_status": "Attendance Status",
+    "note": "Note",
+    "attendance": "Attendance",
+    "status": "Status",
+    "attendance_statuses": {
+        "present": "Present",
+        "absent": "Absent",
+        "late": "Late",
+        "leave": "Leave"
+    },
     "day_of_week": {
         "monday": "Monday",
         "tuesday": "Tuesday",

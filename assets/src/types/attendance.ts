@@ -13,6 +13,13 @@ export type Attendance = {
     user: User;
 };
 
-export type PartialAttendance = Omit<Attendance, 'id' | 'publicId' | 'employee' | 'user'>;
+export type PartialAttendance = Omit<
+    Attendance,
+    'id' | 'publicId' | 'employee' | 'user' | 'clockIn' | 'clockOut' | 'attendanceDate'
+> & {
+    attendanceDate: Date;
+    clockIn?: Date;
+    clockOut?: Date;
+};
 
 export type AttendanceStatus = 'present' | 'absent' | 'leave' | 'late';

@@ -1,34 +1,43 @@
 {
     "required": {
-        "users": {
-            "first_name": "The first name is required.",
-            "last_name": "The last name is required.",
-            "password": "The password is required.",
-            "confirm_password": "The confirmation password is required.",
-            "email": "Email is required."
+        "attendances": {
+            "date": "The attendance date is required.",
+            "status": "The attendance status is required."
         },
         "employees": {
             "first_name": "The first name is required.",
             "last_name": "The last name is required.",
             "id": "The employee is required."
         },
-        "roles": {
-            "id": "The role is required.",
-            "name": "The role name is required."
+        "evaluation_criterias": {
+            "label": "The criteria label is required.",
+            "id": "The criteria is required."
         },
         "evaluation_templates": {
             "name": "The template name is required.",
             "description": "The template description is required.",
             "id": "The template is required."
         },
-        "evaluation_criterias": {
-            "label": "The criteria label is required.",
-            "id": "The criteria is required."
+        "roles": {
+            "id": "The role is required.",
+            "name": "The role name is required."
+        },
+        "users": {
+            "first_name": "The first name is required.",
+            "last_name": "The last name is required.",
+            "password": "The password is required.",
+            "confirm_password": "The confirmation password is required.",
+            "email": "Email is required."
         }
     },
     "maximum": {
         "evaluation_criterias": {
             "weight": "The weight must be a number between {{minimum}} and {{maximum}}."
+        }
+    },
+    "one_of": {
+        "attendances": {
+            "status": "The attendance status must be one of the following: {{values}}."
         }
     },
     "passwords_match": "The password and confirmation password must match."
