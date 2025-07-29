@@ -7,6 +7,7 @@ use App\ApiController\Trait\AttendanceTrait;
 use App\Controller\AbstractController;
 use App\Entity\Attendance;
 use App\Form\AttendanceFormType;
+use App\Form\EmployeeFormType;
 use App\Repository\AttendanceRepository;
 use App\Util\DateHelper;
 use DateTimeImmutable;
@@ -86,6 +87,12 @@ class AttendanceController extends AbstractController
      *
      * @retrun JsonResponse
      */
+    #[OA\RequestBody(
+        description: 'Attendance data to create',
+        content: new OA\JsonContent(
+            ref: new Model(type: AttendanceFormType::class),
+        )
+    )]
     #[OA\Response(
         response: Response::HTTP_CREATED,
         description: 'Returns the created attendance.',
@@ -152,6 +159,64 @@ class AttendanceController extends AbstractController
     {
         $attendance = $this->getAttendanceByPublicId($publicId);
         return $this->createAttendanceResponse($attendance);
+    }
+
+    /**
+     * Update an existing attendance.
+     *
+     * @param string  $publicId The public ID of the attendance to update.
+     * @param Request $request  The request object containing the updated attendance data.
+     *
+     * @return JsonResponse
+     */
+    #[OA\Parameter(
+        name: 'publicId',
+        description: 'Public ID of the attendance to update',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\RequestBody(
+        description: 'Updated attendance data',
+        content: new OA\JsonContent(
+            ref: new Model(type: AttendanceFormType::class),
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns the updated attendance.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'message', description: 'Confirmation message after update', type: 'string'),
+                new OA\Property(property: 'attendance', ref: new Model(type: Attendance::class, groups: ['attendance:read'])),
+            ],
+            type: 'object'
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_BAD_REQUEST,
+        description: 'Invalid attendance data.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'error', description: 'Error message', type: 'string'),
+            ],
+            type: 'object'
+        )
+    )]
+    #[Route('/{publicId}', name: 'put', methods: ['PUT'])]
+    public function put(string $publicId, Request $request): JsonResponse
+    {
+        $attendance = $this->getAttendanceByPublicId($publicId);
+        $form = $this->createForm(AttendanceFormType::class, $attendance);
+        $form->submit($request->getPayload()->all());
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->attendanceRepository->update($attendance);
+
+            return $this->createAttendanceResponse(['attendance' => $attendance, 'message' => $this->translator->trans('updated.attendance')]);
+        }
+
+        return $this->createBadRequestResponse($this->translator->trans('invalid.attendance', domain: 'errors'));
+
     }
 
     /**
