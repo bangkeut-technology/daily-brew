@@ -48,6 +48,15 @@ export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> 
                     },
                 },
             }),
+            columnHelper.accessor('averageScore', {
+                header: t('employees.table.kpi_score'),
+                cell: (info) => info.getValue().toFixed(2),
+                meta: {
+                    style: {
+                        textAlign: 'center',
+                    },
+                },
+            }),
             columnHelper.accessor('publicId', {
                 header: t('employees.table.actions'),
                 cell: (info) => (

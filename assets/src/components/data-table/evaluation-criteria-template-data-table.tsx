@@ -35,7 +35,15 @@ export const EvaluationCriteriaTemplateDataTable: React.FunctionComponent<Evalua
             }),
             columnHelper.accessor('publicId', {
                 header: t('evaluation_criterias.table.actions'),
-                cell: (info) => <RemoveTemplateCriteriaButton publicId={info.getValue()} onRemove={onRemoveTemplate} />,
+                cell: (info) => (
+                    <RemoveTemplateCriteriaButton
+                        title={t('evaluation_criterias.remove.title')}
+                        description={t('evaluation_criterias.remove.description')}
+                        confirmationText={t('evaluation_criterias.remove.confirm')}
+                        publicId={info.getValue()}
+                        onRemove={onRemoveTemplate}
+                    />
+                ),
                 meta: {
                     style: {
                         textAlign: 'center',

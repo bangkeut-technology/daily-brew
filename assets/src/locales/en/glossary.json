@@ -28,6 +28,11 @@
             "resigned": "Resigned",
             "probation": "On Probation"
         },
+        "remove": {
+            "title": "Remove Employee",
+            "description": "Are you sure you want to remove this employee? This action cannot be undone.",
+            "confirm": "Yes, Remove Employee"
+        },
         "new": {
             "title": "New Employee",
             "description": "Add a new employee to manage their KPIs and performance.",
@@ -64,6 +69,11 @@
                 "description": "Add template to the evaluation criteria to assess employee performance.",
                 "save": "Save Template"
             }
+        },
+        "remove": {
+            "title": "Remove Evaluation Criteria",
+            "description": "Are you sure you want to remove this evaluation criteria? This action cannot be undone.",
+            "confirm": "Yes, Remove Criteria"
         },
         "table": {
             "label": "Label",
@@ -115,6 +125,11 @@
             "add": {
                 "title": "Add Employee"
             }
+        },
+        "remove": {
+            "title": "Remove Evaluation Template",
+            "description": "Are you sure you want to remove this evaluation template? This action cannot be undone.",
+            "confirm": "Yes, Remove Template"
         },
         "not_found": "Evaluation template not found",
         "loading": "Loading evaluation templates...",

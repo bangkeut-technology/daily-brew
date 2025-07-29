@@ -6,14 +6,33 @@ import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
 import { deleteTemplateCriteria } from '@/services/evaluation-template-criteria';
 import { useTranslation } from 'react-i18next';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface RemoveTemplateCriteriaButtonProps {
     publicId: string;
+    withText?: boolean;
+    title: string;
+    description: string;
+    confirmationText: string;
     onRemove?: () => void;
 }
 
 export const RemoveTemplateCriteriaButton: React.FunctionComponent<RemoveTemplateCriteriaButtonProps> = ({
     publicId,
+    title,
+    description,
+    confirmationText,
+    withText,
     onRemove,
 }) => {
     const { t } = useTranslation();
@@ -31,14 +50,32 @@ export const RemoveTemplateCriteriaButton: React.FunctionComponent<RemoveTemplat
         },
     });
 
-    const handleRemove = () => {
+    const handleRemove = React.useCallback(() => {
         mutate(publicId);
-    };
+    }, [mutate, publicId]);
 
     return (
-        <Button variant="destructive" size="icon" onClick={handleRemove} disabled={isPending}>
-            <Trash2 className="h-4 w-4" />
-        </Button>
+        <AlertDialog>
+            <AlertDialogTrigger asChild>
+                <Button variant="destructive" size={withText ? 'default' : 'icon'} disabled={isPending}>
+                    <Trash2 className="h-4 w-4" />
+                </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>{title}</AlertDialogTitle>
+                    <AlertDialogDescription>{description}</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                    <AlertDialogAction asChild>
+                        <Button variant="destructive" onClick={handleRemove} disabled={isPending}>
+                            {confirmationText}
+                        </Button>
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
     );
 };
 
