@@ -20,19 +20,26 @@ interface RoleSelectProps {
 }
 
 export const RoleSelect: React.FunctionComponent<RoleSelectProps> = ({ control, name, title, description }) => {
-    const [roles, setRoles] = React.useState<RowSelectionState>({});
-    const { replace } = useFieldArray({
+    const { fields, replace } = useFieldArray({
         name,
         control,
     });
+    const [roles, setRoles] = React.useState<RowSelectionState>(() =>
+        fields.reduce<RowSelectionState>((acc, _, currentIndex) => {
+            acc[currentIndex] = true;
+            return acc;
+        }, {}),
+    );
     const { data = [] } = useQuery({
         queryKey,
         queryFn: () => fetchRoles(),
     });
 
     React.useEffect(() => {
-        const selectedRows = Object.keys(roles).map((value) => data[Number(value)]);
-        replace(selectedRows.map((role) => ({ value: role.id })));
+        if (data.length > 0) {
+            const selectedRows = Object.keys(roles).map((value) => data[Number(value)]);
+            replace(selectedRows.map((role) => ({ value: role.id })));
+        }
     }, [data, replace, roles]);
 
     const columns = React.useMemo(
