@@ -14,10 +14,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { EvaluationTemplateCriteriaDataTable } from '@/components/data-table/evaluation-template-criteria-data-table';
 import { EmployeeDataTable } from '@/components/data-table/employee-data-table';
-import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { EditEvaluationTemplateDialog } from '@/components/dialog/edit-evaluation-template-dialog';
 import { AddEvaluationCriteriaDialog } from '@/components/dialog/add-evaluation-criteria-dialog';
+import { AddEmployeeDialog } from '@/components/dialog/add-employee-dialog';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/templates/$publicId/')({
     component: EvaluationTemplateDetails,
@@ -114,14 +114,7 @@ function EvaluationTemplateDetails() {
                     <CardTitle className="text-base sm:text-lg md:text-xl">
                         {t('evaluation_templates.employees.linked', { ns: 'glossary' })}
                     </CardTitle>
-                    <Button
-                        size="sm"
-                        variant="outline"
-                        className="ml-2 mt-2 md:mt-0"
-                        onClick={() => console.log('Add employee')}
-                    >
-                        {t('evaluation_templates.employees.add.title', { ns: 'glossary' })}
-                    </Button>
+                    <AddEmployeeDialog template={data} onSuccess={onRefreshEmployees} />
                 </CardHeader>
                 <CardContent>
                     <EmployeeDataTable
