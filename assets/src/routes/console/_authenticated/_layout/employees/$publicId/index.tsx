@@ -67,39 +67,35 @@ function EmployeeDetails() {
                         <CardHeader>
                             <CardTitle>{t('employees.information', { ns: 'glossary' })}</CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div>
-                                <span className="font-semibold">
-                                    {t('employees.status.title', { ns: 'glossary' })}:
-                                </span>{' '}
+                        <CardContent className="text-sm text-muted-foreground flex flex-col gap-2">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                                <span>{t('employees.status.title', { ns: 'glossary' })}:</span>
                                 <Badge variant="outline">
                                     {t(`employees.status.${employee.status}`, { ns: 'glossary' })}
                                 </Badge>
                             </div>
                             {employee.phoneNumber && (
-                                <div>
-                                    <span className="font-semibold">
-                                        {t('employees.phone_number', { ns: 'glossary' })}:
-                                    </span>{' '}
-                                    {employee.phoneNumber}
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                                    <span>{t('employees.phone_number', { ns: 'glossary' })}:</span>
+                                    <span className="font-semibold text-foreground">{employee.phoneNumber}</span>
                                 </div>
                             )}
                             {employee.dob && (
-                                <div>
-                                    <span className="font-semibold">{t('employees.dob', { ns: 'glossary' })}:</span>{' '}
-                                    {format(employee.dob, 'PPP')}
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                                    <span>{t('employees.dob', { ns: 'glossary' })}:</span>
+                                    <span className="font-semibold text-foreground">{format(employee.dob, 'PPP')}</span>
                                 </div>
                             )}
                             {employee.joinedAt && (
-                                <div>
-                                    <span className="font-semibold">
-                                        {t('employees.joined_at', { ns: 'glossary' })}:
-                                    </span>{' '}
-                                    {format(new Date(employee.joinedAt), 'PPP')}
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                                    <span>{t('employees.joined_at', { ns: 'glossary' })}:</span>
+                                    <span className="font-semibold text-foreground">
+                                        {format(new Date(employee.joinedAt), 'PPP')}
+                                    </span>
                                 </div>
                             )}
-                            <div>
-                                <span className="font-semibold">{t('employees.roles.title', { ns: 'glossary' })}:</span>
+                            <div className="flex flex-col">
+                                <span>{t('employees.roles.title', { ns: 'glossary' })}:</span>
                                 <div className="mt-1 flex flex-wrap gap-2">
                                     {employee.roles.map((role) => (
                                         <Badge key={role.canonicalName} variant="secondary">
