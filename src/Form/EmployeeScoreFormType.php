@@ -18,12 +18,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Class EmployeeScoreFormType.
+ * Class EmployeeScoreFormType
  *
+ * @package App\Form
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 class EmployeeScoreFormType extends AbstractType
 {
+    /**
+     * @var UserInterface|null
+     */
     private readonly ?UserInterface $user;
 
     public function __construct(Security $security)

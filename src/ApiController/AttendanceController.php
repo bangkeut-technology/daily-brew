@@ -7,7 +7,6 @@ use App\ApiController\Trait\AttendanceTrait;
 use App\Controller\AbstractController;
 use App\Entity\Attendance;
 use App\Form\AttendanceFormType;
-use App\Form\EmployeeFormType;
 use App\Repository\AttendanceRepository;
 use App\Util\DateHelper;
 use DateTimeImmutable;

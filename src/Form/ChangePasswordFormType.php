@@ -53,6 +53,10 @@ class ChangePasswordFormType extends AbstractType
             'first_options' => ['label' => 'New Password'],
             'second_options' => ['label' => 'New Password Confirmation'],
             'invalid_message' => 'The password fields must match.',
+            'documentation' => [
+                'type' => 'string',
+                'description' => 'The new password for the user.',
+            ],
         ]);
     }
 

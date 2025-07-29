@@ -25,9 +25,18 @@ class UserFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('username', TextType::class)
-            ->add('firstName', TextType::class)
-            ->add('lastName', TextType::class)
+            ->add('firstName', TextType::class, [
+                'documentation' => [
+                    'type' => 'string',
+                    'description' => 'The first name of the user.',
+                ]
+            ])
+            ->add('lastName', TextType::class, [
+                'documentation' => [
+                    'type' => 'string',
+                    'description' => 'The last name of the user.',
+                ]
+            ])
             ->add('plainPassword', PasswordType::class, [
                 'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
@@ -41,10 +50,25 @@ class UserFormType extends AbstractType
                         maxMessage: 'Password cannot be longer than {{ limit }} characters',
                     ),
                 ],
-            ])->add('dob', DateTimeImmutableType::class)
+                'documentation' => [
+                    'type' => 'string',
+                    'description' => 'The password of the user. Must be at least 6 characters long.',
+                ]
+            ])->add('dob', DateTimeImmutableType::class, [
+                'documentation' => [
+                    'type' => 'string',
+                    'format' => 'date-time',
+                    'description' => 'The date of birth in YYYY-MM-DD format.',
+                ]
+            ])
             ->add('imageFile', ImageType::class, [
                 'label' => 'Image',
                 'required' => true,
+                'documentation' => [
+                    'type' => 'string',
+                    'format' => 'binary',
+                    'description' => 'The image file of the user.',
+                ]
             ]);
     }
 

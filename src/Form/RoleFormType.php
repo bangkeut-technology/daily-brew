@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class RoleFormType.
@@ -26,6 +27,10 @@ class RoleFormType extends AbstractType
                     'type' => 'string',
                     'description' => 'The name of the role, e.g., ROLE_ADMIN',
                 ],
+                'required' => true,
+                'constraints' => [
+                    new NotBlank(message: 'Please enter a role name'),
+                ]
             ])
             ->add('description', TextareaType::class, [
                 'required' => false,

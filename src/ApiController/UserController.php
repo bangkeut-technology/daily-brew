@@ -85,13 +85,7 @@ class UserController extends AbstractController
      */
     #[OA\RequestBody(content: new OA\MediaType(
         mediaType: 'application/json',
-        schema: new OA\Schema(properties: [
-            new OA\Property(property: 'email', description: 'The email of the user.', type: 'string', format: 'email'),
-            new OA\Property(property: 'firstName', description: 'The first name of the user.', type: 'string'),
-            new OA\Property(property: 'lastName', description: 'The last nme of the user.', type: 'string'),
-            new OA\Property(property: 'dob', description: 'The day of birth of the user.', type: 'string', format: 'date-time'),
-            new OA\Property(property: 'password', description: 'User password', type: 'string', format: 'password'),
-        ], type: 'object')
+        schema: new OA\Schema(ref: new Model(type: UserFormType::class), description: 'The user data to update.'),
     ))]
     #[OA\Response(
         response: Response::HTTP_OK,

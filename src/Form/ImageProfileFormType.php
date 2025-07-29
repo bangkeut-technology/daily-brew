@@ -35,6 +35,11 @@ class ImageProfileFormType extends AbstractType
                         mimeTypesMessage: 'image.mime_type',
                     ),
                 ],
+                'documentation' => [
+                    'type' => 'string',
+                    'format' => 'binary',
+                    'description' => 'The image file to be uploaded as the user profile picture.',
+                ],
             ]);
     }
 
