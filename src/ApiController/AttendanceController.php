@@ -112,4 +112,78 @@ class AttendanceController extends AbstractController
 
         return $this->createAttendanceResponse($attendance, Response::HTTP_CREATED);
     }
+
+    /**
+     * Get an attendance by its public ID.
+     *
+     * @param string $publicId The public ID of the attendance.
+     *
+     * @return JsonResponse
+     */
+    #[OA\Parameter(
+        name: 'publicId',
+        description: 'Public ID of the attendance to retrieve',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns the attendance with the specified public ID.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'attendance', ref: new Model(type: Attendance::class, groups: ['attendance:read'])),
+            ],
+            type: 'object'
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_NOT_FOUND,
+        description: 'Attendance not found.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'error', description: 'Error message', type: 'string'),
+            ],
+            type: 'object'
+        )
+    )]
+    #[Route('/{publicId}', name: 'get', methods: ['GET'])]
+    public function get(string $publicId): JsonResponse
+    {
+        $attendance = $this->getAttendanceByPublicId($publicId);
+        return $this->createAttendanceResponse($attendance);
+    }
+
+    /**
+     * Delete an attendance.
+     *
+     * @param string $publicId The public ID of the attendance to delete.
+     *
+     * @return JsonResponse
+     */
+    #[OA\Parameter(
+        name: 'publicId',
+        description: 'Public ID of the attendance to delete',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns no content after successful deletion.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'message', description: 'Confirmation message after deletion', type: 'string'),
+            ],
+            type: 'object'
+        )
+    )]
+    #[Route('/{publicId}', name: 'delete', methods: ['DELETE'])]
+    public function delete(string $publicId): JsonResponse
+    {
+        $attendance = $this->getAttendanceByPublicId($publicId);
+        $this->attendanceRepository->delete($attendance);
+
+        return $this->createAttendanceResponse($this->translator->trans('deleted.attendance'));
+    }
 }

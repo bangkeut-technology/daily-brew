@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace App\ApiController\Trait;
 
+use App\Entity\Attendance;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Trait AttendanceTrait
@@ -25,5 +27,22 @@ trait AttendanceTrait
     private function createAttendanceResponse(mixed $data, int $statusCode = Response::HTTP_OK): JsonResponse
     {
         return $this->json($data, $statusCode, context: ['groups' => ['attendance:read']]);
+    }
+
+    /**
+     * Retrieve an Attendance entity by its public ID and the current user.
+     *
+     * @param string $publicId The public ID of the attendance.
+     *
+     * @return Attendance The Attendance entity.
+     * @throws NotFoundHttpException If the attendance is not found.
+     */
+    private function getAttendanceByPublicId(string $publicId): Attendance
+    {
+        if (null === $attendance = $this->attendanceRepository->findByPublicIdAndUser($publicId, $this->getUser())) {
+            throw $this->createNotFoundException($this->translator->trans('not_found.attendance', ['%publicId%' => $publicId], domain: 'errors'));
+        }
+
+        return $attendance;
     }
 }

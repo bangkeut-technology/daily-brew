@@ -100,4 +100,24 @@ class AttendanceRepository extends AbstractRepository
             ->getResult();
     }
 
+    /**
+     * Find an attendance by its public ID and user.
+     *
+     * @param string $publicId The public ID of the attendance.
+     * @param User|null $getUser The user associated with the attendance, or null if not applicable.
+     * @return Attendance|null
+     */
+    public function findByPublicIdAndUser(string $publicId, ?User $getUser): ?Attendance
+    {
+        return $this->createQueryBuilder('a')
+            ->addSelect('e')
+            ->where('a.publicId = :publicId')
+            ->andWhere('a.user = :user')
+            ->setParameters(new ArrayCollection([
+                new Parameter('publicId', $publicId),
+                new Parameter('user', $getUser),
+            ]))
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }
