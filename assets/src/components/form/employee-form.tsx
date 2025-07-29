@@ -11,9 +11,10 @@ import { EvaluationTemplateSelect } from '@/components/select/evaluation-templat
 interface EmployeeFormProps {
     form: UseFormReturn<PartialEmployee>;
     isPending?: boolean;
+    withTemplates?: boolean;
 }
 
-export const EmployeeForm: React.FunctionComponent<EmployeeFormProps> = ({ form, isPending }) => {
+export const EmployeeForm: React.FunctionComponent<EmployeeFormProps> = ({ form, isPending, withTemplates }) => {
     const { t } = useTranslation();
 
     return (
@@ -30,13 +31,15 @@ export const EmployeeForm: React.FunctionComponent<EmployeeFormProps> = ({ form,
                 />
                 <DatePicker control={form.control} name="dob" label={t('date_of_birth')} disabled={isPending} />
                 <DatePicker control={form.control} name="joinedAt" label={t('joined_at')} disabled={isPending} />
-                <EvaluationTemplateSelect
-                    name="template"
-                    control={form.control}
-                    label={t('evaluation_templates.title', { ns: 'glossary' })}
-                    description={t('evaluation_templates.select.description', { ns: 'glossary' })}
-                    placeholder={t('evaluation_templates.select.placeholder', { ns: 'glossary' })}
-                />
+                {withTemplates && (
+                    <EvaluationTemplateSelect
+                        name="template"
+                        control={form.control}
+                        label={t('evaluation_templates.title', { ns: 'glossary' })}
+                        description={t('evaluation_templates.select.description', { ns: 'glossary' })}
+                        placeholder={t('evaluation_templates.select.placeholder', { ns: 'glossary' })}
+                    />
+                )}
                 <RoleSelect
                     control={form.control}
                     name="roles"

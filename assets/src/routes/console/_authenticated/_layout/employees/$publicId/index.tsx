@@ -8,8 +8,9 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { EmployeeEvaluationButton } from '@/components/button/employee-evaluation-button';
 import { BackButton } from '@/components/button/back-button';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2, UserRoundX } from 'lucide-react';
+import { EditEmployeeDialog } from '@/components/dialog/edit-employee-dialog';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/employees/$publicId/')({
     component: EmployeeDetails,
@@ -23,10 +24,19 @@ function EmployeeDetails() {
     const { t } = useTranslation();
     const { publicId } = Route.useParams();
     const { from, to } = Route.useSearch();
+    const queryClient = useQueryClient();
     const { data: employee, isPending } = useQuery({
         queryKey: ['employee', publicId, from, to],
         queryFn: () => fetchEmployee({ publicId, from, to }),
     });
+
+    const onSuccess = React.useCallback(() => {
+        queryClient
+            .invalidateQueries({
+                queryKey: ['employee', publicId, from, to],
+            })
+            .then();
+    }, [from, publicId, queryClient, to]);
 
     if (isPending) {
         return (
@@ -43,10 +53,11 @@ function EmployeeDetails() {
                 <div className="space-y-2">
                     <BackButton />
 
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                    <div className="flex flex-col md:flex-row md:items-center gap-2">
                         <h1 className="text-3xl font-bold">
                             {employee.firstName} {employee.lastName}
                         </h1>
+                        <EditEmployeeDialog employee={employee} onSuccess={onSuccess} />
                         <EmployeeEvaluationButton employee={employee} />
                     </div>
                 </div>

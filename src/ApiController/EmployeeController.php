@@ -272,7 +272,7 @@ class EmployeeController extends AbstractController
     {
         $employee = $this->getEmployeeByPublicId($publicId);
         $form = $this->createForm(EmployeeFormType::class, $employee);
-        $form->submit($request->getPayload()->all());
+        $form->submit($request->getPayload()->all(), false);
         if ($form->isSubmitted() && $form->isValid()) {
             $this->employeeRepository->update($employee);
 

@@ -71,7 +71,7 @@ function NewEmployeeComponent() {
             <h1 className="text-2xl font-bold mb-4">{t('employees.new.title', { ns: 'glossary' })}</h1>
             <p>{t('employees.new.description', { ns: 'glossary' })}</p>
             <div className="flex flex-col space-y-2 mt-4">
-                <EmployeeForm form={form} isPending={isPending} />
+                <EmployeeForm form={form} isPending={isPending} withTemplates />
                 <Button className="w-full" onClick={form.handleSubmit(onSubmit)} disabled={isPending}>
                     {t('employees.new.save', { ns: 'glossary' })} <Send />
                 </Button>

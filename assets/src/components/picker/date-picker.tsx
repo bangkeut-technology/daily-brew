@@ -62,6 +62,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                                 mode="single"
                                 selected={field.value}
                                 onSelect={field.onChange}
+                                captionLayout="dropdown"
                                 disabled={disabledDate}
                             />
                         </PopoverContent>

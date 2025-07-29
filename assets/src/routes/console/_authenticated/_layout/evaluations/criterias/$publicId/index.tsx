@@ -71,8 +71,12 @@ function EvaluationTemplateDetails() {
                 </CardHeader>
                 <CardContent className="text-sm md:text-base text-muted-foreground">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                        <span className="font-medium text-foreground">{t('created_at')}:</span>
-                        <span>{format(new Date(data.createdAt), 'PPP')}</span>
+                        <span>{t('weight')}:</span>
+                        <span className="font-medium text-foreground">{data.weight}</span>
+                    </div>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                        <span>{t('created_at')}:</span>
+                        <span className="font-medium text-foreground">{format(new Date(data.createdAt), 'PPP')}</span>
                     </div>
                 </CardContent>
             </Card>
