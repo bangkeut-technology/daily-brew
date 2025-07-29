@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
 import { AddEvaluationTemplateDialog } from '@/components/dialog/add-evaluation-template-dialog';
 import { EditEvaluationCriteriaDialog } from '@/components/dialog/edit-evaluation-criteria-dialog';
-import { EvaluationTemplateCriteriaDataTable } from '@/components/data-table/evaluation-template-criteria-data-table';
+import { EvaluationCriteriaTemplateDataTable } from '@/components/data-table/evaluation-criteria-template-data-table';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/criterias/$publicId/')({
     component: EvaluationTemplateDetails,
@@ -26,8 +26,8 @@ function EvaluationTemplateDetails() {
         queryFn: () => fetchEvaluationCriteria(publicId),
         refetchOnWindowFocus: false,
     });
-    const { data: criterias = [], isPending: isCriteriasPending } = useQuery({
-        queryKey: ['evaluation-criteria-criterias', publicId],
+    const { data: templates = [], isPending: isCriteriasPending } = useQuery({
+        queryKey: ['evaluation-criteria-templates', publicId],
         queryFn: () => fetchTemplateCriterias(publicId),
         enabled: data && !!data.publicId,
     });
@@ -36,8 +36,8 @@ function EvaluationTemplateDetails() {
         queryClient.invalidateQueries({ queryKey: ['evaluation-criteria', publicId] }).then();
     }, [publicId, queryClient]);
 
-    const onRefreshCriterias = React.useCallback(() => {
-        queryClient.invalidateQueries({ queryKey: ['evaluation-criteria-criterias', publicId] }).then();
+    const onRefreshTemplates = React.useCallback(() => {
+        queryClient.invalidateQueries({ queryKey: ['evaluation-criteria-templates', publicId] }).then();
     }, [publicId, queryClient]);
 
     if (isPending) {
@@ -82,13 +82,13 @@ function EvaluationTemplateDetails() {
                     <CardTitle className="text-base sm:text-lg md:text-xl">
                         {t('evaluation_criterias.template.title', { ns: 'glossary' })}
                     </CardTitle>
-                    <AddEvaluationTemplateDialog criteria={data} onSuccess={onRefreshCriterias} />
+                    <AddEvaluationTemplateDialog criteria={data} onSuccess={onRefreshTemplates} />
                 </CardHeader>
                 <CardContent>
-                    <EvaluationTemplateCriteriaDataTable
-                        criterias={criterias}
+                    <EvaluationCriteriaTemplateDataTable
+                        templates={templates}
                         loading={isCriteriasPending}
-                        onRemoveCriteria={onRefreshCriterias}
+                        onRemoveTemplate={onRefreshTemplates}
                     />
                 </CardContent>
             </Card>
