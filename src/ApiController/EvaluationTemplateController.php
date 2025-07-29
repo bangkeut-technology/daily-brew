@@ -491,9 +491,11 @@ class EvaluationTemplateController extends AbstractController
     public function deleteEmployee(string $publicId, string $employeePublicId): JsonResponse
     {
         $template = $this->getEvaluationTemplateByPublicId($publicId);
-        if (null === $employee = $this->employeeRepository->findByPublicIdAndUser($employeePublicId, $this->getUser())) {
+
+        if (null !== $employee = $this->employeeRepository->findByPublicIdAndUser($employeePublicId, $this->getUser())) {
             $template->removeEmployee($employee);
         }
+
         $this->evaluationTemplateRepository->update($template);
         return $this->createEmployeeResponse([
             'message' => $this->translator->trans('deleted.evaluation_template_employee', ['%template%' => $template]),
