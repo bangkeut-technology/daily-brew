@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\Entity(repositoryClass: RoleRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNQ_ROLE_NAME', columns: ['name'])]
 #[ORM\UniqueConstraint(name: 'UNQ_ROLE_NAME_CANONICAL', columns: ['canonical_name'])]
+#[ORM\HasLifecycleCallbacks]
 class Role extends AbstractEntity
 {
     #[ORM\Column(length: 100)]

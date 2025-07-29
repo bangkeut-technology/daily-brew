@@ -34,43 +34,98 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL_SECRET', fields: ['secret'])]
 #[UniqueEntity(fields: ['emailCanonical'], message: 'There is already an account with this emailCanonical')]
 #[Vich\Uploadable]
+#[ORM\HasLifecycleCallbacks]
 class User extends AbstractEntity implements UserInterface, PasswordAuthenticatedUserInterface, Serializable
 {
+    /**
+     * The unique identifier of the user.
+     * While this is not a primary key, it is used to uniquely identify the user.
+     * This is used for various operations such as authentication and authorization.
+     * @var string|null
+     */
     #[ORM\Column(length: 225)]
-    private ?Uuid $secret = null;
+    private ?string $secret = null;
 
+    /**
+     * The email address of the user.
+     * This is used as the unique identifier for the user.
+     * @var string|null
+     */
     #[ORM\Column(length: 180)]
     #[Groups(['user:read'])]
     private ?string $email = null;
 
+    /**
+     * The canonical version of the email address.
+     * This is used to ensure that the email address is unique and case-insensitive.
+     * @var string|null
+     */
     #[ORM\Column(name: 'email_canonical', length: 180)]
     #[Groups(['user:read'])]
     private ?string $emailCanonical = null;
 
+    /**
+     * The plain password of the user.
+     * This is used for validation and should not be stored in the database.
+     *
+     * @var string|null
+     */
     private ?string $plainPassword = null;
 
     /**
-     * @var list<string> The user roles
+     * The roles assigned to the user.
+     * This is used for authorization to determine what actions the user can perform.
+     * @var array<int, string>
      */
     #[ORM\Column]
     #[Groups(['user:read'])]
     private array $roles = [RoleEnum::DEFAULT->value];
 
+    /**
+     * The first name of the user.
+     * This is used for display and can be null if not provided.
+     *
+     * @var string|null
+     */
     #[ORM\Column(name: 'first_name', type: Types::STRING, length: 150, nullable: true)]
     #[Groups(['user:read'])]
     private ?string $firstName = null;
 
+    /**
+     * The last name of the user.
+     * This is used for display and can be null if not provided.
+     *
+     * @var string|null
+     */
     #[ORM\Column(name: 'last_name', type: Types::STRING, length: 150, nullable: true)]
     #[Groups(['user:read'])]
     private ?string $lastName = null;
 
+    /**
+     * The date of birth of the user.
+     * This is used for display and can be null if not provided.
+     *
+     * @var DateTimeImmutable|null
+     */
     #[ORM\Column(name: 'dob', type: Types::DATE_IMMUTABLE, nullable: true)]
     #[Groups(['user:read'])]
     private ?DateTimeImmutable $dob = null;
 
+    /**
+     * The URL of the user's avatar.
+     * This is used for display and can be null if not provided.
+     *
+     * @var string|null
+     */
     #[Groups(['user:read'])]
     public ?string $avatarUrl = null;
 
+    /**
+     * The file associated with the user's image.
+     * This is used for uploading and storing the user's profile image.
+     *
+     * @var File|UploadedFile|null
+     */
     #[Vich\UploadableField(
         mapping: 'users',
         fileNameProperty: 'imageName',
@@ -81,34 +136,76 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     )]
     private UploadedFile|File|null $imageFile = null;
 
+    /**
+     * The name of the image file.
+     * This is used to store the name of the uploaded image file.
+     *
+     * @var string|null
+     */
     #[ORM\Column(name: 'image_name', type: Types::STRING, length: 255, nullable: true)]
     private ?string $imageName = null;
 
+    /**
+     * The size of the uploaded file in bytes.
+     * This is used to store the size of the uploaded image file.
+     *
+     * @var int|null
+     */
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $fileSize = null;
 
+    /**
+     * The original name of the uploaded file.
+     * This is used to store the original name of the file before it was uploaded.
+     *
+     * @var string|null
+     */
     #[ORM\Column(type: 'string', nullable: true)]
     private ?string $originalName = null;
 
+    /**
+     * The MIME type of the uploaded file.
+     * This is used to store the MIME type of the uploaded image file.
+     *
+     * @var string|null
+     */
     #[ORM\Column(type: 'string', nullable: true)]
     private ?string $mimeType = null;
 
     /**
+     * The dimensions of the uploaded image.
+     * This is used to store the width and height of the uploaded image file.
+     *
      * @var array<int, int>
      */
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $dimensions = null;
 
     /**
-     * @var string|null The hashed password
+     * The password of the user.
+     * This is used for authentication and should be stored securely.
+     *
+     * @var string|null The hashed password of the user.
      */
     #[ORM\Column]
     private ?string $password = null;
 
+    /**
+     * The enabled status of the user.
+     * This indicates whether the user account is active or not.
+     *
+     * @var bool
+     */
     #[ORM\Column(type: 'boolean')]
     #[Groups(['user:read'])]
     private bool $enabled = true;
 
+    /**
+     * The locale of the user.
+     * This is used to determine the language and regional settings for the user.
+     *
+     * @var string|null
+     */
     #[ORM\Column(length: 5, nullable: true)]
     #[Groups(['user:read'])]
     private ?string $locale = 'en';
@@ -138,30 +235,39 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         $this->templates = new ArrayCollection();
     }
 
-    public function getSecret(): ?Uuid
+    /**
+     * @return string|null
+     */
+    public function getSecret(): ?string
     {
         return $this->secret;
     }
 
-    public function setSecret(?Uuid $secret): User
+    /**
+     * @param string|null $secret
+     * @return User
+     */
+    public function setSecret(?string $secret): User
     {
         $this->secret = $secret;
-
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getEmail(): ?string
     {
         return $this->email;
     }
 
     /**
-     * @return $this
+     * @param string|null $email
+     * @return User
      */
-    public function setEmail(string $email): static
+    public function setEmail(?string $email): User
     {
         $this->email = $email;
-
         return $this;
     }
 
@@ -234,148 +340,227 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         $this->plainPassword = null;
     }
 
+    /**
+     * @return string|null
+     */
     public function getEmailCanonical(): ?string
     {
         return $this->emailCanonical;
     }
 
     /**
-     * @return $this
+     * @param string|null $emailCanonical
+     * @return User
      */
     public function setEmailCanonical(?string $emailCanonical): User
     {
         $this->emailCanonical = $emailCanonical;
-
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
     }
 
     /**
-     * @return $this
+     * @param string|null $plainPassword
+     * @return User
      */
     public function setPlainPassword(?string $plainPassword): User
     {
         $this->plainPassword = $plainPassword;
-
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getFirstName(): ?string
     {
         return $this->firstName;
     }
 
+    /**
+     * @param string|null $firstName
+     * @return User
+     */
     public function setFirstName(?string $firstName): User
     {
         $this->firstName = $firstName;
-
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getLastName(): ?string
     {
         return $this->lastName;
     }
 
+    /**
+     * @param string|null $lastName
+     * @return User
+     */
     public function setLastName(?string $lastName): User
     {
         $this->lastName = $lastName;
-
         return $this;
     }
 
+    /**
+     * @return DateTimeImmutable|null
+     */
     public function getDob(): ?DateTimeImmutable
     {
         return $this->dob;
     }
 
+    /**
+     * @param DateTimeImmutable|null $dob
+     * @return User
+     */
     public function setDob(?DateTimeImmutable $dob): User
     {
         $this->dob = $dob;
-
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
+    public function getAvatarUrl(): ?string
+    {
+        return $this->avatarUrl;
+    }
+
+    /**
+     * @param string|null $avatarUrl
+     * @return User
+     */
+    public function setAvatarUrl(?string $avatarUrl): User
+    {
+        $this->avatarUrl = $avatarUrl;
+        return $this;
+    }
+
+    /**
+     * @return File|UploadedFile|null
+     */
     public function getImageFile(): File|UploadedFile|null
     {
         return $this->imageFile;
     }
 
+    /**
+     * @param File|UploadedFile|null $imageFile
+     * @return User
+     */
     public function setImageFile(File|UploadedFile|null $imageFile): User
     {
         $this->imageFile = $imageFile;
-
-        if (null !== $imageFile) {
-            $this->updatedAt = new DateTimeImmutable();
-        }
-
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getImageName(): ?string
     {
         return $this->imageName;
     }
 
+    /**
+     * @param string|null $imageName
+     * @return User
+     */
     public function setImageName(?string $imageName): User
     {
         $this->imageName = $imageName;
-
         return $this;
     }
 
+    /**
+     * @return int|null
+     */
     public function getFileSize(): ?int
     {
         return $this->fileSize;
     }
 
+    /**
+     * @param int|null $fileSize
+     * @return User
+     */
     public function setFileSize(?int $fileSize): User
     {
         $this->fileSize = $fileSize;
-
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getOriginalName(): ?string
     {
         return $this->originalName;
     }
 
+    /**
+     * @param string|null $originalName
+     * @return User
+     */
     public function setOriginalName(?string $originalName): User
     {
         $this->originalName = $originalName;
-
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getMimeType(): ?string
     {
         return $this->mimeType;
     }
 
+    /**
+     * @param string|null $mimeType
+     * @return User
+     */
     public function setMimeType(?string $mimeType): User
     {
         $this->mimeType = $mimeType;
-
         return $this;
     }
 
+    /**
+     * @return array|null
+     */
     public function getDimensions(): ?array
     {
         return $this->dimensions;
     }
 
+    /**
+     * @param array|null $dimensions
+     * @return User
+     */
     public function setDimensions(?array $dimensions): User
     {
         $this->dimensions = $dimensions;
-
         return $this;
     }
 
+    /**
+     * Returns the full name of the user.
+     *
+     * @return string The full name in the format "FirstName LastName"
+     */
     public function getFullName(): string
     {
         return sprintf('%s %s', $this->firstName, $this->lastName);
@@ -455,6 +640,11 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         return $this;
     }
 
+    /**
+     * Returns the locale of the user.
+     *
+     * @return string|null The locale of the user, or 'en' if not set
+     */
     public function getLocale(): ?string
     {
         return $this->locale ?? 'en';
@@ -637,6 +827,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[ORM\PrePersist]
     public function generateSecret(): void
     {
-        $this->secret = Uuid::v4();
+        $this->secret = Uuid::v4()->toBase58();
+        dump($this->secret);
     }
 }

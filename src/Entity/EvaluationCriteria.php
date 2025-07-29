@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\Entity(repositoryClass: EvaluationCriteriaRepository::class)]
 #[ORM\UniqueConstraint(name: 'UQ_EVALUATION_CRITERIA_LABEL', columns: ['label', 'user_id'])]
 #[ORM\UniqueConstraint(name: 'UQ_EVALUATION_CRITERIA_CANONICAL_LABEL', columns: ['canonical_label', 'user_id'])]
+#[ORM\HasLifecycleCallbacks]
 class EvaluationCriteria extends AbstractEntity
 {
     /**

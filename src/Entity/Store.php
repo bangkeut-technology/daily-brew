@@ -21,6 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: StoreRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_STORE_NAME', fields: ['name', 'user'])]
 #[ORM\UniqueConstraint(name: 'UNIQ_STORE_CANONICAL_NAME', fields: ['canonicalName', 'user'])]
+#[ORM\HasLifecycleCallbacks]
 class Store extends AbstractEntity
 {
     #[ORM\Column(length: 255)]

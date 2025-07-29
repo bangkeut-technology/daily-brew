@@ -20,6 +20,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\Entity(repositoryClass: EvaluationTemplateRepository::class)]
 #[ORM\UniqueConstraint(name: 'UQ_EVALUATION_TEMPLATE_NAME', columns: ['name', 'user_id'])]
 #[ORM\UniqueConstraint(name: 'UQ_EVALUATION_TEMPLATE_CANONICAL_NAME', columns: ['canonical_name', 'user_id'])]
+#[ORM\HasLifecycleCallbacks]
 class EvaluationTemplate extends AbstractEntity
 {
     #[ORM\Column(length: 255)]
