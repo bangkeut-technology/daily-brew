@@ -111,4 +111,13 @@ class EvaluationCriteriaRepository extends AbstractRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findByUser(User $user)
+    {
+        return $this->createQueryBuilder('ec')
+            ->where('ec.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
+    }
 }

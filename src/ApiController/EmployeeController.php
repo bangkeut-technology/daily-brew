@@ -4,16 +4,20 @@ declare(strict_types=1);
 
 namespace App\ApiController;
 
+use App\ApiController\Trait\AttendanceTrait;
 use App\ApiController\Trait\EmployeeEvaluationTrait;
 use App\ApiController\Trait\EmployeeTrait;
 use App\ApiController\Trait\EvaluationTemplateTrait;
 use App\Controller\AbstractController;
+use App\Entity\Attendance;
 use App\Entity\EmployeeEvaluation;
 use App\Entity\User;
 use App\Event\Employee\CheckEmployeeLimitEvent;
 use App\Event\EmployeeEvaluation\FinalizeEmployeeEvaluationEvent;
+use App\Form\AttendanceFormType;
 use App\Form\EmployeeEvaluationFormType;
 use App\Form\EmployeeFormType;
+use App\Repository\AttendanceRepository;
 use App\Repository\EmployeeEvaluationRepository;
 use App\Repository\EmployeeRepository;
 use App\Util\DateHelper;
@@ -40,6 +44,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[OA\Tag(name: 'Employees')]
 class EmployeeController extends AbstractController
 {
+    use AttendanceTrait;
     use EmployeeTrait;
     use EmployeeEvaluationTrait;
     use EvaluationTemplateTrait;
@@ -48,7 +53,7 @@ class EmployeeController extends AbstractController
         TranslatorInterface                           $translator,
         private readonly EventDispatcherInterface     $dispatcher,
         private readonly EmployeeRepository           $employeeRepository,
-        private readonly EmployeeEvaluationRepository $employeeEvaluationRepository,
+        private readonly EmployeeEvaluationRepository $employeeEvaluationRepository, private readonly AttendanceRepository $attendanceRepository,
     )
     {
         parent::__construct($translator);
@@ -127,7 +132,7 @@ class EmployeeController extends AbstractController
     )]
     #[Route(name: 'post', methods: ['POST'])]
     public function post(
-        Request             $request,
+        Request $request,
     ): JsonResponse
     {
         $this->dispatcher->dispatch(new CheckEmployeeLimitEvent($this->getUser()));
@@ -281,6 +286,93 @@ class EmployeeController extends AbstractController
     }
 
     /**
+     * Post attendance for the employee by publicId.
+     *
+     * @param string  $publicId The unique publicId of the employee
+     * @param Request $request  The HTTP request containing the attendance data
+     *
+     * @return JsonResponse The JSON response containing the created attendance data or an error message
+     */
+    #[OA\Parameter(
+        name: 'publicId',
+        description: 'The unique publicId of the employee',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string', example: 'emp123')
+    )]
+    #[OA\RequestBody(
+        description: 'Attendance data',
+        content: new OA\JsonContent(
+            ref: new Model(type: AttendanceFormType::class),
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_CREATED,
+        description: 'Creates a new attendance for the employee',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'message',
+                    type: 'string',
+                    example: 'Attendance created successfully'
+                ),
+                new OA\Property(
+                    property: 'attendance',
+                    ref: new Model(type: Attendance::class, groups: ['attendance:read'])
+                ),
+            ],
+            type: 'object'
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_BAD_REQUEST,
+        description: 'Invalid input data',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'message',
+                    type: 'string',
+                    example: 'Invalid input data'
+                ),
+            ],
+            type: 'object'
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_NOT_FOUND,
+        description: 'Employee not found',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'message',
+                    type: 'string',
+                    example: 'Employee not found'
+                ),
+            ],
+            type: 'object'
+        )
+    )]
+    #[Route('/{publicId}/attendance', name: 'post_attendance', methods: ['POST'])]
+    public function postAttendance(string $publicId, Request $request): JsonResponse
+    {
+        $employee = $this->getEmployeeByPublicId($publicId);
+        $attendance = $this->attendanceRepository->create();
+        $form = $this->createForm(AttendanceFormType::class, $attendance);
+        $form->submit($request->getPayload()->all());
+        if ($form->isSubmitted() && $form->isValid()) {
+            $attendance->setEmployee($employee);
+            $attendance->setUser($this->getUser());
+            $this->employeeRepository->update($attendance);
+
+            return $this->createAttendanceResponse([
+                'message' => $this->translator->trans('created.attendance', ['%name%' => $employee], domain: 'messages'),
+                'attendance' => $attendance,
+            ], Response::HTTP_CREATED);
+        }
+        return $this->createBadRequestResponse($this->translator->trans('invalid.attendance', domain: 'errors'));
+    }
+
+    /**
      * Delete employee by publicId.
      *
      * @param string $publicId The unique publicId of the employee
@@ -341,7 +433,7 @@ class EmployeeController extends AbstractController
      * @param string  $publicId The unique publicId of the employee
      * @param Request $request  The HTTP request containing the evaluation data
      *
-     * @throws RandomException
+     * @return JsonResponse The JSON response containing the created evaluation data or an error message
      */
     #[OA\Parameter(
         name: 'publicId',

@@ -15,7 +15,6 @@ use App\Form\EvaluationCriteriaFormType;
 use App\Repository\EvaluationCriteriaRepository;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
-use Random\RandomException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -73,8 +72,6 @@ class EvaluationCriteriaController extends AbstractController
      * @param Request $request the HTTP request containing the evaluation criteria data
      *
      * @return JsonResponse the JSON response containing the created evaluation criteria
-     *
-     * @throws RandomException
      */
     #[OA\Response(
         response: Response::HTTP_CREATED,
@@ -101,7 +98,7 @@ class EvaluationCriteriaController extends AbstractController
                 return $this->createBadRequestResponse($this->translator->trans('existed.evaluation_criteria', ['%label%' => $criteria->getLabel()], domain: 'errors'));
             }
             $criteria->setUser($this->getUser());
-            $this->evaluationCriteriaRepository->updateEvaluationCriteria($criteria);
+            $this->evaluationCriteriaRepository->update($criteria);
 
             $this->dispatcher->dispatch(new EvaluationCriteriaCreatedEvent($criteria, $form->get('templates')->getData()));
 
@@ -201,8 +198,6 @@ class EvaluationCriteriaController extends AbstractController
      * @param string  $publicId the publicId of the evaluation criteria to update
      *
      * @return JsonResponse the JSON response containing the updated evaluation criteria
-     *
-     * @throws RandomException
      */
     #[OA\Parameter(
         name: 'publicId',
@@ -232,7 +227,7 @@ class EvaluationCriteriaController extends AbstractController
         $form = $this->createForm(EvaluationCriteriaFormType::class, $criteria);
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->evaluationCriteriaRepository->updateEvaluationCriteria($criteria);
+            $this->evaluationCriteriaRepository->update($criteria);
         }
 
         return $this->createCriteriaResponse($criteria);

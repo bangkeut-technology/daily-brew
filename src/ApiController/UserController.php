@@ -16,7 +16,6 @@ use App\Repository\StoreRepository;
 use App\Repository\UserRepository;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
-use Random\RandomException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -56,7 +55,7 @@ class UserController extends AbstractController
      * with the user information is returned. If the user is not authenticated, a JSON response with a "null" value is
      * returned.
      *
-     * @param User $user the authenticated user
+     * @param User $user an authenticated user
      */
     #[OA\Response(
         response: Response::HTTP_OK,
@@ -78,8 +77,6 @@ class UserController extends AbstractController
      * @param Request $request the request object
      *
      * @return Response the JSON response object with a message indicating the user has been updated
-     *
-     * @throws RandomException
      */
     #[OA\RequestBody(content: new OA\MediaType(
         mediaType: 'application/json',
@@ -143,8 +140,6 @@ class UserController extends AbstractController
      * @param User    $user    the current user, if authenticated, or null if not authenticated
      *
      * @return JsonResponse the JSON response object with a message indicating whether the locale has been updated or not
-     *
-     * @throws RandomException
      */
     #[OA\RequestBody(content: new OA\MediaType(
         mediaType: 'application/json',
@@ -182,8 +177,6 @@ class UserController extends AbstractController
      * @param User    $user    The user whose email is to be updated. If null, the authenticated user will be considered.
      *
      * @return Response the JSON response containing the result of the operation
-     *
-     * @throws RandomException
      */
     #[OA\RequestBody(content: new OA\MediaType(
         mediaType: 'application/json',
@@ -228,11 +221,11 @@ class UserController extends AbstractController
      * Deletes a user from the application. The user is identified by the password provided in the request payload.
      * If the password is not valid for the user, a JSON response with an "Unauthorized" status code and a message
      * indicating that the password is not valid is returned. If the password is valid, the user is deleted from the
-     * application and a JSON response with an "OK" status code and a message indicating that the user has been deleted
+     *  application, and a JSON response with an "OK" status code and a message indicating that the user has been deleted
      * is returned.
      *
      * @param Request $request the request object containing the payload with the password
-     * @param User    $user    The user to delete. If null, the authenticated user will be deleted.
+     * @param User    $user    The user to delete it. If null, the authenticated user will be deleted.
      *
      * @return Response the JSON response containing the result of the operation
      */
@@ -275,8 +268,6 @@ class UserController extends AbstractController
      * @param User    $user    the current user, if authenticated, or null if not authenticated
      *
      * @return Response the JSON response object with a message indicating whether the password has been updated or not
-     *
-     * @throws RandomException
      */
     #[OA\RequestBody(content: new OA\MediaType(
         mediaType: 'application/json',
@@ -324,8 +315,6 @@ class UserController extends AbstractController
      * @param User    $user    the current user, if authenticated, or null if not authenticated
      *
      * @return Response the JSON response object with a message indicating whether the password has been updated or not
-     *
-     * @throws RandomException
      */
     #[OA\RequestBody(content: new OA\MediaType(
         mediaType: 'multipart/form-data',

@@ -20,7 +20,6 @@ use App\Repository\EvaluationTemplateCriteriaRepository;
 use App\Repository\EvaluationTemplateRepository;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
-use Random\RandomException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -83,8 +82,6 @@ class EvaluationTemplateController extends AbstractController
      * @param Request $request the HTTP request containing the evaluation template data
      *
      * @return JsonResponse the JSON response containing the created evaluation template
-     *
-     * @throws RandomException
      */
     #[OA\Response(
         response: Response::HTTP_CREATED,
@@ -111,7 +108,7 @@ class EvaluationTemplateController extends AbstractController
                 return $this->createBadRequestResponse($this->translator->trans('existed.evaluation_template', ['%name%' => $template->getName()], domain: 'errors'));
             }
             $template->setUser($this->getUser());
-            $this->evaluationTemplateRepository->updateEvaluationTemplate($template);
+            $this->evaluationTemplateRepository->update($template);
             $this->dispatcher->dispatch(new EvaluationTemplateCreatedEvent($template, $form->get('criterias')->getData()));
 
             return $this->createTemplateResponse([
@@ -210,8 +207,6 @@ class EvaluationTemplateController extends AbstractController
      * @param string  $publicId the publicId of the evaluation template to update
      *
      * @return JsonResponse the JSON response containing the updated evaluation template
-     *
-     * @throws RandomException
      */
     #[OA\Parameter(
         name: 'publicId',
@@ -241,7 +236,7 @@ class EvaluationTemplateController extends AbstractController
         $form = $this->createForm(EvaluationTemplateFormType::class, $template);
         $form->submit($request->getPayload()->all(), false);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->evaluationTemplateRepository->updateEvaluationTemplate($template);
+            $this->evaluationTemplateRepository->update($template);
 
             return $this->createTemplateResponse([
                 'message' => $this->translator->trans('updated.evaluation_template', ['%name%' => $template->getName()]),
@@ -398,7 +393,6 @@ class EvaluationTemplateController extends AbstractController
      * @param string  $publicId the publicId of the evaluation template to add employees to
      *
      * @return JsonResponse the JSON response indicating the addition status
-     * @throws RandomException
      */
     #[OA\Parameter(
         name: 'publicId',
@@ -446,7 +440,7 @@ class EvaluationTemplateController extends AbstractController
             foreach ($this->employeeRepository->findByPublicIdsAndUser($employees, $this->getUser()) as $employee) {
                 $template->addEmployee($employee);
             }
-            $this->evaluationTemplateRepository->updateEvaluationTemplate($template);
+            $this->evaluationTemplateRepository->update($template);
         }
 
         return $this->createEmployeeResponse([
@@ -460,7 +454,6 @@ class EvaluationTemplateController extends AbstractController
      * @param string $publicId the publicId of the evaluation template
      *
      * @return JsonResponse the JSON response indicating the deletion status
-     * @throws RandomException
      */
     #[OA\Parameter(
         name: 'publicId',
@@ -501,7 +494,7 @@ class EvaluationTemplateController extends AbstractController
         if (null === $employee = $this->employeeRepository->findByPublicIdAndUser($employeePublicId, $this->getUser())) {
             $template->removeEmployee($employee);
         }
-        $this->evaluationTemplateRepository->updateEvaluationTemplate($template);
+        $this->evaluationTemplateRepository->update($template);
         return $this->createEmployeeResponse([
             'message' => $this->translator->trans('deleted.evaluation_template_employee', ['%template%' => $template]),
         ]);

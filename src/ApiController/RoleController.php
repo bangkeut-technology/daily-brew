@@ -53,6 +53,9 @@ class RoleController extends AbstractController
 
     /**
      * Creates a new role.
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
     #[OA\RequestBody(
         required: true,
@@ -84,7 +87,7 @@ class RoleController extends AbstractController
         $form = $this->createForm(RoleFormType::class, $role);
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->roleRepository->updateRole($role);
+            $this->roleRepository->update($role);
 
             return $this->json([
                 'message' => $this->translator->trans('created.role', ['%name%' => $role]),
