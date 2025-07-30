@@ -55,7 +55,7 @@ class EmployeeEvaluationRepository extends AbstractRepository
      *
      * @param DateTimeImmutable $from     the start date of the period
      * @param DateTimeImmutable $to       the end date of the period
-     * @param Employee           $employee the employee to filter evaluations by
+     * @param Employee          $employee the employee to filter evaluations by
      *
      * @return EmployeeEvaluation[]
      */
@@ -77,7 +77,7 @@ class EmployeeEvaluationRepository extends AbstractRepository
     /**
      * Get the average score for an employee over a specified period.
      *
-     * @param Employee           $employee the employee to calculate the average score for
+     * @param Employee          $employee the employee to calculate the average score for
      * @param DateTimeImmutable $from     the start date of the period
      * @param DateTimeImmutable $to       the end date of the period
      *
@@ -96,13 +96,13 @@ class EmployeeEvaluationRepository extends AbstractRepository
                 new Parameter('employee', $employee),
             ]));
 
-        return (float) $qb->getQuery()->getSingleScalarResult();
+        return (float)$qb->getQuery()->getSingleScalarResult();
     }
 
     /**
      * Get the list of average scores for employees over a specified period.
      *
-     * @param Employee[]         $employees the employees to calculate the average score for
+     * @param Employee[]        $employees the employees to calculate the average score for
      * @param DateTimeImmutable $from      the start date of the period
      * @param DateTimeImmutable $to        the end date of the period
      */
@@ -119,7 +119,8 @@ class EmployeeEvaluationRepository extends AbstractRepository
                 new Parameter('from', $from, Types::DATE_IMMUTABLE),
                 new Parameter('to', $to, Types::DATE_IMMUTABLE),
                 new Parameter('employees', $employees),
-            ]));
+            ]))
+            ->groupBy('e.id');
 
         return $qb->getQuery()->getArrayResult();
     }

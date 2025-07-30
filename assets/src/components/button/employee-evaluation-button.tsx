@@ -18,7 +18,7 @@ export const EmployeeEvaluationButton: React.FC<EmployeeEvaluationButtonProps> =
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button size="sm">
+                <Button size="sm" variant="outline">
                     <ClipboardCheck />
                     {t('employees.evaluate')}
                 </Button>

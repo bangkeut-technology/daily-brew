@@ -217,9 +217,10 @@ class EmployeeController extends AbstractController
     /**
      * Update employee details by publicId.
      *
-     * @param string $publicId The unique publicId of the employee
+     * @param Request $request
+     * @param string  $publicId The unique publicId of the employee
      *
-     * @throws RandomException
+     * @return JsonResponse
      */
     #[OA\Parameter(
         name: 'publicId',

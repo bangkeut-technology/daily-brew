@@ -7,7 +7,6 @@ import { z } from 'zod';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { EmployeeEvaluationButton } from '@/components/button/employee-evaluation-button';
-import { BackButton } from '@/components/button/back-button';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2, UserRoundX } from 'lucide-react';
 import { EditEmployeeDialog } from '@/components/dialog/edit-employee-dialog';
@@ -50,16 +49,12 @@ function EmployeeDetails() {
     if (employee) {
         return (
             <div className="w-full px-6 py-4 space-y-6">
-                <div className="space-y-2">
-                    <BackButton />
-
-                    <div className="flex flex-col md:flex-row md:items-center gap-2">
-                        <h1 className="text-3xl font-bold">
-                            {employee.firstName} {employee.lastName}
-                        </h1>
-                        <EditEmployeeDialog employee={employee} onSuccess={onSuccess} />
-                        <EmployeeEvaluationButton employee={employee} />
-                    </div>
+                <div className="flex flex-col md:flex-row md:items-center gap-2">
+                    <h1 className="text-3xl font-bold">
+                        {employee.firstName} {employee.lastName}
+                    </h1>
+                    <EditEmployeeDialog employee={employee} onSuccess={onSuccess} />
+                    <EmployeeEvaluationButton employee={employee} />
                 </div>
 
                 <div className="flex flex-col gap-6 sm:grid sm:grid-cols-1 md:grid-cols-2">
