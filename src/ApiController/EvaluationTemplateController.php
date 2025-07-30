@@ -334,16 +334,16 @@ class EvaluationTemplateController extends AbstractController
     ): JsonResponse
     {
         $template = $this->getEvaluationTemplateByPublicId($publicId);
-        $criterias = $request->request->all('criterias');
+        $criterias = $request->getPayload()->all('criterias');
         if (count($criterias) > 0) {
             $this->dispatcher->dispatch(new EvaluationTemplateCreatedEvent(
                 $template,
-                $this->evaluationCriteriaRepository->findByIdsAndUser($request->request->all('criterias'), $this->getUser())
+                $this->evaluationCriteriaRepository->findByIdsAndUser($criterias, $this->getUser())
             ));
         }
 
         return $this->createTemplateCriteriaResponse([
-            'message' => $this->translator->trans('added.evaluation_template_criteria'),
+            'message' => $this->translator->trans('added.evaluation_template_criterias', ['%template%' => $template]),
         ]);
     }
 

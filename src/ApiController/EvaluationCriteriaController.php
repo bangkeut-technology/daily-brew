@@ -11,8 +11,10 @@ use App\Entity\EvaluationCriteria;
 use App\Entity\EvaluationTemplateCriteria;
 use App\Entity\User;
 use App\Event\EvaluationCriteria\EvaluationCriteriaCreatedEvent;
+use App\Event\EvaluationTemplate\EvaluationTemplateCreatedEvent;
 use App\Form\EvaluationCriteriaFormType;
 use App\Repository\EvaluationCriteriaRepository;
+use App\Repository\EvaluationTemplateRepository;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -38,8 +40,9 @@ class EvaluationCriteriaController extends AbstractController
     public function __construct(
         TranslatorInterface                           $translator,
         private readonly EvaluationCriteriaRepository $evaluationCriteriaRepository,
-        private readonly EventDispatcherInterface     $dispatcher,
-    ) {
+        private readonly EventDispatcherInterface     $dispatcher, private readonly EvaluationTemplateRepository $evaluationTemplateRepository,
+    )
+    {
         parent::__construct($translator);
     }
 
@@ -60,7 +63,8 @@ class EvaluationCriteriaController extends AbstractController
     public function gets(
         #[CurrentUser]
         User $user,
-    ): JsonResponse {
+    ): JsonResponse
+    {
         $criterias = $this->evaluationCriteriaRepository->findByUser($user);
 
         return $this->createCriteriaResponse($criterias);
@@ -194,7 +198,7 @@ class EvaluationCriteriaController extends AbstractController
     /**
      * Updates an existing evaluation criteria.
      *
-     * @param Request $request    the HTTP request containing the updated evaluation criteria data
+     * @param Request $request  the HTTP request containing the updated evaluation criteria data
      * @param string  $publicId the publicId of the evaluation criteria to update
      *
      * @return JsonResponse the JSON response containing the updated evaluation criteria
@@ -270,5 +274,63 @@ class EvaluationCriteriaController extends AbstractController
         $criteria = $this->getEvaluationCriteriaByPublicId($publicId);
 
         return $this->createTemplateCriteriaResponse($criteria->getTemplates());
+    }
+
+    /**
+     * Adds templates to the evaluation criteria.
+     *
+     * @param string  $publicId the publicId of the evaluation criteria
+     * @param Request $request  the HTTP request containing the template data
+     *
+     * @return JsonResponse the JSON response containing the updated evaluation criteria with templates
+     */
+    #[OA\Parameter(
+        name: 'publicId',
+        description: 'The publicId of the evaluation criteria to add templates to.',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Adds templates to the evaluation criteria.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'message', description: 'Confirmation message after adding criteria', type: 'string'),
+            ]
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_NOT_FOUND,
+        description: 'Evaluation template not found.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'message', description: 'Error message', type: 'string'),
+            ]
+        )
+    )]
+    #[OA\RequestBody(
+        description: 'The template data to add to the evaluation criteria.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'templates', type: 'array', items: new OA\Items(ref: new Model(type: EvaluationTemplateCriteria::class, groups: ['template:read']))),
+            ]
+        )
+    )]
+    #[Route('/{publicId}/templates', name: 'post_templates', methods: ['POST'])]
+    public function postTemplates(string $publicId, Request $request): JsonResponse
+    {
+        $criteria = $this->getEvaluationCriteriaByPublicId($publicId);
+        $templates = $request->getPayload()->all('templates');
+        if (count($templates) > 0) {
+            $this->dispatcher->dispatch(new EvaluationCriteriaCreatedEvent(
+                $criteria,
+                $this->evaluationTemplateRepository->findByIdsAndUser($templates, $this->getUser())
+            ));
+        }
+
+        return $this->createTemplateCriteriaResponse([
+            'message' => $this->translator->trans('added.evaluation_criteria_template', ['%criteria%' => $criteria]),
+        ]);
     }
 }

@@ -38,7 +38,7 @@ class EvaluationTemplateCriteriaController extends AbstractController
      *
      * @return JsonResponse
      */
-    #[Route(name: 'deletes', methods: ['DELETE'])]
+    #[Route('/{publicId}', name: 'deletes', methods: ['DELETE'])]
     public function deletes(string $publicId): JsonResponse
     {
         $evaluationTemplateCriteria = $this->getEvaluationTemplateCriteriaByPublicId($publicId);

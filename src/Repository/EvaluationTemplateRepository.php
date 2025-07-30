@@ -119,4 +119,25 @@ class EvaluationTemplateRepository extends AbstractRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    /**
+     * Find evaluation templates by their IDs and user.
+     *
+     * @param array $ids  the IDs of the evaluation templates
+     * @param User  $user the user associated with the evaluation templates
+     *
+     * @return EvaluationTemplate[] returns an array of EvaluationTemplate objects
+     */
+    public function findByIdsAndUser(array $ids, User $user): array
+    {
+        return $this->createQueryBuilder('et')
+            ->where('et.id IN (:ids)')
+            ->andWhere('et.user = :user')
+            ->setParameters(new ArrayCollection([
+                new Parameter('ids', $ids),
+                new Parameter('user', $user),
+            ]))
+            ->getQuery()
+            ->getResult();
+    }
 }

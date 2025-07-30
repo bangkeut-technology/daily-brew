@@ -38,10 +38,11 @@ readonly class EvaluationCriteriaSubscriber implements EventSubscriberInterface
             $templateCriteria->setTemplate($template);
             $templateCriteria->setCriteria($event->criteria);
             $templateCriteria->setWeight($event->criteria->getWeight());
-            $this->templateCriteriaRepository->persist($templateCriteria);
+            $this->templateCriteriaRepository->update($templateCriteria, false);
             if (0 === $index % 20) {
                 $this->templateCriteriaRepository->flush();
             }
         }
+        $this->templateCriteriaRepository->flush();
     }
 }

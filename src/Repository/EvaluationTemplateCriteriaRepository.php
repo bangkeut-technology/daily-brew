@@ -7,6 +7,8 @@ namespace App\Repository;
 use App\Entity\EvaluationTemplateCriteria;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -60,8 +62,10 @@ class EvaluationTemplateCriteriaRepository extends AbstractRepository
             ->innerJoin('etc.template', 't')
             ->where('etc.publicId = :publicId')
             ->andWhere('t.user = :user')
-            ->setParameter('publicId', $publicId)
-            ->setParameter('user', $user)
+            ->setParameters(new ArrayCollection([
+                new Parameter('publicId', $publicId),
+                new Parameter('user', $user),
+            ]))
             ->getQuery()
             ->getOneOrNullResult();
     }
