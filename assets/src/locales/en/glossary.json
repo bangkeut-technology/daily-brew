@@ -4,6 +4,16 @@
             "title": "New Attendance",
             "description": "Create a new attendance record for an employee. You can track their working hours and attendance status.",
             "save": "Save Attendance"
+        },
+        "calendar": {
+            "title": "Attendance Calendar",
+            "description": "View the attendance records of your employees in a calendar format. You can filter by month and employee.",
+            "filter": {
+                "month": "Filter by Month",
+                "employee": "Filter by Employee"
+            },
+            "loading": "Loading attendance records...",
+            "no_records": "No attendance records found for the selected month."
         }
     },
     "employees": {
