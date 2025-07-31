@@ -2,6 +2,7 @@ import { apiAxios } from '@/lib/apiAxios';
 import { Employee, PartialEmployee } from '@/types/employee';
 import { EmployeeEvaluation } from '@/types/employee-evaluation';
 import { formatISO } from 'date-fns';
+import { Attendance, PartialAttendance } from '@/types/attendance';
 
 export const fetchEmployees = async ({ from, to }: { from: string; to: string }) =>
     apiAxios
@@ -44,4 +45,14 @@ export const fetchEmployeeEvaluation = async ({ publicId, date = new Date() }: {
         .get<EmployeeEvaluation | null>(`/employees/${publicId}/evaluation`, {
             params: { date: formatISO(date) },
         })
+        .then((response) => response.data);
+
+export const getAttendances = async ({ publicId, from, to }: { publicId: string; from: string; to: string }) =>
+    apiAxios
+        .get<Attendance[]>(`/employees/${publicId}/attendance`, { params: { from, to } })
+        .then((response) => response.data);
+
+export const postAttendance = async ({ publicId, data }: { publicId: string; data: PartialAttendance }) =>
+    apiAxios
+        .post<{ message: string; attendance: Attendance }>(`/employees/${publicId}/attendance`, data)
         .then((response) => response.data);

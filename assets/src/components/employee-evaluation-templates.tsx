@@ -2,6 +2,7 @@ import React from 'react';
 import { Employee } from '@/types/employee';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { EvaluationTemplateCriterias } from '@/components/evaluation-template-criterias';
+import { useTranslation } from 'react-i18next';
 
 interface EmployeeEvaluationTemplatesProps {
     employee: Employee;
@@ -12,6 +13,7 @@ export const EmployeeEvaluationTemplates: React.FunctionComponent<EmployeeEvalua
     employee,
     onSuccess,
 }) => {
+    const { t } = useTranslation('glossary');
     const renderItems = () => {
         return employee.templates?.map((template) => (
             <AccordionItem key={template.publicId} value={template.publicId}>
@@ -22,6 +24,14 @@ export const EmployeeEvaluationTemplates: React.FunctionComponent<EmployeeEvalua
             </AccordionItem>
         ));
     };
+
+    if (employee.templates?.length === 0) {
+        return (
+            <div className="w-full h-full flex flex-col items-center justify-center space-y-4">
+                <h4 className="text-lg font-semibold text-gray-500">{t('employees.templates.no_linked')}</h4>
+            </div>
+        );
+    }
 
     return (
         <div className="w-full h-full">

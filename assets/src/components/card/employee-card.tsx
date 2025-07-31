@@ -2,7 +2,7 @@ import React from 'react';
 import { Employee } from '@/types/employee';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import { Eye, UserCircle } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { EmployeeEvaluationButton } from '@/components/button/employee-evaluation-button';
@@ -16,15 +16,6 @@ interface EmployeeCardProps {
 
 export const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, from, to, onSuccess }) => {
     const { t } = useTranslation('glossary');
-    const navigate = useNavigate();
-
-    const handleClick = React.useCallback(() => {
-        navigate({
-            to: '/console/employees/$publicId',
-            params: { publicId: employee.publicId },
-            search: { from, to },
-        }).then();
-    }, [employee.publicId, from, navigate, to]);
 
     return (
         <div className="flex flex-col p-4 border rounded-lg hover:bg-primary/5 space-y-2">
@@ -58,10 +49,16 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, from, to, 
 
             <Separator />
 
-            <div className="w-full space-y-2">
-                <Button size="sm" className="w-full" onClick={handleClick}>
-                    <Eye />
-                    {t('employees.view')}
+            <div className="flex w-full space-y-2">
+                <Button size="sm" className="w-full" asChild>
+                    <Link
+                        to="/console/employees/$publicId"
+                        params={{ publicId: employee.publicId }}
+                        search={{ from, to }}
+                    >
+                        <Eye />
+                        {t('employees.view')}
+                    </Link>
                 </Button>
                 <EmployeeEvaluationButton employee={employee} onSuccess={onSuccess} />
             </div>

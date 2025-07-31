@@ -1,4 +1,11 @@
 {
+    "attendances": {
+        "new": {
+            "title": "New Attendance",
+            "description": "Create a new attendance record for an employee. You can track their working hours and attendance status.",
+            "save": "Save Attendance"
+        }
+    },
     "employees": {
         "title": "Employees",
         "description": "Manage your employees' KPIs and performance metrics. You can have up to {{maxFreeEmployees}} employees.",
@@ -27,6 +34,9 @@
             "suspended": "Suspended",
             "resigned": "Resigned",
             "probation": "On Probation"
+        },
+        "templates": {
+            "no_linked": "No templates linked"
         },
         "remove": {
             "title": "Remove Employee",
