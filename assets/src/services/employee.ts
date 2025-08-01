@@ -47,7 +47,7 @@ export const fetchEmployeeEvaluation = async ({ publicId, date = new Date() }: {
         })
         .then((response) => response.data);
 
-export const getAttendances = async ({ publicId, from, to }: { publicId: string; from: string; to: string }) =>
+export const fetchAttendances = async ({ publicId, from, to }: { publicId: string; from: string; to: string }) =>
     apiAxios
         .get<Attendance[]>(`/employees/${publicId}/attendance`, { params: { from, to } })
         .then((response) => response.data);

@@ -10,7 +10,6 @@ import { EmployeeEvaluationButton } from '@/components/button/employee-evaluatio
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2, UserRoundX } from 'lucide-react';
 import { EditEmployeeDialog } from '@/components/dialog/edit-employee-dialog';
-import { Calendar, CalendarDayButton } from '@/components/ui/calendar';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/employees/$publicId/')({
     component: EmployeeDetails,
@@ -121,30 +120,7 @@ function EmployeeDetails() {
                         <CardTitle>{t('attendances.calendar.title', { ns: 'glossary' })}</CardTitle>
                         <CardDescription>{t('attendances.calendar.description', { ns: 'glossary' })}</CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <Calendar
-                            mode="single"
-                            numberOfMonths={1}
-                            captionLayout="dropdown"
-                            className="rounded-lg border shadow-sm [--cell-size:--spacing(11)] md:[--cell-size:--spacing(13)]"
-                            formatters={{
-                                formatMonthDropdown: (date) => {
-                                    return date.toLocaleString('default', { month: 'long' });
-                                },
-                            }}
-                            components={{
-                                DayButton: ({ children, modifiers, day, ...props }) => {
-                                    const isWeekend = day.date.getDay() === 0 || day.date.getDay() === 6;
-                                    return (
-                                        <CalendarDayButton day={day} modifiers={modifiers} {...props}>
-                                            {children}
-                                            {!modifiers.outside && <span>{isWeekend ? '$220' : '$100'}</span>}
-                                        </CalendarDayButton>
-                                    );
-                                },
-                            }}
-                        />
-                    </CardContent>
+                    <CardContent></CardContent>
                 </Card>
             </div>
         );
