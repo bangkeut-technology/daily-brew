@@ -21,11 +21,11 @@ import { useMutation } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
 import { postAttendance } from '@/services/employee';
-import { Loader2Icon, Save } from 'lucide-react';
+import { ClockPlus, Loader2Icon, Save } from 'lucide-react';
 
 const defaultValues: PartialAttendance = {
     attendanceDate: new Date(),
-    status: AttendanceStatusEnum.Present,
+    status: AttendanceStatusEnum.present,
     note: '',
     clockIn: undefined,
     clockOut: undefined,
@@ -69,7 +69,10 @@ export const NewAttendanceDialog: React.FunctionComponent<NewAttendanceDialogPro
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button>{t('attendances.new.title', { ns: 'glossary' })}</Button>
+                <Button className="bg-amber-500 hover:bg-amber-500/90">
+                    <ClockPlus />
+                    {t('attendances.new.title', { ns: 'glossary' })}
+                </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogTitle>{t('attendances.new.title', { ns: 'glossary' })}</DialogTitle>

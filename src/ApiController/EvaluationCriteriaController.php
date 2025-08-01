@@ -11,7 +11,6 @@ use App\Entity\EvaluationCriteria;
 use App\Entity\EvaluationTemplateCriteria;
 use App\Entity\User;
 use App\Event\EvaluationCriteria\EvaluationCriteriaCreatedEvent;
-use App\Event\EvaluationTemplate\EvaluationTemplateCreatedEvent;
 use App\Form\EvaluationCriteriaFormType;
 use App\Repository\EvaluationCriteriaRepository;
 use App\Repository\EvaluationTemplateRepository;

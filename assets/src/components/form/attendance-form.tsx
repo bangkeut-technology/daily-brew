@@ -1,6 +1,6 @@
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import { PartialAttendance } from '@/types/attendance';
+import { AttendanceStatusEnum, PartialAttendance } from '@/types/attendance';
 import { Form } from '@/components/ui/form';
 import { DatePicker } from '@/components/picker/date-picker';
 import { useTranslation } from 'react-i18next';
@@ -15,6 +15,13 @@ interface AttendanceFormProps {
 export const AttendanceForm: React.FunctionComponent<AttendanceFormProps> = ({ form, isPending }) => {
     const { t } = useTranslation();
 
+    const options = React.useMemo(() => {
+        return Object.entries(AttendanceStatusEnum).map(([_, value]) => ({
+            value,
+            label: t(`attendance_statuses.${value}`),
+        }));
+    }, [t]);
+
     return (
         <Form {...form}>
             <div className="flex flex-col space-y-4">
@@ -25,15 +32,11 @@ export const AttendanceForm: React.FunctionComponent<AttendanceFormProps> = ({ f
                     disabled={isPending}
                 />
                 <SelectField
+                    className="w-full"
                     control={form.control}
                     name="status"
                     label={t('status')}
-                    options={[
-                        { value: 'present', label: t('attendance_statuses.present') },
-                        { value: 'absent', label: t('attendance_statuses.absent') },
-                        { value: 'leave', label: t('attendance_statuses.leave') },
-                        { value: 'late', label: t('attendance_statuses.late') },
-                    ]}
+                    options={options}
                     disabled={isPending}
                 />
                 <TextAreaField control={form.control} name="note" label={t('note')} disabled={isPending} />

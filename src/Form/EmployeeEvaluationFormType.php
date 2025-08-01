@@ -11,7 +11,6 @@ use App\Repository\EvaluationTemplateRepository;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -22,7 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-class EmployeeEvaluationFormType extends AbstractType
+class EmployeeEvaluationFormType extends AbstractFormType
 {
     private readonly ?User $user;
 

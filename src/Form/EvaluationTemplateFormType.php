@@ -8,7 +8,6 @@ use App\Entity\Employee;
 use App\Entity\EvaluationCriteria;
 use App\Entity\EvaluationTemplate;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -18,7 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-class EvaluationTemplateFormType extends AbstractType
+class EvaluationTemplateFormType extends AbstractFormType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

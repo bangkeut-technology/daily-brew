@@ -10,7 +10,6 @@ use App\Repository\EvaluationTemplateCriteriaRepository;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -23,7 +22,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @package App\Form
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-class EmployeeScoreFormType extends AbstractType
+class EmployeeScoreFormType extends AbstractFormType
 {
     /**
      * @var UserInterface|null

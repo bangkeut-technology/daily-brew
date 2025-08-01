@@ -22,14 +22,14 @@ export type PartialAttendance = Omit<
     clockOut?: Date;
 };
 
-export type AttendanceStatus = 'present' | 'absent' | 'leave' | 'late' | 'sick' | 'holiday' | 'remote';
+export type AttendanceStatus = keyof typeof AttendanceStatusEnum;
 
 export enum AttendanceStatusEnum {
-    Present = 'present',
-    Absent = 'absent',
-    Leave = 'leave',
-    Late = 'late',
-    Sick = 'sick',
-    Holiday = 'holiday',
-    Remote = 'remote',
+    present = 'present',
+    absent = 'absent',
+    leave = 'leave',
+    late = 'late',
+    sick = 'sick',
+    holiday = 'holiday',
+    remote = 'remote',
 }

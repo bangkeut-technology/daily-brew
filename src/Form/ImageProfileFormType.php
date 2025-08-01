@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Form;
 
 use App\Entity\User;
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -16,7 +15,7 @@ use Symfony\Component\Validator\Constraints\Image;
  *
  * @author Vandeth THO <thovandeth@gmail.com>
  */
-class ImageProfileFormType extends AbstractType
+class ImageProfileFormType extends AbstractFormType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

@@ -23,7 +23,10 @@
         "present": "Present",
         "absent": "Absent",
         "late": "Late",
-        "leave": "Leave"
+        "leave": "Leave",
+        "sick": "Sick",
+        "holiday": "Holiday",
+        "remote": "Remote"
     },
     "day_of_week": {
         "monday": "Monday",

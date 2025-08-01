@@ -6,12 +6,14 @@ import { fetchAttendances } from '@/services/employee';
 import { endOfMonth, format, startOfMonth } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Attendance } from '@/types/attendance';
+import { useTranslation } from 'react-i18next';
 
 interface EmployeeAttendanceCalendarProps {
     employee: Employee;
 }
 
 export const EmployeeAttendanceCalendar: React.FunctionComponent<EmployeeAttendanceCalendarProps> = ({ employee }) => {
+    const { t } = useTranslation();
     const [month, setMonth] = React.useState<Date>(new Date());
     const { data = [] } = useQuery({
         queryKey: ['employee-attendances', employee.publicId, month],
@@ -53,7 +55,7 @@ export const EmployeeAttendanceCalendar: React.FunctionComponent<EmployeeAttenda
                         <CalendarDayButton day={day} modifiers={modifiers} {...props}>
                             {children}
                             {attendanceModifiers[attendanceDate] && (
-                                <Badge>{attendanceModifiers[attendanceDate].status}</Badge>
+                                <Badge>{t(`attendance_statuses.${attendanceModifiers[attendanceDate].status}`)}</Badge>
                             )}
                         </CalendarDayButton>
                     );

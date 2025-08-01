@@ -9,7 +9,6 @@ use App\Entity\Employee;
 use App\Enum\AttendanceStatusEnum;
 use App\Form\Type\DateTimeImmutableType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -21,7 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * @package App\Form
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-class AttendanceFormType extends AbstractType
+class AttendanceFormType extends AbstractFormType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -69,10 +68,16 @@ class AttendanceFormType extends AbstractType
             ]);
     }
 
+    /**
+     * Configures the options for this form type.
+     *
+     * @param OptionsResolver $resolver The resolver for the options.
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Attendance::class,
+            'csrf_protection' => false,
         ]);
     }
 }
