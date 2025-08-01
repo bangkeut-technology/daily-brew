@@ -36,7 +36,10 @@ interface NewAttendanceDialogProps {
     employee: Employee;
 }
 
-export const NewAttendanceDialog: React.FC<NewAttendanceDialogProps> = ({ attendanceDate, employee }) => {
+export const NewAttendanceDialog: React.FunctionComponent<NewAttendanceDialogProps> = ({
+    attendanceDate = new Date(),
+    employee,
+}) => {
     const { t } = useTranslation();
     const [open, setOpen] = useBoolean(false);
     const form = useForm<PartialAttendance>({

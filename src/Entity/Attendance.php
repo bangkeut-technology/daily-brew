@@ -10,6 +10,7 @@ use App\Repository\AttendanceRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 
 /**
@@ -29,6 +30,7 @@ class Attendance extends AbstractEntity
      * @var DateTimeImmutable|null
      */
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[Groups(['attendance:read'])]
     private ?DateTimeImmutable $attendanceDate = null;
 
     /**
@@ -37,6 +39,7 @@ class Attendance extends AbstractEntity
      * @var string|null
      */
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['attendance:read'])]
     private ?string $note = null;
 
     /**
@@ -45,6 +48,7 @@ class Attendance extends AbstractEntity
      * @var DateTimeImmutable|null
      */
     #[ORM\Column(nullable: true)]
+    #[Groups(['attendance:read'])]
     private ?DateTimeImmutable $clockIn = null;
 
     /**
@@ -53,6 +57,7 @@ class Attendance extends AbstractEntity
      * @var DateTimeImmutable|null
      */
     #[ORM\Column(nullable: true)]
+    #[Groups(['attendance:read'])]
     private ?DateTimeImmutable $clockOut = null;
 
     /**
@@ -61,6 +66,7 @@ class Attendance extends AbstractEntity
      * @var AttendanceStatusEnum
      */
     #[ORM\Column(enumType: AttendanceStatusEnum::class)]
+    #[Groups(['attendance:read'])]
     private AttendanceStatusEnum $status = AttendanceStatusEnum::PRESENT;
 
     /**
@@ -70,6 +76,7 @@ class Attendance extends AbstractEntity
      */
     #[ORM\ManyToOne(targetEntity: Employee::class, inversedBy: 'attendances')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Groups(['attendance:read'])]
     private ?Employee $employee = null;
 
     /**

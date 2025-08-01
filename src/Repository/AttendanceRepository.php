@@ -48,6 +48,7 @@ class AttendanceRepository extends AbstractRepository
     {
         return $this->createQueryBuilder('a')
             ->addSelect('e')
+            ->innerJoin('a.employee', 'e')
             ->where('a.user = :user')
             ->andWhere('a.attendanceDate >= :from OR :from IS NULL')
             ->andWhere('a.attendanceDate <= :to OR :to IS NULL')
@@ -70,6 +71,7 @@ class AttendanceRepository extends AbstractRepository
     {
         return $this->createQueryBuilder('a')
             ->addSelect('e')
+            ->innerJoin('a.employee', 'e')
             ->where('a.user = :user')
             ->setParameter('user', $user)
             ->getQuery()
@@ -88,6 +90,7 @@ class AttendanceRepository extends AbstractRepository
     {
         return $this->createQueryBuilder('a')
             ->addSelect('e')
+            ->innerJoin('a.employee', 'e')
             ->where('a.employee = :employee')
             ->andWhere('a.attendanceDate >= :from')
             ->andWhere('a.attendanceDate <= :to')
@@ -111,6 +114,7 @@ class AttendanceRepository extends AbstractRepository
     {
         return $this->createQueryBuilder('a')
             ->addSelect('e')
+            ->innerJoin('a.employee', 'e')
             ->where('a.publicId = :publicId')
             ->andWhere('a.user = :user')
             ->setParameters(new ArrayCollection([
