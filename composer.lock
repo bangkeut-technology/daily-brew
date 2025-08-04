@@ -2575,16 +2575,16 @@
         },
         {
             "name": "nelmio/api-doc-bundle",
-            "version": "v5.4.0",
+            "version": "v5.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nelmio/NelmioApiDocBundle.git",
-                "reference": "49098f9e3f5e7a466b95b1d108d45857ba533c96"
+                "reference": "ce6434107ccb57d0686e25ae6c7767c75a3c6e4e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nelmio/NelmioApiDocBundle/zipball/49098f9e3f5e7a466b95b1d108d45857ba533c96",
-                "reference": "49098f9e3f5e7a466b95b1d108d45857ba533c96",
+                "url": "https://api.github.com/repos/nelmio/NelmioApiDocBundle/zipball/ce6434107ccb57d0686e25ae6c7767c75a3c6e4e",
+                "reference": "ce6434107ccb57d0686e25ae6c7767c75a3c6e4e",
                 "shasum": ""
             },
             "require": {
@@ -2686,7 +2686,7 @@
             ],
             "support": {
                 "issues": "https://github.com/nelmio/NelmioApiDocBundle/issues",
-                "source": "https://github.com/nelmio/NelmioApiDocBundle/tree/v5.4.0"
+                "source": "https://github.com/nelmio/NelmioApiDocBundle/tree/v5.5.0"
             },
             "funding": [
                 {
@@ -2694,7 +2694,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-06-26T15:03:21+00:00"
+            "time": "2025-08-04T14:41:29+00:00"
         },
         {
             "name": "nikic/php-parser",
@@ -12139,16 +12139,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.1.21",
+            "version": "2.1.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "1ccf445757458c06a04eb3f803603cb118fe5fa6"
+                "reference": "41600c8379eb5aee63e9413fe9e97273e25d57e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/1ccf445757458c06a04eb3f803603cb118fe5fa6",
-                "reference": "1ccf445757458c06a04eb3f803603cb118fe5fa6",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/41600c8379eb5aee63e9413fe9e97273e25d57e4",
+                "reference": "41600c8379eb5aee63e9413fe9e97273e25d57e4",
                 "shasum": ""
             },
             "require": {
@@ -12193,7 +12193,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-07-28T19:35:08+00:00"
+            "time": "2025-08-04T19:17:37+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -13243,19 +13243,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "3aaa2be71bcc17b49137b9e8ecd6619a5997b358"
+                "reference": "bbba44089fc15f183516c671398fc1547438c4d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/3aaa2be71bcc17b49137b9e8ecd6619a5997b358",
-                "reference": "3aaa2be71bcc17b49137b9e8ecd6619a5997b358",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/bbba44089fc15f183516c671398fc1547438c4d6",
+                "reference": "bbba44089fc15f183516c671398fc1547438c4d6",
                 "shasum": ""
             },
             "conflict": {
                 "3f/pygmentize": "<1.2",
                 "adaptcms/adaptcms": "<=1.3",
                 "admidio/admidio": "<4.3.12",
-                "adodb/adodb-php": "<=5.22.8",
+                "adodb/adodb-php": "<=5.22.9",
                 "aheinze/cockpit": "<2.2",
                 "aimeos/ai-admin-graphql": ">=2022.04.1,<2022.10.10|>=2023.04.1,<2023.10.6|>=2024.04.1,<2024.07.2",
                 "aimeos/ai-admin-jsonadm": "<2020.10.13|>=2021.04.1,<2021.10.6|>=2022.04.1,<2022.10.3|>=2023.04.1,<2023.10.4|==2024.04.1",
@@ -14196,7 +14196,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-07-30T14:07:45+00:00"
+            "time": "2025-08-04T16:07:43+00:00"
         },
         {
             "name": "sebastian/cli-parser",

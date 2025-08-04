@@ -26,7 +26,8 @@
         "leave": "Leave",
         "sick": "Sick",
         "holiday": "Holiday",
-        "remote": "Remote"
+        "remote": "Remote",
+        "unknown": "Unknown"
     },
     "day_of_week": {
         "monday": "Monday",

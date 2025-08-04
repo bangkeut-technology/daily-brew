@@ -16,15 +16,7 @@ enum AttendanceStatusEnum: string
     case LATE = 'late';
     case LEAVE = 'leave';
     case SICK = 'sick';
-
-    public function label(): string
-    {
-        return match ($this) {
-            self::PRESENT => 'Present',
-            self::ABSENT => 'Absent',
-            self::LATE => 'Late',
-            self::LEAVE => 'Leave',
-            self::SICK => 'Sick',
-        };
-    }
+    case HOLIDAY = 'holiday';
+    case REMOTE = 'remote';
+    case UNKNOWN = 'unknown';
 }

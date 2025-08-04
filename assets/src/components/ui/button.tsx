@@ -36,6 +36,7 @@ function Button({
     className,
     variant,
     size,
+    color,
     asChild = false,
     ...props
 }: React.ComponentProps<'button'> &

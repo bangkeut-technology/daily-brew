@@ -32,4 +32,5 @@ export enum AttendanceStatusEnum {
     sick = 'sick',
     holiday = 'holiday',
     remote = 'remote',
+    unknown = 'unknown',
 }
