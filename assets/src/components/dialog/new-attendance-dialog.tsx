@@ -34,11 +34,13 @@ const defaultValues: PartialAttendance = {
 interface NewAttendanceDialogProps {
     attendanceDate?: Date;
     employee: Employee;
+    button?: React.ReactNode;
 }
 
 export const NewAttendanceDialog: React.FunctionComponent<NewAttendanceDialogProps> = ({
     attendanceDate = new Date(),
     employee,
+    button,
 }) => {
     const { t } = useTranslation();
     const [open, setOpen] = useBoolean(false);
@@ -69,10 +71,14 @@ export const NewAttendanceDialog: React.FunctionComponent<NewAttendanceDialogPro
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="bg-amber-500 hover:bg-amber-500/90">
-                    <ClockPlus />
-                    {t('attendances.new.title', { ns: 'glossary' })}
-                </Button>
+                {button ? (
+                    button
+                ) : (
+                    <Button className="bg-amber-500 hover:bg-amber-500/90">
+                        <ClockPlus />
+                        {t('attendances.new.title', { ns: 'glossary' })}
+                    </Button>
+                )}
             </DialogTrigger>
             <DialogContent>
                 <DialogTitle>{t('attendances.new.title', { ns: 'glossary' })}</DialogTitle>
