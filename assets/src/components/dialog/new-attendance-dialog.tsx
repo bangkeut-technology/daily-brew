@@ -12,7 +12,7 @@ import { Employee } from '@/types/employee';
 import { useTranslation } from 'react-i18next';
 import { useBoolean } from 'react-use';
 import { useForm } from 'react-hook-form';
-import { AttendanceStatusEnum, PartialAttendance } from '@/types/attendance';
+import { Attendance, AttendanceStatusEnum, PartialAttendance } from '@/types/attendance';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { attendanceSchema } from '@/schema/attendance-schema';
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,7 @@ const defaultValues: PartialAttendance = {
 };
 
 interface NewAttendanceDialogProps {
+    attendance?: Attendance;
     attendanceDate?: Date;
     employee: Employee;
     button?: React.ReactNode;

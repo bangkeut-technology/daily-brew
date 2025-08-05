@@ -34,6 +34,7 @@ export const EmployeeAttendanceCalendar: React.FunctionComponent<EmployeeAttenda
         });
         return modifiers;
     }, [data]);
+    console.log(attendanceModifiers);
 
     return (
         <Calendar
@@ -51,6 +52,7 @@ export const EmployeeAttendanceCalendar: React.FunctionComponent<EmployeeAttenda
             components={{
                 DayButton: ({ children, modifiers, day, ...props }) => {
                     const attendanceDate = format(day.date, 'yyyy-MM-dd');
+                    console.log(attendanceDate, attendanceModifiers[attendanceDate]);
                     return (
                         <CalendarDayButton day={day} modifiers={modifiers} {...props}>
                             {children}
