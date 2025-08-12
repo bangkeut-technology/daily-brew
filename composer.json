@@ -6,7 +6,7 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.3",
         "ext-bcmath": "*",
         "ext-ctype": "*",
         "ext-gd": "*",
@@ -121,7 +121,7 @@
         "friendsofphp/php-cs-fixer": "^3.84",
         "phpro/grumphp": "^2.14",
         "phpstan/phpstan": "^2.1",
-        "phpunit/phpunit": "^11.5",
+        "phpunit/phpunit": "^12.3",
         "roave/security-advisories": "dev-latest",
         "symfony/browser-kit": "7.3.*",
         "symfony/css-selector": "7.3.*",
