@@ -1,4 +1,4 @@
-name: 'Ousa Application Release'
+name: 'DailyBrew Application Release'
 
 on:
     push:

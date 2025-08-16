@@ -1,4 +1,4 @@
-name: 'Ousa Application CI'
+name: 'DailyBrew Application CI'
 
 on:
     push:
