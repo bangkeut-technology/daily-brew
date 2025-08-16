@@ -1,0 +1,142 @@
+name: 'Ousa Application CI'
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    unit-test:
+        name:        'Unit and functional testing'
+        runs-on:     ubuntu-latest
+        environment: main
+        permissions:
+            contents:      write
+            pull-requests: write
+        services:
+            mysql:
+                image:   mysql:8.4
+                env:
+                    MYSQL_ALLOW_EMPTY_PASSWORD: false
+                    # _test suffix is needed because the database is created in the test environment
+                    MYSQL_DATABASE:             ${{ secrets.MYSQL_DATABASE }}_test
+                    MYSQL_USER:                 ${{ secrets.MYSQL_USER }}
+                    MYSQL_PASSWORD:             ${{ secrets.MYSQL_PASSWORD }}
+                ports:
+                    - 3306:3306
+                options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        strategy:
+            fail-fast: true
+            matrix:
+                php-versions: [ 8.3 ]
+
+        steps:
+            -
+                name: Checkout code
+                uses: actions/checkout@v2
+
+            -
+                name: Get composer cache directory
+                id:   composer-cache
+                run:  echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+            -
+                name: Cache composer dependencies
+                uses: actions/cache@v3
+                with:
+                    path:         ${{ steps.composer-cache.outputs.dir }}
+                    key:          ${{ runner.os }}-composer-${{ matrix.php-versions }}-${{ hashFiles('**/composer.lock') }}
+                    restore-keys: ${{ runner.os }}-composer-${{ matrix.php-versions }}-
+            -
+                name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php-versions }}
+                    extensions:  mbstring, intl, pdo, sqlite, xml, zip, curl, json, pcntl, tokenizer, ctype, iconv, session, simplexml, xmlwriter, xmlreader, dom, fileinfo, posix, pdo_sqlite, pdo_mysql
+                    coverage:    xdebug
+                env:
+                    update: true
+            -
+                name: Check PHP version
+                run:  php -v
+
+            -
+                name: Install dependencies
+                run:  composer install
+
+            -
+                name: Validate composer.json and composer.lock
+                run:  composer validate
+
+            -
+                name: Install Composer dependencies
+                run:  composer install --no-progress --prefer-dist --optimize-autoloader
+
+            -
+                run: composer require symfony/runtime
+
+            -
+                name: Generating LexikJWTAuthenticationBundle keys
+                run:  php bin/console lexik:jwt:generate-keypair
+                env:
+                    JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE }}
+                    JWT_PUBLIC_KEY: ${{ secrets.JWT_PUBLIC_KEY }}
+                    JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+                    JWT_TOKEN_TTL:  ${{ secrets.JWT_TOKEN_TTL }}
+
+            -
+                name: Run Migration For Test Env
+                run:  |
+                      php bin/console doctrine:database:drop --if-exists --force --env=test
+                      php bin/console doctrine:database:create --if-not-exists --env=test
+                      php bin/console doctrine:migrations:migrate --env=test || echo "No migrations found or migration failed"
+                      php bin/console ousa:generate:contact-types --env=test
+                      php bin/console ousa:generate:configurations --env=test
+                      php bin/console ousa:generate:provinces --env=test
+                env:
+                    DATABASE_URL: mysql://${{ secrets.MYSQL_USER }}:${{ secrets.ENCODE_MYSQL_PASSWORD }}@127.0.0.1:${{ job.services.mysql.ports['3306'] }}/${{ secrets.MYSQL_DATABASE }}
+            -
+                name: Setup Node and Install dependencies
+                uses: actions/setup-node@v4
+                with:
+                    node-version: 20
+            -
+                run: npm ci
+
+            -
+                name: Generate tanstack routes
+                run:  npm run router:generate
+
+            -
+                name: Build assets for test
+                run:  npm run build
+
+            -
+                run: php bin/phpunit
+                env:
+                    DATABASE_URL:             mysql://${{ secrets.MYSQL_USER }}:${{ secrets.ENCODE_MYSQL_PASSWORD }}@127.0.0.1:${{ job.services.mysql.ports['3306'] }}/${{ secrets.MYSQL_DATABASE }}
+                    JWT_PASSPHRASE:           ${{ secrets.JWT_PASSPHRASE }}
+                    JWT_PUBLIC_KEY:           ${{ secrets.JWT_PUBLIC_KEY }}
+                    JWT_SECRET_KEY:           ${{ secrets.JWT_SECRET_KEY }}
+                    JWT_TOKEN_TTL:            ${{ secrets.JWT_TOKEN_TTL }}
+                    REFRESH_TOKEN_TTL:        ${{ secrets.REFRESH_TOKEN_TTL}}
+                    REFRESH_TOKEN_UPDATE_TTL: ${{ secrets.REFRESH_TOKEN_UPDATE_TTL}}
+
+            -
+                name: Bump version & generate changelog
+                id:   release
+                uses: googleapis/release-please-action@v4
+                with:
+                    release-type: node
+                    token:        ${{ secrets.GITHUB_TOKEN }}
+
+            -
+                name: Create GitHub Release
+                if:   steps.release.outputs.release_created == 'true'
+                uses: softprops/action-gh-release@v2
+                with:
+                    tag_name:   ${{ steps.release.outputs.tag_name }}
+                    name:       Release ${{ steps.release.outputs.tag_name }}
+                    body_path:  ./CHANGELOG.md
+                    draft:      false
+                    prerelease: false

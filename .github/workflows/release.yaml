@@ -1,0 +1,37 @@
+name: 'Ousa Application Release'
+
+on:
+    push:
+        branches:
+            - release
+
+jobs:
+    deploy:
+        name:        'Deploy to production'
+        environment: release
+        runs-on:     ubuntu-latest
+        steps:
+            -   name: Deploy to release environment using ssh
+                uses: appleboy/ssh-action@v1.0.3
+                with:
+                    host:            ${{ secrets.HOST }}
+                    username:        ${{ secrets.USERNAME }}
+                    password:        ${{ secrets.PASSWORD }}
+                    port:            ${{ secrets.PORT }}
+                    command_timeout: ${{ secrets.TIMEOUT }}
+                    script:          |
+                                     cd ${{ secrets.PROJECT_FOLDER}}
+                                     sudo git pull https://${{secrets.ACCOUNT_GITHUB_USERNAME}}:${{ secrets.GITHUB_TOKEN }}@github.com/${{secrets.ACCOUNT_GITHUB_USERNAME}}/ousa-server.git release
+                                     sudo chown -R $(whoami) ${{ secrets.PROJECT_FOLDER}}
+                                     composer install --no-dev --optimize-autoloader
+                                     composer dump-env prod
+                                     composer dump-autoload --no-dev --classmap-authoritative
+                                     APP_ENV=prod APP_DEBUG=0 php bin/console cache:clear
+                                     APP_ENV=prod APP_DEBUG=0 php bin/console ousa:generate:contact-types
+                                     APP_ENV=prod APP_DEBUG=0 php bin/console ousa:generate:configurations
+                                     APP_ENV=prod APP_DEBUG=0 php bin/console ousa:generate:provinces
+                                     sudo npm ci
+                                     sudo npm run router:generate
+                                     sudo npm run build
+                                     sudo chown -R www-data:www-data ${{ secrets.PROJECT_FOLDER}}
+                                     sudo systemctl restart php8.3-fpm
