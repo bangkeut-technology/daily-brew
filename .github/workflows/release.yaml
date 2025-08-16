@@ -21,7 +21,7 @@ jobs:
                     command_timeout: ${{ secrets.TIMEOUT }}
                     script:          |
                                      cd ${{ secrets.PROJECT_FOLDER}}
-                                     sudo git pull https://${{secrets.ACCOUNT_GITHUB_USERNAME}}:${{ secrets.GITHUB_TOKEN }}@github.com/${{secrets.ACCOUNT_GITHUB_USERNAME}}/ousa-server.git release
+                                     sudo git pull https://${{secrets.ACCOUNT_GITHUB_USERNAME}}:${{ secrets.GITHUB_TOKEN }}@github.com/${{secrets.ACCOUNT_GITHUB_USERNAME}}/daily-brew.git release
                                      sudo chown -R $(whoami) ${{ secrets.PROJECT_FOLDER}}
                                      composer install --no-dev --optimize-autoloader
                                      composer dump-env prod
