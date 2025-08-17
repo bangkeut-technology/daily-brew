@@ -1,4 +1,3 @@
-// components/kpi/KpiGanttGrid.tsx
 import * as React from 'react';
 import { addDays, endOfMonth, format, isWeekend, startOfMonth } from 'date-fns';
 import { Employee } from '@/types/employee';
@@ -6,7 +5,7 @@ import { cn } from '@/lib/utils';
 
 export type ScoreValue = number | null; // e.g., 0..5 or null (no score yet)
 
-export interface KpiGanttGridProps {
+export interface KpiGanttProps {
     /** Any date in the month to render */
     month: Date;
 
@@ -62,7 +61,7 @@ function colorForScore(score: number, min = 0, max = 5) {
     return 'bg-muted text-muted-foreground'; // 0 or invalid
 }
 
-export const KpiGanttGrid: React.FC<KpiGanttGridProps> = ({
+export const KpiGantt: React.FC<KpiGanttProps> = ({
     month,
     rangeStart,
     rangeEnd,
