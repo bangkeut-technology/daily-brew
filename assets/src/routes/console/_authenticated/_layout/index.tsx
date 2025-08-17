@@ -26,12 +26,15 @@ import { fetchEmployees } from '@/services/employee';
 import { DATE_FORMAT } from '@/constants/date';
 import { ScoreValue } from '@/components/kpi/kpi-gantt';
 import { AttendanceStatus, AttendanceStatusEnum } from '@/types/attendance';
+import { MetricCard } from '@/components/card/metric-card';
+import { useTranslation } from 'react-i18next';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/')({
     component: Dashboard,
 });
 
 function Dashboard() {
+    const { t } = useTranslation();
     const [month, setMonth] = React.useState<Date>(startOfMonth(new Date()));
     const { data: employees = [] } = useQuery({
         queryKey: ['employees', month],
@@ -152,24 +155,23 @@ function Dashboard() {
                 </Badge>
             </div>
 
-            {/* Main grid */}
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                 <div className="xl:col-span-2 space-y-6">
                     <SectionHeader
                         title="KPI"
                         action={
-                            <Link className="text-sm text-primary hover:underline" to="/console/kpi">
-                                View all
+                            <Link className="text-sm text-primary hover:underline" to="/console/performance/kpi">
+                                {t('view_all')}
                             </Link>
                         }
                     />
                     <KpiGanttWithControls employees={employees} getScore={getScore} />
 
                     <SectionHeader
-                        title="Attendance"
+                        title={t('attendance')}
                         action={
                             <Link className="text-sm text-primary hover:underline" to="/console/attendances">
-                                View all
+                                {t('view_all')}
                             </Link>
                         }
                     />
@@ -179,7 +181,7 @@ function Dashboard() {
                 <div className="space-y-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Recent evaluations</CardTitle>
+                            <CardTitle>{t('recent_evaluations', { ns: 'glossary' })}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3 text-sm">
                             {[
@@ -195,7 +197,9 @@ function Dashboard() {
                             ))}
                             <Separator />
                             <Button variant="ghost" asChild className="w-full">
-                                <Link to="/console/evaluations/history">See all evaluations</Link>
+                                <Link to="/console/evaluations/history">
+                                    {t('see_all_evaluations', { ns: 'glossary' })}
+                                </Link>
                             </Button>
                         </CardContent>
                     </Card>
@@ -226,33 +230,6 @@ function Dashboard() {
                 </div>
             </div>
         </div>
-    );
-}
-
-function MetricCard({
-    icon,
-    label,
-    value,
-    suffix,
-}: {
-    icon: React.ReactNode;
-    label: string;
-    value: string;
-    suffix?: string;
-}) {
-    return (
-        <Card>
-            <CardContent className="p-4 flex items-center gap-4">
-                <div className="h-10 w-10 grid place-items-center rounded-lg bg-primary/10 text-primary">{icon}</div>
-                <div className="flex-1">
-                    <div className="text-sm text-muted-foreground">{label}</div>
-                    <div className="text-2xl font-bold tracking-tight">
-                        {value}
-                        {suffix ? <span className="text-base font-medium text-muted-foreground"> {suffix}</span> : null}
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
     );
 }
 

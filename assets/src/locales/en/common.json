@@ -25,6 +25,7 @@
     "manage": "Manage",
     "billing": "Billing",
     "settings": "Settings",
+    "view_all": "View All",
     "attendance_statuses": {
         "present": "Present",
         "absent": "Absent",

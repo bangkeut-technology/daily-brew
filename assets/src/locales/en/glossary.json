@@ -233,5 +233,7 @@
         "drop_click": "Drag and drop an image or click to browse",
         "drop_here": "Drop the files here ...",
         "only": "Only *.jpeg and *.png images will be accepted"
-    }
+    },
+    "recent_evaluations": "Recent evaluations",
+    "see_all_evaluations": "See all evaluations"
 }
