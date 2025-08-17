@@ -209,3 +209,5 @@ export const KpiGantt: React.FC<KpiGanttProps> = ({
         </div>
     );
 };
+
+KpiGantt.displayName = 'KpiGantt';

@@ -25,6 +25,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchEmployees } from '@/services/employee';
 import { DATE_FORMAT } from '@/constants/date';
 import { ScoreValue } from '@/components/kpi/kpi-gantt';
+import { AttendanceStatus, AttendanceStatusEnum } from '@/types/attendance';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/')({
     component: Dashboard,
@@ -54,6 +55,10 @@ function Dashboard() {
 
     const getScore = React.useCallback((employeeId: string, dateISO: string): ScoreValue => {
         return 0;
+    }, []);
+
+    const getStatus = React.useCallback((employeeId: string, dateISO: string): AttendanceStatus => {
+        return AttendanceStatusEnum.leave;
     }, []);
 
     return (
@@ -168,7 +173,7 @@ function Dashboard() {
                             </Link>
                         }
                     />
-                    <AttendanceGanttWithControls employees={employees} />
+                    <AttendanceGanttWithControls employees={employees} getStatus={getStatus} />
                 </div>
 
                 <div className="space-y-6">
@@ -190,7 +195,7 @@ function Dashboard() {
                             ))}
                             <Separator />
                             <Button variant="ghost" asChild className="w-full">
-                                <Link to="/console/evaluations">See all evaluations</Link>
+                                <Link to="/console/evaluations/history">See all evaluations</Link>
                             </Button>
                         </CardContent>
                     </Card>

@@ -9,7 +9,7 @@ import { AttendanceGantt } from './attendance-gantt';
 import { AttendanceStatus } from '@/types/attendance';
 import { Employee } from '@/types/employee';
 
-type Props = {
+type AttendanceGanttWithControlsProps = {
     employees: Employee[];
     getStatus: (employeeId: string, dateISO: string) => AttendanceStatus;
     onCellClick?: (args: { employee: Employee; dateISO: string; status: AttendanceStatus | null }) => void;
@@ -17,12 +17,12 @@ type Props = {
     initialMonth?: Date;
 };
 
-export function AttendanceGanttWithControls({
+export const AttendanceGanttWithControls: React.FC<AttendanceGanttWithControlsProps> = ({
     employees,
     getStatus,
     onCellClick,
     initialMonth = startOfMonth(new Date()),
-}: Props) {
+}) => {
     const [month, setMonth] = React.useState<Date>(startOfMonth(initialMonth));
     const prevMonth = React.useCallback(
         () => setMonth((d) => startOfMonth(new Date(d.getFullYear(), d.getMonth() - 1, 1))),
@@ -89,4 +89,6 @@ export function AttendanceGanttWithControls({
             <AttendanceGantt month={month} employees={employees} getStatus={getStatus} onCellClick={onCellClick} />
         </div>
     );
-}
+};
+
+AttendanceGanttWithControls.displayName = 'AttendanceGanttWithControls';

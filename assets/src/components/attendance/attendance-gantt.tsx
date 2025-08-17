@@ -168,3 +168,5 @@ export const AttendanceGantt: React.FC<AttendanceGanttProps> = ({
         </div>
     );
 };
+
+AttendanceGantt.displayName = 'AttendanceGantt';

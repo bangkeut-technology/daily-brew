@@ -16,13 +16,13 @@ type KpiGanttWithControlsProps = {
     initialMonth?: Date;
 };
 
-export function KpiGanttWithControls({
+export const KpiGanttWithControls: React.FC<KpiGanttWithControlsProps> = ({
     employees,
     getScore,
     onCellClick,
     templateName,
     initialMonth = startOfMonth(new Date()),
-}: KpiGanttWithControlsProps) {
+}) => {
     const [month, setMonth] = React.useState<Date>(startOfMonth(initialMonth));
     const prevMonth = () => setMonth((d) => startOfMonth(new Date(d.getFullYear(), d.getMonth() - 1, 1)));
     const nextMonth = () => setMonth((d) => startOfMonth(new Date(d.getFullYear(), d.getMonth() + 1, 1)));
@@ -66,4 +66,6 @@ export function KpiGanttWithControls({
             />
         </div>
     );
-}
+};
+
+KpiGanttWithControls.displayName = 'KpiGanttWithControls';
