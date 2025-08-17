@@ -20,9 +20,8 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-// If you added these earlier, import your real components instead:
-// import { AttendanceGanttWithControls } from "@/components/attendance/AttendanceGanttWithControls";
-// import { KpiGanttWithControls } from "@/components/kpi/KpiGanttWithControls";
+import { AttendanceGanttWithControls } from '@/components/attendance/AttendanceGanttWithControls';
+import { KpiGanttWithControls } from '@/components/kpi/KpiGanttWithControls';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/')({
     component: Dashboard,
@@ -63,7 +62,9 @@ function Dashboard() {
                         <Coffee className="h-5 w-5" />
                     </div>
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold leading-tight">Dashboard</h1>
+                        <h1 className="bg-gradient-to-r from-primary font-bold leading-tight to-primary/60 bg-clip-text text-transparent text-2xl md:text-3xl">
+                            Dashboard
+                        </h1>
                         <p className="text-sm text-muted-foreground">Overview for {format(month, 'LLLL yyyy')}</p>
                     </div>
                 </div>
@@ -138,13 +139,13 @@ function Dashboard() {
                     </Link>
                 </Button>
                 <Button variant="outline" asChild className="gap-2">
-                    <Link to="/console/evaluations/new">
+                    <Link to="/console/evaluations/templates/new">
                         <ClipboardList className="h-4 w-4" />
                         New evaluation
                     </Link>
                 </Button>
                 <Button variant="outline" asChild className="gap-2">
-                    <Link to="/console/attendance">
+                    <Link to="/console/attendances">
                         <CalendarDays className="h-4 w-4" />
                         Open attendance
                     </Link>
@@ -166,8 +167,7 @@ function Dashboard() {
                             </Link>
                         }
                     />
-                    {/* Replace Stub with <KpiGanttWithControls .../> */}
-                    <Stub title="KPI Gantt" />
+                    <KpiGanttWithControls title="KPI Gantt" />
 
                     <SectionHeader
                         title="Attendance"
@@ -177,8 +177,7 @@ function Dashboard() {
                             </Link>
                         }
                     />
-                    {/* Replace Stub with <AttendanceGanttWithControls .../> */}
-                    <Stub title="Attendance Gantt" />
+                    <AttendanceGanttWithControls title="Attendance Gantt" />
                 </div>
 
                 <div className="space-y-6">
