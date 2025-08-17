@@ -1,166 +1,313 @@
 import React from 'react';
-import { createFileRoute, Link, useRouterState } from '@tanstack/react-router';
+import { BarChart3, CalendarCheck2, Clock4, MapPin, ShieldCheck, Sparkles, Wifi } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { ModeToggle } from '@/components/mode-toggle';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { createFileRoute } from '@tanstack/react-router';
+import { SiteHeader } from '@/components/site-header';
+import { Hero } from '@/components/landing-page/hero';
 
 export const Route = createFileRoute('/')({
-    component: Home,
+    component: LandingPage,
 });
 
-function Home() {
-    const {
-        location: { pathname },
-    } = useRouterState();
+function LandingPage() {
     return (
-        <React.Fragment>
-            <header className="border-grid sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                <div className="container-wrapper">
-                    <div className="container flex h-14 w-full items-center">
-                        <Link to="/" className="mr-4 flex items-center gap-2 lg:mr-6">
-                            <h1 className="text-2xl font-bold text-orange-600 lg:inline-block">Bill&amp;Go</h1>
-                        </Link>
-                        <div className="mr-4 hidden md:flex justify-between w-full">
-                            <nav className="flex items-center gap-4 text-sm xl:gap-6">
-                                <Link
-                                    to="/"
-                                    className={cn(
-                                        'transition-colors hover:text-foreground/80 hover:text-orange-600',
-                                        pathname === '/' ? 'text-foreground' : 'text-foreground/80',
-                                    )}
-                                >
-                                    Home
-                                </Link>
-                            </nav>
-                            <div className="flex flex-1 items-center justify-between gap-2 md:justify-end">
-                                <nav className="flex items-center gap-2">
-                                    <ModeToggle />
-                                    <Button asChild>
-                                        <Link to="/console/sign-in" search={{ redirect: '/console' }}>
-                                            Get Started
-                                        </Link>
-                                    </Button>
-                                </nav>
+        <div className="min-h-screen bg-background text-foreground">
+            <SiteHeader />
+            <main className="mx-auto max-w-7xl px-6 md:px-8">
+                <Hero />
+                <TrustBar />
+                <Features />
+                <Showcase />
+                <ProSection />
+                <Pricing />
+                <FAQ />
+            </main>
+        </div>
+    );
+}
+
+function TrustBar() {
+    return (
+        <section className="py-6">
+            <div className="mx-auto max-w-5xl grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 place-items-center text-xs text-muted-foreground">
+                {['Barista teams', 'Boutique cafés', 'Cloud kitchens', 'Food carts', 'Co-working', 'Retail'].map(
+                    (label) => (
+                        <span key={label} className="rounded-md border px-3 py-1">
+                            {label}
+                        </span>
+                    ),
+                )}
+            </div>
+        </section>
+    );
+}
+
+function Features() {
+    const items = [
+        {
+            icon: <BarChart3 className="h-5 w-5" />,
+            title: 'KPI templates',
+            desc: 'Reusable evaluation templates with criteria. Pro: custom weights & delegated graders.',
+        },
+        {
+            icon: <Clock4 className="h-5 w-5" />,
+            title: 'Attendance Gantt',
+            desc: 'Month grid with per‑day statuses. Quick add, edit, and audit trail.',
+        },
+        {
+            icon: <CalendarCheck2 className="h-5 w-5" />,
+            title: 'Leave tracking',
+            desc: 'Lightweight leave recording in Free. Pro adds approvals & quotas.',
+        },
+        {
+            icon: <ShieldCheck className="h-5 w-5" />,
+            title: 'Access & roles',
+            desc: 'Invite helpers, set roles, and keep owners in control.',
+        },
+        {
+            icon: <MapPin className="h-5 w-5" />,
+            title: 'Geofence & IP (Pro · Coming soon)',
+            desc: 'Restrict clock‑ins to your location or network with whitelists.',
+        },
+        {
+            icon: <Wifi className="h-5 w-5" />,
+            title: 'Multi‑store (Pro · Coming soon)',
+            desc: 'Manage multiple stores with centralized reporting.',
+        },
+    ];
+    return (
+        <section id="features" className="py-10 md:py-14">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {items.map((f, i) => (
+                    <Card key={i} className="hover:shadow-md transition-shadow">
+                        <CardHeader className="flex flex-row items-center gap-3 pb-2">
+                            <div className="h-9 w-9 rounded-lg bg-primary/10 text-primary grid place-items-center">
+                                {f.icon}
+                            </div>
+                            <CardTitle className="text-lg">{f.title}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground">{f.desc}</p>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+        </section>
+    );
+}
+
+function Showcase() {
+    return (
+        <section className="py-12 md:py-16">
+            <div className="grid gap-6 md:grid-cols-2 md:items-center">
+                <div>
+                    <Badge className="mb-3" variant="secondary">
+                        <Sparkles className="mr-1 h-4 w-4" />
+                        Live preview
+                    </Badge>
+                    <h2 className="text-2xl md:text-3xl font-bold tracking-tight">See your month at a glance</h2>
+                    <p className="mt-2 text-muted-foreground">
+                        Our Gantt-style attendance grid keeps the whole team on one screen. Click a day to add a record,
+                        or open details if it already exists.
+                    </p>
+                    <div className="mt-4 flex gap-2">
+                        <Button asChild>
+                            <a href="/console">Open Console</a>
+                        </Button>
+                        <Button variant="outline" asChild>
+                            <a href="#pricing">Compare plans</a>
+                        </Button>
+                    </div>
+                </div>
+                <Card className="overflow-hidden">
+                    <CardContent className="p-0">
+                        <div className="bg-muted/30">
+                            <div className="p-4 text-xs text-muted-foreground">Attendance · July</div>
+                            <div className="overflow-x-auto">
+                                <div className="min-w-[640px] divide-y">
+                                    {/* Header row with days */}
+                                    <div className="grid grid-cols-[160px_repeat(14,minmax(28px,1fr))] bg-card sticky top-0 z-10">
+                                        <div className="px-3 py-2 border-r font-medium text-xs">Employee</div>
+                                        {Array.from({ length: 14 }).map((_, i) => (
+                                            <div
+                                                key={i}
+                                                className="h-8 border-r grid place-items-center text-[10px] font-medium bg-muted"
+                                            >
+                                                {i + 1}
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Employee rows */}
+                                    {['Sovan', 'Chanthy', 'Mey'].map((name) => (
+                                        <div key={name} className="grid grid-cols-[160px_repeat(14,minmax(28px,1fr))]">
+                                            <div className="px-3 py-2 border-r bg-card sticky left-0">{name}</div>
+                                            {Array.from({ length: 14 }).map((_, i) => (
+                                                <div
+                                                    key={i}
+                                                    className="h-8 border-r grid place-items-center text-[10px]"
+                                                >
+                                                    {i % 5 === 0 ? (
+                                                        <span className="px-1 rounded bg-green-500 text-white">P</span>
+                                                    ) : i % 7 === 0 ? (
+                                                        <span className="px-1 rounded bg-yellow-400 text-black">L</span>
+                                                    ) : (
+                                                        <span className="px-1 rounded bg-red-500 text-white">A</span>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </header>
+                    </CardContent>
+                </Card>
+            </div>
+        </section>
+    );
+}
 
-            <section className="bg-orange-50 py-20">
-                <div className="container mx-auto px-6 text-center">
-                    <h1 className="text-4xl font-bold mb-6 text-gray-900">Streamline Your Restaurant with Bill&Go</h1>
-                    <p className="text-lg text-gray-700 mb-8">
-                        Effortlessly manage orders, payments, and more with our easy-to-use POS system designed for
-                        restaurants like yours.
-                    </p>
-                    <a className="bg-orange-600 text-white px-6 py-3 rounded-md shadow-md hover:bg-orange-700">
-                        Learn More
-                    </a>
-                </div>
-            </section>
+function ProSection() {
+    const perks = [
+        {
+            title: 'Custom weights',
+            desc: 'Fine‑tune KPI weights per template.',
+            icon: <BarChart3 className="h-4 w-4" />,
+        },
+        {
+            title: 'Delegated evaluators',
+            desc: 'Let trusted staff grade on your behalf.',
+            icon: <ShieldCheck className="h-4 w-4" />,
+        },
+        {
+            title: 'Geofence & IP',
+            desc: 'Enforce location or network for clock‑ins.',
+            icon: <MapPin className="h-4 w-4" />,
+        },
+        { title: 'Multi‑store', desc: 'One owner, many stores.', icon: <Wifi className="h-4 w-4" /> },
+    ];
+    return (
+        <section className="py-14">
+            <div className="text-center max-w-3xl mx-auto">
+                <Badge variant="secondary" className="mb-2">
+                    Pro extras · Coming soon
+                </Badge>
+                <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Unlock advanced controls</h2>
+                <p className="mt-2 text-muted-foreground">
+                    Start free. Upgrade when you need IP lockdowns, geofencing, and deeper KPI control.
+                </p>
+            </div>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {perks.map((p) => (
+                    <Card key={p.title}>
+                        <CardHeader className="flex flex-row items-center gap-2 pb-2">
+                            <div className="h-8 w-8 grid place-items-center rounded-md bg-primary/10 text-primary">
+                                {p.icon}
+                            </div>
+                            <CardTitle className="text-base">{p.title}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="text-sm text-muted-foreground">{p.desc}</CardContent>
+                    </Card>
+                ))}
+            </div>
+        </section>
+    );
+}
 
-            <section id="features" className="py-20">
-                <div className="container mx-auto px-6">
-                    <h2 className="text-3xl font-bold text-center mb-10 text-gray-900">Features</h2>
-                    <div className="grid md:grid-cols-3 gap-8">
-                        <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                            <div className="text-orange-600 text-4xl mb-4">💳</div>
-                            <h3 className="text-xl font-bold mb-2">Integrated Payments</h3>
-                            <p className="text-gray-700">
-                                Accept multiple payment methods seamlessly, including dual currency support.
-                            </p>
+function Pricing() {
+    return (
+        <section id="pricing" className="py-16">
+            <div className="text-center max-w-3xl mx-auto">
+                <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Simple pricing</h2>
+                <p className="mt-2 text-muted-foreground">
+                    Start free. Upgrade when you need more stores, roles, and controls.
+                </p>
+            </div>
+            <div className="mt-8 grid gap-6 md:grid-cols-2">
+                {/* Free */}
+                <Card className="relative">
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <CardTitle>Free</CardTitle>
+                            <Badge variant="secondary">Great for starters</Badge>
                         </div>
-                        <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                            <div className="text-orange-600 text-4xl mb-4">📋</div>
-                            <h3 className="text-xl font-bold mb-2">Order Management</h3>
-                            <p className="text-gray-700">
-                                Track orders, add custom items, and streamline operations with ease.
-                            </p>
+                    </CardHeader>
+                    <CardContent className="space-y-3 text-sm">
+                        <div className="text-3xl font-bold">
+                            $0<span className="text-base font-medium text-muted-foreground">/mo</span>
                         </div>
-                        <div className="bg-white p-6 rounded-lg shadow-md text-center">
-                            <div className="text-orange-600 text-4xl mb-4">📊</div>
-                            <h3 className="text-xl font-bold mb-2">Sales Analytics</h3>
-                            <p className="text-gray-700">
-                                Get real-time insights into your restaurant&#39;s performance.
-                            </p>
+                        <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                            <li>1 store</li>
+                            <li>Up to 10 employees</li>
+                            <li>5 KPI templates</li>
+                            <li>Attendance + leave (basic)</li>
+                            <li>Owner‑only evaluations</li>
+                        </ul>
+                        <Button asChild className="w-full mt-3">
+                            <a href="/signup">Get started</a>
+                        </Button>
+                    </CardContent>
+                </Card>
+                {/* Pro */}
+                <Card className="relative border-primary/40">
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <CardTitle>Pro</CardTitle>
+                            <Badge variant="secondary">Coming soon</Badge>
                         </div>
-                    </div>
-                </div>
-            </section>
+                    </CardHeader>
+                    <CardContent className="space-y-3 text-sm">
+                        <div className="text-3xl font-bold">Coming soon</div>
+                        <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                            <li>Multiple stores</li>
+                            <li>Unlimited employees & templates</li>
+                            <li>Delegated evaluators & roles</li>
+                            <li>Custom KPI weights</li>
+                            <li>IP & Geofence clock‑ins</li>
+                        </ul>
+                        <Button disabled className="w-full mt-3" variant="outline">
+                            Coming soon
+                        </Button>
+                    </CardContent>
+                </Card>
+            </div>
+        </section>
+    );
+}
 
-            <section id="testimonials" className="bg-gray-100 py-20">
-                <div className="container mx-auto px-6 text-center">
-                    <h2 className="text-3xl font-bold mb-10 text-gray-900">What Our Customers Say</h2>
-                    <div className="grid md:grid-cols-2 gap-8">
-                        <div className="bg-white p-6 rounded-lg shadow-md">
-                            <p className="text-gray-700 mb-4">
-                                &#34;Bill&amp;Go transformed our operations! It&#39;s so intuitive and efficient.&#34;
-                            </p>
-                            <p className="text-orange-600 font-bold">- Sarah, Restaurant Owner</p>
-                        </div>
-                        <div className="bg-white p-6 rounded-lg shadow-md">
-                            <p className="text-gray-700 mb-4">
-                                &#34;I love how easy it is to track orders and payments in real-time.&#34;
-                            </p>
-                            <p className="text-orange-600 font-bold">- John, Manager</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="pricing" className="py-20">
-                <div className="container mx-auto px-6 text-center">
-                    <h2 className="text-3xl font-bold mb-10 text-gray-900">Pricing</h2>
-                    <div className="grid md:grid-cols-3 gap-8">
-                        <div className="bg-white p-6 rounded-lg shadow-md">
-                            <h3 className="text-xl font-bold mb-4">Basic</h3>
-                            <p className="text-2xl font-bold mb-4">$29/month</p>
-                            <ul className="text-gray-700 mb-6">
-                                <li>Order Management</li>
-                                <li>Integrated Payments</li>
-                                <li>Basic Analytics</li>
-                            </ul>
-                            <a
-                                href="#"
-                                className="bg-orange-600 text-white px-6 py-3 rounded-md shadow-md hover:bg-orange-700"
-                            >
-                                Get Started
-                            </a>
-                        </div>
-                        <div className="bg-white p-6 rounded-lg shadow-md">
-                            <h3 className="text-xl font-bold mb-4">Pro</h3>
-                            <p className="text-2xl font-bold mb-4">$59/month</p>
-                            <ul className="text-gray-700 mb-6">
-                                <li>All Basic Features</li>
-                                <li>Advanced Analytics</li>
-                                <li>Priority Support</li>
-                            </ul>
-                            <a
-                                href="#"
-                                className="bg-orange-600 text-white px-6 py-3 rounded-md shadow-md hover:bg-orange-700"
-                            >
-                                Get Started
-                            </a>
-                        </div>
-                        <div className="bg-white p-6 rounded-lg shadow-md">
-                            <h3 className="text-xl font-bold mb-4">Enterprise</h3>
-                            <p className="text-2xl font-bold mb-4">Contact Us</p>
-                            <ul className="text-gray-700 mb-6">
-                                <li>Custom Features</li>
-                                <li>Dedicated Support</li>
-                                <li>Unlimited Users</li>
-                            </ul>
-                            <a
-                                href="#"
-                                className="bg-orange-600 text-white px-6 py-3 rounded-md shadow-md hover:bg-orange-700"
-                            >
-                                Contact Us
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </React.Fragment>
+function FAQ() {
+    return (
+        <section id="faq" className="py-14">
+            <div className="text-center max-w-3xl mx-auto">
+                <h2 className="text-2xl md:text-3xl font-bold tracking-tight">FAQs</h2>
+                <p className="mt-2 text-muted-foreground">Everything you need to know before brewing with us.</p>
+            </div>
+            <div className="mt-6 max-w-3xl mx-auto">
+                <Accordion type="single" collapsible>
+                    <AccordionItem value="item-1">
+                        <AccordionTrigger>What’s included in the free plan?</AccordionTrigger>
+                        <AccordionContent>
+                            One store, up to 10 employees, 5 KPI templates, basic attendance and leave. Owners can grade
+                            KPIs.
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-2">
+                        <AccordionTrigger>When do I need Pro?</AccordionTrigger>
+                        <AccordionContent>
+                            When you need multiple stores, delegated evaluators, custom weights, or to restrict
+                            clock‑ins by IP/geofence.
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="item-3">
+                        <AccordionTrigger>Can I migrate later?</AccordionTrigger>
+                        <AccordionContent>Yes. You can upgrade anytime and your data stays intact.</AccordionContent>
+                    </AccordionItem>
+                </Accordion>
+            </div>
+        </section>
     );
 }

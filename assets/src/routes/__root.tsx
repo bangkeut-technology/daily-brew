@@ -4,6 +4,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { AuthenticationContextValue } from '@/contexts/authentication-context';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { SiteFooter } from '@/components/site-footer';
 
 const TanStackRouterDevtools =
     process.env.NODE_ENV === 'production'
@@ -18,11 +19,7 @@ export const Route = createRootRouteWithContext<{ authentication: Authentication
     component: () => (
         <TooltipProvider>
             <Outlet />
-            <footer className="bg-gray-800 text-white py-6">
-                <div className="container mx-auto px-6 text-center">
-                    <p>&copy; {new Date().getFullYear()} DailyBrew. All rights reserved.</p>
-                </div>
-            </footer>
+            <SiteFooter />
             <Toaster
                 position="top-right"
                 richColors
