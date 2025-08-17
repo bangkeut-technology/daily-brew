@@ -1,9 +1,10 @@
 import i18next from '@/i18next';
 
 export const DATETIME_FORMAT = 'MMMM dd, yyyy hh:mm';
-
-export const DATE_FORMAT = 'dd/MM/yyyy';
+export const DISPLAY_DATE_FORMAT = 'dd/MM/yyyy';
 export const DATE_WITH_TIME_FORMAT = 'dd/MM/yyyy hh:mm';
+export const TIME_FORMAT = 'hh:mm';
+export const DATE_FORMAT = 'yyyy-MM-dd';
 
 export const DAYS = [
     i18next.t('day_of_week.sunday'),

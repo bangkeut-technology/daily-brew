@@ -8,7 +8,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { KpiGantt, ScoreValue } from './kpi-gantt';
 import { Employee } from '@/types/employee';
 
-type Props = {
+type KpiGanttWithControlsProps = {
     employees: Employee[];
     getScore: (employeeId: string, dateISO: string) => ScoreValue;
     onCellClick?: (args: { employee: Employee; dateISO: string; score: ScoreValue }) => void;
@@ -22,7 +22,7 @@ export function KpiGanttWithControls({
     onCellClick,
     templateName,
     initialMonth = startOfMonth(new Date()),
-}: Props) {
+}: KpiGanttWithControlsProps) {
     const [month, setMonth] = React.useState<Date>(startOfMonth(initialMonth));
     const prevMonth = () => setMonth((d) => startOfMonth(new Date(d.getFullYear(), d.getMonth() - 1, 1)));
     const nextMonth = () => setMonth((d) => startOfMonth(new Date(d.getFullYear(), d.getMonth() + 1, 1)));
@@ -44,10 +44,10 @@ export function KpiGanttWithControls({
                     <PopoverContent className="w-auto p-2" align="start">
                         <Calendar
                             mode="single"
+                            captionLayout="dropdown"
                             selected={month}
                             onSelect={(d) => d && setMonth(startOfMonth(d))}
                             showOutsideDays
-                            initialFocus
                         />
                     </PopoverContent>
                 </Popover>

@@ -4,13 +4,15 @@ import { format, startOfMonth } from 'date-fns';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar'; // shadcn calendar (single date)
-import { AttendanceGanttGrid, AttendanceStatus, EmployeeLite } from './AttendanceGanttGrid';
+import { Calendar } from '@/components/ui/calendar';
+import { AttendanceGantt } from './attendance-gantt';
+import { AttendanceStatus } from '@/types/attendance';
+import { Employee } from '@/types/employee';
 
 type Props = {
-    employees: EmployeeLite[];
+    employees: Employee[];
     getStatus: (employeeId: string, dateISO: string) => AttendanceStatus;
-    onCellClick?: (args: { employee: EmployeeLite; dateISO: string; status: AttendanceStatus | null }) => void;
+    onCellClick?: (args: { employee: Employee; dateISO: string; status: AttendanceStatus | null }) => void;
     /** optional: initial month */
     initialMonth?: Date;
 };
@@ -50,14 +52,12 @@ export function AttendanceGanttWithControls({
                         {/* Use single-date selection; we’ll read only the month/year from the selected date */}
                         <Calendar
                             mode="single"
+                            captionLayout="dropdown"
                             selected={month}
                             onSelect={(d) => d && setMonth(startOfMonth(d))}
-                            // show outside days so users can click into next/prev months
                             showOutsideDays
-                            initialFocus
                         />
                         <div className="mt-2 grid grid-cols-3 gap-2">
-                            {/* Quick picks */}
                             <Button variant="secondary" onClick={() => setMonth(startOfMonth(new Date()))}>
                                 This month
                             </Button>
@@ -86,8 +86,7 @@ export function AttendanceGanttWithControls({
                 </Button>
             </div>
 
-            {/* Grid */}
-            <AttendanceGanttGrid month={month} employees={employees} getStatus={getStatus} onCellClick={onCellClick} />
+            <AttendanceGantt month={month} employees={employees} getStatus={getStatus} onCellClick={onCellClick} />
         </div>
     );
 }

@@ -1,46 +1,45 @@
 import * as React from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { format, startOfMonth, endOfMonth } from 'date-fns';
+import { endOfMonth, format, startOfMonth } from 'date-fns';
 import {
-    Coffee,
-    Users,
-    CalendarDays,
-    TrendingUp,
-    Plus,
-    ClipboardList,
-    Crown,
-    Store,
     Calendar as CalendarIcon,
+    CalendarDays,
     ChevronLeft,
     ChevronRight,
+    ClipboardList,
+    Coffee,
+    Crown,
+    Plus,
+    TrendingUp,
+    Users,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { AttendanceGanttWithControls } from '@/components/attendance/attendance-gantt-with-controls';
 import { KpiGanttWithControls } from '@/components/kpi/kpi-gantt-with-controls';
+import { useQuery } from '@tanstack/react-query';
+import { fetchEmployees } from '@/services/employee';
+import { DATE_FORMAT } from '@/constants/date';
+import { ScoreValue } from '@/components/kpi/kpi-gantt';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/')({
     component: Dashboard,
 });
 
-// Temporary lightweight stubs (delete when wiring real ones)
-function Stub({ title }: { title: string }) {
-    return (
-        <div className="h-[340px] rounded-lg border bg-card grid place-items-center text-muted-foreground">
-            <div className="text-sm">{title} • connect component</div>
-        </div>
-    );
-}
-
 function Dashboard() {
     const [month, setMonth] = React.useState<Date>(startOfMonth(new Date()));
-    const [from, setFrom] = React.useState<Date>(startOfMonth(new Date()));
-    const [to, setTo] = React.useState<Date>(endOfMonth(new Date()));
-    const [storeId, setStoreId] = React.useState<string | null>(null);
+    const { data: employees = [] } = useQuery({
+        queryKey: ['employees', month],
+        queryFn: () =>
+            fetchEmployees({
+                from: format(startOfMonth(month), DATE_FORMAT),
+                to: format(endOfMonth(month), DATE_FORMAT),
+            }),
+    });
 
     const prevMonth = () => setMonth((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1));
     const nextMonth = () => setMonth((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1));
@@ -53,9 +52,12 @@ function Dashboard() {
         leavesToday: 1,
     };
 
+    const getScore = React.useCallback((employeeId: string, dateISO: string): ScoreValue => {
+        return 0;
+    }, []);
+
     return (
         <div className="w-full px-6 py-5 space-y-6">
-            {/* Page header */}
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center gap-3">
                     <div className="h-10 w-10 grid place-items-center rounded-xl bg-primary/10 text-primary">
@@ -70,17 +72,6 @@ function Dashboard() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                    {/* Store switcher (replace with real select/combobox) */}
-                    <Button
-                        variant="secondary"
-                        className="gap-2"
-                        onClick={() => setStoreId((s) => (s ? null : 'store-1'))}
-                    >
-                        <Store className="h-4 w-4" />
-                        {storeId ? 'Store A' : 'All stores'}
-                    </Button>
-
-                    {/* Month picker */}
                     <div className="flex items-center gap-1">
                         <Button variant="outline" size="icon" onClick={prevMonth} aria-label="Prev month">
                             <ChevronLeft className="h-4 w-4" />
@@ -167,17 +158,17 @@ function Dashboard() {
                             </Link>
                         }
                     />
-                    <KpiGanttWithControls title="KPI Gantt" />
+                    <KpiGanttWithControls employees={employees} getScore={getScore} />
 
                     <SectionHeader
                         title="Attendance"
                         action={
-                            <Link className="text-sm text-primary hover:underline" to="/console/attendance">
+                            <Link className="text-sm text-primary hover:underline" to="/console/attendances">
                                 View all
                             </Link>
                         }
                     />
-                    <AttendanceGanttWithControls title="Attendance Gantt" />
+                    <AttendanceGanttWithControls employees={employees} />
                 </div>
 
                 <div className="space-y-6">

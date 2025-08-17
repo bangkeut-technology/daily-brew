@@ -139,7 +139,6 @@ export const KpiGantt: React.FC<KpiGanttProps> = ({
                         })}
                     </div>
 
-                    {/* Rows */}
                     {employees.map((emp) => (
                         <div
                             key={emp.id}

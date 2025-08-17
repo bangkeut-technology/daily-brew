@@ -23,7 +23,6 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAuthentication } from '@/hooks/use-authentication';
-import i18next from '@/i18next';
 import { useTranslation } from 'react-i18next';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 
@@ -34,39 +33,42 @@ type SidebarMenuItem = {
     children?: SidebarMenuItem[];
 };
 
-const items: SidebarMenuItem[] = [
-    {
-        title: i18next.t('dashboard'),
-        url: '/console',
-        icon: LayoutDashboard,
-    },
-    {
-        title: i18next.t('employees'),
-        url: '/console/employees',
-        icon: User2,
-    },
-    {
-        title: i18next.t('evaluations'),
-        icon: ListTodo,
-        children: [
-            {
-                title: i18next.t('templates'),
-                url: '/console/evaluations/templates',
-                icon: ListTodo,
-            },
-            {
-                title: i18next.t('criterias'),
-                url: '/console/evaluations/criterias',
-                icon: ClipboardList,
-            },
-        ],
-    },
-];
-
 export const AppSidebar = () => {
     const { user } = useAuthentication();
     const { t } = useTranslation();
     const { pathname } = useLocation();
+
+    const items = React.useMemo<SidebarMenuItem[]>(
+        () => [
+            {
+                title: t('dashboard'),
+                url: '/console',
+                icon: LayoutDashboard,
+            },
+            {
+                title: t('employees'),
+                url: '/console/employees',
+                icon: User2,
+            },
+            {
+                title: t('evaluations'),
+                icon: ListTodo,
+                children: [
+                    {
+                        title: t('templates'),
+                        url: '/console/evaluations/templates',
+                        icon: ListTodo,
+                    },
+                    {
+                        title: t('criterias'),
+                        url: '/console/evaluations/criterias',
+                        icon: ClipboardList,
+                    },
+                ],
+            },
+        ],
+        [t],
+    );
 
     const renderMenuSub = React.useCallback(
         (items: SidebarMenuItem[]) => {
