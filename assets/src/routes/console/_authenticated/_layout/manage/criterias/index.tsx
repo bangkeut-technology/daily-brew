@@ -12,7 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 
 const columnHelper = createColumnHelper<EvaluationCriteria>();
 
-export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/criterias/')({
+export const Route = createFileRoute('/console/_authenticated/_layout/manage/criterias/')({
     component: EvaluationCriterias,
 });
 

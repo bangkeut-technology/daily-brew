@@ -130,13 +130,13 @@ function Dashboard() {
                     </Link>
                 </Button>
                 <Button variant="outline" asChild className="gap-2">
-                    <Link to="/console/evaluations/templates/new">
+                    <Link to="/console/manage/templates/new">
                         <ClipboardList className="h-4 w-4" />
                         New evaluation
                     </Link>
                 </Button>
                 <Button variant="outline" asChild className="gap-2">
-                    <Link to="/console/attendances">
+                    <Link to="/console/performance/attendances">
                         <CalendarDays className="h-4 w-4" />
                         Open attendance
                     </Link>

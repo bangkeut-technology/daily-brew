@@ -19,7 +19,7 @@ import { EditEvaluationTemplateDialog } from '@/components/dialog/edit-evaluatio
 import { AddEvaluationCriteriaDialog } from '@/components/dialog/add-evaluation-criteria-dialog';
 import { AddEmployeeDialog } from '@/components/dialog/add-employee-dialog';
 
-export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/templates/$publicId/')({
+export const Route = createFileRoute('/console/_authenticated/_layout/manage/templates/$publicId/')({
     component: EvaluationTemplateDetails,
     loader: ({ params: { publicId } }) => fetchEvaluationTemplate(publicId),
 });

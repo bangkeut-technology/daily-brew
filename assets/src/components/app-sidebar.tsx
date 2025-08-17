@@ -14,7 +14,22 @@ import {
     SidebarMenuSubButton,
     SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
-import { ChevronRight, ChevronUp, ClipboardList, LayoutDashboard, ListTodo, LogOut, User2 } from 'lucide-react';
+import {
+    BarChart3,
+    Briefcase,
+    CalendarDays,
+    ChevronRight,
+    ChevronUp,
+    ClipboardList,
+    CreditCard,
+    Gauge,
+    LayoutDashboard,
+    ListTodo,
+    LogOut,
+    SettingsIcon,
+    User2,
+    Users,
+} from 'lucide-react';
 import { Link, useLocation } from '@tanstack/react-router';
 import {
     DropdownMenu,
@@ -29,8 +44,9 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/r
 type SidebarMenuItem = {
     title: string;
     url?: string;
-    icon: React.FC;
+    icon: React.FC<React.SVGProps<SVGSVGElement>>;
     children?: SidebarMenuItem[];
+    pro?: boolean;
 };
 
 export const AppSidebar = () => {
@@ -40,32 +56,42 @@ export const AppSidebar = () => {
 
     const items = React.useMemo<SidebarMenuItem[]>(
         () => [
+            { title: t('dashboard'), url: '/console', icon: LayoutDashboard },
+            { title: t('employees'), url: '/console/employees', icon: Users },
+
             {
-                title: t('dashboard'),
-                url: '/console',
-                icon: LayoutDashboard,
-            },
-            {
-                title: t('employees'),
-                url: '/console/employees',
-                icon: User2,
-            },
-            {
+                // EVALUATIONS group (evaluate & history)
                 title: t('evaluations'),
                 icon: ListTodo,
                 children: [
-                    {
-                        title: t('templates'),
-                        url: '/console/evaluations/templates',
-                        icon: ListTodo,
-                    },
-                    {
-                        title: t('criterias'),
-                        url: '/console/evaluations/criterias',
-                        icon: ClipboardList,
-                    },
+                    { title: t('evaluate'), url: '/console/evaluations/evaluate', icon: Gauge },
+                    { title: t('history'), url: '/console/evaluations/history', icon: ClipboardList },
                 ],
             },
+
+            {
+                // PERFORMANCE group (KPI & Attendance)
+                title: t('performance'),
+                icon: BarChart3,
+                children: [
+                    { title: t('kpi'), url: '/console/performance/kpi', icon: BarChart3 },
+                    { title: t('attendance'), url: '/console/performance/attendance', icon: CalendarDays },
+                ],
+            },
+
+            {
+                // MANAGE (admin/setup area)
+                title: t('manage'),
+                icon: Briefcase,
+                children: [
+                    { title: t('templates'), url: '/console/manage/templates', icon: ListTodo },
+                    { title: t('criterias'), url: '/console/manage/criterias', icon: ClipboardList },
+                    { title: t('roles'), url: '/console/manage/roles', icon: Briefcase },
+                ],
+            },
+
+            { title: t('billing'), url: '/console/billing', icon: CreditCard, pro: true },
+            { title: t('settings'), url: '/console/settings', icon: SettingsIcon },
         ],
         [t],
     );

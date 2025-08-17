@@ -12,7 +12,7 @@ import { EvaluationSwitch } from '@/components/switch/evaluations-switch';
 
 const columnHelper = createColumnHelper<EvaluationTemplate>();
 
-export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/templates/')({
+export const Route = createFileRoute('/console/_authenticated/_layout/manage/templates/')({
     component: Evaluations,
     loader: () => fetchEvaluationTemplates(),
 });

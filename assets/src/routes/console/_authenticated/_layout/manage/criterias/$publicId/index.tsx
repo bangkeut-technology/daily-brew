@@ -13,7 +13,7 @@ import { AddEvaluationTemplateDialog } from '@/components/dialog/add-evaluation-
 import { EditEvaluationCriteriaDialog } from '@/components/dialog/edit-evaluation-criteria-dialog';
 import { EvaluationCriteriaTemplateDataTable } from '@/components/data-table/evaluation-criteria-template-data-table';
 
-export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/criterias/$publicId/')({
+export const Route = createFileRoute('/console/_authenticated/_layout/manage/criterias/$publicId/')({
     component: EvaluationTemplateDetails,
 });
 

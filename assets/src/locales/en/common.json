@@ -19,6 +19,12 @@
     "note": "Note",
     "attendance": "Attendance",
     "status": "Status",
+    "history": "History",
+    "kpi": "KPI",
+    "performance": "Performance",
+    "manage": "Manage",
+    "billing": "Billing",
+    "settings": "Settings",
     "attendance_statuses": {
         "present": "Present",
         "absent": "Absent",
