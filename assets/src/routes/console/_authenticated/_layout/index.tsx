@@ -20,8 +20,8 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { AttendanceGanttWithControls } from '@/components/attendance/AttendanceGanttWithControls';
-import { KpiGanttWithControls } from '@/components/kpi/KpiGanttWithControls';
+import { AttendanceGanttWithControls } from '@/components/attendance/attendance-gantt-with-controls';
+import { KpiGanttWithControls } from '@/components/kpi/kpi-gantt-with-controls';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/')({
     component: Dashboard,
@@ -94,11 +94,11 @@ function Dashboard() {
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-2" align="end">
                                 <Calendar
+                                    captionLayout="dropdown"
                                     mode="single"
                                     selected={month}
                                     onSelect={(d) => d && setMonth(startOfMonth(d))}
                                     showOutsideDays
-                                    initialFocus
                                 />
                             </PopoverContent>
                         </Popover>
