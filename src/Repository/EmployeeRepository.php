@@ -51,7 +51,7 @@ class EmployeeRepository extends AbstractRepository
      * Find employee by publicIds and store.
      *
      * @param array $publicIds the list of employee publicIds
-     * @param Store $store       the store entity
+     * @param Store $store     the store entity
      *
      * @return Employee[] returns the list of employee entities
      */
@@ -70,7 +70,7 @@ class EmployeeRepository extends AbstractRepository
      * Find employee by publicIds and user.
      *
      * @param array $publicIds the list of employee publicIds
-     * @param User  $user        the user entity
+     * @param User  $user      the user entity
      * @return Employee[] returns the list of employee entities
      */
     public function findByPublicIdsAndUser(array $publicIds, User $user): array
@@ -79,7 +79,7 @@ class EmployeeRepository extends AbstractRepository
             ->where('e.publicId IN (:publicIds)')
             ->andWhere('e.user = :user')
             ->setParameter('publicIds', $publicIds)
-            ->setParameter('store', $user)
+            ->setParameter('user', $user)
             ->getQuery()
             ->getResult();
     }
@@ -107,7 +107,7 @@ class EmployeeRepository extends AbstractRepository
      * Find an employee by publicId and store.
      *
      * @param string $publicId the employee publicId
-     * @param Store  $store      the store entity
+     * @param Store  $store    the store entity
      *
      * @return Employee|null returns the employee entity if found, otherwise null
      */
@@ -158,7 +158,7 @@ class EmployeeRepository extends AbstractRepository
      * Find an employee by publicId and user.
      *
      * @param string $publicId the employee publicId
-     * @param User   $user       the user entity
+     * @param User   $user     the user entity
      *
      * @return Employee|null returns the employee entity if found, otherwise null
      */
@@ -171,5 +171,24 @@ class EmployeeRepository extends AbstractRepository
             ->setParameter('user', $user)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    /**
+     * Finds entities by their IDs and a specific user.
+     *
+     * @param int[]     $ids  Array of IDs to filter by.
+     * @param User|null $user The user to filter entities by, or null.
+     *
+     * @return Employee[]           Returns an array of Employee objects matching the criteria.
+     */
+    public function findByIdsAndUser(array $ids, ?User $user): array
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.id IN (:ids)')
+            ->andWhere('e.user = :user')
+            ->setParameter('ids', $ids)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
     }
 }

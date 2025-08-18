@@ -7,6 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { DataTable } from '@/components/data-table';
 import { RowSelectionState } from '@tanstack/react-table';
 import { Control, useFieldArray } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 const columnHelper = createColumnHelper<Employee>();
 const queryKey = ['daily-brew-employees'];
@@ -20,6 +21,7 @@ interface EmployeeSelectProps {
 
 export const EmployeeSelect: React.FunctionComponent<EmployeeSelectProps> = ({ control, name, title, description }) => {
     const [employees, setEmployees] = React.useState<RowSelectionState>({});
+    const { t } = useTranslation();
     const { replace } = useFieldArray({
         name,
         control,
@@ -36,7 +38,7 @@ export const EmployeeSelect: React.FunctionComponent<EmployeeSelectProps> = ({ c
 
     const columns = React.useMemo(
         () => [
-            columnHelper.accessor('id', {
+            columnHelper.accessor('publicId', {
                 id: 'select',
                 header: ({ table }) => (
                     <Checkbox
@@ -62,9 +64,9 @@ export const EmployeeSelect: React.FunctionComponent<EmployeeSelectProps> = ({ c
                     },
                 },
             }),
-            columnHelper.accessor('publicId', {
-                header: 'Employee Name',
-                cell: ({ row: { original } }) => `${original.firstName} ${original.lastName}`,
+            columnHelper.accessor('fullName', {
+                header: t('name'),
+                cell: ({ getValue }) => getValue(),
                 meta: {
                     style: {
                         textAlign: 'center',
@@ -72,7 +74,7 @@ export const EmployeeSelect: React.FunctionComponent<EmployeeSelectProps> = ({ c
                 },
             }),
         ],
-        [],
+        [t],
     );
 
     return (

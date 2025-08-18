@@ -46,7 +46,8 @@ class EvaluationTemplateController extends AbstractController
         private readonly EvaluationTemplateRepository         $evaluationTemplateRepository,
         private readonly EvaluationTemplateCriteriaRepository $evaluationTemplateCriteriaRepository,
         private readonly EventDispatcherInterface             $dispatcher,
-        private readonly EvaluationCriteriaRepository         $evaluationCriteriaRepository, private readonly EmployeeRepository $employeeRepository,
+        private readonly EvaluationCriteriaRepository         $evaluationCriteriaRepository,
+        private readonly EmployeeRepository                   $employeeRepository,
     )
     {
         parent::__construct($translator);
@@ -203,7 +204,7 @@ class EvaluationTemplateController extends AbstractController
     /**
      * Updates an existing evaluation template.
      *
-     * @param Request $request    the HTTP request containing the updated evaluation template data
+     * @param Request $request  the HTTP request containing the updated evaluation template data
      * @param string  $publicId the publicId of the evaluation template to update
      *
      * @return JsonResponse the JSON response containing the updated evaluation template
@@ -289,7 +290,7 @@ class EvaluationTemplateController extends AbstractController
     /**
      * Adds criteria to the evaluation template.
      *
-     * @param Request $request    the HTTP request containing the criteria to add
+     * @param Request $request  the HTTP request containing the criteria to add
      * @param string  $publicId the publicId of the evaluation template to add criteria to
      *
      * @return JsonResponse the JSON response indicating the addition status
@@ -389,7 +390,7 @@ class EvaluationTemplateController extends AbstractController
     /**
      * Adds employees to the evaluation template.
      *
-     * @param Request $request    the HTTP request containing the employees to add
+     * @param Request $request  the HTTP request containing the employees to add
      * @param string  $publicId the publicId of the evaluation template to add employees to
      *
      * @return JsonResponse the JSON response indicating the addition status
@@ -434,10 +435,10 @@ class EvaluationTemplateController extends AbstractController
     ): JsonResponse
     {
         $template = $this->getEvaluationTemplateByPublicId($publicId);
-        $employees = $request->request->all('employees');
+        $employees = $request->getPayload()->all('employees');
 
         if (count($employees) > 0) {
-            foreach ($this->employeeRepository->findByPublicIdsAndUser($employees, $this->getUser()) as $employee) {
+            foreach ($this->employeeRepository->findByIdsAndUser($employees, $this->getUser()) as $employee) {
                 $template->addEmployee($employee);
             }
             $this->evaluationTemplateRepository->update($template);

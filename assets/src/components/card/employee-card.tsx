@@ -50,7 +50,7 @@ export const EmployeeCard: React.FC<EmployeeCardProps> = ({ employee, from, to, 
             <Separator />
 
             <div className="flex w-full space-y-2">
-                <Button size="sm" className="w-full" asChild>
+                <Button size="sm" asChild>
                     <Link
                         to="/console/employees/$publicId"
                         params={{ publicId: employee.publicId }}

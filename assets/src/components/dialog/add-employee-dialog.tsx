@@ -29,6 +29,7 @@ interface AddEmployeeDialogProps {
 
 export const AddEmployeeDialog: React.FunctionComponent<AddEmployeeDialogProps> = ({ template, onSuccess }) => {
     const { t } = useTranslation();
+    const [open, setOpen] = React.useState(false);
     const form = useForm<EvaluationTemplateEmployees>({
         resolver: yupResolver(evaluationTemplateEmployeesSchema),
         defaultValues: {
@@ -40,6 +41,7 @@ export const AddEmployeeDialog: React.FunctionComponent<AddEmployeeDialogProps> 
         onSuccess: (data) => {
             toast.success(data.message);
             form.reset();
+            setOpen(false);
             if (onSuccess) {
                 onSuccess();
             }
@@ -61,7 +63,7 @@ export const AddEmployeeDialog: React.FunctionComponent<AddEmployeeDialogProps> 
     );
 
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <Form {...form}>
                 <DialogTrigger asChild>
                     <Button size="sm" variant="outline" className="ml-2 mt-2 md:mt-0">
