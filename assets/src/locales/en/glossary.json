@@ -16,6 +16,9 @@
             "no_records": "No attendance records found for the selected month."
         }
     },
+    "evaluations": {
+        "who": "Who & What"
+    },
     "employees": {
         "title": "Employees",
         "description": "Manage your employees' KPIs and performance metrics. You can have up to {{maxFreeEmployees}} employees.",
@@ -236,5 +239,8 @@
         "only": "Only *.jpeg and *.png images will be accepted"
     },
     "recent_evaluations": "Recent evaluations",
-    "see_all_evaluations": "See all evaluations"
+    "see_all_evaluations": "See all evaluations",
+    "evaluate": {
+        "employee": "Evaluate Employee"
+    }
 }

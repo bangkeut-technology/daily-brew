@@ -26,6 +26,7 @@
     "billing": "Billing",
     "settings": "Settings",
     "view_all": "View All",
+    "employee": "Employee",
     "attendance_statuses": {
         "present": "Present",
         "absent": "Absent",

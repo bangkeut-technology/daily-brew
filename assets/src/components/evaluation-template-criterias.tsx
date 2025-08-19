@@ -27,7 +27,7 @@ interface EvaluationTemplateCriteriasProps {
 export const EvaluationTemplateCriterias: React.FunctionComponent<EvaluationTemplateCriteriasProps> = ({
     employee,
     template,
-    date = new Date(),
+    date,
     onSuccess,
 }) => {
     const { t } = useTranslation();
@@ -41,7 +41,7 @@ export const EvaluationTemplateCriterias: React.FunctionComponent<EvaluationTemp
     });
     const { data: evaluation } = useQuery({
         queryKey: ['employee-evaluation', employee.publicId, template.publicId, date],
-        queryFn: async () => fetchEmployeeEvaluation({ publicId: employee.publicId, date }),
+        queryFn: async () => fetchEmployeeEvaluation({ publicId: employee.publicId, date: date || new Date() }),
     });
     const { mutate } = useMutation({
         mutationFn: postEmployeeEvaluation,
@@ -144,3 +144,5 @@ export const EvaluationTemplateCriterias: React.FunctionComponent<EvaluationTemp
         </div>
     );
 };
+
+EvaluationTemplateCriterias.displayName = 'EvaluationTemplateCriterias';

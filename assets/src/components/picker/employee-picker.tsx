@@ -6,13 +6,14 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface EmployeePickerProps {
+    className?: string;
     label?: string;
     date?: Date;
     value?: string;
     onChange?: (value: string) => void;
 }
 
-export const EmployeePicker: React.FunctionComponent<EmployeePickerProps> = ({ label, value, onChange }) => {
+export const EmployeePicker: React.FunctionComponent<EmployeePickerProps> = ({ className, label, value, onChange }) => {
     const { t } = useTranslation();
     const { data = [] } = useQuery({
         queryKey: ['employees'],
@@ -20,10 +21,10 @@ export const EmployeePicker: React.FunctionComponent<EmployeePickerProps> = ({ l
     });
 
     return (
-        <div className="flex flex-col space-y-4">
+        <div className="flex flex-col space-y-2">
             {label && <Label>{label}</Label>}
             <Select value={value} onValueChange={onChange}>
-                <SelectTrigger>
+                <SelectTrigger className={className}>
                     <SelectValue placeholder={t('placeholder.picker.employee', { ns: 'glossary' })} />
                 </SelectTrigger>
                 <SelectContent>

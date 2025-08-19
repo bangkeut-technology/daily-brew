@@ -21,12 +21,16 @@ class EmployeeEvaluationSubscriber implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * Handles the FinalizeEmployeeEvaluationEvent to calculate scores and average.
+     *
+     * @param FinalizeEmployeeEvaluationEvent $event The event containing the evaluation
+     */
     public function onFinalizeEvaluation(FinalizeEmployeeEvaluationEvent $event): void
     {
         $evaluation = $event->evaluation;
 
         $evaluation->setTemplateName($evaluation->getTemplate()?->getName());
-        $evaluation->setEvaluatedAt(new \DateTimeImmutable());
 
         $totalScore = 0;
         $totalWeight = 0;

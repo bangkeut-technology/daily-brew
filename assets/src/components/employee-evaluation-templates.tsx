@@ -14,7 +14,8 @@ export const EmployeeEvaluationTemplates: React.FunctionComponent<EmployeeEvalua
     onSuccess,
 }) => {
     const { t } = useTranslation('glossary');
-    const renderItems = () => {
+
+    const renderItems = React.useCallback(() => {
         return employee.templates?.map((template) => (
             <AccordionItem key={template.publicId} value={template.publicId}>
                 <AccordionTrigger>{template.name}</AccordionTrigger>
@@ -23,7 +24,7 @@ export const EmployeeEvaluationTemplates: React.FunctionComponent<EmployeeEvalua
                 </AccordionContent>
             </AccordionItem>
         ));
-    };
+    }, [employee, onSuccess]);
 
     if (employee.templates?.length === 0) {
         return (
@@ -41,3 +42,5 @@ export const EmployeeEvaluationTemplates: React.FunctionComponent<EmployeeEvalua
         </div>
     );
 };
+
+EmployeeEvaluationTemplates.displayName = 'EmployeeEvaluationTemplates';

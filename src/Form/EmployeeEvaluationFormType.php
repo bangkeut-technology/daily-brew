@@ -7,6 +7,7 @@ namespace App\Form;
 use App\Entity\EmployeeEvaluation;
 use App\Entity\EvaluationTemplate;
 use App\Entity\User;
+use App\Form\Type\DateTimeImmutableType;
 use App\Repository\EvaluationTemplateRepository;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -23,6 +24,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class EmployeeEvaluationFormType extends AbstractFormType
 {
+    /**
+     * @var User|null
+     */
     private readonly ?User $user;
 
     public function __construct(
@@ -34,6 +38,13 @@ class EmployeeEvaluationFormType extends AbstractFormType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('evaluatedAt', DateTimeImmutableType::class, [
+                'documentation' => [
+                    'type' => 'string',
+                    'format' => 'date-time',
+                    'description' => 'Date and time of the evaluation',
+                ],
+            ])
             ->add('note', TextType::class, [
                 'documentation' => [
                     'type' => 'string',
