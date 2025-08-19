@@ -53,7 +53,6 @@ class EmployeeEvaluationFormType extends AbstractFormType
             ])
             ->add('template', EntityType::class, [
                 'class' => EvaluationTemplate::class,
-                'choice_label' => 'id',
                 'query_builder' => function (EvaluationTemplateRepository $repository): QueryBuilder {
                     return $repository->findByUserQueryBuilder($this->user);
                 },

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\ApiController\Trait;
 
+use App\Entity\EmployeeEvaluation;
+use App\Repository\EmployeeEvaluationRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -14,6 +16,10 @@ use Symfony\Component\HttpFoundation\Response;
  */
 trait EmployeeEvaluationTrait
 {
+    public function __construct(private readonly EmployeeEvaluationRepository $employeeEvaluationRepository)
+    {
+    }
+
     /**
      * Create a JSON response for employee evaluation.
      *
@@ -36,5 +42,21 @@ trait EmployeeEvaluationTrait
     ): JsonResponse
     {
         return $this->json($data, $status, context: $context);
+    }
+
+    /**
+     * Get employee evaluation by publicId and current user.
+     *
+     * @param string $publicId The unique publicId of the employee evaluation
+     *
+     * @return EmployeeEvaluation The found employee evaluation
+     */
+    private function getEmployeeEvaluationByPublicId(string $publicId): EmployeeEvaluation
+    {
+        if (null === $employee = $this->employeeEvaluationRepository->findByPublicIdAndUser($publicId, $this->getUser())) {
+            throw $this->createNotFoundException($this->translator->trans('not_found.employee', ['%publicId%' => $publicId], domain: 'errors'));
+        }
+
+        return $employee;
     }
 }

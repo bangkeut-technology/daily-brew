@@ -16,9 +16,9 @@ export const Route = createFileRoute('/console/_authenticated/_layout/evaluation
 
 function NewEvaluation() {
     const { t } = useTranslation();
-    const [date, setDate] = React.useState<Date | undefined>(new Date());
+    const [evaluatedAt, setEvaluatedAt] = React.useState<Date | undefined>(new Date());
     const [employeeId, setEmployeeId] = React.useState<string>('');
-    const dateISO = format(date || new Date(), 'yyyy-MM-dd');
+    const dateISO = format(evaluatedAt || new Date(), 'yyyy-MM-dd');
     const { data: employee } = useQuery({
         queryKey: ['employee', dateISO, employeeId],
         queryFn: () => fetchEmployee({ publicId: employeeId, from: dateISO, to: dateISO }),
@@ -29,9 +29,6 @@ function NewEvaluation() {
         <div className="w-full px-6 py-5 space-y-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl md:text-3xl font-bold">{t('evaluate.employee', { ns: 'glossary' })}</h1>
-                <div className="flex items-center gap-2">
-                    <DatePicker value={date} onChange={setDate} />
-                </div>
             </div>
 
             <React.Fragment>
@@ -40,6 +37,15 @@ function NewEvaluation() {
                         <CardTitle>{t('evaluations.who', { ns: 'glossary' })}</CardTitle>
                     </CardHeader>
                     <CardContent className="grid gap-4 md:grid-cols-3">
+                        <div className="flex flex-col space-y-2">
+                            <Label>{t('evaluated_on')}</Label>
+                            <DatePicker value={evaluatedAt} onChange={setEvaluatedAt} />
+                            <span className="text-xs text-muted-foreground">
+                                {t('evaluations.date_helper', {
+                                    defaultValue: 'Used to find/update today’s evaluation.',
+                                })}
+                            </span>
+                        </div>
                         <EmployeePicker
                             className="w-full"
                             label={t('employee')}
@@ -62,7 +68,7 @@ function NewEvaluation() {
                             <CardTitle>{t('employee_evaluations.title', { ns: 'glossary' })}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <EmployeeEvaluationTemplates employee={employee} />
+                            <EmployeeEvaluationTemplates employee={employee} evaluatedAt={evaluatedAt} />
                         </CardContent>
                     </Card>
                 )}

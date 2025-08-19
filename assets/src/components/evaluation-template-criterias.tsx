@@ -20,14 +20,14 @@ import { fetchEmployeeEvaluation } from '@/services/employee';
 interface EvaluationTemplateCriteriasProps {
     employee: Employee;
     template: EvaluationTemplate;
-    date?: Date;
+    evaluatedAt?: Date;
     onSuccess?: () => void;
 }
 
 export const EvaluationTemplateCriterias: React.FunctionComponent<EvaluationTemplateCriteriasProps> = ({
     employee,
     template,
-    date,
+    evaluatedAt,
     onSuccess,
 }) => {
     const { t } = useTranslation();
@@ -40,8 +40,8 @@ export const EvaluationTemplateCriterias: React.FunctionComponent<EvaluationTemp
         queryFn: () => fetchTemplateCriterias(template.publicId),
     });
     const { data: evaluation } = useQuery({
-        queryKey: ['employee-evaluation', employee.publicId, template.publicId, date],
-        queryFn: async () => fetchEmployeeEvaluation({ publicId: employee.publicId, date: date || new Date() }),
+        queryKey: ['employee-evaluation', employee.publicId, template.publicId, evaluatedAt],
+        queryFn: async () => fetchEmployeeEvaluation({ publicId: employee.publicId, date: evaluatedAt || new Date() }),
     });
     const { mutate } = useMutation({
         mutationFn: postEmployeeEvaluation,
@@ -60,10 +60,15 @@ export const EvaluationTemplateCriterias: React.FunctionComponent<EvaluationTemp
         defaultValues: {
             template: template.id,
             note: '',
+            evaluatedAt: evaluatedAt,
             scores: [],
         },
     });
     const { fields } = useFieldArray({ control: form.control, name: 'scores' });
+
+    React.useEffect(() => {
+        form.setValue('evaluatedAt', evaluatedAt);
+    }, [evaluatedAt, form]);
 
     React.useEffect(() => {
         if (isSuccess && data.length) {

@@ -6,6 +6,7 @@ namespace App\Repository;
 
 use App\Entity\Employee;
 use App\Entity\EmployeeEvaluation;
+use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -34,11 +35,18 @@ class EmployeeEvaluationRepository extends AbstractRepository
     }
 
     /**
-     * Find evaluations by date and employee.
+     * Find an evaluation by its evaluatedAt and employee.
+     *
+     * @param DateTimeImmutable $date     The date of the evaluation
+     * @param Employee          $employee The employee associated with the evaluation
+     *
+     * @return EmployeeEvaluation|null
      */
-    public function findByDateAndEmployee(DateTimeImmutable $date, Employee $employee): ?EmployeeEvaluation
+    public function findByEvaluatedAtAndEmployee(DateTimeImmutable $date, Employee $employee): ?EmployeeEvaluation
     {
         return $this->createQueryBuilder('ee')
+            ->select('ee, ees, eet')
+            ->innerJoin('ee.template', 'eet')
             ->innerJoin('ee.scores', 'ees')
             ->where('ee.evaluatedAt = :date')
             ->andWhere('ee.employee = :employee')
@@ -123,5 +131,27 @@ class EmployeeEvaluationRepository extends AbstractRepository
             ->groupBy('e.id');
 
         return $qb->getQuery()->getArrayResult();
+    }
+
+    /**
+     * Finds an entity by its public ID and associated user.
+     *
+     * @param string $publicId The public ID of the entity.
+     * @param User   $user     The associated user.
+     *
+     * @return EmployeeEvaluation|null The entity matching the public ID and user, or null if not found.
+     */
+    public function findByPublicIdAndUser(string $publicId, User $user): ?EmployeeEvaluation
+    {
+        return $this->createQueryBuilder('ee')
+            ->innerJoin('ee.scores', 'ees')
+            ->where('ee.publicId = :publicId')
+            ->andWhere('ee.user = :user')
+            ->setParameters(new ArrayCollection([
+                new Parameter('publicId', $publicId),
+                new Parameter('user', $user),
+            ]))
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

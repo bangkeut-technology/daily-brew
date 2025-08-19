@@ -15,6 +15,7 @@ export const postEmployeeEvaluation = async ({
         }>(`/employees/${publicId}/evaluations`, {
             template: data.template,
             note: data.note,
+            evaluatedAt: data.evaluatedAt,
             scores: data.scores.map((score) => ({
                 score: score.score,
                 criteria: score.criteria,

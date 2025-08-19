@@ -6,11 +6,13 @@ import { useTranslation } from 'react-i18next';
 
 interface EmployeeEvaluationTemplatesProps {
     employee: Employee;
+    evaluatedAt?: Date;
     onSuccess?: () => void;
 }
 
 export const EmployeeEvaluationTemplates: React.FunctionComponent<EmployeeEvaluationTemplatesProps> = ({
     employee,
+    evaluatedAt,
     onSuccess,
 }) => {
     const { t } = useTranslation('glossary');
@@ -20,11 +22,16 @@ export const EmployeeEvaluationTemplates: React.FunctionComponent<EmployeeEvalua
             <AccordionItem key={template.publicId} value={template.publicId}>
                 <AccordionTrigger>{template.name}</AccordionTrigger>
                 <AccordionContent>
-                    <EvaluationTemplateCriterias employee={employee} template={template} onSuccess={onSuccess} />
+                    <EvaluationTemplateCriterias
+                        evaluatedAt={evaluatedAt}
+                        employee={employee}
+                        template={template}
+                        onSuccess={onSuccess}
+                    />
                 </AccordionContent>
             </AccordionItem>
         ));
-    }, [employee, onSuccess]);
+    }, [employee, evaluatedAt, onSuccess]);
 
     if (employee.templates?.length === 0) {
         return (

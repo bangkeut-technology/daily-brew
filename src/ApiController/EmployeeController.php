@@ -21,6 +21,7 @@ use App\Repository\AttendanceRepository;
 use App\Repository\EmployeeEvaluationRepository;
 use App\Repository\EmployeeRepository;
 use App\Util\DateHelper;
+use DateMalformedStringException;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Exception;
@@ -52,7 +53,8 @@ class EmployeeController extends AbstractController
         TranslatorInterface                           $translator,
         private readonly EventDispatcherInterface     $dispatcher,
         private readonly EmployeeRepository           $employeeRepository,
-        private readonly EmployeeEvaluationRepository $employeeEvaluationRepository, private readonly AttendanceRepository $attendanceRepository,
+        private readonly EmployeeEvaluationRepository $employeeEvaluationRepository,
+        private readonly AttendanceRepository $attendanceRepository,
     )
     {
         parent::__construct($translator);
@@ -496,6 +498,8 @@ class EmployeeController extends AbstractController
      * @param Request $request  The HTTP request containing the evaluation data
      *
      * @return JsonResponse The JSON response containing the created evaluation data or an error message
+     *
+     * @throws DateMalformedStringException
      */
     #[OA\Parameter(
         name: 'publicId',
@@ -515,7 +519,15 @@ class EmployeeController extends AbstractController
         description: 'Creates a new evaluation for the employee',
         content: new OA\JsonContent(ref: new Model(
             type: EmployeeEvaluation::class,
-            groups: ['employee_evaluation:read', 'employee_criteria:read', 'employee:read', 'user:read', 'store:read', 'role:read', 'template:read']
+            groups: [
+                'user:read',
+                'store:read',
+                'role:read',
+                'employee:read',
+                'template:read',
+                'employee_evaluation:read',
+                'employee_criteria:read',
+            ]
         ))
     )]
     #[OA\Response(
@@ -536,24 +548,27 @@ class EmployeeController extends AbstractController
     public function postEvaluation(string $publicId, Request $request): JsonResponse
     {
         $employee = $this->getEmployeeByPublicId($publicId);
-        if (null === $evaluation = $this->employeeEvaluationRepository->findByDateAndEmployee(new DateTimeImmutable(), $employee)) {
-            $evaluation = $this->employeeEvaluationRepository->create();
-        }
+        if ($evaluatedAt = $request->getPayload()->get('evaluatedAt')) {
+            $evaluatedAt = new DateTimeImmutable($evaluatedAt);
+            if (null === $evaluation = $this->employeeEvaluationRepository->findByEvaluatedAtAndEmployee($evaluatedAt, $employee)) {
+                $evaluation = $this->employeeEvaluationRepository->create();
+            }
 
-        $form = $this->createForm(EmployeeEvaluationFormType::class, $evaluation);
-        $form->submit($request->getPayload()->all());
-        if ($form->isSubmitted() && $form->isValid()) {
-            $evaluation->setEmployee($employee);
-            $evaluation->setEvaluator($this->getUser());
+            $form = $this->createForm(EmployeeEvaluationFormType::class, $evaluation);
+            $form->submit($request->getPayload()->all());
+            if ($form->isSubmitted() && $form->isValid()) {
+                $evaluation->setEmployee($employee);
+                $evaluation->setEvaluator($this->getUser());
 
-            $this->dispatcher->dispatch(new FinalizeEmployeeEvaluationEvent($evaluation));
+                $this->dispatcher->dispatch(new FinalizeEmployeeEvaluationEvent($evaluation));
 
-            $this->employeeEvaluationRepository->update($evaluation);
+                $this->employeeEvaluationRepository->update($evaluation);
 
-            return $this->createEmployeeEvaluationResponse([
-                'message' => $this->translator->trans('created.employee_evaluation'),
-                'evaluation' => $evaluation,
-            ], Response::HTTP_CREATED);
+                return $this->createEmployeeEvaluationResponse([
+                    'message' => $this->translator->trans('created.employee_evaluation'),
+                    'evaluation' => $evaluation,
+                ], Response::HTTP_CREATED);
+            }
         }
 
         return $this->createBadRequestResponse($this->translator->trans('invalid.employee_evaluation', domain: 'errors'));
@@ -584,14 +599,15 @@ class EmployeeController extends AbstractController
     #[OA\Response(
         response: Response::HTTP_OK,
         description: 'Returns the employee evaluation for the specified date',
-        content: new OA\JsonContent(ref: new Model(type: EmployeeEvaluation::class, groups: ['employee_evaluation:read', 'employee_criteria:read', 'employee:read', 'user:read', 'store:read', 'role:read', 'template:read']))
+        content: new OA\JsonContent(ref: new Model(type: EmployeeEvaluation::class, groups: [
+            'employee_evaluation:read', 'employee_criteria:read', 'employee:read', 'user:read', 'store:read', 'role:read', 'template:read']))
     )]
     #[Route('/{publicId}/evaluation', name: 'get_evaluation', methods: ['GET'])]
     public function getEmployeeEvaluation(string $publicId, Request $request): JsonResponse
     {
         $employee = $this->getEmployeeByPublicId($publicId);
         $date = $request->query->get('date', (new DateTimeImmutable())->format('Y-m-d'));
-        $evaluation = $this->employeeEvaluationRepository->findByDateAndEmployee(new DateTimeImmutable($date), $employee);
+        $evaluation = $this->employeeEvaluationRepository->findByEvaluatedAtAndEmployee(new DateTimeImmutable($date), $employee);
 
         return $this->createEmployeeEvaluationResponse($evaluation);
     }
