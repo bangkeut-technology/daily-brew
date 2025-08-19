@@ -24,3 +24,27 @@ export const postEmployeeEvaluation = async ({
         })
         .then((response) => response.data);
 };
+
+export const putEmployeeEvaluation = async ({
+    publicId,
+    data,
+}: {
+    publicId: string;
+    data: PartialEmployeeEvaluation;
+}) => {
+    return apiAxios
+        .put<{
+            message: string;
+            evaluation: EmployeeEvaluation;
+        }>(`/employee-evaluations/${publicId}`, {
+            template: data.template,
+            note: data.note,
+            evaluatedAt: data.evaluatedAt,
+            scores: data.scores.map((score) => ({
+                score: score.score,
+                criteria: score.criteria,
+                comment: score.comment,
+            })),
+        })
+        .then((response) => response.data);
+};

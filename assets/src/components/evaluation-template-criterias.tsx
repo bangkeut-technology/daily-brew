@@ -9,7 +9,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { Loader2Icon } from 'lucide-react';
 import { Form } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
-import { postEmployeeEvaluation } from '@/services/employee-evaluation';
+import { postEmployeeEvaluation, putEmployeeEvaluation } from '@/services/employee-evaluation';
 import { PartialEmployeeEvaluation } from '@/types/employee-evaluation';
 import { PartialEmployeeScore } from '@/types/EmployeeScore';
 import { toast } from 'sonner';
@@ -43,8 +43,21 @@ export const EvaluationTemplateCriterias: React.FunctionComponent<EvaluationTemp
         queryKey: ['employee-evaluation', employee.publicId, template.publicId, evaluatedAt],
         queryFn: async () => fetchEmployeeEvaluation({ publicId: employee.publicId, date: evaluatedAt || new Date() }),
     });
-    const { mutate } = useMutation({
+    const { mutate: post } = useMutation({
         mutationFn: postEmployeeEvaluation,
+        onSuccess: (data) => {
+            toast.success(data.message);
+            if (onSuccess) {
+                onSuccess();
+            }
+        },
+        onError: (error) => {
+            const message = isAxiosError(error) ? error.response?.data.message : t('occurred', { ns: 'error' });
+            toast.error(message);
+        },
+    });
+    const { mutate: put } = useMutation({
+        mutationFn: putEmployeeEvaluation,
         onSuccess: (data) => {
             toast.success(data.message);
             if (onSuccess) {
@@ -91,6 +104,7 @@ export const EvaluationTemplateCriterias: React.FunctionComponent<EvaluationTemp
                         score.score = existingScores[score.criteria];
                     }
                 });
+                form.setValue('note', evaluation.note || '');
             }
             form.setValue('scores', scores);
         }
@@ -135,9 +149,13 @@ export const EvaluationTemplateCriterias: React.FunctionComponent<EvaluationTemp
 
     const onSubmit = React.useCallback(
         (data: PartialEmployeeEvaluation) => {
-            mutate({ publicId: employee.publicId, data });
+            if (evaluation) {
+                put({ publicId: evaluation.publicId, data });
+            } else {
+                post({ publicId: employee.publicId, data });
+            }
         },
-        [employee.publicId, mutate],
+        [employee.publicId, evaluation, post, put],
     );
 
     return (
