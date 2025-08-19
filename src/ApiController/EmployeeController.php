@@ -54,7 +54,7 @@ class EmployeeController extends AbstractController
         private readonly EventDispatcherInterface     $dispatcher,
         private readonly EmployeeRepository           $employeeRepository,
         private readonly EmployeeEvaluationRepository $employeeEvaluationRepository,
-        private readonly AttendanceRepository $attendanceRepository,
+        private readonly AttendanceRepository         $attendanceRepository,
     )
     {
         parent::__construct($translator);
@@ -548,27 +548,22 @@ class EmployeeController extends AbstractController
     public function postEvaluation(string $publicId, Request $request): JsonResponse
     {
         $employee = $this->getEmployeeByPublicId($publicId);
-        if ($evaluatedAt = $request->getPayload()->get('evaluatedAt')) {
-            $evaluatedAt = new DateTimeImmutable($evaluatedAt);
-            if (null === $evaluation = $this->employeeEvaluationRepository->findByEvaluatedAtAndEmployee($evaluatedAt, $employee)) {
-                $evaluation = $this->employeeEvaluationRepository->create();
-            }
+        $evaluation = $this->employeeEvaluationRepository->create();
 
-            $form = $this->createForm(EmployeeEvaluationFormType::class, $evaluation);
-            $form->submit($request->getPayload()->all());
-            if ($form->isSubmitted() && $form->isValid()) {
-                $evaluation->setEmployee($employee);
-                $evaluation->setEvaluator($this->getUser());
+        $form = $this->createForm(EmployeeEvaluationFormType::class, $evaluation);
+        $form->submit($request->getPayload()->all());
+        if ($form->isSubmitted() && $form->isValid()) {
+            $evaluation->setEmployee($employee);
+            $evaluation->setEvaluator($this->getUser());
 
-                $this->dispatcher->dispatch(new FinalizeEmployeeEvaluationEvent($evaluation));
+            $this->dispatcher->dispatch(new FinalizeEmployeeEvaluationEvent($evaluation));
 
-                $this->employeeEvaluationRepository->update($evaluation);
+            $this->employeeEvaluationRepository->update($evaluation);
 
-                return $this->createEmployeeEvaluationResponse([
-                    'message' => $this->translator->trans('created.employee_evaluation'),
-                    'evaluation' => $evaluation,
-                ], Response::HTTP_CREATED);
-            }
+            return $this->createEmployeeEvaluationResponse([
+                'message' => $this->translator->trans('created.employee_evaluation'),
+                'evaluation' => $evaluation,
+            ], Response::HTTP_CREATED);
         }
 
         return $this->createBadRequestResponse($this->translator->trans('invalid.employee_evaluation', domain: 'errors'));

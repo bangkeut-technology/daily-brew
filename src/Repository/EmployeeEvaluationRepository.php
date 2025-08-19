@@ -144,6 +144,8 @@ class EmployeeEvaluationRepository extends AbstractRepository
     public function findByPublicIdAndUser(string $publicId, User $user): ?EmployeeEvaluation
     {
         return $this->createQueryBuilder('ee')
+            ->select('ee, ees, eet')
+            ->innerJoin('ee.template', 'eet')
             ->innerJoin('ee.scores', 'ees')
             ->where('ee.publicId = :publicId')
             ->andWhere('ee.user = :user')
