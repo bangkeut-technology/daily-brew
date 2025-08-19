@@ -25,7 +25,7 @@ export const AttendanceForm: React.FunctionComponent<AttendanceFormProps> = ({ f
     return (
         <Form {...form}>
             <div className="flex flex-col space-y-4">
-                <DatePicker
+                <DatePickerControl
                     control={form.control}
                     name="attendanceDate"
                     label={t('attendance_date')}

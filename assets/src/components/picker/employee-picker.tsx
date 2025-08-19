@@ -1,37 +1,41 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchEmployees } from '@/services/employee';
-import { createColumnHelper } from '@tanstack/table-core';
-import { Employee } from '@/types/employee';
-import { Checkbox } from '@/components/ui/checkbox';
-import { DataTable } from '@/components/data-table';
-import { RowSelectionState } from '@tanstack/react-table';
-import { Control, useFieldArray } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-const queryKey = ['daily-brew-employees'];
-
-interface EmployeeSelectProps {
-    name: string;
-    title?: string;
-    description?: string;
+interface EmployeePickerProps {
+    label?: string;
+    date?: Date;
+    value?: string;
+    onChange?: (value: string) => void;
 }
 
-export const EmployeeSelect: React.FunctionComponent<EmployeeSelectProps> = ({ title, description }) => {
-    const [employees, setEmployees] = React.useState<RowSelectionState>({});
+export const EmployeePicker: React.FunctionComponent<EmployeePickerProps> = ({ label, value, onChange }) => {
     const { t } = useTranslation();
     const { data = [] } = useQuery({
-        queryKey,
+        queryKey: ['employees'],
         queryFn: () => fetchEmployees({ from: new Date().toISOString(), to: new Date().toISOString() }),
     });
 
     return (
         <div className="flex flex-col space-y-4">
-            <div className="flex flex-row space-x-4">{title && <h3 className="text-lg font-semibold">{title}</h3>}</div>
-            {description && <p className="text-sm text-muted-foreground">{description}</p>}
-            <DataTable data={data} columns={columns} rowSelection={employees} onRowSelectionChange={setEmployees} />
+            {label && <Label>{label}</Label>}
+            <Select value={value} onValueChange={onChange}>
+                <SelectTrigger>
+                    <SelectValue placeholder={t('placeholder.picker.employee', { ns: 'glossary' })} />
+                </SelectTrigger>
+                <SelectContent>
+                    {data.map((e) => (
+                        <SelectItem key={e.publicId} value={e.publicId}>
+                            {e.fullName}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
         </div>
     );
 };
 
-EmployeeSelect.displayName = 'EmployeeSelect';
+EmployeePicker.displayName = 'EmployeePicker';

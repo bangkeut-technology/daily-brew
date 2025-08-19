@@ -181,7 +181,8 @@
     "no_account_yet": "Don't have an account yet?",
     "placeholder": {
         "picker": {
-            "date": "Select a date"
+            "date": "Select a date",
+            "employee": "Select an employee"
         }
     },
     "evaluation_template_criterias": {

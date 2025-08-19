@@ -4,10 +4,10 @@ import { EmployeeEvaluationTemplates } from '@/components/employee-evaluation-te
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { fetchEmployee, fetchEmployees } from '@/services/employee';
+import { fetchEmployee } from '@/services/employee';
 import { format } from 'date-fns';
 import { DatePicker } from '@/components/picker/date-picker';
+import { EmployeePicker } from '@/components/picker/employee-picker';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/evaluate')({
     component: NewEvaluation,
@@ -17,17 +17,11 @@ function NewEvaluation() {
     const [date, setDate] = React.useState<Date | undefined>(new Date());
     const [employeeId, setEmployeeId] = React.useState<string>('');
     const dateISO = format(date || new Date(), 'yyyy-MM-dd');
-    const { data: employees = [] } = useQuery({
-        queryKey: ['employees', dateISO],
-        queryFn: () => fetchEmployees({ from: dateISO, to: dateISO }),
-    });
     const { data: employee } = useQuery({
         queryKey: ['employee', dateISO, employeeId],
         queryFn: () => fetchEmployee({ publicId: employeeId, from: dateISO, to: dateISO }),
         enabled: !!employeeId,
     });
-
-    const onSubmit = React.useCallback(() => {}, []);
 
     return (
         <div className="w-full px-6 py-5 space-y-6">
@@ -45,21 +39,7 @@ function NewEvaluation() {
                             <CardTitle>Who & What</CardTitle>
                         </CardHeader>
                         <CardContent className="grid gap-4 md:grid-cols-3">
-                            <div className="space-y-1">
-                                <Label>Employee</Label>
-                                <Select value={employeeId} onValueChange={setEmployeeId}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select employee" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {employees.map((e) => (
-                                            <SelectItem key={e.publicId} value={e.publicId}>
-                                                {e.fullName}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                            <EmployeePicker value={employeeId} onChange={setEmployeeId} />
 
                             {/* Average */}
                             <div className="space-y-1">

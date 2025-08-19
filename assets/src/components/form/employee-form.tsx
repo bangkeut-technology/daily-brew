@@ -29,8 +29,8 @@ export const EmployeeForm: React.FunctionComponent<EmployeeFormProps> = ({ form,
                     type="tel"
                     disabled={isPending}
                 />
-                <DatePicker control={form.control} name="dob" label={t('date_of_birth')} disabled={isPending} />
-                <DatePicker control={form.control} name="joinedAt" label={t('joined_at')} disabled={isPending} />
+                <DatePickerControl control={form.control} name="dob" label={t('date_of_birth')} disabled={isPending} />
+                <DatePickerControl control={form.control} name="joinedAt" label={t('joined_at')} disabled={isPending} />
                 {withTemplates && (
                     <EvaluationTemplateSelect
                         name="template"
