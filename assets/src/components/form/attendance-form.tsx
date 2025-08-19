@@ -2,7 +2,7 @@ import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { AttendanceStatusEnum, PartialAttendance } from '@/types/attendance';
 import { Form } from '@/components/ui/form';
-import { DatePicker } from '@/components/picker/date-picker';
+import { DatePickerControl } from '@/components/picker/date-picker-control';
 import { useTranslation } from 'react-i18next';
 import { SelectField } from '@/components/field/select-field';
 import { TextAreaField } from '@/components/field/textarea-field';

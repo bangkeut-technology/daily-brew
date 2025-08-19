@@ -14,8 +14,9 @@ export const Route = createFileRoute('/console/_authenticated/_layout/evaluation
 });
 
 function NewEvaluation() {
-    const [dateISO, setDateISO] = React.useState<string>(format(new Date(), 'yyyy-MM-dd'));
+    const [date, setDate] = React.useState<Date | undefined>(new Date());
     const [employeeId, setEmployeeId] = React.useState<string>('');
+    const dateISO = format(date || new Date(), 'yyyy-MM-dd');
     const { data: employees = [] } = useQuery({
         queryKey: ['employees', dateISO],
         queryFn: () => fetchEmployees({ from: dateISO, to: dateISO }),
@@ -33,15 +34,7 @@ function NewEvaluation() {
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl md:text-3xl font-bold">Evaluate</h1>
                 <div className="flex items-center gap-2">
-                    <DatePicker control={} name={}
-                    {/*<Button onClick={onSubmit} disabled={!isValid || isSubmitting || mutation.isPending}>*/}
-                    {/*    {isSubmitting || mutation.isPending ? (*/}
-                    {/*        <Loader2 className="h-4 w-4 mr-2 animate-spin" />*/}
-                    {/*    ) : (*/}
-                    {/*        <Save className="h-4 w-4 mr-2" />*/}
-                    {/*    )}*/}
-                    {/*    {existing ? 'Update evaluation' : 'Save evaluation'}*/}
-                    {/*</Button>*/}
+                    <DatePicker value={date} onChange={setDate} />
                 </div>
             </div>
 
@@ -52,7 +45,6 @@ function NewEvaluation() {
                             <CardTitle>Who & What</CardTitle>
                         </CardHeader>
                         <CardContent className="grid gap-4 md:grid-cols-3">
-                            {/* Employee */}
                             <div className="space-y-1">
                                 <Label>Employee</Label>
                                 <Select value={employeeId} onValueChange={setEmployeeId}>

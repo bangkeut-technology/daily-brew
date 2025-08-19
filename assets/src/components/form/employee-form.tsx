@@ -4,7 +4,7 @@ import { UseFormReturn } from 'react-hook-form';
 import { Form } from '@/components/ui/form';
 import { TextField } from '@/components/field/text-field';
 import { useTranslation } from 'react-i18next';
-import { DatePicker } from '@/components/picker/date-picker';
+import { DatePickerControl } from '@/components/picker/date-picker-control';
 import { RoleSelect } from '@/components/select/role-select';
 import { EvaluationTemplateSelect } from '@/components/select/evaluation-template-select';
 
