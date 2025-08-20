@@ -17,20 +17,20 @@ export const Route = createFileRoute('/console/_authenticated/_layout/evaluation
     validateSearch: z.object({
         from: z.string().optional(),
         to: z.string().optional(),
-        employeeId: z.string().optional(),
-        templateId: z.string().optional(),
+        employee: z.string().optional(),
+        template: z.string().optional(),
     }),
 });
 
 function EvaluationsHistoryPage() {
     const { t } = useTranslation();
     const navigate = Route.useNavigate();
-    const { from, to, employeeId, templateId } = Route.useSearch();
+    const { from, to, employee, template } = Route.useSearch();
     const [params, setParams] = React.useState<HistoriesSearchParams>({
         from: from ? new Date(from) : undefined,
         to: to ? new Date(to) : undefined,
-        employeeId: employeeId || '',
-        templateId: templateId || '',
+        employee: employee || '',
+        template: template || '',
     });
 
     const onSearch = React.useCallback(() => {
@@ -38,15 +38,15 @@ function EvaluationsHistoryPage() {
             search: {
                 from: params.from ? format(params.from, DATE_FORMAT) : undefined,
                 to: params.to ? format(params.to, DATE_FORMAT) : undefined,
-                employeeId: params.employeeId || undefined,
-                templateId: params.templateId || undefined,
+                employee: params.employee || undefined,
+                template: params.template || undefined,
             },
         });
-    }, [navigate, params.employeeId, params.from, params.templateId, params.to]);
+    }, [navigate, params.employee, params.from, params.template, params.to]);
 
     const onReset = React.useCallback(() => {
-        setParams({ from: undefined, to: undefined, employeeId: '', templateId: '' });
-        navigate({ search: { from: undefined, to: undefined, employeeId: undefined, templateId: undefined } });
+        setParams({ from: undefined, to: undefined, employee: '', template: '' });
+        navigate({ search: { from: undefined, to: undefined, employee: undefined, template: undefined } });
     }, [navigate]);
 
     const onExportCsv = React.useCallback(() => {}, []);

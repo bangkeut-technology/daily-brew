@@ -10,8 +10,8 @@ import { EvaluationTemplatePicker } from '@/components/picker/template-picker';
 export type HistoriesSearchParams = {
     from: Date | undefined;
     to: Date | undefined;
-    employeeId: string;
-    templateId: string;
+    employee: string;
+    template: string;
 };
 
 interface HistorySearchFormProps {
@@ -83,14 +83,14 @@ export const HistorySearchForm: React.FC<HistorySearchFormProps> = ({
                 <DatePicker label={t('to')} value={value.to} onChange={setTo} className="md:col-span-3" />
                 <EmployeePicker
                     label={t('employee')}
-                    value={value.employeeId}
-                    onChange={(employeeId) => onChange({ employeeId })}
+                    value={value.employee}
+                    onChange={(employee) => onChange({ employee })}
                     className="md:col-span-3 w-full"
                 />
                 <EvaluationTemplatePicker
                     label={t('evaluation_templates')}
-                    value={value.templateId}
-                    onChange={(templateId) => onChange({ templateId })}
+                    value={value.template}
+                    onChange={(template) => onChange({ template })}
                     className="md:col-span-2 w-full"
                 />
             </CardContent>

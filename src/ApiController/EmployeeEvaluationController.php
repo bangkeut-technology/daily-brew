@@ -103,8 +103,8 @@ class EmployeeEvaluationController extends AbstractController
     public function gets(Request $request): JsonResponse
     {
         $criteria['user'] = $this->getUser();
-        $criteria['employee'] = $request->query->get('employee');
-        $criteria['template'] = $request->query->get('template');
+        $criteria['employee'] = $request->query->get('employee') ?: null;
+        $criteria['template'] = $request->query->get('template') ?: null;
         $from = $request->query->get('from');
         $to = $request->query->get('to');
         $criteria['from'] = $from ? new DateTimeImmutable($from) : null;
