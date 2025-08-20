@@ -120,21 +120,21 @@ jobs:
                     REFRESH_TOKEN_TTL:        ${{ secrets.REFRESH_TOKEN_TTL}}
                     REFRESH_TOKEN_UPDATE_TTL: ${{ secrets.REFRESH_TOKEN_UPDATE_TTL}}
 
-            -
-                name: Bump version & generate changelog
-                id:   release
-                uses: googleapis/release-please-action@v4
-                with:
-                    release-type: node
-                    token:        ${{ secrets.GITHUB_TOKEN }}
-
-            -
-                name: Create GitHub Release
-                if:   steps.release.outputs.release_created == 'true'
-                uses: softprops/action-gh-release@v2
-                with:
-                    tag_name:   ${{ steps.release.outputs.tag_name }}
-                    name:       Release ${{ steps.release.outputs.tag_name }}
-                    body_path:  ./CHANGELOG.md
-                    draft:      false
-                    prerelease: false
+#            -
+#                name: Bump version & generate changelog
+#                id:   release
+#                uses: googleapis/release-please-action@v4
+#                with:
+#                    release-type: node
+#                    token:        ${{ secrets.GITHUB_TOKEN }}
+#
+#            -
+#                name: Create GitHub Release
+#                if:   steps.release.outputs.release_created == 'true'
+#                uses: softprops/action-gh-release@v2
+#                with:
+#                    tag_name:   ${{ steps.release.outputs.tag_name }}
+#                    name:       Release ${{ steps.release.outputs.tag_name }}
+#                    body_path:  ./CHANGELOG.md
+#                    draft:      false
+#                    prerelease: false
