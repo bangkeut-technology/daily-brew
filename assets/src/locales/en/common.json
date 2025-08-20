@@ -28,6 +28,9 @@
     "settings": "Settings",
     "view_all": "View All",
     "employee": "Employee",
+    "employee_name": "Employee",
+    "average": "Average",
+    "template": "Template",
     "attendance_statuses": {
         "present": "Present",
         "absent": "Absent",

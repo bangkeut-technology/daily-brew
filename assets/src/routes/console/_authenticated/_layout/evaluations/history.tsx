@@ -14,10 +14,14 @@ import { Calendar, Download, ListFilter, Search } from 'lucide-react';
 import { DateRangePicker } from '@/components/picker/date-range-picker'; // or your DateRange component
 import { DataTable } from '@/components/data-table'; // your wrapper around shadcn table
 import { cn } from '@/lib/utils';
-import { fetchEmployeeEvaluation } from '@/services/employee';
 import { fetchEmployeeEvaluations } from '@/services/employee-evaluation';
 import { ColumnDef } from '@tanstack/react-table';
 import { EmployeeEvaluation } from '@/types/employee-evaluation';
+import { useTranslation } from 'react-i18next';
+import { createColumnHelper } from '@tanstack/table-core';
+import { DISPLAY_DATE_FORMAT } from '@/constants/date';
+
+const columnHelper = createColumnHelper<EmployeeEvaluation>();
 
 // --- Search schema (type-safe route) ---
 const SearchSchema = z.object({
@@ -39,6 +43,7 @@ export const Route = createFileRoute('/console/_authenticated/_layout/evaluation
 });
 
 function EvaluationsHistoryPage() {
+    const { t } = useTranslation();
     const navigate = Route.useNavigate();
 
     // Query list
@@ -60,33 +65,25 @@ function EvaluationsHistoryPage() {
     });
 
     // Table columns
-    const columns = React.useMemo<ColumnDef<EmployeeEvaluation>[]>(
+    const columns = React.useMemo(
         () => [
-            {
-                header: 'Date',
-                accessorKey: 'evaluatedAt',
-                cell: ({ row }) => format(parseISO(row.original.evaluatedAt), 'PP'),
+            columnHelper.accessor('evaluatedAt', {
+                header: t('evaluated_on'),
+                cell: ({ row }) => format(parseISO(row.original.evaluatedAt), DISPLAY_DATE_FORMAT),
                 enableSorting: true,
-                meta: { sortKey: 'evaluatedAt' },
-            },
-            {
-                header: 'Employee',
-                accessorKey: 'employeeName',
+            }),
+            columnHelper.accessor('employee.fullName', {
+                header: t('employee'),
+                cell: ({ getValue }) => getValue(),
                 enableSorting: true,
-                meta: { sortKey: 'employeeName' },
-            },
-            {
-                header: 'Template',
-                accessorKey: 'templateName',
+            }),
+            columnHelper.accessor('templateName', {
+                header: t('template'),
+                cell: ({ getValue }) => getValue(),
                 enableSorting: true,
-                meta: { sortKey: 'templateName' },
-                cell: ({ row }) => row.original.templateName || <span className="text-muted-foreground">—</span>,
-            },
-            {
-                header: 'Average',
-                accessorKey: 'averageScore',
-                enableSorting: true,
-                meta: { sortKey: 'averageScore' },
+            }),
+            columnHelper.accessor('averageScore', {
+                header: t('average'),
                 cell: ({ row }) => (
                     <Badge
                         className={cn(
@@ -107,14 +104,10 @@ function EvaluationsHistoryPage() {
                         {row.original.averageScore?.toFixed(2) ?? '—'}
                     </Badge>
                 ),
-            },
-            {
-                header: 'Scores',
-                accessorKey: 'scoresCount',
-                enableSorting: false,
-            },
+                enableSorting: true,
+            }),
         ],
-        [],
+        [t],
     );
 
     // Row details
@@ -128,30 +121,6 @@ function EvaluationsHistoryPage() {
     // Helpers
     const setSearch = (patch: Partial<z.infer<typeof SearchSchema>>) =>
         navigate({ search: (prev) => ({ ...prev, ...patch, page: 1 }) });
-
-    const onExportCsv = () => {
-        const rows = data?.rows ?? [];
-        const csv = [
-            ['Date', 'Employee', 'Template', 'Average', 'Scores'].join(','),
-            ...rows.map((r) =>
-                [
-                    format(parseISO(r.evaluatedAt), 'yyyy-MM-dd'),
-                    `"${r.employeeName.replace(/"/g, '""')}"`,
-                    `"${(r.templateName || '').replace(/"/g, '""')}"`,
-                    r.averageScore ?? '',
-                    r.scoresCount,
-                ].join(','),
-            ),
-        ].join('\n');
-
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `evaluations_${from ?? ''}_${to ?? ''}.csv`;
-        a.click();
-        URL.revokeObjectURL(url);
-    };
 
     return (
         <div className="w-full px-6 py-5 space-y-6">
