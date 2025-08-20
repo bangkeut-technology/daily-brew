@@ -17,7 +17,8 @@
         }
     },
     "evaluations": {
-        "who": "Who & What"
+        "who": "Who & What",
+        "date_helper": "The selected date determines which evaluation is created or updated."
     },
     "employees": {
         "title": "Employees",
@@ -188,6 +189,7 @@
             "employee": "Select an employee"
         }
     },
+    "date": "Date",
     "evaluation_template_criterias": {
         "title": "Evaluation Template Criterias",
         "subtitle": "Manage the criteria included in your evaluation templates. You can add multiple criteria to each template.",
@@ -241,6 +243,8 @@
     "recent_evaluations": "Recent evaluations",
     "see_all_evaluations": "See all evaluations",
     "evaluate": {
-        "employee": "Evaluate Employee"
+        "employee": "Evaluate Employee",
+        "title": "Evaluate",
+        "description": "Evaluate an employee's performance based on the selected evaluation template."
     }
 }
