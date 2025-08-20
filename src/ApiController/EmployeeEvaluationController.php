@@ -61,12 +61,54 @@ class EmployeeEvaluationController extends AbstractController
     /**
      * @param Request $request
      * @return JsonResponse
+     * @throws DateMalformedStringException
      */
+    #[OA\Parameter(
+        name: 'from',
+        description: 'Start date of the period (YYYY-MM-DD)',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Parameter(
+        name: 'to',
+        description: 'End date of the period (YYYY-MM-DD)',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Parameter(
+        name: 'employee',
+        description: 'The employee to filter evaluations by',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Parameter(
+        name: 'template',
+        description: 'The evaluation template to filter evaluations by',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns a list of evaluations for the specified period and user.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: EmployeeEvaluation::class, groups: ['employee_evaluation:read']))
+        )
+    )]
     #[Route(name: 'gets', methods: ['GET'])]
     public function gets(Request $request): JsonResponse
     {
-        $criteria = $request->query->all();
         $criteria['user'] = $this->getUser();
+        $criteria['employee'] = $request->query->get('employee');
+        $criteria['template'] = $request->query->get('template');
+        $from = $request->query->get('from');
+        $to = $request->query->get('to');
+        $criteria['from'] = $from ? new DateTimeImmutable($from) : null;
+        $criteria['to'] = $to ? new DateTimeImmutable($to) : null;
 
         return $this->createEmployeeEvaluationResponse($this->employeeEvaluationRepository->findByCriteria($criteria));
     }

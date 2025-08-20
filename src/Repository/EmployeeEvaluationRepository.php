@@ -158,23 +158,45 @@ class EmployeeEvaluationRepository extends AbstractRepository
     }
 
     /**
-     * Find evaluations by criteria.
+     * Finds evaluations by given criteria and order parameters.
      *
-     * @param array $criteria
+     * This method builds a query to fetch evaluations along with related entities such as
+     * criteria, scores, template, and employee based on the provided filters and sorting options.
      *
-     * @return EmployeeEvaluation[]
+     * @param array    $criteria The filtering criteria as an associative array, where keys represent field names and values represent expected values.
+     * @param array    $orderBy  An associative array specifying sorting options, where keys are field names and values are the sorting direction ('ASC' or 'DESC').
+     * @param int|null $offset   The starting position for the result set, or null to start from the beginning.
+     * @param int|null $limit    The maximum number of results to return, or null for no limit.
+     *
+     * @return EmployeeEvaluation[] Returns an array of found evaluations with their associated entities.
      */
-    public function findByCriteria(array $criteria): array
+    public function findByCriteria(array $criteria, array $orderBy = [], ?int $offset = null, ?int $limit = null): array
     {
-        return $this->createQueryBuilder('ee')
-            ->select('ee, ees, eet, eee')
-            ->innerJoin('ee.employee', 'eee')
-            ->leftJoin('ee.template', 'eet')
-            ->innerJoin('ee.scores', 'ees')
-            ->leftJoin('ees.criteria', 'ec')
-            ->where('eee.user = :user')
-            ->setParameter('user', $criteria['user'])
-            ->getQuery()
+        $qb = $this->createQueryBuilder('evaluation')
+            ->select('evaluation, criteria, scores, template, employee')
+            ->innerJoin('evaluation.employee', 'employee')
+            ->leftJoin('evaluation.template', 'template')
+            ->innerJoin('evaluation.scores', 'scores')
+            ->leftJoin('scores.criteria', 'criteria')
+            ->where('employee.user = :user')
+            ->andWhere('employee.publicId = :employee OR :employee IS NULL')
+            ->andWhere('template.publicId = :template OR :template IS NULL')
+            ->andWhere('evaluation.evaluatedAt >= :from OR :from IS NULL')
+            ->andWhere('evaluation.evaluatedAt <= :to OR :to IS NULL')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit);
+
+        $parameters = new ArrayCollection();
+        foreach ($criteria as $key => $value) {
+            $parameters->add(new Parameter($key, $value));
+        }
+        $qb->setParameters($parameters);
+
+        foreach ($orderBy as $key => $value) {
+            $qb->addOrderBy($key, $value);
+        }
+
+        return $qb->getQuery()
             ->getResult();
     }
 }
