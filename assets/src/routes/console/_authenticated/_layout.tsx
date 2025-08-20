@@ -1,9 +1,9 @@
 import React from 'react';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/app-sidebar';
 import { createFileRoute, Outlet, useLocation } from '@tanstack/react-router';
 import { Separator } from '@/components/ui/separator';
 import { BackButton } from '@/components/button/back-button';
+import { AppSidebar } from '@/routes/console/_authenticated/-app-sidebar';
 
 export const Route = createFileRoute('/console/_authenticated/_layout')({
     component: DashboardLayout,

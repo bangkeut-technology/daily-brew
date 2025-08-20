@@ -17,7 +17,7 @@ import { RowSelectionState } from '@tanstack/react-table';
 
 const columnHelper = createColumnHelper<EmployeeEvaluation>();
 
-export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/history')({
+export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/histories/')({
     component: EvaluationsHistoryPage,
 });
 

@@ -65,7 +65,7 @@ export const AppSidebar = () => {
                 icon: ListTodo,
                 children: [
                     { title: t('evaluate'), url: '/console/evaluations/evaluate', icon: Gauge },
-                    { title: t('history'), url: '/console/evaluations/history', icon: ClipboardList },
+                    { title: t('history'), url: '/console/evaluations/histories', icon: ClipboardList },
                 ],
             },
 
