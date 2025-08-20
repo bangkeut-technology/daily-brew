@@ -1,7 +1,6 @@
 import React from 'react';
 import { createColumnHelper } from '@tanstack/table-core';
 import { EmployeeEvaluation } from '@/types/employee-evaluation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTable } from '@/components/data-table';
 import { useTranslation } from 'react-i18next';
 import { RowSelectionState } from '@tanstack/react-table';
@@ -89,21 +88,12 @@ export const HistoriesDataTable: React.FunctionComponent<HistoriesDataTableProps
     );
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>
-                    Results {isFetching && <span className="text-xs text-muted-foreground">• Loading…</span>}
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <DataTable
-                    data={data}
-                    columns={columns}
-                    loading={isFetching}
-                    rowSelection={rowSelection}
-                    onRowSelectionChange={setRowSelection}
-                />
-            </CardContent>
-        </Card>
+        <DataTable
+            data={data}
+            columns={columns}
+            loading={isFetching}
+            rowSelection={rowSelection}
+            onRowSelectionChange={setRowSelection}
+        />
     );
 };

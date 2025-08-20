@@ -85,13 +85,13 @@ export const HistorySearchForm: React.FC<HistorySearchFormProps> = ({
                     label={t('employee')}
                     value={value.employeeId}
                     onChange={(employeeId) => onChange({ employeeId })}
-                    className="md:col-span-3"
+                    className="md:col-span-3 w-full"
                 />
                 <EvaluationTemplatePicker
                     label={t('evaluation_templates')}
                     value={value.templateId}
                     onChange={(templateId) => onChange({ templateId })}
-                    className="md:col-span-2"
+                    className="md:col-span-2 w-full"
                 />
             </CardContent>
         </Card>

@@ -19,7 +19,8 @@
     "evaluations": {
         "who": "Who & What",
         "date_helper": "The selected date determines which evaluation is created or updated.",
-        "employee": "Evaluate Employee"
+        "employee": "Evaluate Employee",
+        "histories": "Evaluation Histories"
     },
     "employees": {
         "title": "Employees",

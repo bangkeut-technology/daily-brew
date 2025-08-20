@@ -98,5 +98,10 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System",
-    "active": "Active"
+    "active": "Active",
+    "export": {
+        "csv": "Export CSV",
+        "pdf": "Export PDF",
+        "excel": "Export Excel"
+    }
 }

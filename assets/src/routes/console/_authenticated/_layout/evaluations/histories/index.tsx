@@ -8,23 +8,27 @@ import {
     HistorySearchForm,
 } from '@/routes/console/_authenticated/_layout/evaluations/histories/-search-form';
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
+import { DATE_FORMAT } from '@/constants/date';
+import { format } from 'date-fns';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/histories/')({
     component: EvaluationsHistoryPage,
     validateSearch: z.object({
-        from: z.date().optional(),
-        to: z.date().optional(),
+        from: z.string().optional(),
+        to: z.string().optional(),
         employeeId: z.string().optional(),
         templateId: z.string().optional(),
     }),
 });
 
 function EvaluationsHistoryPage() {
+    const { t } = useTranslation();
     const navigate = Route.useNavigate();
     const { from, to, employeeId, templateId } = Route.useSearch();
     const [params, setParams] = React.useState<HistoriesSearchParams>({
-        from,
-        to,
+        from: from ? new Date(from) : undefined,
+        to: to ? new Date(to) : undefined,
         employeeId: employeeId || '',
         templateId: templateId || '',
     });
@@ -32,8 +36,8 @@ function EvaluationsHistoryPage() {
     const onSearch = React.useCallback(() => {
         navigate({
             search: {
-                from: params.from,
-                to: params.to,
+                from: params.from ? format(params.from, DATE_FORMAT) : undefined,
+                to: params.to ? format(params.to, DATE_FORMAT) : undefined,
                 employeeId: params.employeeId || undefined,
                 templateId: params.templateId || undefined,
             },
@@ -50,11 +54,11 @@ function EvaluationsHistoryPage() {
     return (
         <div className="w-full px-6 py-5 space-y-6">
             <div className="flex items-center justify-between">
-                <h1 className="text-2xl md:text-3xl font-bold">Evaluation History</h1>
+                <h1 className="text-2xl md:text-3xl font-bold">{t('evaluations.histories', { ns: 'glossary' })}</h1>
                 <div className="flex items-center gap-2">
                     <Button variant="outline" onClick={onExportCsv}>
                         <Download className="h-4 w-4 mr-2" />
-                        Export CSV
+                        {t('export.csv')}
                     </Button>
                 </div>
             </div>
