@@ -6,30 +6,28 @@ import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { useTranslation } from 'react-i18next';
-import { DateRange, Matcher } from 'react-day-picker';
+import { DateRange } from 'react-day-picker';
 import { Label } from '@/components/ui/label';
-import { PICKER_DISPLAY_FORMAT } from '@/constants/date';
+import { DISPLAY_DATE_FORMAT } from '@/constants/date';
 
 type OnChangeHandler = (date: DateRange | undefined) => void;
 
-interface DatePickerProps {
+interface DateRangePickerProps {
     label?: string;
     disabled?: boolean;
     description?: string;
     displayFormat?: string;
     className?: string;
-    disabledDate?: Matcher | Matcher[] | undefined;
     value: DateRange | undefined;
     onChange?: OnChangeHandler;
 }
 
-export const DatePicker: React.FC<DatePickerProps> = ({
+export const DateRangePicker: React.FC<DateRangePickerProps> = ({
     label,
     disabled,
     description,
     className,
-    disabledDate,
-    displayFormat = PICKER_DISPLAY_FORMAT,
+    displayFormat = DISPLAY_DATE_FORMAT,
     value,
     onChange,
 }) => {
@@ -51,8 +49,8 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                         variant="outline"
                         className={cn('w-full pl-3 text-left font-normal', value && 'text-muted-foreground')}
                     >
-                        {value ? (
-                            format(  , displayFormat)
+                        {value?.from && value?.to ? (
+                            `${format(value.from, displayFormat)} - ${format(value.to, displayFormat)}`
                         ) : (
                             <span>{t('placeholder.picker.date', { ns: 'glossary' })}</span>
                         )}
@@ -61,15 +59,15 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
+                        className="w-full"
                         mode="range"
+                        defaultMonth={value?.from}
                         selected={value}
                         onSelect={onChange}
-                        disabled={disabledDate}
-                        numberOfMonths={2}
-                        startMonth={new Date(2025, 5, 1)}
-                        endMonth={new Date(2025, 6, 31)}
                         disableNavigation
-                        className="rounded-lg border shadow-sm"
+                        startMonth={value?.from}
+                        fixedWeeks
+                        showOutsideDays
                     />
                 </PopoverContent>
             </Popover>

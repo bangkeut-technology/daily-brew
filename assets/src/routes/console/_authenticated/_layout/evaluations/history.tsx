@@ -6,60 +6,18 @@ import { format, parseISO } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Download, Filter, ListFilter, Calendar, Search } from 'lucide-react';
-import { DateRangePicker } from '@/components/ui/date-range-picker'; // or your DateRange component
-import { DataTable, type ColumnDef } from '@/components/data-table'; // your wrapper around shadcn table
+import { Calendar, Download, ListFilter, Search } from 'lucide-react';
+import { DateRangePicker } from '@/components/picker/date-range-picker'; // or your DateRange component
+import { DataTable } from '@/components/data-table'; // your wrapper around shadcn table
 import { cn } from '@/lib/utils';
-
-// --- Types (align to your API) ---
-type EvaluationRow = {
-    id: string;
-    employeeId: string;
-    employeeName: string;
-    templateId: string | null;
-    templateName: string;
-    evaluatedAt: string; // ISO date
-    averageScore: number | null;
-    scoresCount: number;
-};
-
-type EvaluationDetail = EvaluationRow & {
-    notes?: string | null;
-    scores: Array<{
-        criteriaId: string;
-        criteriaLabel: string;
-        type: 'number' | 'boolean';
-        weight: number;
-        score: number | null;
-        note?: string | null;
-    }>;
-};
-
-// --- API helpers (replace with your endpoints) ---
-async function fetchEmployeesLite() {
-    const res = await fetch('/api/employees?fields=id,firstName,lastName&active=true');
-    const rows = await res.json();
-    return rows.map((e: any) => ({ id: e.id, name: `${e.firstName} ${e.lastName}` }));
-}
-
-async function fetchTemplatesLite() {
-    const res = await fetch('/api/evaluations/templates?fields=id,name');
-    return res.json() as Promise<Array<{ id: string; name: string }>>;
-}
-
-async function fetchEvaluationsList(params: URLSearchParams) {
-    const res = await fetch(`/api/evaluations?${params.toString()}`);
-    return res.json() as Promise<{ rows: EvaluationRow[]; total: number }>;
-}
-
-async function fetchEvaluationDetail(id: string) {
-    const res = await fetch(`/api/evaluations/${id}`);
-    return res.json() as Promise<EvaluationDetail>;
-}
+import { fetchEmployeeEvaluation } from '@/services/employee';
+import { fetchEmployeeEvaluations } from '@/services/employee-evaluation';
+import { ColumnDef } from '@tanstack/react-table';
+import { EmployeeEvaluation } from '@/types/employee-evaluation';
 
 // --- Search schema (type-safe route) ---
 const SearchSchema = z.object({
@@ -75,22 +33,13 @@ const SearchSchema = z.object({
     sort: z.string().optional(), // e.g. 'evaluatedAt:desc'
 });
 
-export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/history/')({
+export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/history')({
     validateSearch: (search) => SearchSchema.parse(search),
     component: EvaluationsHistoryPage,
 });
 
 function EvaluationsHistoryPage() {
-    const { employeeId, templateId, from, to, minAvg, maxAvg, q, page, pageSize, sort } = Route.useSearch();
     const navigate = Route.useNavigate();
-
-    // Debounced local state for free-text min/max
-    const [local, setLocal] = React.useState({ q: q ?? '', minAvg: minAvg ?? '', maxAvg: maxAvg ?? '' });
-    React.useEffect(() => setLocal({ q: q ?? '', minAvg: minAvg ?? '', maxAvg: maxAvg ?? '' }), [q, minAvg, maxAvg]);
-
-    // Filter lists
-    const { data: employees = [] } = useQuery({ queryKey: ['employees-lite'], queryFn: fetchEmployeesLite });
-    const { data: templates = [] } = useQuery({ queryKey: ['templates-lite'], queryFn: fetchTemplatesLite });
 
     // Query list
     const params = new URLSearchParams();
@@ -106,13 +55,12 @@ function EvaluationsHistoryPage() {
     if (sort) params.set('sort', sort);
 
     const { data, isFetching } = useQuery({
-        queryKey: ['evaluations', params.toString()],
-        queryFn: () => fetchEvaluationsList(params),
-        keepPreviousData: true,
+        queryKey: ['employee-evaluations', params],
+        queryFn: () => fetchEmployeeEvaluations(params),
     });
 
     // Table columns
-    const columns = React.useMemo<ColumnDef<EvaluationRow>[]>(
+    const columns = React.useMemo<ColumnDef<EmployeeEvaluation>[]>(
         () => [
             {
                 header: 'Date',

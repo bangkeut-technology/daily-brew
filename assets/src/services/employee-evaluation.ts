@@ -1,6 +1,9 @@
 import { apiAxios } from '@/lib/apiAxios';
 import { EmployeeEvaluation, PartialEmployeeEvaluation } from '@/types/employee-evaluation';
 
+export const fetchEmployeeEvaluations = async () =>
+    apiAxios.get<EmployeeEvaluation[]>('/employee-evaluations').then((response) => response.data);
+
 export const postEmployeeEvaluation = async ({
     publicId,
     data,
