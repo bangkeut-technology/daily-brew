@@ -134,13 +134,13 @@ function Dashboard() {
                 <Button asChild className="gap-2">
                     <Link to="/console/employees/new">
                         <Plus className="h-4 w-4" />
-                        Add employee
+                        {t('evaluation_templates.employees.add.title', { ns: 'glossary' })}
                     </Link>
                 </Button>
                 <Button variant="outline" asChild className="gap-2">
                     <Link to="/console/manage/templates/new">
                         <ClipboardList className="h-4 w-4" />
-                        New evaluation
+                        {t('evaluations.employee', { ns: 'glossary' })}
                     </Link>
                 </Button>
                 <Button variant="outline" asChild className="gap-2">

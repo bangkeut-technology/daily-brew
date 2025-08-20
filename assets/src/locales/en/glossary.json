@@ -18,7 +18,8 @@
     },
     "evaluations": {
         "who": "Who & What",
-        "date_helper": "The selected date determines which evaluation is created or updated."
+        "date_helper": "The selected date determines which evaluation is created or updated.",
+        "employee": "Evaluate Employee"
     },
     "employees": {
         "title": "Employees",
