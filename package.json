@@ -146,5 +146,6 @@
         "router:generate": "tsr generate",
         "lint:fix": "eslint --fix"
     },
-    "name": "daily_brew"
+    "name": "daily_brew",
+    "version": "1.0.0"
 }
