@@ -561,6 +561,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
      *
      * @return string The full name in the format "FirstName LastName"
      */
+    #[Groups(['user:read'])]
     public function getFullName(): string
     {
         return sprintf('%s %s', $this->firstName, $this->lastName);

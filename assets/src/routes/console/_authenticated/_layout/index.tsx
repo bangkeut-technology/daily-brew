@@ -197,7 +197,7 @@ function Dashboard() {
                             ))}
                             <Separator />
                             <Button variant="ghost" asChild className="w-full">
-                                <Link to="/console/evaluations/history">
+                                <Link to="/console/evaluations/histories">
                                     {t('see_all_evaluations', { ns: 'glossary' })}
                                 </Link>
                             </Button>

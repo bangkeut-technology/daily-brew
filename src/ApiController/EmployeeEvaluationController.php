@@ -59,6 +59,19 @@ class EmployeeEvaluationController extends AbstractController
     }
 
     /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    #[Route(name: 'gets', methods: ['GET'])]
+    public function gets(Request $request): JsonResponse
+    {
+        $criteria = $request->query->all();
+        $criteria['user'] = $this->getUser();
+
+        return $this->createEmployeeEvaluationResponse($this->employeeEvaluationRepository->findByCriteria($criteria));
+    }
+
+    /**
      * Handles the update of an employee evaluation based on the provided public ID and request data.
      *
      * This method retrieves the employee evaluation by its public ID, creates a form for the evaluation,

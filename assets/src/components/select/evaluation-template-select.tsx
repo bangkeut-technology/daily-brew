@@ -5,7 +5,7 @@ import { fetchEvaluationTemplates } from '@/services/evaluation-template';
 import { Option, SelectField } from '@/components/field/select-field';
 import { NewEvaluationTemplateDialog } from '@/components/dialog/new-evaluation-template-dialog';
 
-const queryKey = ['daily-brew-evaluation-templates'];
+const queryKey = ['evaluation-templates'];
 
 interface EvaluationTemplateSelectProps {
     control: Control<any>;

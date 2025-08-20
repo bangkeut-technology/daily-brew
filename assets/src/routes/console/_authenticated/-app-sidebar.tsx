@@ -58,9 +58,7 @@ export const AppSidebar = () => {
         () => [
             { title: t('dashboard'), url: '/console', icon: LayoutDashboard },
             { title: t('employees'), url: '/console/employees', icon: Users },
-
             {
-                // EVALUATIONS group (evaluate & history)
                 title: t('evaluations'),
                 icon: ListTodo,
                 children: [
@@ -68,9 +66,7 @@ export const AppSidebar = () => {
                     { title: t('history'), url: '/console/evaluations/histories', icon: ClipboardList },
                 ],
             },
-
             {
-                // PERFORMANCE group (KPI & Attendance)
                 title: t('performance'),
                 icon: BarChart3,
                 children: [
@@ -78,9 +74,7 @@ export const AppSidebar = () => {
                     { title: t('attendance'), url: '/console/performance/attendance', icon: CalendarDays },
                 ],
             },
-
             {
-                // MANAGE (admin/setup area)
                 title: t('manage'),
                 icon: Briefcase,
                 children: [
@@ -89,7 +83,6 @@ export const AppSidebar = () => {
                     { title: t('roles'), url: '/console/manage/roles', icon: Briefcase },
                 ],
             },
-
             { title: t('billing'), url: '/console/billing', icon: CreditCard, pro: true },
             { title: t('settings'), url: '/console/settings', icon: SettingsIcon },
         ],

@@ -156,4 +156,25 @@ class EmployeeEvaluationRepository extends AbstractRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    /**
+     * Find evaluations by criteria.
+     *
+     * @param array $criteria
+     *
+     * @return EmployeeEvaluation[]
+     */
+    public function findByCriteria(array $criteria): array
+    {
+        return $this->createQueryBuilder('ee')
+            ->select('ee, ees, eet, eee')
+            ->innerJoin('ee.employee', 'eee')
+            ->leftJoin('ee.template', 'eet')
+            ->innerJoin('ee.scores', 'ees')
+            ->leftJoin('ees.criteria', 'ec')
+            ->where('eee.user = :user')
+            ->setParameter('user', $criteria['user'])
+            ->getQuery()
+            ->getResult();
+    }
 }

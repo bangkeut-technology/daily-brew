@@ -187,7 +187,8 @@
     "placeholder": {
         "picker": {
             "date": "Select a date",
-            "employee": "Select an employee"
+            "employee": "Select an employee",
+            "evaluation_template": "Select an evaluation template"
         }
     },
     "date": "Date",

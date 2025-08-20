@@ -7,6 +7,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { createFileRoute } from '@tanstack/react-router';
 import { SiteHeader } from '@/components/site-header';
 import { Hero } from '@/components/landing-page/hero';
+import { SiteFooter } from '@/components/site-footer';
 
 export const Route = createFileRoute('/')({
     component: LandingPage,
@@ -25,6 +26,7 @@ function LandingPage() {
                 <Pricing />
                 <FAQ />
             </main>
+            <SiteFooter />
         </div>
     );
 }

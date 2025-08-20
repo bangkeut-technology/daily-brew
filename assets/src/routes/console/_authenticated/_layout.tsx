@@ -4,6 +4,7 @@ import { createFileRoute, Outlet, useLocation } from '@tanstack/react-router';
 import { Separator } from '@/components/ui/separator';
 import { BackButton } from '@/components/button/back-button';
 import { AppSidebar } from '@/routes/console/_authenticated/-app-sidebar';
+import { SiteFooter } from '@/components/site-footer';
 
 export const Route = createFileRoute('/console/_authenticated/_layout')({
     component: DashboardLayout,
@@ -35,6 +36,7 @@ function DashboardLayout() {
                     <div className="flex flex-1 flex-col gap-4 p-4">
                         <Outlet />
                     </div>
+                    <SiteFooter />
                 </SidebarInset>
             </div>
         </SidebarProvider>

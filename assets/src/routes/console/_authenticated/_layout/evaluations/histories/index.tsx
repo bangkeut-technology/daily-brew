@@ -1,80 +1,49 @@
 import * as React from 'react';
 import { createFileRoute } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
-import { format, parseISO } from 'date-fns';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Download } from 'lucide-react';
-import { DataTable } from '@/components/data-table';
-import { cn } from '@/lib/utils';
-import { fetchEmployeeEvaluations } from '@/services/employee-evaluation';
-import { EmployeeEvaluation } from '@/types/employee-evaluation';
-import { useTranslation } from 'react-i18next';
-import { createColumnHelper } from '@tanstack/table-core';
-import { DISPLAY_DATE_FORMAT } from '@/constants/date';
-import { RowSelectionState } from '@tanstack/react-table';
-
-const columnHelper = createColumnHelper<EmployeeEvaluation>();
+import { HistoriesDataTable } from '@/routes/console/_authenticated/_layout/evaluations/histories/-histories-data-table';
+import {
+    HistoriesSearchParams,
+    HistorySearchForm,
+} from '@/routes/console/_authenticated/_layout/evaluations/histories/-search-form';
+import { z } from 'zod';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/evaluations/histories/')({
     component: EvaluationsHistoryPage,
+    validateSearch: z.object({
+        from: z.date().optional(),
+        to: z.date().optional(),
+        employeeId: z.string().optional(),
+        templateId: z.string().optional(),
+    }),
 });
 
 function EvaluationsHistoryPage() {
-    const { t } = useTranslation();
-    const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
-
-    const { data = [], isFetching } = useQuery({
-        queryKey: ['employee-evaluations'],
-        queryFn: () => fetchEmployeeEvaluations(),
+    const navigate = Route.useNavigate();
+    const { from, to, employeeId, templateId } = Route.useSearch();
+    const [params, setParams] = React.useState<HistoriesSearchParams>({
+        from,
+        to,
+        employeeId: employeeId || '',
+        templateId: templateId || '',
     });
 
-    // Table columns
-    const columns = React.useMemo(
-        () => [
-            columnHelper.accessor('evaluatedAt', {
-                header: t('evaluated_on'),
-                cell: ({ row }) => format(parseISO(row.original.evaluatedAt), DISPLAY_DATE_FORMAT),
-                enableSorting: true,
-            }),
-            columnHelper.accessor('employee.fullName', {
-                header: t('employee'),
-                cell: ({ getValue }) => getValue(),
-                enableSorting: true,
-            }),
-            columnHelper.accessor('templateName', {
-                header: t('template'),
-                cell: ({ getValue }) => getValue(),
-                enableSorting: true,
-            }),
-            columnHelper.accessor('averageScore', {
-                header: t('average'),
-                cell: ({ row }) => (
-                    <Badge
-                        className={cn(
-                            'w-14 justify-center',
-                            row.original.averageScore == null
-                                ? 'bg-muted text-muted-foreground'
-                                : row.original.averageScore >= 4.5
-                                  ? 'bg-green-600 text-white'
-                                  : row.original.averageScore >= 3.5
-                                    ? 'bg-green-500 text-white'
-                                    : row.original.averageScore >= 2.5
-                                      ? 'bg-yellow-400 text-black'
-                                      : row.original.averageScore >= 1.5
-                                        ? 'bg-orange-400 text-white'
-                                        : 'bg-red-500 text-white',
-                        )}
-                    >
-                        {row.original.averageScore?.toFixed(2) ?? '—'}
-                    </Badge>
-                ),
-                enableSorting: true,
-            }),
-        ],
-        [t],
-    );
+    const onSearch = React.useCallback(() => {
+        navigate({
+            search: {
+                from: params.from,
+                to: params.to,
+                employeeId: params.employeeId || undefined,
+                templateId: params.templateId || undefined,
+            },
+        });
+    }, [navigate, params.employeeId, params.from, params.templateId, params.to]);
+
+    const onReset = React.useCallback(() => {
+        setParams({ from: undefined, to: undefined, employeeId: '', templateId: '' });
+        navigate({ search: { from: undefined, to: undefined, employeeId: undefined, templateId: undefined } });
+    }, [navigate]);
 
     const onExportCsv = React.useCallback(() => {}, []);
 
@@ -90,22 +59,14 @@ function EvaluationsHistoryPage() {
                 </div>
             </div>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>
-                        Results {isFetching && <span className="text-xs text-muted-foreground">• Loading…</span>}
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <DataTable
-                        data={data}
-                        columns={columns}
-                        loading={isFetching}
-                        rowSelection={rowSelection}
-                        onRowSelectionChange={setRowSelection}
-                    />
-                </CardContent>
-            </Card>
+            <HistorySearchForm
+                value={params}
+                onChange={(patch) => setParams((prevState) => ({ ...prevState, ...patch }))}
+                onSearch={onSearch}
+                onReset={onReset}
+            />
+
+            <HistoriesDataTable params={params} />
         </div>
     );
 }
