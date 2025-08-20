@@ -21,8 +21,8 @@ export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> 
     publicId,
     onRemoveEmployee,
 }) => {
-    const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
     const { t } = useTranslation('glossary');
+    const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
     const columns = React.useMemo(
         () => [
