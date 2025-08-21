@@ -3,6 +3,7 @@ import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import React from 'react';
+import { Link } from '@tanstack/react-router';
 
 export function Showcase() {
     return (
@@ -23,7 +24,7 @@ export function Showcase() {
                             <a href="/console">Open Console</a>
                         </Button>
                         <Button variant="outline" asChild>
-                            <a href="#pricing">Compare plans</a>
+                            <Link to="/pricing">Compare plans</Link>
                         </Button>
                     </div>
                 </div>
