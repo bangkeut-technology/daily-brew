@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Check, Coffee } from 'lucide-react';
 
-export const Route = createFileRoute('/pricing/')({
+export const Route = createFileRoute('/_layout/pricing/')({
     component: PricingPage,
 });
 

@@ -20,7 +20,7 @@ import {
     Wallet,
 } from 'lucide-react';
 
-export const Route = createFileRoute('/features/')({
+export const Route = createFileRoute('/_layout/features/')({
     component: FeaturesPage,
 });
 

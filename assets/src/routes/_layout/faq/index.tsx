@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Coffee, HelpCircle } from 'lucide-react';
 
-export const Route = createFileRoute('/faq/')({
+export const Route = createFileRoute('/_layout/faq/')({
     component: FAQPage,
     // meta: () => [{ title: "FAQ — DailyBrew" }, { name: "description", content: "Frequently asked questions about DailyBrew." }],
 });
