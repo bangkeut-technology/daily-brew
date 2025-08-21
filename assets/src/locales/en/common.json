@@ -99,6 +99,11 @@
     "dark": "Dark",
     "system": "System",
     "active": "Active",
+    "features": "Features",
+    "pricing": "Pricing",
+    "faq": "FAQ",
+    "get_started": "Get Started",
+    "start": "Start",
     "export": {
         "csv": "Export CSV",
         "pdf": "Export PDF",

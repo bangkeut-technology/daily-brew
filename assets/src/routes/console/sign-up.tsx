@@ -16,14 +16,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useBoolean } from 'react-use';
 import { signUpSchema } from '@/schema/sign-up-schema';
 import { signUp } from '@/services/auth';
+import { z } from 'zod';
 
 export const Route = createFileRoute('/console/sign-up')({
     component: SignUpComponent,
-    validateSearch: (search) => {
-        return {
-            redirect: search.redirect || '/console',
-        };
-    },
+    validateSearch: z.object({
+        redirect: z.string().optional().default('/console'),
+    }),
     beforeLoad: ({ context, search }) => {
         if (context.authentication?.isAuthenticated) {
             throw redirect({ to: (search.redirect as any) || '/console' });
@@ -63,7 +62,8 @@ function SignUpComponent() {
 
     React.useEffect(() => {
         if (user) {
-            navigate(redirect).then();
+            const path: any = redirect || '/console';
+            navigate(path).then();
         }
     }, [navigate, redirect, user]);
 

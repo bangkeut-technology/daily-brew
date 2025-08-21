@@ -16,14 +16,13 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useBoolean } from 'react-use';
 import { signIn } from '@/services/auth';
+import { z } from 'zod';
 
 export const Route = createFileRoute('/console/sign-in')({
     component: SignInComponent,
-    validateSearch: (search) => {
-        return {
-            redirect: search.redirect || '/console',
-        };
-    },
+    validateSearch: z.object({
+        redirect: z.string().optional().default('/console'),
+    }),
     beforeLoad: ({ context, search }) => {
         if (context.authentication?.isAuthenticated) {
             throw redirect({ to: (search.redirect as any) || '/console' });
@@ -59,7 +58,8 @@ function SignInComponent() {
 
     React.useEffect(() => {
         if (user) {
-            navigate(redirect).then();
+            const path: any = redirect || '/console';
+            navigate(path).then();
         }
     }, [navigate, redirect, user]);
 
