@@ -28,7 +28,7 @@ export const EmployeeSelect: React.FunctionComponent<EmployeeSelectProps> = ({ c
     });
     const { data = [] } = useQuery({
         queryKey,
-        queryFn: () => fetchEmployees({ from: new Date().toISOString(), to: new Date().toISOString() }),
+        queryFn: () => fetchEmployees({ from: new Date(), to: new Date() }),
     });
 
     React.useEffect(() => {

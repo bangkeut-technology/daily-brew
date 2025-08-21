@@ -23,7 +23,6 @@ import { AttendanceGanttWithControls } from '@/components/attendance/attendance-
 import { KpiGanttWithControls } from '@/components/kpi/kpi-gantt-with-controls';
 import { useQuery } from '@tanstack/react-query';
 import { fetchEmployees } from '@/services/employee';
-import { DATE_FORMAT } from '@/constants/date';
 import { ScoreValue } from '@/components/kpi/kpi-gantt';
 import { AttendanceStatus, AttendanceStatusEnum } from '@/types/attendance';
 import { MetricCard } from '@/components/card/metric-card';
@@ -40,8 +39,8 @@ function Dashboard() {
         queryKey: ['employees', month],
         queryFn: () =>
             fetchEmployees({
-                from: format(startOfMonth(month), DATE_FORMAT),
-                to: format(endOfMonth(month), DATE_FORMAT),
+                from: startOfMonth(month),
+                to: endOfMonth(month),
             }),
     });
 

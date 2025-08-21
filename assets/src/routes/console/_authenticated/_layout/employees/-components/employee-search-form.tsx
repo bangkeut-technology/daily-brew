@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Grid, ListFilter, RotateCcw, Rows3, Search } from 'lucide-react';
+import { ListFilter, RotateCcw, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -11,12 +11,11 @@ import { RolePicker } from '@/components/picker/role-picker';
 import { EmployeeStatusPicker } from '@/components/picker/employee-status-picker';
 
 export type EmployeeSearchParams = {
-    q: string;
+    q?: string;
     status?: EmployeeStatus;
-    role: string;
-    from: Date;
-    to: Date;
-    view?: 'grid' | 'table';
+    role?: string;
+    from?: Date;
+    to?: Date;
 };
 
 interface EmployeeSearchFormProps {
@@ -33,24 +32,6 @@ export const EmployeeSearchForm: React.FunctionComponent<EmployeeSearchFormProps
     onChange,
 }) => {
     const { t } = useTranslation();
-
-    const setFrom = React.useCallback(
-        (date?: Date) => {
-            if (!date) return;
-            const to = params.to ?? date;
-            onChange({ from: date, to: date > to ? date : to });
-        },
-        [onChange, params.to],
-    );
-
-    const setTo = React.useCallback(
-        (date?: Date) => {
-            if (!date) return;
-            const from = params.from ?? date;
-            onChange({ to: date, from: date < from ? date : from });
-        },
-        [onChange, params.from],
-    );
 
     const handleReset = React.useCallback(() => {
         if (onReset) {
@@ -109,26 +90,18 @@ export const EmployeeSearchForm: React.FunctionComponent<EmployeeSearchFormProps
                     <Label className="text-xs text-muted-foreground">
                         {t('evaluations.period', { ns: 'glossary' })}
                     </Label>
-                    <DatePicker label={t('from')} value={params.from} onChange={setFrom} className="md:col-span-3" />
-                    <DatePicker label={t('to')} value={params.to} onChange={setTo} className="md:col-span-3" />
-                </div>
-
-                {/* View toggle (mobile) */}
-                <div className="md:hidden flex items-end gap-2">
-                    <Button
-                        variant={params.view === 'grid' ? 'secondary' : 'outline'}
-                        size="icon"
-                        onClick={() => onChange({ view: 'grid' })}
-                    >
-                        <Grid className="h-4 w-4" />
-                    </Button>
-                    <Button
-                        variant={params.view === 'table' ? 'secondary' : 'outline'}
-                        size="icon"
-                        onClick={() => onChange({ view: 'table' })}
-                    >
-                        <Rows3 className="h-4 w-4" />
-                    </Button>
+                    <DatePicker
+                        label={t('from')}
+                        value={params.from}
+                        onChange={(from) => onChange({ from })}
+                        className="md:col-span-3"
+                    />
+                    <DatePicker
+                        label={t('to')}
+                        value={params.to}
+                        onChange={(to) => onChange({ to })}
+                        className="md:col-span-3"
+                    />
                 </div>
             </CardContent>
         </Card>

@@ -1,7 +1,6 @@
 const Encore = require('@symfony/webpack-encore');
 const path = require('path');
 const WorkboxPlugin = require('workbox-webpack-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 if (!Encore.isRuntimeEnvironmentConfigured()) {
     Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
@@ -49,9 +48,5 @@ config.plugins.push(
         skipWaiting: true,
     }),
 );
-
-if (!Encore.isProduction()) {
-    config.plugins.push(new BundleAnalyzerPlugin());
-}
 
 module.exports = config;

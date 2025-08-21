@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
 import { format, startOfMonth } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-import { Grid, Rows3, UserPlus2 } from 'lucide-react';
+import { UserPlus2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { fetchEmployees } from '@/services/employee';
 import {
@@ -23,7 +23,6 @@ export const Route = createFileRoute('/console/_authenticated/_layout/employees/
         role: z.string().optional(),
         from: z.string().default(format(startOfMonth(new Date()), DATE_FORMAT)),
         to: z.string().default(format(startOfMonth(new Date()), DATE_FORMAT)),
-        view: z.enum(['grid', 'table']).default('grid'),
     }),
     component: EmployeesPage,
 });
@@ -33,13 +32,12 @@ function EmployeesPage() {
     const { t } = useTranslation();
     const { maxFreeEmployees } = useApplication();
     const navigate = Route.useNavigate();
-    const { from, to, q, role, status, view } = Route.useSearch();
+    const { from, to, q, role, status } = Route.useSearch();
     const [params, setParams] = React.useState<EmployeeSearchParams>({
         role: role || '',
         q: q || '',
         from: new Date(from),
         to: new Date(to),
-        view,
         status,
     });
     const { data: employees = [], isFetching } = useQuery({
@@ -55,10 +53,9 @@ function EmployeesPage() {
                 q: params.q || undefined,
                 role: params.role || undefined,
                 status: params.status || undefined,
-                view: params.view || undefined,
             },
         });
-    }, [navigate, params.from, params.q, params.role, params.status, params.to, params.view]);
+    }, [navigate, params.from, params.q, params.role, params.status, params.to]);
 
     const onReset = React.useCallback(() => {
         setParams({
@@ -66,7 +63,6 @@ function EmployeesPage() {
             q: q || '',
             from: new Date(from),
             to: new Date(to),
-            view,
             status,
         });
         navigate({
@@ -75,11 +71,10 @@ function EmployeesPage() {
                 q: q || '',
                 from: format(from, DATE_FORMAT),
                 to: format(to, DATE_FORMAT),
-                view,
                 status,
             },
         });
-    }, [from, navigate, q, role, status, to, view]);
+    }, [from, navigate, q, role, status, to]);
 
     return (
         <div className="w-full px-6 py-5 space-y-6">
@@ -97,26 +92,9 @@ function EmployeesPage() {
                             {t('employees.add', { ns: 'glossary' })}
                         </Link>
                     </Button>
-                    <div className="hidden md:flex items-center gap-2">
-                        <Button
-                            variant={view === 'grid' ? 'secondary' : 'outline'}
-                            size="icon"
-                            onClick={() => setParams((prevState) => ({ ...prevState, view: 'grid' }))}
-                        >
-                            <Grid className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant={view === 'table' ? 'secondary' : 'outline'}
-                            size="icon"
-                            onClick={() => setParams((prevState) => ({ ...prevState, view: 'table' }))}
-                        >
-                            <Rows3 className="h-4 w-4" />
-                        </Button>
-                    </div>
                 </div>
             </div>
 
-            {/* Filters */}
             <EmployeeSearchForm
                 params={params}
                 onSearch={onSearch}

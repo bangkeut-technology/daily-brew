@@ -28,13 +28,13 @@ export const SiteHeader = () => {
 
                     {/* Desktop nav */}
                     <nav className="hidden md:flex items-center gap-6">
-                        <Link to="/#features" className="text-sm text-muted-foreground hover:text-foreground">
+                        <Link to="/features" className="text-sm text-muted-foreground hover:text-foreground">
                             {t('features')}
                         </Link>
-                        <Link to="/#pricing" className="text-sm text-muted-foreground hover:text-foreground">
+                        <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground">
                             {t('pricing')}
                         </Link>
-                        <Link to="/#faq" className="text-sm text-muted-foreground hover:text-foreground">
+                        <Link to="/faq" className="text-sm text-muted-foreground hover:text-foreground">
                             {t('faq')}
                         </Link>
                     </nav>
@@ -79,27 +79,28 @@ export const SiteHeader = () => {
                                 </SheetHeader>
 
                                 <div className="mt-4 space-y-3">
-                                    <Link to="/#features" className="block text-sm py-2">
+                                    <Link to="/features" className="block text-sm py-2">
                                         Features
                                     </Link>
-                                    <Link to="/#pricing" className="block text-sm py-2">
-                                        Pricing
+                                    <Link to="/pricing" className="block text-sm py-2">
+                                        {t('pricing')}
                                     </Link>
-                                    <Link to="/#faq" className="block text-sm py-2">
+                                    <Link to="/faq" className="block text-sm py-2">
+                                        {t('faq')}
                                         FAQ
                                     </Link>
                                     <Separator />
                                     <div className="flex items-center gap-2 pt-1">
                                         <Button asChild variant="ghost" size="sm" className="flex-1">
-                                            <Link to="/sign-in">
+                                            <Link to="/console/sign-in">
                                                 <LogIn className="mr-1 h-4 w-4" />
-                                                Sign in
+                                                {t('sign_in')}
                                             </Link>
                                         </Button>
                                         <Button asChild size="sm" className="flex-1">
-                                            <Link to="/sign-up">
+                                            <Link to="/console/sign-up">
                                                 <UserPlus className="mr-1 h-4 w-4" />
-                                                Get started
+                                                {t('get_started')}
                                             </Link>
                                         </Button>
                                     </div>

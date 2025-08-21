@@ -118,7 +118,7 @@ function EvaluationTemplateDetails() {
                 </CardHeader>
                 <CardContent>
                     <EmployeeDataTable
-                        publicId={publicId}
+                        templatePublicId={publicId}
                         employees={employees}
                         loading={isEmployeesPending}
                         onRemoveEmployee={onRefreshEmployees}

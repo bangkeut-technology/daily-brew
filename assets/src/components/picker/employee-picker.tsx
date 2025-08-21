@@ -24,7 +24,7 @@ export const EmployeePicker: React.FunctionComponent<EmployeePickerProps> = ({
     const { t } = useTranslation();
     const { data = [] } = useQuery({
         queryKey: ['employees'],
-        queryFn: () => fetchEmployees({ from: new Date().toISOString(), to: new Date().toISOString() }),
+        queryFn: () => fetchEmployees({ from: new Date(), to: new Date() }),
     });
 
     const placeholder = React.useMemo(() => t('placeholder.picker.employee', { ns: 'glossary' }), [t]);
