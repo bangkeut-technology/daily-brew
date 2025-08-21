@@ -1,63 +1,130 @@
-import React from 'react';
+import * as React from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { fetchEmployees } from '@/services/employee';
-import { useTranslation } from 'react-i18next';
-import { useApplication } from '@/hooks/use-application';
-import { UserPlus2 } from 'lucide-react';
-import { EmployeeCard } from '@/components/card/employee-card';
+import { useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
-import { endOfMonth, format, startOfMonth } from 'date-fns';
+import { format, startOfMonth } from 'date-fns';
+import { useTranslation } from 'react-i18next';
+import { Grid, Rows3, UserPlus2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { fetchEmployees } from '@/services/employee';
+import {
+    EmployeeSearchForm,
+    EmployeeSearchParams,
+} from '@/routes/console/_authenticated/_layout/employees/-components/employee-search-form';
+import { DATE_FORMAT } from '@/constants/date';
+import { useApplication } from '@/hooks/use-application';
+import { EmployeeDataTable } from '@/components/data-table/employee-data-table';
 
+// ---- Route ----
 export const Route = createFileRoute('/console/_authenticated/_layout/employees/')({
-    component: Employees,
     validateSearch: z.object({
-        from: z.string().default(format(startOfMonth(new Date()), 'yyyy-MM-dd')),
-        to: z.string().default(format(endOfMonth(new Date()), 'yyyy-MM-dd')),
+        q: z.string().optional(),
+        status: z.enum(['active', 'on_leave', 'suspended', 'resigned', 'probation']).optional(),
+        role: z.string().optional(),
+        from: z.string().default(format(startOfMonth(new Date()), DATE_FORMAT)),
+        to: z.string().default(format(startOfMonth(new Date()), DATE_FORMAT)),
+        view: z.enum(['grid', 'table']).default('grid'),
     }),
+    component: EmployeesPage,
 });
 
-function Employees() {
+// ---- Page ----
+function EmployeesPage() {
     const { t } = useTranslation();
-    const { from, to } = Route.useSearch();
     const { maxFreeEmployees } = useApplication();
-    const queryClient = useQueryClient();
-    const { data = [] } = useQuery({
-        queryKey: ['employees', from, to],
-        queryFn: () => fetchEmployees({ from, to }),
+    const navigate = Route.useNavigate();
+    const { from, to, q, role, status, view } = Route.useSearch();
+    const [params, setParams] = React.useState<EmployeeSearchParams>({
+        role: role || '',
+        q: q || '',
+        from: new Date(from),
+        to: new Date(to),
+        view,
+        status,
+    });
+    const { data: employees = [], isFetching } = useQuery({
+        queryKey: ['employees', params],
+        queryFn: () => fetchEmployees(params),
     });
 
-    const onSuccess = React.useCallback(() => {
-        queryClient
-            .invalidateQueries({
-                queryKey: ['employees'],
-            })
-            .then();
-    }, [queryClient]);
+    const onSearch = React.useCallback(() => {
+        navigate({
+            search: {
+                from: params.from ? format(params.from, DATE_FORMAT) : undefined,
+                to: params.to ? format(params.to, DATE_FORMAT) : undefined,
+                q: params.q || undefined,
+                role: params.role || undefined,
+                status: params.status || undefined,
+                view: params.view || undefined,
+            },
+        });
+    }, [navigate, params.from, params.q, params.role, params.status, params.to, params.view]);
+
+    const onReset = React.useCallback(() => {
+        setParams({
+            role: role || '',
+            q: q || '',
+            from: new Date(from),
+            to: new Date(to),
+            view,
+            status,
+        });
+        navigate({
+            search: {
+                role: role || '',
+                q: q || '',
+                from: format(from, DATE_FORMAT),
+                to: format(to, DATE_FORMAT),
+                view,
+                status,
+            },
+        });
+    }, [from, navigate, q, role, status, to, view]);
 
     return (
-        <div className="p-4">
-            <div className="flex gap-2">
-                <h1 className="text-2xl font-bold mb-4">{t('employees.title', { ns: 'glossary' })}</h1>
-                <Button variant="outline" asChild>
-                    <Link to="/console/employees/new" className="flex items-center gap-2">
-                        {t('employees.add', { ns: 'glossary' })} <UserPlus2 />
-                    </Link>
-                </Button>
+        <div className="w-full px-6 py-5 space-y-6">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h1 className="text-2xl md:text-3xl font-bold">{t('employees.title', { ns: 'glossary' })}</h1>
+                    <p className="text-sm text-muted-foreground">
+                        {t('employees.description', { maxFreeEmployees: maxFreeEmployees, ns: 'glossary' })}
+                    </p>
+                </div>
+                <div className="flex items-center gap-2">
+                    <Button asChild className="gap-2">
+                        <Link to="/console/employees/new">
+                            <UserPlus2 className="h-4 w-4" />
+                            {t('employees.add', { ns: 'glossary' })}
+                        </Link>
+                    </Button>
+                    <div className="hidden md:flex items-center gap-2">
+                        <Button
+                            variant={view === 'grid' ? 'secondary' : 'outline'}
+                            size="icon"
+                            onClick={() => setParams((prevState) => ({ ...prevState, view: 'grid' }))}
+                        >
+                            <Grid className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant={view === 'table' ? 'secondary' : 'outline'}
+                            size="icon"
+                            onClick={() => setParams((prevState) => ({ ...prevState, view: 'table' }))}
+                        >
+                            <Rows3 className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
             </div>
-            <p>{t('employees.description', { maxFreeEmployees: maxFreeEmployees, ns: 'glossary' })}</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                {data.map((employee) => (
-                    <EmployeeCard
-                        key={employee.publicId}
-                        employee={employee}
-                        from={from}
-                        to={to}
-                        onSuccess={onSuccess}
-                    />
-                ))}
-            </div>
+
+            {/* Filters */}
+            <EmployeeSearchForm
+                params={params}
+                onSearch={onSearch}
+                onReset={onReset}
+                onChange={(patch) => setParams((prevState) => ({ ...prevState, ...patch }))}
+            />
+
+            <EmployeeDataTable employees={employees} loading={isFetching} />
         </div>
     );
 }

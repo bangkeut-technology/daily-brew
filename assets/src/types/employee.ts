@@ -26,4 +26,12 @@ export type PartialEmployee = Omit<
     template?: number;
 };
 
-export type EmployeeStatus = 'active' | 'on_leave' | 'suspended' | 'resigned' | 'probation';
+export type EmployeeStatus = keyof typeof EmployeeStatusEnum;
+
+export enum EmployeeStatusEnum {
+    active = 'active',
+    on_leave = 'on_leave',
+    suspended = 'suspended',
+    resigned = 'resigned',
+    probation = 'probation',
+}

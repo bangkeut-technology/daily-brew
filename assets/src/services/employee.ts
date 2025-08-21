@@ -3,8 +3,9 @@ import { Employee, PartialEmployee } from '@/types/employee';
 import { EmployeeEvaluation } from '@/types/employee-evaluation';
 import { formatISO } from 'date-fns';
 import { Attendance, PartialAttendance } from '@/types/attendance';
+import { EmployeeSearchParams } from '@/routes/console/_authenticated/_layout/employees/-components/employee-search-form';
 
-export const fetchEmployees = async ({ from, to }: { from: string; to: string }) =>
+export const fetchEmployees = async ({ from, to }: EmployeeSearchParams) =>
     apiAxios
         .get<Employee[]>(`/employees`, {
             params: {

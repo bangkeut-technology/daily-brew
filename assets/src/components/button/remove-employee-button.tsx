@@ -5,7 +5,6 @@ import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
 import { deleteTemplateEmployees } from '@/services/evaluation-template';
-import { useTranslation } from 'react-i18next';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -17,16 +16,17 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { useTranslation } from 'react-i18next';
 
 interface RemoveEmployeeButtonProps {
-    publicId: string;
+    templatePublicId: string;
     employeePublicId: string;
     withText?: boolean;
     onRemove?: () => void;
 }
 
 export const RemoveEmployeeButton: React.FunctionComponent<RemoveEmployeeButtonProps> = ({
-    publicId,
+    templatePublicId,
     employeePublicId,
     withText,
     onRemove,
@@ -47,8 +47,8 @@ export const RemoveEmployeeButton: React.FunctionComponent<RemoveEmployeeButtonP
     });
 
     const handleRemove = React.useCallback(() => {
-        mutate({ publicId, employeePublicId });
-    }, [mutate, publicId, employeePublicId]);
+        mutate({ publicId: templatePublicId, employeePublicId });
+    }, [mutate, templatePublicId, employeePublicId]);
 
     return (
         <AlertDialog>

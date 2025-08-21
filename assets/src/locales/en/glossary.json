@@ -20,7 +20,8 @@
         "who": "Who & What",
         "date_helper": "The selected date determines which evaluation is created or updated.",
         "employee": "Evaluate Employee",
-        "histories": "Evaluation Histories"
+        "histories": "Evaluation Histories",
+        "period": "Evaluation Period"
     },
     "employees": {
         "title": "Employees",
@@ -38,6 +39,7 @@
         "loading": "Loading employees...",
         "joined_at": "Joined At",
         "not_found": "Employee not found",
+        "search_placeholder": "Search employees by name",
         "performance": {
             "view": "View Performance",
             "title": "Performance",
@@ -189,7 +191,8 @@
         "picker": {
             "date": "Select a date",
             "employee": "Select an employee",
-            "evaluation_template": "Select an evaluation template"
+            "evaluation_template": "Select an evaluation template",
+            "role": "Select a role"
         }
     },
     "date": "Date",

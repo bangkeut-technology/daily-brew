@@ -10,7 +10,7 @@ import { format } from 'date-fns';
 import { DISPLAY_DATE_FORMAT } from '@/constants/date';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { HistoriesSearchParams } from '@/routes/console/_authenticated/_layout/evaluations/histories/-search-form';
+import { HistoriesSearchParams } from '@/routes/console/_authenticated/_layout/evaluations/histories/-components/history-search-form';
 
 const columnHelper = createColumnHelper<EmployeeEvaluation>();
 

@@ -11,7 +11,7 @@ import { Form } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { postEmployeeEvaluation, putEmployeeEvaluation } from '@/services/employee-evaluation';
 import { PartialEmployeeEvaluation } from '@/types/employee-evaluation';
-import { PartialEmployeeScore } from '@/types/EmployeeScore';
+import { PartialEmployeeScore } from '@/types/employee-score';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
 import { Employee } from '@/types/employee';

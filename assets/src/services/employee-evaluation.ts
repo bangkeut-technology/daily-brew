@@ -1,6 +1,6 @@
 import { apiAxios } from '@/lib/apiAxios';
 import { EmployeeEvaluation, PartialEmployeeEvaluation } from '@/types/employee-evaluation';
-import { HistoriesSearchParams } from '@/routes/console/_authenticated/_layout/evaluations/histories/-search-form';
+import { HistoriesSearchParams } from '@/routes/console/_authenticated/_layout/evaluations/histories/-components/history-search-form';
 
 export const fetchEmployeeEvaluations = async (params: HistoriesSearchParams) =>
     apiAxios.get<EmployeeEvaluation[]>('/employee-evaluations', { params }).then((response) => response.data);

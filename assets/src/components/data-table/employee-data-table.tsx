@@ -9,16 +9,16 @@ import { RemoveEmployeeButton } from '@/components/button/remove-employee-button
 const columnHelper = createColumnHelper<Employee>();
 
 interface EmployeeDataTableProps {
-    publicId: string;
+    templatePublicId?: string;
     employees: Employee[];
     loading: boolean;
-    onRemoveEmployee: () => void;
+    onRemoveEmployee?: () => void;
 }
 
 export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> = ({
     employees,
     loading,
-    publicId,
+    templatePublicId,
     onRemoveEmployee,
 }) => {
     const { t } = useTranslation('glossary');
@@ -59,13 +59,14 @@ export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> 
             }),
             columnHelper.accessor('publicId', {
                 header: t('employees.table.actions'),
-                cell: (info) => (
-                    <RemoveEmployeeButton
-                        publicId={publicId}
-                        employeePublicId={info.getValue()}
-                        onRemove={onRemoveEmployee}
-                    />
-                ),
+                cell: (info) =>
+                    templatePublicId && (
+                        <RemoveEmployeeButton
+                            templatePublicId={templatePublicId}
+                            employeePublicId={info.getValue()}
+                            onRemove={onRemoveEmployee}
+                        />
+                    ),
                 meta: {
                     style: {
                         textAlign: 'center',
@@ -73,7 +74,7 @@ export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> 
                 },
             }),
         ],
-        [publicId, onRemoveEmployee, t],
+        [t, templatePublicId, onRemoveEmployee],
     );
 
     return (

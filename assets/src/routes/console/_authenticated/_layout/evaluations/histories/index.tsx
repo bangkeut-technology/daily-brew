@@ -2,11 +2,11 @@ import * as React from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
-import { HistoriesDataTable } from '@/routes/console/_authenticated/_layout/evaluations/histories/-histories-data-table';
+import { HistoriesDataTable } from '@/routes/console/_authenticated/_layout/evaluations/histories/-components/histories-data-table';
 import {
     HistoriesSearchParams,
     HistorySearchForm,
-} from '@/routes/console/_authenticated/_layout/evaluations/histories/-search-form';
+} from '@/routes/console/_authenticated/_layout/evaluations/histories/-components/history-search-form';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { DATE_FORMAT } from '@/constants/date';
@@ -64,7 +64,7 @@ function EvaluationsHistoryPage() {
             </div>
 
             <HistorySearchForm
-                value={params}
+                params={params}
                 onChange={(patch) => setParams((prevState) => ({ ...prevState, ...patch }))}
                 onSearch={onSearch}
                 onReset={onReset}

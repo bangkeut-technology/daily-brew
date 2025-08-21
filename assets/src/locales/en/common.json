@@ -108,5 +108,7 @@
         "csv": "Export CSV",
         "pdf": "Export PDF",
         "excel": "Export Excel"
-    }
+    },
+    "all": "All",
+    "details": "Details"
 }

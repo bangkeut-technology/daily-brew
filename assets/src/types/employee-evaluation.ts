@@ -1,7 +1,7 @@
 import { Employee } from '@/types/employee';
 import { EvaluationTemplate } from '@/types/evaluation-template';
 import { User } from '@/types/user';
-import { EmployeeScore, PartialEmployeeScore } from '@/types/EmployeeScore';
+import { EmployeeScore, PartialEmployeeScore } from '@/types/employee-score';
 
 export type EmployeeEvaluation = {
     id: number;

@@ -15,7 +15,7 @@ export type HistoriesSearchParams = {
 };
 
 interface HistorySearchFormProps {
-    value: HistoriesSearchParams;
+    params: HistoriesSearchParams;
     onChange: (patch: Partial<HistoriesSearchParams>) => void;
     onSearch?: () => void;
     onReset?: () => void;
@@ -26,7 +26,7 @@ export const HistorySearchForm: React.FC<HistorySearchFormProps> = ({
     onSearch,
     onReset,
     className,
-    value,
+    params,
     onChange,
 }) => {
     const { t } = useTranslation();
@@ -34,19 +34,19 @@ export const HistorySearchForm: React.FC<HistorySearchFormProps> = ({
     const setFrom = React.useCallback(
         (date?: Date) => {
             if (!date) return;
-            const to = value.to ?? date;
+            const to = params.to ?? date;
             onChange({ from: date, to: date > to ? date : to });
         },
-        [onChange, value.to],
+        [onChange, params.to],
     );
 
     const setTo = React.useCallback(
         (date?: Date) => {
             if (!date) return;
-            const from = value.from ?? date;
+            const from = params.from ?? date;
             onChange({ to: date, from: date < from ? date : from });
         },
-        [onChange, value.from],
+        [onChange, params.from],
     );
 
     const handleReset = React.useCallback(() => {
@@ -79,17 +79,17 @@ export const HistorySearchForm: React.FC<HistorySearchFormProps> = ({
             </CardHeader>
 
             <CardContent className="grid gap-4 md:grid-cols-6">
-                <DatePicker label={t('from')} value={value.from} onChange={setFrom} className="md:col-span-3" />
-                <DatePicker label={t('to')} value={value.to} onChange={setTo} className="md:col-span-3" />
+                <DatePicker label={t('from')} value={params.from} onChange={setFrom} className="md:col-span-3" />
+                <DatePicker label={t('to')} value={params.to} onChange={setTo} className="md:col-span-3" />
                 <EmployeePicker
                     label={t('employee')}
-                    value={value.employee}
+                    value={params.employee}
                     onChange={(employee) => onChange({ employee })}
                     className="md:col-span-3 w-full"
                 />
                 <EvaluationTemplatePicker
                     label={t('evaluation_templates')}
-                    value={value.template}
+                    value={params.template}
                     onChange={(template) => onChange({ template })}
                     className="md:col-span-2 w-full"
                 />
