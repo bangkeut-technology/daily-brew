@@ -36,42 +36,53 @@ export const SiteFooter = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
                         <div>
                             <div className="font-medium mb-2">Product</div>
-                            <Link to="/features" className="text-sm text-muted-foreground hover:text-foreground">
-                                {t('features')}
-                            </Link>
-                            <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground">
-                                {t('pricing')}
-                            </Link>
-                            <Link to="/faq" className="text-sm text-muted-foreground hover:text-foreground">
-                                {t('faq')}
-                            </Link>
+                            <ul className="space-y-1 text-muted-foreground">
+                                <li>
+                                    <Link
+                                        to="/features"
+                                        className="text-sm text-muted-foreground hover:text-foreground"
+                                    >
+                                        {t('features')}
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground">
+                                        {t('pricing')}
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link to="/faq" className="text-sm text-muted-foreground hover:text-foreground">
+                                        {t('faq')}
+                                    </Link>
+                                </li>
+                            </ul>
                         </div>
                         <div>
                             <div className="font-medium mb-2">Company</div>
                             <ul className="space-y-1 text-muted-foreground">
                                 <li>
-                                    <a
-                                        href="/about"
+                                    <Link
+                                        to="/about"
                                         className="hover:text-foreground hover:underline underline-offset-2"
                                     >
                                         About
-                                    </a>
+                                    </Link>
                                 </li>
                                 <li>
-                                    <a
-                                        href="/terms"
+                                    <Link
+                                        to="/terms"
                                         className="hover:text-foreground hover:underline underline-offset-2"
                                     >
                                         Terms
-                                    </a>
+                                    </Link>
                                 </li>
                                 <li>
-                                    <a
-                                        href="/privacy"
+                                    <Link
+                                        to="/privacy"
                                         className="hover:text-foreground hover:underline underline-offset-2"
                                     >
                                         Privacy
-                                    </a>
+                                    </Link>
                                 </li>
                             </ul>
                         </div>
@@ -87,12 +98,12 @@ export const SiteFooter = () => {
                                     </a>
                                 </li>
                                 <li>
-                                    <a
-                                        href="/status"
+                                    <Link
+                                        to="/status"
                                         className="hover:text-foreground hover:underline underline-offset-2"
                                     >
                                         Status
-                                    </a>
+                                    </Link>
                                 </li>
                             </ul>
                         </div>

@@ -18,7 +18,7 @@ import { signUpSchema } from '@/schema/sign-up-schema';
 import { signUp } from '@/services/auth';
 import { z } from 'zod';
 
-export const Route = createFileRoute('/console/sign-up')({
+export const Route = createFileRoute('/_layout/sign-up/')({
     component: SignUpComponent,
     validateSearch: z.object({
         redirect: z.string().optional().default('/console'),
@@ -145,7 +145,7 @@ function SignUpComponent() {
                                 <div className="mt-4 text-center text-sm">
                                     {t('have_account', { ns: 'glossary' })}&nbsp;
                                     <Link
-                                        to="/console/sign-in"
+                                        to="/sign-in"
                                         search={{
                                             redirect: '/console',
                                         }}

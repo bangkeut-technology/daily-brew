@@ -42,13 +42,13 @@ export const SiteHeader = () => {
                     {/* Desktop actions */}
                     <div className="flex items-center gap-2">
                         <Button variant="ghost" asChild>
-                            <Link to="/console/sign-in">
+                            <Link to="/sign-in">
                                 <LogIn className="mr-1 h-4 w-4" />
                                 {t('sign_in')}
                             </Link>
                         </Button>
                         <Button asChild>
-                            <Link to="/console/sign-up">
+                            <Link to="/sign-up">
                                 <UserPlus className="mr-1 h-4 w-4" />
                                 {t('get_started')}
                             </Link>
@@ -58,7 +58,7 @@ export const SiteHeader = () => {
                     {/* Mobile: menu + single CTA */}
                     <div className="flex md:hidden items-center gap-2">
                         <Button asChild size="sm" className="px-3">
-                            <Link to="/console/sign-up">
+                            <Link to="/sign-up">
                                 <UserPlus className="mr-1 h-4 w-4" />
                                 {t('start')}
                             </Link>
@@ -92,13 +92,13 @@ export const SiteHeader = () => {
                                     <Separator />
                                     <div className="flex items-center gap-2 pt-1">
                                         <Button asChild variant="ghost" size="sm" className="flex-1">
-                                            <Link to="/console/sign-in">
+                                            <Link to="/sign-in">
                                                 <LogIn className="mr-1 h-4 w-4" />
                                                 {t('sign_in')}
                                             </Link>
                                         </Button>
                                         <Button asChild size="sm" className="flex-1">
-                                            <Link to="/console/sign-up">
+                                            <Link to="/sign-up">
                                                 <UserPlus className="mr-1 h-4 w-4" />
                                                 {t('get_started')}
                                             </Link>

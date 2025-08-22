@@ -28,10 +28,10 @@ function FAQPage() {
                     </p>
                     <div className="mt-2 flex w-full flex-col sm:flex-row gap-2">
                         <Button asChild size="lg" className="w-full sm:w-auto">
-                            <Link to="/console/sign-up">Create free account</Link>
+                            <Link to="/sign-up">Create free account</Link>
                         </Button>
                         <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
-                            <Link to="/console/sign-in">Sign in</Link>
+                            <Link to="/sign-in">Sign in</Link>
                         </Button>
                     </div>
                 </div>
@@ -122,10 +122,10 @@ function FAQPage() {
                         </div>
                         <div className="flex w-full sm:w-auto flex-col sm:flex-row gap-2">
                             <Button asChild variant="outline" className="w-full sm:w-auto">
-                                <Link to="/console/sign-in">Contact support</Link>
+                                <Link to="/sign-in">Contact support</Link>
                             </Button>
                             <Button asChild className="w-full sm:w-auto">
-                                <Link to="/console/sign-up">Start free</Link>
+                                <Link to="/sign-up">Start free</Link>
                             </Button>
                         </div>
                     </CardContent>

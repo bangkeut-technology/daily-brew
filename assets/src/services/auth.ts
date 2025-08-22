@@ -8,6 +8,6 @@ export const signIn = async (signIn: SignIn) => {
 export const signUp = async (signUp: SignUp) => {
     const { password, confirmPassword, ...rest } = signUp;
     return axios
-        .post<{ message: string; user: User }>('/console/sign-up', { ...rest, plainPassword: password })
+        .post<{ message: string; user: User }>('/sign-up', { ...rest, plainPassword: password })
         .then((response) => response.data);
 };

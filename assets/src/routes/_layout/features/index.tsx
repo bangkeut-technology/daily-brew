@@ -44,12 +44,12 @@ function FeaturesPage() {
                     </p>
                     <div className="flex w-full flex-col sm:flex-row gap-2">
                         <Button asChild size="lg" className="w-full sm:w-auto">
-                            <Link to="/console/sign-up">
+                            <Link to="/sign-up">
                                 Get started free <ArrowRight className="ml-1.5 h-4 w-4" />
                             </Link>
                         </Button>
                         <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
-                            <Link to="/console/sign-in">Sign in</Link>
+                            <Link to="/sign-in">Sign in</Link>
                         </Button>
                     </div>
                 </div>
@@ -180,10 +180,10 @@ function FeaturesPage() {
                         </div>
                         <div className="flex w-full sm:w-auto flex-col sm:flex-row gap-2">
                             <Button asChild size="lg" className="w-full sm:w-auto">
-                                <Link to="/console/sign-up">Create free account</Link>
+                                <Link to="/sign-up">Create free account</Link>
                             </Button>
                             <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
-                                <Link to="/console/sign-in">Sign in</Link>
+                                <Link to="/sign-in">Sign in</Link>
                             </Button>
                         </div>
                     </CardContent>

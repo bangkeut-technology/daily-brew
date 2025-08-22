@@ -26,10 +26,10 @@ function PricingPage() {
                     </p>
                     <div className="mt-2 flex w-full flex-col sm:flex-row gap-2">
                         <Button asChild size="lg" className="w-full sm:w-auto">
-                            <Link to="/console/sign-up">Get started free</Link>
+                            <Link to="/sign-up">Get started free</Link>
                         </Button>
                         <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
-                            <Link to="/console/sign-in">Sign in</Link>
+                            <Link to="/sign-in">Sign in</Link>
                         </Button>
                     </div>
                 </div>
@@ -58,7 +58,7 @@ function PricingPage() {
                             'No exports/downloads',
                         ]}
                         ctaLabel="Start free"
-                        ctaTo="/console/sign-up"
+                        ctaTo="/sign-up"
                     />
 
                     {/* Pro (Coming soon) */}
@@ -79,7 +79,7 @@ function PricingPage() {
                             'Attendance IP / geo restriction',
                         ]}
                         ctaLabel="Join waitlist"
-                        ctaTo="/console/sign-in"
+                        ctaTo="/sign-in"
                         comingSoon
                     />
 
@@ -97,7 +97,7 @@ function PricingPage() {
                             'Priority support & onboarding',
                         ]}
                         ctaLabel="Contact us"
-                        ctaTo="/console/sign-in"
+                        ctaTo="/sign-in"
                         secondary
                     />
                 </div>
@@ -160,10 +160,10 @@ function PricingPage() {
                             </div>
                             <div className="flex w-full sm:w-auto flex-col sm:flex-row gap-2">
                                 <Button asChild size="lg" className="w-full sm:w-auto">
-                                    <Link to="/console/sign-up">Create free account</Link>
+                                    <Link to="/sign-up">Create free account</Link>
                                 </Button>
                                 <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
-                                    <Link to="/console/sign-in">Join Pro waitlist</Link>
+                                    <Link to="/sign-in">Join Pro waitlist</Link>
                                 </Button>
                             </div>
                         </CardContent>
