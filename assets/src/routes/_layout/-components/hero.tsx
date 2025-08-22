@@ -3,6 +3,7 @@ import { ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { Link } from '@tanstack/react-router';
 
 export const Hero = () => (
     <section className="py-14 md:py-20">
@@ -28,9 +29,9 @@ export const Hero = () => (
             </p>
             <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Button size="lg" asChild className="w-full sm:w-auto">
-                    <a href="/signup" className="inline-flex items-center">
+                    <Link to="/sign-up" className="inline-flex items-center">
                         Get started free <ChevronRight className="ml-1 h-4 w-4" />
-                    </a>
+                    </Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild className="w-full sm:w-auto">
                     <a href="/demo" className="inline-flex items-center">

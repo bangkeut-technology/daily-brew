@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import React from 'react';
+import { Link } from '@tanstack/react-router';
 
 export function Pricing() {
     return (
@@ -33,7 +34,7 @@ export function Pricing() {
                             <li>Owner‑only evaluations</li>
                         </ul>
                         <Button asChild className="w-full mt-3">
-                            <a href="/signup">Get started</a>
+                            <Link to="/sign-up">Get started</Link>
                         </Button>
                     </CardContent>
                 </Card>
