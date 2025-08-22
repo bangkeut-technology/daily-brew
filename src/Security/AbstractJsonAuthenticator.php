@@ -15,6 +15,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
@@ -66,6 +67,11 @@ abstract class AbstractJsonAuthenticator extends AbstractAuthenticator
     {
         $credentials = $this->getCredentials($request);
 
+        $badges = [];
+        if ($credentials['remember_me']) {
+            $badges[] = new RememberMeBadge();
+        }
+
         return new Passport(
             new UserBadge($credentials['email'], function ($credential) {
                 if (null === $user = $this->userRepository->findByIdentifier($credential)) {
@@ -79,6 +85,7 @@ abstract class AbstractJsonAuthenticator extends AbstractAuthenticator
                 throw new CustomUserMessageAuthenticationException('Your account has been disabled');
             }),
             new PasswordCredentials($credentials['password']),
+            $badges
         );
     }
 

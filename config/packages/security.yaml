@@ -26,7 +26,7 @@ security:
             refresh_jwt:
                 check_path: gesdinet_jwt_refresh_token
             provider:    daily_brew_user_provider
-            context:     'daily_brew'
+            context:     '%env(string:DAILY_BREW_CONTEXT)%'
 
         console_area:
             pattern:  ^/console
@@ -36,7 +36,10 @@ security:
             logout:
                 path:   daily_brew_security_logout
                 target: daily_brew_security_login
-            context:  'daily_brew'
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: '%env(int:DAILY_BREW_REMEMBER_ME_LIFETIME)%'
+            context:  '%env(string:DAILY_BREW_CONTEXT)%'
             custom_authenticators:
                 - App\Security\JsonAuthenticator
 

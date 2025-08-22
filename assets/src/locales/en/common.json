@@ -38,6 +38,9 @@
     "to": "To",
     "template": "Template",
     "evaluation_templates": "Evaluation Templates",
+    "forgot": "Forgot",
+    "remember_me": "Remember Me",
+    "create_one_free": "Create One Free",
     "attendance_statuses": {
         "present": "Present",
         "absent": "Absent",
@@ -110,5 +113,6 @@
         "excel": "Export Excel"
     },
     "all": "All",
+    "dont_have_account": "Don't have an account",
     "details": "Details"
 }

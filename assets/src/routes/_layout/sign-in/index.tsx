@@ -15,10 +15,11 @@ import { useBoolean } from 'react-use';
 import { signIn } from '@/services/auth';
 import { z } from 'zod';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowRight, Coffee, Lock, LogIn, Mail } from 'lucide-react';
+import { ArrowRight, Coffee, Lock, LockOpen, LogIn, Mail } from 'lucide-react';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { Form } from '@/components/ui/form';
+import { TextField } from '@/components/field/text-field';
 
 export const Route = createFileRoute('/_layout/sign-in/')({
     component: SignInComponent,
@@ -34,6 +35,7 @@ export const Route = createFileRoute('/_layout/sign-in/')({
 
 function SignInComponent() {
     const { t } = useTranslation();
+    const [rememberMe, setRememberMe] = React.useState(false);
     const [showPassword, onToggle] = useBoolean(false);
     const { redirect } = Route.useSearch();
     const navigate = useNavigate();
@@ -65,9 +67,12 @@ function SignInComponent() {
         }
     }, [navigate, redirect, user]);
 
-    const onSubmit = (data: SignIn) => {
-        mutate(data);
-    };
+    const onSubmit = React.useCallback(
+        (data: SignIn) => {
+            mutate({ ...data, remember_me: rememberMe });
+        },
+        [mutate, rememberMe],
+    );
 
     return (
         <div className="relative min-h-dvh bg-gradient-to-b from-background via-background to-muted/30">
@@ -104,72 +109,90 @@ function SignInComponent() {
                                 <CardDescription>Use your email to access the console</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-5">
-                                <form className="space-y-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="email">Email</Label>
-                                        <div className="relative">
-                                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                            <Input
-                                                id="email"
-                                                type="email"
-                                                placeholder="you@coffee.co"
-                                                className="pl-9"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
+                                <Form {...form}>
+                                    <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)} noValidate>
+                                        <TextField
+                                            control={form.control}
+                                            name="email"
+                                            label={t('email')}
+                                            placeholder="your@coffee.co"
+                                            startIcon={
+                                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                            }
+                                            required
+                                            disabled={isPending}
+                                        />
 
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between">
-                                            <Label htmlFor="password">Password</Label>
-                                            <Link
-                                                to="/forgot-password"
-                                                className="text-xs text-primary hover:underline underline-offset-2"
-                                            >
-                                                Forgot?
-                                            </Link>
-                                        </div>
-                                        <div className="relative">
-                                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                            <Input
-                                                id="password"
-                                                type="password"
+                                        <div className="space-y-2">
+                                            <TextField
+                                                control={form.control}
+                                                name="password"
                                                 placeholder="••••••••"
-                                                className="pl-9"
+                                                label={t('password')}
+                                                type={showPassword ? 'text' : 'password'}
+                                                disabled={isPending}
+                                                endIcon={
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        type="button"
+                                                        onClick={onToggle}
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+                                                    >
+                                                        {showPassword ? (
+                                                            <Lock className="h-4 w-4" />
+                                                        ) : (
+                                                            <LockOpen className="h-4 w-4" />
+                                                        )}
+                                                    </Button>
+                                                }
+                                                labelRight={
+                                                    <Link
+                                                        to="/forgot-password"
+                                                        className="text-xs text-primary hover:underline underline-offset-2"
+                                                    >
+                                                        {t('forgot')}?
+                                                    </Link>
+                                                }
                                                 required
                                             />
                                         </div>
-                                    </div>
 
-                                    <div className="flex items-center gap-2">
-                                        <Checkbox id="remember" />
-                                        <Label htmlFor="remember" className="text-xs text-muted-foreground">
-                                            Remember me
-                                        </Label>
-                                    </div>
+                                        <div className="flex items-center gap-2">
+                                            <Checkbox
+                                                id="remember"
+                                                checked={rememberMe}
+                                                onCheckedChange={() => setRememberMe((prevState) => !prevState)}
+                                            />
+                                            <Label htmlFor="remember" className="text-xs text-muted-foreground">
+                                                {t('remember_me')}
+                                            </Label>
+                                        </div>
 
-                                    <Button type="submit" className="w-full">
-                                        <LogIn className="mr-2 h-4 w-4" />
-                                        Sign in
-                                    </Button>
-                                </form>
+                                        <Button type="submit" className="w-full">
+                                            <LogIn className="mr-2 h-4 w-4" />
+                                            {t('sign_in')}
+                                        </Button>
+                                    </form>
+                                </Form>
 
                                 <Separator />
 
                                 {/* SSO placeholders (optional) */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    <Button variant="outline" className="w-full">
-                                        Continue with Google
-                                    </Button>
-                                    <Button variant="outline" className="w-full">
-                                        Continue with Apple
-                                    </Button>
-                                </div>
+                                {/*<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">*/}
+                                {/*    <Button variant="outline" className="w-full">*/}
+                                {/*        Continue with Google*/}
+                                {/*    </Button>*/}
+                                {/*    <Button variant="outline" className="w-full">*/}
+                                {/*        Continue with Apple*/}
+                                {/*    </Button>*/}
+                                {/*</div>*/}
 
                                 <p className="text-xs text-muted-foreground text-center">
-                                    Don’t have an account?{' '}
+                                    {t('dont_have_account')}?{' '}
                                     <Link to="/sign-up" className="text-primary hover:underline underline-offset-2">
-                                        Create one free <ArrowRight className="inline h-3.5 w-3.5" />
+                                        {t('create_one_free')}
+                                        <ArrowRight className="inline h-3.5 w-3.5" />
                                     </Link>
                                 </p>
                             </CardContent>

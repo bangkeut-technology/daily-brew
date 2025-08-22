@@ -1,7 +1,7 @@
 import { SignIn, SignUp, User } from '@/types/user';
 import axios from 'axios';
 
-export const signIn = async (signIn: SignIn) => {
+export const signIn = async (signIn: SignIn & { remember_me: boolean }) => {
     return axios.post<{ message: string; user: User }>('/console/login', signIn).then((response) => response.data);
 };
 
