@@ -14,7 +14,7 @@ export const SiteHeader = () => {
             <div className="mx-auto max-w-7xl px-3 sm:px-4 lg:px-6">
                 <div className="flex h-14 items-center justify-between">
                     {/* Brand */}
-                    <a href="#" className="flex items-center gap-2">
+                    <Link to="/" className="flex items-center gap-2">
                         <div className="h-9 w-9 grid place-items-center rounded-xl bg-primary/10 text-primary">
                             <Coffee className="h-5 w-5" />
                         </div>
@@ -24,7 +24,7 @@ export const SiteHeader = () => {
                             </span>
                             <span className="text-muted-foreground">.work</span>
                         </span>
-                    </a>
+                    </Link>
 
                     {/* Desktop nav */}
                     <nav className="hidden md:flex items-center gap-6">
@@ -40,7 +40,7 @@ export const SiteHeader = () => {
                     </nav>
 
                     {/* Desktop actions */}
-                    <div className="flex items-center gap-2">
+                    <div className="hidden md:flex items-center gap-2">
                         <Button variant="ghost" asChild>
                             <Link to="/sign-in">
                                 <LogIn className="mr-1 h-4 w-4" />

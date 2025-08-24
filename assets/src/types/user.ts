@@ -15,6 +15,7 @@ export type SignIn = Omit<User, 'id' | 'firstName' | 'lastName' | 'canonicalEmai
 export type SignUp = Omit<User, 'id' | 'canonicalEmail' | 'locale' | 'fullName'> & {
     password: string;
     confirmPassword: string;
+    acceptedTerms: boolean;
 };
 
 export type ChangePassword = {

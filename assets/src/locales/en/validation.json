@@ -40,5 +40,6 @@
             "status": "The attendance status must be one of the following: {{values}}."
         }
     },
-    "passwords_match": "The password and confirmation password must match."
+    "passwords_match": "The password and confirmation password must match.",
+    "accept_terms": "You must accept the terms and conditions."
 }
