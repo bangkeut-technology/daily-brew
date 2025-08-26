@@ -19,7 +19,7 @@ interface DatePickerProps {
     displayFormat?: string;
     className?: string;
     disabledDate?: Matcher | Matcher[] | undefined;
-    value: Date | undefined;
+    value?: Date;
     onChange?: OnChangeHandler;
 }
 

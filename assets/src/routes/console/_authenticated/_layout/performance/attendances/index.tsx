@@ -49,7 +49,7 @@ const STATUS_COLORS: Record<AttendanceStatus, string> = {
 
 // —————————————————————————————————————————
 // Route (URL-synced filters)
-export const Route = createFileRoute('/console/_authenticated/_layout/attendances/list')({
+export const Route = createFileRoute('/console/_authenticated/_layout/performance/attendances/')({
     component: AttendanceListPage,
     validateSearch: z.object({
         from: z.string().optional(), // 'yyyy-MM-dd'
@@ -213,8 +213,6 @@ function AttendanceListPage() {
                     )}
                 </Button>
             </div>
-
-            {/* Filters */}
 
             {/* Table */}
             <Card className="overflow-hidden">

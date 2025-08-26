@@ -1,20 +1,24 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { EmployeeStatusEnum } from '@/types/employee';
+import { EmployeeStatus, EmployeeStatusEnum } from '@/types/employee';
 import { useTranslation } from 'react-i18next';
 
 interface EmployeeStatusPickerProps {
     label?: string;
-    value?: string;
-    onChange?: (value: any) => void;
+    value?: EmployeeStatus;
+    onChange?: (value: EmployeeStatus) => void;
 }
 
-export const EmployeeStatusPicker: React.FC<EmployeeStatusPickerProps> = ({ label, value, onChange }) => {
+export const EmployeeStatusPicker: React.FunctionComponent<EmployeeStatusPickerProps> = ({
+    label,
+    value,
+    onChange,
+}) => {
     const { t } = useTranslation();
 
     return (
-        <React.Fragment>
+        <div className="space-y-2">
             {label && <Label className="text-xs text-muted-foreground">{label}</Label>}
             <Select value={value} onValueChange={onChange}>
                 <SelectTrigger>
@@ -23,23 +27,23 @@ export const EmployeeStatusPicker: React.FC<EmployeeStatusPickerProps> = ({ labe
                 <SelectContent>
                     <SelectItem value="">{t('all')}</SelectItem>
                     <SelectItem value={EmployeeStatusEnum.active}>
-                        {t('employees.status.active', { ns: 'glossary' })}
+                        {t(`employees.status.${EmployeeStatusEnum.active}`, { ns: 'glossary' })}
                     </SelectItem>
                     <SelectItem value={EmployeeStatusEnum.on_leave}>
-                        {t('employees.status.on_leave', { ns: 'glossary' })}
+                        {t(`employees.status.${EmployeeStatusEnum.on_leave}`, { ns: 'glossary' })}
                     </SelectItem>
                     <SelectItem value={EmployeeStatusEnum.probation}>
-                        {t('employees.status.probation', { ns: 'glossary' })}
+                        {t(`employees.status.${EmployeeStatusEnum.probation}`, { ns: 'glossary' })}
                     </SelectItem>
                     <SelectItem value={EmployeeStatusEnum.resigned}>
-                        {t('employees.status.resigned', { ns: 'glossary' })}
+                        {t(`employees.status.${EmployeeStatusEnum.resigned}`, { ns: 'glossary' })}
                     </SelectItem>
                     <SelectItem value={EmployeeStatusEnum.suspended}>
-                        {t('employees.status.suspended', { ns: 'glossary' })}
+                        {t(`employees.status.${EmployeeStatusEnum.suspended}`, { ns: 'glossary' })}
                     </SelectItem>
                 </SelectContent>
             </Select>
-        </React.Fragment>
+        </div>
     );
 };
 
