@@ -39,7 +39,7 @@ export const TextField = React.memo<TextFieldProps>(
                                     }
                                 }}
                                 id={id || localId}
-                                className={cn(startIcon && 'pl-9', endIcon && 'pr-9', props.className)}
+                                className={cn('w-full', startIcon && 'pl-9', endIcon && 'pr-9', props.className)}
                             />
                             {endIcon && endIcon}
                         </div>
