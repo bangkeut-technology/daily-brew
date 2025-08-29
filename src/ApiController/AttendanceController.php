@@ -60,6 +60,27 @@ class AttendanceController extends AbstractController
         required: false,
         schema: new OA\Schema(type: 'string', format: 'date')
     )]
+    #[OA\Parameter(
+        name: 'employee',
+        description: 'The employee to filter attendances by',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Parameter(
+        name:'status',
+        description: 'The status of the attendance',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Parameter(
+        name: 'user',
+        description: 'The user to filter attendances by',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'string')
+    )]
     #[OA\Response(
         response: Response::HTTP_OK,
         description: 'Returns a list of attendances for the specified period and user.',
@@ -73,8 +94,19 @@ class AttendanceController extends AbstractController
     {
         $from = new DateTimeImmutable($request->query->get('from', DateHelper::startOfMonth()->format('Y-m-d')));
         $to = new DateTimeImmutable($request->query->get('to', DateHelper::endOfMonth()->format('Y-m-d')));
+        $employee = $request->query->get('employee');
+        $status = $request->query->get('status');
+        $user = $request->query->get('user');
 
-        $attendances = $this->attendanceRepository->findByPeriodAndUser($from, $to, $this->getUser());
+        $criteria = [
+            'from' => $from,
+            'to' => $to,
+            'employee' => $employee,
+            'status' => $status,
+            'user' => $user,
+        ];
+
+        $attendances = $this->attendanceRepository->findByCriteria($criteria);
 
         return $this->createAttendanceResponse($attendances);
     }

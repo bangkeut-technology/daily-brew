@@ -86,6 +86,7 @@ class Attendance extends AbstractEntity
      */
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    #[Groups(['attendance:read'])]
     private ?User $user = null;
 
     /**

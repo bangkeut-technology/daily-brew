@@ -48,10 +48,10 @@ class AttendanceRepository extends AbstractRepository
     {
         return $this->createQueryBuilder('a')
             ->addSelect('e')
-            ->innerJoin('a.employee', 'e')
-            ->where('a.user = :user')
-            ->andWhere('a.attendanceDate >= :from OR :from IS NULL')
-            ->andWhere('a.attendanceDate <= :to OR :to IS NULL')
+            ->innerJoin('attendance.employee', 'e')
+            ->where('attendance.user = :user')
+            ->andWhere('attendance.attendanceDate >= :from OR :from IS NULL')
+            ->andWhere('attendance.attendanceDate <= :to OR :to IS NULL')
             ->setParameters(new ArrayCollection([
                 new Parameter('user', $user),
                 new Parameter('from', $from, Types::DATE_IMMUTABLE),
@@ -59,6 +59,35 @@ class AttendanceRepository extends AbstractRepository
             ]))
             ->getQuery()
             ->getResult();
+    }
+
+    public function findByCriteria(array $criteria, array $orderBy = [], $limit = null, $offset = null)
+    {
+        $qb=  $this->createQueryBuilder('attendance')
+            ->addSelect('employee')
+            ->addSelect('user')
+            ->innerJoin('attendance.employee', 'employee')
+            ->innerJoin('attendance.user', 'user')
+            ->innerJoin('attendance.recorder', 'recorder')
+            ->where('attendance.attendanceDate >= :from OR :from IS NULL')
+            ->andWhere('attendance.attendanceDate <= :to OR :to IS NULL')
+            ->andWhere('employee.publicId = :employee OR :employee IS NULL')
+            ->andWhere('user.publicId = :user OR :user IS NULL')
+            ->setParameters(new ArrayCollection([
+                new Parameter('from', $criteria['from'], Types::DATE_IMMUTABLE),
+                new Parameter('to', $criteria['to'], Types::DATE_IMMUTABLE),
+                new Parameter('user', $criteria['user']),
+                new Parameter('employee', $criteria['employee']),
+                new Parameter('status', $criteria['status']),
+            ]))
+        ->setMaxResults($limit)
+        ->setFirstResult($offset);
+
+        foreach ($orderBy as $sort => $sort) {
+            $qb->addOrderBy($sort, $sort);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     /**
@@ -71,8 +100,8 @@ class AttendanceRepository extends AbstractRepository
     {
         return $this->createQueryBuilder('a')
             ->addSelect('e')
-            ->innerJoin('a.employee', 'e')
-            ->where('a.user = :user')
+            ->innerJoin('attendance.employee', 'e')
+            ->where('attendance.user = :user')
             ->setParameter('user', $user)
             ->getQuery()
             ->getResult();
@@ -90,10 +119,10 @@ class AttendanceRepository extends AbstractRepository
     {
         return $this->createQueryBuilder('a')
             ->addSelect('e')
-            ->innerJoin('a.employee', 'e')
-            ->where('a.employee = :employee')
-            ->andWhere('a.attendanceDate >= :from')
-            ->andWhere('a.attendanceDate <= :to')
+            ->innerJoin('attendance.employee', 'e')
+            ->where('attendance.employee = :employee')
+            ->andWhere('attendance.attendanceDate >= :from')
+            ->andWhere('attendance.attendanceDate <= :to')
             ->setParameters(new ArrayCollection([
                 new Parameter('employee', $employee),
                 new Parameter('from', $from, Types::DATE_IMMUTABLE),
@@ -114,9 +143,9 @@ class AttendanceRepository extends AbstractRepository
     {
         return $this->createQueryBuilder('a')
             ->addSelect('e')
-            ->innerJoin('a.employee', 'e')
-            ->where('a.publicId = :publicId')
-            ->andWhere('a.user = :user')
+            ->innerJoin('attendance.employee', 'e')
+            ->where('attendance.publicId = :publicId')
+            ->andWhere('attendance.user = :user')
             ->setParameters(new ArrayCollection([
                 new Parameter('publicId', $publicId),
                 new Parameter('user', $getUser),

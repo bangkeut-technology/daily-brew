@@ -192,8 +192,8 @@ class EmployeeEvaluationRepository extends AbstractRepository
         }
         $qb->setParameters($parameters);
 
-        foreach ($orderBy as $key => $value) {
-            $qb->addOrderBy($key, $value);
+        foreach ($orderBy as $sort => $sort) {
+            $qb->addOrderBy($sort, $sort);
         }
 
         return $qb->getQuery()
