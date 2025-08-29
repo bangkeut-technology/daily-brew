@@ -71,6 +71,7 @@ class AttendanceRepository extends AbstractRepository
             ->innerJoin('attendance.recorder', 'recorder')
             ->where('attendance.attendanceDate >= :from OR :from IS NULL')
             ->andWhere('attendance.attendanceDate <= :to OR :to IS NULL')
+            ->andWhere('attendance.status = :status OR :status IS NULL')
             ->andWhere('employee.publicId = :employee OR :employee IS NULL')
             ->andWhere('user.publicId = :user OR :user IS NULL')
             ->setParameters(new ArrayCollection([
