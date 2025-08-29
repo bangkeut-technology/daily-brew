@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CalendarDays, Download } from 'lucide-react';
 import { AttendanceDataTable } from '@/routes/console/_authenticated/_layout/attendances/histories/-components/attendance-data-table';
-import { SearchForm } from '@/routes/console/_authenticated/_layout/attendances/histories/-components/search-form';
+import { AttendanceSearchForm } from '@/routes/console/_authenticated/_layout/attendances/histories/-components/attendance-search-form';
 import { AttendanceSearchParams } from '@/services/attendance';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/attendances/histories/')({
@@ -65,7 +65,7 @@ function AttendanceListPage() {
                     <CardTitle className="text-base">Filters</CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-3 md:grid-cols-5">
-                    <SearchForm from={from} to={to} employee={employee} status={status} onChange={onChange} />
+                    <AttendanceSearchForm from={from} to={to} employee={employee} status={status} onChange={onChange} />
                 </CardContent>
             </Card>
 

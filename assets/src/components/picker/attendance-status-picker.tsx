@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 interface AttendanceStatusPickerProps {
     label?: string;
     value?: AttendanceStatus;
-    onChange?: (value: AttendanceStatus) => void;
+    onChange?: (value: AttendanceStatus | undefined) => void;
 }
 
 export const AttendanceStatusPicker: React.FC<AttendanceStatusPickerProps> = ({ label, value, onChange }) => {
@@ -16,12 +16,17 @@ export const AttendanceStatusPicker: React.FC<AttendanceStatusPickerProps> = ({ 
     return (
         <div className="space-y-2">
             {label && <Label className="text-xs text-muted-foreground">{label}</Label>}
-            <Select value={value} onValueChange={onChange}>
+            <Select
+                value={value || '_null'}
+                onValueChange={(value) => {
+                    onChange?.(value === '_null' ? undefined : (value as AttendanceStatus));
+                }}
+            >
                 <SelectTrigger>
                     <SelectValue placeholder={t('all')} />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="">{t('all')}</SelectItem>
+                    <SelectItem value="_null">{t('all')}</SelectItem>
                     <SelectItem value={AttendanceStatusEnum.absent}>
                         {t(`attendances.status.${AttendanceStatusEnum.absent}`, { ns: 'glossary' })}
                     </SelectItem>
@@ -51,3 +56,5 @@ export const AttendanceStatusPicker: React.FC<AttendanceStatusPickerProps> = ({ 
         </div>
     );
 };
+
+AttendanceStatusPicker.displayName = 'AttendanceStatusPicker';
