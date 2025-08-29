@@ -169,7 +169,10 @@ function Dashboard() {
                     <SectionHeader
                         title={t('attendance')}
                         action={
-                            <Link className="text-sm text-primary hover:underline" to="/console/attendances">
+                            <Link
+                                className="text-sm text-primary hover:underline"
+                                to="/console/performance/attendances"
+                            >
                                 {t('view_all')}
                             </Link>
                         }

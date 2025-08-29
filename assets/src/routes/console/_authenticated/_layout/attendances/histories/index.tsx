@@ -4,11 +4,11 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CalendarDays, Download } from 'lucide-react';
-import { AttendanceDataTable } from '@/routes/console/_authenticated/_layout/attendances/-components/attendance-data-table';
-import { SearchForm } from '@/routes/console/_authenticated/_layout/attendances/-components/search-form';
+import { AttendanceDataTable } from '@/routes/console/_authenticated/_layout/attendances/histories/-components/attendance-data-table';
+import { SearchForm } from '@/routes/console/_authenticated/_layout/attendances/histories/-components/search-form';
 import { AttendanceSearchParams } from '@/services/attendance';
 
-export const Route = createFileRoute('/console/_authenticated/_layout/attendances/')({
+export const Route = createFileRoute('/console/_authenticated/_layout/attendances/histories/')({
     component: AttendanceListPage,
     validateSearch: z.object({
         from: z.string().optional(),

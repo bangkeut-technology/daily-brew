@@ -111,6 +111,7 @@
     "clock_out": "Clock Out",
     "recorded_by": "Recorded By",
     "clear": "Clear",
+    "attendances": "Attendances",
     "export": {
         "csv": "Export CSV",
         "pdf": "Export PDF",

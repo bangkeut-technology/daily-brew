@@ -17,11 +17,13 @@ import {
 import {
     BarChart3,
     Briefcase,
+    CalendarClock,
     CalendarDays,
     ChevronRight,
     ChevronUp,
     ClipboardList,
     CreditCard,
+    FileClock,
     Gauge,
     LayoutDashboard,
     ListTodo,
@@ -59,6 +61,14 @@ export const AppSidebar = () => {
             { title: t('dashboard'), url: '/console', icon: LayoutDashboard },
             { title: t('employees'), url: '/console/employees', icon: Users },
             {
+                title: t('performance'),
+                icon: BarChart3,
+                children: [
+                    { title: t('kpi'), url: '/console/performance/kpi', icon: BarChart3 },
+                    { title: t('attendance'), url: '/console/performance/attendances', icon: CalendarDays },
+                ],
+            },
+            {
                 title: t('evaluations'),
                 icon: ListTodo,
                 children: [
@@ -67,11 +77,16 @@ export const AppSidebar = () => {
                 ],
             },
             {
+                title: t('attendances'),
+                icon: CalendarClock,
+                children: [{ title: t('history'), url: '/console/attendances/histories', icon: FileClock }],
+            },
+            {
                 title: t('performance'),
                 icon: BarChart3,
                 children: [
                     { title: t('kpi'), url: '/console/performance/kpi', icon: BarChart3 },
-                    { title: t('attendance'), url: '/console/performance/attendance', icon: CalendarDays },
+                    { title: t('attendance'), url: '/console/performance/attendances', icon: CalendarDays },
                 ],
             },
             {

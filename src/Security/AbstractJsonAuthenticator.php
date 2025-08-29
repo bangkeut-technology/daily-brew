@@ -66,7 +66,7 @@ abstract class AbstractJsonAuthenticator extends AbstractAuthenticator
     public function authenticate(Request $request): Passport
     {
         $credentials = $this->getCredentials($request);
-
+        dump($credentials);
         $badges = [];
         if ($credentials['remember_me']) {
             $badges[] = new RememberMeBadge();
