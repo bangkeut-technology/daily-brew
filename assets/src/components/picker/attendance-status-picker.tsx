@@ -1,56 +1,53 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AttendanceStatus, AttendanceStatusEnum } from '@/types/attendance';
 import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
 
 interface AttendanceStatusPickerProps {
     label?: string;
     value?: AttendanceStatus;
     onChange?: (value: AttendanceStatus | undefined) => void;
+    includeAllOption?: boolean;
+    allLabel?: string;
+    placeholder?: string;
 }
 
-export const AttendanceStatusPicker: React.FC<AttendanceStatusPickerProps> = ({ label, value, onChange }) => {
+export const AttendanceStatusPicker: React.FC<AttendanceStatusPickerProps> = ({
+    label,
+    value,
+    onChange,
+    includeAllOption = true,
+    allLabel,
+    placeholder,
+}) => {
     const { t } = useTranslation();
+    const selectId = useId();
+
+    const statusOptions = Object.values(AttendanceStatusEnum);
 
     return (
         <div className="space-y-2">
-            {label && <Label className="text-xs text-muted-foreground">{label}</Label>}
+            {label && (
+                <Label htmlFor={selectId} className="text-xs text-muted-foreground">
+                    {label}
+                </Label>
+            )}
             <Select
-                value={value || '_null'}
-                onValueChange={(value) => {
-                    onChange?.(value === '_null' ? undefined : (value as AttendanceStatus));
-                }}
+                value={value ?? '_null'}
+                onValueChange={(v) => onChange?.(v === '_null' ? undefined : (v as AttendanceStatus))}
             >
-                <SelectTrigger>
-                    <SelectValue placeholder={t('all')} />
+                <SelectTrigger id={selectId} className={cn(!value && 'text-muted-foreground')}>
+                    <SelectValue placeholder={placeholder ?? t('all')} />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="_null">{t('all')}</SelectItem>
-                    <SelectItem value={AttendanceStatusEnum.absent}>
-                        {t(`attendances.status.${AttendanceStatusEnum.absent}`, { ns: 'glossary' })}
-                    </SelectItem>
-                    <SelectItem value={AttendanceStatusEnum.present}>
-                        {t(`attendances.status.${AttendanceStatusEnum.present}`, { ns: 'glossary' })}
-                    </SelectItem>
-                    <SelectItem value={AttendanceStatusEnum.late}>
-                        {t(`attendances.status.${AttendanceStatusEnum.late}`, { ns: 'glossary' })}
-                    </SelectItem>
-                    <SelectItem value={AttendanceStatusEnum.leave}>
-                        {t(`attendances.status.${AttendanceStatusEnum.leave}`, { ns: 'glossary' })}
-                    </SelectItem>
-                    <SelectItem value={AttendanceStatusEnum.sick}>
-                        {t(`attendances.status.${AttendanceStatusEnum.sick}`, { ns: 'glossary' })}
-                    </SelectItem>
-                    <SelectItem value={AttendanceStatusEnum.remote}>
-                        {t(`attendances.status.${AttendanceStatusEnum.remote}`, { ns: 'glossary' })}
-                    </SelectItem>
-                    <SelectItem value={AttendanceStatusEnum.holiday}>
-                        {t(`attendances.status.${AttendanceStatusEnum.holiday}`, { ns: 'glossary' })}
-                    </SelectItem>
-                    <SelectItem value={AttendanceStatusEnum.unknown}>
-                        {t(`attendances.status.${AttendanceStatusEnum.unknown}`, { ns: 'glossary' })}
-                    </SelectItem>
+                    {includeAllOption && <SelectItem value="_null">{allLabel ?? t('all')}</SelectItem>}
+                    {statusOptions.map((status) => (
+                        <SelectItem key={status} value={status}>
+                            {t(`attendances.status.${status}`, { ns: 'glossary' })}
+                        </SelectItem>
+                    ))}
                 </SelectContent>
             </Select>
         </div>

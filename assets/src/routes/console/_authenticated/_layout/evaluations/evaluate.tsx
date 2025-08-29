@@ -17,11 +17,11 @@ export const Route = createFileRoute('/console/_authenticated/_layout/evaluation
 function NewEvaluation() {
     const { t } = useTranslation();
     const [evaluatedAt, setEvaluatedAt] = React.useState<Date | undefined>(new Date());
-    const [employeeId, setEmployeeId] = React.useState<string>('');
+    const [employeeId, setEmployeeId] = React.useState<string | undefined>('');
     const dateISO = format(evaluatedAt || new Date(), 'yyyy-MM-dd');
     const { data: employee } = useQuery({
         queryKey: ['employee', dateISO, employeeId],
-        queryFn: () => fetchEmployee({ publicId: employeeId, from: dateISO, to: dateISO }),
+        queryFn: () => fetchEmployee({ publicId: employeeId ? employeeId : '', from: dateISO, to: dateISO }),
         enabled: !!employeeId,
     });
 

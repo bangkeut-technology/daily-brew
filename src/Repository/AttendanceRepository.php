@@ -68,7 +68,6 @@ class AttendanceRepository extends AbstractRepository
             ->addSelect('user')
             ->innerJoin('attendance.employee', 'employee')
             ->innerJoin('attendance.user', 'user')
-            ->innerJoin('attendance.recorder', 'recorder')
             ->where('attendance.attendanceDate >= :from OR :from IS NULL')
             ->andWhere('attendance.attendanceDate <= :to OR :to IS NULL')
             ->andWhere('attendance.status = :status OR :status IS NULL')

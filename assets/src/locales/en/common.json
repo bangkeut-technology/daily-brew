@@ -112,6 +112,7 @@
     "recorded_by": "Recorded By",
     "clear": "Clear",
     "attendances": "Attendances",
+    "new": "New",
     "export": {
         "csv": "Export CSV",
         "pdf": "Export PDF",

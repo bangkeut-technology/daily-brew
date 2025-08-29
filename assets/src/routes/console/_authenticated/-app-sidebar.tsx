@@ -22,6 +22,7 @@ import {
     ChevronRight,
     ChevronUp,
     ClipboardList,
+    ClockPlus,
     CreditCard,
     FileClock,
     Gauge,
@@ -79,14 +80,9 @@ export const AppSidebar = () => {
             {
                 title: t('attendances'),
                 icon: CalendarClock,
-                children: [{ title: t('history'), url: '/console/attendances/histories', icon: FileClock }],
-            },
-            {
-                title: t('performance'),
-                icon: BarChart3,
                 children: [
-                    { title: t('kpi'), url: '/console/performance/kpi', icon: BarChart3 },
-                    { title: t('attendance'), url: '/console/performance/attendances', icon: CalendarDays },
+                    { title: t('new'), url: '/console/attendances/new', icon: ClockPlus },
+                    { title: t('history'), url: '/console/attendances/histories', icon: FileClock },
                 ],
             },
             {
