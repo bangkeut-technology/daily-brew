@@ -200,24 +200,6 @@ function SignInComponent() {
                     </div>
                 </div>
             </main>
-
-            {/* Subtle bottom band */}
-            <div className="mt-6 border-t">
-                <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-6 text-xs text-muted-foreground flex items-center justify-between">
-                    <span>© {new Date().getFullYear()} DailyBrew. All rights reserved.</span>
-                    <div className="hidden sm:flex items-center gap-4">
-                        <Link to="/privacy" className="hover:underline underline-offset-2">
-                            Privacy
-                        </Link>
-                        <Link to="/terms" className="hover:underline underline-offset-2">
-                            Terms
-                        </Link>
-                        <Link to="/status" className="hover:underline underline-offset-2">
-                            Status
-                        </Link>
-                    </div>
-                </div>
-            </div>
         </div>
     );
 }

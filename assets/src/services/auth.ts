@@ -6,7 +6,7 @@ export const signIn = async (signIn: SignIn & { remember_me: boolean }) => {
 };
 
 export const signUp = async (signUp: SignUp) => {
-    const { password, confirmPassword, ...rest } = signUp;
+    const { password, confirmPassword, acceptedTerms, ...rest } = signUp;
     return axios
         .post<{ message: string; user: User }>('/sign-up', { ...rest, plainPassword: password })
         .then((response) => response.data);

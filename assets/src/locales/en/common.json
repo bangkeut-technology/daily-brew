@@ -107,6 +107,10 @@
     "faq": "FAQ",
     "get_started": "Get Started",
     "start": "Start",
+    "clock_in": "Clock In",
+    "clock_out": "Clock Out",
+    "recorded_by": "Recorded By",
+    "clear": "Clear",
     "export": {
         "csv": "Export CSV",
         "pdf": "Export PDF",

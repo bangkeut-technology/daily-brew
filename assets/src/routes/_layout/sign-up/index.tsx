@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { createFileRoute, Link, redirect, useNavigate } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
-import { ArrowLeft, ArrowRight, Lock, Mail, User } from 'lucide-react';
+import { ArrowRight, Lock, Mail, User } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -71,9 +71,12 @@ function SignUpPage() {
         }
     }, [navigate, redirect, user]);
 
-    const onSubmit = (data: SignUp) => {
-        mutate(data);
-    };
+    const onSubmit = React.useCallback(
+        (data: SignUp) => {
+            mutate(data);
+        },
+        [mutate],
+    );
 
     return (
         <div className="relative min-h-dvh bg-gradient-to-b from-background via-background to-muted/30">
@@ -82,13 +85,6 @@ function SignUpPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-center">
                     {/* Copy */}
                     <div className="order-2 md:order-1">
-                        <Link
-                            to="/sign-in"
-                            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
-                        >
-                            <ArrowLeft className="h-4 w-4 mr-1" />
-                            Back to sign in
-                        </Link>
                         <h1 className="mt-3 text-3xl sm:text-4xl font-bold leading-tight">Create your account</h1>
                         <p className="mt-3 text-muted-foreground max-w-prose">
                             Start with the free plan—add employees, track attendance, and evaluate KPIs. Upgrade later
@@ -210,14 +206,14 @@ function SignUpPage() {
                                 <Separator />
 
                                 {/* Optional SSO placeholders */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    <Button variant="outline" className="w-full">
-                                        Continue with Google
-                                    </Button>
-                                    <Button variant="outline" className="w-full">
-                                        Continue with Apple
-                                    </Button>
-                                </div>
+                                {/*<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">*/}
+                                {/*    <Button variant="outline" className="w-full">*/}
+                                {/*        Continue with Google*/}
+                                {/*    </Button>*/}
+                                {/*    <Button variant="outline" className="w-full">*/}
+                                {/*        Continue with Apple*/}
+                                {/*    </Button>*/}
+                                {/*</div>*/}
 
                                 <p className="text-xs text-muted-foreground text-center">
                                     Already have an account?{' '}

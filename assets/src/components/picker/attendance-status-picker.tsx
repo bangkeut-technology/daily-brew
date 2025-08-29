@@ -1,13 +1,13 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AttendanceStatusEnum } from '@/types/attendance';
+import { AttendanceStatus, AttendanceStatusEnum } from '@/types/attendance';
 import { useTranslation } from 'react-i18next';
 
 interface AttendanceStatusPickerProps {
     label?: string;
-    value?: AttendanceStatusEnum;
-    onChange?: (value: AttendanceStatusEnum) => void;
+    value?: AttendanceStatus;
+    onChange?: (value: AttendanceStatus) => void;
 }
 
 export const AttendanceStatusPicker: React.FC<AttendanceStatusPickerProps> = ({ label, value, onChange }) => {

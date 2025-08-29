@@ -9942,16 +9942,16 @@
         },
         {
             "name": "zircote/swagger-php",
-            "version": "5.3.1",
+            "version": "5.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zircote/swagger-php.git",
-                "reference": "e174ef759a934c337209dc41c7490919c2362df8"
+                "reference": "d8fa9dc4c3b2fc8651ae780021bb9719b1e63d40"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/e174ef759a934c337209dc41c7490919c2362df8",
-                "reference": "e174ef759a934c337209dc41c7490919c2362df8",
+                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/d8fa9dc4c3b2fc8651ae780021bb9719b1e63d40",
+                "reference": "d8fa9dc4c3b2fc8651ae780021bb9719b1e63d40",
                 "shasum": ""
             },
             "require": {
@@ -10022,9 +10022,9 @@
             ],
             "support": {
                 "issues": "https://github.com/zircote/swagger-php/issues",
-                "source": "https://github.com/zircote/swagger-php/tree/5.3.1"
+                "source": "https://github.com/zircote/swagger-php/tree/5.3.2"
             },
-            "time": "2025-08-16T22:59:55+00:00"
+            "time": "2025-08-25T21:57:16+00:00"
         }
     ],
     "packages-dev": [
@@ -10340,16 +10340,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "12.3.2",
+            "version": "12.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "086553c5b2e0e1e20293d782d788ab768202b621"
+                "reference": "733025d94635a001f67db71a2ed1bab4e7e4a9dc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/086553c5b2e0e1e20293d782d788ab768202b621",
-                "reference": "086553c5b2e0e1e20293d782d788ab768202b621",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/733025d94635a001f67db71a2ed1bab4e7e4a9dc",
+                "reference": "733025d94635a001f67db71a2ed1bab4e7e4a9dc",
                 "shasum": ""
             },
             "require": {
@@ -10405,7 +10405,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-code-coverage/issues",
                 "security": "https://github.com/sebastianbergmann/php-code-coverage/security/policy",
-                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/12.3.2"
+                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/12.3.3"
             },
             "funding": [
                 {
@@ -10425,7 +10425,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-07-29T06:19:24+00:00"
+            "time": "2025-08-27T14:43:48+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -10674,16 +10674,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "12.3.6",
+            "version": "12.3.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "a2cab3224f687150ac2f3cc13d99b64ba1e1d088"
+                "reference": "b8fa997c49682979ad6bfaa0d7fb25f54954965e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/a2cab3224f687150ac2f3cc13d99b64ba1e1d088",
-                "reference": "a2cab3224f687150ac2f3cc13d99b64ba1e1d088",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/b8fa997c49682979ad6bfaa0d7fb25f54954965e",
+                "reference": "b8fa997c49682979ad6bfaa0d7fb25f54954965e",
                 "shasum": ""
             },
             "require": {
@@ -10697,7 +10697,7 @@
                 "phar-io/manifest": "^2.0.4",
                 "phar-io/version": "^3.2.1",
                 "php": ">=8.3",
-                "phpunit/php-code-coverage": "^12.3.2",
+                "phpunit/php-code-coverage": "^12.3.3",
                 "phpunit/php-file-iterator": "^6.0.0",
                 "phpunit/php-invoker": "^6.0.0",
                 "phpunit/php-text-template": "^5.0.0",
@@ -10751,7 +10751,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.3.6"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.3.7"
             },
             "funding": [
                 {
@@ -10775,7 +10775,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-08-20T14:43:23+00:00"
+            "time": "2025-08-28T05:15:46+00:00"
         },
         {
             "name": "roave/security-advisories",
@@ -10783,12 +10783,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "f9827bdb1caa9af2bde8def6899734610e7bddf9"
+                "reference": "1e6dd833087765a9aa80c5c0a6444f4521a63a79"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/f9827bdb1caa9af2bde8def6899734610e7bddf9",
-                "reference": "f9827bdb1caa9af2bde8def6899734610e7bddf9",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/1e6dd833087765a9aa80c5c0a6444f4521a63a79",
+                "reference": "1e6dd833087765a9aa80c5c0a6444f4521a63a79",
                 "shasum": ""
             },
             "conflict": {
@@ -10806,7 +10806,7 @@
                 "airesvsg/acf-to-rest-api": "<=3.1",
                 "akaunting/akaunting": "<2.1.13",
                 "akeneo/pim-community-dev": "<5.0.119|>=6,<6.0.53",
-                "alextselegidis/easyappointments": "<=1.5.1",
+                "alextselegidis/easyappointments": "<1.5.2.0-beta1",
                 "alterphp/easyadmin-extension-bundle": ">=1.2,<1.2.11|>=1.3,<1.3.1",
                 "amazing/media2click": ">=1,<1.3.3",
                 "ameos/ameos_tarteaucitron": "<1.2.23",
@@ -10844,7 +10844,7 @@
                 "backpack/crud": "<3.4.9",
                 "backpack/filemanager": "<2.0.2|>=3,<3.0.9",
                 "bacula-web/bacula-web": "<9.7.1",
-                "badaso/core": "<2.7",
+                "badaso/core": "<=2.9.11",
                 "bagisto/bagisto": "<2.1",
                 "barrelstrength/sprout-base-email": "<1.2.7",
                 "barrelstrength/sprout-forms": "<3.9",
@@ -10909,15 +10909,15 @@
                 "concrete5/core": "<8.5.8|>=9,<9.1",
                 "contao-components/mediaelement": ">=2.14.2,<2.21.1",
                 "contao/comments-bundle": ">=2,<4.13.40|>=5.0.0.0-RC1-dev,<5.3.4",
-                "contao/contao": ">=3,<3.5.37|>=4,<4.4.56|>=4.5,<4.9.40|>=4.10,<4.11.7|>=4.13,<4.13.21|>=5.1,<5.1.4",
+                "contao/contao": ">=3,<3.5.37|>=4,<4.4.56|>=4.5,<4.13.56|>=5,<5.3.38|>=5.4.0.0-RC1-dev,<5.6.1",
                 "contao/core": "<3.5.39",
-                "contao/core-bundle": "<4.13.54|>=5,<5.3.30|>=5.4,<5.5.6",
+                "contao/core-bundle": "<4.13.56|>=5,<5.3.38|>=5.4,<5.6.1",
                 "contao/listing-bundle": ">=3,<=3.5.30|>=4,<4.4.8",
                 "contao/managed-edition": "<=1.5",
                 "corveda/phpsandbox": "<1.3.5",
                 "cosenary/instagram": "<=2.3",
                 "couleurcitron/tarteaucitron-wp": "<0.3",
-                "craftcms/cms": "<4.16.3|>=5,<5.8.4",
+                "craftcms/cms": "<=4.16.5|>=5,<=5.8.6",
                 "croogo/croogo": "<4",
                 "cuyz/valinor": "<0.12",
                 "czim/file-handling": "<1.5|>=2,<2.3",
@@ -11073,7 +11073,7 @@
                 "globalpayments/php-sdk": "<2",
                 "goalgorilla/open_social": "<12.3.11|>=12.4,<12.4.10|>=13.0.0.0-alpha1,<13.0.0.0-alpha11",
                 "gogentooss/samlbase": "<1.2.7",
-                "google/protobuf": "<3.15",
+                "google/protobuf": "<3.4",
                 "gos/web-socket-bundle": "<1.10.4|>=2,<2.6.1|>=3,<3.3",
                 "gree/jose": "<2.2.1",
                 "gregwar/rst": "<1.0.3",
@@ -11337,7 +11337,7 @@
                 "phpoffice/common": "<0.2.9",
                 "phpoffice/math": "<=0.2",
                 "phpoffice/phpexcel": "<=1.8.2",
-                "phpoffice/phpspreadsheet": "<1.29.9|>=2,<2.1.8|>=2.2,<2.3.7|>=3,<3.9",
+                "phpoffice/phpspreadsheet": "<1.30|>=2,<2.1.12|>=2.2,<2.4|>=3,<3.10|>=4,<5",
                 "phpseclib/phpseclib": "<2.0.47|>=3,<3.0.36",
                 "phpservermon/phpservermon": "<3.6",
                 "phpsysinfo/phpsysinfo": "<3.4.3",
@@ -11464,6 +11464,7 @@
                 "snipe/snipe-it": "<8.1",
                 "socalnick/scn-social-auth": "<1.15.2",
                 "socialiteproviders/steam": "<1.1",
+                "solspace/craft-freeform": ">=5,<5.10.16",
                 "soosyze/soosyze": "<=2",
                 "spatie/browsershot": "<5.0.5",
                 "spatie/image-optimizer": "<1.7.3",
@@ -11611,7 +11612,7 @@
                 "vertexvaar/falsftp": "<0.2.6",
                 "villagedefrance/opencart-overclocked": "<=1.11.1",
                 "vova07/yii2-fileapi-widget": "<0.1.9",
-                "vrana/adminer": "<4.8.1",
+                "vrana/adminer": "<=4.8.1",
                 "vufind/vufind": ">=2,<9.1.1",
                 "waldhacker/hcaptcha": "<2.1.2",
                 "wallabag/tcpdf": "<6.2.22",
@@ -11739,7 +11740,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-08-22T17:05:03+00:00"
+            "time": "2025-08-28T15:05:43+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -12171,16 +12172,16 @@
         },
         {
             "name": "sebastian/global-state",
-            "version": "8.0.0",
+            "version": "8.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/global-state.git",
-                "reference": "570a2aeb26d40f057af686d63c4e99b075fb6cbc"
+                "reference": "912dd568677a6e13c67c08321710ad6ac81e6dca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/global-state/zipball/570a2aeb26d40f057af686d63c4e99b075fb6cbc",
-                "reference": "570a2aeb26d40f057af686d63c4e99b075fb6cbc",
+                "url": "https://api.github.com/repos/sebastianbergmann/global-state/zipball/912dd568677a6e13c67c08321710ad6ac81e6dca",
+                "reference": "912dd568677a6e13c67c08321710ad6ac81e6dca",
                 "shasum": ""
             },
             "require": {
@@ -12221,15 +12222,27 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/global-state/issues",
                 "security": "https://github.com/sebastianbergmann/global-state/security/policy",
-                "source": "https://github.com/sebastianbergmann/global-state/tree/8.0.0"
+                "source": "https://github.com/sebastianbergmann/global-state/tree/8.0.1"
             },
             "funding": [
                 {
                     "url": "https://github.com/sebastianbergmann",
                     "type": "github"
+                },
+                {
+                    "url": "https://liberapay.com/sebastianbergmann",
+                    "type": "liberapay"
+                },
+                {
+                    "url": "https://thanks.dev/u/gh/sebastianbergmann",
+                    "type": "thanks_dev"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/sebastian/global-state",
+                    "type": "tidelift"
                 }
             ],
-            "time": "2025-02-07T04:56:59+00:00"
+            "time": "2025-08-28T09:13:48+00:00"
         },
         {
             "name": "sebastian/lines-of-code",

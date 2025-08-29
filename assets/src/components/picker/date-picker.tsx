@@ -15,6 +15,7 @@ type OnChangeHandler = (date: Date | undefined) => void;
 interface DatePickerProps {
     label?: string;
     disabled?: boolean;
+    nullable?: boolean;
     description?: string;
     displayFormat?: string;
     className?: string;
@@ -25,6 +26,7 @@ interface DatePickerProps {
 
 export const DatePicker: React.FC<DatePickerProps> = ({
     label,
+    nullable,
     disabled,
     description,
     className,
@@ -67,6 +69,17 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                         captionLayout="dropdown"
                         disabled={disabledDate}
                     />
+                    {value && nullable && (
+                        <div className="pt-2 flex justify-end">
+                            <Button
+                                type="button"
+                                onClick={() => onChange?.(undefined)}
+                                className="text-xs text-red-500 hover:underline"
+                            >
+                                {t('clear')}
+                            </Button>
+                        </div>
+                    )}
                 </PopoverContent>
             </Popover>
             {description && (
