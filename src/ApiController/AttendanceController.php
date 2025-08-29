@@ -103,7 +103,7 @@ class AttendanceController extends AbstractController
             'to' => $to,
             'employee' => $employee,
             'status' => $status,
-            'user' => $user,
+            'user' => $user ?: $this->getUser()->getPublicId(),
         ];
 
         $attendances = $this->attendanceRepository->findByCriteria($criteria);
