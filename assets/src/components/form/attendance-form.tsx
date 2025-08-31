@@ -11,10 +11,9 @@ import { EmployeeSelect } from '@/components/select/employee-select';
 interface AttendanceFormProps {
     form: UseFormReturn<PartialAttendance>;
     isPending?: boolean;
-    withEmployee?: boolean;
 }
 
-export const AttendanceForm: React.FunctionComponent<AttendanceFormProps> = ({ form, withEmployee, isPending }) => {
+export const AttendanceForm: React.FunctionComponent<AttendanceFormProps> = ({ form, isPending }) => {
     const { t } = useTranslation();
 
     const options = React.useMemo(() => {
@@ -27,7 +26,7 @@ export const AttendanceForm: React.FunctionComponent<AttendanceFormProps> = ({ f
     return (
         <Form {...form}>
             <div className="flex flex-col space-y-4">
-                {withEmployee && <EmployeeSelect name="employee" control={form.control} valueProp="id" />}
+                <EmployeeSelect label={t('employee')} name="employee" control={form.control} valueProp="id" />
                 <DatePickerControl
                     control={form.control}
                     name="attendanceDate"
@@ -47,3 +46,5 @@ export const AttendanceForm: React.FunctionComponent<AttendanceFormProps> = ({ f
         </Form>
     );
 };
+
+AttendanceForm.displayName = 'AttendanceForm';

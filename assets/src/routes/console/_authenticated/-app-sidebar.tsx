@@ -190,3 +190,5 @@ export const AppSidebar = () => {
         </Sidebar>
     );
 };
+
+AppSidebar.displayName = 'AppSidebar';

@@ -45,6 +45,7 @@ export const EmployeeSelect: React.FunctionComponent<EmployeeSelectProps> = ({
                 label={label}
                 description={description}
                 placeholder={placeholder}
+                className="w-full"
             />
         </div>
     );
