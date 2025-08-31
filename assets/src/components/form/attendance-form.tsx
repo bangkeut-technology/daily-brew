@@ -6,7 +6,7 @@ import { DatePickerControl } from '@/components/picker/date-picker-control';
 import { useTranslation } from 'react-i18next';
 import { SelectField } from '@/components/field/select-field';
 import { TextAreaField } from '@/components/field/textarea-field';
-import { EmployeePicker } from '@/components/picker/employee-picker';
+import { EmployeeSelect } from '@/components/select/employee-select';
 
 interface AttendanceFormProps {
     form: UseFormReturn<PartialAttendance>;
@@ -27,7 +27,7 @@ export const AttendanceForm: React.FunctionComponent<AttendanceFormProps> = ({ f
     return (
         <Form {...form}>
             <div className="flex flex-col space-y-4">
-                {withEmployee && <EmployeePicker />}
+                {withEmployee && <EmployeeSelect name="employee" control={form.control} valueProp="id" />}
                 <DatePickerControl
                     control={form.control}
                     name="attendanceDate"

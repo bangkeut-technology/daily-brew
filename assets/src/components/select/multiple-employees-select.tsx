@@ -12,15 +12,17 @@ import { useTranslation } from 'react-i18next';
 const columnHelper = createColumnHelper<Employee>();
 const queryKey = ['employees'];
 
-interface EmployeesSelectProps {
+interface MultipleEmployeesSelectProps {
     control: Control<any>;
+    valueProp?: keyof Employee;
     name: string;
     title?: string;
     description?: string;
 }
 
-export const EmployeesSelect: React.FunctionComponent<EmployeesSelectProps> = ({
+export const MultipleEmployeesSelect: React.FunctionComponent<MultipleEmployeesSelectProps> = ({
     control,
+    valueProp = 'publicId',
     name,
     title,
     description,
@@ -43,7 +45,7 @@ export const EmployeesSelect: React.FunctionComponent<EmployeesSelectProps> = ({
 
     const columns = React.useMemo(
         () => [
-            columnHelper.accessor('publicId', {
+            columnHelper.accessor(valueProp, {
                 id: 'select',
                 header: ({ table }) => (
                     <Checkbox
@@ -79,7 +81,7 @@ export const EmployeesSelect: React.FunctionComponent<EmployeesSelectProps> = ({
                 },
             }),
         ],
-        [t],
+        [t, valueProp],
     );
 
     return (
@@ -91,4 +93,4 @@ export const EmployeesSelect: React.FunctionComponent<EmployeesSelectProps> = ({
     );
 };
 
-EmployeesSelect.displayName = 'EmployeesSelect';
+MultipleEmployeesSelect.displayName = 'MultipleEmployeesSelect';
