@@ -20,7 +20,7 @@ import { AttendanceForm } from '@/components/form/attendance-form';
 import { useMutation } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
-import { postAttendance } from '@/services/employee';
+import { postAttendance } from '@/services/attendance';
 import { ClockPlus, Loader2Icon, Save } from 'lucide-react';
 
 const defaultValues: PartialAttendance = {
@@ -35,7 +35,7 @@ const defaultValues: PartialAttendance = {
 interface NewAttendanceDialogProps {
     attendance?: Attendance;
     attendanceDate?: Date;
-    employee: Employee;
+    employee?: Employee;
     button?: React.ReactNode;
 }
 
@@ -48,7 +48,11 @@ export const NewAttendanceDialog: React.FunctionComponent<NewAttendanceDialogPro
     const [open, setOpen] = useBoolean(false);
     const form = useForm<PartialAttendance>({
         resolver: yupResolver(attendanceSchema),
-        defaultValues: { ...defaultValues, attendanceDate },
+        defaultValues: {
+            ...defaultValues,
+            attendanceDate,
+            employee: employee?.id ? employee.id.toString() : '_null',
+        },
     });
     const { mutate, isPending } = useMutation({
         mutationFn: postAttendance,
@@ -65,9 +69,9 @@ export const NewAttendanceDialog: React.FunctionComponent<NewAttendanceDialogPro
 
     const onSubmit = React.useCallback(
         (data: PartialAttendance) => {
-            mutate({ publicId: employee.publicId, data });
+            mutate(data);
         },
-        [employee.publicId, mutate],
+        [mutate],
     );
 
     return (

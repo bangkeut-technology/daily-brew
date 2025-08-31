@@ -27,6 +27,7 @@ import { ScoreValue } from '@/components/kpi/kpi-gantt';
 import { AttendanceStatus, AttendanceStatusEnum } from '@/types/attendance';
 import { MetricCard } from '@/components/card/metric-card';
 import { useTranslation } from 'react-i18next';
+import { NewAttendanceDialog } from '@/components/dialog/new-attendance-dialog';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/')({
     component: Dashboard,
@@ -148,6 +149,7 @@ function Dashboard() {
                         Open attendance
                     </Link>
                 </Button>
+                <NewAttendanceDialog />
                 <Badge className="ml-auto" variant="outline">
                     <Crown className="h-3 w-3 mr-1" />
                     Pro • Coming soon

@@ -8,7 +8,7 @@ import { AttendanceDataTable } from '@/routes/console/_authenticated/_layout/att
 import { AttendanceSearchForm } from '@/routes/console/_authenticated/_layout/attendances/-components/attendance-search-form';
 import { AttendanceSearchParams } from '@/services/attendance';
 
-export const Route = createFileRoute('/console/_authenticated/_layout/attendances/histories/')({
+export const Route = createFileRoute('/console/_authenticated/_layout/attendances/')({
     component: AttendanceListPage,
     validateSearch: z.object({
         from: z.string().optional(),
