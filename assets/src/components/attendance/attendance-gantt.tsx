@@ -3,6 +3,7 @@ import { addDays, endOfMonth, format, isWeekend, startOfMonth } from 'date-fns';
 import { AttendanceStatus } from '@/types/attendance';
 import { Employee } from '@/types/employee';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 type StatusColor = { bg: string; text: string; short: string; title: string };
 
@@ -40,6 +41,7 @@ export const AttendanceGantt: React.FC<AttendanceGanttProps> = ({
     className,
     leftColWidth = 160,
 }) => {
+    const { t } = useTranslation();
     const start = React.useMemo(() => rangeStart ?? startOfMonth(month), [rangeStart, month]);
     const end = React.useMemo(() => rangeEnd ?? endOfMonth(month), [rangeEnd, month]);
 
@@ -63,7 +65,9 @@ export const AttendanceGantt: React.FC<AttendanceGanttProps> = ({
 
     return (
         <div className={cn('bg-muted/30 rounded-lg', className)}>
-            <div className="p-4 text-xs text-muted-foreground">Attendance · {format(start, 'LLLL yyyy')}</div>
+            <div className="p-4 text-xs text-muted-foreground">
+                {t('attendance')} · {format(start, 'LLLL yyyy')}
+            </div>
 
             <div className="overflow-x-auto">
                 <div className="min-w-[720px] divide-y">
@@ -72,7 +76,7 @@ export const AttendanceGantt: React.FC<AttendanceGanttProps> = ({
                         className="grid sticky top-0 z-10 bg-card"
                         style={{ gridTemplateColumns: `${leftColWidth}px repeat(${days.length}, minmax(28px, 1fr))` }}
                     >
-                        <div className="px-3 py-2 border-r font-medium text-xs">Employee</div>
+                        <div className="px-3 py-2 border-r font-medium text-xs">{t('employee')}</div>
                         {days.map((d, idx) => {
                             const isWknd = isWeekend(d);
                             return (
@@ -100,18 +104,18 @@ export const AttendanceGantt: React.FC<AttendanceGanttProps> = ({
                     </div>
 
                     {/* Rows */}
-                    {employees.map((emp) => (
+                    {employees.map((employee) => (
                         <div
-                            key={emp.id}
+                            key={employee.id}
                             className="grid"
                             style={{
                                 gridTemplateColumns: `${leftColWidth}px repeat(${days.length}, minmax(28px, 1fr))`,
                             }}
                         >
-                            <div className="px-3 py-2 border-r bg-card sticky left-0 z-10">{emp.fullName}</div>
+                            <div className="px-3 py-2 border-r bg-card sticky left-0 z-10">{employee.fullName}</div>
                             {days.map((d, i) => {
                                 const dateISO = format(d, 'yyyy-MM-dd');
-                                const status = getStatus(emp.publicId, dateISO);
+                                const status = getStatus(employee.publicId, dateISO);
                                 const isWknd = isWeekend(d);
 
                                 const chip =
@@ -131,18 +135,18 @@ export const AttendanceGantt: React.FC<AttendanceGanttProps> = ({
 
                                 return (
                                     <div
-                                        key={`${emp.id}_${i}`}
+                                        key={`${employee.id}_${i}`}
                                         role="button"
                                         tabIndex={0}
-                                        onClick={() => onCellClick?.({ employee: emp, dateISO, status })}
-                                        onKeyDown={(e) => handleKeyDown(e, emp, dateISO, status)}
+                                        onClick={() => onCellClick?.({ employee, dateISO, status })}
+                                        onKeyDown={(e) => handleKeyDown(e, employee, dateISO, status)}
                                         className={cn(
                                             'h-8 border-r grid place-items-center text-[10px] cursor-pointer transition-colors',
                                             'hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                                             isWknd ? 'bg-muted/60' : 'bg-background',
                                         )}
                                         title={status ? STATUS_UI[status].title : 'No record'}
-                                        aria-label={`Cell ${emp.fullName} ${dateISO} ${status ?? 'empty'}`}
+                                        aria-label={`Cell ${employee.fullName} ${dateISO} ${status ?? 'empty'}`}
                                     >
                                         {chip}
                                     </div>
