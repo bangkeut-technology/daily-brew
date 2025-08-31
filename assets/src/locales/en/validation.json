@@ -1,6 +1,7 @@
 {
     "required": {
         "attendances": {
+            "employee": "The employee is required.",
             "date": "The attendance date is required.",
             "status": "The attendance status is required."
         },

@@ -24,6 +24,7 @@ import { postAttendance } from '@/services/employee';
 import { ClockPlus, Loader2Icon, Save } from 'lucide-react';
 
 const defaultValues: PartialAttendance = {
+    employee: undefined,
     attendanceDate: new Date(),
     status: AttendanceStatusEnum.present,
     note: '',

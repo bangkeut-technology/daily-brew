@@ -4,9 +4,11 @@ import { fetchEmployees } from '@/services/employee';
 import { useTranslation } from 'react-i18next';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Employee } from '@/types/employee';
 
 interface EmployeePickerProps {
     className?: string;
+    valueProperty?: keyof Employee;
     label?: string;
     date?: Date;
     nullable?: boolean;
@@ -17,6 +19,7 @@ interface EmployeePickerProps {
 export const EmployeePicker: React.FunctionComponent<EmployeePickerProps> = ({
     className,
     label,
+    valueProperty = 'publicId',
     nullable,
     value,
     onChange,
@@ -44,7 +47,7 @@ export const EmployeePicker: React.FunctionComponent<EmployeePickerProps> = ({
                 <SelectContent>
                     {nullable && <SelectItem value="_null">{placeholder}</SelectItem>}
                     {data.map((e) => (
-                        <SelectItem key={e.publicId} value={e.publicId}>
+                        <SelectItem key={e.publicId} value={e[valueProperty]?.toString() || 'undefined'}>
                             {e.fullName}
                         </SelectItem>
                     ))}

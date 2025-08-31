@@ -6,13 +6,15 @@ import { DatePickerControl } from '@/components/picker/date-picker-control';
 import { useTranslation } from 'react-i18next';
 import { SelectField } from '@/components/field/select-field';
 import { TextAreaField } from '@/components/field/textarea-field';
+import { EmployeePicker } from '@/components/picker/employee-picker';
 
 interface AttendanceFormProps {
     form: UseFormReturn<PartialAttendance>;
     isPending?: boolean;
+    withEmployee?: boolean;
 }
 
-export const AttendanceForm: React.FunctionComponent<AttendanceFormProps> = ({ form, isPending }) => {
+export const AttendanceForm: React.FunctionComponent<AttendanceFormProps> = ({ form, withEmployee, isPending }) => {
     const { t } = useTranslation();
 
     const options = React.useMemo(() => {
@@ -25,6 +27,7 @@ export const AttendanceForm: React.FunctionComponent<AttendanceFormProps> = ({ f
     return (
         <Form {...form}>
             <div className="flex flex-col space-y-4">
+                {withEmployee && <EmployeePicker />}
                 <DatePickerControl
                     control={form.control}
                     name="attendanceDate"

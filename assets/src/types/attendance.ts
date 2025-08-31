@@ -17,6 +17,7 @@ export type PartialAttendance = Omit<
     Attendance,
     'id' | 'publicId' | 'employee' | 'user' | 'clockIn' | 'clockOut' | 'attendanceDate'
 > & {
+    employee?: string;
     attendanceDate: Date;
     clockIn?: Date;
     clockOut?: Date;

@@ -3,6 +3,7 @@ import { PartialAttendance } from '@/types/attendance';
 import i18next from '@/i18next';
 
 export const attendanceSchema: ObjectSchema<PartialAttendance> = object({
+    employee: string().required(i18next.t('validation:required.attendances.employee')),
     attendanceDate: date().required(i18next.t('validation:required.attendances.date')),
     note: string().optional(),
     status: string()

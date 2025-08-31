@@ -10,16 +10,21 @@ import { Control, useFieldArray } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 const columnHelper = createColumnHelper<Employee>();
-const queryKey = ['daily-brew-employees'];
+const queryKey = ['employees'];
 
-interface EmployeeSelectProps {
+interface EmployeesSelectProps {
     control: Control<any>;
     name: string;
     title?: string;
     description?: string;
 }
 
-export const EmployeeSelect: React.FunctionComponent<EmployeeSelectProps> = ({ control, name, title, description }) => {
+export const EmployeesSelect: React.FunctionComponent<EmployeesSelectProps> = ({
+    control,
+    name,
+    title,
+    description,
+}) => {
     const [employees, setEmployees] = React.useState<RowSelectionState>({});
     const { t } = useTranslation();
     const { replace } = useFieldArray({
@@ -86,4 +91,4 @@ export const EmployeeSelect: React.FunctionComponent<EmployeeSelectProps> = ({ c
     );
 };
 
-EmployeeSelect.displayName = 'EmployeeSelect';
+EmployeesSelect.displayName = 'EmployeesSelect';

@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { Form } from '@/components/ui/form';
-import { EmployeeSelect } from '@/components/select/employee-select';
+import { EmployeesSelect } from '@/components/select/employees-select';
 import { Loader2Icon, Save } from 'lucide-react';
 import { evaluationTemplateEmployeesSchema } from '@/schema/evaluation-template-schema';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -75,7 +75,7 @@ export const AddEmployeeDialog: React.FunctionComponent<AddEmployeeDialogProps> 
                     <DialogDescription>
                         {t('evaluation_templates.edit.description', { ns: 'glossary' })}
                     </DialogDescription>
-                    <EmployeeSelect
+                    <EmployeesSelect
                         control={form.control}
                         name="employees"
                         title={t('employees.table.title', { ns: 'glossary' })}

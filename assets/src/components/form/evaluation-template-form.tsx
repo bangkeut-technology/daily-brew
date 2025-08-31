@@ -6,7 +6,7 @@ import { TextAreaField } from '@/components/field/textarea-field';
 import { useTranslation } from 'react-i18next';
 import { Form } from '@/components/ui/form';
 import { EvaluationCriteriaSelect } from '@/components/select/evaluation-criteria-select';
-import { EmployeeSelect } from '@/components/select/employee-select';
+import { EmployeesSelect } from '@/components/select/employees-select';
 
 interface EvaluationTemplateFormProps {
     form: UseFormReturn<PartialEvaluationTemplate>;
@@ -42,7 +42,7 @@ export const EvaluationTemplateForm = React.memo<EvaluationTemplateFormProps>(
                     />
                 )}
                 {withEmployees && (
-                    <EmployeeSelect
+                    <EmployeesSelect
                         control={form.control}
                         name="employees"
                         title={t('employees.table.title', { ns: 'glossary' })}
