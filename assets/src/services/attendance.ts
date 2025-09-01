@@ -1,15 +1,21 @@
 import { apiAxios } from '@/lib/apiAxios';
 import { Attendance, AttendanceStatus, PartialAttendance } from '@/types/attendance';
+import { Employee } from '@/types/employee';
 
 export type AttendanceSearchParams = {
     from: string | undefined;
     to: string | undefined;
-    employee: string | undefined;
-    status: AttendanceStatus | undefined;
+    employee?: string;
+    employees?: Employee[];
+    status?: AttendanceStatus;
 };
 
-export const fetchAttendances = async (params: AttendanceSearchParams) =>
-    apiAxios.get<Attendance[]>('/attendances', { params }).then((response) => response.data);
+export const fetchAttendances = async ({ employees, ...params }: AttendanceSearchParams) =>
+    apiAxios
+        .get<
+            Attendance[]
+        >('/attendances', { params: { ...params, employees: employees?.map((employee) => employee.publicId) } })
+        .then((response) => response.data);
 
 export const postAttendance = async (attendance: PartialAttendance) =>
     apiAxios

@@ -13,7 +13,8 @@ invalid:
     evaluation_criteria: 'Invalid evaluation criteria information.'
     evaluation_template: 'Invalid evaluation template information.'
     employee_evaluation: 'Invalid employee evaluation information.'
-    attendance:          'Invalid attendance information.'
+    attendance: 'Invalid attendance information.'
+    employees:  'Invalid employees information.'
 max_free_employees: 'You have reached the maximum number of %count% free employees allowed. Please upgrade your plan to add more employees.'
 existed:
     evaluation_template: 'Evaluation template ''%name%'' already exists.'

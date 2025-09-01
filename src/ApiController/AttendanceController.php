@@ -112,6 +112,80 @@ class AttendanceController extends AbstractController
     }
 
     /**
+     * Get attendances by period and user.
+     * @param Request $request
+     * @return JsonResponse
+     * @throws Exception
+     */
+    #[OA\Parameter(
+        name: 'from',
+        description: 'Start date of the period (YYYY-MM-DD)',
+        in: 'query',
+        required: true,
+        schema: new OA\Schema(type: 'string', format: 'date')
+    )]
+    #[OA\Parameter(
+        name: 'to',
+        description: 'End date of the period (YYYY-MM-DD)',
+        in: 'query',
+        required: true,
+        schema: new OA\Schema(type: 'string', format: 'date')
+    )]
+    #[OA\Parameter(
+        name: 'employees',
+        description: 'The employees to filter attendances by',
+        in: 'query',
+        required: true,
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns a list of attendances for the specified period and user.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Attendance::class, groups: ['attendance:read']))
+        )
+    )]
+    #[Route('/gantt', name: 'gantt', methods: ['GET'])]
+    public function gantt(Request $request): JsonResponse
+    {
+        $from = new DateTimeImmutable($request->query->get('from', DateHelper::startOfMonth()->format('Y-m-d')));
+        $to = new DateTimeImmutable($request->query->get('to', DateHelper::endOfMonth()->format('Y-m-d')));
+        $employees = $request->query->all('employees');
+
+        if (empty($employees)) {
+            return $this->createBadRequestResponse($this->translator->trans('invalid.employees', domain: 'errors'));
+        }
+
+        $attendances = $this->attendanceRepository->findForGantt([
+            'from' => $from,
+            'to' => $to,
+            'employees' => $employees,
+            'user' => $this->getUser()->getPublicId(),
+        ]);
+
+        $grouped = [];
+        foreach ($attendances as $attendance) {
+            $employee = $attendance->getEmployee();
+            $employeePublicId = $employee->getPublicId();
+            $date = $attendance->getAttendanceDate()->format('Y-m-d');
+
+            if (!isset($grouped[$employeePublicId])) {
+                $grouped[$employeePublicId] = [
+                    'employee' => $employee,
+                    'attendances' => [],
+                ];
+            }
+
+            $grouped[$employeePublicId]['attendances'][$date] = [
+                'status' => $attendance->getStatus(),
+                'date' => $attendance->getAttendanceDate(),
+            ];
+        }
+
+        return $this->createAttendanceResponse($grouped);
+    }
+
+    /**
      * Create a new attendance.
      *
      * @param Request $request The request object containing the attendance data.

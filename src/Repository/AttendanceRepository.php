@@ -63,7 +63,7 @@ class AttendanceRepository extends AbstractRepository
 
     public function findByCriteria(array $criteria, array $orderBy = [], $limit = null, $offset = null)
     {
-        $qb=  $this->createQueryBuilder('attendance')
+        $qb = $this->createQueryBuilder('attendance')
             ->addSelect('employee')
             ->addSelect('user')
             ->innerJoin('attendance.employee', 'employee')
@@ -80,8 +80,8 @@ class AttendanceRepository extends AbstractRepository
                 new Parameter('employee', $criteria['employee']),
                 new Parameter('status', $criteria['status']),
             ]))
-        ->setMaxResults($limit)
-        ->setFirstResult($offset);
+            ->setMaxResults($limit)
+            ->setFirstResult($offset);
 
         foreach ($orderBy as $sort => $sort) {
             $qb->addOrderBy($sort, $sort);
@@ -110,9 +110,9 @@ class AttendanceRepository extends AbstractRepository
     /**
      * Find attendances by employee and period.
      *
-     * @param Employee $employee The employee for whom to find attendances.
-     * @param DateTimeImmutable $from The start date of the period.
-     * @param DateTimeImmutable $to The end date of the period.
+     * @param Employee          $employee The employee for whom to find attendances.
+     * @param DateTimeImmutable $from     The start date of the period.
+     * @param DateTimeImmutable $to       The end date of the period.
      * @return Attendance[]
      */
     public function findByEmployeeAndPeriod(Employee $employee, DateTimeImmutable $from, DateTimeImmutable $to): array
@@ -135,8 +135,8 @@ class AttendanceRepository extends AbstractRepository
     /**
      * Find an attendance by its public ID and user.
      *
-     * @param string $publicId The public ID of the attendance.
-     * @param User|null $getUser The user associated with the attendance, or null if not applicable.
+     * @param string    $publicId The public ID of the attendance.
+     * @param User|null $getUser  The user associated with the attendance, or null if not applicable.
      * @return Attendance|null
      */
     public function findByPublicIdAndUser(string $publicId, ?User $getUser): ?Attendance
@@ -152,5 +152,35 @@ class AttendanceRepository extends AbstractRepository
             ]))
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    /**
+     * Finds attendance data for Gantt chart visualization based on provided criteria.
+     *
+     * @param array $criteria A set of filters to retrieve attendance data. Expected keys:
+     *                        - 'from': Start date of the attendance range (nullable, DATE_IMMUTABLE).
+     *                        - 'to': End date of the attendance range (nullable, DATE_IMMUTABLE).
+     *                        - 'employees': Array of employee public IDs to filter by.
+     *                        - 'user': Public ID of the user associated with the attendance.
+     *
+     * @return Attendance[] The array of attendance records matching the given criteria.
+     */
+    public function findForGantt(array $criteria): array
+    {
+        return $this->createQueryBuilder('a')
+            ->addSelect('e')
+            ->innerJoin('attendance.employee', 'e')
+            ->where('attendance.attendanceDate >= :from OR :from IS NULL')
+            ->andWhere('attendance.attendanceDate <= :to OR :to IS NULL')
+            ->andWhere('employee.publicId in (:employees)')
+            ->andWhere('user.publicId = :user')
+            ->setParameters(new ArrayCollection([
+                new Parameter('from', $criteria['from'], Types::DATE_IMMUTABLE),
+                new Parameter('to', $criteria['to'], Types::DATE_IMMUTABLE),
+                new Parameter('employees', $criteria['employees']),
+                new Parameter('user', $criteria['user']),
+            ]))
+            ->getQuery()
+            ->getResult();
     }
 }

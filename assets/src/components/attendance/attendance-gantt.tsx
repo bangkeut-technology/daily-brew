@@ -4,6 +4,9 @@ import { AttendanceStatus } from '@/types/attendance';
 import { Employee } from '@/types/employee';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
+import { fetchAttendances } from '@/services/attendance';
+import { DATE_FORMAT } from '@/constants/date';
 
 type StatusColor = { bg: string; text: string; short: string; title: string };
 
@@ -30,7 +33,7 @@ export interface AttendanceGanttProps {
     leftColWidth?: number;
 }
 
-export const AttendanceGantt: React.FC<AttendanceGanttProps> = ({
+export const AttendanceGantt: React.FunctionComponent<AttendanceGanttProps> = ({
     month,
     rangeStart,
     rangeEnd,
@@ -44,6 +47,10 @@ export const AttendanceGantt: React.FC<AttendanceGanttProps> = ({
     const { t } = useTranslation();
     const start = React.useMemo(() => rangeStart ?? startOfMonth(month), [rangeStart, month]);
     const end = React.useMemo(() => rangeEnd ?? endOfMonth(month), [rangeEnd, month]);
+    const { data = [] } = useQuery({
+        queryKey: ['attendance-gantt', start, end, employees],
+        queryFn: () => fetchAttendances({ from: format(start, DATE_FORMAT), to: format(end, DATE_FORMAT), employees }),
+    });
 
     const days = React.useMemo(() => {
         const arr: Date[] = [];
