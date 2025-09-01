@@ -11,15 +11,12 @@ import { Employee } from '@/types/employee';
 
 type AttendanceGanttWithControlsProps = {
     employees: Employee[];
-    getStatus: (employeeId: string, dateISO: string) => AttendanceStatus;
-    onCellClick?: (args: { employee: Employee; dateISO: string; status: AttendanceStatus | null }) => void;
-    /** optional: initial month */
+    onCellClick?: (args: { employee: Employee; dateISO: string; status: AttendanceStatus | undefined }) => void;
     initialMonth?: Date;
 };
 
-export const AttendanceGanttWithControls: React.FC<AttendanceGanttWithControlsProps> = ({
+export const AttendanceGanttWithControls: React.FunctionComponent<AttendanceGanttWithControlsProps> = ({
     employees,
-    getStatus,
     onCellClick,
     initialMonth = startOfMonth(new Date()),
 }) => {
@@ -86,7 +83,7 @@ export const AttendanceGanttWithControls: React.FC<AttendanceGanttWithControlsPr
                 </Button>
             </div>
 
-            <AttendanceGantt month={month} employees={employees} getStatus={getStatus} onCellClick={onCellClick} />
+            <AttendanceGantt month={month} employees={employees} onCellClick={onCellClick} />
         </div>
     );
 };

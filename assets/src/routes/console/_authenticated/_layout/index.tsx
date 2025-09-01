@@ -24,7 +24,6 @@ import { KpiGanttWithControls } from '@/components/kpi/kpi-gantt-with-controls';
 import { useQuery } from '@tanstack/react-query';
 import { fetchEmployees } from '@/services/employee';
 import { ScoreValue } from '@/components/kpi/kpi-gantt';
-import { AttendanceStatus, AttendanceStatusEnum } from '@/types/attendance';
 import { MetricCard } from '@/components/card/metric-card';
 import { useTranslation } from 'react-i18next';
 import { NewAttendanceDialog } from '@/components/dialog/new-attendance-dialog';
@@ -58,10 +57,6 @@ function Dashboard() {
 
     const getScore = React.useCallback((employeeId: string, dateISO: string): ScoreValue => {
         return 0;
-    }, []);
-
-    const getStatus = React.useCallback((employeeId: string, dateISO: string): AttendanceStatus => {
-        return AttendanceStatusEnum.leave;
     }, []);
 
     return (
@@ -179,7 +174,7 @@ function Dashboard() {
                             </Link>
                         }
                     />
-                    <AttendanceGanttWithControls employees={employees} getStatus={getStatus} />
+                    <AttendanceGanttWithControls employees={employees} />
                 </div>
 
                 <div className="space-y-6">
