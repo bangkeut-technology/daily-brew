@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Enum\EmployeeStatus;
+use App\Enum\EmployeeStatusEnum;
 use App\Repository\EmployeeRepository;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -44,9 +44,9 @@ class Employee extends AbstractEntity
     #[Groups(['employee:read'])]
     private ?DateTimeImmutable $joinedAt = null;
 
-    #[ORM\Column(type: 'string', enumType: EmployeeStatus::class)]
+    #[ORM\Column(type: 'string', enumType: EmployeeStatusEnum::class)]
     #[Groups(['employee:read'])]
-    private EmployeeStatus $status = EmployeeStatus::ACTIVE;
+    private EmployeeStatusEnum $status = EmployeeStatusEnum::ACTIVE;
 
     #[Groups(['employee:read'])]
     public float $averageScore = 0;
@@ -154,12 +154,12 @@ class Employee extends AbstractEntity
         return $this;
     }
 
-    public function getStatus(): EmployeeStatus
+    public function getStatus(): EmployeeStatusEnum
     {
         return $this->status;
     }
 
-    public function setStatus(EmployeeStatus $status): Employee
+    public function setStatus(EmployeeStatusEnum $status): Employee
     {
         $this->status = $status;
 

@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Enum;
 
 /**
- * Class EmployeeStatus.
+ * Class EmployeeStatusEnum
  *
+ * @package App\Enum
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-enum EmployeeStatus: string
+enum EmployeeStatusEnum: string
 {
     case ACTIVE = 'active';
     case ON_LEAVE = 'on_leave';

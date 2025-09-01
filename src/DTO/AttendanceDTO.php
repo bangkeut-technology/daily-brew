@@ -16,6 +16,8 @@ use DateTimeImmutable;
 final readonly class AttendanceDTO
 {
     public function __construct(
+        public int                  $id,
+        public string               $publicId,
         public DateTimeImmutable    $attendanceDate,
         public AttendanceStatusEnum $status,
         public ?DateTimeImmutable   $clockIn = null,
@@ -34,16 +36,23 @@ final readonly class AttendanceDTO
      *
      * @return self A new instance of the class populated with data from the Attendance entity.
      */
-    public static function fromEntity(Attendance $attendance): self
+    public static function fromEntity(Attendance $attendance, bool $withEmployee = true): self
     {
-        return new self(
+        $class = new self(
+            id: $attendance->getId(),
+            publicId: $attendance->getPublicId(),
             attendanceDate: $attendance->getAttendanceDate(),
             status: $attendance->getStatus(),
             clockIn: $attendance->getClockIn(),
             clockOut: $attendance->getClockOut(),
             note: $attendance->getNote(),
-            employee: EmployeeDTO::fromEntity()
         );
+
+        if ($withEmployee) {
+            $class->employee = EmployeeDTO::fromEntity($attendance->getEmployee());
+        }
+
+        return $class;
     }
 }
 
