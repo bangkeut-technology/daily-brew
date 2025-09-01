@@ -1,6 +1,6 @@
 import { apiAxios } from '@/lib/apiAxios';
 import { Attendance, AttendanceStatus, PartialAttendance } from '@/types/attendance';
-import { Employee } from '@/types/employee';
+import { Employee, EmployeeAttendance } from '@/types/employee';
 
 export type AttendanceSearchParams = {
     from: string | undefined;
@@ -23,6 +23,20 @@ export const postAttendance = async (attendance: PartialAttendance) =>
             message: string;
             attendance: Attendance;
         }>('/attendances', attendance)
+        .then((response) => response.data);
+
+export const fetchGanttAttendances = async ({
+    employees,
+    ...params
+}: {
+    from: string;
+    to: string;
+    employees: Employee[];
+}) =>
+    apiAxios
+        .get<{
+            [key: string]: EmployeeAttendance;
+        }>('/attendances/gantt', { params: { ...params, employees: employees?.map((employee) => employee.publicId) } })
         .then((response) => response.data);
 
 export const getAttendance = async (publicId: string) =>

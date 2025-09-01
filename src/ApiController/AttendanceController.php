@@ -5,7 +5,10 @@ namespace App\ApiController;
 
 use App\ApiController\Trait\AttendanceTrait;
 use App\Controller\AbstractController;
+use App\DTO\AttendanceDTO;
+use App\DTO\EmployeeDTO;
 use App\Entity\Attendance;
+use App\Entity\Employee;
 use App\Form\AttendanceFormType;
 use App\Repository\AttendanceRepository;
 use App\Util\DateHelper;
@@ -163,26 +166,20 @@ class AttendanceController extends AbstractController
             'user' => $this->getUser()->getPublicId(),
         ]);
 
-        $grouped = [];
+        $employees = [];
         foreach ($attendances as $attendance) {
             $employee = $attendance->getEmployee();
             $employeePublicId = $employee->getPublicId();
             $date = $attendance->getAttendanceDate()->format('Y-m-d');
 
-            if (!isset($grouped[$employeePublicId])) {
-                $grouped[$employeePublicId] = [
-                    'employee' => $employee,
-                    'attendances' => [],
-                ];
+            if (!isset($employees[$employeePublicId])) {
+                $employees[$employeePublicId] = EmployeeDTO::fromEntity($employee, true);
             }
 
-            $grouped[$employeePublicId]['attendances'][$date] = [
-                'status' => $attendance->getStatus(),
-                'date' => $attendance->getAttendanceDate(),
-            ];
+            $employees[$employeePublicId]->attendances[$date] = AttendanceDTO::fromEntity($attendance, false);
         }
 
-        return $this->createAttendanceResponse($grouped);
+        return $this->createAttendanceResponse($employees);
     }
 
     /**

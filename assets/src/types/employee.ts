@@ -1,5 +1,6 @@
 import { Role } from '@/types/role';
 import { EvaluationTemplate } from '@/types/evaluation-template';
+import { Attendance } from '@/types/attendance';
 
 export type Employee = {
     id: number;
@@ -35,3 +36,7 @@ export enum EmployeeStatusEnum {
     resigned = 'resigned',
     probation = 'probation',
 }
+
+export type EmployeeAttendance = Omit<Employee, 'roles' | 'templates' | 'averageScore'> & {
+    attendances: { [key: string]: Attendance };
+};

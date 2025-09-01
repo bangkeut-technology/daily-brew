@@ -13,18 +13,19 @@ use DateTimeImmutable;
  * @package App\DTO
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-final readonly class EmployeeDTO
+final  class EmployeeDTO
 {
     public function __construct(
-        public int    $id,
-        public string $publicId,
-        public string $firstName,
-        public string $lastName,
-        public string $fullName,
-        public ?string $phoneNumber = null,
-        public ?DateTimeImmutable $dob = null,
-        public ?DateTimeImmutable $joinedAt = null,
-        public EmployeeStatusEnum $status,
+        public readonly int                $id,
+        public readonly string             $publicId,
+        public readonly string             $firstName,
+        public readonly string             $lastName,
+        public readonly string             $fullName,
+        public readonly ?string            $phoneNumber = null,
+        public readonly ?DateTimeImmutable $dob = null,
+        public readonly ?DateTimeImmutable $joinedAt = null,
+        public readonly EmployeeStatusEnum $status,
+        public ?array                      $attendances = null,
     )
     {
     }
@@ -36,9 +37,9 @@ final readonly class EmployeeDTO
      *
      * @return self A new instance of the class.
      */
-    public static function fromEntity(Employee $employee): self
+    public static function fromEntity(Employee $employee, bool $withAttendances = false): self
     {
-        return new self(
+        $class = new self(
             id: $employee->getId(),
             publicId: $employee->getPublicId(),
             firstName: $employee->getFirstName(),
@@ -49,5 +50,11 @@ final readonly class EmployeeDTO
             joinedAt: $employee->getJoinedAt(),
             status: $employee->getStatus(),
         );
+
+        if ($withAttendances) {
+            $class->attendances = [];
+        }
+
+        return $class;
     }
 }

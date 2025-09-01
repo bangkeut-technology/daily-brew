@@ -5,7 +5,7 @@ import { Employee } from '@/types/employee';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { fetchAttendances } from '@/services/attendance';
+import { fetchGanttAttendances } from '@/services/attendance';
 import { DATE_FORMAT } from '@/constants/date';
 
 type StatusColor = { bg: string; text: string; short: string; title: string };
@@ -26,8 +26,7 @@ export interface AttendanceGanttProps {
     rangeStart?: Date;
     rangeEnd?: Date;
     employees: Employee[];
-    getStatus: (employeeId: string, dateISO: string) => AttendanceStatus;
-    onCellClick?: (args: { employee: Employee; dateISO: string; status: AttendanceStatus }) => void;
+    onCellClick?: (args: { employee: Employee; dateISO: string; status: AttendanceStatus | undefined }) => void;
     renderDayHeaderCell?: (date: Date, idx: number) => React.ReactNode;
     className?: string;
     leftColWidth?: number;
@@ -38,7 +37,6 @@ export const AttendanceGantt: React.FunctionComponent<AttendanceGanttProps> = ({
     rangeStart,
     rangeEnd,
     employees,
-    getStatus,
     onCellClick,
     renderDayHeaderCell,
     className,
@@ -47,9 +45,10 @@ export const AttendanceGantt: React.FunctionComponent<AttendanceGanttProps> = ({
     const { t } = useTranslation();
     const start = React.useMemo(() => rangeStart ?? startOfMonth(month), [rangeStart, month]);
     const end = React.useMemo(() => rangeEnd ?? endOfMonth(month), [rangeEnd, month]);
-    const { data = [] } = useQuery({
+    const { data } = useQuery({
         queryKey: ['attendance-gantt', start, end, employees],
-        queryFn: () => fetchAttendances({ from: format(start, DATE_FORMAT), to: format(end, DATE_FORMAT), employees }),
+        queryFn: () =>
+            fetchGanttAttendances({ from: format(start, DATE_FORMAT), to: format(end, DATE_FORMAT), employees }),
     });
 
     const days = React.useMemo(() => {
@@ -58,17 +57,34 @@ export const AttendanceGantt: React.FunctionComponent<AttendanceGanttProps> = ({
         return arr;
     }, [start, end]);
 
-    const handleKeyDown = (
-        e: React.KeyboardEvent<HTMLDivElement>,
-        employee: Employee,
-        dateISO: string,
-        status: AttendanceStatus,
-    ) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            onCellClick?.({ employee, dateISO, status });
-        }
-    };
+    const handleKeyDown = React.useCallback(
+        (
+            e: React.KeyboardEvent<HTMLDivElement>,
+            employee: Employee,
+            dateISO: string,
+            status: AttendanceStatus | undefined,
+        ) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onCellClick?.({ employee, dateISO, status });
+            }
+        },
+        [onCellClick],
+    );
+
+    const getStatus = React.useCallback(
+        (employeePublicId: string, date: string) => {
+            if (!data && !Array.isArray(data)) return undefined;
+            if (data[employeePublicId]) {
+                const employee = data[employeePublicId];
+                if (employee.attendances[date]) {
+                    return employee.attendances[date].status;
+                }
+            }
+            return undefined;
+        },
+        [data],
+    );
 
     return (
         <div className={cn('bg-muted/30 rounded-lg', className)}>
