@@ -13,14 +13,16 @@ use DateTimeImmutable;
  * @package App\DTO
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-readonly class AttendanceDTO
+final readonly class AttendanceDTO
 {
     public function __construct(
         public DateTimeImmutable    $attendanceDate,
         public AttendanceStatusEnum $status,
-        public ?DateTimeImmutable    $clockIn = null,
-        public ?DateTimeImmutable    $clockOut = null,
+        public ?DateTimeImmutable   $clockIn = null,
+        public ?DateTimeImmutable   $clockOut = null,
         public ?string              $note = null,
+        public ?EmployeeDTO         $employee = null,
+        public ?UserDTO             $user = null,
     )
     {
     }
@@ -37,8 +39,10 @@ readonly class AttendanceDTO
         return new self(
             attendanceDate: $attendance->getAttendanceDate(),
             status: $attendance->getStatus(),
+            clockIn: $attendance->getClockIn(),
+            clockOut: $attendance->getClockOut(),
             note: $attendance->getNote(),
-            recordedBy: $attendance->getUser()?->getFullName()
+            employee: EmployeeDTO::fromEntity()
         );
     }
 }
