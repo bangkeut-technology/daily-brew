@@ -23,6 +23,11 @@
             "id": "The role is required.",
             "name": "The role name is required."
         },
+        "settings": {
+            "number_of_paid_leave": "The number of paid leave is required.",
+            "paid_leave_cycle": "The paid leave cycle is required.",
+            "maximum_late_count": "The maximum late count is required."
+        },
         "users": {
             "first_name": "The first name is required.",
             "last_name": "The last name is required.",
@@ -39,6 +44,15 @@
     "one_of": {
         "attendances": {
             "status": "The attendance status must be one of the following: {{values}}."
+        },
+        "settings": {
+            "paid_leave_cycle": "The paid leave cycle must be one of the following: {{values}}."
+        }
+    },
+    "positive": {
+        "settings": {
+            "number_of_paid_leave": "The number of paid leave must be a positive number.",
+            "maximum_late_count": "The maximum late count must be a positive number."
         }
     },
     "passwords_match": "The password and confirmation password must match.",

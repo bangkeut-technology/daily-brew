@@ -7,6 +7,8 @@ updated:
     evaluation_template: 'Evaluation template %name% has been updated successfully'
     attendance:          'Attendance has been updated successfully'
     employee_evaluation: 'Employee evaluation has been updated successfully'
+    settings:            'Settings have been updated successfully'
+    setting:             'Setting %name% has been updated successfully'
 deleted:
     user:                         'User has been deleted successfully'
     evaluation_template:          'Evaluation template %name% has been deleted successfully'

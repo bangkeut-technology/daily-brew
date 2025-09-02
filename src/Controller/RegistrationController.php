@@ -11,8 +11,8 @@ use App\Repository\UserRepository;
 use Exception;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -26,9 +26,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class RegistrationController extends AbstractController
 {
     public function __construct(
-        TranslatorInterface              $translator,
-        private readonly EventDispatcher $dispatcher,
-    ){
+        TranslatorInterface                       $translator,
+        private readonly EventDispatcherInterface $dispatcher,
+    )
+    {
         parent::__construct($translator);
     }
 

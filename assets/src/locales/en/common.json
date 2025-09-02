@@ -114,6 +114,8 @@
     "attendances": "Attendances",
     "new": "New",
     "no_records": "No records",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
     "export": {
         "csv": "Export CSV",
         "pdf": "Export PDF",

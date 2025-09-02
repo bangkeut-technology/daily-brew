@@ -262,5 +262,19 @@
         "employee": "Evaluate Employee",
         "title": "Evaluate",
         "description": "Evaluate an employee's performance based on the selected evaluation template."
+    },
+    "settings": {
+        "number_of_paid_leave": {
+            "label": "Number of paid leave",
+            "description": "The number of paid leave days an employee can take as a paid leave."
+        },
+        "maximum_late_count": {
+            "label": "Maximum late count",
+            "description": "The maximum number of late days an employee can take before being counted as a leave."
+        },
+        "paid_leave_cycle": {
+            "label": "Paid Leave Cycle",
+            "description": "The cycle of paid leave, which determines the renewal number of the leave."
+        }
     }
 }
