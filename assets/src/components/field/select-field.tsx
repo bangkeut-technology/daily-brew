@@ -27,38 +27,36 @@ export const SelectField = React.memo<SelectFieldProps>(
         const id = useId();
 
         return (
-            <div className={cn('flex flex-row space-x-2 items-end', className)}>
-                <FormField
-                    control={control}
-                    name={name}
-                    render={({ field }) => (
-                        <FormItem className={className}>
-                            {label && <FormLabel id={id}>{label}</FormLabel>}
-                            <Select name={name} onValueChange={field.onChange} value={field.value?.toString()}>
-                                <FormControl>
-                                    <SelectTrigger disabled={disabled} className="w-full">
-                                        <SelectValue placeholder={placeholder} />
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    {placeholder && <SelectItem value={nullValue}>{placeholder}</SelectItem>}
-                                    {options.map((option, index) => (
-                                        <SelectItem
-                                            key={`${id}-select-item-${index}}`}
-                                            value={option.value.toString()}
-                                            disabled={option.disabled}
-                                        >
-                                            {option.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                            {description && <FormDescription>{description}</FormDescription>}
-                        </FormItem>
-                    )}
-                />
-            </div>
+            <FormField
+                control={control}
+                name={name}
+                render={({ field }) => (
+                    <FormItem className={cn('space-y-2', className)}>
+                        {label && <FormLabel id={id}>{label}</FormLabel>}
+                        <Select name={name} onValueChange={field.onChange} value={field.value?.toString()}>
+                            <FormControl>
+                                <SelectTrigger disabled={disabled} className="w-full">
+                                    <SelectValue placeholder={placeholder} />
+                                </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                                {placeholder && <SelectItem value={nullValue}>{placeholder}</SelectItem>}
+                                {options.map((option, index) => (
+                                    <SelectItem
+                                        key={`${id}-select-item-${index}}`}
+                                        value={option.value.toString()}
+                                        disabled={option.disabled}
+                                    >
+                                        {option.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <FormMessage />
+                        {description && <FormDescription>{description}</FormDescription>}
+                    </FormItem>
+                )}
+            />
         );
     },
 );

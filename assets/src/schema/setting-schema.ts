@@ -1,8 +1,8 @@
 import { object, ObjectSchema, string } from 'yup';
-import { SubmitSetting } from '@/types/setting';
+import { SettingType } from '@/types/setting';
 import i18next from '@/i18next';
 
-export const settingSchema: ObjectSchema<SubmitSetting> = object({
+export const settingSchema: ObjectSchema<SettingType> = object({
     numberOfPaidLeave: string()
         .required(i18next.t('validation:required.settings.number_of_paid_leave'))
         .test('is-positive', i18next.t('validation:positive.settings.number_of_paid_leave'), (value) =>

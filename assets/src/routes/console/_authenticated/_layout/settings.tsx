@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchSettings, updateSettings } from '@/services/setting';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
-import { SubmitSetting } from '@/types/setting';
+import { SettingType } from '@/types/setting';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { settingSchema } from '@/schema/setting-schema';
 import { toast } from 'sonner';
@@ -37,26 +37,26 @@ function SettingsPage() {
             toast.error(message);
         },
     });
-    const form = useForm<SubmitSetting>({
+    const form = useForm<SettingType>({
         resolver: yupResolver(settingSchema),
         defaultValues: {
-            numberOfPaidLeave: settings?.number_of_paid_leave || '0',
-            maximumLateCount: settings?.maximum_late_count || '3',
-            paidLeaveCycle: settings?.paid_leave_cycle || 'monthly',
+            numberOfPaidLeave: settings?.numberOfPaidLeave || '0',
+            maximumLateCount: settings?.maximumLateCount || '3',
+            paidLeaveCycle: settings?.paidLeaveCycle || 'monthly',
         },
     });
     React.useEffect(() => {
         if (isSuccess && settings) {
             form.reset({
-                numberOfPaidLeave: settings?.number_of_paid_leave || '0',
-                maximumLateCount: settings?.maximum_late_count || '3',
-                paidLeaveCycle: settings?.paid_leave_cycle || 'monthly',
+                numberOfPaidLeave: settings?.numberOfPaidLeave || '0',
+                maximumLateCount: settings?.maximumLateCount || '3',
+                paidLeaveCycle: settings?.paidLeaveCycle || 'monthly',
             });
         }
     }, [form, isSuccess, settings]);
 
     const onSubmit = React.useCallback(
-        (data: SubmitSetting) => {
+        (data: SettingType) => {
             mutate(data);
         },
         [mutate],
@@ -68,22 +68,24 @@ function SettingsPage() {
             <p className="text-gray-600">Manage your account settings here.</p>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-                    <TextField
-                        control={form.control}
-                        name="numberOfPaidLeave"
-                        label={t('settings.number_of_paid_leave.label', { ns: 'glossary' })}
-                        description={t('settings.number_of_paid_leave.description', { ns: 'glossary' })}
-                    />
-                    <SelectField
-                        control={form.control}
-                        name="paidLeaveCycle"
-                        options={[
-                            { label: t('monthly'), value: 'monthly' },
-                            { label: t('yearly'), value: 'yearly' },
-                        ]}
-                        label={t('settings.paid_leave_cycle.label', { ns: 'glossary' })}
-                        description={t('settings.paid_leave_cycle.description', { ns: 'glossary' })}
-                    />
+                    <div className="flex space-x-2">
+                        <TextField
+                            control={form.control}
+                            name="numberOfPaidLeave"
+                            label={t('settings.number_of_paid_leave.label', { ns: 'glossary' })}
+                            description={t('settings.number_of_paid_leave.description', { ns: 'glossary' })}
+                        />
+                        <SelectField
+                            control={form.control}
+                            name="paidLeaveCycle"
+                            options={[
+                                { label: t('monthly'), value: 'monthly' },
+                                { label: t('yearly'), value: 'yearly' },
+                            ]}
+                            label={t('settings.paid_leave_cycle.label', { ns: 'glossary' })}
+                            description={t('settings.paid_leave_cycle.description', { ns: 'glossary' })}
+                        />
+                    </div>
                     <TextField
                         control={form.control}
                         name="maximumLateCount"
