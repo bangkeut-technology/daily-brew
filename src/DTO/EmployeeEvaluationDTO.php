@@ -18,6 +18,9 @@ final class EmployeeEvaluationDTO
         public readonly string            $publicId,
         public readonly string            $templateName,
         public readonly DateTimeImmutable $evaluatedAt,
+        public readonly ?string           $note = null,
+        public readonly ?float            $averageScore = null,
+        public readonly array             $scores = [],
         public ?UserDTO                   $evaluator = null,
     )
     {
@@ -40,7 +43,14 @@ final class EmployeeEvaluationDTO
             publicId: $evaluation->getPublicId(),
             templateName: $evaluation->getTemplateName(),
             evaluatedAt: $evaluation->getEvaluatedAt(),
+            note: $evaluation->getNote(),
+            averageScore: $evaluation->getAverageScore(),
+            scores: [],
         );
+
+        foreach ($evaluation->getScores() as $score) {
+            $score[] = EmployeeScoreDTO::fromEntity($score);
+        }
 
         if ($withEvaluator) {
             $class->evaluator = UserDTO::fromEntity($evaluation->getEvaluator());
