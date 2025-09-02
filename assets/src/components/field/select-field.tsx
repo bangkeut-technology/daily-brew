@@ -34,7 +34,7 @@ export const SelectField = React.memo<SelectFieldProps>(
                     render={({ field }) => (
                         <FormItem className={className}>
                             {label && <FormLabel id={id}>{label}</FormLabel>}
-                            <Select onValueChange={field.onChange} value={field.value?.toString()}>
+                            <Select name={name} onValueChange={field.onChange} value={field.value?.toString()}>
                                 <FormControl>
                                     <SelectTrigger disabled={disabled} className="w-full">
                                         <SelectValue placeholder={placeholder} />

@@ -35,9 +35,9 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
         rel="stylesheet" />
-    {#    <link rel="manifest" href="{{ asset('manifest.json') }}" /> #}
-    {#    <link rel="shortcut icon" href="{{ asset('images/favicon.ico') }}" type="image/x-icon" /> #}
-    {#    <link rel="apple-touch-icon" href="{{ asset('images/icon-512.png') }}" /> #}
+    <link rel="manifest" href="{{ asset('manifest.json') }}" />
+    <link rel="shortcut icon" href="{{ asset('/favicon.ico') }}" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="{{ asset('icons/icon-512x512.png') }}" />
     {% block stylesheets %}
         {{ encore_entry_link_tags('daily_brew_application') }}
     {% endblock %}
