@@ -2,8 +2,18 @@ import * as React from 'react';
 import { addDays, endOfMonth, format, isWeekend, startOfMonth } from 'date-fns';
 import { Employee } from '@/types/employee';
 import { cn } from '@/lib/utils';
+import { useQuery } from '@tanstack/react-query';
+import { DATE_FORMAT } from '@/constants/date';
+import { fetchGanttEmployeeEvaluations } from '@/services/employee-evaluation';
+import { useTranslation } from 'react-i18next';
 
 export type ScoreValue = number | null; // e.g., 0..5 or null (no score yet)
+
+export type OnCellClickFunc = (args: {
+    employee: Employee;
+    dateISO: string; // yyyy-MM-dd
+    score: ScoreValue | undefined; // current value
+}) => void;
 
 export interface KpiGanttProps {
     /** Any date in the month to render */
@@ -17,19 +27,9 @@ export interface KpiGanttProps {
     employees: Employee[];
 
     /**
-     * Provide a score per employee + date (0..5 or null).
-     * You can read from a Map keyed by `${employeeId}_${yyyy-MM-dd}`.
-     */
-    getScore: (employeeId: string, dateISO: string) => ScoreValue;
-
-    /**
      * Click handler to open evaluate/edit dialog.
      */
-    onCellClick?: (args: {
-        employee: Employee;
-        dateISO: string; // yyyy-MM-dd
-        score: ScoreValue; // current value
-    }) => void;
+    onCellClick?: OnCellClickFunc;
 
     /**
      * Optional: show which KPI template you're visualizing.
@@ -66,7 +66,6 @@ export const KpiGantt: React.FC<KpiGanttProps> = ({
     rangeStart,
     rangeEnd,
     employees,
-    getScore,
     onCellClick,
     templateName,
     renderDayHeaderCell,
@@ -75,8 +74,19 @@ export const KpiGantt: React.FC<KpiGanttProps> = ({
     minScore = 0,
     maxScore = 5,
 }) => {
+    const { t } = useTranslation();
     const start = React.useMemo(() => rangeStart ?? startOfMonth(month), [rangeStart, month]);
     const end = React.useMemo(() => rangeEnd ?? endOfMonth(month), [rangeEnd, month]);
+    const { data } = useQuery({
+        queryKey: ['employee-kpi-gantt', start, end, employees],
+        queryFn: () =>
+            fetchGanttEmployeeEvaluations({
+                from: format(start, DATE_FORMAT),
+                to: format(end, DATE_FORMAT),
+                employees,
+            }),
+        enabled: !!employees.length,
+    });
 
     const days = React.useMemo(() => {
         const arr: Date[] = [];
@@ -84,17 +94,34 @@ export const KpiGantt: React.FC<KpiGanttProps> = ({
         return arr;
     }, [start, end]);
 
-    const handleKeyDown = (
-        e: React.KeyboardEvent<HTMLDivElement>,
-        employee: Employee,
-        dateISO: string,
-        score: ScoreValue,
-    ) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            onCellClick?.({ employee, dateISO, score });
-        }
-    };
+    const handleKeyDown = React.useCallback(
+        (
+            e: React.KeyboardEvent<HTMLDivElement>,
+            employee: Employee,
+            dateISO: string,
+            score: ScoreValue | undefined,
+        ) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onCellClick?.({ employee, dateISO, score });
+            }
+        },
+        [onCellClick],
+    );
+
+    const getScore = React.useCallback(
+        (employeePublicId: string, evaluatedAt: string) => {
+            if (!data && !Array.isArray(data)) return undefined;
+            if (data[employeePublicId]) {
+                const employee = data[employeePublicId];
+                if (employee[evaluatedAt]) {
+                    return employee[evaluatedAt].averageScore;
+                }
+            }
+            return undefined;
+        },
+        [data],
+    );
 
     return (
         <div className={cn('bg-muted/30 rounded-lg', className)}>
@@ -112,7 +139,7 @@ export const KpiGantt: React.FC<KpiGanttProps> = ({
                         className="grid sticky top-0 z-10 bg-card"
                         style={{ gridTemplateColumns: `${leftColWidth}px repeat(${days.length}, minmax(28px, 1fr))` }}
                     >
-                        <div className="px-3 py-2 border-r font-medium text-xs">Employee</div>
+                        <div className="px-3 py-2 border-r font-medium text-xs">{t('employee')}</div>
                         {days.map((d, idx) => {
                             const wknd = isWeekend(d);
                             return (
@@ -156,7 +183,7 @@ export const KpiGantt: React.FC<KpiGanttProps> = ({
                                 const chip = Number.isFinite(score as number) ? (
                                     <span
                                         className={cn(
-                                            'px-1 rounded text-[10px] font-medium',
+                                            'px-1 rounded text-[12px] font-medium',
                                             colorForScore(Number(score), minScore, maxScore),
                                         )}
                                         title={`Score: ${score}`}
@@ -164,7 +191,9 @@ export const KpiGantt: React.FC<KpiGanttProps> = ({
                                     >
                                         {Number(score).toFixed(1)}
                                     </span>
-                                ) : null;
+                                ) : (
+                                    '-'
+                                );
 
                                 return (
                                     <div
@@ -174,7 +203,7 @@ export const KpiGantt: React.FC<KpiGanttProps> = ({
                                         onClick={() => onCellClick?.({ employee: emp, dateISO, score })}
                                         onKeyDown={(e) => handleKeyDown(e, emp, dateISO, score)}
                                         className={cn(
-                                            'h-8 border-r grid place-items-center text-[10px] cursor-pointer transition-colors',
+                                            'h-10 border-r grid place-items-center text-[10px] cursor-pointer transition-colors',
                                             'hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                                             isWeekend(d) ? 'bg-muted/60' : 'bg-background',
                                         )}

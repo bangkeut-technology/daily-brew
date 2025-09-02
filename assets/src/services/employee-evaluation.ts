@@ -1,6 +1,7 @@
 import { apiAxios } from '@/lib/apiAxios';
 import { EmployeeEvaluation, PartialEmployeeEvaluation } from '@/types/employee-evaluation';
 import { HistoriesSearchParams } from '@/routes/console/_authenticated/_layout/evaluations/histories/-components/history-search-form';
+import { Employee } from '@/types/employee';
 
 export const fetchEmployeeEvaluations = async (params: HistoriesSearchParams) =>
     apiAxios.get<EmployeeEvaluation[]>('/employee-evaluations', { params }).then((response) => response.data);
@@ -52,3 +53,19 @@ export const putEmployeeEvaluation = async ({
         })
         .then((response) => response.data);
 };
+
+export const fetchGanttEmployeeEvaluations = async ({
+    employees,
+    ...params
+}: {
+    from: string;
+    to: string;
+    employees: Employee[];
+}) =>
+    apiAxios
+        .get<{
+            [employeePublicId: string]: { [evaluatedAt: string]: EmployeeEvaluation };
+        }>('/employee-evaluations/gantt', {
+            params: { ...params, employees: employees?.map((employee) => employee.publicId) },
+        })
+        .then((response) => response.data);

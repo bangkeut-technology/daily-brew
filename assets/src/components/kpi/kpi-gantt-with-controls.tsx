@@ -1,24 +1,21 @@
-// components/kpi/KpiGanttWithControls.tsx
 import * as React from 'react';
 import { format, startOfMonth } from 'date-fns';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { KpiGantt, ScoreValue } from './kpi-gantt';
+import { KpiGantt, OnCellClickFunc } from './kpi-gantt';
 import { Employee } from '@/types/employee';
 
 type KpiGanttWithControlsProps = {
     employees: Employee[];
-    getScore: (employeeId: string, dateISO: string) => ScoreValue;
-    onCellClick?: (args: { employee: Employee; dateISO: string; score: ScoreValue }) => void;
+    onCellClick?: OnCellClickFunc;
     templateName?: string;
     initialMonth?: Date;
 };
 
 export const KpiGanttWithControls: React.FC<KpiGanttWithControlsProps> = ({
     employees,
-    getScore,
     onCellClick,
     templateName,
     initialMonth = startOfMonth(new Date()),
@@ -57,13 +54,7 @@ export const KpiGanttWithControls: React.FC<KpiGanttWithControlsProps> = ({
                 </Button>
             </div>
 
-            <KpiGantt
-                month={month}
-                employees={employees}
-                getScore={getScore}
-                onCellClick={onCellClick}
-                templateName={templateName}
-            />
+            <KpiGantt month={month} employees={employees} onCellClick={onCellClick} templateName={templateName} />
         </div>
     );
 };

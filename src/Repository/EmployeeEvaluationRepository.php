@@ -199,4 +199,40 @@ class EmployeeEvaluationRepository extends AbstractRepository
         return $qb->getQuery()
             ->getResult();
     }
+
+    /**
+     * Finds employee evaluations for a Gantt chart within the specified date range and employee list.
+     *
+     * This method retrieves evaluations by constructing a query with conditions based on the provided user, employee identifiers,
+     * and date range. The query includes inner joins on related entities such as template, scores, and employee to fetch related data.
+     *
+     * @param User|null         $user      The user to filter the evaluations by, or null to exclude user filtering.
+     * @param array             $employees List of employee public IDs to filter the evaluations by.
+     * @param DateTimeImmutable $from      The starting date of the evaluation period, or null for no lower date limit.
+     * @param DateTimeImmutable $to        The ending date of the evaluation period, or null for no upper date limit.
+     *
+     * @return EmployeeEvaluation[] Returns an array of employee evaluations matching the criteria.
+     */
+    public function findForGantt(?User $user, array $employees, DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        $qb = $this->createQueryBuilder('employee_evaluation')
+            ->addSelect('template')
+            ->addSelect('scores')
+            ->addSelect('employee')
+            ->innerJoin('employee_evaluation.template', 'template')
+            ->innerJoin('employee_evaluation.scores', 'scores')
+            ->innerJoin('employee_evaluation.employee', 'employee')
+            ->where('employee_evaluation.evaluatedAt >= :from OR :from IS NULL')
+            ->andWhere('employee_evaluation.evaluatedAt <= :to OR :to IS NULL')
+            ->andWhere('employee.publicId IN (:employees)')
+            ->andWhere('employee_evaluation.user = :user')
+            ->setParameters(new ArrayCollection([
+                new Parameter('from', $from, Types::DATE_IMMUTABLE),
+                new Parameter('to', $to, Types::DATE_IMMUTABLE),
+                new Parameter('employees', $employees),
+                new Parameter('user', $user),
+            ]));
+
+        return $qb->getQuery()->getResult();
+    }
 }

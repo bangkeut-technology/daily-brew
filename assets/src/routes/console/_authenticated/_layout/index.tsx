@@ -19,14 +19,13 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { AttendanceGanttWithControls } from '@/components/attendance/attendance-gantt-with-controls';
-import { KpiGanttWithControls } from '@/components/kpi/kpi-gantt-with-controls';
 import { useQuery } from '@tanstack/react-query';
 import { fetchEmployees } from '@/services/employee';
-import { ScoreValue } from '@/components/kpi/kpi-gantt';
+import { KpiGantt } from '@/components/kpi/kpi-gantt';
 import { MetricCard } from '@/components/card/metric-card';
 import { useTranslation } from 'react-i18next';
 import { NewAttendanceDialog } from '@/components/dialog/new-attendance-dialog';
+import { AttendanceGantt } from '@/components/attendance/attendance-gantt';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/')({
     component: Dashboard,
@@ -54,10 +53,6 @@ function Dashboard() {
         employees: 8,
         leavesToday: 1,
     };
-
-    const getScore = React.useCallback((employeeId: string, dateISO: string): ScoreValue => {
-        return 0;
-    }, []);
 
     return (
         <div className="w-full px-6 py-5 space-y-6">
@@ -161,7 +156,7 @@ function Dashboard() {
                             </Link>
                         }
                     />
-                    <KpiGanttWithControls employees={employees} getScore={getScore} />
+                    <KpiGantt month={month} employees={employees} />
 
                     <SectionHeader
                         title={t('attendance')}
@@ -174,7 +169,7 @@ function Dashboard() {
                             </Link>
                         }
                     />
-                    <AttendanceGanttWithControls employees={employees} />
+                    <AttendanceGantt month={month} employees={employees} />
                 </div>
 
                 <div className="space-y-6">

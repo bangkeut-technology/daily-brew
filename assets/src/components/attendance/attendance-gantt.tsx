@@ -49,6 +49,7 @@ export const AttendanceGantt: React.FunctionComponent<AttendanceGanttProps> = ({
         queryKey: ['attendance-gantt', start, end, employees],
         queryFn: () =>
             fetchGanttAttendances({ from: format(start, DATE_FORMAT), to: format(end, DATE_FORMAT), employees }),
+        enabled: !!employees.length,
     });
 
     const days = React.useMemo(() => {
@@ -145,7 +146,7 @@ export const AttendanceGantt: React.FunctionComponent<AttendanceGanttProps> = ({
                                     status && STATUS_UI[status] ? (
                                         <span
                                             className={cn(
-                                                'px-1 rounded text-[10px]',
+                                                'px-1 rounded text-[12px]',
                                                 STATUS_UI[status].bg,
                                                 STATUS_UI[status].text,
                                             )}
@@ -154,7 +155,9 @@ export const AttendanceGantt: React.FunctionComponent<AttendanceGanttProps> = ({
                                         >
                                             {STATUS_UI[status].short}
                                         </span>
-                                    ) : null;
+                                    ) : (
+                                        '-'
+                                    );
 
                                 return (
                                     <div
@@ -164,11 +167,11 @@ export const AttendanceGantt: React.FunctionComponent<AttendanceGanttProps> = ({
                                         onClick={() => onCellClick?.({ employee, dateISO, status })}
                                         onKeyDown={(e) => handleKeyDown(e, employee, dateISO, status)}
                                         className={cn(
-                                            'h-8 border-r grid place-items-center text-[10px] cursor-pointer transition-colors',
+                                            'h-10 border-r grid place-items-center text-[10px] cursor-pointer transition-colors',
                                             'hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                                             isWknd ? 'bg-muted/60' : 'bg-background',
                                         )}
-                                        title={status ? STATUS_UI[status].title : 'No record'}
+                                        title={status ? STATUS_UI[status].title : t('no_records')}
                                         aria-label={`Cell ${employee.fullName} ${dateISO} ${status ?? 'empty'}`}
                                     >
                                         {chip}

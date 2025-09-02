@@ -167,9 +167,11 @@ class AttendanceRepository extends AbstractRepository
      */
     public function findForGantt(array $criteria): array
     {
-        return $this->createQueryBuilder('a')
-            ->addSelect('e')
-            ->innerJoin('attendance.employee', 'e')
+        return $this->createQueryBuilder('attendance')
+            ->addSelect('employee')
+            ->addSelect('user')
+            ->innerJoin('attendance.employee', 'employee')
+            ->innerJoin('attendance.user', 'user')
             ->where('attendance.attendanceDate >= :from OR :from IS NULL')
             ->andWhere('attendance.attendanceDate <= :to OR :to IS NULL')
             ->andWhere('employee.publicId in (:employees)')

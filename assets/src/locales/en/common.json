@@ -113,6 +113,7 @@
     "clear": "Clear",
     "attendances": "Attendances",
     "new": "New",
+    "no_records": "No records",
     "export": {
         "csv": "Export CSV",
         "pdf": "Export PDF",

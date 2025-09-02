@@ -179,7 +179,7 @@ class AttendanceController extends AbstractController
             $employees[$employeePublicId]->attendances[$date] = AttendanceDTO::fromEntity($attendance, false);
         }
 
-        return $this->createAttendanceResponse($employees);
+        return $this->json($employees);
     }
 
     /**

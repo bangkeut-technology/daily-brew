@@ -114,6 +114,44 @@ class EmployeeEvaluationController extends AbstractController
     }
 
     /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws DateMalformedStringException
+     */
+    #[OA\Parameter(
+        name: 'from',
+        description: 'Start date of the period (YYYY-MM-DD)',
+        in: 'query',
+        required: false,
+    )]
+    public function gantt(Request $request): JsonResponse
+    {
+        $from = new DateTimeImmutable($request->query->get('from', DateHelper::startOfMonth()->format('Y-m-d')));
+        $to = new DateTimeImmutable($request->query->get('to', DateHelper::endOfMonth()->format('Y-m-d')));
+        $employees = $request->query->all('employees');
+
+        if (empty($employees)) {
+            return $this->createBadRequestResponse($this->translator->trans('invalid.employees', domain: 'errors'));
+        }
+
+        $evaluations = $this->employeeEvaluationRepository->findForGantt(
+            user: $this->getUser(),
+            employees: $employees,
+            from: $from,
+            to: $to
+        );
+        $data = [];
+        foreach ($evaluations as $evaluation) {
+            $employee = $evaluation->getEmployee();
+            $employeePublicId = $employee->getPublicId();
+            $date = $evaluation->getEvaluatedAt()->format('Y-m-d');
+            $data[$employeePublicId][$date] = $evaluation;
+        }
+
+        return $this->json($data);
+    }
+
+    /**
      * Handles the update of an employee evaluation based on the provided public ID and request data.
      *
      * This method retrieves the employee evaluation by its public ID, creates a form for the evaluation,
