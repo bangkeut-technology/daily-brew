@@ -77,7 +77,7 @@ class Setting extends AbstractEntity
     /**
      * @return User|null
      */
-    public function getUser(): ?User
+    public function getOwner(): ?User
     {
         return $this->owner;
     }
@@ -86,7 +86,7 @@ class Setting extends AbstractEntity
      * @param User|null $owner
      * @return Setting
      */
-    public function setUser(?User $owner): Setting
+    public function setOwner(?User $owner): Setting
     {
         $this->owner = $owner;
         return $this;

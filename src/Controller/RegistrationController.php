@@ -5,14 +5,18 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Event\User\UserRegisteredEvent;
 use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
+use Exception;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class RegistrationController.
@@ -21,6 +25,13 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 class RegistrationController extends AbstractController
 {
+    public function __construct(
+        TranslatorInterface              $translator,
+        private readonly EventDispatcher $dispatcher,
+    ){
+        parent::__construct($translator);
+    }
+
     /**
      * Registers a new user.
      *
@@ -30,7 +41,7 @@ class RegistrationController extends AbstractController
      *
      * @return Response the HTTP response object
      *
-     * @throws \Exception if an error occurs during registration
+     * @throws Exception if an error occurs during registration
      */
     #[OA\RequestBody(
         description: 'User registration',
@@ -78,6 +89,8 @@ class RegistrationController extends AbstractController
             }
 
             $userRepository->updateUser($user);
+
+            $this->dispatcher->dispatch(new UserRegisteredEvent($user));
 
             $security->login($user, 'json_login', 'console_area');
 
