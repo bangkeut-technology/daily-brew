@@ -18,7 +18,7 @@ final readonly class EmployeeScoreDTO
         public string $criteriaLabel,
         public int    $score,
         public int    $weight,
-        public string $comment,
+        public ?string $comment,
     )
     {
     }

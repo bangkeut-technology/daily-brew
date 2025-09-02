@@ -9,6 +9,7 @@ use App\ApiController\Trait\EmployeeEvaluationTrait;
 use App\ApiController\Trait\EmployeeTrait;
 use App\ApiController\Trait\EvaluationTemplateTrait;
 use App\Controller\AbstractController;
+use App\DTO\EmployeeEvaluationDTO;
 use App\Entity\Attendance;
 use App\Entity\EmployeeEvaluation;
 use App\Entity\User;
@@ -117,18 +118,42 @@ class EmployeeEvaluationController extends AbstractController
      * @param Request $request
      * @return JsonResponse
      * @throws DateMalformedStringException
+     * @throws Exception
      */
     #[OA\Parameter(
         name: 'from',
         description: 'Start date of the period (YYYY-MM-DD)',
         in: 'query',
-        required: false,
+        required: true,
+        schema: new OA\Schema(type: 'string', format: 'date')
     )]
+    #[OA\Parameter(
+        name: 'to',
+        description: 'End date of the period (YYYY-MM-DD)',
+        in: 'query',
+        required: true,
+        schema: new OA\Schema(type: 'string', format: 'date')
+    )]
+    #[OA\Parameter(
+        name: 'employees',
+        description: 'The employees to filter attendances by',
+        in: 'query',
+        required: true,
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns a list of attendances for the specified period and user.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Attendance::class, groups: ['attendance:read']))
+        )
+    )]
+    #[Route('/gantt', name: 'gantt', methods: ['GET'])]
     public function gantt(Request $request): JsonResponse
     {
+        $employees = $request->query->all('employees');
         $from = new DateTimeImmutable($request->query->get('from', DateHelper::startOfMonth()->format('Y-m-d')));
         $to = new DateTimeImmutable($request->query->get('to', DateHelper::endOfMonth()->format('Y-m-d')));
-        $employees = $request->query->all('employees');
 
         if (empty($employees)) {
             return $this->createBadRequestResponse($this->translator->trans('invalid.employees', domain: 'errors'));
@@ -145,7 +170,7 @@ class EmployeeEvaluationController extends AbstractController
             $employee = $evaluation->getEmployee();
             $employeePublicId = $employee->getPublicId();
             $date = $evaluation->getEvaluatedAt()->format('Y-m-d');
-            $data[$employeePublicId][$date] = $evaluation;
+            $data[$employeePublicId][$date] = EmployeeEvaluationDTO::fromEntity($evaluation, true);
         }
 
         return $this->json($data);

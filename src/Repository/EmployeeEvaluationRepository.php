@@ -225,7 +225,7 @@ class EmployeeEvaluationRepository extends AbstractRepository
             ->where('employee_evaluation.evaluatedAt >= :from OR :from IS NULL')
             ->andWhere('employee_evaluation.evaluatedAt <= :to OR :to IS NULL')
             ->andWhere('employee.publicId IN (:employees)')
-            ->andWhere('employee_evaluation.user = :user')
+            ->andWhere('employee_evaluation.evaluator = :user')
             ->setParameters(new ArrayCollection([
                 new Parameter('from', $from, Types::DATE_IMMUTABLE),
                 new Parameter('to', $to, Types::DATE_IMMUTABLE),

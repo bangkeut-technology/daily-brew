@@ -20,7 +20,7 @@ final class EmployeeEvaluationDTO
         public readonly DateTimeImmutable $evaluatedAt,
         public readonly ?string           $note = null,
         public readonly ?float            $averageScore = null,
-        public readonly array             $scores = [],
+        public array                      $scores = [],
         public ?UserDTO                   $evaluator = null,
     )
     {
@@ -49,7 +49,7 @@ final class EmployeeEvaluationDTO
         );
 
         foreach ($evaluation->getScores() as $score) {
-            $score[] = EmployeeScoreDTO::fromEntity($score);
+            $class->scores[] = EmployeeScoreDTO::fromEntity($score);
         }
 
         if ($withEvaluator) {
