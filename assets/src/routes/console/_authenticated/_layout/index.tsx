@@ -10,8 +10,6 @@ import {
     Coffee,
     Crown,
     Plus,
-    TrendingUp,
-    Users,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,10 +20,10 @@ import { Calendar } from '@/components/ui/calendar';
 import { useQuery } from '@tanstack/react-query';
 import { fetchEmployees } from '@/services/employee';
 import { KpiGantt } from '@/components/kpi/kpi-gantt';
-import { MetricCard } from '@/components/card/metric-card';
 import { useTranslation } from 'react-i18next';
 import { NewAttendanceDialog } from '@/components/dialog/new-attendance-dialog';
 import { AttendanceGantt } from '@/components/attendance/attendance-gantt';
+import { MetricSection } from '@/routes/console/_authenticated/_layout/-components/metric-section';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/')({
     component: Dashboard,
@@ -98,26 +96,7 @@ function Dashboard() {
                 </div>
             </div>
 
-            {/* KPI cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                <MetricCard
-                    icon={<TrendingUp className="h-4 w-4" />}
-                    label="Avg KPI"
-                    value={metrics.avgKpi.toFixed(2)}
-                    suffix="/ 5"
-                />
-                <MetricCard
-                    icon={<CalendarDays className="h-4 w-4" />}
-                    label="Attendance"
-                    value={`${metrics.attendanceRate}%`}
-                />
-                <MetricCard icon={<Users className="h-4 w-4" />} label="Employees" value={String(metrics.employees)} />
-                <MetricCard
-                    icon={<ClipboardList className="h-4 w-4" />}
-                    label="On leave today"
-                    value={String(metrics.leavesToday)}
-                />
-            </div>
+            <MetricSection month={month} />
 
             {/* Quick actions */}
             <div className="flex flex-wrap items-center gap-2">

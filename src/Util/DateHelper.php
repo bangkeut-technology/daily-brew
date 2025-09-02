@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Util;
 
+use DateMalformedStringException;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -22,7 +23,7 @@ class DateHelper
      * @param DateTimeInterface|null $date the date to convert. If null, returns the current date and time.
      *
      * @return DateTimeImmutable
-     * @throws Exception
+     * @throws DateMalformedStringException
      */
     public static function toImmutable(?DateTimeInterface $date): DateTimeImmutable
     {
@@ -45,8 +46,7 @@ class DateHelper
      * Converts a DateTimeInterface to DateTimeImmutable and returns the start of the day.
      *
      * @param DateTimeInterface $date the date to convert
-     *
-     * @throws Exception
+     * @throws DateMalformedStringException
      */
     public static function startOfDay(DateTimeInterface $date): DateTimeImmutable
     {
@@ -58,7 +58,7 @@ class DateHelper
      *
      * @param DateTimeInterface $date the date to convert
      *
-     * @throws Exception
+     * @throws DateMalformedStringException
      */
     public static function endOfDay(DateTimeInterface $date): DateTimeImmutable
     {
@@ -70,7 +70,7 @@ class DateHelper
      *
      * @return array{0: DateTimeImmutable, 1: DateTimeImmutable}
      *
-     * @throws Exception
+     * @throws DateMalformedStringException
      */
     public static function todayRange(): array
     {
@@ -87,7 +87,7 @@ class DateHelper
      *
      * @return array{0: DateTimeImmutable, 1: DateTimeImmutable}
      *
-     * @throws Exception
+     * @throws DateMalformedStringException
      */
     public static function currentMonthRange(): array
     {
@@ -105,7 +105,8 @@ class DateHelper
      * @param DateTimeInterface|null $date the date to use for the year. If null, use the current date.
      *
      * @return DateTimeImmutable
-     * @throws Exception
+     *
+     * @throws DateMalformedStringException
      */
     public static function startOfMonth(?DateTimeInterface $date = null): DateTimeImmutable
     {
@@ -120,7 +121,7 @@ class DateHelper
      * @param DateTimeInterface|null $date the date to use for the month. If null, use the current date.
      *
      * @return DateTimeImmutable
-     * @throws Exception
+     * @throws DateMalformedStringException
      */
     public static function endOfMonth(?DateTimeInterface $date = null): DateTimeImmutable
     {
@@ -137,7 +138,7 @@ class DateHelper
      *
      * @return array{0: DateTimeImmutable, 1: DateTimeImmutable}
      *
-     * @throws Exception
+     * @throws DateMalformedStringException
      */
     public static function fromToRange(
         DateTimeInterface|string|null $from = null,
@@ -167,7 +168,8 @@ class DateHelper
      * @param DateTimeInterface|null $date the date to use for the year. If null, use the current date.
      *
      * @return DateTimeImmutable
-     * @throws Exception
+     *
+     * @throws DateMalformedStringException
      */
     public static function startOfYear(?DateTimeInterface $date = null): DateTimeImmutable
     {
@@ -182,7 +184,8 @@ class DateHelper
      * @param DateTimeInterface|null $date the date to use for the year. If null, use the current date.
      *
      * @return DateTimeImmutable
-     * @throws Exception
+     *
+     * @throws DateMalformedStringException
      */
     public static function endOfYear(?DateTimeInterface $date = null): DateTimeImmutable
     {
