@@ -22,8 +22,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * @package App\ApiController
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-#[Route('/stores/{identifier}/settings', name: 'store_setting_')]
-#[OA\Tag(name: 'Store Setting')]
+#[Route('/settings', name: 'setting_')]
+#[OA\Tag(name: 'Setting')]
 class SettingController extends AbstractController
 {
     use SettingTrait;
@@ -95,11 +95,32 @@ class SettingController extends AbstractController
     {
         $payload = $request->getPayload()->all();
         $settingNames = array_keys($payload);
-        $settings = $this->settingRepository->findByNamesAndUser($settingNames, $this->getUser());
-        foreach ($settings as $setting) {
-            $setting->setValue($payload[$setting->getName()]);
-            $this->settingRepository->update($setting, false);
+        $user = $this->getUser();
+
+        // Load existing settings
+        $existingSettings = $this->settingRepository->findByNamesAndUser($settingNames, $user);
+        $settingsByName = [];
+        foreach ($existingSettings as $setting) {
+            $settingsByName[$setting->getName()] = $setting;
         }
+
+        $settings = [];
+
+        foreach ($payload as $name => $value) {
+            if (isset($settingsByName[$name])) {
+                $setting = $settingsByName[$name];
+                $setting->setValue($value);
+            } else {
+                $setting = (new Setting())
+                    ->setName($name)
+                    ->setValue($value)
+                    ->setOwner($user);
+                $this->settingRepository->update($setting, false);
+            }
+
+            $settings[] = $setting;
+        }
+
         $this->settingRepository->flush();
 
         return $this->createSettingResponse([

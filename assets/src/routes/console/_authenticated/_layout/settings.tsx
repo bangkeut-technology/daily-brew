@@ -63,14 +63,11 @@ function SettingsPage() {
     );
 
     return (
-        <div className="flex flex-col items-center justify-center h-full">
+        <div className="flex flex-col space-y-2 h-full">
             <h1 className="text-2xl font-bold">Settings</h1>
             <p className="text-gray-600">Manage your account settings here.</p>
             <Form {...form}>
-                <form
-                    onSubmit={form.handleSubmit(onSubmit)}
-                    className="w-full max-w-md space-y-6 bg-white shadow-md p-6 rounded-md mt-10"
-                >
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
                     <TextField
                         control={form.control}
                         name="numberOfPaidLeave"
@@ -94,7 +91,7 @@ function SettingsPage() {
                         description={t('settings.maximum_late_count.description', { ns: 'glossary' })}
                     />
 
-                    <Button>{t('save')}</Button>
+                    <Button className="w-full">{t('save')}</Button>
                 </form>
             </Form>
         </div>

@@ -69,9 +69,6 @@ class CommonController extends AbstractController
             'leavesToday' => 0,
         ];
 
-
-
-
         return $this->json($data);
     }
 }
