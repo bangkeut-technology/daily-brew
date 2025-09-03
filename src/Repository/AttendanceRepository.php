@@ -8,6 +8,8 @@ namespace App\Repository;
 use App\Entity\Attendance;
 use App\Entity\Employee;
 use App\Entity\User;
+use App\Enum\AttendanceStatusEnum;
+use DatePeriod;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -16,18 +18,9 @@ use Doctrine\ORM\Query\Parameter;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * Class AttendanceRepository
- *
- * @package App\Repository
- * @author  Vandeth THO <thovandeth@gmail.com>
- *
- * @extends ServiceEntityRepository<Attendance>
- *
- * @method Attendance      create()
- * @method Attendance|null find($id, $lockMode = null, $lockVersion = null)
- * @method Attendance|null findOneBy(array $criteria, array $orderBy = null)
- * @method Attendance[]    findAll()
- * @method Attendance[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * Repository for managing Attendance entities.
+ * Extends the base AbstractRepository to provide custom query methods
+ * specific to attendance records.
  */
 class AttendanceRepository extends AbstractRepository
 {
@@ -184,5 +177,57 @@ class AttendanceRepository extends AbstractRepository
             ]))
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Count the number of late attendances for a specific employee within a given period.
+     *
+     * @param Employee   $employee The employee whose late attendances are being counted.
+     * @param DatePeriod $period   The period within which to count the late attendances.
+     * @return int The count of late attendances.
+     */
+    public function countLate(Employee $employee, DatePeriod $period): int
+    {
+        return $this->countStatus(employee: $employee, period: $period, status: AttendanceStatusEnum::LATE);
+    }
+
+    /**
+     * Counts the number of absences for a given employee within a specified date period.
+     *
+     * @param Employee   $employee The employee for whom the absences are being counted.
+     * @param DatePeriod $period   The date range within which absences are counted.
+     *
+     * @return int The total count of absences.
+     */
+    public function countAbsent(Employee $employee, DatePeriod $period): int
+    {
+        return $this->countStatus(employee: $employee, period: $period, status: AttendanceStatusEnum::ABSENT);
+    }
+
+    /**
+     * Counts the occurrences of a specific attendance status for a given employee within a specified date period.
+     *
+     * @param Employee             $employee The employee for whom the status is being counted.
+     * @param DatePeriod           $period   The date range within which the status is counted.
+     * @param AttendanceStatusEnum $status   The attendance status to be counted.
+     *
+     * @return int The total count of the specified attendance status.
+     */
+    public function countStatus(Employee $employee, DatePeriod $period, AttendanceStatusEnum $status): int
+    {
+        return $this->createQueryBuilder('attendance')
+            ->select('COUNT(attendance.id)')
+            ->where('attendance.employee = :employee')
+            ->andWhere('attendance.attendanceDate >= :from')
+            ->andWhere('attendance.attendanceDate <= :to')
+            ->andWhere('attendance.status = :status')
+            ->setParameters(new ArrayCollection([
+                new Parameter('employee', $employee),
+                new Parameter('from', $period->getStartDate(), Types::DATE_IMMUTABLE),
+                new Parameter('to', $period->getEndDate(), Types::DATE_IMMUTABLE),
+                new Parameter('status', $status),
+            ]))
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

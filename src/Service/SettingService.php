@@ -8,6 +8,7 @@ use App\Entity\Setting;
 use App\Entity\User;
 use App\Repository\SettingRepository;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class SettingService
@@ -17,6 +18,9 @@ use Symfony\Bundle\SecurityBundle\Security;
  */
 class SettingService
 {
+    /**
+     * @var User|null
+     */
     private ?User $user;
 
     public function __construct(
@@ -65,6 +69,14 @@ class SettingService
         return (int) $this->get($key, $default);
     }
 
+    /**
+     * Retrieves a string value associated with the given key.
+     *
+     * @param string $key     The key to retrieve the value for.
+     * @param string $default The default value to return if the key does not exist.
+     *
+     * @return string The retrieved string value, or the default value if the key does not exist.
+     */
     public function getString(string $key, string $default = ''): string
     {
         return (string) $this->get($key, $default);
