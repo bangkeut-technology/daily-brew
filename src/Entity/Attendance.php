@@ -6,6 +6,7 @@ namespace App\Entity;
 
 
 use App\Enum\AttendanceStatusEnum;
+use App\Enum\LeaveTypeEnum;
 use App\Repository\AttendanceRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
@@ -68,6 +69,12 @@ class Attendance extends AbstractEntity
     #[ORM\Column(enumType: AttendanceStatusEnum::class)]
     #[Groups(['attendance:read'])]
     private AttendanceStatusEnum $status = AttendanceStatusEnum::PRESENT;
+
+    /**
+     * @var LeaveTypeEnum|null
+     */
+    #[ORM\Column(nullable: true, enumType: LeaveTypeEnum::class)]
+    private ?LeaveTypeEnum $leaveType = null;
 
     /**
      * The employee associated with this attendance.
@@ -176,6 +183,29 @@ class Attendance extends AbstractEntity
     public function setStatus(AttendanceStatusEnum $status): Attendance
     {
         $this->status = $status;
+        return $this;
+    }
+
+    /**
+     * @return LeaveTypeEnum|null
+     */
+    public function getLeaveType(): ?LeaveTypeEnum
+    {
+        return $this->leaveType;
+    }
+
+    /**
+     * @param LeaveTypeEnum|null $leaveType
+     * @return Attendance
+     */
+    public function setLeaveType(?LeaveTypeEnum $leaveType): self
+    {
+        if ($this->status !== AttendanceStatusEnum::LEAVE) {
+            $leaveType = null;
+        }
+
+        $this->leaveType = $leaveType;
+
         return $this;
     }
 

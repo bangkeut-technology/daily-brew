@@ -9,6 +9,7 @@ use App\Entity\Attendance;
 use App\Entity\Employee;
 use App\Entity\User;
 use App\Enum\AttendanceStatusEnum;
+use App\Enum\LeaveTypeEnum;
 use DatePeriod;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -226,6 +227,34 @@ class AttendanceRepository extends AbstractRepository
                 new Parameter('from', $period->getStartDate(), Types::DATE_IMMUTABLE),
                 new Parameter('to', $period->getEndDate(), Types::DATE_IMMUTABLE),
                 new Parameter('status', $status),
+            ]))
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Counts the number of paid leaves for a specific user within a given date range.
+     *
+     * @param User         $user  The user whose paid leaves are to be counted.
+     * @param DateTimeImmutable $start The start date of the period for which to count paid leaves.
+     * @param DateTimeImmutable $end   The end date of the period for which to count paid leaves.
+     *
+     * @return int The total number of paid leaves within the specified range.
+     */
+    public function countPaidLeavesBetween(User $user, DateTimeImmutable $start, DateTimeImmutable $end): int
+    {
+        return $this->createQueryBuilder('attendance')
+            ->select('COUNT(attendance.id)')
+            ->where('attendance.user = :user')
+            ->andWhere('attendance.attendanceDate >= :start')
+            ->andWhere('attendance.attendanceDate <= :end')
+            ->andWhere('attendance.status = :status')
+            ->andWhere('attendance.leaveType = :leaveType')
+            ->setParameters(new ArrayCollection([
+                new Parameter('user', $user),
+                new Parameter('start', $start, Types::DATE_IMMUTABLE),
+                new Parameter('end', $end, Types::DATE_IMMUTABLE),
+                new Parameter('leaveType', LeaveTypeEnum::PAID),
             ]))
             ->getQuery()
             ->getSingleScalarResult();

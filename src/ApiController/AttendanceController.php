@@ -9,6 +9,7 @@ use App\DTO\AttendanceDTO;
 use App\DTO\EmployeeDTO;
 use App\Entity\Attendance;
 use App\Entity\Employee;
+use App\Event\Attendance\AttendanceCreatedEvent;
 use App\Form\AttendanceFormType;
 use App\Repository\AttendanceRepository;
 use App\Util\DateHelper;
@@ -16,6 +17,7 @@ use DateTimeImmutable;
 use Exception;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,7 +38,7 @@ class AttendanceController extends AbstractController
 
     public function __construct(
         TranslatorInterface                   $translator,
-        private readonly AttendanceRepository $attendanceRepository
+        private readonly AttendanceRepository $attendanceRepository, private readonly EventDispatcherInterface $eventDispatcher
     )
     {
         parent::__construct($translator);
@@ -214,7 +216,10 @@ class AttendanceController extends AbstractController
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
             $attendance->setUser($this->getUser());
+
             $this->attendanceRepository->update($attendance);
+
+            $this->eventDispatcher->dispatch(new AttendanceCreatedEvent($attendance));
 
             return $this->createAttendanceResponse($attendance, Response::HTTP_CREATED);
         }
