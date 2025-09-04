@@ -42,12 +42,13 @@ readonly class AttendanceSubscriber implements EventSubscriberInterface
      * The method applies a limit to the number of paid leaves allowed and adjusts the leave types
      * (paid or unpaid) for a given time window (monthly or yearly) according to the cycle configuration.
      *
-     * @param Attendance $attendance
+     * @param RebalanceLeaveCycleEvent $event
      * @return void
      * @throws DateMalformedStringException
      */
-    public function onRebalanceCycle(Attendance $attendance): void
+    public function onRebalanceCycle(RebalanceLeaveCycleEvent $event): void
     {
+        $attendance = $event->attendance;
         if ($attendance->getStatus() !== AttendanceStatusEnum::LEAVE) {
             return;
         }
