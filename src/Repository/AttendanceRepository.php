@@ -16,6 +16,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Parameter;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -235,7 +236,7 @@ class AttendanceRepository extends AbstractRepository
     /**
      * Counts the number of paid leaves for a specific user within a given date range.
      *
-     * @param User         $user  The user whose paid leaves are to be counted.
+     * @param User              $user  The user whose paid leaves are to be counted.
      * @param DateTimeImmutable $start The start date of the period for which to count paid leaves.
      * @param DateTimeImmutable $end   The end date of the period for which to count paid leaves.
      *
@@ -243,8 +244,40 @@ class AttendanceRepository extends AbstractRepository
      */
     public function countPaidLeavesBetween(User $user, DateTimeImmutable $start, DateTimeImmutable $end): int
     {
-        return $this->createQueryBuilder('attendance')
+        return $this->createFindPaidLeavesBetweenQuery($user, $start, $end)
             ->select('COUNT(attendance.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Finds the total number of paid leave records for a specified user within a specified date range.
+     *
+     * @param User              $user  The user for whom the paid leaves are being queried.
+     * @param DateTimeImmutable $start The start date of the date range.
+     * @param DateTimeImmutable $end   The end date of the date range.
+     *
+     * @return Attendance[] The list of paid leave records within the specified range.
+     */
+    public function findPaidLeavesBetween(User $user, DateTimeImmutable $start, DateTimeImmutable $end): array
+    {
+        return $this->createFindPaidLeavesBetweenQuery($user, $start, $end)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Creates a query builder to find paid leave records for a given user within a specified date range.
+     *
+     * @param User              $user  The user for whom the paid leave query is being constructed.
+     * @param DateTimeImmutable $start The start date of the date range used in the query.
+     * @param DateTimeImmutable $end   The end date of the date range used in the query.
+     *
+     * @return QueryBuilder The query builder configured to retrieve the specified paid leave records.
+     */
+    private function createFindPaidLeavesBetweenQuery(User $user, DateTimeImmutable $start, DateTimeImmutable $end): QueryBuilder
+    {
+        return $this->createQueryBuilder('attendance')
             ->where('attendance.user = :user')
             ->andWhere('attendance.attendanceDate >= :start')
             ->andWhere('attendance.attendanceDate <= :end')
@@ -255,8 +288,6 @@ class AttendanceRepository extends AbstractRepository
                 new Parameter('start', $start, Types::DATE_IMMUTABLE),
                 new Parameter('end', $end, Types::DATE_IMMUTABLE),
                 new Parameter('leaveType', LeaveTypeEnum::PAID),
-            ]))
-            ->getQuery()
-            ->getSingleScalarResult();
+            ]));
     }
 }

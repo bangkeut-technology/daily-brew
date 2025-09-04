@@ -52,13 +52,9 @@ readonly class AttendanceSubscriber implements EventSubscriberInterface
 
 
         $date = $attendance->getAttendanceDate();
-        if ($cycle === 'yearly') {
-            $start = DateHelper::startOfYear($date);
-            $end = DateHelper::endOfYear($date);
-        } else {
-            $start = DateHelper::startOfMonth($date);
-            $end = DateHelper::endOfMonth($date);
-        }
+        [$start, $end] = $cycle === 'yearly'
+            ? [DateHelper::startOfYear($date), DateHelper::endOfYear($date)]
+            : [DateHelper::startOfMonth($date), DateHelper::endOfMonth($date)];
 
         $usedPaidLeaves = $this->attendanceRepository->countPaidLeavesBetween($user, $start, $end);
 
