@@ -12,7 +12,6 @@ use App\Enum\AttendanceStatusEnum;
 use App\Enum\LeaveTypeEnum;
 use DatePeriod;
 use DateTimeImmutable;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Parameter;
@@ -78,8 +77,8 @@ class AttendanceRepository extends AbstractRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        foreach ($orderBy as $sort => $sort) {
-            $qb->addOrderBy($sort, $sort);
+        foreach ($orderBy as $sort => $order) {
+            $qb->addOrderBy($sort, $order);
         }
 
         return $qb->getQuery()->getResult();
@@ -153,10 +152,10 @@ class AttendanceRepository extends AbstractRepository
      * Finds attendance data for Gantt chart visualization based on provided criteria.
      *
      * @param array $criteria A set of filters to retrieve attendance data. Expected keys:
-     *                        - 'from': Start date of the attendance range (nullable, DATE_IMMUTABLE).
+     *                        - 'From': Start date of the attendance range (nullable, DATE_IMMUTABLE).
      *                        - 'to': End date of the attendance range (nullable, DATE_IMMUTABLE).
      *                        - 'employees': Array of employee public IDs to filter by.
-     *                        - 'user': Public ID of the user associated with the attendance.
+     *                        - 'User': Public ID of the user associated with the attendance.
      *
      * @return Attendance[] The array of attendance records matching the given criteria.
      */
@@ -184,110 +183,150 @@ class AttendanceRepository extends AbstractRepository
     /**
      * Count the number of late attendances for a specific employee within a given period.
      *
-     * @param Employee   $employee The employee whose late attendances are being counted.
-     * @param DatePeriod $period   The period within which to count the late attendances.
+     * @param Employee          $employee The employee whose late attendances are being counted.
+     * @param DateTimeImmutable $start    The start date of the period.
+     * @param DateTimeImmutable $end      The end date of the period.
      * @return int The count of late attendances.
      */
-    public function countLate(Employee $employee, DatePeriod $period): int
+    public function countLate(Employee $employee, DateTimeImmutable $start, DateTimeImmutable $end): int
     {
-        return $this->countStatus(employee: $employee, period: $period, status: AttendanceStatusEnum::LATE);
+        return $this->countStatus($employee, $start, $end, AttendanceStatusEnum::LATE);
     }
 
     /**
      * Counts the number of absences for a given employee within a specified date period.
      *
      * @param Employee   $employee The employee for whom the absences are being counted.
-     * @param DatePeriod $period   The date range within which absences are counted.
+     * @param DateTimeImmutable $start The start date of the period.
+     * @param DateTimeImmutable $end The end date of the period.
      *
      * @return int The total count of absences.
      */
-    public function countAbsent(Employee $employee, DatePeriod $period): int
+    public function countAbsent(Employee $employee, DateTimeImmutable $start, DateTimeImmutable $end): int
     {
-        return $this->countStatus(employee: $employee, period: $period, status: AttendanceStatusEnum::ABSENT);
+        return $this->countStatus($employee, $start, $end, AttendanceStatusEnum::ABSENT);
     }
 
     /**
      * Counts the occurrences of a specific attendance status for a given employee within a specified date period.
      *
      * @param Employee             $employee The employee for whom the status is being counted.
-     * @param DatePeriod           $period   The date range within which the status is counted.
+     * @param DateTimeImmutable    $start    The start date of the period.
+     * @param DateTimeImmutable    $end      The end date of the period.
      * @param AttendanceStatusEnum $status   The attendance status to be counted.
      *
      * @return int The total count of the specified attendance status.
      */
-    public function countStatus(Employee $employee, DatePeriod $period, AttendanceStatusEnum $status): int
+    public function countStatus(Employee $employee, DateTimeImmutable $start, DateTimeImmutable $end, AttendanceStatusEnum $status): int
+    {
+        return $this->createStatusBetweenQuery($employee, $start, $end, $status)
+            ->select('COUNT(attendance.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Counts the occurrences of a specific attendance status for a given employee within a specified date period.
+     *
+     * @param Employee             $employee The employee for whom the status is being counted.
+     * @param DateTimeImmutable    $start    The start date of the period.
+     * @param DateTimeImmutable    $end      The end date of the period.
+     * @param AttendanceStatusEnum $status   The attendance status to be counted.
+     *
+     * @return Attendance[] The list of attendance records matching the specified status within the given period.
+     */
+    public function findStatus(Employee $employee, DateTimeImmutable $start, DateTimeImmutable $end, AttendanceStatusEnum $status): array
+    {
+        return $this->createStatusBetweenQuery($employee, $start, $end, $status)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Finds the total number of paid leave records for a specified user within a specified date range.
+     *
+     * @param Employee          $employee The employee for whom the paid leave records are being counted.
+     * @param DateTimeImmutable $start    The start date of the date range.
+     * @param DateTimeImmutable $end      The end date of the date range.
+     *
+     * @return Attendance[] The list of paid leave records within the specified range.
+     */
+    public function findPaidLeavesBetween(Employee $employee, DateTimeImmutable $start, DateTimeImmutable $end): array
+    {
+        return $this->createPaidLeavesBetweenQuery($employee, $start, $end)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Counts the number of paid leaves for a specific user within a given date range.
+     *
+     * @param Employee          $employee The employee for whom the paid leaves are being counted.
+     * @param DateTimeImmutable $start    The start date of the period for which to count paid leaves.
+     * @param DateTimeImmutable $end      The end date of the period for which to count paid leaves.
+     *
+     * @return int The total number of paid leaves within the specified range.
+     */
+    public function countPaidLeavesBetween(Employee $employee, DateTimeImmutable $start, DateTimeImmutable $end): int
+    {
+        return $this->createPaidLeavesBetweenQuery($employee, $start, $end)
+            ->select('COUNT(attendance.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Creates a query builder to find paid leave records for a given user within a specified date range.
+     *
+     * @param Employee          $employee The employee for whom the paid leaves are being counted.
+     * @param DateTimeImmutable $start    The start date of the date range used in the query.
+     * @param DateTimeImmutable $end      The end date of the date range used in the query.
+     *
+     * @return QueryBuilder The query builder configured to retrieve the specified paid leave records.
+     */
+    private function createPaidLeavesBetweenQuery(Employee $employee, DateTimeImmutable $start, DateTimeImmutable $end): QueryBuilder
     {
         return $this->createQueryBuilder('attendance')
-            ->select('COUNT(attendance.id)')
+            ->where('attendance.employee = :employee')
+            ->andWhere('attendance.attendanceDate >= :start')
+            ->andWhere('attendance.attendanceDate <= :end')
+            ->andWhere('attendance.status = :status')
+            ->andWhere('attendance.leaveType = :leaveType')
+            ->setParameters(new ArrayCollection([
+                new Parameter('employee', $employee),
+                new Parameter('start', $start, Types::DATE_IMMUTABLE),
+                new Parameter('end', $end, Types::DATE_IMMUTABLE),
+                new Parameter('leaveType', LeaveTypeEnum::PAID),
+            ]));
+    }
+
+    /**
+     * Creates a query to retrieve attendance records for an employee within a specific date range and with a specified status.
+     *
+     * @param Employee             $employee The employee whose attendance records are being queried.
+     * @param DateTimeImmutable    $start    The start date of the query range.
+     * @param DateTimeImmutable    $end      The end date of the query range.
+     * @param AttendanceStatusEnum $status   The attendance status to filter by.
+     *
+     * @return QueryBuilder The query builder configured for retrieving the specified attendance records.
+     */
+    private function createStatusBetweenQuery(
+        Employee             $employee,
+        DateTimeImmutable    $start,
+        DateTimeImmutable    $end,
+        AttendanceStatusEnum $status
+    ): QueryBuilder
+    {
+        return $this->createQueryBuilder('attendance')
             ->where('attendance.employee = :employee')
             ->andWhere('attendance.attendanceDate >= :from')
             ->andWhere('attendance.attendanceDate <= :to')
             ->andWhere('attendance.status = :status')
             ->setParameters(new ArrayCollection([
                 new Parameter('employee', $employee),
-                new Parameter('from', $period->getStartDate(), Types::DATE_IMMUTABLE),
-                new Parameter('to', $period->getEndDate(), Types::DATE_IMMUTABLE),
+                new Parameter('from', $start, Types::DATE_IMMUTABLE),
+                new Parameter('to', $end, Types::DATE_IMMUTABLE),
                 new Parameter('status', $status),
-            ]))
-            ->getQuery()
-            ->getSingleScalarResult();
-    }
-
-    /**
-     * Counts the number of paid leaves for a specific user within a given date range.
-     *
-     * @param User              $user  The user whose paid leaves are to be counted.
-     * @param DateTimeImmutable $start The start date of the period for which to count paid leaves.
-     * @param DateTimeImmutable $end   The end date of the period for which to count paid leaves.
-     *
-     * @return int The total number of paid leaves within the specified range.
-     */
-    public function countPaidLeavesBetween(User $user, DateTimeImmutable $start, DateTimeImmutable $end): int
-    {
-        return $this->createFindPaidLeavesBetweenQuery($user, $start, $end)
-            ->select('COUNT(attendance.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
-    }
-
-    /**
-     * Finds the total number of paid leave records for a specified user within a specified date range.
-     *
-     * @param User              $user  The user for whom the paid leaves are being queried.
-     * @param DateTimeImmutable $start The start date of the date range.
-     * @param DateTimeImmutable $end   The end date of the date range.
-     *
-     * @return Attendance[] The list of paid leave records within the specified range.
-     */
-    public function findPaidLeavesBetween(User $user, DateTimeImmutable $start, DateTimeImmutable $end): array
-    {
-        return $this->createFindPaidLeavesBetweenQuery($user, $start, $end)
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
-     * Creates a query builder to find paid leave records for a given user within a specified date range.
-     *
-     * @param User              $user  The user for whom the paid leave query is being constructed.
-     * @param DateTimeImmutable $start The start date of the date range used in the query.
-     * @param DateTimeImmutable $end   The end date of the date range used in the query.
-     *
-     * @return QueryBuilder The query builder configured to retrieve the specified paid leave records.
-     */
-    private function createFindPaidLeavesBetweenQuery(User $user, DateTimeImmutable $start, DateTimeImmutable $end): QueryBuilder
-    {
-        return $this->createQueryBuilder('attendance')
-            ->where('attendance.user = :user')
-            ->andWhere('attendance.attendanceDate >= :start')
-            ->andWhere('attendance.attendanceDate <= :end')
-            ->andWhere('attendance.status = :status')
-            ->andWhere('attendance.leaveType = :leaveType')
-            ->setParameters(new ArrayCollection([
-                new Parameter('user', $user),
-                new Parameter('start', $start, Types::DATE_IMMUTABLE),
-                new Parameter('end', $end, Types::DATE_IMMUTABLE),
-                new Parameter('leaveType', LeaveTypeEnum::PAID),
             ]));
     }
 }

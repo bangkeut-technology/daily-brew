@@ -9,7 +9,7 @@ use App\DTO\AttendanceDTO;
 use App\DTO\EmployeeDTO;
 use App\Entity\Attendance;
 use App\Entity\Employee;
-use App\Event\Attendance\AttendanceCreatedEvent;
+use App\Event\Attendance\RebalanceLeaveCycleEvent;
 use App\Form\AttendanceFormType;
 use App\Repository\AttendanceRepository;
 use App\Util\DateHelper;
@@ -219,7 +219,7 @@ class AttendanceController extends AbstractController
 
             $this->attendanceRepository->update($attendance);
 
-            $this->eventDispatcher->dispatch(new AttendanceCreatedEvent($attendance));
+            $this->eventDispatcher->dispatch(new RebalanceLeaveCycleEvent($attendance));
 
             return $this->createAttendanceResponse($attendance, Response::HTTP_CREATED);
         }
@@ -319,6 +319,8 @@ class AttendanceController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->attendanceRepository->update($attendance);
 
+            $this->eventDispatcher->dispatch(new RebalanceLeaveCycleEvent($attendance));
+
             return $this->createAttendanceResponse(['attendance' => $attendance, 'message' => $this->translator->trans('updated.attendance')]);
         }
 
@@ -355,6 +357,8 @@ class AttendanceController extends AbstractController
     {
         $attendance = $this->getAttendanceByPublicId($publicId);
         $this->attendanceRepository->delete($attendance);
+
+        $this->eventDispatcher->dispatch(new RebalanceLeaveCycleEvent($attendance));
 
         return $this->createAttendanceResponse($this->translator->trans('deleted.attendance'));
     }

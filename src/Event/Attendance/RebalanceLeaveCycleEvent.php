@@ -7,12 +7,12 @@ use App\Entity\Attendance;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class AttendanceCreatedEvent
+ * Class RebalanceLeaveCycleEvent
  *
  * @package App\Event\Attendance
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-class AttendanceCreatedEvent extends Event
+class RebalanceLeaveCycleEvent extends Event
 {
     public function __construct(
         public Attendance $attendance

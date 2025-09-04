@@ -4,9 +4,10 @@ declare(strict_types=1);
 namespace App\EventSubscriber;
 
 use App\Constant\SettingConstant;
+use App\Entity\Attendance;
 use App\Enum\AttendanceStatusEnum;
 use App\Enum\LeaveTypeEnum;
-use App\Event\Attendance\AttendanceCreatedEvent;
+use App\Event\Attendance\RebalanceLeaveCycleEvent;
 use App\Repository\AttendanceRepository;
 use App\Service\SettingService;
 use App\Util\DateHelper;
@@ -31,36 +32,43 @@ readonly class AttendanceSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            AttendanceCreatedEvent::class => 'onAttendanceCreated',
+            RebalanceLeaveCycleEvent::class => 'onRebalanceCycle',
         ];
     }
 
     /**
+     * Adjusts the leave cycle for an employee based on a defined anchor date and cycle settings.
+     *
+     * The method applies a limit to the number of paid leaves allowed and adjusts the leave types
+     * (paid or unpaid) for a given time window (monthly or yearly) according to the cycle configuration.
+     *
+     * @param Attendance $attendance
+     * @return void
      * @throws DateMalformedStringException
      */
-    public function onAttendanceCreated(AttendanceCreatedEvent $event): void
+    public function onRebalanceCycle(Attendance $attendance): void
     {
-        $attendance = $event->attendance;
-        if ($attendance->getLeaveType() !== null || $attendance->getStatus() !== AttendanceStatusEnum::LEAVE) {
-            return; // Skip if already has leaveType or not absent
+        if ($attendance->getStatus() !== AttendanceStatusEnum::LEAVE) {
+            return;
         }
 
-        $user = $attendance->getUser();
-
-        $paidLeaveLimit = $this->settingService->getInt(SettingConstant::NUMBER_OF_PAID_LEAVE, 3);
+        $limit = $this->settingService->getInt(SettingConstant::NUMBER_OF_PAID_LEAVE, 3);
         $cycle = $this->settingService->getString(SettingConstant::PAID_LEAVE_CYCLE, 'monthly');
+        $attendanceDate = $attendance->getAttendanceDate();
 
-
-        $date = $attendance->getAttendanceDate();
         [$start, $end] = $cycle === 'yearly'
-            ? [DateHelper::startOfYear($date), DateHelper::endOfYear($date)]
-            : [DateHelper::startOfMonth($date), DateHelper::endOfMonth($date)];
+            ? [DateHelper::startOfYear($attendanceDate), DateHelper::endOfYear($attendanceDate)]
+            : [DateHelper::startOfMonth($attendanceDate), DateHelper::endOfMonth($attendanceDate)];
 
-        $usedPaidLeaves = $this->attendanceRepository->countPaidLeavesBetween($user, $start, $end);
+        $leaves = $this->attendanceRepository->findStatus($attendance->getEmployee(), $start, $end, AttendanceStatusEnum::LEAVE);
 
-        $leaveType = $usedPaidLeaves < $paidLeaveLimit ? LeaveTypeEnum::PAID : LeaveTypeEnum::UNPAID;
-        $attendance->setLeaveType($leaveType);
+        foreach ($leaves as $i => $leave) {
+            $shouldBe = ($i < $limit) ? LeaveTypeEnum::PAID : LeaveTypeEnum::UNPAID;
+            if ($leave->getLeaveType() !== $shouldBe) {
+                $leave->setLeaveType($shouldBe);
+            }
+        }
 
-        $this->attendanceRepository->update($attendance);
+        $this->attendanceRepository->flush();
     }
 }
