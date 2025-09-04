@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace App\EventSubscriber;
 
 use App\Constant\SettingConstant;
-use App\Entity\Attendance;
 use App\Enum\AttendanceStatusEnum;
 use App\Enum\LeaveTypeEnum;
 use App\Event\Attendance\RebalanceLeaveCycleEvent;
