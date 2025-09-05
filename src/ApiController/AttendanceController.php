@@ -13,6 +13,7 @@ use App\Event\Attendance\RebalanceLeaveCycleEvent;
 use App\Form\AttendanceFormType;
 use App\Repository\AttendanceRepository;
 use App\Util\DateHelper;
+use DateMalformedStringException;
 use DateTimeImmutable;
 use Exception;
 use Nelmio\ApiDocBundle\Attribute\Model;
@@ -225,6 +226,50 @@ class AttendanceController extends AbstractController
         }
 
         return $this->createAttendanceResponse($attendance, Response::HTTP_CREATED);
+    }
+
+    /**
+     * Retrieve upcoming leaves within a specified date range for filtering by an employee if provided.
+     *
+     * @param Request              $request              The HTTP request containing query parameters.
+     * @param AttendanceRepository $attendanceRepository The repository to fetch attendance data.
+     *
+     * @return JsonResponse
+     *
+     * @throws DateMalformedStringException
+     */
+    #[Route('/upcoming', name: 'upcoming', methods: ['GET'])]
+    public function upcomingLeaves(
+        Request $request,
+        AttendanceRepository $attendanceRepository,
+    ): JsonResponse {
+        $fromStr = $request->query->get('from');
+        $toStr   = $request->query->get('to');
+        $employeeId = $request->query->get('employeeId');
+
+        $today = new DateTimeImmutable('today');
+        $defaultTo = $today->modify('+14 days');
+
+        $from = $fromStr ? new DateTimeImmutable($fromStr) : $today;
+        $to   = $toStr   ? new DateTimeImmutable($toStr)   : $defaultTo;
+
+        if ($from > $to) {
+            return $this->json(
+                ['message' => 'Invalid date range: from must be <= to.'],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+
+        $owner = $this->getUser();
+
+        $attendances = $attendanceRepository->findUpcomingLeaves(
+            owner: $owner,
+            from: $from,
+            to: $to,
+            employeeId: $employeeId
+        );
+
+        return $this->createAttendanceResponse($attendances);
     }
 
     /**

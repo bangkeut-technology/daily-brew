@@ -12,6 +12,7 @@ use App\Enum\AttendanceStatusEnum;
 use App\Enum\LeaveTypeEnum;
 use DatePeriod;
 use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Parameter;
@@ -354,5 +355,40 @@ class AttendanceRepository extends AbstractRepository
             ]));
 
         return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Retrieves a list of upcoming leave records for a specific user within a given date range.
+     *
+     * @param User              $owner      The owner of the leave records being queried.
+     * @param DateTimeImmutable $from       The start of the date range for querying leaves.
+     * @param DateTimeImmutable $to         The end of the date range for querying leaves.
+     * @param string|null       $employeeId An optional employee ID to filter leave records for a specific employee.
+     *
+     * @return Attendance[] The list of leave records matching the criteria within the specified range.
+     */
+    public function findUpcomingLeaves(
+        User $owner,
+        DateTimeImmutable $from,
+        DateTimeImmutable $to,
+        ?string $employeeId = null
+    ): array {
+        $qb = $this->createQueryBuilder('attendance')
+            ->addSelect('employee')
+            ->innerJoin('attendance.employee', 'employee')
+            ->andWhere('employee.owner = :owner')
+            ->andWhere('attendance.status = :leaveStatus')
+            ->andWhere('attendance.attendanceDate BETWEEN :from AND :to')
+            ->setParameter('owner', $owner)
+            ->setParameter('leaveStatus', AttendanceStatusEnum::LEAVE)
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->orderBy('a.attendanceDate', 'ASC');
+
+        if ($employeeId) {
+            $qb->andWhere('employee.publicId = :eid')->setParameter('eid', $employeeId);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 }
