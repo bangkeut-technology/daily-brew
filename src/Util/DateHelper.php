@@ -193,4 +193,22 @@ class DateHelper
             self::toImmutable($date)->modify('last day of December this year')
         );
     }
+
+    /**
+     * Calculates the number of days between two dates.
+     *
+     * This method computes the difference in days between two specified dates.
+     * If the $inclusive flag is set to true, the result includes both the start
+     * and end dates in the count; otherwise, only the days in between are counted.
+     *
+     * @param DateTimeInterface $from      The starting date.
+     * @param DateTimeInterface $to        The ending date.
+     * @param bool              $inclusive Whether to include the start and end dates in the count.
+     * @return int The number of days between the two dates, including the boundaries if $inclusive is true.
+     */
+    public static function daysBetween(DateTimeInterface $from, DateTimeInterface $to, bool $inclusive = false): int
+    {
+        $diff = $from->diff($to)->days;
+        return $inclusive ? $diff + 1 : $diff;
+    }
 }

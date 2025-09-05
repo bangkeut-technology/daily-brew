@@ -7,7 +7,10 @@ namespace App\Repository;
 use App\Entity\Employee;
 use App\Entity\Store;
 use App\Entity\User;
+use App\Enum\EmployeeStatusEnum;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -188,6 +191,39 @@ class EmployeeRepository extends AbstractRepository
             ->andWhere('e.user = :user')
             ->setParameter('ids', $ids)
             ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Searches for active employees associated with a given owner.
+     *
+     * @param User $user The owner to filter employees by.
+     *
+     * @return array An array of active employees associated with the given owner.
+     */
+    public function findActiveByOwner(User $user): array
+    {
+        return $this->findStatus($user, EmployeeStatusEnum::ACTIVE);
+    }
+
+    /**
+     * Method to find employees based on user and status.
+     *
+     * @param User               $user   The user entity to filter results by.
+     * @param EmployeeStatusEnum $status The status enumeration to filter results by.
+     *
+     * @return Employee[] Returns an array of Employee entities that match the criteria.
+     */
+    public function findStatus(User $user, EmployeeStatusEnum $status): array
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.user = :user')
+            ->andWhere('e.status = :status')
+            ->setParameters(new ArrayCollection([
+                new Parameter('status', $status),
+                new Parameter('user', $user),
+            ]))
             ->getQuery()
             ->getResult();
     }

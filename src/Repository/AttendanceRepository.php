@@ -196,9 +196,9 @@ class AttendanceRepository extends AbstractRepository
     /**
      * Counts the number of absences for a given employee within a specified date period.
      *
-     * @param Employee   $employee The employee for whom the absences are being counted.
-     * @param DateTimeImmutable $start The start date of the period.
-     * @param DateTimeImmutable $end The end date of the period.
+     * @param Employee          $employee The employee for whom the absences are being counted.
+     * @param DateTimeImmutable $start    The start date of the period.
+     * @param DateTimeImmutable $end      The end date of the period.
      *
      * @return int The total count of absences.
      */
@@ -328,5 +328,31 @@ class AttendanceRepository extends AbstractRepository
                 new Parameter('to', $end, Types::DATE_IMMUTABLE),
                 new Parameter('status', $status),
             ]));
+    }
+
+    /**
+     * Counts the number of attendance records with a specific status for a given user on a specific date.
+     *
+     * @param User                 $user    The user for whom the attendance records should be counted.
+     *                                      If null, the count will be performed with no user restriction.
+     * @param DateTimeImmutable    $today   The date for which the attendance records should be counted.
+     * @param AttendanceStatusEnum $status  The attendance status to filter by.
+     *
+     * @return int The count of attendance records matching the criteria.
+     */
+    public function countByStatusOnDateForOwner(User $user, DateTimeImmutable $today, AttendanceStatusEnum $status): int
+    {
+        $qb = $this->createQueryBuilder('attendance')
+            ->select('COUNT(attendance.id)')
+            ->where('attendance.attendanceDate = :today')
+            ->andWhere('attendance.status = :status')
+            ->andWhere('attendance.user = :user')
+            ->setParameters(new ArrayCollection([
+                new Parameter('today', $today, Types::DATE_IMMUTABLE),
+                new Parameter('status', $status),
+                new Parameter('user', $user),
+            ]));
+
+        return $qb->getQuery()->getSingleScalarResult();
     }
 }
