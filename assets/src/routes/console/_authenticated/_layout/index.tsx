@@ -12,9 +12,7 @@ import {
     Plus,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { useQuery } from '@tanstack/react-query';
@@ -25,6 +23,7 @@ import { NewAttendanceDialog } from '@/components/dialog/new-attendance-dialog';
 import { AttendanceGantt } from '@/components/attendance/attendance-gantt';
 import { MetricSection } from '@/routes/console/_authenticated/_layout/-components/metric-section';
 import { UpcomingLeaves } from '@/routes/console/_authenticated/_layout/-components/upcoming-leaves';
+import { RecentEvaluations } from '@/routes/console/_authenticated/_layout/-components/recent-evaluations';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/')({
     component: Dashboard,
@@ -153,32 +152,8 @@ function Dashboard() {
                 </div>
 
                 <div className="space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{t('recent_evaluations', { ns: 'glossary' })}</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-3 text-sm">
-                            {[
-                                { name: 'Sovan', score: 4.3, date: new Date() },
-                                { name: 'Chanthy', score: 3.9, date: new Date() },
-                                { name: 'Mey', score: 4.8, date: new Date() },
-                            ].map((row, i) => (
-                                <div key={i} className="flex items-center justify-between">
-                                    <div className="truncate max-w-[55%]">{row.name}</div>
-                                    <div className="text-muted-foreground">{format(row.date, 'MMM d')}</div>
-                                    <div className="font-medium">{row.score.toFixed(1)}</div>
-                                </div>
-                            ))}
-                            <Separator />
-                            <Button variant="ghost" asChild className="w-full">
-                                <Link to="/console/evaluations/histories">
-                                    {t('see_all_evaluations', { ns: 'glossary' })}
-                                </Link>
-                            </Button>
-                        </CardContent>
-                    </Card>
-
-                    <UpcomingLeaves employees={employees} />
+                    <UpcomingLeaves />
+                    <RecentEvaluations />
                 </div>
             </div>
         </div>

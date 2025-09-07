@@ -66,8 +66,8 @@ class CommonController extends AbstractController
             ]
         )
     )]
-    #[Route('/metric', name: 'metric')]
-    public function metric(
+    #[Route('/metrics', name: 'metrics', methods: ['GET'])]
+    public function metrics(
         Request                      $request,
         AttendanceRateCalculator     $attendanceRateCalculator,
         AttendanceRepository         $attendanceRepository,

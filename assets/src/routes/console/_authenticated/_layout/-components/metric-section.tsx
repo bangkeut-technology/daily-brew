@@ -2,15 +2,20 @@ import React from 'react';
 import { CalendarDays, ClipboardList, TrendingUp, Users } from 'lucide-react';
 import { MetricCard } from '@/components/card/metric-card';
 import { useQuery } from '@tanstack/react-query';
+import { fetchMetrics } from '@/services/common';
+import { endOfMonth, format, startOfMonth } from 'date-fns';
+import { DATE_FORMAT } from '@/constants/date';
 
 interface MetricSectionProps {
     month: Date;
 }
 
-export const MetricSection: React.FunctionComponent<MetricSectionProps> = () => {
+export const MetricSection: React.FunctionComponent<MetricSectionProps> = ({ month }) => {
+    const start = React.useMemo(() => startOfMonth(month), [month]);
+    const end = React.useMemo(() => endOfMonth(month), [month]);
     const { data } = useQuery({
-        queryKey: ['metrics', new Date().toISOString().split('T')[0]],
-        queryFn: () => fetch('/api/metrics').then((res) => res.json()),
+        queryKey: ['common-metrics', start, end],
+        queryFn: () => fetchMetrics({ from: format(start, DATE_FORMAT), to: format(end, DATE_FORMAT) }),
     });
 
     return (
