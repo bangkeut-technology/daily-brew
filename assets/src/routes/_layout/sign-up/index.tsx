@@ -1,4 +1,3 @@
-// routes/sign-up.tsx
 import * as React from 'react';
 import { createFileRoute, Link, redirect, useNavigate } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';

@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { NewAttendanceDialog } from '@/components/dialog/new-attendance-dialog';
 import { AttendanceGantt } from '@/components/attendance/attendance-gantt';
 import { MetricSection } from '@/routes/console/_authenticated/_layout/-components/metric-section';
+import { UpcomingLeaves } from '@/routes/console/_authenticated/_layout/-components/upcoming-leaves';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/')({
     component: Dashboard,
@@ -177,29 +178,7 @@ function Dashboard() {
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Upcoming leave</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-3 text-sm">
-                            {[
-                                { name: 'Mey', from: new Date(), to: new Date() },
-                                { name: 'Boran', from: new Date(), to: new Date() },
-                            ].map((row, i) => (
-                                <div key={i} className="flex items-center justify-between">
-                                    <div className="truncate max-w-[55%]">{row.name}</div>
-                                    <div className="text-muted-foreground">
-                                        {format(row.from, 'MMM d')} – {format(row.to, 'MMM d')}
-                                    </div>
-                                    <Badge variant="secondary">Approved</Badge>
-                                </div>
-                            ))}
-                            <Separator />
-                            <Button variant="ghost" asChild className="w-full">
-                                <Link to="/console/leaves">Open leave board</Link>
-                            </Button>
-                        </CardContent>
-                    </Card>
+                    <UpcomingLeaves employees={employees} />
                 </div>
             </div>
         </div>
