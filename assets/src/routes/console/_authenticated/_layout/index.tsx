@@ -1,20 +1,9 @@
 import * as React from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { endOfMonth, format, startOfMonth } from 'date-fns';
-import {
-    Calendar as CalendarIcon,
-    CalendarDays,
-    ChevronLeft,
-    ChevronRight,
-    ClipboardList,
-    Coffee,
-    Crown,
-    Plus,
-} from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, ClipboardList, Coffee, Crown, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
 import { useQuery } from '@tanstack/react-query';
 import { fetchEmployees } from '@/services/employee';
 import { KpiGantt } from '@/components/kpi/kpi-gantt';
@@ -24,6 +13,7 @@ import { AttendanceGantt } from '@/components/attendance/attendance-gantt';
 import { MetricSection } from '@/routes/console/_authenticated/_layout/-components/metric-section';
 import { UpcomingLeaves } from '@/routes/console/_authenticated/_layout/-components/upcoming-leaves';
 import { RecentEvaluations } from '@/routes/console/_authenticated/_layout/-components/recent-evaluations';
+import { DatePicker } from '@/components/picker/date-picker';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/')({
     component: Dashboard,
@@ -43,14 +33,6 @@ function Dashboard() {
 
     const prevMonth = () => setMonth((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1));
     const nextMonth = () => setMonth((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1));
-
-    // demo metrics (replace with API)
-    const metrics = {
-        avgKpi: 3.8,
-        attendanceRate: 92,
-        employees: 8,
-        leavesToday: 1,
-    };
 
     return (
         <div className="w-full px-6 py-5 space-y-6">
@@ -72,23 +54,14 @@ function Dashboard() {
                         <Button variant="outline" size="icon" onClick={prevMonth} aria-label="Prev month">
                             <ChevronLeft className="h-4 w-4" />
                         </Button>
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button variant="outline" className="min-w-[200px] justify-between">
-                                    <span>{format(month, 'LLLL yyyy')}</span>
-                                    <CalendarIcon className="h-4 w-4 opacity-70" />
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-2" align="end">
-                                <Calendar
-                                    captionLayout="dropdown"
-                                    mode="single"
-                                    selected={month}
-                                    onSelect={(d) => d && setMonth(startOfMonth(d))}
-                                    showOutsideDays
-                                />
-                            </PopoverContent>
-                        </Popover>
+                        <DatePicker
+                            value={month}
+                            onChange={(date) => {
+                                if (date) {
+                                    setMonth(date);
+                                }
+                            }}
+                        />
                         <Button variant="outline" size="icon" onClick={nextMonth} aria-label="Next month">
                             <ChevronRight className="h-4 w-4" />
                         </Button>
