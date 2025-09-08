@@ -134,28 +134,27 @@ class EmployeeEvaluationRepository extends AbstractRepository
     }
 
     /**
-     * Get the list of average scores for employees over a specified period.
+     * Get the average score for a user over a specified period.
      *
      * @param User              $user the user to calculate the average score for
      * @param DateTimeImmutable $from the start date of the period
      * @param DateTimeImmutable $to   the end date of the period
-     * @return array
+     * @return int the average score
      */
-    public function getAverageScoresForPeriodByUser(User $user, DateTimeImmutable $from, DateTimeImmutable $to): array
+    public function getAverageScoresForPeriodByUser(User $user, DateTimeImmutable $from, DateTimeImmutable $to): int
     {
-        $qb = $this->createQueryBuilder('employee_evaluation')
+        $qb = $this->createQueryBuilder('ee')
             ->select('ROUND(AVG(scores.score), 2) AS averageScore')
-            ->innerJoin('employee_evaluation.scores', 'scores')
+            ->innerJoin('ee.scores', 'scores')
             ->where('ee.evaluatedAt BETWEEN :from AND :to')
             ->andWhere('ee.evaluator = :user')
             ->setParameters(new ArrayCollection([
                 new Parameter('from', $from, Types::DATE_IMMUTABLE),
                 new Parameter('to', $to, Types::DATE_IMMUTABLE),
                 new Parameter('user', $user),
-            ]))
-            ->groupBy('e.id');
+            ]));
 
-        return $qb->getQuery()->getArrayResult();
+        return $qb->getQuery()->getSingleScalarResult() ?? 0;
     }
 
     /**

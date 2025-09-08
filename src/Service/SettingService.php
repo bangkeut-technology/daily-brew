@@ -47,7 +47,7 @@ class SettingService
         }
 
         $setting = $this->settingRepository->findOneBy([
-            'user' => $this->user,
+            'owner' => $this->user,
             'name' => $key,
         ]);
 

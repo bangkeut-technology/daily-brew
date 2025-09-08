@@ -44,7 +44,10 @@ readonly class AttendanceRateCalculator
         $lates = $this->attendanceRepository->countLate($employee, $start, $end);
         $absences = $this->attendanceRepository->countAbsent($employee, $start, $end);
 
-        $maxLateAllowed = (int)$this->settingService->get(SettingConstant::MAXIMUM_LATE_COUNT) ?? 3;
+        if (0 === $maxLateAllowed = $this->settingService->getInt(SettingConstant::MAXIMUM_LATE_COUNT, 3)) {
+            return $absences;
+        }
+
         $penaltyAbsences = intdiv($lates, $maxLateAllowed);
 
         return $absences + $penaltyAbsences;
@@ -99,7 +102,16 @@ readonly class AttendanceRateCalculator
     {
         $lates = $this->attendanceRepository->countLate($employee, $start, $end);
         $absences = $this->attendanceRepository->countAbsent($employee, $start, $end);
-        $maxLateAllowed = (int)$this->settingService->get(SettingConstant::MAXIMUM_LATE_COUNT) ?? 3;
+        if (0 === $maxLateAllowed = $this->settingService->getInt(SettingConstant::MAXIMUM_LATE_COUNT, 3)) {
+            return [
+                'attendance_rate' => 0.0,
+                'total_days' => 0,
+                'absences' => 0,
+                'lates' => 0,
+                'penalty_absences' => 0,
+                'adjusted_absences' => 0,
+            ];
+        }
         $penaltyAbsences = intdiv($lates, $maxLateAllowed);
 
         $adjustedAbsences = $absences + $penaltyAbsences;

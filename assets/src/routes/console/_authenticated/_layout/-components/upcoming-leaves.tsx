@@ -10,17 +10,20 @@ import { useQuery } from '@tanstack/react-query';
 
 export const UpcomingLeaves = () => {
     const { t } = useTranslation();
-    const { data } = useQuery({
+    const { data = [] } = useQuery({
         queryKey: ['upcoming-leaves'],
         queryFn: () => {
             return Promise.resolve([]);
         },
         enabled: false,
     });
+
+    console.log(data);
+
     return (
         <Card>
             <CardHeader>
-                <CardTitle>{t('upcoming_leave')}</CardTitle>
+                <CardTitle>{t('upcoming_leaves')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
                 {[
