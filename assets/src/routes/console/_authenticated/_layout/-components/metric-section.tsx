@@ -23,7 +23,7 @@ export const MetricSection: React.FunctionComponent<MetricSectionProps> = ({ mon
             <MetricCard
                 icon={<TrendingUp className="h-4 w-4" />}
                 label="Avg KPI"
-                value={data?.avgKpi.toFixed(2)}
+                value={data?.averageKpi.toFixed(2) || '0'}
                 suffix="/ 5"
             />
             <MetricCard
@@ -31,7 +31,7 @@ export const MetricSection: React.FunctionComponent<MetricSectionProps> = ({ mon
                 label="Attendance"
                 value={`${data?.attendanceRate}%`}
             />
-            <MetricCard icon={<Users className="h-4 w-4" />} label="Employees" value={String(data?.employees)} />
+            <MetricCard icon={<Users className="h-4 w-4" />} label="Employees" value={String(data?.totalEmployees)} />
             <MetricCard
                 icon={<ClipboardList className="h-4 w-4" />}
                 label="On leave today"
