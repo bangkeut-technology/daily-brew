@@ -15,8 +15,9 @@ use Doctrine\ORM\Query\Parameter;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * Class EmployeeEvaluationRepository.
+ * Class EmployeeEvaluationRepository
  *
+ * @package App\Repository
  * @author  Vandeth THO <thovandeth@gmail.com>
  *
  * @extends ServiceEntityRepository<EmployeeEvaluation>

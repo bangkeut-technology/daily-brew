@@ -11,6 +11,7 @@ use App\Entity\User;
 use App\Enum\AttendanceStatusEnum;
 use App\Enum\LeaveTypeEnum;
 use DateTimeImmutable;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Parameter;
@@ -18,9 +19,22 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * Repository for managing Attendance entities.
- * Extends the base AbstractRepository to provide custom query methods
- * specific to attendance records.
+ * Class AttendanceRepository
+ *
+ *  Repository for managing Attendance entities.
+ *  Extends the base AbstractRepository to provide custom query methods
+ *  specific to attendance records.
+ *
+ * @package App\Repository
+ * @author  Vandeth THO <thovandeth@gmail.com>
+ *
+ * @extends ServiceEntityRepository<Attendance>
+ *
+ * @method Attendance      create()
+ * @method Attendance|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Attendance|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Attendance[]    findAll()
+ * @method Attendance[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class AttendanceRepository extends AbstractRepository
 {
@@ -413,5 +427,27 @@ class AttendanceRepository extends AbstractRepository
         }
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Checks if an attendance record exists for a specific user on a given date.
+     *
+     * @param User              $user           The user whose attendance record is being checked.
+     * @param DateTimeImmutable $attendanceDate The date for which the attendance record is being checked.
+     *
+     * @return bool True if an attendance record exists for the user on the specified date, false otherwise.
+     */
+    public function existsForUserOnDay(User $user, DateTimeImmutable $attendanceDate): bool
+    {
+        return $this->createQueryBuilder('attendance')
+            ->select('COUNT(attendance.id)')
+            ->where('attendance.attendanceDate = :attendanceDate')
+            ->andWhere('attendance.user = :user')
+            ->setParameters(new ArrayCollection([
+                new Parameter('attendanceDate', $attendanceDate, Types::DATE_IMMUTABLE),
+                new Parameter('user', $user),
+            ]))
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

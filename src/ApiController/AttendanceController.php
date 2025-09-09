@@ -8,7 +8,6 @@ use App\Controller\AbstractController;
 use App\DTO\AttendanceDTO;
 use App\DTO\EmployeeDTO;
 use App\Entity\Attendance;
-use App\Entity\Employee;
 use App\Enum\AttendanceStatusEnum;
 use App\Event\Attendance\RebalanceLeaveCycleEvent;
 use App\Form\AttendanceFormType;
@@ -39,8 +38,9 @@ class AttendanceController extends AbstractController
     use AttendanceTrait;
 
     public function __construct(
-        TranslatorInterface                   $translator,
-        private readonly AttendanceRepository $attendanceRepository, private readonly EventDispatcherInterface $eventDispatcher
+        TranslatorInterface                       $translator,
+        private readonly AttendanceRepository     $attendanceRepository,
+        private readonly EventDispatcherInterface $eventDispatcher
     )
     {
         parent::__construct($translator);
@@ -75,7 +75,7 @@ class AttendanceController extends AbstractController
         schema: new OA\Schema(type: 'string')
     )]
     #[OA\Parameter(
-        name:'status',
+        name: 'status',
         description: 'The status of the attendance',
         in: 'query',
         required: false,
@@ -219,6 +219,14 @@ class AttendanceController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $attendance->setUser($this->getUser());
 
+            $exists = $this->attendanceRepository->existsForUserOnDay($this->getUser(), $attendance->getAttendanceDate());
+            if ($exists) {
+                return $this->json(
+                    ['message' => $this->translator->trans('attendance.duplicate_for_day', ['%date%' => $attendance->getAttendanceDate()], domain: 'errors')],
+                    Response::HTTP_CONFLICT
+                );
+            }
+
             $this->attendanceRepository->update($attendance);
 
             $this->eventDispatcher->dispatch(new RebalanceLeaveCycleEvent($attendance));
@@ -241,14 +249,15 @@ class AttendanceController extends AbstractController
      */
     #[Route('/upcoming', name: 'upcoming', methods: ['GET'])]
     public function upcomingLeaves(
-        Request $request,
+        Request              $request,
         AttendanceRepository $attendanceRepository,
-    ): JsonResponse {
+    ): JsonResponse
+    {
         $employeePublicId = $request->query->get('employeePublicId');
         $status = $request->query->get('status');
 
         $from = new DateTimeImmutable('today 00:00:00');
-        $to   = $from->modify('+14 days')->setTime(23, 59, 59);
+        $to = $from->modify('+14 days')->setTime(23, 59, 59);
 
         $attendances = $attendanceRepository->findUpcomingStatus(
             user: $this->getUser(),
