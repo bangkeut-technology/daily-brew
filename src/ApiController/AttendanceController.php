@@ -226,7 +226,7 @@ class AttendanceController extends AbstractController
             return $this->createAttendanceResponse($attendance, Response::HTTP_CREATED);
         }
 
-        return $this->createAttendanceResponse($attendance, Response::HTTP_CREATED);
+        return $this->createBadRequestResponse($this->translator->trans('invalid.attendance', domain: 'errors'));
     }
 
     /**
@@ -249,9 +249,6 @@ class AttendanceController extends AbstractController
 
         $from = new DateTimeImmutable('today 00:00:00');
         $to   = $from->modify('+14 days')->setTime(23, 59, 59);
-
-
-        $owner = $this->getUser();
 
         $attendances = $attendanceRepository->findUpcomingStatus(
             user: $this->getUser(),
