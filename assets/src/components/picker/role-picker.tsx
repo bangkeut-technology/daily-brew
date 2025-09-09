@@ -11,7 +11,7 @@ interface RolePickerProps {
     date?: Date;
     nullable?: boolean;
     value?: string;
-    onChange?: (value: string) => void;
+    onChange?: (value: string | undefined) => void;
 }
 
 export const RolePicker: React.FunctionComponent<RolePickerProps> = ({
@@ -32,12 +32,17 @@ export const RolePicker: React.FunctionComponent<RolePickerProps> = ({
     return (
         <div className="flex flex-col space-y-2">
             {label && <Label>{label}</Label>}
-            <Select value={value} onValueChange={onChange}>
+            <Select
+                value={value || '_null'}
+                onValueChange={(value) => {
+                    onChange?.(value === '_null' ? undefined : value);
+                }}
+            >
                 <SelectTrigger className={className}>
                     <SelectValue placeholder={placeholder} />
                 </SelectTrigger>
                 <SelectContent>
-                    {nullable && <SelectItem value="">{placeholder}</SelectItem>}
+                    {nullable && <SelectItem value="_null">{placeholder}</SelectItem>}
                     {data.map((e) => (
                         <SelectItem key={e.publicId} value={e.publicId}>
                             {e.name}

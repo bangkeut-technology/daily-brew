@@ -244,7 +244,7 @@ class AttendanceController extends AbstractController
         Request $request,
         AttendanceRepository $attendanceRepository,
     ): JsonResponse {
-        $employeeId = $request->query->get('employeeId');
+        $employeePublicId = $request->query->get('employeePublicId');
         $status = $request->query->get('status');
 
         $from = new DateTimeImmutable('today 00:00:00');
@@ -254,11 +254,11 @@ class AttendanceController extends AbstractController
         $owner = $this->getUser();
 
         $attendances = $attendanceRepository->findUpcomingStatus(
-            owner: $owner,
+            user: $this->getUser(),
             from: $from,
             to: $to,
             status: AttendanceStatusEnum::from($status),
-            employeeId: $employeeId
+            employeePublicId: $employeePublicId
         );
 
         return $this->createAttendanceResponse($attendances);

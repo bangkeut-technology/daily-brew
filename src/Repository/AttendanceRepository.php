@@ -10,9 +10,7 @@ use App\Entity\Employee;
 use App\Entity\User;
 use App\Enum\AttendanceStatusEnum;
 use App\Enum\LeaveTypeEnum;
-use DatePeriod;
 use DateTimeImmutable;
-use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Parameter;
@@ -360,55 +358,58 @@ class AttendanceRepository extends AbstractRepository
     /**
      * Retrieves a list of upcoming leave records for a specific user within a given date range.
      *
-     * @param User              $owner      The owner of the leave records being queried.
-     * @param DateTimeImmutable $from       The start of the date range for querying leaves.
-     * @param DateTimeImmutable $to         The end of the date range for querying leaves.
-     * @param string|null       $employeeId An optional employee ID to filter leave records for a specific employee.
+     * @param User              $user             The owner of the leave records being queried.
+     * @param DateTimeImmutable $from             The start of the date range for querying leaves.
+     * @param DateTimeImmutable $to               The end of the date range for querying leaves.
+     * @param string|null       $employeePublicId An optional employee ID to filter leave records for a specific employee.
      *
      * @return Attendance[] The list of leave records matching the criteria within the specified range.
      */
     public function findUpcomingLeaves(
-        User $owner,
+        User              $user,
         DateTimeImmutable $from,
         DateTimeImmutable $to,
-        ?string $employeeId = null
-    ): array {
+        ?string           $employeePublicId = null
+    ): array
+    {
 
-        return $this->findUpcomingStatus($owner, $from, $to, AttendanceStatusEnum::LEAVE, $employeeId);
+        return $this->findUpcomingStatus($user, $from, $to, AttendanceStatusEnum::LEAVE, $employeePublicId);
     }
 
     /**
      * Retrieves upcoming attendance records with a specified status for a given owner within a specified date range.
      *
-     * @param User                 $owner      The user who owns the attendance records.
-     * @param DateTimeImmutable    $from       The start date of the date range.
-     * @param DateTimeImmutable    $to         The end date of the date range.
-     * @param AttendanceStatusEnum $status     The attendance status to filter by.
-     * @param string|null          $employeeId Optional employee identifier for further filtering.
+     * @param User                 $user             The user who owns the attendance records.
+     * @param DateTimeImmutable    $from             The start date of the date range.
+     * @param DateTimeImmutable    $to               The end date of the date range.
+     * @param AttendanceStatusEnum $status           The attendance status to filter by.
+     * @param string|null          $employeePublicId Optional employee identifier for further filtering.
      *
      * @return Attendance[] The list of attendance records matching the specified criteria.
      */
     public function findUpcomingStatus(
-        User $owner,
-        DateTimeImmutable $from,
-        DateTimeImmutable $to,
+        User                 $user,
+        DateTimeImmutable    $from,
+        DateTimeImmutable    $to,
         AttendanceStatusEnum $status,
-        ?string $employeeId = null
-    ): array {
+        ?string              $employeePublicId = null
+    ): array
+    {
         $qb = $this->createQueryBuilder('attendance')
             ->addSelect('employee')
             ->innerJoin('attendance.employee', 'employee')
-            ->andWhere('employee.owner = :owner')
+            ->andWhere('employee.user = :user')
             ->andWhere('attendance.status = :status')
             ->andWhere('attendance.attendanceDate BETWEEN :from AND :to')
-            ->setParameter('owner', $owner)
+            ->setParameter('user', $user)
             ->setParameter('status', $status)
             ->setParameter('from', $from)
             ->setParameter('to', $to)
-            ->orderBy('a.attendanceDate', 'ASC');
+            ->orderBy('attendance.attendanceDate', 'ASC');
 
-        if ($employeeId) {
-            $qb->andWhere('employee.publicId = :eid')->setParameter('eid', $employeeId);
+        if ($employeePublicId) {
+            $qb->andWhere('employee.publicId = :employeePublicId')
+                ->setParameter('employeePublicId', $employeePublicId);
         }
 
         return $qb->getQuery()->getResult();

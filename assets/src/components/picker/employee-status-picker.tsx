@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 interface EmployeeStatusPickerProps {
     label?: string;
     value?: EmployeeStatus;
-    onChange?: (value: EmployeeStatus) => void;
+    onChange?: (value: EmployeeStatus | undefined) => void;
 }
 
 export const EmployeeStatusPicker: React.FunctionComponent<EmployeeStatusPickerProps> = ({
@@ -20,12 +20,17 @@ export const EmployeeStatusPicker: React.FunctionComponent<EmployeeStatusPickerP
     return (
         <div className="space-y-2">
             {label && <Label className="text-xs text-muted-foreground">{label}</Label>}
-            <Select value={value} onValueChange={onChange}>
+            <Select
+                value={value || '_null'}
+                onValueChange={(value) => {
+                    onChange?.(value === '_null' ? undefined : (value as EmployeeStatus));
+                }}
+            >
                 <SelectTrigger>
                     <SelectValue placeholder={t('all')} />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="">{t('all')}</SelectItem>
+                    <SelectItem value="_null">{t('all')}</SelectItem>
                     <SelectItem value={EmployeeStatusEnum.active}>
                         {t(`employees.status.${EmployeeStatusEnum.active}`, { ns: 'glossary' })}
                     </SelectItem>
