@@ -373,14 +373,36 @@ class AttendanceRepository extends AbstractRepository
         DateTimeImmutable $to,
         ?string $employeeId = null
     ): array {
+
+        return $this->findUpcomingStatus($owner, $from, $to, AttendanceStatusEnum::LEAVE, $employeeId);
+    }
+
+    /**
+     * Retrieves upcoming attendance records with a specified status for a given owner within a specified date range.
+     *
+     * @param User                 $owner      The user who owns the attendance records.
+     * @param DateTimeImmutable    $from       The start date of the date range.
+     * @param DateTimeImmutable    $to         The end date of the date range.
+     * @param AttendanceStatusEnum $status     The attendance status to filter by.
+     * @param string|null          $employeeId Optional employee identifier for further filtering.
+     *
+     * @return Attendance[] The list of attendance records matching the specified criteria.
+     */
+    public function findUpcomingStatus(
+        User $owner,
+        DateTimeImmutable $from,
+        DateTimeImmutable $to,
+        AttendanceStatusEnum $status,
+        ?string $employeeId = null
+    ): array {
         $qb = $this->createQueryBuilder('attendance')
             ->addSelect('employee')
             ->innerJoin('attendance.employee', 'employee')
             ->andWhere('employee.owner = :owner')
-            ->andWhere('attendance.status = :leaveStatus')
+            ->andWhere('attendance.status = :status')
             ->andWhere('attendance.attendanceDate BETWEEN :from AND :to')
             ->setParameter('owner', $owner)
-            ->setParameter('leaveStatus', AttendanceStatusEnum::LEAVE)
+            ->setParameter('status', $status)
             ->setParameter('from', $from)
             ->setParameter('to', $to)
             ->orderBy('a.attendanceDate', 'ASC');

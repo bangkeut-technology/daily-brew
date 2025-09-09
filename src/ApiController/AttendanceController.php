@@ -9,6 +9,7 @@ use App\DTO\AttendanceDTO;
 use App\DTO\EmployeeDTO;
 use App\Entity\Attendance;
 use App\Entity\Employee;
+use App\Enum\AttendanceStatusEnum;
 use App\Event\Attendance\RebalanceLeaveCycleEvent;
 use App\Form\AttendanceFormType;
 use App\Repository\AttendanceRepository;
@@ -243,29 +244,20 @@ class AttendanceController extends AbstractController
         Request $request,
         AttendanceRepository $attendanceRepository,
     ): JsonResponse {
-        $fromStr = $request->query->get('from');
-        $toStr   = $request->query->get('to');
         $employeeId = $request->query->get('employeeId');
+        $status = $request->query->get('status');
 
-        $today = new DateTimeImmutable('today');
-        $defaultTo = $today->modify('+14 days');
+        $from = new DateTimeImmutable('today 00:00:00');
+        $to   = $from->modify('+14 days')->setTime(23, 59, 59);
 
-        $from = $fromStr ? new DateTimeImmutable($fromStr) : $today;
-        $to   = $toStr   ? new DateTimeImmutable($toStr)   : $defaultTo;
-
-        if ($from > $to) {
-            return $this->json(
-                ['message' => 'Invalid date range: from must be <= to.'],
-                Response::HTTP_BAD_REQUEST
-            );
-        }
 
         $owner = $this->getUser();
 
-        $attendances = $attendanceRepository->findUpcomingLeaves(
+        $attendances = $attendanceRepository->findUpcomingStatus(
             owner: $owner,
             from: $from,
             to: $to,
+            status: AttendanceStatusEnum::from($status),
             employeeId: $employeeId
         );
 
