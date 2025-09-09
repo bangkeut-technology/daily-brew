@@ -7,9 +7,7 @@ use App\Constant\SettingConstant;
 use App\Entity\Employee;
 use App\Repository\AttendanceRepository;
 use App\Util\DateHelper;
-use DatePeriod;
 use DateTimeImmutable;
-use DateTimeInterface;
 
 /**
  * Class AttendanceRateCalculator
@@ -31,7 +29,7 @@ readonly class AttendanceRateCalculator
      *
      * This method retrieves the count of late arrivals and absences for a specified
      * employee within a defined date range. It computes the penalty absences based
-     * on the number of lates divided by the maximum allowable late count, and returns
+     * on the number of lates divided by the maximum allowable late count and returns
      * the total absences including penalties.
      *
      * @param Employee          $employee The employee whose absences are being calculated.
@@ -70,7 +68,6 @@ readonly class AttendanceRateCalculator
      */
     public function calculateRate(Employee $employee, DateTimeImmutable $start, DateTimeImmutable $end): float
     {
-        ;
         if (0 === $totalDays = DateHelper::daysBetween($start, $end, true)) {
             return 0.0;
         }
