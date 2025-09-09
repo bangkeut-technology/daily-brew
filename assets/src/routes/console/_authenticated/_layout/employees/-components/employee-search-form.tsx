@@ -62,7 +62,7 @@ export const EmployeeSearchForm: React.FunctionComponent<EmployeeSearchFormProps
                 </div>
             </CardHeader>
             <CardContent className="grid gap-3 md:grid-cols-6">
-                <div className="md:col-span-2">
+                <div className="md:col-span-2 space-y-2">
                     <Label className="text-xs text-muted-foreground flex items-center gap-1">
                         <Search className="h-3 w-3" /> {t('search')}
                     </Label>
@@ -73,37 +73,46 @@ export const EmployeeSearchForm: React.FunctionComponent<EmployeeSearchFormProps
                     />
                 </div>
 
-                {/* Status */}
                 <div className="md:col-span-2">
                     <EmployeeStatusPicker
                         label={t('employees.status.title', { ns: 'glossary' })}
+                        className="w-full"
                         value={params.status}
                         onChange={(v) => onChange({ status: v || undefined })}
                     />
                 </div>
 
                 <div className="md:col-span-2">
-                    <RolePicker value={params.role} onChange={(v) => onChange({ role: v || undefined })} />
+                    <RolePicker
+                        label={t('role')}
+                        className="w-full"
+                        value={params.role}
+                        onChange={(v) => onChange({ role: v || undefined })}
+                    />
                 </div>
 
-                <div className="md:col-span-3">
+                <div className="md:col-span-3 space-y-2">
                     <Label className="text-xs text-muted-foreground">
                         {t('evaluations.period', { ns: 'glossary' })}
                     </Label>
-                    <DatePicker
-                        label={t('from')}
-                        value={params.from}
-                        onChange={(from) => onChange({ from })}
-                        className="md:col-span-3"
-                    />
-                    <DatePicker
-                        label={t('to')}
-                        value={params.to}
-                        onChange={(to) => onChange({ to })}
-                        className="md:col-span-3"
-                    />
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                        <DatePicker
+                            label={t('from')}
+                            value={params.from}
+                            onChange={(from) => onChange({ from })}
+                            className="w-full sm:w-auto"
+                        />
+                        <DatePicker
+                            label={t('to')}
+                            value={params.to}
+                            onChange={(to) => onChange({ to })}
+                            className="w-full sm:w-auto"
+                        />
+                    </div>
                 </div>
             </CardContent>
         </Card>
     );
 };
+
+EmployeeSearchForm.displayName = 'EmployeeSearchForm';

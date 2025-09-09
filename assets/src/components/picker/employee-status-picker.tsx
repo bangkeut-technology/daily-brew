@@ -6,12 +6,14 @@ import { useTranslation } from 'react-i18next';
 
 interface EmployeeStatusPickerProps {
     label?: string;
+    className?: string;
     value?: EmployeeStatus;
     onChange?: (value: EmployeeStatus | undefined) => void;
 }
 
 export const EmployeeStatusPicker: React.FunctionComponent<EmployeeStatusPickerProps> = ({
     label,
+    className,
     value,
     onChange,
 }) => {
@@ -26,7 +28,7 @@ export const EmployeeStatusPicker: React.FunctionComponent<EmployeeStatusPickerP
                     onChange?.(value === '_null' ? undefined : (value as EmployeeStatus));
                 }}
             >
-                <SelectTrigger>
+                <SelectTrigger className={className}>
                     <SelectValue placeholder={t('all')} />
                 </SelectTrigger>
                 <SelectContent>

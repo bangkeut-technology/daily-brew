@@ -2,7 +2,7 @@ import * as React from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
-import { format, startOfMonth } from 'date-fns';
+import { endOfMonth, format, startOfMonth } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { UserPlus2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,7 +22,7 @@ export const Route = createFileRoute('/console/_authenticated/_layout/employees/
         status: z.enum(['active', 'on_leave', 'suspended', 'resigned', 'probation']).optional(),
         role: z.string().optional(),
         from: z.string().default(format(startOfMonth(new Date()), DATE_FORMAT)),
-        to: z.string().default(format(startOfMonth(new Date()), DATE_FORMAT)),
+        to: z.string().default(format(endOfMonth(new Date()), DATE_FORMAT)),
     }),
     component: EmployeesPage,
 });
