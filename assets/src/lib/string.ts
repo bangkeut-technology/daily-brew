@@ -13,6 +13,16 @@ export const getRoleName = (role: string) => {
     return i18next.t(role.toLocaleLowerCase() as any);
 };
 
+export const getInitials = (str: string | undefined) => {
+    if (!str) return '';
+    return str
+        .split(/\s+/) // split by spaces
+        .map((word) => word.charAt(0)) // take first letter of each
+        .join('')
+        .substring(0, 2) // take up to 2 chars
+        .toUpperCase();
+};
+
 export const getLocaleLabel = (locale: string) => {
     switch (locale) {
         case 'en':

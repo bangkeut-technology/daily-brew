@@ -1,5 +1,6 @@
 export type User = {
     id: number;
+    avatarUrl?: string;
     firstName: string;
     lastName: string;
     email: string;
@@ -8,11 +9,14 @@ export type User = {
     fullName: string;
 };
 
-export type SignIn = Omit<User, 'id' | 'firstName' | 'lastName' | 'canonicalEmail' | 'locale' | 'fullName'> & {
+export type SignIn = Omit<
+    User,
+    'id' | 'firstName' | 'lastName' | 'canonicalEmail' | 'locale' | 'fullName' | 'avatarUrl'
+> & {
     password: string;
 };
 
-export type SignUp = Omit<User, 'id' | 'canonicalEmail' | 'locale' | 'fullName'> & {
+export type SignUp = Omit<User, 'id' | 'canonicalEmail' | 'locale' | 'fullName' | 'avatarUrl'> & {
     password: string;
     confirmPassword: string;
     acceptedTerms: boolean;

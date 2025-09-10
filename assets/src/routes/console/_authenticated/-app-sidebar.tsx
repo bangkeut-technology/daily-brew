@@ -6,7 +6,6 @@ import {
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
-    SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
@@ -22,13 +21,13 @@ import {
     ChevronRight,
     ChevronUp,
     ClipboardList,
+    Coffee,
     CreditCard,
     Gauge,
     LayoutDashboard,
     ListTodo,
     LogOut,
     SettingsIcon,
-    User2,
     Users,
 } from 'lucide-react';
 import { Link, useLocation } from '@tanstack/react-router';
@@ -41,6 +40,8 @@ import {
 import { useAuthentication } from '@/hooks/use-authentication';
 import { useTranslation } from 'react-i18next';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { getInitials } from '@/lib/string';
 
 type SidebarMenuItem = {
     title: string;
@@ -50,7 +51,7 @@ type SidebarMenuItem = {
     pro?: boolean;
 };
 
-export const AppSidebar = () => {
+export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
     const { user } = useAuthentication();
     const { t } = useTranslation();
     const { pathname } = useLocation();
@@ -149,11 +150,25 @@ export const AppSidebar = () => {
     );
 
     return (
-        <Sidebar>
-            <SidebarHeader>
-                <h1 className="text-2xl font-bold">DailyBrew</h1>
-                <p className="text-sm text-gray-500">{t('admin_console')}</p>
-            </SidebarHeader>
+        <Sidebar collapsible="icon" {...props}>
+            <SidebarMenu>
+                <SidebarMenuItem>
+                    <SidebarMenuButton
+                        size="lg"
+                        className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                    >
+                        <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                            <Coffee className="size-4" />
+                        </div>
+                        <span className="text-lg font-bold tracking-tight">
+                            <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                                DailyBrew
+                            </span>
+                            <span className="text-muted-foreground">.work</span>
+                        </span>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+            </SidebarMenu>
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupLabel>{t('application')}</SidebarGroupLabel>
@@ -168,7 +183,13 @@ export const AppSidebar = () => {
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <SidebarMenuButton>
-                                    <User2 /> {user?.email}
+                                    <Avatar className="h-8 w-8 rounded-lg">
+                                        <AvatarImage src={user?.avatarUrl} alt={user?.fullName} />
+                                        <AvatarFallback className="rounded-lg">
+                                            {getInitials(user?.fullName)}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    {user?.fullName}
                                     <ChevronUp className="ml-auto" />
                                 </SidebarMenuButton>
                             </DropdownMenuTrigger>
