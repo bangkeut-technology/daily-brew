@@ -69,3 +69,8 @@ export const fetchGanttEmployeeEvaluations = async ({
             params: { ...params, employees: employees?.map((employee) => employee.publicId) },
         })
         .then((response) => response.data);
+
+export const fetchRecentEvaluations = async (limit = 10) =>
+    apiAxios
+        .get<EmployeeEvaluation[]>('/employee-evaluations/recents', { params: { limit } })
+        .then((response) => response.data);
