@@ -260,4 +260,25 @@ class EmployeeEvaluationRepository extends AbstractRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    /**
+     * Finds the most recent employee evaluations performed by a specific evaluator.
+     *
+     * @param User $user  The evaluator whose evaluations need to be retrieved.
+     * @param int  $limit The maximum number of evaluations to retrieve. Default is 10.
+     *
+     * @return array An array of EmployeeEvaluation entities ordered by evaluation date in descending order.
+     */
+    public function findRecentByEvaluator(User $user, int $limit = 10): array
+    {
+        return $this->createQueryBuilder('ee')
+            ->addSelect('e')
+            ->innerJoin('ee.employee', 'e')
+            ->andWhere('ee.evaluator = :user')
+            ->setParameter('user', $user)
+            ->orderBy('ee.evaluatedAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }

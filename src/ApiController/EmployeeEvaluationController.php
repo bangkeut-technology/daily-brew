@@ -177,6 +177,42 @@ class EmployeeEvaluationController extends AbstractController
     }
 
     /**
+     * Retrieves a list of recent employee evaluations based on the given limit.
+     *
+     * Accepts a query parameter 'limit,' which defines the maximum number of evaluations
+     * to fetch. Defaults to 10 if not specified. Returns a response containing an array
+     * of recent employee evaluations associated with the authenticated evaluator.
+     *
+     * @param Request $request The HTTP request containing the query parameters.
+     * @return JsonResponse A JSON response containing the list of recent evaluations.
+     * @throws Exception
+     */
+    #[OA\Parameter(
+        name: 'limit',
+        description: 'Maximum number of evaluations to fetch (default: 10)',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'integer', default: 10)
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'List of recent evaluations',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: EmployeeEvaluation::class, groups: ['employee_evaluation:read'])),
+        )
+    )]
+    #[Route('/recents', name: 'recents', methods: ['GET'])]
+    public function recent(
+        Request $request,
+    ): JsonResponse
+    {
+        $limit = $request->query->getInt('limit', 10);
+        $user = $this->getUser();
+        return $this->createEmployeeEvaluationResponse($this->employeeEvaluationRepository->findRecentByEvaluator($user, $limit));
+    }
+
+    /**
      * Handles the update of an employee evaluation based on the provided public ID and request data.
      *
      * This method retrieves the employee evaluation by its public ID, creates a form for the evaluation,
@@ -191,7 +227,7 @@ class EmployeeEvaluationController extends AbstractController
      */
     #[Route('/{publicId}', name: 'put', methods: ['PUT'])]
     public function put(
-        string $publicId,
+        string  $publicId,
         Request $request,
     ): JsonResponse
     {
