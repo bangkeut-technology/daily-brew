@@ -63,10 +63,11 @@ export const EmployeeSearchForm: React.FunctionComponent<EmployeeSearchFormProps
             </CardHeader>
             <CardContent className="grid gap-3 md:grid-cols-6">
                 <div className="md:col-span-2 space-y-2">
-                    <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Label htmlFor="searchName" className="text-xs text-muted-foreground flex items-center gap-1">
                         <Search className="h-3 w-3" /> {t('search')}
                     </Label>
                     <Input
+                        name="searchName"
                         placeholder={t('employees.search_placeholder', { ns: 'glossary' }) || 'Search by name…'}
                         defaultValue={params.q ?? ''}
                         onChange={(e) => onChange({ q: e.target.value || undefined })}

@@ -86,7 +86,7 @@ function Dashboard() {
                     </Link>
                 </Button>
                 <Button variant="outline" asChild className="gap-2">
-                    <Link to="/console/performance/attendances">
+                    <Link to="/console/attendances">
                         <CalendarDays className="h-4 w-4" />
                         Open attendance
                     </Link>
@@ -103,7 +103,7 @@ function Dashboard() {
                     <SectionHeader
                         title="KPI"
                         action={
-                            <Link className="text-sm text-primary hover:underline" to="/console/performance/kpi">
+                            <Link className="text-sm text-primary hover:underline" to="/console/evaluations/histories">
                                 {t('view_all')}
                             </Link>
                         }
@@ -113,10 +113,7 @@ function Dashboard() {
                     <SectionHeader
                         title={t('attendance')}
                         action={
-                            <Link
-                                className="text-sm text-primary hover:underline"
-                                to="/console/performance/attendances"
-                            >
+                            <Link className="text-sm text-primary hover:underline" to="/console/attendances">
                                 {t('view_all')}
                             </Link>
                         }

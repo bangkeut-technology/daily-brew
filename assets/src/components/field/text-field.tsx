@@ -24,7 +24,11 @@ export const TextField = React.memo<TextFieldProps>(
                 render={({ field }) => (
                     <FormItem className={cn('space-y-2', props.className)}>
                         <div className="flex items-center justify-between">
-                            {label && <FormLabel htmlFor={id || localId}>{label}</FormLabel>}
+                            {label && (
+                                <FormLabel htmlFor={id || localId} id={id || localId}>
+                                    {label}
+                                </FormLabel>
+                            )}
                             {labelRight}
                         </div>
                         <div className="relative">

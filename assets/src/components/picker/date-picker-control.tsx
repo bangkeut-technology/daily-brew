@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,7 @@ export const DatePickerControl: React.FC<DatePickerControlProps> = ({
     className,
     disabledDate,
 }) => {
+    const id = useId();
     const { t } = useTranslation();
     return (
         <FormField
@@ -39,7 +40,7 @@ export const DatePickerControl: React.FC<DatePickerControlProps> = ({
             name={name}
             render={({ field }) => (
                 <FormItem className={cn('flex flex-col w-full', className)}>
-                    {label && <FormLabel>{label}</FormLabel>}
+                    {label && <FormLabel id={id}>{label}</FormLabel>}
                     <Popover>
                         <PopoverTrigger asChild>
                             <FormControl>
