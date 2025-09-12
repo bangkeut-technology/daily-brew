@@ -276,5 +276,11 @@
             "label": "Paid Leave Cycle",
             "description": "The cycle of paid leave, which determines the renewal number of the leave."
         }
+    },
+    "not_found": {
+        "upcoming_leaves": "No upcoming leaves"
+    },
+    "loading": {
+        "upcoming_leaves": "Loading upcoming leaves..."
     }
 }

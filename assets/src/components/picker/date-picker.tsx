@@ -7,7 +7,6 @@ import { CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { useTranslation } from 'react-i18next';
 import { Matcher } from 'react-day-picker';
-import { Label } from '@/components/ui/label';
 import { PICKER_DISPLAY_FORMAT } from '@/constants/date';
 
 type OnChangeHandler = (date: Date | undefined) => void;
@@ -40,11 +39,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 
     return (
         <div className={cn('flex flex-col gap-3', className)}>
-            {label && (
-                <Label htmlFor="date" className="px-1" id={id}>
-                    {label}
-                </Label>
-            )}
+            {label && <p className="px-1">{label}</p>}
             <Popover>
                 <PopoverTrigger asChild>
                     <Button

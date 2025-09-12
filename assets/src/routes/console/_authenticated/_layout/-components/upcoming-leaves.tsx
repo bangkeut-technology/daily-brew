@@ -24,9 +24,9 @@ export const UpcomingLeaves = () => {
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
                 {isPending ? (
-                    <Loading loadingText="Loading upcoming leaves..." />
+                    <Loading loadingText={t('loading.upcoming_leaves', { ns: 'glossary' })} />
                 ) : data.length === 0 ? (
-                    <p>No upcoming leaves.</p>
+                    <p>{t('not_found.upcoming_leaves', { ns: 'glossary' })}</p>
                 ) : (
                     data.map((attendance, i) => (
                         <div key={i} className="flex items-center justify-between">
@@ -37,7 +37,7 @@ export const UpcomingLeaves = () => {
                 )}
                 <Separator />
                 <Button variant="ghost" asChild className="w-full">
-                    <Link to="/console/leaves">Open leave board</Link>
+                    <Link to="/console/attendances">{t('open.leave_board')}</Link>
                 </Button>
             </CardContent>
         </Card>

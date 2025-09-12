@@ -124,5 +124,8 @@
     "all": "All",
     "upcoming_leaves": "Upcoming Leaves",
     "dont_have_account": "Don't have an account",
-    "details": "Details"
+    "details": "Details",
+    "open": {
+        "leave_board": "Open leave board"
+    }
 }

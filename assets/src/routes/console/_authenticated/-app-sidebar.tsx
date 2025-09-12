@@ -15,10 +15,8 @@ import {
     SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import {
-    BarChart3,
     Briefcase,
     CalendarClock,
-    CalendarDays,
     ChevronRight,
     ChevronUp,
     ClipboardList,
@@ -61,14 +59,6 @@ export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) =
         () => [
             { title: t('dashboard'), url: '/console', icon: LayoutDashboard },
             { title: t('employees'), url: '/console/employees', icon: Users },
-            {
-                title: t('performance'),
-                icon: BarChart3,
-                children: [
-                    { title: t('kpi'), url: '/console/performance/kpi', icon: BarChart3 },
-                    { title: t('attendance'), url: '/console/performance/attendances', icon: CalendarDays },
-                ],
-            },
             {
                 title: t('evaluations'),
                 icon: ListTodo,
