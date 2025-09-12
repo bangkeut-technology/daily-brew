@@ -96,6 +96,9 @@ class Attendance extends AbstractEntity
     #[Groups(['attendance:read'])]
     private ?User $user = null;
 
+    #[ORM\ManyToOne(inversedBy: 'attendances')]
+    private ?AttendanceBatch $batch = null;
+
     /**
      * @return DateTimeImmutable|null
      */
@@ -242,6 +245,18 @@ class Attendance extends AbstractEntity
     public function setUser(?User $user): Attendance
     {
         $this->user = $user;
+        return $this;
+    }
+
+    public function getBatch(): ?AttendanceBatch
+    {
+        return $this->batch;
+    }
+
+    public function setBatch(?AttendanceBatch $batch): static
+    {
+        $this->batch = $batch;
+
         return $this;
     }
 }
