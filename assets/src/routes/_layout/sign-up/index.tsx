@@ -142,29 +142,35 @@ function SignUpPage() {
                                         </div>
 
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                            <TextField
-                                                control={form.control}
-                                                name="password"
-                                                label={t('password')}
-                                                type="password"
-                                                placeholder="••••••••"
-                                                startIcon={
-                                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                                }
-                                                disabled={isPending}
-                                            />
-                                            <PasswordStrength value={password} />
+                                            <div className="flex flex-col space-y-2 w-full">
+                                                <TextField
+                                                    control={form.control}
+                                                    name="password"
+                                                    label={t('password')}
+                                                    className="w-full"
+                                                    type="password"
+                                                    autoComplete="new-password"
+                                                    placeholder="••••••••"
+                                                    startIcon={
+                                                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                                    }
+                                                    disabled={isPending}
+                                                />
+                                                <PasswordStrength value={password} />
+                                            </div>
 
                                             <TextField
                                                 control={form.control}
                                                 name="confirmPassword"
                                                 label={t('confirm_password')}
+                                                className="w-full"
                                                 type="password"
                                                 placeholder="••••••••"
                                                 startIcon={
                                                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                                 }
                                                 disabled={isPending}
+                                                autoComplete="new-password"
                                             />
                                         </div>
 
