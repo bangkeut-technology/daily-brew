@@ -107,12 +107,13 @@ function SignUpPage() {
                             <CardContent className="space-y-5">
                                 <Form {...form}>
                                     <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)} noValidate>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div className="flex space-x-2">
                                             <TextField
                                                 control={form.control}
                                                 name="firstName"
                                                 label={t('first_name')}
                                                 placeholder="John"
+                                                autoComplete="name"
                                                 startIcon={
                                                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                                 }
@@ -123,25 +124,28 @@ function SignUpPage() {
                                                 name="lastName"
                                                 label={t('last_name')}
                                                 placeholder="Doe"
+                                                autoComplete="family-name"
                                                 startIcon={
                                                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                                 }
                                                 disabled={isPending}
                                             />
-
-                                            <TextField
-                                                control={form.control}
-                                                name="email"
-                                                label={t('email')}
-                                                placeholder="you@coffee.co"
-                                                startIcon={
-                                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                                }
-                                                disabled={isPending}
-                                            />
                                         </div>
 
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <TextField
+                                            control={form.control}
+                                            name="email"
+                                            label={t('email')}
+                                            placeholder="you@coffee.co"
+                                            className="w-full"
+                                            autoComplete="email"
+                                            startIcon={
+                                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                            }
+                                            disabled={isPending}
+                                        />
+
+                                        <div className="flex flex-col space-y-2 w-full">
                                             <div className="flex flex-col space-y-2 w-full">
                                                 <TextField
                                                     control={form.control}

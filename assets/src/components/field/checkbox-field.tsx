@@ -25,9 +25,14 @@ export const CheckboxField: React.FC<CheckboxFieldProps> = ({ control, label, na
                                 id={id || localId}
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
+                                name={name}
                             />
                         </FormControl>
-                        {label && <FormLabel className="text-sm font-normal">{label}</FormLabel>}
+                        {label && (
+                            <FormLabel htmlFor={name} className="text-sm font-normal">
+                                {label}
+                            </FormLabel>
+                        )}
                         <FormMessage />
                     </FormItem>
                 );
