@@ -19,16 +19,8 @@ import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
 import { useAuthentication } from '@/hooks/use-authentication';
 import { z } from 'zod';
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
-import { TermContent } from '@/components/term-content';
+import { TermsAndConditionsDialog } from '@/routes/_layout/sign-up/-components/terms-and-conditions-dialog';
+import { PrivacyPolicyDialog } from '@/routes/_layout/sign-up/-components/privacy-policy-dialog';
 
 export const Route = createFileRoute('/_layout/sign-up/')({
     component: SignUpPage,
@@ -196,34 +188,9 @@ function SignUpPage() {
                                                 label={
                                                     <React.Fragment>
                                                         I agree to the
-                                                        <Dialog>
-                                                            <DialogTrigger asChild>
-                                                                <Button variant="link" className="text-primary">
-                                                                    Terms of Service
-                                                                </Button>
-                                                            </DialogTrigger>
-                                                            <DialogContent className="p-4">
-                                                                <DialogHeader>
-                                                                    <DialogTitle>Terms & Conditions</DialogTitle>
-                                                                </DialogHeader>
-                                                                <TermContent />
-                                                                <DialogFooter className="sm:justify-start">
-                                                                    <DialogClose asChild>
-                                                                        <Button type="button" variant="secondary">
-                                                                            Close
-                                                                        </Button>
-                                                                    </DialogClose>
-                                                                </DialogFooter>
-                                                            </DialogContent>
-                                                        </Dialog>
-                                                        and{' '}
-                                                        <Link
-                                                            to="/privacy"
-                                                            className="text-primary underline underline-offset-2"
-                                                        >
-                                                            Privacy Policy
-                                                        </Link>
-                                                        .
+                                                        <TermsAndConditionsDialog />
+                                                        and
+                                                        <PrivacyPolicyDialog />.
                                                     </React.Fragment>
                                                 }
                                             ></CheckboxField>
