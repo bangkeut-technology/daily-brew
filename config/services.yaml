@@ -1,16 +1,18 @@
 parameters:
     daily_brew.free_employee_limit: '%env(int:DAILY_BREW_FREE_EMPLOYEE_LIMIT)%'
     daily_brew.free_template_limit: '%env(int:DAILY_BREW_FREE_TEMPLATE_LIMIT)%'
-    daily_brew.allow_store: '%env(bool:DAILY_BREW_ALLOW_STORE)%'
+    daily_brew.allow_store:         '%env(bool:DAILY_BREW_ALLOW_STORE)%'
+    daily_brew.site.contact_email:  '%env(DAILY_BREW_SITE_CONTACT_EMAIL)%'
 
 services:
     _defaults:
-        autowire: true
+        autowire:      true
         autoconfigure: true
         bind:
             $maxFreeEmployees: '%daily_brew.free_employee_limit%'
             $maxFreeTemplates: '%daily_brew.free_template_limit%'
-            $storeAllowed: '%daily_brew.allow_store%'
+            $storeAllowed:     '%daily_brew.allow_store%'
+            $contactEmail:     '%daily_brew.site.contact_email%'
 
     App\:
         resource: '../src/'

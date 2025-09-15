@@ -57,14 +57,15 @@
 
             storeLocale('{{ user ? user.locale : 'en' }}');
 
-            function storeApplicationData(maxFreeEmployees, maxFreeTemplates, storeAllowed) {
-                sessionStorage.setItem("application", `{"maxFreeEmployees": ${maxFreeEmployees}, "maxFreeTemplates": ${maxFreeTemplates}, "storeAllowed": "${storeAllowed}"}`);
+            function storeApplicationData(maxFreeEmployees, maxFreeTemplates, storeAllowed, $contactEmail) {
+                sessionStorage.setItem("application", `{"maxFreeEmployees": ${maxFreeEmployees}, "maxFreeTemplates": ${maxFreeTemplates}, "storeAllowed": "${storeAllowed}", "contactEmail": "${$contactEmail}"}`);
             }
 
             storeApplicationData(
                 {{ maxFreeEmployees }},
                 {{ maxFreeTemplates }},
                 {{ storeAllowed ? 'true' : 'false' }}
+                '{{ contactEmail }}'
             );
         </script>
         <!-- Google tag (gtag.js) -->

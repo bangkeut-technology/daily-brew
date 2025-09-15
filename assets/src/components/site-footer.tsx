@@ -3,9 +3,11 @@ import { Coffee } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { useApplication } from '@/hooks/use-application';
 
 export const SiteFooter = () => {
     const { t } = useTranslation();
+    const { contactEmail } = useApplication();
 
     return (
         <footer className="border-t pt-10">
@@ -91,10 +93,10 @@ export const SiteFooter = () => {
                             <ul className="space-y-1 text-muted-foreground">
                                 <li>
                                     <a
-                                        href="mailto:support@dailybrew.work"
+                                        href={`mailto:${contactEmail}`}
                                         className="hover:text-foreground hover:underline underline-offset-2"
                                     >
-                                        support@dailybrew.work
+                                        {contactEmail}
                                     </a>
                                 </li>
                                 <li>

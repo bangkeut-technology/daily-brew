@@ -28,6 +28,12 @@ use function count;
 #[Route('/commons', name: 'common_')]
 class CommonController extends AbstractController
 {
+    #[Route('/application-configurations', name: 'application_configurations', methods: ['GET'])]
+    public function getApplicationConfiguration(): JsonResponse
+    {
+        return $this->json([]);
+    }
+
     /**
      * Handles the metric computation for a specified period.
      *

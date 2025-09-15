@@ -36,12 +36,14 @@ class PageController extends AbstractController
         int $maxFreeEmployees,
         int $maxFreeTemplates,
         bool $storeAllowed,
+        string $contactEmail,
     ): Response {
         return $this->render('page/index.html.twig', [
             'user' => $user,
             'maxFreeEmployees' => $maxFreeEmployees,
             'maxFreeTemplates' => $maxFreeTemplates,
             'storeAllowed' => $storeAllowed,
+            'contactEmail' => $contactEmail,
         ]);
     }
 }

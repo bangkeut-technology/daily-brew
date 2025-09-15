@@ -11,6 +11,7 @@ export const ApplicationProvider = ({ children }: { children: React.ReactNode })
                     maxFreeEmployees: applicationState.maxFreeEmployees || 10,
                     maxFreeTemplates: applicationState.maxFreeTemplates || 5,
                     storeAllowed: applicationState.storeAllowed === 'true',
+                    contactEmail: applicationState.contactEmail,
                 };
             } catch (error) {
                 console.error('Failed to parse application setting:', error);
@@ -20,6 +21,7 @@ export const ApplicationProvider = ({ children }: { children: React.ReactNode })
             maxFreeEmployees: 0,
             maxFreeTemplates: 0,
             storeAllowed: false,
+            contactEmail: undefined,
         };
     }, []);
 
