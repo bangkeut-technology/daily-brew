@@ -19,6 +19,16 @@ import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
 import { useAuthentication } from '@/hooks/use-authentication';
 import { z } from 'zod';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
+import { TermContent } from '@/components/term-content';
 
 export const Route = createFileRoute('/_layout/sign-up/')({
     component: SignUpPage,
@@ -185,13 +195,27 @@ function SignUpPage() {
                                                 name="acceptedTerms"
                                                 label={
                                                     <React.Fragment>
-                                                        I agree to the{' '}
-                                                        <Link
-                                                            to="/terms"
-                                                            className="text-primary underline underline-offset-2"
-                                                        >
-                                                            Terms
-                                                        </Link>{' '}
+                                                        I agree to the
+                                                        <Dialog>
+                                                            <DialogTrigger asChild>
+                                                                <Button variant="link" className="text-primary">
+                                                                    Terms of Service
+                                                                </Button>
+                                                            </DialogTrigger>
+                                                            <DialogContent className="p-4">
+                                                                <DialogHeader>
+                                                                    <DialogTitle>Terms & Conditions</DialogTitle>
+                                                                </DialogHeader>
+                                                                <TermContent />
+                                                                <DialogFooter className="sm:justify-start">
+                                                                    <DialogClose asChild>
+                                                                        <Button type="button" variant="secondary">
+                                                                            Close
+                                                                        </Button>
+                                                                    </DialogClose>
+                                                                </DialogFooter>
+                                                            </DialogContent>
+                                                        </Dialog>
                                                         and{' '}
                                                         <Link
                                                             to="/privacy"

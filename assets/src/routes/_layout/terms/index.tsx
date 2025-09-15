@@ -4,14 +4,12 @@ import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { TermContent } from '@/components/term-content';
-import { useApplication } from '@/hooks/use-application';
 
 export const Route = createFileRoute('/_layout/terms/')({
     component: TermsPage,
 });
 
 function TermsPage() {
-    const { contactEmail } = useApplication();
     return (
         <div className="min-h-screen flex flex-col items-center p-6">
             <div className="max-w-3xl w-full">
@@ -21,7 +19,7 @@ function TermsPage() {
 
                 <Card className="shadow-md rounded-2xl">
                     <CardContent className="p-8 space-y-6">
-                        <TermContent contactEmail={contactEmail} />
+                        <TermContent withHeader />
 
                         <div className="pt-6">
                             <Button asChild>

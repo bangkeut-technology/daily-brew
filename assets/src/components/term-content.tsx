@@ -1,13 +1,15 @@
 import React from 'react';
+import { useApplication } from '@/hooks/use-application';
 
 interface TermContentProps {
-    contactEmail?: string;
+    withHeader?: boolean;
 }
 
-export const TermContent: React.FunctionComponent<TermContentProps> = ({ contactEmail }) => {
+export const TermContent: React.FunctionComponent<TermContentProps> = ({ withHeader }) => {
+    const { contactEmail } = useApplication();
     return (
         <div className="flex flex-col gap-4">
-            <h1 className="text-3xl font-bold mb-4">Terms & Conditions</h1>
+            {withHeader && <h1 className="text-3xl font-bold mb-4">Terms & Conditions</h1>}
 
             <section className="space-y-2">
                 <h2 className="text-xl font-semibold">1. Introduction</h2>
@@ -53,9 +55,9 @@ export const TermContent: React.FunctionComponent<TermContentProps> = ({ contact
                 <h2 className="text-xl font-semibold">6. Contact</h2>
                 <p>
                     If you have questions about these Terms & Conditions, please contact us at
-                    <a href={`mailto:${contactEmail}`} className="text-blue-600 hover:underline">
+                    <a href={`mailto:${contactEmail}`} className="text-primary hover:underline">
                         {' '}
-                        ${contactEmail}
+                        {contactEmail}
                     </a>
                     .
                 </p>
@@ -63,3 +65,5 @@ export const TermContent: React.FunctionComponent<TermContentProps> = ({ contact
         </div>
     );
 };
+
+TermContent.displayName = 'TermContent';
