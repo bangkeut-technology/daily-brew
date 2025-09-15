@@ -63,7 +63,7 @@
         "tailwind-merge": "^3.3.1",
         "tailwindcss-animate": "^1.0.7",
         "tw-animate-css": "^1.3.8",
-        "type-fest": "^5.0.0",
+        "type-fest": "^4.41.0",
         "vaul": "^1.1.2",
         "vest": "^5.4.6",
         "web-worker": "^1.5.0",
