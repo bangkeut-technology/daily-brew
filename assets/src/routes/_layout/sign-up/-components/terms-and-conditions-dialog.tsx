@@ -18,7 +18,7 @@ export const TermsAndConditionsDialog = () => (
                 Terms of Service
             </Button>
         </DialogTrigger>
-        <DialogContent className="p-4">
+        <DialogContent className="p-4" aria-describedby="terms-and-conditions-dialog-description">
             <DialogHeader>
                 <DialogTitle>Terms & Conditions</DialogTitle>
             </DialogHeader>

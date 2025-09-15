@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { PrivacyContent } from '@/components/privacy-content';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export const PrivacyPolicyDialog = () => (
     <Dialog>
@@ -18,11 +19,13 @@ export const PrivacyPolicyDialog = () => (
                 Privacy Policy
             </Button>
         </DialogTrigger>
-        <DialogContent className="p-4">
+        <DialogContent className="p-4" aria-describedby="privacy-policy-dialog-description">
             <DialogHeader>
                 <DialogTitle>Privacy Policy</DialogTitle>
             </DialogHeader>
-            <PrivacyContent />
+            <ScrollArea className="h-[40rem]">
+                <PrivacyContent />
+            </ScrollArea>
             <DialogFooter className="sm:justify-start">
                 <DialogClose asChild>
                     <Button type="button" variant="secondary">
