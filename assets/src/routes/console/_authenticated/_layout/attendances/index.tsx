@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CalendarDays, Download } from 'lucide-react';
 import { AttendanceDataTable } from '@/routes/console/_authenticated/_layout/attendances/-components/attendance-data-table';
 import { AttendanceSearchForm } from '@/routes/console/_authenticated/_layout/attendances/-components/attendance-search-form';
-import { AttendanceSearchParams } from '@/services/attendance';
+import { AttendanceSearchParams } from '@/types/attendance';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/attendances/')({
     component: AttendanceListPage,
@@ -14,23 +14,25 @@ export const Route = createFileRoute('/console/_authenticated/_layout/attendance
         from: z.string().optional(),
         to: z.string().optional(),
         employee: z.string().optional(),
-        status: z.enum(['present', 'absent', 'leave', 'late', 'sick', 'holiday', 'remote', 'unknown']).optional(),
+        type: z
+            .enum(['present', 'absent', 'leave', 'late', 'sick', 'holiday', 'closure', 'remote', 'unknown'])
+            .optional(),
     }),
 });
 
 function AttendanceListPage() {
-    const { from, to, employee, status } = Route.useSearch();
+    const { from, to, employee, type } = Route.useSearch();
     const navigate = Route.useNavigate();
 
     const onChange = React.useCallback(
         (patch: Partial<AttendanceSearchParams>) => {
             navigate({
                 to: Route.fullPath,
-                search: { from, to, employee, status, ...patch },
+                search: { from, to, employee, type, ...patch },
                 replace: true,
             });
         },
-        [navigate, from, to, employee, status],
+        [navigate, from, to, employee, type],
     );
 
     const isPro = false; // TODO: wire to your plan/feature gate
@@ -65,7 +67,7 @@ function AttendanceListPage() {
                     <CardTitle className="text-base">Filters</CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-3 md:grid-cols-5">
-                    <AttendanceSearchForm from={from} to={to} employee={employee} status={status} onChange={onChange} />
+                    <AttendanceSearchForm from={from} to={to} employee={employee} type={type} onChange={onChange} />
                 </CardContent>
             </Card>
 
@@ -75,7 +77,7 @@ function AttendanceListPage() {
                     <CardTitle className="text-base">Results</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                    <AttendanceDataTable params={{ to, employee, status, from }} />
+                    <AttendanceDataTable params={{ to, employee, type, from }} />
                 </CardContent>
             </Card>
         </div>

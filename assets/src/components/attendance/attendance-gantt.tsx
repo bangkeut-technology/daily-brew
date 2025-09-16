@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { addDays, endOfMonth, format, isWeekend, startOfMonth } from 'date-fns';
-import { AttendanceStatus } from '@/types/attendance';
+import { AttendanceType } from '@/types/attendance';
 import { Employee } from '@/types/employee';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
@@ -8,9 +8,11 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchGanttAttendances } from '@/services/attendance';
 import { DATE_FORMAT } from '@/constants/date';
 
+export type CellClickFunc = (args: { employee: Employee; dateISO: string; type: AttendanceType | undefined }) => void;
+
 type StatusColor = { bg: string; text: string; short: string; title: string };
 
-const STATUS_UI: Record<Exclude<AttendanceStatus, null>, StatusColor> = {
+const STATUS_UI: Record<Exclude<AttendanceType, null>, StatusColor> = {
     present: { bg: 'bg-green-500', text: 'text-white', short: 'P', title: 'Present' },
     absent: { bg: 'bg-red-500', text: 'text-white', short: 'A', title: 'Absent' },
     leave: { bg: 'bg-yellow-400', text: 'text-black', short: 'L', title: 'Leave' },
@@ -18,6 +20,7 @@ const STATUS_UI: Record<Exclude<AttendanceStatus, null>, StatusColor> = {
     sick: { bg: 'bg-sky-500', text: 'text-white', short: 'S', title: 'Sick' },
     holiday: { bg: 'bg-emerald-700', text: 'text-white', short: 'H', title: 'Holiday' },
     remote: { bg: 'bg-indigo-500', text: 'text-white', short: 'R', title: 'Remote' },
+    closure: { bg: 'bg-purple-500', text: 'text-white', short: 'C', title: 'Closure' },
     unknown: { bg: 'bg-gray-500', text: 'text-white', short: 'U', title: 'Unknown' },
 };
 
@@ -26,7 +29,7 @@ export interface AttendanceGanttProps {
     rangeStart?: Date;
     rangeEnd?: Date;
     employees: Employee[];
-    onCellClick?: (args: { employee: Employee; dateISO: string; status: AttendanceStatus | undefined }) => void;
+    onCellClick?: CellClickFunc;
     renderDayHeaderCell?: (date: Date, idx: number) => React.ReactNode;
     className?: string;
     leftColWidth?: number;
@@ -63,11 +66,11 @@ export const AttendanceGantt: React.FunctionComponent<AttendanceGanttProps> = ({
             e: React.KeyboardEvent<HTMLDivElement>,
             employee: Employee,
             dateISO: string,
-            status: AttendanceStatus | undefined,
+            type: AttendanceType | undefined,
         ) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                onCellClick?.({ employee, dateISO, status });
+                onCellClick?.({ employee, dateISO, type });
             }
         },
         [onCellClick],
@@ -79,7 +82,7 @@ export const AttendanceGantt: React.FunctionComponent<AttendanceGanttProps> = ({
             if (data[employeePublicId]) {
                 const employee = data[employeePublicId];
                 if (employee.attendances[date]) {
-                    return employee.attendances[date].status;
+                    return employee.attendances[date].type;
                 }
             }
             return undefined;
@@ -139,21 +142,21 @@ export const AttendanceGantt: React.FunctionComponent<AttendanceGanttProps> = ({
                             <div className="px-3 py-2 border-r bg-card sticky left-0 z-10">{employee.fullName}</div>
                             {days.map((d, i) => {
                                 const dateISO = format(d, 'yyyy-MM-dd');
-                                const status = getStatus(employee.publicId, dateISO);
+                                const type = getStatus(employee.publicId, dateISO);
                                 const isWknd = isWeekend(d);
 
                                 const chip =
-                                    status && STATUS_UI[status] ? (
+                                    type && STATUS_UI[type] ? (
                                         <span
                                             className={cn(
                                                 'px-1 rounded text-[12px]',
-                                                STATUS_UI[status].bg,
-                                                STATUS_UI[status].text,
+                                                STATUS_UI[type].bg,
+                                                STATUS_UI[type].text,
                                             )}
-                                            title={STATUS_UI[status].title}
-                                            aria-label={STATUS_UI[status].title}
+                                            title={STATUS_UI[type].title}
+                                            aria-label={STATUS_UI[type].title}
                                         >
-                                            {STATUS_UI[status].short}
+                                            {STATUS_UI[type].short}
                                         </span>
                                     ) : (
                                         '-'
@@ -164,15 +167,15 @@ export const AttendanceGantt: React.FunctionComponent<AttendanceGanttProps> = ({
                                         key={`${employee.id}_${i}`}
                                         role="button"
                                         tabIndex={0}
-                                        onClick={() => onCellClick?.({ employee, dateISO, status })}
-                                        onKeyDown={(e) => handleKeyDown(e, employee, dateISO, status)}
+                                        onClick={() => onCellClick?.({ employee, dateISO, type })}
+                                        onKeyDown={(e) => handleKeyDown(e, employee, dateISO, type)}
                                         className={cn(
                                             'h-10 border-r grid place-items-center text-[10px] cursor-pointer transition-colors',
                                             'hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                                             isWknd ? 'bg-muted/60' : 'bg-background',
                                         )}
-                                        title={status ? STATUS_UI[status].title : t('no_records')}
-                                        aria-label={`Cell ${employee.fullName} ${dateISO} ${status ?? 'empty'}`}
+                                        title={type ? STATUS_UI[type].title : t('no_records')}
+                                        aria-label={`Cell ${employee.fullName} ${dateISO} ${type ?? 'empty'}`}
                                     >
                                         {chip}
                                     </div>

@@ -2,10 +2,10 @@ import * as React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle, Sun, Clock, HeartPulse, Home, Calendar, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { AttendanceStatus } from '@/types/attendance';
+import type { AttendanceType } from '@/types/attendance';
 
 const STATUS_META: Record<
-    AttendanceStatus,
+    AttendanceType,
     {
         label: string;
         icon: React.FC<any>;
@@ -47,6 +47,11 @@ const STATUS_META: Record<
         icon: Home,
         className: 'bg-violet-500 text-white',
     },
+    closure: {
+        label: 'Closure',
+        icon: Home,
+        className: 'bg-violet-500 text-white',
+    },
     unknown: {
         label: 'Unknown',
         icon: HelpCircle,
@@ -54,13 +59,13 @@ const STATUS_META: Record<
     },
 };
 
-interface AttendanceStatusBadgeProps {
-    status: AttendanceStatus;
+interface AttendanceTypeBadgeProps {
+    type: AttendanceType;
     className?: string;
 }
 
-export const AttendanceStatusBadge: React.FC<AttendanceStatusBadgeProps> = ({ status, className }) => {
-    const meta = STATUS_META[status];
+export const AttendanceTypeBadge: React.FC<AttendanceTypeBadgeProps> = ({ type, className }) => {
+    const meta = STATUS_META[type];
     const Icon = meta.icon;
 
     return (
@@ -70,3 +75,5 @@ export const AttendanceStatusBadge: React.FC<AttendanceStatusBadgeProps> = ({ st
         </Badge>
     );
 };
+
+AttendanceTypeBadge.displayName = 'AttendanceTypeBadge';

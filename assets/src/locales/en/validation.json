@@ -3,7 +3,7 @@
         "attendances": {
             "employee": "The employee is required.",
             "date": "The attendance date is required.",
-            "status": "The attendance status is required."
+            "type": "The attendance type is required."
         },
         "employees": {
             "first_name": "The first name is required.",
@@ -43,7 +43,7 @@
     },
     "one_of": {
         "attendances": {
-            "status": "The attendance status must be one of the following: {{values}}."
+            "type": "The attendance type must be one of the following: {{values}}."
         },
         "settings": {
             "paid_leave_cycle": "The paid leave cycle must be one of the following: {{values}}."

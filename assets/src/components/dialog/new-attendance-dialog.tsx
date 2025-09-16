@@ -12,7 +12,7 @@ import { Employee } from '@/types/employee';
 import { useTranslation } from 'react-i18next';
 import { useBoolean } from 'react-use';
 import { useForm } from 'react-hook-form';
-import { Attendance, AttendanceStatusEnum, PartialAttendance } from '@/types/attendance';
+import { Attendance, AttendanceTypeEnum, PartialAttendance } from '@/types/attendance';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { attendanceSchema } from '@/schema/attendance-schema';
 import { Button } from '@/components/ui/button';
@@ -26,7 +26,7 @@ import { ClockPlus, Loader2Icon, Save } from 'lucide-react';
 const defaultValues: PartialAttendance = {
     employee: undefined,
     attendanceDate: new Date(),
-    status: AttendanceStatusEnum.present,
+    type: AttendanceTypeEnum.present,
     note: '',
     clockIn: undefined,
     clockOut: undefined,

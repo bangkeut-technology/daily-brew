@@ -13,9 +13,10 @@
     "sign_in": "Sign In",
     "sign_up": "Sign Up",
     "password": "Password",
+    "type": "Type",
     "confirm_password": "Confirm Password",
     "attendance_date": "Attendance Date",
-    "attendance_status": "Attendance Status",
+    "attendance_type": "Attendance Status",
     "note": "Note",
     "attendance": "Attendance",
     "status": "Status",
@@ -41,7 +42,7 @@
     "forgot": "Forgot",
     "remember_me": "Remember Me",
     "create_one_free": "Create One Free",
-    "attendance_statuses": {
+    "attendance_types": {
         "present": "Present",
         "absent": "Absent",
         "late": "Late",
@@ -49,6 +50,7 @@
         "sick": "Sick",
         "holiday": "Holiday",
         "remote": "Remote",
+        "closure": "Closure",
         "unknown": "Unknown"
     },
     "day_of_week": {

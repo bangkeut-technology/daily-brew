@@ -31,6 +31,7 @@ export enum AttendanceTypeEnum {
     leave = 'leave',
     late = 'late',
     sick = 'sick',
+    closure = 'closure',
     holiday = 'holiday',
     remote = 'remote',
     unknown = 'unknown',

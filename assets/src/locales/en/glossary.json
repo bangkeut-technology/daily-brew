@@ -15,7 +15,7 @@
             "loading": "Loading attendance records...",
             "no_records": "No attendance records found for the selected month."
         },
-        "status": {
+        "type": {
             "present": "Present",
             "absent": "Absent",
             "late": "Late",
@@ -23,6 +23,7 @@
             "sick": "Sick",
             "holiday": "Holiday",
             "remote": "Remote",
+            "closure": "Closure",
             "unknown": "Unknown"
         }
     },

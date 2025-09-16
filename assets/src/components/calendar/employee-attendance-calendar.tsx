@@ -57,7 +57,7 @@ export const EmployeeAttendanceCalendar: React.FunctionComponent<EmployeeAttenda
                         <CalendarDayButton day={day} modifiers={modifiers} {...props}>
                             {children}
                             {attendanceModifiers[attendanceDate] && (
-                                <Badge>{t(`attendance_statuses.${attendanceModifiers[attendanceDate].status}`)}</Badge>
+                                <Badge>{t(`attendance_types.${attendanceModifiers[attendanceDate].type}`)}</Badge>
                             )}
                         </CalendarDayButton>
                     );

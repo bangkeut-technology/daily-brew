@@ -2,9 +2,9 @@ import React from 'react';
 import { DatePicker } from '@/components/picker/date-picker';
 import { useTranslation } from 'react-i18next';
 import { EmployeePicker } from '@/components/picker/employee-picker';
-import { AttendanceStatusPicker } from '@/components/picker/attendance-status-picker';
-import { AttendanceStatus } from '@/types/attendance';
-import { AttendanceSearchParams } from '@/services/attendance';
+import { AttendanceTypePicker } from '@/components/picker/attendance-type-picker';
+import { AttendanceType } from '@/types/attendance';
+import { AttendanceSearchParams } from '@/types/attendance';
 import { format } from 'date-fns';
 import { DATE_FORMAT } from '@/constants/date';
 
@@ -12,11 +12,11 @@ interface AttendanceSearchFormProps {
     from: string | undefined;
     to: string | undefined;
     employee: string | undefined;
-    status: AttendanceStatus | undefined;
+    type: AttendanceType | undefined;
     onChange: (patch: Partial<AttendanceSearchParams>) => void;
 }
 
-export const AttendanceSearchForm: React.FC<AttendanceSearchFormProps> = ({ from, to, employee, status, onChange }) => {
+export const AttendanceSearchForm: React.FC<AttendanceSearchFormProps> = ({ from, to, employee, type, onChange }) => {
     const { t } = useTranslation();
 
     return (
@@ -39,11 +39,7 @@ export const AttendanceSearchForm: React.FC<AttendanceSearchFormProps> = ({ from
                 value={employee}
                 onChange={(employee) => onChange({ employee })}
             />
-            <AttendanceStatusPicker
-                label={t('attendance_status')}
-                value={status}
-                onChange={(status) => onChange({ status })}
-            />
+            <AttendanceTypePicker label={t('attendance_type')} value={type} onChange={(type) => onChange({ type })} />
         </React.Fragment>
     );
 };

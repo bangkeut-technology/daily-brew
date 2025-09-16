@@ -7,14 +7,14 @@ import { Button } from '@/components/ui/button';
 import { Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { fetchUpcomingAttendances } from '@/services/attendance';
-import { AttendanceStatusEnum } from '@/types/attendance';
+import { AttendanceTypeEnum } from '@/types/attendance';
 import { Loading } from '@/components/loader/loading';
 
 export const UpcomingLeaves = () => {
     const { t } = useTranslation();
     const { data = [], isPending } = useQuery({
         queryKey: ['upcoming-leaves'],
-        queryFn: () => fetchUpcomingAttendances(AttendanceStatusEnum.leave),
+        queryFn: () => fetchUpcomingAttendances(AttendanceTypeEnum.leave),
     });
 
     return (

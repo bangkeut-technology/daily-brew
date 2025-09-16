@@ -1,14 +1,14 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { AttendanceSearchParams, fetchAttendances } from '@/services/attendance';
+import { fetchAttendances } from '@/services/attendance';
 import { DataTable } from '@/components/data-table';
 import { RowSelectionState } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/table-core';
-import { Attendance } from '@/types/attendance';
+import { Attendance, AttendanceSearchParams } from '@/types/attendance';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { DISPLAY_DATE_FORMAT, DISPLAY_TIME_FORMAT } from '@/constants/date';
-import { AttendanceStatusBadge } from '@/components/attendance/attendance-status-badge';
+import { AttendanceTypeBadge } from '@/components/attendance/attendance-type-badge';
 
 const columnHelper = createColumnHelper<Attendance>();
 
@@ -30,9 +30,9 @@ export const AttendanceDataTable: React.FunctionComponent<AttendanceDataTablePro
                 header: t('employee'),
                 cell: ({ getValue }) => getValue(),
             }),
-            columnHelper.accessor('status', {
-                header: t('status'),
-                cell: ({ getValue }) => <AttendanceStatusBadge status={getValue()} />,
+            columnHelper.accessor('type', {
+                header: t('type'),
+                cell: ({ getValue }) => <AttendanceTypeBadge type={getValue()} />,
             }),
             columnHelper.accessor('attendanceDate', {
                 header: t('attendance_date'),

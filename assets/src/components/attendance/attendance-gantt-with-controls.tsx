@@ -5,13 +5,12 @@ import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-reac
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { AttendanceGantt } from './attendance-gantt';
-import { AttendanceStatus } from '@/types/attendance';
+import { AttendanceGantt, CellClickFunc } from './attendance-gantt';
 import { Employee } from '@/types/employee';
 
 type AttendanceGanttWithControlsProps = {
     employees: Employee[];
-    onCellClick?: (args: { employee: Employee; dateISO: string; status: AttendanceStatus | undefined }) => void;
+    onCellClick?: CellClickFunc;
     initialMonth?: Date;
 };
 

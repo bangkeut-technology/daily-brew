@@ -1,6 +1,6 @@
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import { AttendanceStatusEnum, PartialAttendance } from '@/types/attendance';
+import { AttendanceTypeEnum, PartialAttendance } from '@/types/attendance';
 import { Form } from '@/components/ui/form';
 import { DatePickerControl } from '@/components/picker/date-picker-control';
 import { useTranslation } from 'react-i18next';
@@ -17,9 +17,9 @@ export const AttendanceForm: React.FunctionComponent<AttendanceFormProps> = ({ f
     const { t } = useTranslation();
 
     const options = React.useMemo(() => {
-        return Object.entries(AttendanceStatusEnum).map(([_, value]) => ({
+        return Object.entries(AttendanceTypeEnum).map(([_, value]) => ({
             value,
-            label: t(`attendance_statuses.${value}`),
+            label: t(`attendance_types.${value}`),
         }));
     }, [t]);
 
