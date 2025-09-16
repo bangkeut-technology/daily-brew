@@ -6,6 +6,8 @@ namespace App\Entity;
 
 use App\Enum\AttendanceBatchTypeEnum;
 use App\Repository\AttendanceBatchRepository;
+use App\Util\Canonicalizer;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -36,10 +38,10 @@ class AttendanceBatch extends AbstractEntity
     private ?string $note = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
-    private ?\DateTimeImmutable $fromDate = null;
+    private ?DateTimeImmutable $fromDate = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
-    private ?\DateTimeImmutable $toDate = null;
+    private ?DateTimeImmutable $toDate = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     private ?User $user = null;
@@ -127,36 +129,36 @@ class AttendanceBatch extends AbstractEntity
     }
 
     /**
-     * @return \DateTimeImmutable|null
+     * @return DateTimeImmutable|null
      */
-    public function getFromDate(): ?\DateTimeImmutable
+    public function getFromDate(): ?DateTimeImmutable
     {
         return $this->fromDate;
     }
 
     /**
-     * @param \DateTimeImmutable|null $fromDate
+     * @param DateTimeImmutable|null $fromDate
      * @return AttendanceBatch
      */
-    public function setFromDate(?\DateTimeImmutable $fromDate): AttendanceBatch
+    public function setFromDate(?DateTimeImmutable $fromDate): AttendanceBatch
     {
         $this->fromDate = $fromDate;
         return $this;
     }
 
     /**
-     * @return \DateTimeImmutable|null
+     * @return DateTimeImmutable|null
      */
-    public function getToDate(): ?\DateTimeImmutable
+    public function getToDate(): ?DateTimeImmutable
     {
         return $this->toDate;
     }
 
     /**
-     * @param \DateTimeImmutable|null $toDate
+     * @param DateTimeImmutable|null $toDate
      * @return AttendanceBatch
      */
-    public function setToDate(?\DateTimeImmutable $toDate): AttendanceBatch
+    public function setToDate(?DateTimeImmutable $toDate): AttendanceBatch
     {
         $this->toDate = $toDate;
         return $this;
@@ -197,13 +199,28 @@ class AttendanceBatch extends AbstractEntity
 
     public function removeAttendance(Attendance $attendance): static
     {
-        if ($this->attendances->removeElement($attendance)) {
-            // set the owning side to null (unless already changed)
-            if ($attendance->getBatch() === $this) {
-                $attendance->setBatch(null);
-            }
+        if ($this->attendances->removeElement($attendance) && $attendance->getBatch() === $this) {
+            $attendance->setBatch(null);
         }
 
         return $this;
+    }
+
+
+    public function __toString(): string
+    {
+        return $this->getLabel() ?? '';
+    }
+
+    /**
+     * Canonicalizes the name of the evaluation template.
+     * This method should be called before persisting the entity to ensure
+     * that the canonical name is set correctly.
+     */
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function canonicalize(): void
+    {
+        $this->canonicalLabel = Canonicalizer::canonicalize($this->label);
     }
 }

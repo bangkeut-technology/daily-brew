@@ -9,11 +9,15 @@ use Doctrine\ORM\Exception\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * Class AbstractRepository.
+ * Class AbstractRepository
  *
- * @author Vandeth THO <thovandeth@gmail.com>
+ *  Abstract repository class for managing entities.
  *
- * @template T
+ * @package App\Repository
+ * @author  Vandeth THO <thovandeth@gmail.com>
+ *
+ * @template-covariant T of object
+ *
  */
 abstract class AbstractRepository extends ServiceEntityRepository
 {
