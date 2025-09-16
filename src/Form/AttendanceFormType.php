@@ -6,7 +6,7 @@ namespace App\Form;
 
 use App\Entity\Attendance;
 use App\Entity\Employee;
-use App\Enum\AttendanceStatusEnum;
+use App\Enum\AttendanceTypeEnum;
 use App\Form\Type\DateTimeImmutableType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
@@ -38,7 +38,7 @@ class AttendanceFormType extends AbstractFormType
                 ]
             ])
             ->add('status', EnumType::class, [
-                'class' => AttendanceStatusEnum::class,
+                'class' => AttendanceTypeEnum::class,
                 'documentation' => [
                     'type' => 'string',
                     'description' => 'The status of the attendance, e.g. "Present", "Absent", "Late", or "Leave".',

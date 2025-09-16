@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\DTO;
 
 use App\Entity\Attendance;
-use App\Enum\AttendanceStatusEnum;
+use App\Enum\AttendanceTypeEnum;
 use DateTimeImmutable;
 
 /**
@@ -16,15 +16,15 @@ use DateTimeImmutable;
 final readonly class AttendanceDTO
 {
     public function __construct(
-        public int                  $id,
-        public string               $publicId,
-        public DateTimeImmutable    $attendanceDate,
-        public AttendanceStatusEnum $status,
-        public ?DateTimeImmutable   $clockIn = null,
-        public ?DateTimeImmutable   $clockOut = null,
-        public ?string              $note = null,
-        public ?EmployeeDTO         $employee = null,
-        public ?UserDTO             $user = null,
+        public int                $id,
+        public string             $publicId,
+        public DateTimeImmutable  $attendanceDate,
+        public AttendanceTypeEnum $type,
+        public ?DateTimeImmutable $clockIn = null,
+        public ?DateTimeImmutable $clockOut = null,
+        public ?string            $note = null,
+        public ?EmployeeDTO       $employee = null,
+        public ?UserDTO           $user = null,
     )
     {
     }
@@ -42,7 +42,7 @@ final readonly class AttendanceDTO
             id: $attendance->getId(),
             publicId: $attendance->getPublicId(),
             attendanceDate: $attendance->getAttendanceDate(),
-            status: $attendance->getStatus(),
+            type: $attendance->getType(),
             clockIn: $attendance->getClockIn(),
             clockOut: $attendance->getClockOut(),
             note: $attendance->getNote(),

@@ -4,12 +4,12 @@ declare(strict_types=1);
 namespace App\Enum;
 
 /**
- * Class AttendanceStatusEnum
+ * Class AttendanceTypeEnum
  *
  * @package App\Enum
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-enum AttendanceStatusEnum: string
+enum AttendanceTypeEnum: string
 {
     case PRESENT = 'present';
     case ABSENT = 'absent';
@@ -18,5 +18,6 @@ enum AttendanceStatusEnum: string
     case SICK = 'sick';
     case HOLIDAY = 'holiday';
     case REMOTE = 'remote';
+    case CLOSURE = 'closure';
     case UNKNOWN = 'unknown';
 }

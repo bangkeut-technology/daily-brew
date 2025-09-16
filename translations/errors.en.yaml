@@ -5,6 +5,7 @@ not_found:
     evaluation_template_criteria: 'Evaluation template criteria %publicId% not found in template %template%.'
     attendance:                   'Attendance %publicId% not found.'
     setting:                      'Setting %name% not found.'
+    attendance_batch:             'Attendance batch %publicId% not found.'
 invalid:
     user:                'Invalid user information'
     user_password:       'The current password is incorrect.'
@@ -16,6 +17,7 @@ invalid:
     employee_evaluation: 'Invalid employee evaluation information.'
     attendance:          'Invalid attendance information.'
     employees:           'Invalid employees information.'
+    attendance_batch:    'Invalid attendance batch information.'
 max_free_employees: 'You have reached the maximum number of %count% free employees allowed. Please upgrade your plan to add more employees.'
 existed:
     evaluation_template: 'Evaluation template ''%name%'' already exists.'

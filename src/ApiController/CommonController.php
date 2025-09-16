@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\ApiController;
 
 use App\Controller\AbstractController;
-use App\Enum\AttendanceStatusEnum;
+use App\Enum\AttendanceTypeEnum;
 use App\Repository\AttendanceRepository;
 use App\Repository\EmployeeEvaluationRepository;
 use App\Repository\EmployeeRepository;
@@ -103,7 +103,7 @@ class CommonController extends AbstractController
         $leavesToday = $attendanceRepository->countByStatusOnDateForOwner(
             $user,
             $today,
-            AttendanceStatusEnum::LEAVE
+            AttendanceTypeEnum::LEAVE
         );
 
         $data = [

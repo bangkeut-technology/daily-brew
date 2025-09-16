@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Enum\AttendanceBatchTypeEnum;
+use App\Enum\AttendanceTypeEnum;
 use App\Repository\AttendanceBatchRepository;
 use App\Util\Canonicalizer;
 use DateTimeImmutable;
@@ -12,6 +12,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Class AttendanceBatch.
@@ -25,25 +26,32 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\HasLifecycleCallbacks]
 class AttendanceBatch extends AbstractEntity
 {
-    #[ORM\Column(enumType: AttendanceBatchTypeEnum::class)]
-    private ?AttendanceBatchTypeEnum $type = null;
+    #[ORM\Column(enumType: AttendanceTypeEnum::class)]
+    #[Groups('attendance_batch:read')]
+    private ?AttendanceTypeEnum $type = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups('attendance_batch:read')]
     private ?string $label = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups('attendance_batch:read')]
     private ?string $canonicalLabel = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups('attendance_batch:read')]
     private ?string $note = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[Groups('attendance_batch:read')]
     private ?DateTimeImmutable $fromDate = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[Groups('attendance_batch:read')]
     private ?DateTimeImmutable $toDate = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
+    #[Groups('attendance_batch:read')]
     private ?User $user = null;
 
     /**
@@ -57,18 +65,18 @@ class AttendanceBatch extends AbstractEntity
     }
 
     /**
-     * @return AttendanceBatchTypeEnum|null
+     * @return AttendanceTypeEnum|null
      */
-    public function getType(): ?AttendanceBatchTypeEnum
+    public function getType(): ?AttendanceTypeEnum
     {
         return $this->type;
     }
 
     /**
-     * @param AttendanceBatchTypeEnum|null $type
+     * @param AttendanceTypeEnum|null $type
      * @return AttendanceBatch
      */
-    public function setType(?AttendanceBatchTypeEnum $type): AttendanceBatch
+    public function setType(?AttendanceTypeEnum $type): AttendanceBatch
     {
         $this->type = $type;
         return $this;
@@ -206,7 +214,9 @@ class AttendanceBatch extends AbstractEntity
         return $this;
     }
 
-
+    /**
+     * @return string
+     */
     public function __toString(): string
     {
         return $this->getLabel() ?? '';

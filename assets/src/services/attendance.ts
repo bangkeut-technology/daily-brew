@@ -1,14 +1,6 @@
 import { apiAxios } from '@/lib/apiAxios';
-import { Attendance, AttendanceStatus, AttendanceStatusEnum, PartialAttendance } from '@/types/attendance';
+import { Attendance, AttendanceSearchParams, AttendanceTypeEnum, PartialAttendance } from '@/types/attendance';
 import { Employee, EmployeeAttendance } from '@/types/employee';
-
-export type AttendanceSearchParams = {
-    from: string | undefined;
-    to: string | undefined;
-    employee?: string;
-    employees?: Employee[];
-    status?: AttendanceStatus;
-};
 
 export const fetchAttendances = async ({ employees, ...params }: AttendanceSearchParams) =>
     apiAxios
@@ -25,7 +17,7 @@ export const postAttendance = async (attendance: PartialAttendance) =>
         }>('/attendances', attendance)
         .then((response) => response.data);
 
-export const fetchUpcomingAttendances = async (status: AttendanceStatusEnum) =>
+export const fetchUpcomingAttendances = async (status: AttendanceTypeEnum) =>
     apiAxios.get<Attendance[]>('/attendances/upcoming', { params: { status } }).then((response) => response.data);
 
 export const fetchGanttAttendances = async ({

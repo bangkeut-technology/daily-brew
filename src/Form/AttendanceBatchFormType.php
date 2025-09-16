@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Form;
 
 use App\Entity\AttendanceBatch;
+use App\Entity\Employee;
 use App\Entity\User;
 use App\Enum\AttendanceBatchTypeEnum;
 use App\Form\Type\DateTimeImmutableType;
@@ -34,6 +35,10 @@ class AttendanceBatchFormType extends AbstractFormType
             ->add('note', TextType::class)
             ->add('fromDate', DateTimeImmutableType::class)
             ->add('toDate', DateTimeImmutableType::class)
+            ->add('employees', EntityType::class, [
+                'class' => Employee::class,
+                'mapped' => false,
+            ])
         ;
     }
 

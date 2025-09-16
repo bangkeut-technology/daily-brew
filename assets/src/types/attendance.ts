@@ -6,7 +6,7 @@ export type Attendance = {
     publicId: string;
     attendanceDate: string;
     note?: string;
-    status: AttendanceStatus;
+    type: AttendanceType;
     clockIn?: string;
     clockOut?: string;
     employee: Employee;
@@ -23,9 +23,9 @@ export type PartialAttendance = Omit<
     clockOut?: Date;
 };
 
-export type AttendanceStatus = keyof typeof AttendanceStatusEnum;
+export type AttendanceType = keyof typeof AttendanceTypeEnum;
 
-export enum AttendanceStatusEnum {
+export enum AttendanceTypeEnum {
     present = 'present',
     absent = 'absent',
     leave = 'leave',
@@ -35,3 +35,11 @@ export enum AttendanceStatusEnum {
     remote = 'remote',
     unknown = 'unknown',
 }
+
+export type AttendanceSearchParams = {
+    from: string | undefined;
+    to: string | undefined;
+    employee?: string;
+    employees?: Employee[];
+    type?: AttendanceType;
+};

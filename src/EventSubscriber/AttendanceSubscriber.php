@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\EventSubscriber;
 
 use App\Constant\SettingConstant;
-use App\Enum\AttendanceStatusEnum;
+use App\Enum\AttendanceTypeEnum;
 use App\Enum\LeaveTypeEnum;
 use App\Event\Attendance\RebalanceLeaveCycleEvent;
 use App\Repository\AttendanceRepository;
@@ -48,7 +48,7 @@ readonly class AttendanceSubscriber implements EventSubscriberInterface
     public function onRebalanceCycle(RebalanceLeaveCycleEvent $event): void
     {
         $attendance = $event->attendance;
-        if ($attendance->getStatus() !== AttendanceStatusEnum::LEAVE) {
+        if ($attendance->getType() !== AttendanceTypeEnum::LEAVE) {
             return;
         }
 
@@ -60,7 +60,7 @@ readonly class AttendanceSubscriber implements EventSubscriberInterface
             ? [DateHelper::startOfYear($attendanceDate), DateHelper::endOfYear($attendanceDate)]
             : [DateHelper::startOfMonth($attendanceDate), DateHelper::endOfMonth($attendanceDate)];
 
-        $leaves = $this->attendanceRepository->findStatus($attendance->getEmployee(), $start, $end, AttendanceStatusEnum::LEAVE);
+        $leaves = $this->attendanceRepository->findStatus($attendance->getEmployee(), $start, $end, AttendanceTypeEnum::LEAVE);
 
         foreach ($leaves as $i => $leave) {
             $shouldBe = ($i < $limit) ? LeaveTypeEnum::PAID : LeaveTypeEnum::UNPAID;

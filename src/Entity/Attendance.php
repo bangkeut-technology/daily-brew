@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 
-use App\Enum\AttendanceStatusEnum;
+use App\Enum\AttendanceTypeEnum;
 use App\Enum\LeaveTypeEnum;
 use App\Repository\AttendanceRepository;
 use DateTimeImmutable;
@@ -62,13 +62,13 @@ class Attendance extends AbstractEntity
     private ?DateTimeImmutable $clockOut = null;
 
     /**
-     * The status of the attendance.
+     * The type of the attendance.
      *
-     * @var AttendanceStatusEnum
+     * @var AttendanceTypeEnum
      */
-    #[ORM\Column(enumType: AttendanceStatusEnum::class)]
+    #[ORM\Column(enumType: AttendanceTypeEnum::class)]
     #[Groups(['attendance:read'])]
-    private AttendanceStatusEnum $status = AttendanceStatusEnum::PRESENT;
+    private AttendanceTypeEnum $type = AttendanceTypeEnum::PRESENT;
 
     /**
      * @var LeaveTypeEnum|null
@@ -172,20 +172,20 @@ class Attendance extends AbstractEntity
     }
 
     /**
-     * @return AttendanceStatusEnum
+     * @return AttendanceTypeEnum
      */
-    public function getStatus(): AttendanceStatusEnum
+    public function getType(): AttendanceTypeEnum
     {
-        return $this->status;
+        return $this->type;
     }
 
     /**
-     * @param AttendanceStatusEnum $status
+     * @param AttendanceTypeEnum $type
      * @return Attendance
      */
-    public function setStatus(AttendanceStatusEnum $status): Attendance
+    public function setType(AttendanceTypeEnum $type): Attendance
     {
-        $this->status = $status;
+        $this->type = $type;
         return $this;
     }
 
@@ -203,7 +203,7 @@ class Attendance extends AbstractEntity
      */
     public function setLeaveType(?LeaveTypeEnum $leaveType): self
     {
-        if ($this->status !== AttendanceStatusEnum::LEAVE) {
+        if ($this->type !== AttendanceTypeEnum::LEAVE) {
             $leaveType = null;
         }
 

@@ -8,7 +8,7 @@ use App\Controller\AbstractController;
 use App\DTO\AttendanceDTO;
 use App\DTO\EmployeeDTO;
 use App\Entity\Attendance;
-use App\Enum\AttendanceStatusEnum;
+use App\Enum\AttendanceTypeEnum;
 use App\Event\Attendance\RebalanceLeaveCycleEvent;
 use App\Form\AttendanceFormType;
 use App\Repository\AttendanceRepository;
@@ -263,7 +263,7 @@ class AttendanceController extends AbstractController
             user: $this->getUser(),
             from: $from,
             to: $to,
-            status: AttendanceStatusEnum::from($status),
+            status: AttendanceTypeEnum::from($status),
             employeePublicId: $employeePublicId
         );
 
