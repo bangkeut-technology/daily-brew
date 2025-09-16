@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace App\ApiController;
 
 use App\Controller\AbstractController;
+use App\Repository\AttendanceBatchRepository;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class AttendanceBatchController
@@ -13,5 +15,16 @@ use App\Controller\AbstractController;
  */
 class AttendanceBatchController extends AbstractController
 {
+    public function __construct(
+        TranslatorInterface $translator,
+        AttendanceBatchRepository $attendanceBatchRepository,
+    )
+    {
+        parent::__construct($translator);
+    }
 
+    public function post()
+    {
+        
+    }
 }
