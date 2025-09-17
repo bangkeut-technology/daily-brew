@@ -5,12 +5,10 @@ namespace App\EventSubscriber;
 
 use App\Event\AttendanceBatch\AttendanceBatchCreatedEvent;
 use App\Repository\AttendanceRepository;
-use App\Repository\EmployeeRepository;
 use DateMalformedStringException;
 use DateTimeImmutable;
 use Generator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class AttendanceBatchSubscriber
@@ -51,18 +49,23 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
         $type = $batch->getType();
         $from = $batch->getFromDate();
         $to = $batch->getToDate();
-        $interval = $from->diff($to);
 
         foreach ($employees as $employee) {
             $exists = $this->attendanceRepository->getExistDatesByEmployeeAndPeriod($employee, $from, $to);
             foreach ($this->days($from, $to) as $day) {
-                if (array_find($day->format('Y-m-d'), $exists)) {}
+                if ($this->isDateExist($day, $exists)) {
+                    continue;
+                }
                 $attendance = $this->attendanceRepository->create();
                 $attendance->setUser($user);
                 $attendance->setEmployee($employee);
                 $attendance->setBatch($batch);
                 $attendance->setType($type);
+                $attendance->setAttendanceDate($day);
+
+                $this->attendanceRepository->update($attendance, false);
             }
+            $this->attendanceRepository->flush();
         }
     }
 
@@ -75,9 +78,23 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
      * @return Generator<DateTimeImmutable> A generator yielding each date in the range.
      * @throws DateMalformedStringException
      */
-    private function days(DateTimeImmutable $from, DateTimeImmutable $to): Generator {
+    private function days(DateTimeImmutable $from, DateTimeImmutable $to): Generator
+    {
         for ($d = $from; $d <= $to; $d = $d->modify('+1 day')) {
             yield $d;
         }
+    }
+
+    /**
+     * Checks if the given date exists in the provided array of dates.
+     *
+     * @param DateTimeImmutable   $date  The date to check.
+     * @param DateTimeImmutable[] $dates An array of DateTimeImmutable objects to search within.
+     *
+     * @return bool True if the date exists in the array, false otherwise.
+     */
+    private function isDateExist(DateTimeImmutable $date, array $dates): bool
+    {
+        return array_any($dates, fn($d) => $d->format('Y-m-d') === $date->format('Y-m-d'));
     }
 }

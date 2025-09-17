@@ -16,7 +16,6 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class AttendanceBatchCreatedEvent extends Event
 {
-
     /**
      * Represents the event triggered when an attendance batch is created.
      *
@@ -26,8 +25,8 @@ class AttendanceBatchCreatedEvent extends Event
      */
     public function __construct(
         public readonly AttendanceBatch $batch,
-        public readonly User          $user,
-        public readonly array          $employees = [],
+        public readonly User            $user,
+        public readonly array           $employees = [],
     )
     {
     }
