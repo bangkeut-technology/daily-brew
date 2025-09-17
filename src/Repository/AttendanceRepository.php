@@ -450,4 +450,18 @@ class AttendanceRepository extends AbstractRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    public function existsForUserOnPeriod(User $user, ?DateTimeImmutable $from, ?DateTimeImmutable $to)
+    {
+        return $this->createQueryBuilder('attendance')
+            ->select('COUNT(attendance.id)')
+            ->where('attendance.user = :user')
+            ->andWhere('attendance.attendanceDate >= :from')
+            ->andWhere('attendance.attendanceDate <= :to')
+            ->setParameters(new ArrayCollection([
+                new Parameter('user', $user),
+                new Parameter('from', $from, Types::DATE_IMMUTABLE),
+                new Parameter('to', $to, Types::DATE_IMMUTABLE),
+            ]));
+    }
 }

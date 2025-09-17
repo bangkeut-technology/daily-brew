@@ -5,6 +5,7 @@ namespace App\Event\AttendanceBatch;
 
 use App\Entity\AttendanceBatch;
 use App\Entity\Employee;
+use App\Entity\User;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -15,12 +16,17 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class AttendanceBatchCreatedEvent extends Event
 {
+
     /**
-     * @param AttendanceBatch $batch
-     * @param Employee[]      $employees
+     * Represents the event triggered when an attendance batch is created.
+     *
+     * @param AttendanceBatch $batch     The attendance batch that is created.
+     * @param User            $user      The user associated with the event.
+     * @param Employee[]      $employees The list of employees associated with the batch.
      */
     public function __construct(
         public readonly AttendanceBatch $batch,
+        public readonly User          $user,
         public readonly array          $employees = [],
     )
     {
