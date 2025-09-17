@@ -140,6 +140,29 @@ class AttendanceRepository extends AbstractRepository
     }
 
     /**
+     * @param Employee          $employee
+     * @param DateTimeImmutable $from
+     * @param DateTimeImmutable $to
+     * @return array
+     */
+    public function getExistDatesByEmployeeAndPeriod(Employee $employee, DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        return $this->createQueryBuilder('a')
+            ->select('a.attendanceDate')
+            ->innerJoin('attendance.employee', 'e')
+            ->where('attendance.employee = :employee')
+            ->andWhere('attendance.attendanceDate >= :from')
+            ->andWhere('attendance.attendanceDate <= :to')
+            ->setParameters(new ArrayCollection([
+                new Parameter('employee', $employee),
+                new Parameter('from', $from, Types::DATE_IMMUTABLE),
+                new Parameter('to', $to, Types::DATE_IMMUTABLE),
+            ]))
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
      * Find an attendance by its public ID and user.
      *
      * @param string    $publicId The public ID of the attendance.

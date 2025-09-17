@@ -35,6 +35,14 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
     }
 
 
+    /**
+     * Handles the creation of attendance records when an AttendanceBatchCreatedEvent is triggered.
+     *
+     * @param AttendanceBatchCreatedEvent $event The event containing details of the attendance batch creation, including employees, batch data, and user information.
+     *
+     * @return void
+     * @throws DateMalformedStringException
+     */
     public function onCreated(AttendanceBatchCreatedEvent $event): void
     {
         $employees = $event->employees;
@@ -46,8 +54,9 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
         $interval = $from->diff($to);
 
         foreach ($employees as $employee) {
-            $exists = $this->attendanceRepository->findByEmployeeAndPeriod($employee, $from, $to);
+            $exists = $this->attendanceRepository->getExistDatesByEmployeeAndPeriod($employee, $from, $to);
             foreach ($this->days($from, $to) as $day) {
+                if (array_find($day->format('Y-m-d'), $exists)) {}
                 $attendance = $this->attendanceRepository->create();
                 $attendance->setUser($user);
                 $attendance->setEmployee($employee);
