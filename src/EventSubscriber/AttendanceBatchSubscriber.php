@@ -7,6 +7,7 @@ use App\Event\AttendanceBatch\AttendanceBatchCreatedEvent;
 use App\Repository\AttendanceRepository;
 use DateMalformedStringException;
 use DateTimeImmutable;
+use DateTimeInterface;
 use Generator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -32,7 +33,6 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
         return [AttendanceBatchCreatedEvent::class => 'onCreated'];
     }
 
-
     /**
      * Handles the creation of attendance records when an AttendanceBatchCreatedEvent is triggered.
      *
@@ -50,51 +50,51 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
         $from = $batch->getFromDate();
         $to = $batch->getToDate();
 
-        foreach ($employees as $employee) {
-            $exists = $this->attendanceRepository->getExistDatesByEmployeeAndPeriod($employee, $from, $to);
-            foreach ($this->days($from, $to) as $day) {
-                if ($this->isDateExist($day, $exists)) {
+        $days = [];
+        for ($d = $from; $d <= $to; $d = $d->modify('+1 day')) {
+            $days[] = $d->format('Y-m-d');
+        }
+
+        if (empty($employees) || empty($days)) {
+            return;
+        }
+
+        $existing = $this->attendanceRepository->getExistingByEmployeesAndPeriod($employees, $from, $to);
+
+        $existingMap = [];
+        foreach ($existing as $row) {
+            $empId = (int)$row['employee_id'];
+            $key = $row['date'] instanceof DateTimeInterface ? $row['date']->format('Y-m-d') : new DateTimeImmutable($row['date'])->format('Y-m-d');
+            $existingMap[$empId][$key] = true;
+        }
+
+        $batchSize = 20;
+
+        foreach ($employees as $index => $employee) {
+            $empId = $employee->getId();
+            $existsForEmp = $existingMap[$empId] ?? [];
+
+            foreach ($days as $day) {
+                if (isset($existsForEmp[$day])) {
                     continue;
                 }
+
                 $attendance = $this->attendanceRepository->create();
                 $attendance->setUser($user);
                 $attendance->setEmployee($employee);
                 $attendance->setBatch($batch);
                 $attendance->setType($type);
-                $attendance->setAttendanceDate($day);
+                $attendance->setAttendanceDate(new DateTimeImmutable($day));
 
                 $this->attendanceRepository->update($attendance, false);
+
+                if (($index % $batchSize) === 0) {
+                    $this->attendanceRepository->flush();
+                }
             }
-            $this->attendanceRepository->flush();
         }
+
+        $this->attendanceRepository->flush();
     }
 
-    /**
-     * Generates a range of days between two given dates, inclusive.
-     *
-     * @param DateTimeImmutable $from The start date of the range.
-     * @param DateTimeImmutable $to   The end date of the range.
-     *
-     * @return Generator<DateTimeImmutable> A generator yielding each date in the range.
-     * @throws DateMalformedStringException
-     */
-    private function days(DateTimeImmutable $from, DateTimeImmutable $to): Generator
-    {
-        for ($d = $from; $d <= $to; $d = $d->modify('+1 day')) {
-            yield $d;
-        }
-    }
-
-    /**
-     * Checks if the given date exists in the provided array of dates.
-     *
-     * @param DateTimeImmutable   $date  The date to check.
-     * @param DateTimeImmutable[] $dates An array of DateTimeImmutable objects to search within.
-     *
-     * @return bool True if the date exists in the array, false otherwise.
-     */
-    private function isDateExist(DateTimeImmutable $date, array $dates): bool
-    {
-        return array_any($dates, fn($d) => $d->format('Y-m-d') === $date->format('Y-m-d'));
-    }
 }

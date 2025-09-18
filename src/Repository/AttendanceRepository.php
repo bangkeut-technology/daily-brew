@@ -14,6 +14,8 @@ use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -140,10 +142,19 @@ class AttendanceRepository extends AbstractRepository
     }
 
     /**
-     * @param Employee          $employee
-     * @param DateTimeImmutable $from
-     * @param DateTimeImmutable $to
-     * @return array
+     * Retrieves existing attendance dates for a specific employee within a given period.
+     *
+     * This method executes a query to fetch attendance dates associated with
+     * the provided employee and falling within the specified date range.
+     *
+     * @param Employee          $employee The employee whose attendance dates are being queried.
+     * @param DateTimeImmutable $from     The start date of the period for filtering attendance records (inclusive).
+     * @param DateTimeImmutable $to       The end date of the period for filtering attendance records (inclusive).
+     *
+     * @return array An array of attendance dates matching the specified criteria.
+     *
+     * @throws NonUniqueResultException   If the query result is not unique.
+     * @throws NoResultException          If the query yields no results.
      */
     public function getExistDatesByEmployeeAndPeriod(Employee $employee, DateTimeImmutable $from, DateTimeImmutable $to): array
     {
@@ -160,6 +171,42 @@ class AttendanceRepository extends AbstractRepository
             ]))
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /**
+     * Retrieves attendance records for specific employees within a given date period.
+     *
+     * This method constructs and executes a query to fetch attendance data for the provided employees
+     * and time period, returning the results as lightweight arrays to optimize performance.
+     *
+     * The returned data is structured as an array of maps containing `employee_id` and `date` fields.
+     *
+     * @param array              $employees The list of employee identifiers to filter by.
+     * @param \DateTimeInterface $from      The start date of the period.
+     * @param \DateTimeInterface $to        The end date of the period.
+     *
+     * @return array The resulting attendance data, each element containing keys:
+     *               'Employee_id' (int): The identifier of the employee.
+     *               'Date' (string): The attendance date in 'Y-m-d' format.
+     */
+    public function getExistingByEmployeesAndPeriod(array $employees, \DateTimeInterface $from, \DateTimeInterface $to): array
+    {
+        $qb = $this->createQueryBuilder('a')
+            ->select('IDENTITY(e.id) AS employee_id, a.attendanceDate AS date')
+            ->innerJoin('attendance.employee', 'e')
+            ->where('a.employee IN (:employees)')
+            ->andWhere('attendance.attendanceDate >= :from')
+            ->andWhere('attendance.attendanceDate <= :to')
+            ->setParameters(new ArrayCollection([
+                new Parameter('employees', $employees),
+                new Parameter('from', $from, Types::DATE_IMMUTABLE),
+                new Parameter('to', $to, Types::DATE_IMMUTABLE),
+            ]));
+
+        return array_map(
+            fn($row) => ['employee_id' => (int) $row['employee_id'], 'date' => $row['date']],
+            $qb->getQuery()->getArrayResult()
+        );
     }
 
     /**
