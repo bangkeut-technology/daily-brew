@@ -82,6 +82,7 @@ class EmployeeFormType extends AbstractFormType
                 'class' => EvaluationTemplate::class,
                 'choice_label' => 'id',
                 'multiple' => true,
+                'required' => false,
                 'documentation' => [
                     'description' => 'The evaluation templates assigned to the employee.',
                     'type' => 'array',
