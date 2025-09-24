@@ -1,26 +1,19 @@
 import * as React from 'react';
 import { createFileRoute, Link, redirect, useNavigate } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
-import { ArrowRight, Lock, Mail, User } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { signUpSchema } from '@/schema/sign-up-schema';
 import { SignUp } from '@/types/user';
-import { Form } from '@/components/ui/form';
-import { TextField } from '@/components/field/text-field';
 import { useTranslation } from 'react-i18next';
-import { CheckboxField } from '@/components/field/checkbox-field';
 import { useMutation } from '@tanstack/react-query';
 import { signUp } from '@/services/auth';
 import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
 import { useAuthentication } from '@/hooks/use-authentication';
 import { z } from 'zod';
-import { TermsAndConditionsDialog } from '@/routes/_layout/sign-up/-components/terms-and-conditions-dialog';
-import { PrivacyPolicyDialog } from '@/routes/_layout/sign-up/-components/privacy-policy-dialog';
+import { SignUpForm } from '@/routes/_layout/sign-up/-components/sign-up-form';
 
 export const Route = createFileRoute('/_layout/sign-up/')({
     component: SignUpPage,
@@ -62,8 +55,6 @@ function SignUpPage() {
             toast.error(message, { closeButton: true });
         },
     });
-
-    const password = form.watch('password');
 
     React.useEffect(() => {
         if (user) {
@@ -107,101 +98,7 @@ function SignUpPage() {
                                 <CardDescription>Set up your DailyBrew account</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-5">
-                                <Form {...form}>
-                                    <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)} noValidate>
-                                        <div className="flex space-x-2">
-                                            <TextField
-                                                control={form.control}
-                                                name="firstName"
-                                                label={t('first_name')}
-                                                placeholder="John"
-                                                autoComplete="name"
-                                                startIcon={
-                                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                                }
-                                                disabled={isPending}
-                                            />
-                                            <TextField
-                                                control={form.control}
-                                                name="lastName"
-                                                label={t('last_name')}
-                                                placeholder="Doe"
-                                                autoComplete="family-name"
-                                                startIcon={
-                                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                                }
-                                                disabled={isPending}
-                                            />
-                                        </div>
-
-                                        <TextField
-                                            control={form.control}
-                                            name="email"
-                                            label={t('email')}
-                                            placeholder="you@coffee.co"
-                                            className="w-full"
-                                            autoComplete="email"
-                                            startIcon={
-                                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                            }
-                                            disabled={isPending}
-                                        />
-
-                                        <div className="flex flex-col space-y-2 w-full">
-                                            <div className="flex flex-col space-y-2 w-full">
-                                                <TextField
-                                                    control={form.control}
-                                                    name="password"
-                                                    label={t('password')}
-                                                    className="w-full"
-                                                    type="password"
-                                                    autoComplete="new-password"
-                                                    placeholder="••••••••"
-                                                    startIcon={
-                                                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                                    }
-                                                    disabled={isPending}
-                                                />
-                                                <PasswordStrength value={password} />
-                                            </div>
-
-                                            <TextField
-                                                control={form.control}
-                                                name="confirmPassword"
-                                                label={t('confirm_password')}
-                                                className="w-full"
-                                                type="password"
-                                                placeholder="••••••••"
-                                                startIcon={
-                                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                                }
-                                                disabled={isPending}
-                                                autoComplete="new-password"
-                                            />
-                                        </div>
-
-                                        <div className="flex items-start gap-2">
-                                            <CheckboxField
-                                                disabled={isPending}
-                                                control={form.control}
-                                                name="acceptedTerms"
-                                                label={
-                                                    <React.Fragment>
-                                                        I agree to the
-                                                        <TermsAndConditionsDialog />
-                                                        and
-                                                        <PrivacyPolicyDialog />.
-                                                    </React.Fragment>
-                                                }
-                                            ></CheckboxField>
-                                        </div>
-
-                                        <Button type="submit" className="w-full" disabled={isPending}>
-                                            Create account
-                                            <ArrowRight className="ml-2 h-4 w-4" />
-                                        </Button>
-                                    </form>
-                                </Form>
+                                <SignUpForm form={form} onSubmit={onSubmit} isPending={isPending} />
 
                                 <Separator />
 
@@ -226,42 +123,6 @@ function SignUpPage() {
                     </div>
                 </div>
             </main>
-        </div>
-    );
-}
-
-/** Simple password strength helper (client-side only) */
-function PasswordStrength({ value }: { value?: string }) {
-    const score = React.useMemo(() => {
-        if (!value) return 0;
-        let s = 0;
-        if (value.length >= 8) s++;
-        if (/[A-Z]/.test(value)) s++;
-        if (/[a-z]/.test(value)) s++;
-        if (/\d/.test(value)) s++;
-        if (/[^A-Za-z0-9]/.test(value)) s++; // symbol bonus
-        return Math.min(s, 5);
-    }, [value]);
-
-    const labels = ['Very weak', 'Weak', 'Okay', 'Good', 'Strong'];
-    const pct = (score / 5) * 100;
-
-    return (
-        <div>
-            <div className="h-1.5 w-full rounded bg-muted/60 overflow-hidden">
-                <div
-                    className={cn(
-                        'h-full transition-all',
-                        score <= 2 && 'bg-destructive',
-                        score === 3 && 'bg-yellow-500',
-                        score >= 4 && 'bg-green-500',
-                    )}
-                    style={{ width: `${pct}%` }}
-                />
-            </div>
-            <div className="mt-1 text-[11px] text-muted-foreground">
-                {value ? labels[Math.max(0, score - 1)] : 'Use 8+ chars with a mix of letters & numbers'}
-            </div>
         </div>
     );
 }
