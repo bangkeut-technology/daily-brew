@@ -75,8 +75,8 @@ class AttendanceController extends AbstractController
         schema: new OA\Schema(type: 'string')
     )]
     #[OA\Parameter(
-        name: 'status',
-        description: 'The status of the attendance',
+        name: 'type',
+        description: 'The type of the attendance',
         in: 'query',
         required: false,
         schema: new OA\Schema(type: 'string')
@@ -102,14 +102,14 @@ class AttendanceController extends AbstractController
         $from = new DateTimeImmutable($request->query->get('from', DateHelper::startOfMonth()->format('Y-m-d')));
         $to = new DateTimeImmutable($request->query->get('to', DateHelper::endOfMonth()->format('Y-m-d')));
         $employee = $request->query->get('employee');
-        $status = $request->query->get('status');
+        $type = $request->query->get('type');
         $user = $request->query->get('user');
 
         $criteria = [
             'from' => $from,
             'to' => $to,
             'employee' => $employee,
-            'status' => $status,
+            'type' => $type,
             'user' => $user ?: $this->getUser()->getPublicId(),
         ];
 
@@ -254,7 +254,7 @@ class AttendanceController extends AbstractController
     ): JsonResponse
     {
         $employeePublicId = $request->query->get('employeePublicId');
-        $status = $request->query->get('status');
+        $type = $request->query->get('type');
 
         $from = new DateTimeImmutable('today 00:00:00');
         $to = $from->modify('+14 days')->setTime(23, 59, 59);
@@ -263,7 +263,7 @@ class AttendanceController extends AbstractController
             user: $this->getUser(),
             from: $from,
             to: $to,
-            status: AttendanceTypeEnum::from($status),
+            type: AttendanceTypeEnum::from($type),
             employeePublicId: $employeePublicId
         );
 

@@ -38,7 +38,13 @@ export const TextField = React.memo<TextFieldProps>(
                                     }
                                 }}
                                 name={name}
-                                className={cn('w-full', startIcon && 'pl-9', endIcon && 'pr-9', props.className)}
+                                className={cn(
+                                    'w-full',
+                                    'focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary',
+                                    startIcon && 'pl-9',
+                                    endIcon && 'pr-9',
+                                    props.className,
+                                )}
                             />
                             {endIcon && endIcon}
                         </div>

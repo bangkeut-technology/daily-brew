@@ -19,6 +19,7 @@ use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 
 /**
  * Class AttendanceRepository
@@ -70,7 +71,30 @@ class AttendanceRepository extends AbstractRepository
             ->getResult();
     }
 
-    public function findByCriteria(array $criteria, array $orderBy = [], $limit = null, $offset = null)
+    /**
+     * Retrieves Attendance entities based on specified criteria.
+     *
+     * This method uses query builder to build and execute a query
+     * based on the provided criteria, ordering, limit, and offset.
+     * It includes joins with related employee and user entities,
+     * allowing filters on attendance dates, type, and associated employee or user public IDs.
+     *
+     * @param array    $criteria   Associative array containing filtering criteria:
+     *                             - 'from' (DateTimeImmutable|null): Start date for attendance records.
+     *                             - 'to' (DateTimeImmutable|null): End date for attendance records.
+     *                             - 'user' (string|null): Public ID of the associated user.
+     *                             - 'employee' (string|null): Public ID of the associated employee.
+     *                             - 'type' (string|null): Type of attendance record.
+     * @param array    $orderBy    Optional associative array of sorting instructions
+     *                             (field => ASC/DESC).
+     * @param int|null $limit      Maximum number of records to retrieve.
+     * @param int|null $offset     Number of records to skip before applying the limit.
+     *
+     * @return Attendance[] Returns an array of Attendance entities matching the criteria.
+     *
+     * @throws Exception If an invalid parameter is provided.
+     */
+    public function findByCriteria(array $criteria, array $orderBy = [], ?int $limit = null, ?int $offset = null): array
     {
         $qb = $this->createQueryBuilder('attendance')
             ->addSelect('employee')
@@ -79,7 +103,7 @@ class AttendanceRepository extends AbstractRepository
             ->innerJoin('attendance.user', 'user')
             ->where('attendance.attendanceDate >= :from OR :from IS NULL')
             ->andWhere('attendance.attendanceDate <= :to OR :to IS NULL')
-            ->andWhere('attendance.status = :status OR :status IS NULL')
+            ->andWhere('attendance.type = :type OR :type IS NULL')
             ->andWhere('employee.publicId = :employee OR :employee IS NULL')
             ->andWhere('user.publicId = :user OR :user IS NULL')
             ->setParameters(new ArrayCollection([
@@ -87,7 +111,7 @@ class AttendanceRepository extends AbstractRepository
                 new Parameter('to', $criteria['to'], Types::DATE_IMMUTABLE),
                 new Parameter('user', $criteria['user']),
                 new Parameter('employee', $criteria['employee']),
-                new Parameter('status', $criteria['status']),
+                new Parameter('type', $criteria['type']),
             ]))
             ->setMaxResults($limit)
             ->setFirstResult($offset);
@@ -204,7 +228,7 @@ class AttendanceRepository extends AbstractRepository
             ]));
 
         return array_map(
-            fn($row) => ['employee_id' => (int) $row['employee_id'], 'date' => $row['date']],
+            fn($row) => ['employee_id' => (int)$row['employee_id'], 'date' => $row['date']],
             $qb->getQuery()->getArrayResult()
         );
     }
@@ -373,12 +397,13 @@ class AttendanceRepository extends AbstractRepository
             ->where('attendance.employee = :employee')
             ->andWhere('attendance.attendanceDate >= :start')
             ->andWhere('attendance.attendanceDate <= :end')
-            ->andWhere('attendance.status = :status')
+            ->andWhere('attendance.type = :type')
             ->andWhere('attendance.leaveType = :leaveType')
             ->setParameters(new ArrayCollection([
                 new Parameter('employee', $employee),
                 new Parameter('start', $start, Types::DATE_IMMUTABLE),
                 new Parameter('end', $end, Types::DATE_IMMUTABLE),
+                new Parameter('type', AttendanceTypeEnum::LEAVE),
                 new Parameter('leaveType', LeaveTypeEnum::PAID),
             ]));
     }
@@ -389,50 +414,49 @@ class AttendanceRepository extends AbstractRepository
      * @param Employee           $employee The employee whose attendance records are being queried.
      * @param DateTimeImmutable  $start    The start date of the query range.
      * @param DateTimeImmutable  $end      The end date of the query range.
-     * @param AttendanceTypeEnum $status   The attendance status to filter by.
-     *
+     * @param AttendanceTypeEnum $type     The attendance type to filter by.
      * @return QueryBuilder The query builder configured for retrieving the specified attendance records.
      */
     private function createStatusBetweenQuery(
-        Employee             $employee,
-        DateTimeImmutable    $start,
-        DateTimeImmutable    $end,
-        AttendanceTypeEnum $status
+        Employee           $employee,
+        DateTimeImmutable  $start,
+        DateTimeImmutable  $end,
+        AttendanceTypeEnum $type
     ): QueryBuilder
     {
         return $this->createQueryBuilder('attendance')
             ->where('attendance.employee = :employee')
             ->andWhere('attendance.attendanceDate >= :from')
             ->andWhere('attendance.attendanceDate <= :to')
-            ->andWhere('attendance.status = :status')
+            ->andWhere('attendance.type = :type')
             ->setParameters(new ArrayCollection([
                 new Parameter('employee', $employee),
                 new Parameter('from', $start, Types::DATE_IMMUTABLE),
                 new Parameter('to', $end, Types::DATE_IMMUTABLE),
-                new Parameter('status', $status),
+                new Parameter('type', $type),
             ]));
     }
 
     /**
-     * Counts the number of attendance records with a specific status for a given user on a specific date.
+     * Counts the number of attendance records with a specific type for a given user on a specific date.
      *
      * @param User               $user      The user for whom the attendance records should be counted.
      *                                      If null, the count will be performed with no user restriction.
      * @param DateTimeImmutable  $today     The date for which the attendance records should be counted.
-     * @param AttendanceTypeEnum $status    The attendance status to filter by.
+     * @param AttendanceTypeEnum $type      The attendance type to filter by.
      *
      * @return int The count of attendance records matching the criteria.
      */
-    public function countByStatusOnDateForOwner(User $user, DateTimeImmutable $today, AttendanceTypeEnum $status): int
+    public function countByStatusOnDateForOwner(User $user, DateTimeImmutable $today, AttendanceTypeEnum $type): int
     {
         $qb = $this->createQueryBuilder('attendance')
             ->select('COUNT(attendance.id)')
             ->where('attendance.attendanceDate = :today')
-            ->andWhere('attendance.status = :status')
+            ->andWhere('attendance.type = :type')
             ->andWhere('attendance.user = :user')
             ->setParameters(new ArrayCollection([
                 new Parameter('today', $today, Types::DATE_IMMUTABLE),
-                new Parameter('status', $status),
+                new Parameter('type', $type),
                 new Parameter('user', $user),
             ]));
 
@@ -461,12 +485,12 @@ class AttendanceRepository extends AbstractRepository
     }
 
     /**
-     * Retrieves upcoming attendance records with a specified status for a given owner within a specified date range.
+     * Retrieves upcoming attendance records with a specified type for a given owner within a specified date range.
      *
      * @param User               $user             The user who owns the attendance records.
      * @param DateTimeImmutable  $from             The start date of the date range.
      * @param DateTimeImmutable  $to               The end date of the date range.
-     * @param AttendanceTypeEnum $status           The attendance status to filter by.
+     * @param AttendanceTypeEnum $type             The attendance type to filter by.
      * @param string|null        $employeePublicId Optional employee identifier for further filtering.
      *
      * @return Attendance[] The list of attendance records matching the specified criteria.
@@ -475,7 +499,7 @@ class AttendanceRepository extends AbstractRepository
         User               $user,
         DateTimeImmutable  $from,
         DateTimeImmutable  $to,
-        AttendanceTypeEnum $status,
+        AttendanceTypeEnum $type,
         ?string            $employeePublicId = null
     ): array
     {
@@ -483,10 +507,10 @@ class AttendanceRepository extends AbstractRepository
             ->addSelect('employee')
             ->innerJoin('attendance.employee', 'employee')
             ->andWhere('employee.user = :user')
-            ->andWhere('attendance.status = :status')
+            ->andWhere('attendance.type = :type')
             ->andWhere('attendance.attendanceDate BETWEEN :from AND :to')
             ->setParameter('user', $user)
-            ->setParameter('status', $status)
+            ->setParameter('type', $type)
             ->setParameter('from', $from)
             ->setParameter('to', $to)
             ->orderBy('attendance.attendanceDate', 'ASC');

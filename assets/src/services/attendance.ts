@@ -17,8 +17,8 @@ export const postAttendance = async (attendance: PartialAttendance) =>
         }>('/attendances', attendance)
         .then((response) => response.data);
 
-export const fetchUpcomingAttendances = async (status: AttendanceTypeEnum) =>
-    apiAxios.get<Attendance[]>('/attendances/upcoming', { params: { status } }).then((response) => response.data);
+export const fetchUpcomingAttendances = async (type: AttendanceTypeEnum) =>
+    apiAxios.get<Attendance[]>('/attendances/upcoming', { params: { type } }).then((response) => response.data);
 
 export const fetchGanttAttendances = async ({
     employees,
