@@ -150,9 +150,9 @@ class AttendanceRepository extends AbstractRepository
      */
     public function findByEmployeeAndPeriod(Employee $employee, DateTimeImmutable $from, DateTimeImmutable $to): array
     {
-        return $this->createQueryBuilder('a')
-            ->addSelect('e')
-            ->innerJoin('attendance.employee', 'e')
+        return $this->createQueryBuilder('attendance')
+            ->addSelect('employee')
+            ->innerJoin('attendance.employee', 'employee')
             ->where('attendance.employee = :employee')
             ->andWhere('attendance.attendanceDate >= :from')
             ->andWhere('attendance.attendanceDate <= :to')
