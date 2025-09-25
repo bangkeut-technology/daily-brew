@@ -49,7 +49,7 @@ abstract class AbstractEntity
         'employee_evaluation:read',
         'employee_score:read',
     ])]
-    public string $publicId {
+    public ?string $publicId = null {
         get {
             return $this->publicId;
         }

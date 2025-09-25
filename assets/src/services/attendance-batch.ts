@@ -6,5 +6,5 @@ export const postAttendanceBatch = async ({ employees, ...data }: PartialAttenda
         .post<{
             message: string;
             batch: AttendanceBatch;
-        }>('/attendance-batches', { data, employees: employees?.map((employee) => employee.value) })
+        }>('/attendance-batches', { ...data, employees: employees?.map((employee) => employee.value) })
         .then((response) => response.data);

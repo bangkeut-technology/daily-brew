@@ -24,7 +24,8 @@ export const AttendanceBatchForm: React.FunctionComponent<AttendanceBatchFormPro
                     control={form.control}
                     name="label"
                     label={t('label')}
-                    placeholder="Sophia"
+                    placeholder="e.g., 'January 2024 Attendance'"
+                    className="w-full"
                     disabled={isPending}
                 />
                 <MultipleEmployeesSelect

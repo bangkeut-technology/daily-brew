@@ -66,6 +66,12 @@ class AttendanceBatchController extends AbstractController
      *
      * @return JsonResponse A JSON response indicating the success of the operation.
      */
+    #[OA\RequestBody(
+        description: 'Attendance Batch data',
+        content: new OA\JsonContent(
+            ref: new Model(type: AttendanceBatchFormType::class),
+        )
+    )]
     #[Route(name: 'post', methods: ['POST'])]
     public function post(Request $request): JsonResponse
     {
@@ -76,7 +82,7 @@ class AttendanceBatchController extends AbstractController
             $attendanceBatch->setUser($this->getUser());
             $this->attendanceBatchRepository->update($attendanceBatch);
 
-            $this->dispatcher->dispatch(new AttendanceBatchCreatedEvent($attendanceBatch, $this->getUser(), $form->get('attendances')->getData()));
+            $this->dispatcher->dispatch(new AttendanceBatchCreatedEvent($attendanceBatch, $this->getUser(), $form->get('employees')->getData()));
 
             return $this->json(['message' => $this->translator->trans('created.attendance_batch', ['%label%' => $attendanceBatch])]);
         }
