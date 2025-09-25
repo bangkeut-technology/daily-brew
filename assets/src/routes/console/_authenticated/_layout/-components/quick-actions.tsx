@@ -33,3 +33,5 @@ export const QuickActions = () => {
         </div>
     );
 };
+
+QuickActions.displayName = 'QuickActions';
