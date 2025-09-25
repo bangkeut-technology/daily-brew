@@ -168,7 +168,7 @@ class EmployeeEvaluationController extends AbstractController
         $data = [];
         foreach ($evaluations as $evaluation) {
             $employee = $evaluation->getEmployee();
-            $employeePublicId = $employee->getPublicId();
+            $employeePublicId = $employee->publicId;
             $date = $evaluation->getEvaluatedAt()->format('Y-m-d');
             $data[$employeePublicId][$date] = EmployeeEvaluationDTO::fromEntity($evaluation, true);
         }

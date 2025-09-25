@@ -1,8 +1,22 @@
+import { User } from '@/types/user';
+import { AttendanceTypeEnum } from '@/types/attendance';
+
 export type AttendanceBatch = {
     id: number;
-    name: string;
-    start_date: string;
-    end_date: string;
-    created_at: string;
-    updated_at: string;
+    publicId: number;
+    label: string;
+    canonicalLabel: string;
+    fromDate: string;
+    toDate: string;
+    type: AttendanceTypeEnum;
+    note?: string;
+    user: User;
+};
+
+export type PartialAttendanceBatch = Omit<
+    AttendanceBatch,
+    'id' | 'publicId' | 'user' | 'canonicalLabel' | 'fromDate' | 'toDate'
+> & {
+    fromDate: Date;
+    toDate: Date;
 };

@@ -20,13 +20,26 @@ export const EmployeeForm: React.FunctionComponent<EmployeeFormProps> = ({ form,
     return (
         <Form {...form}>
             <div className="flex flex-col space-y-4">
-                <TextField control={form.control} name="firstName" label={t('first_name')} disabled={isPending} />
-                <TextField control={form.control} name="lastName" label={t('last_name')} disabled={isPending} />
+                <TextField
+                    control={form.control}
+                    name="firstName"
+                    label={t('first_name')}
+                    placeholder="Sophia"
+                    disabled={isPending}
+                />
+                <TextField
+                    control={form.control}
+                    name="lastName"
+                    label={t('last_name')}
+                    placeholder="Lim"
+                    disabled={isPending}
+                />
                 <TextField
                     control={form.control}
                     name="phoneNumber"
                     label={t('phone_number')}
                     type="tel"
+                    placeholder="0123456789"
                     disabled={isPending}
                 />
                 <DatePickerControl control={form.control} name="dob" label={t('date_of_birth')} disabled={isPending} />

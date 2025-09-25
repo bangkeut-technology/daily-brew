@@ -110,7 +110,7 @@ class AttendanceController extends AbstractController
             'to' => $to,
             'employee' => $employee,
             'type' => $type,
-            'user' => $user ?: $this->getUser()->getPublicId(),
+            'user' => $user ?: $this->getUser()->publicId,
         ];
 
         $attendances = $this->attendanceRepository->findByCriteria($criteria);
@@ -167,13 +167,13 @@ class AttendanceController extends AbstractController
             'from' => $from,
             'to' => $to,
             'employees' => $employees,
-            'user' => $this->getUser()->getPublicId(),
+            'user' => $this->getUser()->publicId,
         ]);
 
         $employees = [];
         foreach ($attendances as $attendance) {
             $employee = $attendance->getEmployee();
-            $employeePublicId = $employee->getPublicId();
+            $employeePublicId = $employee->publicId;
             $date = $attendance->getAttendanceDate()->format('Y-m-d');
 
             if (!isset($employees[$employeePublicId])) {

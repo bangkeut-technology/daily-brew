@@ -71,7 +71,7 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
         $batchSize = 20;
 
         foreach ($employees as $index => $employee) {
-            $empId = $employee->getId();
+            $empId = $employee->id;
             $existsForEmp = $existingMap[$empId] ?? [];
 
             foreach ($days as $day) {

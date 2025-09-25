@@ -33,7 +33,7 @@ final readonly class EmployeeScoreDTO
     public static function fromEntity(EmployeeScore $score): self
     {
         return new self(
-            publicId: $score->getPublicId(),
+            publicId: $score->publicId,
             criteriaLabel: $score->getCriteriaLabel(),
             score: $score->getScore(),
             weight: $score->getWeight(),

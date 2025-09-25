@@ -85,7 +85,7 @@ class EmployeeController extends AbstractController
         $to = new DateTimeImmutable($request->query->get('to', DateHelper::endOfMonth($now)->format('Y-m-d')));
         $listEmployees = [];
         foreach ($employees as $employee) {
-            $listEmployees[$employee->getId()] = $employee;
+            $listEmployees[$employee->id] = $employee;
         }
         if (count($listEmployees) > 0) {
             $averageScores = $this->employeeEvaluationRepository->getAverageScoresForPeriod($employees, $from, $to);

@@ -37,8 +37,8 @@ readonly class UserProvider implements UserProviderInterface
         }
 
         /** @var UserInterface $reloadedUser */
-        if (null === $reloadedUser = $this->userRepository->findById($user->getId())) {
-            throw new UserNotFoundException(sprintf('User "%s" could not be reloaded.', $user->getId()));
+        if (null === $reloadedUser = $this->userRepository->findById($user->id)) {
+            throw new UserNotFoundException(sprintf('User "%s" could not be reloaded.', $user->id));
         }
 
         return $reloadedUser;

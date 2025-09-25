@@ -19,6 +19,7 @@
     "attendance_type": "Attendance Status",
     "note": "Note",
     "attendance": "Attendance",
+    "label": "Label",
     "status": "Status",
     "history": "History",
     "kpi": "KPI",

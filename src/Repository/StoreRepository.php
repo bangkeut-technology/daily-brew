@@ -136,7 +136,7 @@ class StoreRepository extends AbstractRepository
             ->innerJoin('c.employees', 'e')
             ->innerJoin('e.user', 'u')
             ->where('u.id = :userId')
-            ->setParameter('userId', $user->getId())
+            ->setParameter('userId', $user->id)
             ->getQuery()
             ->getResult();
     }

@@ -39,8 +39,8 @@ final readonly class AttendanceDTO
     public static function fromEntity(Attendance $attendance, bool $withEmployee = true): self
     {
         $class = new self(
-            id: $attendance->getId(),
-            publicId: $attendance->getPublicId(),
+            id: $attendance->id,
+            publicId: $attendance->publicId,
             attendanceDate: $attendance->getAttendanceDate(),
             type: $attendance->getType(),
             clockIn: $attendance->getClockIn(),

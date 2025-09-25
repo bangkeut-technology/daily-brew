@@ -40,8 +40,8 @@ final  class EmployeeDTO
     public static function fromEntity(Employee $employee, bool $withAttendances = false): self
     {
         $class = new self(
-            id: $employee->getId(),
-            publicId: $employee->getPublicId(),
+            id: $employee->id,
+            publicId: $employee->publicId,
             firstName: $employee->getFirstName(),
             lastName: $employee->getLastName(),
             fullName: $employee->getFullName(),

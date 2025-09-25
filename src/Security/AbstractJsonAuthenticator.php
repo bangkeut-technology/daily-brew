@@ -98,7 +98,7 @@ abstract class AbstractJsonAuthenticator extends AbstractAuthenticator
         return new JsonResponse([
             'message' => 'Authentication successful',
             'user' => [
-                'id' => $user->getId(),
+                'id' => $user->id,
                 'email' => $user->getEmail(),
                 'emailCanonical' => $user->getEmailCanonical(),
                 'firstName' => $user->getFirstName(),

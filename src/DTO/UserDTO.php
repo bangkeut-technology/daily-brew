@@ -33,7 +33,7 @@ final readonly class UserDTO
     public static function fromEntity(User $user): self
     {
         return new self(
-            publicId: $user->getPublicId(),
+            publicId: $user->publicId,
             email: $user->getEmail(),
             emailCanonical: $user->getEmailCanonical(),
             firstName: $user->getFirstName(),

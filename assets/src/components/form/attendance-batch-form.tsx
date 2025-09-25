@@ -1,29 +1,29 @@
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import { PartialAttendance } from '@/types/attendance';
 import { Form } from '@/components/ui/form';
 import { DatePickerControl } from '@/components/picker/date-picker-control';
 import { useTranslation } from 'react-i18next';
 import { TextAreaField } from '@/components/field/textarea-field';
-import { EmployeeSelect } from '@/components/select/employee-select';
+import { PartialAttendanceBatch } from '@/types/attendance-batch';
+import { TextField } from '@/components/field/text-field';
 import { AttendanceTypeSelect } from '@/components/select/attendance-type-select';
 
-interface AttendanceFormProps {
-    form: UseFormReturn<PartialAttendance>;
+interface AttendanceBatchFormProps {
+    form: UseFormReturn<PartialAttendanceBatch>;
     isPending?: boolean;
 }
 
-export const AttendanceForm: React.FunctionComponent<AttendanceFormProps> = ({ form, isPending }) => {
+export const AttendanceBatchForm: React.FunctionComponent<AttendanceBatchFormProps> = ({ form, isPending }) => {
     const { t } = useTranslation();
 
     return (
         <Form {...form}>
             <div className="flex flex-col space-y-4">
-                <EmployeeSelect label={t('employee')} name="employee" control={form.control} valueProp="id" />
-                <DatePickerControl
+                <TextField
                     control={form.control}
-                    name="attendanceDate"
-                    label={t('attendance_date')}
+                    name="label"
+                    label={t('label')}
+                    placeholder="Sophia"
                     disabled={isPending}
                 />
                 <AttendanceTypeSelect
@@ -33,10 +33,12 @@ export const AttendanceForm: React.FunctionComponent<AttendanceFormProps> = ({ f
                     label={t('type')}
                     disabled={isPending}
                 />
+                <DatePickerControl control={form.control} name="fromDate" label={t('from')} disabled={isPending} />
+                <DatePickerControl control={form.control} name="toDate" label={t('to')} disabled={isPending} />
                 <TextAreaField control={form.control} name="note" label={t('note')} disabled={isPending} />
             </div>
         </Form>
     );
 };
 
-AttendanceForm.displayName = 'AttendanceForm';
+AttendanceBatchForm.displayName = 'AttendanceForm';

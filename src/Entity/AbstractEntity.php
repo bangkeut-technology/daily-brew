@@ -32,7 +32,11 @@ abstract class AbstractEntity
         'employee_evaluation:read',
         'employee_score:read',
     ])]
-    protected ?int $id = null;
+    public ?int $id = null {
+        get {
+            return $this->id;
+        }
+    }
 
     #[ORM\Column(type: 'string', length: 36, unique: true)]
     #[Groups([
@@ -45,7 +49,11 @@ abstract class AbstractEntity
         'employee_evaluation:read',
         'employee_score:read',
     ])]
-    protected string $publicId;
+    public string $publicId {
+        get {
+            return $this->publicId;
+        }
+    }
 
     #[ORM\Column(name: 'created_at', type: Types::DATETIME_IMMUTABLE, nullable: false)]
     #[Groups([
@@ -73,45 +81,44 @@ abstract class AbstractEntity
     ])]
     protected ?DateTimeImmutable $updatedAt = null;
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
     /**
-     * @return string
+     * @return DateTimeImmutable|null
      */
-    public function getPublicId(): string
-    {
-        return $this->publicId;
-    }
-
     public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(?DateTimeImmutable $createdAt): self
+    /**
+     * @param DateTimeImmutable|null $createdAt
+     * @return AbstractEntity
+     */
+    public function setCreatedAt(?DateTimeImmutable $createdAt): AbstractEntity
     {
         $this->createdAt = $createdAt;
-
         return $this;
     }
 
+    /**
+     * @return DateTimeImmutable|null
+     */
     public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTimeImmutable $updatedAt): self
+    /**
+     * @param DateTimeImmutable|null $updatedAt
+     * @return AbstractEntity
+     */
+    public function setUpdatedAt(?DateTimeImmutable $updatedAt): AbstractEntity
     {
         $this->updatedAt = $updatedAt;
-
         return $this;
     }
 
     /**
-     * Pre-persist lifecycle callback to set the created and updated timestamps,
+     * Pre-persist lifecycle callback to set the created and updated timestamps
      * and generate a public ID for the entity.
      */
     #[ORM\PrePersist]

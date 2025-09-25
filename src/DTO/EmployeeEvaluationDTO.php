@@ -40,7 +40,7 @@ final class EmployeeEvaluationDTO
     ): self
     {
         $class = new self(
-            publicId: $evaluation->getPublicId(),
+            publicId: $evaluation->publicId,
             templateName: $evaluation->getTemplateName(),
             evaluatedAt: $evaluation->getEvaluatedAt(),
             note: $evaluation->getNote(),

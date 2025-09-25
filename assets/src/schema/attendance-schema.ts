@@ -1,5 +1,5 @@
 import { date, object, ObjectSchema, string } from 'yup';
-import { PartialAttendance } from '@/types/attendance';
+import { AttendanceTypeEnum, PartialAttendance } from '@/types/attendance';
 import i18next from '@/i18next';
 
 export const attendanceSchema: ObjectSchema<PartialAttendance> = object({
@@ -7,7 +7,7 @@ export const attendanceSchema: ObjectSchema<PartialAttendance> = object({
     attendanceDate: date().required(i18next.t('validation:required.attendances.date')),
     note: string().optional(),
     type: string()
-        .oneOf(['present', 'absent', 'leave', 'late'], i18next.t('validation:one_of.attendances.type'))
+        .oneOf(Object.values(AttendanceTypeEnum), i18next.t('validation:one_of.attendances.type'))
         .required(i18next.t('validation:required.attendances.type')),
     clockIn: date().optional(),
     clockOut: date().optional(),
