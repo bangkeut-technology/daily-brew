@@ -27,12 +27,33 @@
             "unknown": "Unknown"
         }
     },
-    "evaluations": {
-        "who": "Who & What",
-        "date_helper": "The selected date determines which evaluation is created or updated.",
-        "employee": "Evaluate Employee",
-        "histories": "Evaluation Histories",
-        "period": "Evaluation Period"
+    "attendance_batches": {
+        "title": "Attendance Batches",
+        "subtitle": "Manage your attendance batches. You can create new batches based on selected templates.",
+        "new": {
+            "title": "New Attendance Batch",
+            "description": "Create a new attendance batch for an employee using the selected template.",
+            "save": "Save Attendance Batch"
+        },
+        "view": {
+            "title": "View Attendance Batch",
+            "description": "View the details of the selected attendance batch, including scores and comments."
+        },
+        "label": "Attendance Batch Label"
+    },
+    "date": "Date",
+    "employee_evaluations": {
+        "title": "Employee Evaluations",
+        "subtitle": "View and manage evaluations for your employees. You can create new evaluations based on selected templates.",
+        "new": {
+            "title": "New Evaluation",
+            "description": "Create a new evaluation for an employee using the selected template.",
+            "save": "Save Evaluation"
+        },
+        "view": {
+            "title": "View Evaluation",
+            "description": "View the details of the selected evaluation, including scores and comments."
+        }
     },
     "employees": {
         "title": "Employees",
@@ -97,6 +118,11 @@
             "actions": "Actions"
         }
     },
+    "evaluate": {
+        "employee": "Evaluate Employee",
+        "title": "Evaluate",
+        "description": "Evaluate an employee's performance based on the selected evaluation template."
+    },
     "evaluation_criterias": {
         "not_found": "Evaluation criteria not found",
         "information": "Evaluation Criteria Information",
@@ -149,6 +175,11 @@
             "description": "Edit the selected evaluation criteria to update its details or template."
         }
     },
+    "evaluation_template_criterias": {
+        "title": "Evaluation Template Criterias",
+        "subtitle": "Manage the criteria included in your evaluation templates. You can add multiple criteria to each template.",
+        "score": "Score"
+    },
     "evaluation_templates": {
         "information": "Evaluation Template Information",
         "criteria": {
@@ -196,8 +227,26 @@
             "description": "Edit the selected evaluation template to update its details or criteria."
         }
     },
+    "evaluations": {
+        "who": "Who & What",
+        "date_helper": "The selected date determines which evaluation is created or updated.",
+        "employee": "Evaluate Employee",
+        "histories": "Evaluation Histories",
+        "period": "Evaluation Period"
+    },
     "have_account": "Already have an account?",
+    "image": {
+        "drop_click": "Drag and drop an image or click to browse",
+        "drop_here": "Drop the files here ...",
+        "only": "Only *.jpeg and *.png images will be accepted"
+    },
+    "loading": {
+        "upcoming_leaves": "Loading upcoming leaves..."
+    },
     "no_account_yet": "Don't have an account yet?",
+    "not_found": {
+        "upcoming_leaves": "No upcoming leaves"
+    },
     "placeholder": {
         "picker": {
             "date": "Select a date",
@@ -206,25 +255,7 @@
             "role": "Select a role"
         }
     },
-    "date": "Date",
-    "evaluation_template_criterias": {
-        "title": "Evaluation Template Criterias",
-        "subtitle": "Manage the criteria included in your evaluation templates. You can add multiple criteria to each template.",
-        "score": "Score"
-    },
-    "employee_evaluations": {
-        "title": "Employee Evaluations",
-        "subtitle": "View and manage evaluations for your employees. You can create new evaluations based on selected templates.",
-        "new": {
-            "title": "New Evaluation",
-            "description": "Create a new evaluation for an employee using the selected template.",
-            "save": "Save Evaluation"
-        },
-        "view": {
-            "title": "View Evaluation",
-            "description": "View the details of the selected evaluation, including scores and comments."
-        }
-    },
+    "recent_evaluations": "Recent evaluations",
     "role": {
         "new": {
             "title": "New Role",
@@ -232,6 +263,21 @@
         },
         "name": "Role Name",
         "description": "Role Description"
+    },
+    "see_all_evaluations": "See all evaluations",
+    "settings": {
+        "number_of_paid_leave": {
+            "label": "Number of paid leave",
+            "description": "The number of paid leave days an employee can take as a paid leave."
+        },
+        "maximum_late_count": {
+            "label": "Maximum late count",
+            "description": "The maximum number of late days an employee can take before being counted as a leave."
+        },
+        "paid_leave_cycle": {
+            "label": "Paid Leave Cycle",
+            "description": "The cycle of paid leave, which determines the renewal number of the leave."
+        }
     },
     "sign_in": {
         "title": "Sign In",
@@ -251,37 +297,5 @@
         "next": "Next",
         "row_selected": "row(s) selected",
         "no_data": "No data available"
-    },
-    "image": {
-        "drop_click": "Drag and drop an image or click to browse",
-        "drop_here": "Drop the files here ...",
-        "only": "Only *.jpeg and *.png images will be accepted"
-    },
-    "recent_evaluations": "Recent evaluations",
-    "see_all_evaluations": "See all evaluations",
-    "evaluate": {
-        "employee": "Evaluate Employee",
-        "title": "Evaluate",
-        "description": "Evaluate an employee's performance based on the selected evaluation template."
-    },
-    "settings": {
-        "number_of_paid_leave": {
-            "label": "Number of paid leave",
-            "description": "The number of paid leave days an employee can take as a paid leave."
-        },
-        "maximum_late_count": {
-            "label": "Maximum late count",
-            "description": "The maximum number of late days an employee can take before being counted as a leave."
-        },
-        "paid_leave_cycle": {
-            "label": "Paid Leave Cycle",
-            "description": "The cycle of paid leave, which determines the renewal number of the leave."
-        }
-    },
-    "not_found": {
-        "upcoming_leaves": "No upcoming leaves"
-    },
-    "loading": {
-        "upcoming_leaves": "Loading upcoming leaves..."
     }
 }

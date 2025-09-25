@@ -5,6 +5,12 @@
             "date": "The attendance date is required.",
             "type": "The attendance type is required."
         },
+        "attendance_batches": {
+            "label": "The batch label is required.",
+            "from": "The batch from date is required.",
+            "to": "The batch to date is required.",
+            "type": "The batch type is required."
+        },
         "employees": {
             "first_name": "The first name is required.",
             "last_name": "The last name is required.",
@@ -44,6 +50,9 @@
     "one_of": {
         "attendances": {
             "type": "The attendance type must be one of the following: {{values}}."
+        },
+        "attendance_batches": {
+            "type": "The batch type must be one of the following: {{values}}."
         },
         "settings": {
             "paid_leave_cycle": "The paid leave cycle must be one of the following: {{values}}."
