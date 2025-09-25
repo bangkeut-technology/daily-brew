@@ -37,7 +37,7 @@ abstract class AbstractController extends BaseAbstractController
      *
      * Initializes the propertyAccessor object.
      *
-     * @var TranslatorInterface translator service used for translating messages and texts in the application
+     * @param TranslatorInterface $translator service used for translating messages and texts in the application
      */
     public function __construct(
         protected readonly TranslatorInterface $translator,

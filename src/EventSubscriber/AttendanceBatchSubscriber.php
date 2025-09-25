@@ -8,7 +8,6 @@ use App\Repository\AttendanceRepository;
 use DateMalformedStringException;
 use DateTimeImmutable;
 use DateTimeInterface;
-use Generator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**

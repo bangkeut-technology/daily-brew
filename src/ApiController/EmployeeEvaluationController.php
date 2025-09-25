@@ -12,19 +12,12 @@ use App\Controller\AbstractController;
 use App\DTO\EmployeeEvaluationDTO;
 use App\Entity\Attendance;
 use App\Entity\EmployeeEvaluation;
-use App\Entity\User;
-use App\Event\Employee\CheckEmployeeLimitEvent;
 use App\Event\EmployeeEvaluation\FinalizeEmployeeEvaluationEvent;
-use App\Form\AttendanceFormType;
 use App\Form\EmployeeEvaluationFormType;
-use App\Form\EmployeeFormType;
-use App\Repository\AttendanceRepository;
 use App\Repository\EmployeeEvaluationRepository;
-use App\Repository\EmployeeRepository;
 use App\Util\DateHelper;
 use DateMalformedStringException;
 use DateTimeImmutable;
-use Doctrine\Common\Collections\ArrayCollection;
 use Exception;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
@@ -33,7 +26,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**

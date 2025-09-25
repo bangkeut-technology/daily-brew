@@ -218,8 +218,8 @@ class AttendanceRepository extends AbstractRepository
     public function getExistingByEmployeesAndPeriod(array|Collection $employees, DateTimeInterface $from, DateTimeInterface $to): array
     {
         $qb = $this->createQueryBuilder('a')
-            ->select('IDENTITY(e.id) AS employee_id, a.attendanceDate AS date')
-            ->innerJoin('attendance.employee', 'e')
+            ->select('a.id as attendance_id, e.id AS employee_id, a.attendanceDate AS date')
+            ->innerJoin('a.employee', 'e')
             ->where('a.employee IN (:employees)')
             ->andWhere('a.attendanceDate >= :from')
             ->andWhere('a.attendanceDate <= :to')
@@ -229,10 +229,7 @@ class AttendanceRepository extends AbstractRepository
                 new Parameter('to', $to, Types::DATE_IMMUTABLE),
             ]));
 
-        return array_map(
-            fn($row) => ['employee_id' => (int)$row['employee_id'], 'date' => $row['date']],
-            $qb->getQuery()->getArrayResult()
-        );
+        return $qb->getQuery()->getArrayResult();
     }
 
     /**

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, XCircle, Sun, Clock, HeartPulse, Home, Calendar, HelpCircle } from 'lucide-react';
+import { CheckCircle, XCircle, Sun, Clock, HeartPulse, Home, HelpCircle, Palmtree, LucideProps } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { AttendanceType } from '@/types/attendance';
 
@@ -8,7 +8,7 @@ const STATUS_META: Record<
     AttendanceType,
     {
         label: string;
-        icon: React.FC<any>;
+        icon: React.FC<LucideProps>;
         className: string;
     }
 > = {
@@ -39,7 +39,7 @@ const STATUS_META: Record<
     },
     holiday: {
         label: 'Holiday',
-        icon: Calendar,
+        icon: Palmtree,
         className: 'bg-indigo-500 text-white',
     },
     remote: {

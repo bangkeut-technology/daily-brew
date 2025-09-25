@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Entity\Setting;
 use App\Entity\User;
 use App\Repository\SettingRepository;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class SettingService

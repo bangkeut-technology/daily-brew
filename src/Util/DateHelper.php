@@ -8,7 +8,6 @@ use DateMalformedStringException;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
-use Exception;
 
 /**
  * Class DateHelper.

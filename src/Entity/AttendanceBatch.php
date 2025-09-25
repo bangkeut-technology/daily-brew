@@ -15,8 +15,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
- * Class AttendanceBatch.
+ * Class AttendanceBatch
  *
+ * @package App\Entity
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 #[ORM\Table(name: 'daily_brew_attendance_batches')]
