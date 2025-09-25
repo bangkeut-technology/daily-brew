@@ -7,6 +7,7 @@ use App\ApiController\Trait\AttendanceBatchTrait;
 use App\Controller\AbstractController;
 use App\Entity\AttendanceBatch;
 use App\Event\AttendanceBatch\AttendanceBatchCreatedEvent;
+use App\Event\AttendanceBatch\AttendanceBatchUpdatedEvent;
 use App\Form\AttendanceBatchFormType;
 use App\Repository\AttendanceBatchRepository;
 use Nelmio\ApiDocBundle\Attribute\Model;
@@ -40,6 +41,8 @@ class AttendanceBatchController extends AbstractController
     }
 
     /**
+     * Get attendance batches by the current user.
+     *
      * @return JsonResponse
      */
     #[OA\Response(
@@ -72,6 +75,25 @@ class AttendanceBatchController extends AbstractController
             ref: new Model(type: AttendanceBatchFormType::class),
         )
     )]
+    #[OA\Response(
+        response: Response::HTTP_CREATED,
+        description: 'Returns the created attendance batch.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'message', description: 'Confirmation message after creation', type: 'string'),
+                new OA\Property(property: 'attendance_batch', ref: new Model(type: AttendanceBatch::class, groups: ['attendance_batch:read'])),
+            ], type: 'object'
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_BAD_REQUEST,
+        description: 'Invalid attendance batch data.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'error', description: 'Error message', type: 'string'),
+            ], type: 'object'
+        )
+    )]
     #[Route(name: 'post', methods: ['POST'])]
     public function post(Request $request): JsonResponse
     {
@@ -85,9 +107,115 @@ class AttendanceBatchController extends AbstractController
             $attendanceBatch->setUser($this->getUser());
             $this->attendanceBatchRepository->update($attendanceBatch);
 
-            $this->dispatcher->dispatch(new AttendanceBatchCreatedEvent($attendanceBatch, $this->getUser(), $form->get('employees')->getData()));
+            $this->dispatcher->dispatch(new AttendanceBatchCreatedEvent($attendanceBatch, $this->getUser()));
 
-            return $this->json(['message' => $this->translator->trans('created.attendance_batch', ['%label%' => $attendanceBatch])]);
+            return $this->createAttendanceBatchResponse([
+                'message' => $this->translator->trans('created.attendance_batch', ['%label%' => $attendanceBatch]),
+                'attendance_batch' => $attendanceBatch,
+            ]);
+        }
+        return $this->createBadRequestResponse($this->translator->trans('invalid.attendance_batch', domain: 'errors'));
+    }
+
+    /**
+     * Retrieves an attendance batch by its publicId.
+     *
+     * @param string $publicId The public ID of the attendance batch to retrieve.
+     *
+     * @return JsonResponse The JSON response containing the attendance batch data.
+     */
+    #[OA\Parameter(
+        name: 'publicId',
+        description: 'The public ID of the attendance batch to retrieve.',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns the attendance batch data for the specified public ID.',
+        content: new OA\JsonContent(ref: new Model(type: AttendanceBatch::class, groups: ['attendance_batch:read']))
+    )]
+    #[OA\Response(
+        response: Response::HTTP_NOT_FOUND,
+        description: 'Attendance batch not found.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'message', description: 'Error message', type: 'string'),
+            ], type: 'object'
+        )
+    )]
+    #[Route('/{publicId}', name: 'get', methods: ['GET'])]
+    public function get(string $publicId): JsonResponse
+    {
+        $batch = $this->getAttendanceBatchByPublicId($publicId);
+
+        return $this->createAttendanceBatchResponse($batch);
+    }
+
+    /**
+     * Updates an attendance batch by its publicId with the provided data.
+     *
+     * @param string  $publicId The public ID of the attendance batch to update.
+     * @param Request $request  The HTTP request containing the data to update the attendance batch.
+     *
+     * @return JsonResponse The JSON response containing the updated attendance batch data or an error message.
+     */
+    #[OA\Parameter(
+        name: 'publicId',
+        description: 'The public ID of the attendance batch to update.',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\RequestBody(
+        description: 'Attendance Batch data',
+        content: new OA\JsonContent(
+            ref: new Model(type: AttendanceBatchFormType::class),
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns the updated attendance batch.',
+        content: new OA\JsonContent(ref: new Model(type: AttendanceBatch::class, groups: ['attendance_batch:read']))
+    )]
+    #[OA\Response(
+        response: Response::HTTP_BAD_REQUEST,
+        description: 'Invalid attendance batch data.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'error', description: 'Error message', type: 'string'),
+            ], type: 'object'
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_NOT_FOUND,
+        description: 'Attendance batch not found.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'message', description: 'Error message', type: 'string'),
+            ]
+        )
+    )]
+    #[Route('/{publicId}', name: 'put', methods: ['PUT'])]
+    public function put(string $publicId, Request $request): JsonResponse
+    {
+        $batch = $this->getAttendanceBatchByPublicId($publicId);
+        $form = $this->createForm(AttendanceBatchFormType::class, $batch);
+        $form->submit($request->getPayload()->all());
+        if ($form->isSubmitted() && $form->isValid()) {
+            if (null !== $this->attendanceBatchRepository->findByLabelAndUser($batch->getLabel(), $this->getUser())) {
+                return $this->createBadRequestResponse($this->translator->trans('existed.attendance_batch', ['%label%' => $batch->getLabel()], domain: 'errors'));
+            }
+
+            $this->attendanceBatchRepository->update($batch);
+
+            $this->dispatcher->dispatch(new AttendanceBatchUpdatedEvent($batch, $this->getUser(), $form->get('employees')->getData()));
+
+            return $this->createAttendanceBatchResponse([
+                'message' => $this->translator->trans('updated.attendance_batch', ['%label%' => $batch]),
+                'attendance_batch' => $batch,
+            ]);
         }
         return $this->createBadRequestResponse($this->translator->trans('invalid.attendance_batch', domain: 'errors'));
     }

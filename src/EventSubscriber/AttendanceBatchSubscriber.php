@@ -29,7 +29,9 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents(): array
     {
-        return [AttendanceBatchCreatedEvent::class => 'onCreated'];
+        return [
+            AttendanceBatchCreatedEvent::class => 'onCreated'
+        ];
     }
 
     /**
@@ -42,9 +44,9 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
      */
     public function onCreated(AttendanceBatchCreatedEvent $event): void
     {
-        $employees = $event->employees;
         $batch = $event->batch;
         $user = $event->user;
+        $employees = $batch->getEmployees();
         $type = $batch->getType();
         $from = $batch->getFromDate();
         $to = $batch->getToDate();
@@ -54,7 +56,7 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
             $days[] = $d->format('Y-m-d');
         }
 
-        if (empty($employees) || empty($days)) {
+        if ($employees->isEmpty() || empty($days)) {
             return;
         }
 
