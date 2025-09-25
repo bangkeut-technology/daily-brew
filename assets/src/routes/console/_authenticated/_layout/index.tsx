@@ -70,7 +70,6 @@ function DashboardPage() {
 
             <MetricSection month={month} />
 
-            {/* Quick actions */}
             <QuickActions />
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">

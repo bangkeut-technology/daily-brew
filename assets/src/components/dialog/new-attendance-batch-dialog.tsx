@@ -29,6 +29,7 @@ const defaultValues: PartialAttendanceBatch = {
     type: AttendanceTypeEnum.present,
     label: '',
     note: '',
+    employees: [],
 };
 
 interface NewAttendanceBatchDialogProps {

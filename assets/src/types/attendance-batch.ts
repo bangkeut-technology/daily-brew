@@ -19,4 +19,5 @@ export type PartialAttendanceBatch = Omit<
 > & {
     fromDate: Date;
     toDate: Date;
+    employees?: Array<{ value: number }>;
 };

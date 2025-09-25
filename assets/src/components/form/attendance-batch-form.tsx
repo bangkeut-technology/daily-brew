@@ -7,6 +7,7 @@ import { TextAreaField } from '@/components/field/textarea-field';
 import { PartialAttendanceBatch } from '@/types/attendance-batch';
 import { TextField } from '@/components/field/text-field';
 import { AttendanceTypeSelect } from '@/components/select/attendance-type-select';
+import { MultipleEmployeesSelect } from '@/components/select/multiple-employees-select';
 
 interface AttendanceBatchFormProps {
     form: UseFormReturn<PartialAttendanceBatch>;
@@ -25,6 +26,12 @@ export const AttendanceBatchForm: React.FunctionComponent<AttendanceBatchFormPro
                     label={t('label')}
                     placeholder="Sophia"
                     disabled={isPending}
+                />
+                <MultipleEmployeesSelect
+                    control={form.control}
+                    name="employees"
+                    title={t('employees.table.title', { ns: 'glossary' })}
+                    description={t('employees.table.description', { ns: 'glossary' })}
                 />
                 <AttendanceTypeSelect
                     className="w-full"

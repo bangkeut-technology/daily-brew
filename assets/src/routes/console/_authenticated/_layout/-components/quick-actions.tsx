@@ -18,7 +18,7 @@ export const QuickActions = () => {
                     {t('evaluation_templates.employees.add.title', { ns: 'glossary' })}
                 </Link>
             </Button>
-            <Button variant="outline" asChild className="bg-orange-500 gap-2 hover:bg-orange-500/90">
+            <Button asChild className="bg-orange-500 gap-2 hover:bg-orange-500/90">
                 <Link to="/console/manage/templates/new">
                     <ClipboardList className="h-4 w-4" />
                     {t('evaluations.employee', { ns: 'glossary' })}
