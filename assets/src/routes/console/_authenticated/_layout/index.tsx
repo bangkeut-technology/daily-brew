@@ -16,10 +16,10 @@ import { RecentEvaluations } from '@/routes/console/_authenticated/_layout/-comp
 import { DatePicker } from '@/components/picker/date-picker';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/')({
-    component: Dashboard,
+    component: DashboardPage,
 });
 
-function Dashboard() {
+function DashboardPage() {
     const { t } = useTranslation();
     const [month, setMonth] = React.useState<Date>(startOfMonth(new Date()));
     const { data: employees = [] } = useQuery({
