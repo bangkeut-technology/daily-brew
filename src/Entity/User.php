@@ -829,6 +829,5 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function generateSecret(): void
     {
         $this->secret = Uuid::v4()->toBase58();
-        dump($this->secret);
     }
 }
