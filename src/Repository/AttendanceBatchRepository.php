@@ -78,4 +78,50 @@ class AttendanceBatchRepository extends AbstractRepository
     {
         return $this->findOneBy(['publicId' => $publicId, 'user' => $user]);
     }
+
+    /**
+     * Finds an entity by its label and associated user.
+     *
+     * @param string $label The label of the entity.
+     * @param User   $user  The user associated with the entity.
+     *
+     * @return AttendanceBatch|null The matched entity or null if not found.
+     */
+    public function findByLabelAndUser(string $label, User $user): ?AttendanceBatch
+    {
+        return $this->findOneBy(['label' => $label, 'user' => $user]);
+    }
+
+    /**
+     * Finds an entity by its canonical label and associated user.
+     *
+     * @param string $canonicalLabel The canonical label of the entity.
+     * @param User   $user           The user associated with the entity.
+     *
+     * @return AttendanceBatch|null The matched entity or null if not found.
+     */
+    public function findByCanonicalLabelAndUser(string $canonicalLabel, User   $user): ?AttendanceBatch
+    {
+        return $this->createQueryBuilder('ab')
+            ->where('ab.user = :user')
+            ->andWhere('ab.canonicalLabel = :canonicalLabel')
+            ->setParameters(new ArrayCollection([
+                new Parameter('user', $user),
+                new Parameter('canonicalLabel', $canonicalLabel),
+            ]))
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * Finds entities by associated user.
+     *
+     * @param User $user The user associated with the entities.
+     *
+     * @return AttendanceBatch[] The matched entities.
+     */
+    public function findByUser(User $user): array
+    {
+        return $this->findBy(['user' => $user]);
+    }
 }

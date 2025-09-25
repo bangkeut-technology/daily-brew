@@ -55,8 +55,8 @@ class AttendanceBatchController extends AbstractController
     {
         $criteria = ['user' => $this->getUser()];
         $attendanceBatches = $this->attendanceBatchRepository->findByCriteria($criteria);
-        return $this->json($attendanceBatches);
 
+        return $this->json($attendanceBatches);
     }
 
     /**
@@ -79,6 +79,9 @@ class AttendanceBatchController extends AbstractController
         $form = $this->createForm(AttendanceBatchFormType::class, $attendanceBatch);
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
+            if (null !== $this->attendanceBatchRepository->findByLabelAndUser($attendanceBatch->getLabel(), $this->getUser())) {
+                return $this->createBadRequestResponse($this->translator->trans('existed.attendance_batch', ['%label%' => $attendanceBatch->getLabel()], domain: 'errors'));
+            }
             $attendanceBatch->setUser($this->getUser());
             $this->attendanceBatchRepository->update($attendanceBatch);
 

@@ -22,5 +22,6 @@ max_free_employees: 'You have reached the maximum number of %count% free employe
 existed:
     evaluation_template: 'Evaluation template ''%name%'' already exists.'
     evaluation_criteria: 'Evaluation criteria ''%label%'' already exists.'
+    attendance_batch:    'Attendance batch ''%label%'' already exists.'
 attendance:
     duplicate_for_day: 'Attendance for %date% already exists.'

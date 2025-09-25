@@ -11,8 +11,10 @@ use App\Entity\User;
 use App\Enum\AttendanceTypeEnum;
 use App\Enum\LeaveTypeEnum;
 use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
@@ -58,10 +60,10 @@ class AttendanceRepository extends AbstractRepository
     {
         return $this->createQueryBuilder('a')
             ->addSelect('e')
-            ->innerJoin('attendance.employee', 'e')
-            ->where('attendance.user = :user')
-            ->andWhere('attendance.attendanceDate >= :from OR :from IS NULL')
-            ->andWhere('attendance.attendanceDate <= :to OR :to IS NULL')
+            ->innerJoin('a.employee', 'e')
+            ->where('a.user = :user')
+            ->andWhere('a.attendanceDate >= :from OR :from IS NULL')
+            ->andWhere('a.attendanceDate <= :to OR :to IS NULL')
             ->setParameters(new ArrayCollection([
                 new Parameter('user', $user),
                 new Parameter('from', $from, Types::DATE_IMMUTABLE),
@@ -133,8 +135,8 @@ class AttendanceRepository extends AbstractRepository
     {
         return $this->createQueryBuilder('a')
             ->addSelect('e')
-            ->innerJoin('attendance.employee', 'e')
-            ->where('attendance.user = :user')
+            ->innerJoin('a.employee', 'e')
+            ->where('a.user = :user')
             ->setParameter('user', $user)
             ->getQuery()
             ->getResult();
@@ -184,10 +186,10 @@ class AttendanceRepository extends AbstractRepository
     {
         return $this->createQueryBuilder('a')
             ->select('a.attendanceDate')
-            ->innerJoin('attendance.employee', 'e')
-            ->where('attendance.employee = :employee')
-            ->andWhere('attendance.attendanceDate >= :from')
-            ->andWhere('attendance.attendanceDate <= :to')
+            ->innerJoin('a.employee', 'e')
+            ->where('a.employee = :employee')
+            ->andWhere('a.attendanceDate >= :from')
+            ->andWhere('a.attendanceDate <= :to')
             ->setParameters(new ArrayCollection([
                 new Parameter('employee', $employee),
                 new Parameter('from', $from, Types::DATE_IMMUTABLE),
@@ -205,22 +207,22 @@ class AttendanceRepository extends AbstractRepository
      *
      * The returned data is structured as an array of maps containing `employee_id` and `date` fields.
      *
-     * @param array              $employees The list of employee identifiers to filter by.
-     * @param \DateTimeInterface $from      The start date of the period.
-     * @param \DateTimeInterface $to        The end date of the period.
+     * @param array|Collection  $employees The list of employee identifiers to filter by.
+     * @param DateTimeInterface $from      The start date of the period.
+     * @param DateTimeInterface $to        The end date of the period.
      *
      * @return array The resulting attendance data, each element containing keys:
      *               'Employee_id' (int): The identifier of the employee.
      *               'Date' (string): The attendance date in 'Y-m-d' format.
      */
-    public function getExistingByEmployeesAndPeriod(array $employees, \DateTimeInterface $from, \DateTimeInterface $to): array
+    public function getExistingByEmployeesAndPeriod(array|Collection $employees, DateTimeInterface $from, DateTimeInterface $to): array
     {
         $qb = $this->createQueryBuilder('a')
             ->select('IDENTITY(e.id) AS employee_id, a.attendanceDate AS date')
             ->innerJoin('attendance.employee', 'e')
             ->where('a.employee IN (:employees)')
-            ->andWhere('attendance.attendanceDate >= :from')
-            ->andWhere('attendance.attendanceDate <= :to')
+            ->andWhere('a.attendanceDate >= :from')
+            ->andWhere('a.attendanceDate <= :to')
             ->setParameters(new ArrayCollection([
                 new Parameter('employees', $employees),
                 new Parameter('from', $from, Types::DATE_IMMUTABLE),
@@ -244,9 +246,9 @@ class AttendanceRepository extends AbstractRepository
     {
         return $this->createQueryBuilder('a')
             ->addSelect('e')
-            ->innerJoin('attendance.employee', 'e')
-            ->where('attendance.publicId = :publicId')
-            ->andWhere('attendance.user = :user')
+            ->innerJoin('a.employee', 'e')
+            ->where('a.publicId = :publicId')
+            ->andWhere('a.user = :user')
             ->setParameters(new ArrayCollection([
                 new Parameter('publicId', $publicId),
                 new Parameter('user', $getUser),
@@ -545,7 +547,16 @@ class AttendanceRepository extends AbstractRepository
             ->getSingleScalarResult();
     }
 
-    public function existsForUserOnPeriod(User $user, ?DateTimeImmutable $from, ?DateTimeImmutable $to)
+    /**
+     * Checks if attendance records exist for a user within a specified period.
+     *
+     * @param User                   $user The user for whom attendance records are being checked.
+     * @param DateTimeImmutable|null $from The start date of the period (inclusive). If null, no lower bound is applied.
+     * @param DateTimeImmutable|null $to   The end date of the period (inclusive). If null, no upper bound is applied.
+     *
+     * @return QueryBuilder The query builder for the count query.
+     */
+    public function existsForUserOnPeriod(User $user, ?DateTimeImmutable $from, ?DateTimeImmutable $to): QueryBuilder
     {
         return $this->createQueryBuilder('attendance')
             ->select('COUNT(attendance.id)')
