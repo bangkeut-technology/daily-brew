@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button';
 import { useMutation } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
-import { ClockPlus, Loader2Icon, Save } from 'lucide-react';
+import { CalendarRange, Loader2Icon, Save } from 'lucide-react';
 import { PartialAttendanceBatch } from '@/types/attendance-batch';
 import { postAttendanceBatch } from '@/services/attendance-batch';
 import { AttendanceBatchForm } from '@/components/form/attendance-batch-form';
@@ -69,15 +69,15 @@ export const NewAttendanceBatchDialog: React.FunctionComponent<NewAttendanceBatc
                 {button ? (
                     button
                 ) : (
-                    <Button className="bg-amber-500 hover:bg-amber-500/90">
-                        <ClockPlus />
-                        {t('attendances.new.title', { ns: 'glossary' })}
+                    <Button className="bg-teal-500 hover:bg-teal-500/90">
+                        <CalendarRange />
+                        {t('attendance_batches.new.title', { ns: 'glossary' })}
                     </Button>
                 )}
             </DialogTrigger>
             <DialogContent>
-                <DialogTitle>{t('attendances.new.title', { ns: 'glossary' })}</DialogTitle>
-                <DialogDescription>{t('attendances.new.description', { ns: 'glossary' })}</DialogDescription>
+                <DialogTitle>{t('attendance_batches.new.title', { ns: 'glossary' })}</DialogTitle>
+                <DialogDescription>{t('attendance_batches.new.description', { ns: 'glossary' })}</DialogDescription>
                 <div className="grid gap-4">
                     <AttendanceBatchForm form={form} isPending={isPending} />
                 </div>
@@ -96,7 +96,7 @@ export const NewAttendanceBatchDialog: React.FunctionComponent<NewAttendanceBatc
                         ) : (
                             <React.Fragment>
                                 <Save />
-                                {t('attendances.new.save', { ns: 'glossary' })}
+                                {t('attendance_batches.new.save', { ns: 'glossary' })}
                             </React.Fragment>
                         )}
                     </Button>

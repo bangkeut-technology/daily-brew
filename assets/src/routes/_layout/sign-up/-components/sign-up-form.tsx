@@ -4,7 +4,7 @@ import { SignUp } from '@/types/user';
 import { useTranslation } from 'react-i18next';
 import { Form } from '@/components/ui/form';
 import { TextField } from '@/components/field/text-field';
-import { ArrowRight, Lock, Mail, User } from 'lucide-react';
+import { ArrowRight, Lock, LockOpen, Mail, User } from 'lucide-react';
 import { CheckboxField } from '@/components/field/checkbox-field';
 import { TermsAndConditionsDialog } from '@/routes/_layout/sign-up/-components/terms-and-conditions-dialog';
 import { PrivacyPolicyDialog } from '@/routes/_layout/sign-up/-components/privacy-policy-dialog';
@@ -19,6 +19,8 @@ interface SignUpFormProps {
 
 export const SignUpForm: React.FC<SignUpFormProps> = ({ form, onSubmit, isPending }) => {
     const { t } = useTranslation();
+    const [showPassword, onTogglePassword] = React.useState(false);
+    const [showConfirmPassword, onToggleConfirmPassword] = React.useState(false);
     const password = form.watch('password');
 
     return (
@@ -71,11 +73,22 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ form, onSubmit, isPendin
                             name="password"
                             label={t('password')}
                             className="w-full"
-                            type="password"
+                            type={showPassword ? 'text' : 'password'}
                             autoComplete="new-password"
                             placeholder="••••••••"
-                            startIcon={
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            endIcon={
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    type="button"
+                                    onClick={(event) => {
+                                        event.preventDefault();
+                                        onTogglePassword((prevState) => !prevState);
+                                    }}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+                                >
+                                    {showPassword ? <Lock className="h-4 w-4" /> : <LockOpen className="h-4 w-4" />}
+                                </Button>
                             }
                             disabled={isPending}
                         />
@@ -87,10 +100,21 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ form, onSubmit, isPendin
                         name="confirmPassword"
                         label={t('confirm_password')}
                         className="w-full"
-                        type="password"
+                        type={showConfirmPassword ? 'text' : 'password'}
                         placeholder="••••••••"
-                        startIcon={
-                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        endIcon={
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                type="button"
+                                onClick={(event) => {
+                                    event.preventDefault();
+                                    onToggleConfirmPassword((prevState) => !prevState);
+                                }}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+                            >
+                                {showConfirmPassword ? <Lock className="h-4 w-4" /> : <LockOpen className="h-4 w-4" />}
+                            </Button>
                         }
                         disabled={isPending}
                         autoComplete="new-password"

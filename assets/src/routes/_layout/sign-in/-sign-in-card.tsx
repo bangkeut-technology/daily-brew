@@ -9,7 +9,6 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { signInSchema } from '@/schema/sign-in-schema';
 import { useTranslation } from 'react-i18next';
-import { useBoolean } from 'react-use';
 import { useMutation } from '@tanstack/react-query';
 import { signIn } from '@/services/auth';
 import { isAxiosError } from 'axios';
@@ -23,7 +22,7 @@ import { Separator } from '@/components/ui/separator';
 export const SignInCard = () => {
     const { t } = useTranslation();
     const [rememberMe, setRememberMe] = React.useState(false);
-    const [showPassword, onToggle] = useBoolean(false);
+    const [showPassword, onToggle] = React.useState(false);
     const { setEmail } = useAuthentication();
 
     const form = useForm<SignIn>({
@@ -88,7 +87,10 @@ export const SignInCard = () => {
                                         variant="ghost"
                                         size="icon"
                                         type="button"
-                                        onClick={onToggle}
+                                        onClick={(event) => {
+                                            event.preventDefault();
+                                            onToggle((prevState) => !prevState);
+                                        }}
                                         className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
                                     >
                                         {showPassword ? <Lock className="h-4 w-4" /> : <LockOpen className="h-4 w-4" />}
