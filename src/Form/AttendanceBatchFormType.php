@@ -46,6 +46,7 @@ class AttendanceBatchFormType extends AbstractFormType
     {
         $resolver->setDefaults([
             'data_class' => AttendanceBatch::class,
+            'csrf_protection' => false,
         ]);
     }
 }

@@ -29,3 +29,4 @@ created:
     evaluation_template: 'Evaluation template %name% has been created successfully'
     employee_evaluation: 'Employee evaluation has been submitted successfully'
     attendance:          'Attendance has been submitted successfully'
+    attendance_batch:    'Attendance batch %label% have been submitted successfully'

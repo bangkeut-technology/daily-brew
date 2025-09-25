@@ -78,7 +78,7 @@ class AttendanceBatchController extends AbstractController
 
             $this->dispatcher->dispatch(new AttendanceBatchCreatedEvent($attendanceBatch, $this->getUser(), $form->get('attendances')->getData()));
 
-            return $this->json(['message' => 'ok']);
+            return $this->json(['message' => $this->translator->trans('created.attendance_batch', ['%label%' => $attendanceBatch])]);
         }
         return $this->createBadRequestResponse($this->translator->trans('invalid.attendance_batch', domain: 'errors'));
     }
