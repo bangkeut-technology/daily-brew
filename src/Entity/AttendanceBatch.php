@@ -65,6 +65,16 @@ class AttendanceBatch extends AbstractEntity
         }
     }
 
+    #[ORM\ManyToMany(targetEntity: Employee::class, inversedBy: 'attendanceBatches')]
+    #[ORM\JoinTable(name: 'daily_brew_employee_attendance_batches')]
+    private Collection $employees;
+
+    public function __construct()
+    {
+        $this->attendances = new ArrayCollection();
+        $this->employees = new ArrayCollection();
+    }
+
     /**
      * @return AttendanceTypeEnum|null
      */
@@ -191,11 +201,6 @@ class AttendanceBatch extends AbstractEntity
         return $this;
     }
 
-    public function __construct()
-    {
-        $this->attendances = new ArrayCollection();
-    }
-
     public function addAttendance(Attendance $attendance): static
     {
         if (!$this->attendances->contains($attendance)) {
@@ -212,6 +217,34 @@ class AttendanceBatch extends AbstractEntity
             $attendance->setBatch(null);
         }
 
+        return $this;
+    }
+
+    public function getEmployees(): Collection
+    {
+        return $this->employees;
+    }
+
+    public function setEmployees(Collection $employees): AttendanceBatch
+    {
+        $this->employees = $employees;
+        return $this;
+    }
+
+    public function addEmployee(Employee $employee): AttendanceBatch
+    {
+        if (!$this->employees->contains($employee)) {
+            $this->employees->add($employee);
+            $employee->addAttendanceBatch($this);
+        }
+        return $this;
+    }
+
+    public function removeEmployee(Employee $employee): AttendanceBatch
+    {
+        if ($this->employees->removeElement($employee)) {
+            $employee->removeAttendanceBatch($this);
+        }
         return $this;
     }
 

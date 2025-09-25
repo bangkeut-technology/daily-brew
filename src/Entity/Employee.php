@@ -85,13 +85,24 @@ class Employee extends AbstractEntity
      * @var Collection<int, Attendance>
      */
     #[ORM\OneToMany(targetEntity: Attendance::class, mappedBy: 'employee', orphanRemoval: true)]
-    private Collection $attendances;
+    private Collection $attendances {
+        get {
+            return $this->attendances;
+        }
+    }
+
+    /**
+     * @var Collection<int, AttendanceBatch>
+     */
+    #[ORM\ManyToMany(targetEntity: AttendanceBatch::class, mappedBy: 'employees')]
+    private Collection $attendanceBatches;
 
     public function __construct()
     {
+        $this->attendances = new ArrayCollection();
+        $this->attendanceBatches = new ArrayCollection();
         $this->roles = new ArrayCollection();
         $this->templates = new ArrayCollection();
-        $this->attendances = new ArrayCollection();
     }
 
     public function getFirstName(): string
@@ -276,14 +287,6 @@ class Employee extends AbstractEntity
         return sprintf('%s %s', $this->firstName, $this->lastName);
     }
 
-    /**
-     * @return Collection<int, Attendance>
-     */
-    public function getAttendances(): Collection
-    {
-        return $this->attendances;
-    }
-
     public function addAttendance(Attendance $attendance): static
     {
         if (!$this->attendances->contains($attendance)) {
@@ -300,6 +303,41 @@ class Employee extends AbstractEntity
             $attendance->setEmployee(null);
         }
 
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AttendanceBatch>
+     */
+    public function getAttendanceBatches(): Collection
+    {
+        return $this->attendanceBatches;
+    }
+
+    /**
+     * @param Collection $attendanceBatches
+     * @return Employee
+     */
+    public function setAttendanceBatches(Collection $attendanceBatches): Employee
+    {
+        $this->attendanceBatches = $attendanceBatches;
+        return $this;
+    }
+
+    public function addAttendanceBatch(AttendanceBatch $attendanceBatch): Employee
+    {
+        if (!$this->attendanceBatches->contains($attendanceBatch)) {
+            $this->attendanceBatches->add($attendanceBatch);
+            $attendanceBatch->addEmployee($this);
+        }
+        return $this;
+    }
+
+    public function removeAttendanceBatch(AttendanceBatch $attendanceBatch): Employee
+    {
+        if ($this->attendanceBatches->removeElement($attendanceBatch)) {
+            $attendanceBatch->removeEmployee($this);
+        }
         return $this;
     }
 
