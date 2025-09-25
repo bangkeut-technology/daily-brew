@@ -85,11 +85,7 @@ class Employee extends AbstractEntity
      * @var Collection<int, Attendance>
      */
     #[ORM\OneToMany(targetEntity: Attendance::class, mappedBy: 'employee', orphanRemoval: true)]
-    private Collection $attendances {
-        get {
-            return $this->attendances;
-        }
-    }
+    private Collection $attendances;
 
     /**
      * @var Collection<int, AttendanceBatch>
@@ -285,6 +281,24 @@ class Employee extends AbstractEntity
     public function __toString(): string
     {
         return sprintf('%s %s', $this->firstName, $this->lastName);
+    }
+
+    /**
+     * @return Collection<int, Attendance>
+     */
+    public function getAttendances(): Collection
+    {
+        return $this->attendances;
+    }
+
+    /**
+     * @param Collection<int, Attendance> $attendances
+     * @return Employee
+     */
+    public function setAttendances(Collection $attendances): Employee
+    {
+        $this->attendances = $attendances;
+        return $this;
     }
 
     public function addAttendance(Attendance $attendance): static

@@ -67,7 +67,6 @@ class AttendanceBatchFormType extends AbstractFormType
             ])
             ->add('employees', EntityType::class, [
                 'class' => Employee::class,
-                'mapped' => false,
                 'multiple' => true,
                 'documentation' => [
                     'type' => 'array',

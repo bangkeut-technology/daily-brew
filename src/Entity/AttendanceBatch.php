@@ -59,11 +59,7 @@ class AttendanceBatch extends AbstractEntity
      * @var Collection<int, Attendance>
      */
     #[ORM\OneToMany(targetEntity: Attendance::class, mappedBy: 'batch')]
-    private Collection $attendances {
-        get {
-            return $this->attendances;
-        }
-    }
+    private Collection $attendances;
 
     #[ORM\ManyToMany(targetEntity: Employee::class, inversedBy: 'attendanceBatches')]
     #[ORM\JoinTable(name: 'daily_brew_employee_attendance_batches')]
@@ -220,11 +216,36 @@ class AttendanceBatch extends AbstractEntity
         return $this;
     }
 
+    /**
+     * @return Collection
+     */
+    public function getAttendances(): Collection
+    {
+        return $this->attendances;
+    }
+
+    /**
+     * @param Collection $attendances
+     * @return AttendanceBatch
+     */
+    public function setAttendances(Collection $attendances): AttendanceBatch
+    {
+        $this->attendances = $attendances;
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
     public function getEmployees(): Collection
     {
         return $this->employees;
     }
 
+    /**
+     * @param Collection $employees
+     * @return AttendanceBatch
+     */
     public function setEmployees(Collection $employees): AttendanceBatch
     {
         $this->employees = $employees;
