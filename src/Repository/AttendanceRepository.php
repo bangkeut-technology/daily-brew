@@ -296,7 +296,7 @@ class AttendanceRepository extends AbstractRepository
      */
     public function countLate(Employee $employee, DateTimeImmutable $start, DateTimeImmutable $end): int
     {
-        return $this->countStatus($employee, $start, $end, AttendanceTypeEnum::LATE);
+        return $this->countType($employee, $start, $end, AttendanceTypeEnum::LATE);
     }
 
     /**
@@ -310,40 +310,40 @@ class AttendanceRepository extends AbstractRepository
      */
     public function countAbsent(Employee $employee, DateTimeImmutable $start, DateTimeImmutable $end): int
     {
-        return $this->countStatus($employee, $start, $end, AttendanceTypeEnum::ABSENT);
+        return $this->countType($employee, $start, $end, AttendanceTypeEnum::ABSENT);
     }
 
     /**
-     * Counts the occurrences of a specific attendance status for a given employee within a specified date period.
+     * Counts the occurrences of a specific attendance type for a given employee within a specified date period.
      *
-     * @param Employee           $employee The employee for whom the status is being counted.
+     * @param Employee           $employee The employee for whom the type is being counted.
      * @param DateTimeImmutable  $start    The start date of the period.
      * @param DateTimeImmutable  $end      The end date of the period.
-     * @param AttendanceTypeEnum $status   The attendance status to be counted.
+     * @param AttendanceTypeEnum $type   The attendance type to be counted.
      *
-     * @return int The total count of the specified attendance status.
+     * @return int The total count of the specified attendance type.
      */
-    public function countStatus(Employee $employee, DateTimeImmutable $start, DateTimeImmutable $end, AttendanceTypeEnum $status): int
+    public function countType(Employee $employee, DateTimeImmutable $start, DateTimeImmutable $end, AttendanceTypeEnum $type): int
     {
-        return $this->createStatusBetweenQuery($employee, $start, $end, $status)
+        return $this->createTypeBetweenQuery($employee, $start, $end, $type)
             ->select('COUNT(attendance.id)')
             ->getQuery()
             ->getSingleScalarResult();
     }
 
     /**
-     * Counts the occurrences of a specific attendance status for a given employee within a specified date period.
+     * Counts the occurrences of a specific attendance type for a given employee within a specified date period.
      *
-     * @param Employee           $employee The employee for whom the status is being counted.
+     * @param Employee           $employee The employee for whom the type is being counted.
      * @param DateTimeImmutable  $start    The start date of the period.
      * @param DateTimeImmutable  $end      The end date of the period.
-     * @param AttendanceTypeEnum $status   The attendance status to be counted.
+     * @param AttendanceTypeEnum $type   The attendance type to be counted.
      *
-     * @return Attendance[] The list of attendance records matching the specified status within the given period.
+     * @return Attendance[] The list of attendance records matching the specified type within the given period.
      */
-    public function findStatus(Employee $employee, DateTimeImmutable $start, DateTimeImmutable $end, AttendanceTypeEnum $status): array
+    public function findType(Employee $employee, DateTimeImmutable $start, DateTimeImmutable $end, AttendanceTypeEnum $type): array
     {
-        return $this->createStatusBetweenQuery($employee, $start, $end, $status)
+        return $this->createTypeBetweenQuery($employee, $start, $end, $type)
             ->getQuery()
             ->getResult();
     }
@@ -408,7 +408,7 @@ class AttendanceRepository extends AbstractRepository
     }
 
     /**
-     * Creates a query to retrieve attendance records for an employee within a specific date range and with a specified status.
+     * Creates a query to retrieve attendance records for an employee within a specific date range and with a specified type.
      *
      * @param Employee           $employee The employee whose attendance records are being queried.
      * @param DateTimeImmutable  $start    The start date of the query range.
@@ -416,7 +416,7 @@ class AttendanceRepository extends AbstractRepository
      * @param AttendanceTypeEnum $type     The attendance type to filter by.
      * @return QueryBuilder The query builder configured for retrieving the specified attendance records.
      */
-    private function createStatusBetweenQuery(
+    private function createTypeBetweenQuery(
         Employee           $employee,
         DateTimeImmutable  $start,
         DateTimeImmutable  $end,
@@ -446,7 +446,7 @@ class AttendanceRepository extends AbstractRepository
      *
      * @return int The count of attendance records matching the criteria.
      */
-    public function countByStatusOnDateForOwner(User $user, DateTimeImmutable $today, AttendanceTypeEnum $type): int
+    public function countByTypeOnDateForOwner(User $user, DateTimeImmutable $today, AttendanceTypeEnum $type): int
     {
         $qb = $this->createQueryBuilder('attendance')
             ->select('COUNT(attendance.id)')
@@ -480,25 +480,25 @@ class AttendanceRepository extends AbstractRepository
     ): array
     {
 
-        return $this->findUpcomingStatus($user, $from, $to, AttendanceTypeEnum::LEAVE, $employeePublicId);
+        return $this->findUpcomingType($user, $from, $to, AttendanceTypeEnum::LEAVE, $employeePublicId);
     }
 
     /**
      * Retrieves upcoming attendance records with a specified type for a given owner within a specified date range.
      *
-     * @param User               $user             The user who owns the attendance records.
-     * @param DateTimeImmutable  $from             The start date of the date range.
-     * @param DateTimeImmutable  $to               The end date of the date range.
-     * @param AttendanceTypeEnum $type             The attendance type to filter by.
-     * @param string|null        $employeePublicId Optional employee identifier for further filtering.
+     * @param User                    $user             The user who owns the attendance records.
+     * @param DateTimeImmutable       $from             The start date of the date range.
+     * @param DateTimeImmutable       $to               The end date of the date range.
+     * @param AttendanceTypeEnum|null $type             The attendance type to filter by.
+     * @param string|null             $employeePublicId Optional employee identifier for further filtering.
      *
      * @return Attendance[] The list of attendance records matching the specified criteria.
      */
-    public function findUpcomingStatus(
+    public function findUpcomingType(
         User               $user,
         DateTimeImmutable  $from,
         DateTimeImmutable  $to,
-        AttendanceTypeEnum $type,
+        ?AttendanceTypeEnum $type = null,
         ?string            $employeePublicId = null
     ): array
     {
@@ -506,18 +506,23 @@ class AttendanceRepository extends AbstractRepository
             ->addSelect('employee')
             ->innerJoin('attendance.employee', 'employee')
             ->andWhere('employee.user = :user')
-            ->andWhere('attendance.type = :type')
+            ->andWhere('attendance.type = :type OR :type IS NULL')
             ->andWhere('attendance.attendanceDate BETWEEN :from AND :to')
-            ->setParameter('user', $user)
-            ->setParameter('type', $type)
-            ->setParameter('from', $from)
-            ->setParameter('to', $to)
             ->orderBy('attendance.attendanceDate', 'ASC');
 
+        $parameter = new ArrayCollection([
+            new Parameter('user', $user),
+            new Parameter('type', $type),
+            new Parameter('from', $from, Types::DATE_IMMUTABLE),
+            new Parameter('to', $to, Types::DATE_IMMUTABLE),
+        ]);
+
         if ($employeePublicId) {
-            $qb->andWhere('employee.publicId = :employeePublicId')
-                ->setParameter('employeePublicId', $employeePublicId);
+            $qb->andWhere('employee.publicId = :employeePublicId');
+            $parameter->add(new Parameter('employeePublicId', $employeePublicId));
         }
+
+        $qb->setParameters($parameter);
 
         return $qb->getQuery()->getResult();
     }
