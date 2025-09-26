@@ -30,5 +30,5 @@ export type PartialEmployeeEvaluation = Omit<
 > & {
     template: number;
     scores: PartialEmployeeScore[];
-    evaluatedAt: Date | unknown;
+    evaluatedAt?: Date;
 };

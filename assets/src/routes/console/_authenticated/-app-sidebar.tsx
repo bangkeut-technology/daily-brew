@@ -17,6 +17,7 @@ import {
 import {
     Briefcase,
     CalendarClock,
+    CalendarRange,
     ChevronRight,
     ChevronUp,
     ClipboardList,
@@ -71,6 +72,11 @@ export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) =
                 title: t('attendances'),
                 icon: CalendarClock,
                 url: '/console/attendances',
+            },
+            {
+                title: t('attendance_batches'),
+                icon: CalendarRange,
+                url: '/console/attendance-batches',
             },
             {
                 title: t('manage'),

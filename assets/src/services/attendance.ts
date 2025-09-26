@@ -1,6 +1,8 @@
 import { apiAxios } from '@/lib/apiAxios';
 import { Attendance, AttendanceSearchParams, AttendanceTypeEnum, PartialAttendance } from '@/types/attendance';
 import { Employee, EmployeeAttendance } from '@/types/employee';
+import { format } from 'date-fns';
+import { DATE_FORMAT } from '@/constants/date';
 
 export const fetchAttendances = async ({ employees, ...params }: AttendanceSearchParams) =>
     apiAxios
@@ -9,12 +11,12 @@ export const fetchAttendances = async ({ employees, ...params }: AttendanceSearc
         >('/attendances', { params: { ...params, employees: employees?.map((employee) => employee.publicId) } })
         .then((response) => response.data);
 
-export const postAttendance = async (attendance: PartialAttendance) =>
+export const postAttendance = async ({ attendanceDate, ...attendance }: PartialAttendance) =>
     apiAxios
         .post<{
             message: string;
             attendance: Attendance;
-        }>('/attendances', attendance)
+        }>('/attendances', { ...attendance, attendanceDate: format(attendanceDate, DATE_FORMAT) })
         .then((response) => response.data);
 
 export const fetchUpcomingAttendances = async (type: AttendanceTypeEnum) =>

@@ -100,7 +100,7 @@ class CommonController extends AbstractController
 
         // 4) Leaves today.
         $today = new DateTimeImmutable('today');
-        $leavesToday = $attendanceRepository->countByStatusOnDateForOwner(
+        $leavesToday = $attendanceRepository->countByTypeOnDateForOwner(
             $user,
             $today,
             AttendanceTypeEnum::LEAVE
