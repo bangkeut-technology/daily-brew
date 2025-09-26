@@ -241,11 +241,19 @@
         "only": "Only *.jpeg and *.png images will be accepted"
     },
     "loading": {
-        "upcoming_leaves": "Loading upcoming leaves..."
+        "upcoming_leaves": "Loading upcoming leaves...",
+        "upcoming_attendance_batches": "Loading upcoming attendance batches..."
     },
     "no_account_yet": "Don't have an account yet?",
     "not_found": {
-        "upcoming_leaves": "No upcoming leaves"
+        "upcoming_leaves": "No upcoming leaves",
+        "upcoming_attendance_batches": "No upcoming attendance batches found",
+        "employees": "No employees found",
+        "evaluations": "No evaluations found",
+        "evaluation_criterias": "No evaluation criteria found",
+        "evaluation_templates": "No evaluation templates found",
+        "attendance_batches": "No attendance batches found",
+        "attendances": "No attendance records found"
     },
     "placeholder": {
         "picker": {

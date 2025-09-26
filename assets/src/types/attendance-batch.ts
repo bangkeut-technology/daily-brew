@@ -1,5 +1,6 @@
 import { User } from '@/types/user';
 import { AttendanceType, AttendanceTypeEnum } from '@/types/attendance';
+import { Employee } from '@/types/employee';
 
 export type AttendanceBatch = {
     id: number;
@@ -11,6 +12,7 @@ export type AttendanceBatch = {
     type: AttendanceTypeEnum;
     note?: string;
     user: User;
+    employees?: Employee[];
 };
 
 export type PartialAttendanceBatch = Omit<
