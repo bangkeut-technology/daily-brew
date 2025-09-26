@@ -6,8 +6,11 @@ namespace App\Repository;
 
 use App\Entity\AttendanceBatch;
 use App\Entity\User;
+use App\Enum\AttendanceTypeEnum;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -100,7 +103,7 @@ class AttendanceBatchRepository extends AbstractRepository
      *
      * @return AttendanceBatch|null The matched entity or null if not found.
      */
-    public function findByCanonicalLabelAndUser(string $canonicalLabel, User   $user): ?AttendanceBatch
+    public function findByCanonicalLabelAndUser(string $canonicalLabel, User $user): ?AttendanceBatch
     {
         return $this->createQueryBuilder('ab')
             ->where('ab.user = :user')
@@ -123,5 +126,44 @@ class AttendanceBatchRepository extends AbstractRepository
     public function findByUser(User $user): array
     {
         return $this->findBy(['user' => $user]);
+    }
+
+    /**
+     * Retrieves a list of upcoming attendance batches filtered by type, user, date range, and optionally by employee public ID.
+     *
+     * @param User                    $user             The user to which the attendances are associated.
+     * @param DateTimeImmutable       $from             The start date of the date range.
+     * @param DateTimeImmutable       $to               The end date of the date range.
+     * @param AttendanceTypeEnum|null $type             The type of attendance to filter by; null includes all types.
+     * @param string|null             $employeePublicId The public ID of the employee to filter by; null includes all employees.
+     *
+     * @return array                Returns an array of attendance batches matching the criteria.
+     */
+    public function findUpcomingByType(
+        User                $user,
+        DateTimeImmutable   $from,
+        DateTimeImmutable   $to,
+        ?AttendanceTypeEnum $type = null,
+        ?string             $employeePublicId = null,
+    ): array
+    {
+        $qb = $this->createQueryBuilder('ab')
+            ->addSelect('e')
+            ->innerJoin('ab.employee', 'e')
+            ->where('ab.type = :type OR :type IS NULL')
+            ->andWhere('ab.fromDate <= :to')
+            ->andWhere('ab.toDate >= :from')
+            ->andWhere('e.user = :user')
+            ->andWhere('e.publicId = :employeePublicId OR :employeePublicId IS NULL')
+            ->orderBy('ab.fromDate', 'ASC')
+            ->setParameters(new ArrayCollection([
+                new Parameter('user', $user),
+                new Parameter('type', $type),
+                new Parameter('from', $from, Types::DATE_IMMUTABLE),
+                new Parameter('to', $to, Types::DATE_IMMUTABLE),
+                new Parameter('employeePublicId', $employeePublicId),
+            ]));
+
+        return $qb->getQuery()->getResult();
     }
 }

@@ -276,7 +276,7 @@ class AttendanceController extends AbstractController
         $from = new DateTimeImmutable('today 00:00:00');
         $to = $from->modify('+14 days')->setTime(23, 59, 59);
 
-        $attendances = $this->attendanceRepository->findUpcomingType(
+        $attendances = $this->attendanceRepository->findUpcomingByType(
             user: $this->getUser(),
             from: $from,
             to: $to,

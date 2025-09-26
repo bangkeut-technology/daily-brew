@@ -319,7 +319,7 @@ class AttendanceRepository extends AbstractRepository
      * @param Employee           $employee The employee for whom the type is being counted.
      * @param DateTimeImmutable  $start    The start date of the period.
      * @param DateTimeImmutable  $end      The end date of the period.
-     * @param AttendanceTypeEnum $type   The attendance type to be counted.
+     * @param AttendanceTypeEnum $type     The attendance type to be counted.
      *
      * @return int The total count of the specified attendance type.
      */
@@ -337,7 +337,7 @@ class AttendanceRepository extends AbstractRepository
      * @param Employee           $employee The employee for whom the type is being counted.
      * @param DateTimeImmutable  $start    The start date of the period.
      * @param DateTimeImmutable  $end      The end date of the period.
-     * @param AttendanceTypeEnum $type   The attendance type to be counted.
+     * @param AttendanceTypeEnum $type     The attendance type to be counted.
      *
      * @return Attendance[] The list of attendance records matching the specified type within the given period.
      */
@@ -480,7 +480,7 @@ class AttendanceRepository extends AbstractRepository
     ): array
     {
 
-        return $this->findUpcomingType($user, $from, $to, AttendanceTypeEnum::LEAVE, $employeePublicId);
+        return $this->findUpcomingByType($user, $from, $to, AttendanceTypeEnum::LEAVE, $employeePublicId);
     }
 
     /**
@@ -494,35 +494,29 @@ class AttendanceRepository extends AbstractRepository
      *
      * @return Attendance[] The list of attendance records matching the specified criteria.
      */
-    public function findUpcomingType(
-        User               $user,
-        DateTimeImmutable  $from,
-        DateTimeImmutable  $to,
+    public function findUpcomingByType(
+        User                $user,
+        DateTimeImmutable   $from,
+        DateTimeImmutable   $to,
         ?AttendanceTypeEnum $type = null,
-        ?string            $employeePublicId = null
+        ?string             $employeePublicId = null
     ): array
     {
         $qb = $this->createQueryBuilder('attendance')
             ->addSelect('employee')
             ->innerJoin('attendance.employee', 'employee')
-            ->andWhere('employee.user = :user')
+            ->where('employee.user = :user')
             ->andWhere('attendance.type = :type OR :type IS NULL')
             ->andWhere('attendance.attendanceDate BETWEEN :from AND :to')
-            ->orderBy('attendance.attendanceDate', 'ASC');
-
-        $parameter = new ArrayCollection([
-            new Parameter('user', $user),
-            new Parameter('type', $type),
-            new Parameter('from', $from, Types::DATE_IMMUTABLE),
-            new Parameter('to', $to, Types::DATE_IMMUTABLE),
-        ]);
-
-        if ($employeePublicId) {
-            $qb->andWhere('employee.publicId = :employeePublicId');
-            $parameter->add(new Parameter('employeePublicId', $employeePublicId));
-        }
-
-        $qb->setParameters($parameter);
+            ->andWhere('employee.publicId = :employeePublicId OR :employeePublicId IS NULL')
+            ->orderBy('attendance.attendanceDate', 'ASC')
+            ->setParameters(new ArrayCollection([
+                new Parameter('user', $user),
+                new Parameter('type', $type),
+                new Parameter('from', $from, Types::DATE_IMMUTABLE),
+                new Parameter('to', $to, Types::DATE_IMMUTABLE),
+                new Parameter('employeePublicId', $employeePublicId)
+            ]));
 
         return $qb->getQuery()->getResult();
     }
