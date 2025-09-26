@@ -13,6 +13,7 @@ import { MetricSection } from '@/routes/console/_authenticated/_layout/-componen
 import { UpcomingLeaves } from '@/routes/console/_authenticated/_layout/-components/upcoming-leaves';
 import { RecentEvaluations } from '@/routes/console/_authenticated/_layout/-components/recent-evaluations';
 import { QuickActions } from '@/routes/console/_authenticated/_layout/-components/quick-actions';
+import { UpcomingAttendanceBatches } from '@/routes/console/_authenticated/_layout/-components/upcoming-attendance-batches';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/')({
     component: DashboardPage,
@@ -96,6 +97,7 @@ function DashboardPage() {
                 </div>
 
                 <div className="space-y-6">
+                    <UpcomingAttendanceBatches />
                     <UpcomingLeaves />
                     <RecentEvaluations />
                 </div>

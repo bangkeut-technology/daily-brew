@@ -127,20 +127,12 @@ class AttendanceBatchController extends AbstractController
      * Retrieves a list of upcoming leaves for the specified date range and filters, if provided.
      *
      * @param Request $request The HTTP request containing optional query parameters:
-     *                         - 'employeePublicId': Public ID of the employee for filtering upcoming leaves.
      *                         - 'type': Type of attendance to filter (e.g., LEAVE, SICK_LEAVE).
      *
      * @return JsonResponse The JSON response containing a list of filtered upcoming leaves.
      *
      * @throws DateMalformedStringException
      */
-    #[OA\Parameter(
-        name: 'employeePublicId',
-        description: 'Public ID of the employee to filter upcoming leaves (optional)',
-        in: 'query',
-        required: false,
-        schema: new OA\Schema(type: 'string')
-    )]
     #[OA\Parameter(
         name: 'type',
         description: 'Type of attendance to filter (e.g., LEAVE, SICK_LEAVE)',
@@ -158,7 +150,6 @@ class AttendanceBatchController extends AbstractController
     #[Route('/upcoming', name: 'upcoming', methods: ['GET'])]
     public function upcoming(Request $request): JsonResponse
     {
-        $employeePublicId = $request->query->get('employeePublicId');
         $type = $request->query->get('type');
 
         $from = new DateTimeImmutable('today 00:00:00');
@@ -168,8 +159,7 @@ class AttendanceBatchController extends AbstractController
             user: $this->getUser(),
             from: $from,
             to: $to,
-            type: AttendanceTypeEnum::from($type),
-            employeePublicId: $employeePublicId
+            type: $type ? AttendanceTypeEnum::from($type) : null,
         );
 
         return $this->createAttendanceBatchResponse($attendances);

@@ -280,7 +280,7 @@ class AttendanceController extends AbstractController
             user: $this->getUser(),
             from: $from,
             to: $to,
-            type: AttendanceTypeEnum::from($type),
+            type: $type ? AttendanceTypeEnum::from($type) : null,
             employeePublicId: $employeePublicId
         );
 

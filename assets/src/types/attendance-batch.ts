@@ -17,7 +17,7 @@ export type AttendanceBatch = {
 
 export type PartialAttendanceBatch = Omit<
     AttendanceBatch,
-    'id' | 'publicId' | 'user' | 'canonicalLabel' | 'fromDate' | 'toDate'
+    'id' | 'publicId' | 'user' | 'canonicalLabel' | 'fromDate' | 'toDate' | 'employees'
 > & {
     fromDate: Date;
     toDate: Date;

@@ -135,7 +135,6 @@ class AttendanceBatchRepository extends AbstractRepository
      * @param DateTimeImmutable       $from             The start date of the date range.
      * @param DateTimeImmutable       $to               The end date of the date range.
      * @param AttendanceTypeEnum|null $type             The type of attendance to filter by; null includes all types.
-     * @param string|null             $employeePublicId The public ID of the employee to filter by; null includes all employees.
      *
      * @return array                Returns an array of attendance batches matching the criteria.
      */
@@ -144,24 +143,21 @@ class AttendanceBatchRepository extends AbstractRepository
         DateTimeImmutable   $from,
         DateTimeImmutable   $to,
         ?AttendanceTypeEnum $type = null,
-        ?string             $employeePublicId = null,
     ): array
     {
         $qb = $this->createQueryBuilder('ab')
             ->addSelect('e')
-            ->innerJoin('ab.employee', 'e')
+            ->innerJoin('ab.employees', 'e')
             ->where('ab.type = :type OR :type IS NULL')
             ->andWhere('ab.fromDate <= :to')
             ->andWhere('ab.toDate >= :from')
             ->andWhere('e.user = :user')
-            ->andWhere('e.publicId = :employeePublicId OR :employeePublicId IS NULL')
             ->orderBy('ab.fromDate', 'ASC')
             ->setParameters(new ArrayCollection([
                 new Parameter('user', $user),
                 new Parameter('type', $type),
                 new Parameter('from', $from, Types::DATE_IMMUTABLE),
                 new Parameter('to', $to, Types::DATE_IMMUTABLE),
-                new Parameter('employeePublicId', $employeePublicId),
             ]));
 
         return $qb->getQuery()->getResult();
