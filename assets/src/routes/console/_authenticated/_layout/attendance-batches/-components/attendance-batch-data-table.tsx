@@ -1,55 +1,45 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchAttendances } from '@/services/attendance';
 import { DataTable } from '@/components/data-table';
 import { RowSelectionState } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/table-core';
-import { Attendance, AttendanceSearchParams } from '@/types/attendance';
+import { AttendanceBatch, AttendanceBatchSearchParams } from '@/types/attendance-batch';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { DISPLAY_DATE_FORMAT, DISPLAY_TIME_FORMAT } from '@/constants/date';
 import { AttendanceTypeBadge } from '@/components/attendance/attendance-type-badge';
+import { fetchAttendanceBatches } from '@/services/attendance-batch';
 
-const columnHelper = createColumnHelper<Attendance>();
+const columnHelper = createColumnHelper<AttendanceBatch>();
 
-interface AttendanceDataTableProps {
-    params: AttendanceSearchParams;
+interface AttendanceBatchDataTableProps {
+    params: AttendanceBatchSearchParams;
 }
 
-export const AttendanceDataTable: React.FunctionComponent<AttendanceDataTableProps> = ({ params }) => {
+export const AttendanceBatchDataTable: React.FunctionComponent<AttendanceBatchDataTableProps> = ({ params }) => {
     const { t } = useTranslation();
     const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
     const { data = [], isPending } = useQuery({
-        queryKey: ['attendances', params],
-        queryFn: () => fetchAttendances(params),
+        queryKey: ['attendance-batches', params],
+        queryFn: () => fetchAttendanceBatches(params),
     });
 
     const columns = React.useMemo(() => {
         return [
-            columnHelper.accessor('employee.fullName', {
-                header: t('employee'),
+            columnHelper.accessor('label', {
+                header: t('label'),
                 cell: ({ getValue }) => getValue(),
             }),
             columnHelper.accessor('type', {
                 header: t('type'),
                 cell: ({ getValue }) => <AttendanceTypeBadge type={getValue()} />,
             }),
-            columnHelper.accessor('attendanceDate', {
-                header: t('attendance_date'),
+            columnHelper.accessor('fromDate', {
+                header: t('from'),
                 cell: ({ getValue }) => format(getValue(), DISPLAY_DATE_FORMAT),
             }),
-            columnHelper.accessor('clockIn', {
-                header: t('clock_in'),
-                cell: ({ getValue }) => {
-                    const time = getValue();
-                    if (time) {
-                        return format(time, DISPLAY_TIME_FORMAT);
-                    }
-                    return '-';
-                },
-            }),
-            columnHelper.accessor('clockOut', {
-                header: t('clock_out'),
+            columnHelper.accessor('toDate', {
+                header: t('to'),
                 cell: ({ getValue }) => {
                     const time = getValue();
                     if (time) {
@@ -75,3 +65,5 @@ export const AttendanceDataTable: React.FunctionComponent<AttendanceDataTablePro
         />
     );
 };
+
+AttendanceBatchDataTable.displayName = 'AttendanceBatchDataTable';

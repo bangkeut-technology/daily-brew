@@ -38,7 +38,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     const { t } = useTranslation();
 
     return (
-        <div className={cn('flex flex-col gap-3', className)}>
+        <div className={cn('flex flex-col gap-2', className)}>
             {label && <p className="px-1">{label}</p>}
             <Popover>
                 <PopoverTrigger asChild>

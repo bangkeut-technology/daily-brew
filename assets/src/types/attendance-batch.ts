@@ -1,5 +1,5 @@
 import { User } from '@/types/user';
-import { AttendanceTypeEnum } from '@/types/attendance';
+import { AttendanceType, AttendanceTypeEnum } from '@/types/attendance';
 
 export type AttendanceBatch = {
     id: number;
@@ -20,4 +20,11 @@ export type PartialAttendanceBatch = Omit<
     fromDate: Date;
     toDate: Date;
     employees?: Array<{ value: number }>;
+};
+
+export type AttendanceBatchSearchParams = {
+    from: string | undefined;
+    to: string | undefined;
+    name?: string;
+    type?: AttendanceType;
 };

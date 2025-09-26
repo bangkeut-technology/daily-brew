@@ -44,4 +44,4 @@ export const AttendanceSearchForm: React.FC<AttendanceSearchFormProps> = ({ from
     );
 };
 
-AttendanceSearchForm.displayName = 'SearchForm';
+AttendanceSearchForm.displayName = 'AttendanceSearchForm';

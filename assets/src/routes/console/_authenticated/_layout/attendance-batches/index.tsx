@@ -3,13 +3,14 @@ import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CalendarDays } from 'lucide-react';
-import { AttendanceDataTable } from '@/routes/console/_authenticated/_layout/attendances/-components/attendance-data-table';
-import { AttendanceSearchForm } from '@/routes/console/_authenticated/_layout/attendances/-components/attendance-search-form';
 import { AttendanceSearchParams } from '@/types/attendance';
+import { AttendanceBatchDataTable } from '@/routes/console/_authenticated/_layout/attendance-batches/-components/attendance-batch-data-table';
+import { AttendanceBatchSearchForm } from '@/routes/console/_authenticated/_layout/attendance-batches/-components/attendance-batch-search-form';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/attendance-batches/')({
     component: AttendanceListPage,
     validateSearch: z.object({
+        name: z.string().optional(),
         from: z.string().optional(),
         to: z.string().optional(),
         employee: z.string().optional(),
@@ -20,18 +21,18 @@ export const Route = createFileRoute('/console/_authenticated/_layout/attendance
 });
 
 function AttendanceListPage() {
-    const { from, to, employee, type } = Route.useSearch();
+    const { name, from, to, type } = Route.useSearch();
     const navigate = Route.useNavigate();
 
     const onChange = React.useCallback(
         (patch: Partial<AttendanceSearchParams>) => {
             navigate({
                 to: Route.fullPath,
-                search: { from, to, employee, type, ...patch },
+                search: { from, to, name, type, ...patch },
                 replace: true,
             });
         },
-        [navigate, from, to, employee, type],
+        [navigate, from, to, name, type],
     );
 
     return (
@@ -43,21 +44,14 @@ function AttendanceListPage() {
                         <CalendarDays className="h-4 w-4" />
                     </span>
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold">Attendance — Raw List</h1>
+                        <h1 className="text-2xl md:text-3xl font-bold">Attendance Batches — Raw List</h1>
                         <p className="text-sm text-muted-foreground">Filter, search, and review entries</p>
                     </div>
                 </div>
             </div>
 
             {/* Filters */}
-            <Card>
-                <CardHeader className="pb-2">
-                    <CardTitle className="text-base">Filters</CardTitle>
-                </CardHeader>
-                <CardContent className="grid gap-3 md:grid-cols-5">
-                    <AttendanceSearchForm from={from} to={to} employee={employee} type={type} onChange={onChange} />
-                </CardContent>
-            </Card>
+            <AttendanceBatchSearchForm from={from} to={to} name={name} type={type} onChange={onChange} />
 
             {/* Table */}
             <Card className="overflow-hidden">
@@ -65,7 +59,7 @@ function AttendanceListPage() {
                     <CardTitle className="text-base">Results</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                    <AttendanceDataTable params={{ to, employee, type, from }} />
+                    <AttendanceBatchDataTable params={{ to, name, type, from }} />
                 </CardContent>
             </Card>
         </div>

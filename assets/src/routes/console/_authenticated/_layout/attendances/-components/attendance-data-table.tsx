@@ -75,3 +75,5 @@ export const AttendanceDataTable: React.FunctionComponent<AttendanceDataTablePro
         />
     );
 };
+
+AttendanceDataTable.displayName = 'AttendanceDataTable';
