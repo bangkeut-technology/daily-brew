@@ -6,32 +6,37 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import { fetchUpcomingAttendances } from '@/services/attendance';
-import { AttendanceTypeEnum } from '@/types/attendance';
 import { Loading } from '@/components/loader/loading';
+import { fetchUpcomingAttendanceBatches } from '@/services/attendance-batch';
+import { AttendanceTypeBadge } from '@/components/attendance/attendance-type-badge';
+import { CalendarRange } from 'lucide-react';
 
-export const UpcomingLeaves = () => {
+export const UpcomingAttendanceBatches = () => {
     const { t } = useTranslation();
     const { data = [], isPending } = useQuery({
-        queryKey: ['upcoming-leaves'],
-        queryFn: () => fetchUpcomingAttendances(AttendanceTypeEnum.leave),
+        queryKey: ['upcoming-attendance-batches'],
+        queryFn: () => fetchUpcomingAttendanceBatches(),
     });
 
     return (
         <Card>
-            <CardHeader>
-                <CardTitle>{t('upcoming_leaves')}</CardTitle>
+            <CardHeader className="flex items-center space-x-2">
+                <CalendarRange className="w-5 h-5 text-muted-foreground" />
+                <CardTitle>{t('upcoming_attendance_batches')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
                 {isPending ? (
-                    <Loading loadingText={t('loading.upcoming_leaves', { ns: 'glossary' })} />
+                    <Loading loadingText={t('loading.upcoming_attendance_batches', { ns: 'glossary' })} />
                 ) : data.length === 0 ? (
-                    <p>{t('not_found.upcoming_leaves', { ns: 'glossary' })}</p>
+                    <p>{t('not_found.upcoming_attendance_batches', { ns: 'glossary' })}</p>
                 ) : (
-                    data.map((attendance, i) => (
+                    data.map((batch, i) => (
                         <div key={i} className="flex items-center justify-between">
-                            <div className="truncate max-w-[55%]">{attendance.employee.fullName}</div>
-                            <div className="text-muted-foreground">{format(attendance.attendanceDate, 'MMM d')}</div>
+                            <div className="truncate max-w-[55%]">{batch.label}</div>
+                            <AttendanceTypeBadge type={batch.type} />
+                            <div className="text-muted-foreground">
+                                {format(batch.fromDate, 'MMM d')} – {format(batch.toDate, 'MMM d')}
+                            </div>
                         </div>
                     ))
                 )}

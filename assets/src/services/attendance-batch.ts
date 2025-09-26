@@ -18,3 +18,6 @@ export const postAttendanceBatch = async ({ employees, fromDate, toDate, ...data
             employees: employees?.map((employee) => employee.value),
         })
         .then((response) => response.data);
+
+export const fetchUpcomingAttendanceBatches = async () =>
+    apiAxios.get<AttendanceBatch[]>('/attendance-batches/upcoming').then((response) => response.data);
