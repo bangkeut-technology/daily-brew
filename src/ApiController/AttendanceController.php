@@ -238,20 +238,37 @@ class AttendanceController extends AbstractController
     }
 
     /**
-     * Retrieve upcoming leaves within a specified date range for filtering by an employee if provided.
+     * Retrieve a list of upcoming attendance within the specified date range.
      *
-     * @param Request              $request              The HTTP request containing query parameters.
-     * @param AttendanceRepository $attendanceRepository The repository to fetch attendance data.
+     * @param Request $request The HTTP request containing query parameters.
      *
-     * @return JsonResponse
+     * @return JsonResponse A JSON response containing the list of upcoming attendance.
      *
      * @throws DateMalformedStringException
      */
+    #[OA\Parameter(
+        name: 'employeePublicId',
+        description: 'Public ID of the employee to filter upcoming leaves (optional)',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Parameter(
+        name: 'type',
+        description: 'Type of attendance to filter (e.g., LEAVE, SICK_LEAVE)',
+        in: 'query',
+        required: false,
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns a list of upcoming attendance within the specified date range.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Attendance::class, groups: ['attendance:read']))
+        )
+    )]
     #[Route('/upcoming', name: 'upcoming', methods: ['GET'])]
-    public function upcomingLeaves(
-        Request              $request,
-        AttendanceRepository $attendanceRepository,
-    ): JsonResponse
+    public function upcoming(Request $request): JsonResponse
     {
         $employeePublicId = $request->query->get('employeePublicId');
         $type = $request->query->get('type');
@@ -259,7 +276,7 @@ class AttendanceController extends AbstractController
         $from = new DateTimeImmutable('today 00:00:00');
         $to = $from->modify('+14 days')->setTime(23, 59, 59);
 
-        $attendances = $attendanceRepository->findUpcomingType(
+        $attendances = $this->attendanceRepository->findUpcomingType(
             user: $this->getUser(),
             from: $from,
             to: $to,

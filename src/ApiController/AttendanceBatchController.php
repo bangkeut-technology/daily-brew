@@ -5,11 +5,16 @@ namespace App\ApiController;
 
 use App\ApiController\Trait\AttendanceBatchTrait;
 use App\Controller\AbstractController;
+use App\Entity\Attendance;
 use App\Entity\AttendanceBatch;
+use App\Enum\AttendanceTypeEnum;
 use App\Event\AttendanceBatch\AttendanceBatchCreatedEvent;
 use App\Event\AttendanceBatch\AttendanceBatchUpdatedEvent;
 use App\Form\AttendanceBatchFormType;
 use App\Repository\AttendanceBatchRepository;
+use App\Repository\AttendanceRepository;
+use DateMalformedStringException;
+use DateTimeImmutable;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -115,6 +120,59 @@ class AttendanceBatchController extends AbstractController
             ]);
         }
         return $this->createBadRequestResponse($this->translator->trans('invalid.attendance_batch', domain: 'errors'));
+    }
+
+
+    /**
+     * Retrieves a list of upcoming leaves for the specified date range and filters, if provided.
+     *
+     * @param Request $request The HTTP request containing optional query parameters:
+     *                         - 'employeePublicId': Public ID of the employee for filtering upcoming leaves.
+     *                         - 'type': Type of attendance to filter (e.g., LEAVE, SICK_LEAVE).
+     *
+     * @return JsonResponse The JSON response containing a list of filtered upcoming leaves.
+     *
+     * @throws DateMalformedStringException
+     */
+    #[OA\Parameter(
+        name: 'employeePublicId',
+        description: 'Public ID of the employee to filter upcoming leaves (optional)',
+        in: 'query',
+        required: false,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Parameter(
+        name: 'type',
+        description: 'Type of attendance to filter (e.g., LEAVE, SICK_LEAVE)',
+        in: 'query',
+        required: false,
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns a list of upcoming leaves within the specified date range.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: AttendanceBatch::class, groups: ['attendance_batch:read']))
+        )
+    )]
+    #[Route('/upcoming', name: 'upcoming', methods: ['GET'])]
+    public function upcoming(Request $request): JsonResponse
+    {
+        $employeePublicId = $request->query->get('employeePublicId');
+        $type = $request->query->get('type');
+
+        $from = new DateTimeImmutable('today 00:00:00');
+        $to = $from->modify('+14 days')->setTime(23, 59, 59);
+
+        $attendances = $this->attendanceBatchRepository->findUpcomingType(
+            user: $this->getUser(),
+            from: $from,
+            to: $to,
+            type: AttendanceTypeEnum::from($type),
+            employeePublicId: $employeePublicId
+        );
+
+        return $this->createAttendanceBatchResponse($attendances);
     }
 
     /**
