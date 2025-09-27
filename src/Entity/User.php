@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Enum\RoleEnum;
+use App\Enum\UserRoleEnum;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Deprecated;
@@ -79,7 +79,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
      */
     #[ORM\Column]
     #[Groups(['user:read'])]
-    private array $roles = [RoleEnum::DEFAULT->value];
+    private array $roles = [UserRoleEnum::DEFAULT->value];
 
     /**
      * The first name of the user.
@@ -289,7 +289,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function getRoles(): array
     {
         $roles = $this->roles;
-        $roles[] = RoleEnum::DEFAULT->value;
+        $roles[] = UserRoleEnum::DEFAULT->value;
 
         return array_values(array_unique($roles));
     }
@@ -589,7 +589,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function addRole(string $role): static
     {
         $role = strtoupper($role);
-        if ($role === RoleEnum::DEFAULT->value) {
+        if ($role === UserRoleEnum::DEFAULT->value) {
             return $this;
         }
 
@@ -733,9 +733,9 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function setSuperAdmin(bool $true): static
     {
         if ($true) {
-            $this->addRole(RoleEnum::SUPER_ADMIN->value);
+            $this->addRole(UserRoleEnum::SUPER_ADMIN->value);
         } else {
-            $this->removeRole(RoleEnum::SUPER_ADMIN->value);
+            $this->removeRole(UserRoleEnum::SUPER_ADMIN->value);
         }
 
         return $this;

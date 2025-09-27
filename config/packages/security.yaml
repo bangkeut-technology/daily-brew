@@ -5,6 +5,8 @@ security:
         daily_brew_user_provider:
             id: App\Security\Provider\UserProvider
     role_hierarchy:
+        ROLE_DEMO:
+            - ROLE_USER
         ROLE_ADMIN:
             - ROLE_USER
         ROLE_SUPER_ADMIN:
@@ -37,7 +39,7 @@ security:
                 path:   daily_brew_security_logout
                 target: daily_brew_security_login
             remember_me:
-                secret: '%kernel.secret%'
+                secret:   '%kernel.secret%'
                 lifetime: '%env(int:DAILY_BREW_REMEMBER_ME_LIFETIME)%'
             context:  '%env(string:DAILY_BREW_CONTEXT)%'
             custom_authenticators:

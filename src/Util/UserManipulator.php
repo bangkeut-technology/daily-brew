@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Util;
 
 use App\Entity\User;
-use App\Enum\RoleEnum;
+use App\Enum\UserRoleEnum;
 use App\Repository\UserRepository;
 use Random\RandomException;
 
@@ -31,18 +31,16 @@ readonly class UserManipulator implements UserManipulatorInterface
      * @param string      $password  The password of the new user
      * @param string|null $firstName The first name of the new user (optional)
      * @param string|null $lastName  The last name of the new user (optional)
-     * @param RoleEnum    $role      The role of the new user (default is RoleEnum::EMPLOYEE)
+     * @param UserRoleEnum    $role      The role of the new user (default is UserRoleEnum::DEFAULT)
      *
      * @return User The created user
-     *
-     * @throws RandomException
      */
     public function create(
         string $email,
         string $password,
         ?string $firstName,
         ?string $lastName,
-        RoleEnum $role = RoleEnum::DEFAULT,
+        UserRoleEnum $role = UserRoleEnum::DEFAULT,
     ): User {
         $user = $this->userRepository->create();
         $user->setEmail($email);
