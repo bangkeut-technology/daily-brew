@@ -14,6 +14,7 @@
     "sign_up": "Sign Up",
     "password": "Password",
     "type": "Type",
+    "actions": "Actions",
     "confirm_password": "Confirm Password",
     "attendance_date": "Attendance Date",
     "attendance_type": "Attendance Status",
