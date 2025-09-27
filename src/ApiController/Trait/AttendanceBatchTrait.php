@@ -26,7 +26,7 @@ trait AttendanceBatchTrait
      */
     private function createAttendanceBatchResponse(mixed $data, int $statusCode = Response::HTTP_OK): JsonResponse
     {
-        return $this->json($data, $statusCode, context: ['groups' => ['attendance_batch:read']]);
+        return $this->json($data, $statusCode, context: ['groups' => ['attendance_batch:read', 'employee:read', 'user:read']]);
     }
 
     /**
