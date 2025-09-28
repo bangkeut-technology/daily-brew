@@ -37,10 +37,16 @@ trait AttendanceBatchTrait
      * @return AttendanceBatch The Attendance batch entity.
      * @throws NotFoundHttpException If the attendance is not found.
      */
-    private function getAttendanceBatchByPublicId(string $publicId): AttendanceBatch
+    private function getAttendanceBatchByPublicId(string $publicId, bool $eager = false): AttendanceBatch
     {
-        if (null === $batch = $this->attendanceBatchRepository->findByPublicIdAndUser($publicId, $this->getUser())) {
-            throw $this->createNotFoundException($this->translator->trans('not_found.attendance_batch', ['%publicId%' => $publicId], domain: 'errors'));
+        if ($eager) {
+            if (null === $batch = $this->attendanceBatchRepository->findByPublicIdAndUserEager($publicId, $this->getUser())) {
+                throw $this->createNotFoundException($this->translator->trans('not_found.attendance_batch', ['%publicId%' => $publicId], domain: 'errors'));
+            }
+        } else {
+            if (null === $batch = $this->attendanceBatchRepository->findByPublicIdAndUser($publicId, $this->getUser())) {
+                throw $this->createNotFoundException($this->translator->trans('not_found.attendance_batch', ['%publicId%' => $publicId], domain: 'errors'));
+            }
         }
 
         return $batch;

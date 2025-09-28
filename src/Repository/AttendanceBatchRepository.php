@@ -83,6 +83,30 @@ class AttendanceBatchRepository extends AbstractRepository
     }
 
     /**
+     * Finds an entity by its public ID and associated user.
+     *
+     * @param string    $publicId The public ID of the entity.
+     * @param User|null $user     The user associated with the entity, or null.
+     *
+     * @return AttendanceBatch|null The matched entity or null if not found.
+     */
+    public function findByPublicIdAndUserEager(string $publicId, ?User $user): ?AttendanceBatch
+    {
+        return $this->createQueryBuilder('ab')
+            ->addSelect('e', 'a')
+            ->leftJoin('ab.employees', 'e')
+            ->leftJoin('ab.attendances', 'a')
+            ->where('ab.publicId = :publicId')
+            ->andWhere('ab.user = :user')
+            ->setParameters(new ArrayCollection([
+                new Parameter('publicId', $publicId),
+                new Parameter('user', $user),
+            ]))
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
      * Finds an entity by its label and associated user.
      *
      * @param string $label The label of the entity.

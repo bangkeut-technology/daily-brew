@@ -9,6 +9,7 @@ use App\Entity\Attendance;
 use App\Entity\AttendanceBatch;
 use App\Enum\AttendanceTypeEnum;
 use App\Event\AttendanceBatch\AttendanceBatchCreatedEvent;
+use App\Event\AttendanceBatch\AttendanceBatchDeletedEvent;
 use App\Event\AttendanceBatch\AttendanceBatchUpdatedEvent;
 use App\Form\AttendanceBatchFormType;
 use App\Repository\AttendanceBatchRepository;
@@ -258,7 +259,7 @@ class AttendanceBatchController extends AbstractController
 
             $this->attendanceBatchRepository->update($batch);
 
-            $this->dispatcher->dispatch(new AttendanceBatchUpdatedEvent($batch, $this->getUser(), $form->get('employees')->getData()));
+            $this->dispatcher->dispatch(new AttendanceBatchUpdatedEvent($batch, $this->getUser()));
 
             return $this->createAttendanceBatchResponse([
                 'message' => $this->translator->trans('updated.attendance_batch', ['%label%' => $batch]),
@@ -266,5 +267,54 @@ class AttendanceBatchController extends AbstractController
             ]);
         }
         return $this->createBadRequestResponse($this->translator->trans('invalid.attendance_batch', domain: 'errors'));
+    }
+
+    /**
+     * Deletes an attendance batch by its publicId.
+     *
+     * @param string $publicId The public ID of the attendance batch to delete.
+     *
+     * @return JsonResponse The JSON response indicating the result of the deletion operation.
+     */
+    #[OA\Parameter(
+        name: 'publicId',
+        description: 'The public ID of the attendance batch to delete.',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Attendance batch deleted successfully.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'message', type: 'string'),
+                new OA\Property(property: 'attendance_batch', type: 'object'),
+            ],
+            type: 'object'
+        )
+    )]
+    #[OA\Response(
+        response: Response::HTTP_NOT_FOUND,
+        description: 'Attendance batch not found.',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'message', description: 'Error message', type: 'string'),
+            ], type: 'object'
+        )
+    )]
+    #[Route('/{publicId}', name: 'delete', methods: ['DELETE'])]
+    public function delete(string $publicId): JsonResponse
+    {
+        $batch = $this->getAttendanceBatchByPublicId($publicId);
+
+        $this->dispatcher->dispatch(new AttendanceBatchDeletedEvent($batch, $this->getUser()));
+
+        $this->attendanceBatchRepository->delete($batch);
+
+        return $this->createAttendanceBatchResponse([
+            'message' => $this->translator->trans('deleted.attendance_batch', ['%label%' => $batch]),
+            'attendance_batch' => $batch,
+        ]);
     }
 }

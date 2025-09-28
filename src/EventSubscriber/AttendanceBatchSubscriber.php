@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace App\EventSubscriber;
 
 use App\Event\AttendanceBatch\AttendanceBatchCreatedEvent;
+use App\Event\AttendanceBatch\AttendanceBatchDeletedEvent;
+use App\Event\AttendanceBatch\AttendanceBatchUpdatedEvent;
 use App\Repository\AttendanceRepository;
 use DateMalformedStringException;
 use DateTimeImmutable;
@@ -30,7 +32,9 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            AttendanceBatchCreatedEvent::class => 'onCreated'
+            AttendanceBatchCreatedEvent::class => 'onCreated',
+            AttendanceBatchUpdatedEvent::class => 'onUpdated',
+            AttendanceBatchDeletedEvent::class => 'onDeleted',
         ];
     }
 
@@ -93,6 +97,84 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
                     $this->attendanceRepository->flush();
                 }
             }
+        }
+
+        $this->attendanceRepository->flush();
+    }
+
+    /**
+     * Handles the update of attendance records when an AttendanceBatchUpdatedEvent is triggered.
+     *
+     * This method ensures that attendance records are synchronized with the updated batch details,
+     * including the date range and associated employees. It performs the following operations:
+     * - Builds a desired set of attendance records based on the updated batch information.
+     * - Loads existing attendance records for the batch and indexes them for quick lookup.
+     * - Inserts new attendance records for any missing entries in the desired set.
+     * - Updates existing records if their status has changed.
+     * - Deletes any records that are no longer needed based on the updated batch details.
+     *
+     * @param AttendanceBatchUpdatedEvent $event The event containing details of the attendance batch update, including the updated batch data.
+     *
+     * @return void
+     * @throws DateMalformedStringException
+     */
+    public function onUpdated(AttendanceBatchUpdatedEvent $event): void
+    {
+        $batch = $event->batch;
+
+        $from = \DateTimeImmutable::createFromInterface($batch->getFromDate())->setTime(0,0);
+        $to   = \DateTimeImmutable::createFromInterface($batch->getToDate())->setTime(0,0);
+        $days = [];
+        for ($d = $from; $d <= $to; $d = $d->modify('+1 day')) $days[] = $d->format('Y-m-d');
+
+        $employees = $batch->getEmployees();
+        $empIds = array_map(static fn($e) => $e->getId(), $employees->toArray());
+
+        // A) Build desired set
+        $desired = [];
+        foreach ($empIds as $eid) foreach ($days as $day) $desired["$eid|$day"] = true;
+
+        // B) Load existing batch rows (one query) and index
+        $existingRows = $this->attendanceRepository->findByBatch($batch); // returns Attendance[]
+        $existing = []; // key => entity
+        foreach ($existingRows as $a) {
+            $key = $a->getEmployee()->getId().'|'.$a->getAttendanceDate()->format('Y-m-d');
+            $existing[$key] = $a;
+        }
+
+        $status = $batch->getStatus(); // or map from type
+        $em = $this->attendanceRepository->getEntityManager();
+
+        // C) Insert or update
+        $ops = 0;
+        foreach ($desired as $key => $_) {
+            if (isset($existing[$key])) {
+                // Update status if changed (optional)
+                $a = $existing[$key];
+                if ($a->getType() !== $status) {
+                    $a->setType($status);
+                    $ops++;
+                }
+                unset($existing[$key]); // mark as kept
+            } else {
+                // parse key back
+                [$eid, $day] = explode('|', $key, 2);
+                $employee = $this->employeeRepository->find((int)$eid);
+                if (!$employee) continue;
+
+                $a = $this->attendanceRepository->create();
+                $a->setBatch($batch);
+                $a->setEmployee($employee);
+                $a->setAttendanceDate(new \DateTimeImmutable($day));
+                $a->setType($status);
+                $this->attendanceRepository->update($a, false);
+                if ((++$ops % 200) === 0) $this->attendanceRepository->flush();
+            }
+        }
+
+        if (!empty($existing)) {
+            $toDeleteIds = array_map(static fn($a) => $a->getId(), $existing);
+            $this->attendanceRepository->bulkDeleteByIds($toDeleteIds);
         }
 
         $this->attendanceRepository->flush();
