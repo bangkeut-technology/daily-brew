@@ -21,3 +21,25 @@ export const postAttendanceBatch = async ({ employees, fromDate, toDate, ...data
 
 export const fetchUpcomingAttendanceBatches = async () =>
     apiAxios.get<AttendanceBatch[]>('/attendance-batches/upcoming').then((response) => response.data);
+
+export const fetchAttendanceBatch = async (publicId: string) =>
+    apiAxios.get<AttendanceBatch>(`/attendance-batches/${publicId}`).then((response) => response.data);
+
+export const putAttendanceBatch = async ({
+    publicId,
+    attendanceBatch,
+}: {
+    publicId: string;
+    attendanceBatch: PartialAttendanceBatch;
+}) =>
+    apiAxios
+        .put<{ message: string; batch: AttendanceBatch }>(`/attendance-batches/${publicId}`, {
+            ...attendanceBatch,
+            fromDate: format(attendanceBatch.fromDate, DATE_FORMAT),
+            toDate: format(attendanceBatch.toDate, DATE_FORMAT),
+            employees: attendanceBatch.employees?.map((employee) => employee.value),
+        })
+        .then((response) => response.data);
+
+export const deleteAttendanceBatch = async (publicId: string) =>
+    apiAxios.delete<{ message: string }>(`/attendance-batches/${publicId}`).then((response) => response.data);

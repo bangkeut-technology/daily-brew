@@ -39,7 +39,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 
     return (
         <div className={cn('flex flex-col gap-2', className)}>
-            {label && <p className="px-1">{label}</p>}
+            {label && <p className="text-xs text-muted-foreground">{label}</p>}
             <Popover>
                 <PopoverTrigger asChild>
                     <Button

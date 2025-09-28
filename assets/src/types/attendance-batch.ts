@@ -4,8 +4,10 @@ import { Employee } from '@/types/employee';
 
 export type AttendanceBatch = {
     id: number;
-    publicId: number;
+    publicId: string;
     label: string;
+    createdAt: string;
+    updatedAt: string;
     canonicalLabel: string;
     fromDate: string;
     toDate: string;
@@ -17,7 +19,7 @@ export type AttendanceBatch = {
 
 export type PartialAttendanceBatch = Omit<
     AttendanceBatch,
-    'id' | 'publicId' | 'user' | 'canonicalLabel' | 'fromDate' | 'toDate' | 'employees'
+    'id' | 'publicId' | 'user' | 'canonicalLabel' | 'fromDate' | 'toDate' | 'employees' | 'createdAt' | 'updatedAt'
 > & {
     fromDate: Date;
     toDate: Date;

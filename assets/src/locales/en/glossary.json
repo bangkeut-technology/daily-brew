@@ -1,4 +1,28 @@
 {
+    "attendance_batches": {
+        "detail": {
+            "title": "Attendance Batch Detail",
+            "description": "View the details of the selected attendance batch, including the employees in the batch"
+        },
+        "title": "Attendance Batches",
+        "subtitle": "Manage your attendance batches. You can create new batches based on selected templates.",
+        "new": {
+            "title": "New Attendance Batch",
+            "description": "Create a new attendance batch for an employee using the selected template.",
+            "save": "Save Attendance Batch"
+        },
+        "view": {
+            "title": "View Attendance Batch",
+            "description": "View the details of the selected attendance batch, including scores and comments."
+        },
+        "label": "Attendance Batch Label",
+        "delete": {
+            "title": "Delete Attendance Batch",
+            "description": "Are you sure you want to delete this attendance batch? This action cannot be undone.",
+            "confirm": "Yes, Delete Attendance Batch",
+            "button": "Delete Batch"
+        }
+    },
     "attendances": {
         "new": {
             "title": "New Attendance",
@@ -26,20 +50,6 @@
             "closure": "Closure",
             "unknown": "Unknown"
         }
-    },
-    "attendance_batches": {
-        "title": "Attendance Batches",
-        "subtitle": "Manage your attendance batches. You can create new batches based on selected templates.",
-        "new": {
-            "title": "New Attendance Batch",
-            "description": "Create a new attendance batch for an employee using the selected template.",
-            "save": "Save Attendance Batch"
-        },
-        "view": {
-            "title": "View Attendance Batch",
-            "description": "View the details of the selected attendance batch, including scores and comments."
-        },
-        "label": "Attendance Batch Label"
     },
     "date": "Date",
     "employee_evaluations": {
@@ -91,7 +101,8 @@
         "remove": {
             "title": "Remove Employee",
             "description": "Are you sure you want to remove this employee? This action cannot be undone.",
-            "confirm": "Yes, Remove Employee"
+            "confirm": "Yes, Remove Employee",
+            "button": "Remove Employee"
         },
         "new": {
             "title": "New Employee",
@@ -138,7 +149,8 @@
         "remove": {
             "title": "Remove Evaluation Criteria",
             "description": "Are you sure you want to remove this evaluation criteria? This action cannot be undone.",
-            "confirm": "Yes, Remove Criteria"
+            "confirm": "Yes, Remove Criteria",
+            "button": "Remove Criteria"
         },
         "table": {
             "label": "Label",
@@ -242,7 +254,10 @@
     },
     "loading": {
         "upcoming_leaves": "Loading upcoming leaves...",
-        "upcoming_attendance_batches": "Loading upcoming attendance batches..."
+        "upcoming_attendance_batches": "Loading upcoming attendance batches...",
+        "attendance_batch": "Loading attendance batch...",
+        "employees": "Loading employees...",
+        "evaluations": "Loading evaluations..."
     },
     "no_account_yet": "Don't have an account yet?",
     "not_found": {

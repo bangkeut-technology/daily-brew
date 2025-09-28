@@ -46,7 +46,7 @@ class AttendanceBatchRepository extends AbstractRepository
      * @param int|null $limit    Optional maximum number of results to return.
      * @param int|null $offset   Optional starting point for the result set (useful for pagination).
      *
-     * @return array Returns an array of AttendanceBatch entities matching the specified criteria.
+     * @return AttendanceBatch[] Returns an array of AttendanceBatch entities matching the specified criteria.
      */
     public function findByCriteria(array $criteria, array $orderBy = [], ?int $limit = null, ?int $offset = null): array
     {

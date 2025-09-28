@@ -116,6 +116,8 @@
     "clock_out": "Clock Out",
     "recorded_by": "Recorded By",
     "clear": "Clear",
+    "delete": "Delete",
+    "summary": "Summary",
     "attendances": "Attendances",
     "new": "New",
     "no_records": "No records",

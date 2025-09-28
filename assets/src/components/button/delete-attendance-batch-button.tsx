@@ -4,8 +4,6 @@ import { Trash2 } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
-import { deleteTemplateCriteria } from '@/services/evaluation-template-criteria';
-import { useTranslation } from 'react-i18next';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -17,28 +15,24 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { useTranslation } from 'react-i18next';
+import { deleteAttendanceBatch } from '@/services/attendance-batch';
 import { cn } from '@/lib/utils';
 
-interface RemoveTemplateCriteriaButtonProps {
-    publicId: string;
+interface DeleteAttendanceBatchButonProps {
+    attendanceBatchPublicId: string;
     withText?: boolean;
-    title: string;
-    description: string;
-    confirmationText: string;
     onRemove?: () => void;
 }
 
-export const RemoveTemplateCriteriaButton: React.FunctionComponent<RemoveTemplateCriteriaButtonProps> = ({
-    publicId,
-    title,
-    description,
-    confirmationText,
+export const DeleteAttendanceBatchButon: React.FunctionComponent<DeleteAttendanceBatchButonProps> = ({
+    attendanceBatchPublicId,
     withText,
     onRemove,
 }) => {
     const { t } = useTranslation();
     const { mutate, isPending } = useMutation({
-        mutationFn: deleteTemplateCriteria,
+        mutationFn: deleteAttendanceBatch,
         onSuccess: (data) => {
             toast.success(data.message);
             if (onRemove) {
@@ -52,27 +46,29 @@ export const RemoveTemplateCriteriaButton: React.FunctionComponent<RemoveTemplat
     });
 
     const handleRemove = React.useCallback(() => {
-        mutate(publicId);
-    }, [mutate, publicId]);
+        mutate(attendanceBatchPublicId);
+    }, [mutate, attendanceBatchPublicId]);
 
     return (
         <AlertDialog>
             <AlertDialogTrigger asChild>
                 <Button variant="destructive" size={withText ? 'default' : 'icon'} disabled={isPending}>
                     <Trash2 className={cn('h-4 w-4', withText && 'mr-2')} />
-                    {withText && t('evaluation_criterias.remove.button', { ns: 'glossary' })}
+                    {withText && t('attendance_batches.delete.button', { ns: 'glossary' })}
                 </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>{title}</AlertDialogTitle>
-                    <AlertDialogDescription>{description}</AlertDialogDescription>
+                    <AlertDialogTitle>{t('attendance_batches.delete.title', { ns: 'glossary' })}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        {t('attendance_batches.delete.description', { ns: 'glossary' })}
+                    </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
                     <AlertDialogAction asChild>
                         <Button variant="destructive" onClick={handleRemove} disabled={isPending}>
-                            {confirmationText}
+                            {t('attendance_batches.delete.confirm', { ns: 'glossary' })}
                         </Button>
                     </AlertDialogAction>
                 </AlertDialogFooter>
@@ -81,4 +77,4 @@ export const RemoveTemplateCriteriaButton: React.FunctionComponent<RemoveTemplat
     );
 };
 
-RemoveTemplateCriteriaButton.displayName = 'RemoveCriteriaButton';
+DeleteAttendanceBatchButon.displayName = 'DeleteAttendanceBatchButon';

@@ -61,10 +61,10 @@ class AttendanceBatchController extends AbstractController
     #[Route(name: 'gets', methods: ['GET'])]
     public function gets(): JsonResponse
     {
-        $criteria = ['user' => $this->getUser()];
+        $criteria = ['user' => $this->getUser(), 'label' => null];
         $attendanceBatches = $this->attendanceBatchRepository->findByCriteria($criteria);
 
-        return $this->json($attendanceBatches);
+        return $this->createAttendanceBatchResponse($attendanceBatches);
     }
 
     /**

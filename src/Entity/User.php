@@ -776,6 +776,16 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         return $this->stores;
     }
 
+    /**
+     * @param Collection<int, Store> $stores
+     * @return User
+     */
+    public function setStores(Collection $stores): User
+    {
+        $this->stores = $stores;
+        return $this;
+    }
+
     public function addStore(Store $store): User
     {
         if (!$this->stores->contains($store)) {
