@@ -178,6 +178,29 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
         $this->attendanceRepository->flush();
     }
 
+    /**
+     * Handles the deletion of attendance records when an AttendanceBatchDeletedEvent is triggered.
+     *
+     * This method deletes all attendance records associated with the specified attendance batch.
+     * It iterates through each attendance record linked to the batch and removes it from the repository.
+     * To optimize performance, it flushes the changes to the database in batches of 20 records.
+     *
+     * @param AttendanceBatchDeletedEvent $event The event containing details of the attendance batch deletion, including the batch data.
+     *
+     * @return void
+     */
+    public function onDeleted(AttendanceBatchDeletedEvent $event): void
+    {
+        $batch = $event->batch;
+
+        foreach ($batch->getAttendances()->toArray() as $index => $attendance) {
+            $this->attendanceRepository->delete($attendance, false);
+            if ($index % 20 === 0) {
+                $this->attendanceRepository->flush();
+            }
+        }
+        $this->attendanceRepository->flush();
+    }
 
     /**
      * @throws DateMalformedStringException
