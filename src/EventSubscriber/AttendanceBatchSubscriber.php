@@ -55,10 +55,7 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
         $from = $batch->getFromDate();
         $to = $batch->getToDate();
 
-        $days = [];
-        for ($d = $from; $d <= $to; $d = $d->modify('+1 day')) {
-            $days[] = $d->format('Y-m-d');
-        }
+        $days = $this->getDaysFromPeriod($from, $to);
 
         if ($employees->isEmpty() || empty($days)) {
             return;
@@ -121,16 +118,17 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
     public function onUpdated(AttendanceBatchUpdatedEvent $event): void
     {
         $batch = $event->batch;
+        $user = $event->user;
+        $employees = $batch->getEmployees();
+        $type = $batch->getType();
+        $from = $batch->getFromDate();
+        $to = $batch->getToDate();
 
-        $from = \DateTimeImmutable::createFromInterface($batch->getFromDate())->setTime(0,0);
-        $to   = \DateTimeImmutable::createFromInterface($batch->getToDate())->setTime(0,0);
-        $days = [];
-        for ($d = $from; $d <= $to; $d = $d->modify('+1 day')) $days[] = $d->format('Y-m-d');
+        $days = $this->getDaysFromPeriod($from, $to);
 
         $employees = $batch->getEmployees();
         $empIds = array_map(static fn($e) => $e->getId(), $employees->toArray());
 
-        // A) Build desired set
         $desired = [];
         foreach ($empIds as $eid) foreach ($days as $day) $desired["$eid|$day"] = true;
 
@@ -142,7 +140,7 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
             $existing[$key] = $a;
         }
 
-        $status = $batch->getStatus(); // or map from type
+        $type = $batch->getType(); // or map from type
         $em = $this->attendanceRepository->getEntityManager();
 
         // C) Insert or update
@@ -151,8 +149,8 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
             if (isset($existing[$key])) {
                 // Update status if changed (optional)
                 $a = $existing[$key];
-                if ($a->getType() !== $status) {
-                    $a->setType($status);
+                if ($a->getType() !== $type) {
+                    $a->setType($type);
                     $ops++;
                 }
                 unset($existing[$key]); // mark as kept
@@ -165,8 +163,8 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
                 $a = $this->attendanceRepository->create();
                 $a->setBatch($batch);
                 $a->setEmployee($employee);
-                $a->setAttendanceDate(new \DateTimeImmutable($day));
-                $a->setType($status);
+                $a->setAttendanceDate(new DateTimeImmutable($day));
+                $a->setType($type);
                 $this->attendanceRepository->update($a, false);
                 if ((++$ops % 200) === 0) $this->attendanceRepository->flush();
             }
@@ -180,4 +178,17 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
         $this->attendanceRepository->flush();
     }
 
+
+    /**
+     * @throws DateMalformedStringException
+     */
+    private function getDaysFromPeriod(DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        $days = [];
+        for ($d = $from; $d <= $to; $d = $d->modify('+1 day')) {
+            $days[] = $d->format('Y-m-d');
+        }
+        return $days;
+
+    }
 }
