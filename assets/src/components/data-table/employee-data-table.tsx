@@ -11,7 +11,7 @@ const columnHelper = createColumnHelper<Employee>();
 interface EmployeeDataTableProps {
     templatePublicId?: string;
     employees: Employee[];
-    loading: boolean;
+    loading?: boolean;
     onRemoveEmployee?: () => void;
 }
 

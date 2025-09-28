@@ -63,6 +63,7 @@ class AttendanceBatch extends AbstractEntity
 
     #[ORM\ManyToMany(targetEntity: Employee::class, inversedBy: 'attendanceBatches')]
     #[ORM\JoinTable(name: 'daily_brew_employee_attendance_batches')]
+    #[Groups('attendance_batch:read')]
     private Collection $employees;
 
     public function __construct()

@@ -17,7 +17,6 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { cn } from '@/lib/utils';
 
 interface RemoveTemplateCriteriaButtonProps {
     publicId: string;
@@ -59,7 +58,7 @@ export const RemoveTemplateCriteriaButton: React.FunctionComponent<RemoveTemplat
         <AlertDialog>
             <AlertDialogTrigger asChild>
                 <Button variant="destructive" size={withText ? 'default' : 'icon'} disabled={isPending}>
-                    <Trash2 className={cn('h-4 w-4', withText && 'mr-2')} />
+                    <Trash2 className="h-4 w-4" />
                     {withText && t('evaluation_criterias.remove.button', { ns: 'glossary' })}
                 </Button>
             </AlertDialogTrigger>

@@ -17,7 +17,6 @@ import {
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useTranslation } from 'react-i18next';
-import { cn } from '@/lib/utils';
 
 interface RemoveEmployeeButtonProps {
     templatePublicId: string;
@@ -55,7 +54,7 @@ export const RemoveEmployeeButton: React.FunctionComponent<RemoveEmployeeButtonP
         <AlertDialog>
             <AlertDialogTrigger asChild>
                 <Button variant="destructive" size={withText ? 'default' : 'icon'} disabled={isPending}>
-                    <Trash2 className={cn('h-4 w-4', withText && 'mr-2')} />
+                    <Trash2 className="h-4 w-4" />
                     {withText && t('employees.remove.button', { ns: 'glossary' })}
                 </Button>
             </AlertDialogTrigger>

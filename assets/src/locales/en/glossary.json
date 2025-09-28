@@ -4,6 +4,10 @@
             "title": "Attendance Batch Detail",
             "description": "View the details of the selected attendance batch, including the employees in the batch"
         },
+        "employees": {
+            "title": "Employees",
+            "description": "View the list of employees in the attendance batch"
+        },
         "title": "Attendance Batches",
         "subtitle": "Manage your attendance batches. You can create new batches based on selected templates.",
         "new": {

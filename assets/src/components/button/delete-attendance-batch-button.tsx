@@ -17,7 +17,6 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useTranslation } from 'react-i18next';
 import { deleteAttendanceBatch } from '@/services/attendance-batch';
-import { cn } from '@/lib/utils';
 
 interface DeleteAttendanceBatchButonProps {
     attendanceBatchPublicId: string;
@@ -53,7 +52,7 @@ export const DeleteAttendanceBatchButon: React.FunctionComponent<DeleteAttendanc
         <AlertDialog>
             <AlertDialogTrigger asChild>
                 <Button variant="destructive" size={withText ? 'default' : 'icon'} disabled={isPending}>
-                    <Trash2 className={cn('h-4 w-4', withText && 'mr-2')} />
+                    <Trash2 className="h-4 w-4" />
                     {withText && t('attendance_batches.delete.button', { ns: 'glossary' })}
                 </Button>
             </AlertDialogTrigger>
