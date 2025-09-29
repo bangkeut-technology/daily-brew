@@ -126,7 +126,6 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
 
         $days = $this->getDaysFromPeriod($from, $to);
 
-        $employees = $batch->getEmployees();
         $empIds = array_map(static fn($e) => $e->getId(), $employees->toArray());
 
         $desired = [];

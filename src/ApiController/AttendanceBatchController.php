@@ -257,9 +257,9 @@ class AttendanceBatchController extends AbstractController
                 return $this->createBadRequestResponse($this->translator->trans('existed.attendance_batch', ['%label%' => $batch->getLabel()], domain: 'errors'));
             }
 
-            $this->attendanceBatchRepository->update($batch);
-
             $this->dispatcher->dispatch(new AttendanceBatchUpdatedEvent($batch, $this->getUser()));
+
+            $this->attendanceBatchRepository->update($batch);
 
             return $this->createAttendanceBatchResponse([
                 'message' => $this->translator->trans('updated.attendance_batch', ['%label%' => $batch]),
