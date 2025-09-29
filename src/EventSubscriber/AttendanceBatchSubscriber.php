@@ -80,28 +80,16 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
         $to = $batch->getToDate();
 
         // Remove attendances that are outside the new date range
-        $outsideRangeAttendances = $this->attendanceRepository->findOutsideDateRangeByBatch($batch, $from, $to);
-        foreach ($outsideRangeAttendances as $index => $attendance) {
-            $this->attendanceRepository->delete($attendance, false);
-            if ($index % $this->batchSize === 0) {
-                $this->attendanceRepository->flush();
-            }
-        }
-        $this->attendanceRepository->flush();
+        $this->attendanceRepository->deleteOutsideDateRangeByBatch($batch, $from, $to);
 
         // Remove attendances that are for employees no longer in the batch
-        $employees = $batch->getEmployees();
-        $removedEmployeeAttendances = $this->attendanceRepository->findByBatchExcludingEmployees($batch, $employees);
-        foreach ($removedEmployeeAttendances as $index => $attendance) {
-            $this->attendanceRepository->delete($attendance, false);
-            if ($index % $this->batchSize === 0) {
-                $this->attendanceRepository->flush();
-            }
-        }
-        $this->attendanceRepository->flush();
+        $this->attendanceRepository->deleteByBatchExcludingEmployees($batch, $batch->getEmployees());
 
         // Fill missing attendances within the new date range
         $this->fillMissingAttendance($batch, $user);
+
+        // Update existing attendances to match the new type
+        $this->attendanceRepository->updateTypeForBatch($batch, $batch->getType());
     }
 
     /**
@@ -119,13 +107,7 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
     {
         $batch = $event->batch;
 
-        foreach ($batch->getAttendances()->toArray() as $index => $attendance) {
-            $this->attendanceRepository->delete($attendance, false);
-            if ($index % 20 === 0) {
-                $this->attendanceRepository->flush();
-            }
-        }
-        $this->attendanceRepository->flush();
+        $this->attendanceRepository->deleteByBatch($batch);
     }
 
     /**

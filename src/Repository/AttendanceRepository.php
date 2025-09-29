@@ -584,7 +584,30 @@ class AttendanceRepository extends AbstractRepository
             ->setParameter('from', $from)->setParameter('to', $to)
             ->getQuery()
             ->getResult();
+    }
 
+
+    /**
+     * Deletes attendance records linked to a specific batch that fall outside the given date range.
+     *
+     * This method deletes records associated with the provided AttendanceBatch
+     * where the attendance date is earlier than the "from" date or later than the "to" date.
+     *
+     * @param AttendanceBatch        $batch The batch of attendance records to filter.
+     * @param DateTimeImmutable|null $from  The start date of the range. Records earlier than this will be deleted.
+     * @param DateTimeImmutable|null $to    The end date of the range. Records later than this will be deleted.
+     *
+     * @return int The number of records deleted.
+     */
+    public function deleteOutsideDateRangeByBatch(AttendanceBatch $batch, ?DateTimeImmutable $from, ?DateTimeImmutable $to): int
+    {
+        return $this->createQueryBuilder('a')
+            ->delete()
+            ->andWhere('a.batch = :b')->setParameter('b', $batch)
+            ->andWhere('(a.attendanceDate < :from OR a.attendanceDate > :to)')
+            ->setParameter('from', $from)->setParameter('to', $to)
+            ->getQuery()
+            ->execute();
     }
 
     /**
@@ -611,5 +634,80 @@ class AttendanceRepository extends AbstractRepository
 
         return $qb->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Deletes attendance records within a given batch, excluding the records
+     * associated with the provided employees.
+     *
+     * This method is designed to remove attendance entries that belong to a
+     * specific batch but ensures that attendance records for the specified
+     * employees remain untouched.
+     *
+     * @param AttendanceBatch $batch     The attendance batch for which records
+     *                                   will be deleted.
+     * @param Collection      $employees A collection of employees to be excluded
+     *                                   from deletion.
+     *
+     * @return int The number of records deleted.
+     */
+    public function deleteByBatchExcludingEmployees(AttendanceBatch $batch, Collection $employees): int
+    {
+        $qb = $this->createQueryBuilder('a')
+            ->delete()
+            ->andWhere('a.batch = :batch')
+            ->setParameter('batch', $batch);
+
+        if (!$employees->isEmpty()) {
+            $qb->andWhere('a.employee NOT IN (:employees)')
+                ->setParameter('employees', $employees);
+        }
+
+        return $qb->getQuery()->execute();
+    }
+
+    /**
+     * Updates the type of attendance records for a given batch.
+     *
+     * This method modifies all attendance records associated with the specified batch,
+     * setting their type to the provided type value. It utilizes a query builder
+     * to efficiently perform the update in bulk.
+     *
+     * @param AttendanceBatch         $batch   The attendance batch for which the type needs to be updated.
+     * @param AttendanceTypeEnum|null $getType The new type to be set for the attendance records, or null if unset.
+     *
+     * @return int The number of records updated in the batch.
+     */
+    public function updateTypeForBatch(AttendanceBatch $batch, ?AttendanceTypeEnum $getType): int
+    {
+        $qb = $this->createQueryBuilder('a')
+            ->update()
+            ->set('a.type', ':type')
+            ->setParameter('type', $getType)
+            ->andWhere('a.batch = :batch')
+            ->setParameter('batch', $batch);
+
+        return $qb->getQuery()->execute();
+    }
+
+    /**
+     * Deletes all attendance records associated with the specified batch.
+     *
+     * Uses a query builder to perform a batch delete operation based on the given
+     * attendance batch entity.
+     *
+     * @param AttendanceBatch $batch  The batch entity whose associated attendance
+     *                                records should be deleted.
+     *
+     * @return int The number of records that were deleted.
+     */
+    public function deleteByBatch(AttendanceBatch $batch): int
+    {
+        return $this->createQueryBuilder('a')
+            ->delete()
+            ->andWhere('a.batch = :batch')
+            ->setParameter('batch', $batch)
+            ->getQuery()
+            ->execute();
     }
 }
