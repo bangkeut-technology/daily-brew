@@ -253,7 +253,8 @@ class AttendanceBatchController extends AbstractController
         $form = $this->createForm(AttendanceBatchFormType::class, $batch);
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
-            if (null !== $this->attendanceBatchRepository->findByLabelAndUser($batch->getLabel(), $this->getUser())) {
+            $found = $this->attendanceBatchRepository->findByLabelAndUser($batch->getLabel(), $this->getUser());
+            if (null !== $found && $batch->getLabel() !== $found->getLabel()) {
                 return $this->createBadRequestResponse($this->translator->trans('existed.attendance_batch', ['%label%' => $batch->getLabel()], domain: 'errors'));
             }
 
