@@ -1,37 +1,42 @@
 {
     "attendance_batches": {
-        "detail": {
-            "title": "Attendance Batch Detail",
-            "description": "View the details of the selected attendance batch, including the employees in the batch"
-        },
-        "employees": {
-            "title": "Employees",
-            "description": "View the list of employees in the attendance batch"
-        },
-        "title": "Attendance Batches",
-        "subtitle": "Manage your attendance batches. You can create new batches based on selected templates.",
-        "new": {
-            "title": "New Attendance Batch",
-            "description": "Create a new attendance batch for an employee using the selected template.",
-            "save": "Save Attendance Batch"
-        },
-        "view": {
-            "title": "View Attendance Batch",
-            "description": "View the details of the selected attendance batch, including scores and comments."
-        },
-        "label": "Attendance Batch Label",
         "delete": {
             "title": "Delete Attendance Batch",
             "description": "Are you sure you want to delete this attendance batch? This action cannot be undone.",
             "confirm": "Yes, Delete Attendance Batch",
             "button": "Delete Batch"
         },
+        "detail": {
+            "title": "Attendance Batch Detail",
+            "description": "View the details of the selected attendance batch, including the employees in the batch"
+        },
+        "edit": {
+            "title": "Edit Attendance Batch",
+            "description": "Edit the selected attendance batch to update its details or employees.",
+            "save": "Save Attendance Batch"
+        },
+        "employees": {
+            "title": "Employees",
+            "description": "View the list of employees in the attendance batch"
+        },
+        "label": "Attendance Batch Label",
+        "loading": "Loading attendance batch...",
+        "new": {
+            "title": "New Attendance Batch",
+            "description": "Create a new attendance batch for an employee using the selected template.",
+            "save": "Save Attendance Batch"
+        },
         "not_found": {
             "title": "Attendance batch not found",
             "description": "The attendance batch you are looking for does not exist or has been deleted.",
             "button": "Back to Attendance Batches"
         },
-        "loading": "Loading attendance batch..."
+        "subtitle": "Manage your attendance batches. You can create new batches based on selected templates.",
+        "title": "Attendance Batches",
+        "view": {
+            "title": "View Attendance Batch",
+            "description": "View the details of the selected attendance batch, including scores and comments."
+        }
     },
     "attendances": {
         "new": {

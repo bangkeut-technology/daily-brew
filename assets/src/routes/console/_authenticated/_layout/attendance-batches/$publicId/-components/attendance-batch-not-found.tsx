@@ -8,10 +8,12 @@ export const AttendanceBatchNotFound: React.FunctionComponent = () => {
     const { t } = useTranslation();
 
     return (
-        <div className="w-full h-full flex justify-center items-center">
-            <CalendarX className="w-16 h-16 mb-4" />
-            <p className="text-lg font-medium">{t('attendance_batches.not_found.title', { ns: 'glossary' })}</p>
-            <span className="text-sm text-muted-foreground">
+        <div className="w-full h-full flex flex-col justify-center items-center gap-4">
+            <CalendarX className="w-32 h-32 mb-4 text-primary" />
+            <p className="text-xl text-primary font-bold">
+                {t('attendance_batches.not_found.title', { ns: 'glossary' })}
+            </p>
+            <span className="text-md text-muted-foreground">
                 {t('attendance_batches.not_found.description', { ns: 'glossary' })}
             </span>
             <Button asChild>

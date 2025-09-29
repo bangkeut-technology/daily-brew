@@ -25,19 +25,13 @@ export const fetchUpcomingAttendanceBatches = async () =>
 export const fetchAttendanceBatch = async (publicId: string) =>
     apiAxios.get<AttendanceBatch>(`/attendance-batches/${publicId}`).then((response) => response.data);
 
-export const putAttendanceBatch = async ({
-    publicId,
-    attendanceBatch,
-}: {
-    publicId: string;
-    attendanceBatch: PartialAttendanceBatch;
-}) =>
+export const putAttendanceBatch = async ({ publicId, data }: { publicId: string; data: PartialAttendanceBatch }) =>
     apiAxios
         .put<{ message: string; batch: AttendanceBatch }>(`/attendance-batches/${publicId}`, {
-            ...attendanceBatch,
-            fromDate: format(attendanceBatch.fromDate, DATE_FORMAT),
-            toDate: format(attendanceBatch.toDate, DATE_FORMAT),
-            employees: attendanceBatch.employees?.map((employee) => employee.value),
+            ...data,
+            fromDate: format(data.fromDate, DATE_FORMAT),
+            toDate: format(data.toDate, DATE_FORMAT),
+            employees: data.employees?.map((employee) => employee.value),
         })
         .then((response) => response.data);
 

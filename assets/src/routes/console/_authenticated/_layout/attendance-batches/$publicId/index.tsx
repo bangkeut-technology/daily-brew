@@ -17,12 +17,11 @@ import i18next from '@/i18next';
 export const Route = createFileRoute('/console/_authenticated/_layout/attendance-batches/$publicId/')({
     component: AttendanceBatchPage,
     loader: ({ params: { publicId } }) => fetchAttendanceBatch(publicId),
-    notFoundComponent: () => <AttendanceBatchNotFound />,
+    errorComponent: () => <AttendanceBatchNotFound />,
     pendingComponent: () => <Loading loadingText={i18next.t('attendance_batches.loading', { ns: 'glossary' })} />,
 });
 
 function AttendanceBatchPage() {
-    const { publicId } = Route.useParams();
     const batch = Route.useLoaderData();
     const { t } = useTranslation();
 
@@ -34,12 +33,12 @@ function AttendanceBatchPage() {
                     <CardDescription>{t('attendance_batches.detail.description', { ns: 'glossary' })}</CardDescription>
                     <CardAction className="space-x-2">
                         <Button asChild>
-                            <Link to="/console/attendance-batches/$publicId/edit" params={{ publicId }}>
+                            <Link to="/console/attendance-batches/$publicId/edit" params={{ publicId: batch.publicId }}>
                                 <Pencil className="h-4 w-4" />
                                 {t('edit')}
                             </Link>
                         </Button>
-                        <DeleteAttendanceBatchButon attendanceBatchPublicId={publicId} withText />
+                        <DeleteAttendanceBatchButon attendanceBatchPublicId={batch.publicId} withText />
                     </CardAction>
                 </CardHeader>
 
