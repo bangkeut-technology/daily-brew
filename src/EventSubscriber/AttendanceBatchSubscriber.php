@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber;
 
+use App\Entity\AttendanceBatch;
+use App\Entity\User;
 use App\Event\AttendanceBatch\AttendanceBatchCreatedEvent;
 use App\Event\AttendanceBatch\AttendanceBatchDeletedEvent;
 use App\Event\AttendanceBatch\AttendanceBatchUpdatedEvent;
@@ -20,10 +22,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
 {
+    private int $batchSize;
+
     public function __construct(
         private AttendanceRepository $attendanceRepository,
     )
     {
+        $this->batchSize = 20;
     }
 
     /**
@@ -48,55 +53,7 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
      */
     public function onCreated(AttendanceBatchCreatedEvent $event): void
     {
-        $batch = $event->batch;
-        $user = $event->user;
-        $employees = $batch->getEmployees();
-        $type = $batch->getType();
-        $from = $batch->getFromDate();
-        $to = $batch->getToDate();
-
-        $days = $this->getDaysFromPeriod($from, $to);
-
-        if ($employees->isEmpty() || empty($days)) {
-            return;
-        }
-
-        $existing = $this->attendanceRepository->getExistingByEmployeesAndPeriod($employees, $from, $to);
-
-        $existingMap = [];
-        foreach ($existing as $row) {
-            $empId = (int)$row['employee_id'];
-            $key = $row['date'] instanceof DateTimeInterface ? $row['date']->format('Y-m-d') : new DateTimeImmutable($row['date'])->format('Y-m-d');
-            $existingMap[$empId][$key] = true;
-        }
-
-        $batchSize = 20;
-
-        foreach ($employees as $index => $employee) {
-            $empId = $employee->id;
-            $existsForEmp = $existingMap[$empId] ?? [];
-
-            foreach ($days as $day) {
-                if (isset($existsForEmp[$day])) {
-                    continue;
-                }
-
-                $attendance = $this->attendanceRepository->create();
-                $attendance->setUser($user);
-                $attendance->setEmployee($employee);
-                $attendance->setBatch($batch);
-                $attendance->setType($type);
-                $attendance->setAttendanceDate(new DateTimeImmutable($day));
-
-                $this->attendanceRepository->update($attendance, false);
-
-                if (($index % $batchSize) === 0) {
-                    $this->attendanceRepository->flush();
-                }
-            }
-        }
-
-        $this->attendanceRepository->flush();
+        $this->fillMissingAttendance($event->batch, $event->user);
     }
 
     /**
@@ -119,62 +76,32 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
     {
         $batch = $event->batch;
         $user = $event->user;
-        $employees = $batch->getEmployees();
-        $type = $batch->getType();
         $from = $batch->getFromDate();
         $to = $batch->getToDate();
 
-        $days = $this->getDaysFromPeriod($from, $to);
-
-        $empIds = array_map(static fn($e) => $e->getId(), $employees->toArray());
-
-        $desired = [];
-        foreach ($empIds as $eid) foreach ($days as $day) $desired["$eid|$day"] = true;
-
-        // B) Load existing batch rows (one query) and index
-        $existingRows = $this->attendanceRepository->findByBatch($batch); // returns Attendance[]
-        $existing = []; // key => entity
-        foreach ($existingRows as $a) {
-            $key = $a->getEmployee()->getId().'|'.$a->getAttendanceDate()->format('Y-m-d');
-            $existing[$key] = $a;
-        }
-
-        $type = $batch->getType(); // or map from type
-        $em = $this->attendanceRepository->getEntityManager();
-
-        // C) Insert or update
-        $ops = 0;
-        foreach ($desired as $key => $_) {
-            if (isset($existing[$key])) {
-                // Update status if changed (optional)
-                $a = $existing[$key];
-                if ($a->getType() !== $type) {
-                    $a->setType($type);
-                    $ops++;
-                }
-                unset($existing[$key]); // mark as kept
-            } else {
-                // parse key back
-                [$eid, $day] = explode('|', $key, 2);
-                $employee = $this->employeeRepository->find((int)$eid);
-                if (!$employee) continue;
-
-                $a = $this->attendanceRepository->create();
-                $a->setBatch($batch);
-                $a->setEmployee($employee);
-                $a->setAttendanceDate(new DateTimeImmutable($day));
-                $a->setType($type);
-                $this->attendanceRepository->update($a, false);
-                if ((++$ops % 200) === 0) $this->attendanceRepository->flush();
+        // Remove attendances that are outside the new date range
+        $outsideRangeAttendances = $this->attendanceRepository->findOutsideDateRangeByBatch($batch, $from, $to);
+        foreach ($outsideRangeAttendances as $index => $attendance) {
+            $this->attendanceRepository->delete($attendance, false);
+            if ($index % $this->batchSize === 0) {
+                $this->attendanceRepository->flush();
             }
         }
-
-        if (!empty($existing)) {
-            $toDeleteIds = array_map(static fn($a) => $a->getId(), $existing);
-            $this->attendanceRepository->bulkDeleteByIds($toDeleteIds);
-        }
-
         $this->attendanceRepository->flush();
+
+        // Remove attendances that are for employees no longer in the batch
+        $employees = $batch->getEmployees();
+        $removedEmployeeAttendances = $this->attendanceRepository->findByBatchExcludingEmployees($batch, $employees);
+        foreach ($removedEmployeeAttendances as $index => $attendance) {
+            $this->attendanceRepository->delete($attendance, false);
+            if ($index % $this->batchSize === 0) {
+                $this->attendanceRepository->flush();
+            }
+        }
+        $this->attendanceRepository->flush();
+
+        // Fill missing attendances within the new date range
+        $this->fillMissingAttendance($batch, $user);
     }
 
     /**
@@ -211,6 +138,73 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
             $days[] = $d->format('Y-m-d');
         }
         return $days;
+    }
 
+    /**
+     * Fills in missing attendance records for a given batch and user.
+     *
+     * This function retrieves the list of employees and the period from the provided attendance batch.
+     * It calculates the days within the specified period and ensures that attendance records
+     * exist for each day and employee within the batch. If records are missing, they are created
+     * and persisted in the database.
+     *
+     * The function processes attendance in batches to minimize memory usage and optimize performance.
+     *
+     * @param AttendanceBatch $batch The attendance batch containing employees, type, and date period.
+     * @param User            $user  The user responsible for the attendance updates.
+     *
+     * @return void
+     * @throws DateMalformedStringException
+     */
+    private function fillMissingAttendance(
+        AttendanceBatch $batch,
+        User            $user,
+    ): void
+    {
+        $employees = $batch->getEmployees();
+        $type = $batch->getType();
+        $from = $batch->getFromDate();
+        $to = $batch->getToDate();
+
+        $days = $this->getDaysFromPeriod($from, $to);
+
+        if ($employees->isEmpty() || empty($days)) {
+            return;
+        }
+
+        $existing = $this->attendanceRepository->getExistingByEmployeesAndPeriod($employees, $from, $to);
+
+        $existingMap = [];
+        foreach ($existing as $row) {
+            $empId = (int)$row['employee_id'];
+            $key = $row['date'] instanceof DateTimeInterface ? $row['date']->format('Y-m-d') : new DateTimeImmutable($row['date'])->format('Y-m-d');
+            $existingMap[$empId][$key] = true;
+        }
+
+        foreach ($employees as $index => $employee) {
+            $empId = $employee->id;
+            $existsForEmp = $existingMap[$empId] ?? [];
+
+            foreach ($days as $day) {
+                if (isset($existsForEmp[$day])) {
+                    continue;
+                }
+
+                $attendance = $this->attendanceRepository->create();
+                $attendance->setUser($user);
+                $attendance->setEmployee($employee);
+                $attendance->setBatch($batch);
+                $attendance->setType($type);
+                $attendance->setAttendanceDate(new DateTimeImmutable($day));
+
+                $this->attendanceRepository->update($attendance, false);
+
+                if ($index % $this->batchSize === 0) {
+                    $this->attendanceRepository->flush();
+                }
+            }
+        }
+
+        $this->attendanceRepository->flush();
     }
 }

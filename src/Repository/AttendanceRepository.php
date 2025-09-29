@@ -6,6 +6,7 @@ namespace App\Repository;
 
 
 use App\Entity\Attendance;
+use App\Entity\AttendanceBatch;
 use App\Entity\Employee;
 use App\Entity\User;
 use App\Enum\AttendanceTypeEnum;
@@ -564,5 +565,51 @@ class AttendanceRepository extends AbstractRepository
                 new Parameter('from', $from, Types::DATE_IMMUTABLE),
                 new Parameter('to', $to, Types::DATE_IMMUTABLE),
             ]));
+    }
+
+    /**
+     * Finds attendance records outside a specified date range for a specific batch.
+     *
+     * @param AttendanceBatch        $batch The batch for which to find attendance records.
+     * @param DateTimeImmutable|null $from  The start date of the range (inclusive).
+     * @param DateTimeImmutable|null $to    The end date of the range (inclusive).
+     *
+     * @return Attendance[]
+     */
+    public function findOutsideDateRangeByBatch(AttendanceBatch $batch, ?DateTimeImmutable $from, ?DateTimeImmutable $to): array
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.batch = :b')->setParameter('b', $batch)
+            ->andWhere('(a.attendanceDate < :from OR a.attendanceDate > :to)')
+            ->setParameter('from', $from)->setParameter('to', $to)
+            ->getQuery()
+            ->getResult();
+
+    }
+
+    /**
+     * Finds Attendance entities associated with a specific batch, excluding certain employees.
+     *
+     * This method constructs and executes a query to retrieve attendance records
+     * for a given AttendanceBatch while excluding the provided list of employees.
+     *
+     * @param AttendanceBatch $batch     The attendance batch for which records are retrieved.
+     * @param Collection      $employees A collection of employees to exclude from the results.
+     *
+     * @return Attendance[] An array of Attendance entities matching the criteria.
+     */
+    public function findByBatchExcludingEmployees(AttendanceBatch $batch, Collection $employees): array
+    {
+        $qb = $this->createQueryBuilder('a')
+            ->andWhere('a.batch = :batch')
+            ->setParameter('batch', $batch);
+
+        if (!$employees->isEmpty()) {
+            $qb->andWhere('a.employee NOT IN (:employees)')
+                ->setParameter('employees', $employees);
+        }
+
+        return $qb->getQuery()
+            ->getResult();
     }
 }
