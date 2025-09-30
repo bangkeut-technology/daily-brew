@@ -229,7 +229,7 @@ class AttendanceController extends AbstractController
 
             $this->attendanceRepository->update($attendance);
 
-            $this->eventDispatcher->dispatch(new RebalanceLeaveCycleEvent($attendance));
+//            $this->eventDispatcher->dispatch(new RebalanceLeaveCycleEvent($attendance));
 
             return $this->createAttendanceResponse($attendance, Response::HTTP_CREATED);
         }
@@ -379,7 +379,7 @@ class AttendanceController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->attendanceRepository->update($attendance);
 
-            $this->eventDispatcher->dispatch(new RebalanceLeaveCycleEvent($attendance));
+//            $this->eventDispatcher->dispatch(new RebalanceLeaveCycleEvent($attendance));
 
             return $this->createAttendanceResponse(['attendance' => $attendance, 'message' => $this->translator->trans('updated.attendance')]);
         }
@@ -418,7 +418,7 @@ class AttendanceController extends AbstractController
         $attendance = $this->getAttendanceByPublicId($publicId);
         $this->attendanceRepository->delete($attendance);
 
-        $this->eventDispatcher->dispatch(new RebalanceLeaveCycleEvent($attendance));
+//        $this->eventDispatcher->dispatch(new RebalanceLeaveCycleEvent($attendance));
 
         return $this->createAttendanceResponse($this->translator->trans('deleted.attendance'));
     }
