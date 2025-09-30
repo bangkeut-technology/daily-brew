@@ -5,10 +5,14 @@ namespace App\EventSubscriber;
 
 use App\Entity\AttendanceBatch;
 use App\Entity\User;
+use App\Enum\AttendanceTypeEnum;
+use App\Enum\LeaveTypeEnum;
 use App\Event\AttendanceBatch\AttendanceBatchCreatedEvent;
 use App\Event\AttendanceBatch\AttendanceBatchDeletedEvent;
 use App\Event\AttendanceBatch\AttendanceBatchUpdatedEvent;
 use App\Repository\AttendanceRepository;
+use App\Service\AttendanceRateCalculator;
+use App\Service\SettingService;
 use DateMalformedStringException;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -25,7 +29,7 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
     private int $batchSize;
 
     public function __construct(
-        private AttendanceRepository $attendanceRepository,
+        private AttendanceRepository     $attendanceRepository,
     )
     {
         $this->batchSize = 20;
@@ -166,6 +170,7 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
         foreach ($employees as $index => $employee) {
             $empId = $employee->id;
             $existsForEmp = $existingMap[$empId] ?? [];
+            $paidCount = $this->attendanceRepository->countPaidLeavesBetween($employee, $from, $to);
 
             foreach ($days as $day) {
                 if (isset($existsForEmp[$day])) {
@@ -178,6 +183,9 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
                 $attendance->setBatch($batch);
                 $attendance->setType($type);
                 $attendance->setAttendanceDate(new DateTimeImmutable($day));
+                if ($type === AttendanceTypeEnum::LEAVE) {
+                    $attendance->setLeaveType($paidCount < 3 ? LeaveTypeEnum::PAID : LeaveTypeEnum::UNPAID);
+                }
 
                 $this->attendanceRepository->update($attendance, false);
 

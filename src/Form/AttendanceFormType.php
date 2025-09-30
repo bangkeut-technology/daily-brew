@@ -7,6 +7,7 @@ namespace App\Form;
 use App\Entity\Attendance;
 use App\Entity\Employee;
 use App\Enum\AttendanceTypeEnum;
+use App\Enum\LeaveTypeEnum;
 use App\Form\Type\DateTimeImmutableType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
@@ -26,22 +27,33 @@ class AttendanceFormType extends AbstractFormType
     {
         $builder
             ->add('attendanceDate', DateTimeImmutableType::class, [
+                'required' => true,
                 'documentation' => [
                     'type' => 'string',
                     'format' => 'date-time',
                     'description' => 'The date of the attendance in YYYY-MM-DD format.',
                 ]])
             ->add('note', TextType::class, [
+                'required' => false,
                 'documentation' => [
                     'type' => 'string',
                     'description' => 'A note for the attendance, e.g. "Sick leave" or "Vacation".',
                 ]
             ])
-            ->add('status', EnumType::class, [
+            ->add('type', EnumType::class, [
                 'class' => AttendanceTypeEnum::class,
+                'required' => true,
                 'documentation' => [
                     'type' => 'string',
-                    'description' => 'The status of the attendance, e.g. "Present", "Absent", "Late", or "Leave".',
+                    'description' => 'The type of the attendance, e.g. "Present", "Absent", "Late", or "Leave".',
+                ]
+            ])
+            ->add('leaveType', EnumType::class, [
+                'class' => LeaveTypeEnum::class,
+                'required' => false,
+                'documentation' => [
+                    'type' => 'string',
+                    'description' => 'The type of leave, e.g. "Paid" or "Unpaid".',
                 ]
             ])
             ->add('clockIn', DateTimeImmutableType::class, [
