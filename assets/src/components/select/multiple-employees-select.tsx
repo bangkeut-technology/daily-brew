@@ -15,6 +15,7 @@ const queryKey = ['employees'];
 interface MultipleEmployeesSelectProps {
     control: Control<any>;
     valueProp?: keyof Employee;
+    defaultValue?: Employee[];
     name: string;
     title?: string;
     description?: string;
@@ -23,25 +24,40 @@ interface MultipleEmployeesSelectProps {
 export const MultipleEmployeesSelect: React.FunctionComponent<MultipleEmployeesSelectProps> = ({
     control,
     valueProp = 'publicId',
+    defaultValue = [],
     name,
     title,
     description,
 }) => {
-    const [employees, setEmployees] = React.useState<RowSelectionState>({});
     const { t } = useTranslation();
     const { replace } = useFieldArray({
         name,
         control,
     });
-    const { data = [] } = useQuery({
+    const { data: employees = [], isSuccess } = useQuery({
         queryKey,
         queryFn: () => fetchEmployees({ from: new Date(), to: new Date() }),
     });
+    const [selectedEmployees, setSelectedEmployees] = React.useState<RowSelectionState>({});
 
     React.useEffect(() => {
-        const selectedRows = Object.keys(employees).map((value) => data[Number(value)]);
+        if (isSuccess && employees.length > 0) {
+            setSelectedEmployees(() =>
+                defaultValue.reduce<RowSelectionState>((accumulator, selected) => {
+                    const foundIndex = employees.findIndex((employee) => employee.id === selected.id);
+                    if (foundIndex !== -1) {
+                        accumulator[foundIndex] = true;
+                    }
+                    return accumulator;
+                }, {}),
+            );
+        }
+    }, [isSuccess, employees, defaultValue]);
+
+    React.useEffect(() => {
+        const selectedRows = Object.keys(selectedEmployees).map((value) => employees[Number(value)]);
         replace(selectedRows.map((employee) => ({ value: employee.id })));
-    }, [data, replace, employees]);
+    }, [employees, replace, selectedEmployees]);
 
     const columns = React.useMemo(
         () => [
@@ -88,7 +104,13 @@ export const MultipleEmployeesSelect: React.FunctionComponent<MultipleEmployeesS
         <div className="flex flex-col space-y-4">
             <div className="flex flex-row space-x-4">{title && <h3 className="text-lg font-semibold">{title}</h3>}</div>
             {description && <p className="text-sm text-muted-foreground">{description}</p>}
-            <DataTable data={data} columns={columns} rowSelection={employees} onRowSelectionChange={setEmployees} />
+            <DataTable
+                data={employees}
+                columns={columns}
+                rowSelection={selectedEmployees}
+                onRowSelectionChange={setSelectedEmployees}
+                valueProps={valueProp}
+            />
         </div>
     );
 };

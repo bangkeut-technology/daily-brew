@@ -18,6 +18,7 @@ import { Loader2Icon } from 'lucide-react';
 interface DataTableProps<T> {
     data: T[];
     loading?: boolean;
+    valueProps?: keyof T;
     columns: ColumnDef<T, any>[];
     rowSelection: RowSelectionState;
     sorting?: SortingState;
