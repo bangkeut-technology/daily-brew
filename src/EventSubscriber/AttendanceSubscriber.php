@@ -60,7 +60,7 @@ readonly class AttendanceSubscriber implements EventSubscriberInterface
             ? [DateHelper::startOfYear($attendanceDate), DateHelper::endOfYear($attendanceDate)]
             : [DateHelper::startOfMonth($attendanceDate), DateHelper::endOfMonth($attendanceDate)];
 
-        $leaves = $this->attendanceRepository->findStatus($attendance->getEmployee(), $start, $end, AttendanceTypeEnum::LEAVE);
+        $leaves = $this->attendanceRepository->findType($attendance->getEmployee(), $start, $end, AttendanceTypeEnum::LEAVE);
 
         foreach ($leaves as $i => $leave) {
             $shouldBe = ($i < $limit) ? LeaveTypeEnum::PAID : LeaveTypeEnum::UNPAID;

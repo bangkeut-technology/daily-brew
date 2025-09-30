@@ -5,8 +5,10 @@ namespace App\Service;
 
 use App\Constant\SettingConstant;
 use App\Entity\Employee;
+use App\Enum\LeaveTypeEnum;
 use App\Repository\AttendanceRepository;
 use App\Util\DateHelper;
+use DateMalformedStringException;
 use DateTimeImmutable;
 
 /**
@@ -123,5 +125,54 @@ readonly class AttendanceRateCalculator
             'penalty_absences' => $penaltyAbsences,
             'adjusted_absences' => $adjustedAbsences,
         ];
+    }
+
+    /**
+     * Calculates the remaining balance of paid leave for an employee up to a given date.
+     *
+     * This method determines the applicable leave cycle (yearly or monthly) and retrieves
+     * the start and end dates for the corresponding period. It computes the number of paid
+     * leaves used within the specified period and subtracts this amount from the total
+     * allocable paid leaves, ensuring the result is never negative.
+     *
+     * @param Employee          $employee The employee whose remaining paid leave is being calculated.
+     * @param DateTimeImmutable $asOfDate The date as of which the remaining paid leave is determined.
+     * @return int The calculated remaining balance of paid leave.
+     * @throws DateMalformedStringException
+     */
+    public function remainPaidLeave(Employee $employee, DateTimeImmutable $asOfDate): int
+    {
+        $cycle = $this->paidLeaveCycle();
+        [$start, $end] = $cycle === 'yearly'
+            ? [DateHelper::startOfYear($asOfDate), DateHelper::endOfYear($asOfDate)]
+            : [DateHelper::startOfMonth($asOfDate), DateHelper::endOfMonth($asOfDate)];
+
+        $usedPaidLeave = $this->attendanceRepository->countPaidLeavesBetween(
+            $employee,
+            $start,
+            $end
+        );
+
+        return max(0, $this->numberOfPaidLeave() - $usedPaidLeave);
+    }
+
+    /**
+     * Retrieves the paid leave cycle setting.
+     *
+     * @return string The configured paid leave cycle, defaulting to 'monthly' if not set.
+     */
+    public function paidLeaveCycle(): string
+    {
+        return $this->settingService->getString(SettingConstant::PAID_LEAVE_CYCLE, 'monthly');
+    }
+
+    /**
+     * Retrieves the number of paid leave days setting.
+     *
+     * @return int The configured number of paid leave days, defaulting to 3 if not set.
+     */
+    public function numberOfPaidLeave(): int
+    {
+        return $this->settingService->getInt(SettingConstant::NUMBER_OF_PAID_LEAVE, 3);
     }
 }
