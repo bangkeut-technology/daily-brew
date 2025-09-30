@@ -62,7 +62,7 @@ readonly class AttendanceBatchSubscriber implements EventSubscriberInterface
      * This method ensures that attendance records are synchronized with the updated batch details,
      * including the date range and associated employees. It performs the following operations:
      * - Builds a desired set of attendance records based on the updated batch information.
-     * - Loads existing attendance records for the batch and indexes them for quick lookup.
+     * - Loads existing attendance records for the batch and indexes them for a quick lookup.
      * - Inserts new attendance records for any missing entries in the desired set.
      * - Updates existing records if their status has changed.
      * - Deletes any records that are no longer needed based on the updated batch details.
