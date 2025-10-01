@@ -15,6 +15,7 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
  *
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
+#[Route('/console', name: 'daily_brew_security_')]
 class SecurityController extends AbstractController
 {
     /**
@@ -25,7 +26,7 @@ class SecurityController extends AbstractController
      *
      * @return JsonResponse the rendered login page
      */
-    #[Route('/console/login', name: 'daily_brew_security_login', methods: ['POST'])]
+    #[Route('/login', name: 'login', methods: ['POST'])]
     public function login(#[CurrentUser] ?User $user): JsonResponse
     {
         if (null === $user) {
@@ -43,7 +44,7 @@ class SecurityController extends AbstractController
     /**
      * Description: This method handles the logout page route in the Symfony application.
      */
-    #[Route('/console/logout', name: 'bandg_security_logout', methods: ['GET'])]
+    #[Route('/logout', name: 'logout', methods: ['GET'])]
     public function logout()
     {
         // This method is intentionally empty.
