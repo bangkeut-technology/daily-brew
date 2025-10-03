@@ -8,13 +8,19 @@ import { PartialAttendanceBatch } from '@/types/attendance-batch';
 import { TextField } from '@/components/field/text-field';
 import { AttendanceTypeSelect } from '@/components/select/attendance-type-select';
 import { MultipleEmployeesSelect } from '@/components/select/multiple-employees-select';
+import { Employee } from '@/types/employee';
 
 interface AttendanceBatchFormProps {
     form: UseFormReturn<PartialAttendanceBatch>;
+    defaultEmployees?: Employee[];
     isPending?: boolean;
 }
 
-export const AttendanceBatchForm: React.FunctionComponent<AttendanceBatchFormProps> = ({ form, isPending }) => {
+export const AttendanceBatchForm: React.FunctionComponent<AttendanceBatchFormProps> = ({
+    form,
+    defaultEmployees,
+    isPending,
+}) => {
     const { t } = useTranslation();
 
     return (
@@ -31,6 +37,8 @@ export const AttendanceBatchForm: React.FunctionComponent<AttendanceBatchFormPro
                 <MultipleEmployeesSelect
                     control={form.control}
                     name="employees"
+                    defaultValue={defaultEmployees}
+                    valueProp="id"
                     title={t('employees.table.title', { ns: 'glossary' })}
                     description={t('employees.table.description', { ns: 'glossary' })}
                 />

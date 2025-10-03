@@ -113,7 +113,7 @@ function EditAttendanceBatchPage() {
 
             <div className="mx-auto w-full max-w-screen-md px-4">
                 <div className="rounded-lg border p-4 sm:p-6 space-y-6">
-                    <AttendanceBatchForm form={form} isPending={isPending} />
+                    <AttendanceBatchForm form={form} defaultEmployees={batch.employees} isPending={isPending} />
                 </div>
             </div>
         </div>
