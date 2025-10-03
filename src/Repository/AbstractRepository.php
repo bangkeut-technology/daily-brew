@@ -102,4 +102,18 @@ abstract class AbstractRepository extends ServiceEntityRepository
     {
         $this->getEntityManager()->flush();
     }
+
+    /**
+     * Finds an entity by its public ID.
+     *
+     * Searches for a record in the database matching the given public ID.
+     *
+     * @param string $publicId The public ID of the entity to search for.
+     *
+     * @return object|null The entity object if found, or null otherwise.
+     */
+    public function findByPublicId(string $publicId): ?object
+    {
+        return $this->findOneBy(['publicId' => $publicId]);
+    }
 }

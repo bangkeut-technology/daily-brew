@@ -4,70 +4,104 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\DemoSessionRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Class DemoSession
+ *
+ * @package App\Entity
+ * @author  Vandeth THO <thovandeth@gmail.com>
+ */
 #[ORM\Table(name: 'daily_brew_demo_session')]
 #[ORM\Entity(repositoryClass: DemoSessionRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQ_DEMO_SESSION_DEVICE_ID', fields: ['deviceId'])]
+#[ORM\HasLifecycleCallbacks]
 class DemoSession extends AbstractEntity
 {
-    #[ORM\Column]
-    private ?int $deviceId = null;
+    public function __construct(
+        #[ORM\Column]
+        private ?string            $deviceId = null,
+        #[ORM\Column]
+        private ?DateTimeImmutable $expiresAt = null,
+        #[ORM\Column]
+        private ?bool              $active = null,
+        #[ORM\ManyToOne]
+        #[ORM\JoinColumn(nullable: false)]
+        private ?User              $user = null,
+    )
+    {
+    }
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $expiresAt = null;
-
-    #[ORM\Column]
-    private ?bool $active = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $user = null;
-
-    public function getDeviceId(): ?int
+    /**
+     * @return string|null
+     */
+    public function getDeviceId(): ?string
     {
         return $this->deviceId;
     }
 
-    public function setDeviceId(int $deviceId): static
+    /**
+     * @param string|null $deviceId
+     * @return DemoSession
+     */
+    public function setDeviceId(?string $deviceId): DemoSession
     {
         $this->deviceId = $deviceId;
-
         return $this;
     }
 
-    public function getExpiresAt(): ?\DateTimeImmutable
+    /**
+     * @return DateTimeImmutable|null
+     */
+    public function getExpiresAt(): ?DateTimeImmutable
     {
         return $this->expiresAt;
     }
 
-    public function setExpiresAt(\DateTimeImmutable $expiresAt): static
+    /**
+     * @param DateTimeImmutable|null $expiresAt
+     * @return DemoSession
+     */
+    public function setExpiresAt(?DateTimeImmutable $expiresAt): DemoSession
     {
         $this->expiresAt = $expiresAt;
-
         return $this;
     }
 
-    public function isActive(): ?bool
+    /**
+     * @return bool|null
+     */
+    public function getActive(): ?bool
     {
         return $this->active;
     }
 
-    public function setActive(bool $active): static
+    /**
+     * @param bool|null $active
+     * @return DemoSession
+     */
+    public function setActive(?bool $active): DemoSession
     {
         $this->active = $active;
-
         return $this;
     }
 
+    /**
+     * @return User|null
+     */
     public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUser(?User $user): static
+    /**
+     * @param User|null $user
+     * @return DemoSession
+     */
+    public function setUser(?User $user): DemoSession
     {
         $this->user = $user;
-
         return $this;
     }
 }

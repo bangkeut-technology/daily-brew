@@ -17,17 +17,19 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\Entity(repositoryClass: EvaluationTemplateCriteriaRepository::class)]
 class EvaluationTemplateCriteria extends AbstractEntity
 {
-    #[ORM\Column]
-    #[Groups(['template_criteria:read'])]
-    private ?int $weight = null;
-
-    #[ORM\ManyToOne(targetEntity: EvaluationTemplate::class, inversedBy: 'criterias')]
-    #[Groups(['template_criteria:read'])]
-    private ?EvaluationTemplate $template = null;
-
-    #[ORM\ManyToOne(targetEntity: EvaluationCriteria::class, inversedBy: 'templates')]
-    #[Groups(['template_criteria:read'])]
-    private ?EvaluationCriteria $criteria = null;
+    public function __construct(
+        #[ORM\Column]
+        #[Groups(['template_criteria:read'])]
+        private ?int                $weight = null,
+        #[ORM\ManyToOne(targetEntity: EvaluationTemplate::class, inversedBy: 'criterias')]
+        #[Groups(['template_criteria:read'])]
+        private ?EvaluationTemplate $template = null,
+        #[ORM\ManyToOne(targetEntity: EvaluationCriteria::class, inversedBy: 'templates')]
+        #[Groups(['template_criteria:read'])]
+        private ?EvaluationCriteria $criteria = null,
+    )
+    {
+    }
 
     /**
      * @return int|null
