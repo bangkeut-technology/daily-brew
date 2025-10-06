@@ -13,9 +13,7 @@ export const SiteFooter = () => {
         <footer className="border-t pt-10">
             <div className="mx-auto max-w-7xl px-6 md:px-8 pb-8">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    {/* Logo */}
                     <Logo to="/" />
-                    {/* Copyright */}
                     <div className="text-sm text-muted-foreground">
                         © {new Date().getFullYear()} DailyBrew. All rights reserved.
                     </div>
