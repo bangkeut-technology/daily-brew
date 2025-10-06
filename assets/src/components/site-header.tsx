@@ -5,6 +5,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
+import { Logo } from '@/components/logo';
 
 export const SiteHeader = () => {
     const { t } = useTranslation();
@@ -14,18 +15,7 @@ export const SiteHeader = () => {
             <div className="mx-auto max-w-7xl px-3 sm:px-4 lg:px-6">
                 <div className="flex h-14 items-center justify-between">
                     {/* Brand */}
-                    <Link to="/" className="flex items-center gap-2">
-                        <div className="h-9 w-9 grid place-items-center rounded-xl bg-primary/10 text-primary">
-                            <Coffee className="h-5 w-5" />
-                        </div>
-                        <span className="text-lg font-bold tracking-tight">
-                            <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                                DailyBrew
-                            </span>
-                            <span className="text-muted-foreground">.work</span>
-                        </span>
-                    </Link>
-
+                    <Logo to="/" />
                     {/* Desktop nav */}
                     <nav className="hidden md:flex items-center gap-6">
                         <Link to="/features" className="text-sm text-muted-foreground hover:text-foreground">
@@ -38,7 +28,6 @@ export const SiteHeader = () => {
                             {t('faq')}
                         </Link>
                     </nav>
-
                     {/* Desktop actions */}
                     <div className="hidden md:flex items-center gap-2">
                         <Button variant="ghost" asChild>
@@ -54,7 +43,6 @@ export const SiteHeader = () => {
                             </Link>
                         </Button>
                     </div>
-
                     {/* Mobile: menu + single CTA */}
                     <div className="flex md:hidden items-center gap-2">
                         <Button asChild size="sm" className="px-3">

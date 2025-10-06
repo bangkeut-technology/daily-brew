@@ -12,6 +12,7 @@ import './styles/globals.css';
 import { LanguageProvider } from '@/providers/language-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { ApplicationProvider } from '@/providers/application-provider';
+import { PageNotFound } from '@/components/page-not-found';
 
 const router = createRouter({
     routeTree,
@@ -19,6 +20,7 @@ const router = createRouter({
     context: {
         authentication: undefined,
     },
+    defaultNotFoundComponent: () => <PageNotFound />,
 });
 
 // Register the router instance for type safety

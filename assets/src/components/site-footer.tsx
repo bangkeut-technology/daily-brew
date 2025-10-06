@@ -1,9 +1,9 @@
 import React from 'react';
-import { Coffee } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useApplication } from '@/hooks/use-application';
+import { Logo } from '@/components/logo';
 
 export const SiteFooter = () => {
     const { t } = useTranslation();
@@ -14,17 +14,7 @@ export const SiteFooter = () => {
             <div className="mx-auto max-w-7xl px-6 md:px-8 pb-8">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     {/* Logo */}
-                    <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 grid place-items-center rounded-lg bg-primary/10 text-primary">
-                            <Coffee className="h-4 w-4" />
-                        </div>
-                        <span className="text-lg font-bold tracking-tight">
-                            <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                                DailyBrew
-                            </span>
-                            <span className="text-muted-foreground">.work</span>
-                        </span>
-                    </div>
+                    <Logo to="/" />
                     {/* Copyright */}
                     <div className="text-sm text-muted-foreground">
                         © {new Date().getFullYear()} DailyBrew. All rights reserved.
