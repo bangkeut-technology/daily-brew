@@ -5,15 +5,22 @@ import { fetchCurrentUser } from '@/services/user';
 
 export const AuthenticationProvider = ({ children }: { children: React.ReactNode }) => {
     const [email, setEmail] = React.useState(sessionStorage.getItem('email'));
+    const [demo, setDemo] = React.useState(false);
 
-    const { data } = useQuery({
+    const { data, isSuccess } = useQuery({
         queryKey: ['me'],
         enabled: !!email,
         queryFn: fetchCurrentUser,
     });
 
+    React.useEffect(() => {
+        if (isSuccess && data) {
+            setDemo(data.roles.includes('ROLE_DEMO'));
+        }
+    }, [isSuccess]);
+
     return (
-        <AuthenticationContext.Provider value={{ isAuthenticated: !!email, user: data, setEmail: setEmail }}>
+        <AuthenticationContext.Provider value={{ isAuthenticated: !!email, user: data, setEmail: setEmail, demo }}>
             {children}
         </AuthenticationContext.Provider>
     );
