@@ -140,4 +140,21 @@ class EvaluationTemplateRepository extends AbstractRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Deletes entities associated with a specific user.
+     *
+     * @param User $user The user whose associated entities should be deleted.
+     *
+     * @return int The number of entities deleted.
+     */
+    public function deleteByUser(User $user): int
+    {
+        return $this->createQueryBuilder('et')
+            ->delete()
+            ->where('et.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->execute();
+    }
 }

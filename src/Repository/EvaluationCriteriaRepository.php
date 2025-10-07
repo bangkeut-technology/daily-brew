@@ -38,7 +38,7 @@ class EvaluationCriteriaRepository extends AbstractRepository
      * Finds an EvaluationCriteria by its publicId and associated user.
      *
      * @param string $publicId the unique publicId of the evaluation criteria
-     * @param User   $user       the user associated with the evaluation criteria
+     * @param User   $user     the user associated with the evaluation criteria
      *
      * @return EvaluationCriteria|null the found evaluation criteria or null if not found
      */
@@ -119,5 +119,22 @@ class EvaluationCriteriaRepository extends AbstractRepository
             ->setParameter('user', $user)
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Delete evaluation criteria associated with a user.
+     *
+     * @param User $user the user associated with the evaluation criteria to delete
+     *
+     * @return int the number of deleted evaluation criteria
+     */
+    public function deleteByUser(User $user): int
+    {
+        return $this->createQueryBuilder('ec')
+            ->delete()
+            ->where('ec.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->execute();
     }
 }

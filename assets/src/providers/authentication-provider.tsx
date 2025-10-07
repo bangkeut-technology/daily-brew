@@ -6,6 +6,7 @@ import { fetchCurrentUser } from '@/services/user';
 export const AuthenticationProvider = ({ children }: { children: React.ReactNode }) => {
     const [email, setEmail] = React.useState(sessionStorage.getItem('email'));
     const [demo, setDemo] = React.useState(false);
+    const [expiresAt, setExpiresAt] = React.useState<Date | null>(null);
 
     const { data, isSuccess } = useQuery({
         queryKey: ['me'],
@@ -16,6 +17,8 @@ export const AuthenticationProvider = ({ children }: { children: React.ReactNode
     React.useEffect(() => {
         if (isSuccess && data) {
             setDemo(data.roles.includes('ROLE_DEMO'));
+            setEmail(data.email);
+            sessionStorage.setItem('email', data.email);
         }
     }, [isSuccess]);
 
