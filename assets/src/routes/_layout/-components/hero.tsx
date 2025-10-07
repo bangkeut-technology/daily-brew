@@ -34,9 +34,9 @@ export const Hero = () => (
                     </Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild className="w-full sm:w-auto">
-                    <a href="/demo" className="inline-flex items-center">
-                        View demo
-                    </a>
+                    <Link to="/demo" className="inline-flex items-center">
+                        Try the Demo
+                    </Link>
                 </Button>
             </div>
         </div>
