@@ -1,4 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
+import { PageNotFound } from '@/components/page-not-found';
 
 export const Route = createFileRoute('/console/_authenticated')({
     beforeLoad: ({ context, location }) => {
@@ -11,4 +12,5 @@ export const Route = createFileRoute('/console/_authenticated')({
             });
         }
     },
+    notFoundComponent: () => <PageNotFound to="/console" />,
 });
