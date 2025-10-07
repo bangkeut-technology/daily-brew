@@ -6,6 +6,7 @@ namespace App\Entity;
 use App\Repository\DemoSessionRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Class DemoSession
@@ -21,13 +22,17 @@ class DemoSession extends AbstractEntity
 {
     public function __construct(
         #[ORM\Column]
+        #[Groups('demo_session:read')]
         private ?string            $deviceId = null,
         #[ORM\Column]
+        #[Groups('demo_session:read')]
         private ?DateTimeImmutable $expiresAt = null,
         #[ORM\Column]
+        #[Groups('demo_session:read')]
         private ?bool              $active = null,
         #[ORM\ManyToOne]
         #[ORM\JoinColumn(nullable: false)]
+        #[Groups('demo_session:read')]
         private ?User              $user = null,
     )
     {

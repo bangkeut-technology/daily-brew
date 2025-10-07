@@ -7,7 +7,6 @@ namespace App\ApiController;
 use App\Controller\AbstractController;
 use App\Enum\UserRoleEnum;
 use App\Repository\DemoSessionRepository;
-use App\Repository\UserRepository;
 use App\Seeder\DemoSeeder;
 use App\Util\UserManipulatorInterface;
 use DateMalformedStringException;
@@ -58,7 +57,7 @@ class DemoController extends AbstractController
         $session = $this->demoSessionRepository->findActiveDeviceId($deviceId);
         if ($session && $session->getExpiresAt() > $now) {
             $this->security->login($session->getUser(), 'json_login', 'console_area');
-            return $this->json(['demoSession' => true, 'message' => 'Demo session found'], Response::HTTP_OK);
+            return $this->createDemoSessionResponse(['demoSession' => $session, 'message' => 'Demo session found']);
         }
 
         $faker = Factory::create();
@@ -82,6 +81,19 @@ class DemoController extends AbstractController
 
         $this->security->login($user, 'json_login', 'console_area');
 
-        return $this->json(['demoSession' => $demo, 'message' => 'Demo session have been created'], Response::HTTP_CREATED);
+        return $this->createDemoSessionResponse(['demoSession' => $demo, 'message' => 'Demo session have been created'], Response::HTTP_CREATED);
+    }
+
+    /**
+     * Prepares and returns a JSON response for a demo session.
+     *
+     * @param mixed $data       The data to be serialized into the JSON response.
+     * @param int   $statusCode The HTTP status code of the response. Defaults to Response::HTTP_OK.
+     *
+     * @return JsonResponse The JSON response object.
+     */
+    private function createDemoSessionResponse(mixed $data, int $statusCode = Response::HTTP_OK): JsonResponse
+    {
+        return $this->json($data, $statusCode, context: ['groups' => ['demo_session:read', 'user:read']]);
     }
 }
