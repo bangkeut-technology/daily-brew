@@ -42,6 +42,7 @@ import { useTranslation } from 'react-i18next';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '@/lib/string';
+import { DemoPill } from '@/routes/console/_authenticated/-demo-pill';
 
 type SidebarMenuItem = {
     title: string;
@@ -52,7 +53,7 @@ type SidebarMenuItem = {
 };
 
 export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
-    const { user } = useAuthentication();
+    const { user, demo } = useAuthentication();
     const { t } = useTranslation();
     const { pathname } = useLocation();
 
@@ -158,12 +159,15 @@ export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) =
                             <div className="bg-primary text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                                 <Coffee className="size-4" />
                             </div>
-                            <span className="text-lg font-bold tracking-tight">
-                                <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                                    DailyBrew
+                            <div className="flex flex-col">
+                                <span className="text-lg font-bold tracking-tight">
+                                    <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                                        DailyBrew
+                                    </span>
+                                    <span className="text-muted-foreground">.work</span>
                                 </span>
-                                <span className="text-muted-foreground">.work</span>
-                            </span>
+                                {demo && <DemoPill />}
+                            </div>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
