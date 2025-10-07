@@ -48,6 +48,7 @@ security:
     access_control:
         - { path: ^/api/(login|token/refresh|doc), roles: PUBLIC_ACCESS }
         - { path: ^/api/v1/(en|fr|km)/(login),     roles: PUBLIC_ACCESS }
+        - { path: ^/api/v1/(en|fr|km)/demo/start,  roles: PUBLIC_ACCESS }
         - { path: ^/api/v1/(en|fr|km),             roles: [ ROLE_USER ] }
         - { path: ^/console,                       roles: PUBLIC_ACCESS }
 
