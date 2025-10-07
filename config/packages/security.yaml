@@ -37,7 +37,7 @@ security:
                 check_path: daily_brew_security_login
             logout:
                 path:   daily_brew_security_logout
-                target: /console/sign-in
+                target: /sign-in
             remember_me:
                 secret:   '%kernel.secret%'
                 lifetime: '%env(int:DAILY_BREW_REMEMBER_ME_LIFETIME)%'

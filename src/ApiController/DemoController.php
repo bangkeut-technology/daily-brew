@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\ApiController;
 
 use App\Controller\AbstractController;
+use App\Enum\UserRoleEnum;
 use App\Repository\DemoSessionRepository;
 use App\Repository\UserRepository;
 use App\Seeder\DemoSeeder;
+use App\Util\UserManipulatorInterface;
 use DateMalformedStringException;
 use DateTimeImmutable;
+use Faker\Factory;
 use Random\RandomException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -28,10 +31,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class DemoController extends AbstractController
 {
     public function __construct(
-        TranslatorInterface                    $translator,
-        private readonly DemoSessionRepository $demoSessionRepository,
-        private readonly UserRepository        $userRepository,
-        private readonly Security              $security, private readonly DemoSeeder $demoSeeder
+        TranslatorInterface                       $translator,
+        private readonly DemoSessionRepository    $demoSessionRepository,
+        private readonly UserManipulatorInterface $userManipulator,
+        private readonly Security                 $security,
+        private readonly DemoSeeder               $demoSeeder
     )
     {
         parent::__construct($translator);
@@ -47,29 +51,28 @@ class DemoController extends AbstractController
         $payload = $request->getPayload()->all();
         $deviceId = (string)($payload['deviceId'] ?? '');
         if ($deviceId === '') {
-            return new JsonResponse(['error' => 'deviceId required'], 400);
+            return $this->json(['message' => 'deviceId required'], Response::HTTP_BAD_REQUEST);
         }
 
         $now = new DateTimeImmutable();
         $session = $this->demoSessionRepository->findActiveDeviceId($deviceId);
-
         if ($session && $session->getExpiresAt() > $now) {
-            // Reuse: authenticate existing user (creates/refreshes session cookie)
-            $this->security->login($session->getUser());
-            return new JsonResponse(['demo' => true], Response::HTTP_OK);
+            $this->security->login($session->getUser(), 'json_login', 'console_area');
+            return $this->json(['demoSession' => true, 'message' => 'Demo session found'], Response::HTTP_OK);
         }
 
-        $session?->setActive(false);
+        $faker = Factory::create();
 
-        // Create fresh demo user/org
-        $user = $this->userRepository->create();
-        $user->setEmail(sprintf('demo+%s@dailybrew.app', bin2hex(random_bytes(4))))
-            ->setRoles(['ROLE_DEMO']);
-        $this->userRepository->updateUser($user);
+        $user = $this->userManipulator->create(
+            sprintf('demo+%s@dailybrew.app', bin2hex(random_bytes(4))),
+            $faker->password(),
+            $faker->firstName(),
+            $faker->lastName(),
+            UserRoleEnum::DEMO,
+        );
 
         $this->demoSeeder->seedFor($user);
 
-        // Store session record (e.g., 2h TTL)
         $demo = $this->demoSessionRepository->create();
         $demo->setDeviceId($deviceId)
             ->setUser($user)
@@ -77,9 +80,8 @@ class DemoController extends AbstractController
             ->setActive(true);
         $this->demoSessionRepository->update($demo);
 
-        // Authenticate -> creates Symfony session and cookie
-        $this->security->login($user);
+        $this->security->login($user, 'json_login', 'console_area');
 
-        return new JsonResponse(['demo' => true], Response::HTTP_CREATED);
+        return $this->json(['demoSession' => $demo, 'message' => 'Demo session have been created'], Response::HTTP_CREATED);
     }
 }

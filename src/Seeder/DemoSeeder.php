@@ -40,6 +40,7 @@ final readonly class DemoSeeder
             ->setName('Waiter\'s KPI')
             ->setUser($user)
             ->setDescription('This is a demo template for waiters to evaluate their performance.');
+        $this->evaluationTemplateRepository->update($template);
         for ($i = 0; $i < 5; $i++) {
             $employee = $this->employeeRepository->create()
                 ->setUser($user)
@@ -48,9 +49,9 @@ final readonly class DemoSeeder
                 ->setFirstName($faker->firstName())
                 ->setLastName($faker->lastName())
                 ->setStatus(EmployeeStatusEnum::ACTIVE)
-                ->setPhoneNumber($faker->phoneNumber());
+                ->setPhoneNumber($faker->phoneNumber())
+                ->addTemplate($template);
             $this->employeeRepository->update($employee);
-            $template->addEmployee($employee);
         }
 
         $criteriaLabel = [
@@ -65,7 +66,8 @@ final readonly class DemoSeeder
             $criteria = $this->evaluationCriteriaRepository->create()
                 ->setLabel($label)
                 ->setWeight($faker->numberBetween(1, 5))
-                ->setDescription($faker->sentence());
+                ->setDescription($faker->sentence())
+                ->setUser($user);
             $this->evaluationCriteriaRepository->update($criteria);
             $template->addCriteria(new EvaluationTemplateCriteria(
                 $criteria->getWeight(),
