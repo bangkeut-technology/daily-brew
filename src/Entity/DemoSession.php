@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
  * @package App\Entity
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-#[ORM\Table(name: 'daily_brew_demo_session')]
+#[ORM\Table(name: 'daily_brew_demo_sessions')]
 #[ORM\Entity(repositoryClass: DemoSessionRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_DEMO_SESSION_DEVICE_ID', fields: ['deviceId'])]
 #[ORM\HasLifecycleCallbacks]
