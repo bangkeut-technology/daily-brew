@@ -107,6 +107,7 @@ export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> 
                                 employeeName={original.fullName}
                                 onDeleted={onRemoveEmployee}
                                 variant="ghost"
+                                className="text-red-500 hover:text-red-200"
                                 size="icon"
                             />
                         </DropdownMenu>

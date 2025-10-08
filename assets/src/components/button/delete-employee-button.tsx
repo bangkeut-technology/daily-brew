@@ -21,14 +21,16 @@ import { toast } from 'sonner';
 interface DeleteEmployeeButtonProps {
     employeePublicId: string;
     employeeName?: string;
-    onDeleted?: () => void; // e.g. refetch
+    className?: string;
     variant?: 'ghost' | 'destructive' | 'outline' | 'secondary' | 'default' | null;
     size?: 'icon' | 'sm' | 'lg' | 'default' | null;
+    onDeleted?: () => void; // e.g. refetch
 }
 
 export const DeleteEmployeeButton: React.FC<DeleteEmployeeButtonProps> = ({
     employeePublicId,
     employeeName,
+    className,
     onDeleted,
     variant = 'ghost',
     size = 'icon',
@@ -57,6 +59,7 @@ export const DeleteEmployeeButton: React.FC<DeleteEmployeeButtonProps> = ({
             <AlertDialogTrigger asChild>
                 <Button
                     disabled={isPending}
+                    className={className}
                     variant={variant ?? 'ghost'}
                     size={size ?? 'icon'}
                     aria-label={t('employees.delete', { ns: 'glossary' })}
