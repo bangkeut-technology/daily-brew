@@ -1,6 +1,8 @@
 import React from 'react';
 import {
     AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
     AlertDialogFooter,
@@ -14,6 +16,7 @@ import { Trash2 } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { deleteEmployee } from '@/services/employee';
 import { isAxiosError } from 'axios';
+import { toast } from 'sonner';
 
 interface DeleteEmployeeButtonProps {
     employeePublicId: string;
@@ -30,38 +33,30 @@ export const DeleteEmployeeButton: React.FC<DeleteEmployeeButtonProps> = ({
     variant = 'ghost',
     size = 'icon',
 }) => {
-    const { t } = useTranslation(['glossary', 'common']);
+    const { t } = useTranslation();
     const [open, setOpen] = React.useState(false);
-    const {} = useMutation({
-        mutationFn: () => deleteEmployee(employeePublicId),
-        onSuccess: () => {
+    const {mutate, isPending} = useMutation({
+        mutationFn: deleteEmployee,
+        onSuccess: (data) => {
+            toast.success(data.message);
             setOpen(false);
             onDeleted?.();
         },
         onError: (error) => {
-            const message = isAxiosError(error) ? error.
-            toast.error(error?.message ?? t('common.unknown_error', { ns: 'common' }));
+            const message = isAxiosError(error) ? error.response?.data.message : t('unknown_error', { ns: 'error' });
+            toast.error(message);
         },
     });
 
-    const onConfirm = async () => {
-        try {
-            setSubmitting(true);
-            setError(null);
-            await deleteEmployee(employeePublicId);
-            setOpen(false);
-            onDeleted?.();
-        } catch (e: any) {
-            setError(e?.message ?? t('common.unknown_error', { ns: 'common' }));
-        } finally {
-            setSubmitting(false);
-        }
-    };
+    const onConfirm = React.useCallback(async () => {
+        mutate(employeePublicId);
+    }, []);
 
     return (
         <AlertDialog open={open} onOpenChange={setOpen}>
             <AlertDialogTrigger asChild>
                 <Button
+                    disabled={isPending}
                     variant={variant ?? 'ghost'}
                     size={size ?? 'icon'}
                     aria-label={t('employees.delete', { ns: 'glossary' })}
@@ -72,21 +67,20 @@ export const DeleteEmployeeButton: React.FC<DeleteEmployeeButtonProps> = ({
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>
-                        {t('employees.delete.title', { ns: 'glossary', name: employeeName ?? '' })}
+                        {t('employees.delete_title', { ns: 'glossary', name: employeeName ?? '' })}
                     </AlertDialogTitle>
                     <AlertDialogDescription>
-                        {t('employees.delete.description', { ns: 'glossary', name: employeeName ?? '' })}
+                        {t('employees.delete_description', { ns: 'glossary', name: employeeName ?? '' })}
                     </AlertDialogDescription>
-                    {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel disabled={submitting}>{t('common.cancel', { ns: 'common' })}</AlertDialogCancel>
+                    <AlertDialogCancel disabled={isPending}>{t('cancel')}</AlertDialogCancel>
                     <AlertDialogAction
                         onClick={onConfirm}
-                        disabled={submitting}
+                        disabled={isPending}
                         className="bg-red-600 hover:bg-red-700"
                     >
-                        {submitting ? t('common.deleting', { ns: 'common' }) : t('common.delete', { ns: 'common' })}
+                        {isPending ? t('deleting') : t('delete')}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

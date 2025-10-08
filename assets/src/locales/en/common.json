@@ -19,8 +19,6 @@
         "sick": "Sick",
         "unknown": "Unknown"
     },
-    "deleting": "Deleting...",
-    "view_kpi": "View KPI",
     "attendances": "Attendances",
     "average": "Average",
     "back": "Back",
@@ -46,6 +44,7 @@
         "sunday": "Sunday"
     },
     "delete": "Delete",
+    "deleting": "Deleting...",
     "details": "Details",
     "dont_have_account": "Don't have an account",
     "edit": "Edit",
@@ -137,6 +136,7 @@
     "upcoming_leaves": "Upcoming Leaves",
     "view": "View",
     "view_all": "View All",
+    "view_kpi": "View KPI",
     "weight": "Weight",
     "yearly": "Yearly"
 }

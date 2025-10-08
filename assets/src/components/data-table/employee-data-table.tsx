@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Eye, Gauge, MoreHorizontal, Pencil } from 'lucide-react';
+import { DeleteEmployeeButton } from '@/components/button/delete-employee-button';
 
 const columnHelper = createColumnHelper<Employee>();
 
@@ -30,13 +31,13 @@ export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> 
     templatePublicId,
     onRemoveEmployee,
 }) => {
-    const { t } = useTranslation('glossary');
+    const { t } = useTranslation();
     const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
     const columns = React.useMemo(
         () => [
             columnHelper.accessor('fullName', {
-                header: t('employees.table.full_name'),
+                header: t('employees.table.full_name', { ns: 'glossary' }),
                 cell: (info) => info.getValue(),
                 meta: {
                     style: {
@@ -45,7 +46,7 @@ export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> 
                 },
             }),
             columnHelper.accessor('roles', {
-                header: t('employees.table.roles'),
+                header: t('employees.table.roles', { ns: 'glossary' }),
                 cell: (info) =>
                     info
                         .getValue()
@@ -58,7 +59,7 @@ export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> 
                 },
             }),
             columnHelper.accessor('averageScore', {
-                header: t('employees.table.kpi_score'),
+                header: t('employees.table.kpi_score', { ns: 'glossary' }),
                 cell: (info) => info.getValue().toFixed(2),
                 meta: {
                     style: {
@@ -67,39 +68,49 @@ export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> 
                 },
             }),
             columnHelper.accessor('publicId', {
-                header: t('employees.table.actions'),
-                cell: ({ getValue }) => {
+                header: t('actions'),
+                cell: ({ getValue, row: { original } }) => {
                     const employeePublicId = getValue();
-                    return <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                                <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => console.log('View', employeePublicId)}>
-                                <Eye className="mr-2 h-4 w-4" />
-                                {t('view')}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => console.log('Edit', employeePublicId)}>
-                                <Pencil className="mr-2 h-4 w-4" />
-                                {t('edit')}
-                            </DropdownMenuItem>
-                            {templatePublicId && (
-                                <DropdownMenuItem asChild>
-                                    <RemoveEmployeeButton
-                                        templatePublicId={templatePublicId}
-                                        employeePublicId={employeePublicId}
-                                        onRemove={onRemoveEmployee}
-                                    />
+                    return (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => console.log('View', employeePublicId)}>
+                                    <Eye className="mr-2 h-4 w-4" />
+                                    {t('view')}
                                 </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem onClick={() => console.log('View KPI', employeePublicId)}>
-                                <Gauge className="mr-2 h-4 w-4" />
-                                {t('employees.view_kpi')}
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>;
+                                <DropdownMenuItem onClick={() => console.log('Edit', employeePublicId)}>
+                                    <Pencil className="mr-2 h-4 w-4" />
+                                    {t('edit')}
+                                </DropdownMenuItem>
+                                {templatePublicId && (
+                                    <DropdownMenuItem asChild>
+                                        <RemoveEmployeeButton
+                                            templatePublicId={templatePublicId}
+                                            employeePublicId={employeePublicId}
+                                            onRemove={onRemoveEmployee}
+                                        />
+                                    </DropdownMenuItem>
+                                )}
+                                <DropdownMenuItem onClick={() => console.log('View KPI', employeePublicId)}>
+                                    <Gauge className="mr-2 h-4 w-4" />
+                                    {t('view_kpi')}
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+
+                            <DeleteEmployeeButton
+                                employeePublicId={employeePublicId}
+                                employeeName={original.fullName}
+                                onDeleted={onRemoveEmployee}
+                                variant="ghost"
+                                size="icon"
+                            />
+                        </DropdownMenu>
+                    );
                 },
                 meta: {
                     style: {

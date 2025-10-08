@@ -96,7 +96,7 @@
         "@symfony/webpack-encore": "^5.2.0",
         "@tanstack/eslint-plugin-query": "^5.91.0",
         "@tanstack/react-query-devtools": "^5.90.2",
-        "@tanstack/react-router-devtools": "^1.132.47",
+        "@tanstack/react-router-devtools": "^1.132.50",
         "@tanstack/react-table-devtools": "^8.21.3",
         "@tanstack/router-cli": "^1.132.47",
         "@tanstack/router-generator": "^1.121.2",
@@ -131,7 +131,7 @@
         "tsx": "^4.20.6",
         "typescript": "^5.9.3",
         "util": "^0.12.5",
-        "webpack": "^5.102.0",
+        "webpack": "^5.102.1",
         "webpack-bundle-analyzer": "^4.10.2",
         "webpack-cli": "^5.1.4",
         "webpack-notifier": "^1.15.0"
