@@ -41,6 +41,9 @@ export const putEmployee = async ({ publicId, data }: { publicId: string; data: 
         }>(`/employees/${publicId}`, { ...data, roles: data.roles?.map((role) => role.value) || [] })
         .then((response) => response.data);
 
+export const deleteEmployee = async (publicId: string) =>
+    apiAxios.delete<{ message: string, employee: Employee }>(`/employees/${publicId}`).then((response) => response.data);
+
 export const fetchEmployeeEvaluation = async ({ publicId, date = new Date() }: { publicId: string; date: Date }) =>
     apiAxios
         .get<EmployeeEvaluation | null>(`/employees/${publicId}/evaluation`, {

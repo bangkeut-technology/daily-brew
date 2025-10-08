@@ -5,6 +5,14 @@ import { DataTable } from '@/components/data-table';
 import { Employee } from '@/types/employee';
 import { RowSelectionState } from '@tanstack/react-table';
 import { RemoveEmployeeButton } from '@/components/button/remove-employee-button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Eye, Gauge, MoreHorizontal, Pencil } from 'lucide-react';
 
 const columnHelper = createColumnHelper<Employee>();
 
@@ -12,6 +20,7 @@ interface EmployeeDataTableProps {
     templatePublicId?: string;
     employees: Employee[];
     loading?: boolean;
+
     onRemoveEmployee?: () => void;
 }
 
@@ -59,14 +68,39 @@ export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> 
             }),
             columnHelper.accessor('publicId', {
                 header: t('employees.table.actions'),
-                cell: (info) =>
-                    templatePublicId && (
-                        <RemoveEmployeeButton
-                            templatePublicId={templatePublicId}
-                            employeePublicId={info.getValue()}
-                            onRemove={onRemoveEmployee}
-                        />
-                    ),
+                cell: ({ getValue }) => {
+                    const employeePublicId = getValue();
+                    return <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                                <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => console.log('View', employeePublicId)}>
+                                <Eye className="mr-2 h-4 w-4" />
+                                {t('view')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => console.log('Edit', employeePublicId)}>
+                                <Pencil className="mr-2 h-4 w-4" />
+                                {t('edit')}
+                            </DropdownMenuItem>
+                            {templatePublicId && (
+                                <DropdownMenuItem asChild>
+                                    <RemoveEmployeeButton
+                                        templatePublicId={templatePublicId}
+                                        employeePublicId={employeePublicId}
+                                        onRemove={onRemoveEmployee}
+                                    />
+                                </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem onClick={() => console.log('View KPI', employeePublicId)}>
+                                <Gauge className="mr-2 h-4 w-4" />
+                                {t('employees.view_kpi')}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>;
+                },
                 meta: {
                     style: {
                         textAlign: 'center',

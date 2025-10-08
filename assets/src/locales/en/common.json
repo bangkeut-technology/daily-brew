@@ -19,6 +19,8 @@
         "sick": "Sick",
         "unknown": "Unknown"
     },
+    "deleting": "Deleting...",
+    "view_kpi": "View KPI",
     "attendances": "Attendances",
     "average": "Average",
     "back": "Back",

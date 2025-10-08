@@ -15,7 +15,6 @@ import { DATE_FORMAT } from '@/constants/date';
 import { useApplication } from '@/hooks/use-application';
 import { EmployeeDataTable } from '@/components/data-table/employee-data-table';
 
-// ---- Route ----
 export const Route = createFileRoute('/console/_authenticated/_layout/employees/')({
     validateSearch: z.object({
         q: z.string().optional(),
@@ -27,7 +26,6 @@ export const Route = createFileRoute('/console/_authenticated/_layout/employees/
     component: EmployeesPage,
 });
 
-// ---- Page ----
 function EmployeesPage() {
     const { t } = useTranslation();
     const { maxFreeEmployees } = useApplication();

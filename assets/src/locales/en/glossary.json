@@ -86,6 +86,8 @@
         "add": "Add Employee",
         "edit": "Edit Employee",
         "delete": "Delete Employee",
+        "delete_title": "Delete {{name}}?",
+        "delete_description": "This action permanently removes the employee and related records that are safe to delete. You can’t undo this.",
         "current_month_score": "Current Month Score",
         "kpi_score": "KPI Score",
         "evaluate": "Evaluate",
