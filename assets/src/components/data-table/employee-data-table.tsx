@@ -14,6 +14,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Eye, Gauge, MoreHorizontal, Pencil } from 'lucide-react';
 import { DeleteEmployeeButton } from '@/components/button/delete-employee-button';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 
 const columnHelper = createColumnHelper<Employee>();
 
@@ -32,6 +33,8 @@ export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> 
     onRemoveEmployee,
 }) => {
     const { t } = useTranslation();
+    const { from, to } = useSearch({ from: '/console/_authenticated/_layout/employees/' });
+    const navigate = useNavigate();
     const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
     const columns = React.useMemo(
@@ -79,7 +82,15 @@ export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> 
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => console.log('View', employeePublicId)}>
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        navigate({
+                                            to: '/console/employees/$publicId',
+                                            params: { publicId: employeePublicId },
+                                            search: { from, to },
+                                        })
+                                    }
+                                >
                                     <Eye className="mr-2 h-4 w-4" />
                                     {t('view')}
                                 </DropdownMenuItem>
