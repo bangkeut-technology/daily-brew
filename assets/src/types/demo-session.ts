@@ -1,3 +1,5 @@
+import { User } from '@/types/user';
+
 export type DemoSession = {
     id: number;
     publicId: string;
@@ -6,4 +8,15 @@ export type DemoSession = {
     active: boolean;
     createdAt: string;
     updatedAt: string;
+    user: User;
+};
+
+export type DemoSessionAction = { type: 'SET_DEMO_SESSION'; payload: DemoSession };
+
+export type DemoSessionState = {
+    demoSession: DemoSession | undefined;
+};
+
+export type DemoSessionActions = {
+    setDemoSession: (demoSession: DemoSession) => void;
 };
