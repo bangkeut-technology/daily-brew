@@ -37,7 +37,7 @@ export const DeleteEmployeeButton: React.FC<DeleteEmployeeButtonProps> = ({
 }) => {
     const { t } = useTranslation();
     const [open, setOpen] = React.useState(false);
-    const {mutate, isPending} = useMutation({
+    const { mutate, isPending } = useMutation({
         mutationFn: deleteEmployee,
         onSuccess: (data) => {
             toast.success(data.message);
@@ -52,7 +52,7 @@ export const DeleteEmployeeButton: React.FC<DeleteEmployeeButtonProps> = ({
 
     const onConfirm = React.useCallback(async () => {
         mutate(employeePublicId);
-    }, []);
+    }, [employeePublicId, mutate]);
 
     return (
         <AlertDialog open={open} onOpenChange={setOpen}>
@@ -78,11 +78,7 @@ export const DeleteEmployeeButton: React.FC<DeleteEmployeeButtonProps> = ({
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel disabled={isPending}>{t('cancel')}</AlertDialogCancel>
-                    <AlertDialogAction
-                        onClick={onConfirm}
-                        disabled={isPending}
-                        className="bg-red-600 hover:bg-red-700"
-                    >
+                    <AlertDialogAction onClick={onConfirm} disabled={isPending} className="bg-red-600 hover:bg-red-700">
                         {isPending ? t('deleting') : t('delete')}
                     </AlertDialogAction>
                 </AlertDialogFooter>
