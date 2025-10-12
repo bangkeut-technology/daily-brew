@@ -131,7 +131,7 @@ export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> 
                 },
             }),
         ],
-        [t, templatePublicId, onRemoveEmployee],
+        [t, templatePublicId, onRemoveEmployee, navigate, from, to],
     );
 
     return (
