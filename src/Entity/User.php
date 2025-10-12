@@ -12,6 +12,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use LogicException;
+use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
 use Serializable;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\File;
@@ -35,7 +37,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 #[UniqueEntity(fields: ['emailCanonical'], message: 'There is already an account with this emailCanonical')]
 #[Vich\Uploadable]
 #[ORM\HasLifecycleCallbacks]
-class User extends AbstractEntity implements UserInterface, PasswordAuthenticatedUserInterface, Serializable
+class User extends AbstractEntity implements UserInterface, PasswordAuthenticatedUserInterface, Serializable, TwoFactorInterface
 {
     /**
      * The unique identifier of the user.
@@ -227,6 +229,9 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
      */
     #[ORM\OneToMany(targetEntity: EvaluationTemplate::class, mappedBy: 'user', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $templates;
+
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $authCode;
 
     public function __construct()
     {
@@ -839,5 +844,30 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function generateSecret(): void
     {
         $this->secret = Uuid::v4()->toBase58();
+    }
+
+    public function isEmailAuthEnabled(): bool
+    {
+        return true;
+    }
+
+    public function getEmailAuthRecipient(): string
+    {
+        return $this->email;
+    }
+
+    public function getEmailAuthCode(): string
+    {
+        return null === $this->authCode ? throw new LogicException('The email authentication code was not set') : $this->authCode;
+
+    }
+
+    /**
+     * @param string $authCode
+     * @return void
+     */
+    public function setEmailAuthCode(string $authCode): void
+    {
+        $this->authCode = $authCode;
     }
 }

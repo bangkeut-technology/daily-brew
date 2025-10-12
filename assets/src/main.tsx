@@ -13,6 +13,7 @@ import { LanguageProvider } from '@/providers/language-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { ApplicationProvider } from '@/providers/application-provider';
 import { PageNotFound } from '@/components/page-not-found';
+import { DemoSessionProvider } from '@/providers/demo-session-provider';
 
 const router = createRouter({
     routeTree,
@@ -46,11 +47,13 @@ if (rootElement && !rootElement.innerHTML) {
             <QueryClientProvider client={queryClient}>
                 <ThemeProvider>
                     <ApplicationProvider>
-                        <AuthenticationProvider>
-                            <LanguageProvider>
-                                <Application />
-                            </LanguageProvider>
-                        </AuthenticationProvider>
+                        <DemoSessionProvider>
+                            <AuthenticationProvider>
+                                <LanguageProvider>
+                                    <Application />
+                                </LanguageProvider>
+                            </AuthenticationProvider>
+                        </DemoSessionProvider>
                     </ApplicationProvider>
                 </ThemeProvider>
             </QueryClientProvider>
