@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 
 import { routeTree } from './routeTree.gen';
-import { useAuthentication } from '@/hooks/use-authentication';
+import { useAuthenticationState } from '@/hooks/use-authentication';
 import { AuthenticationProvider } from '@/providers/authentication-provider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@/i18next';
@@ -32,7 +32,7 @@ declare module '@tanstack/react-router' {
 }
 
 const Application = () => {
-    const authentication = useAuthentication();
+    const authentication = useAuthenticationState();
     return <RouterProvider router={router} context={{ authentication }} />;
 };
 

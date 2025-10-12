@@ -3,7 +3,7 @@ import { LanguageContext } from '@/contexts/language-context';
 import { Locale } from '@/types/locale';
 import i18next from '@/i18next';
 import { toast } from 'sonner';
-import { useAuthentication } from '@/hooks/use-authentication';
+import { useAuthenticationState } from '@/hooks/use-authentication';
 
 interface LanguageProviderProps {
     children: React.ReactNode;
@@ -11,7 +11,7 @@ interface LanguageProviderProps {
 
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
     const [locale, setLocale] = React.useState<Locale>('en');
-    const { user, isAuthenticated } = useAuthentication();
+    const { user, isAuthenticated } = useAuthenticationState();
 
     const updateLocale = React.useCallback((locale: Locale) => {
         i18next

@@ -2,7 +2,7 @@ import React from 'react';
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { AuthenticationContextValue } from '@/contexts/authentication-context';
+import { AuthenticationState } from '@/contexts/authentication-context';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 const TanStackRouterDevtools =
@@ -14,7 +14,7 @@ const TanStackRouterDevtools =
               })),
           );
 
-export const Route = createRootRouteWithContext<{ authentication: AuthenticationContextValue | undefined }>()({
+export const Route = createRootRouteWithContext<{ authentication: AuthenticationState | undefined }>()({
     component: () => (
         <TooltipProvider>
             <Outlet />
