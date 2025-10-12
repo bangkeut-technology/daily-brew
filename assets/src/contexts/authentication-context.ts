@@ -1,16 +1,18 @@
 import React from 'react';
 import { User } from '@/types/user';
 
-export interface AuthenticationContextValue {
+export interface AuthenticationState {
     isAuthenticated: boolean;
     demo: boolean;
     user: User | undefined;
-    setEmail: (email: string) => void;
 }
 
-export const AuthenticationContext = React.createContext<AuthenticationContextValue>({
+export type AuthenticationAction = { type: 'LOGIN'; user: User } | { type: 'LOGOUT' };
+
+export const AuthenticationContextState = React.createContext<AuthenticationState>({
     isAuthenticated: false,
     demo: false,
     user: undefined,
-    setEmail: () => {},
 });
+
+export const AuthenticationContextDispatch = React.createContext<React.Dispatch<AuthenticationAction>>(() => {});

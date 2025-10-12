@@ -11,7 +11,7 @@ import { useMutation } from '@tanstack/react-query';
 import { signUp } from '@/services/auth';
 import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
-import { useAuthentication } from '@/hooks/use-authentication';
+import { useAuthenticationDispatch, useAuthenticationState } from '@/hooks/use-authentication';
 import { z } from 'zod';
 import { SignUpForm } from '@/routes/_layout/sign-up/-components/sign-up-form';
 
@@ -30,7 +30,8 @@ export const Route = createFileRoute('/_layout/sign-up/')({
 function SignUpPage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { user, setEmail } = useAuthentication();
+    const { user } = useAuthenticationState();
+    const dispatch = useAuthenticationDispatch();
     const { redirect } = Route.useSearch();
     const form = useForm<SignUp>({
         resolver: yupResolver(signUpSchema),
@@ -48,7 +49,7 @@ function SignUpPage() {
         onSuccess: (data) => {
             sessionStorage.setItem('email', data.user.email);
             sessionStorage.setItem('locale', data.user.locale || 'en');
-            setEmail(data.user.email);
+            dispatch({ type: 'LOGIN', user: data.user });
         },
         onError: (data) => {
             const message = isAxiosError(data) ? data.response?.data.message : t('sign_up.failed', { ns: 'glossary' });

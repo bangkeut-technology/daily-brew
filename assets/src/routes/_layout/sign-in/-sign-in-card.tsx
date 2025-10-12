@@ -4,7 +4,7 @@ import { Form } from '@/components/ui/form';
 import { TextField } from '@/components/field/text-field';
 import { SignIn } from '@/types/user';
 import { Link } from '@tanstack/react-router';
-import { useAuthentication } from '@/hooks/use-authentication';
+import { useAuthenticationDispatch } from '@/hooks/use-authentication';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { signInSchema } from '@/schema/sign-in-schema';
@@ -23,7 +23,7 @@ export const SignInCard = () => {
     const { t } = useTranslation();
     const [rememberMe, setRememberMe] = React.useState(false);
     const [showPassword, onToggle] = React.useState(false);
-    const { setEmail } = useAuthentication();
+    const dispatch = useAuthenticationDispatch();
 
     const form = useForm<SignIn>({
         resolver: yupResolver(signInSchema),
@@ -37,7 +37,7 @@ export const SignInCard = () => {
         onSuccess: (data) => {
             sessionStorage.setItem('email', data.user.email);
             sessionStorage.setItem('locale', data.user.locale || 'en');
-            setEmail(data.user.email);
+            dispatch({ type: 'LOGIN', user: data.user });
         },
         onError: (data) => {
             const message = isAxiosError(data) ? data.response?.data.message : t('sign_in.failed', { ns: 'glossary' });

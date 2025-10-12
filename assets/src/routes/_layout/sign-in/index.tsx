@@ -1,6 +1,6 @@
 import React from 'react';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
-import { useAuthentication } from '@/hooks/use-authentication';
+import { useAuthenticationState } from '@/hooks/use-authentication';
 import { z } from 'zod';
 import { WelcomeSection } from '@/routes/_layout/sign-in/-welcome-section';
 import { SignInCard } from '@/routes/_layout/sign-in/-sign-in-card';
@@ -20,7 +20,7 @@ export const Route = createFileRoute('/_layout/sign-in/')({
 function SignInComponent() {
     const { redirect } = Route.useSearch();
     const navigate = useNavigate();
-    const { user } = useAuthentication();
+    const { user } = useAuthenticationState();
 
     React.useEffect(() => {
         if (user) {

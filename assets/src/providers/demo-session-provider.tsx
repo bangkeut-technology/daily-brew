@@ -8,6 +8,7 @@ interface DemoSessionProviderProps {
 
 export const DemoSessionProvider: React.FC<DemoSessionProviderProps> = ({ children }) => {
     const [state, dispatch] = React.useReducer(demoSessionReducer, demoSessionInitialState);
+
     return (
         <DemoSessionContextState.Provider value={state}>
             <DemoSessionContextDispatch.Provider value={dispatch}>{children}</DemoSessionContextDispatch.Provider>

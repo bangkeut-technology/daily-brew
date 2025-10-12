@@ -37,7 +37,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useAuthentication } from '@/hooks/use-authentication';
+import { useAuthenticationState } from '@/hooks/use-authentication';
 import { useTranslation } from 'react-i18next';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -53,7 +53,7 @@ type SidebarMenuItem = {
 };
 
 export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
-    const { user, demo } = useAuthentication();
+    const { user, demo } = useAuthenticationState();
     const { t } = useTranslation();
     const { pathname } = useLocation();
 
