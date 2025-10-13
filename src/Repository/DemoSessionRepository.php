@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\DemoSession;
+use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -72,5 +73,15 @@ class DemoSessionRepository extends AbstractRepository
         return $this->findOneBy(['deviceId' => $deviceId]);
     }
 
-
+    /**
+     * Finds active demo session for a given user.
+     *
+     * @param User $user the user entity to find active demo sessions for
+     *
+     * @return DemoSession|null the found demo session or null if not found
+     */
+    public function findActiveByUser(User $user): ?DemoSession
+    {
+        return $this->findOneBy(['user' => $user, 'active' => true]);
+    }
 }

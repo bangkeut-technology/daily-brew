@@ -71,8 +71,8 @@ class DemoSessionController extends AbstractController
     {
         $limiter = $this->anonymousLimiter->create($request->getClientIp());
 
-        if (false === $limiter->consume(1)->isAccepted()) {
-            throw new TooManyRequestsHttpException();
+        if (false === $limiter->consume()->isAccepted()) {
+            return $this->json(['message' => 'Too many requests'], Response::HTTP_TOO_MANY_REQUESTS);
         }
 
         $payload = $request->getPayload()->all();
@@ -85,7 +85,20 @@ class DemoSessionController extends AbstractController
         $session = $this->demoSessionRepository->findDeviceId($deviceId);
         if ($session && $session->getExpiresAt() > $now) {
             $this->security->login($session->getUser(), 'json_login', 'console_area');
-            return $this->createDemoSessionResponse(['demoSession' => $session, 'message' => 'Demo session found']);
+            return $this->createDemoSessionResponse([
+                'demoSession' => $session,
+                'message' => 'Demo session found',
+                'status' => 'reused',]);
+        }
+
+        // CASE 2: existed but expired -> deactivate + wipe data
+        if ($session) {
+            $session->setActive(false);
+            $this->demoSessionRepository->update($session);
+
+            // Wipe old demo data for that user (adjust these repository methods to your schema)
+            $this->demoSessionRepository->deleteDemoDataForUser($session->getUser());
+            $this->demoSessionRepository->deleteUserIfOrphan($session->getUser());
         }
 
         $faker = Factory::create();
@@ -110,6 +123,59 @@ class DemoSessionController extends AbstractController
         $this->security->login($user, 'json_login', 'console_area');
 
         return $this->createDemoSessionResponse(['demoSession' => $demo, 'message' => 'Demo session have been created'], Response::HTTP_CREATED);
+    }
+
+    /**
+     * Check if current session is demo & active (for proactive refresh on client).
+     */
+    #[Route('/status', name: 'status', methods: ['GET'])]
+    public function status(): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['active' => false], Response::HTTP_OK);
+        }
+
+        $session = $this->demoSessionRepository->findActiveByUser($user);
+        if (!$session) {
+            return $this->json(['active' => false], Response::HTTP_OK);
+        }
+
+        $now       = new DateTimeImmutable();
+        $isActive  = $session->getExpiresAt() > $now && $session->isActive();
+
+        return $this->json([
+            'active'    => $isActive,
+            'isDemo'    => true,
+            'expiresAt' => $session->getExpiresAt()->format(DATE_ATOM),
+        ]);
+    }
+
+    /**
+     * Optional: re-seed current demo space without creating a new account.
+     */
+    #[Route('/reset', name: 'reset', methods: ['POST'])]
+    public function reset(): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+        }
+        $session = $this->demoSessionRepository->findActiveByUser($user);
+        if (!$session) {
+            return $this->json(['message' => 'No active demo session'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Clear then seed again
+        $this->demoSessionRepository->deleteDemoDataForUser($user);
+        $this->demoSeeder->seedFor($user);
+
+        // Optionally extend TTL a bit (sliding window)
+        $now = new DateTimeImmutable();
+        $session->setLastSeen($now);
+        $this->demoSessionRepository->update($session);
+
+        return $this->json(['message' => 'Demo data has been refreshed']);
     }
 
     /**

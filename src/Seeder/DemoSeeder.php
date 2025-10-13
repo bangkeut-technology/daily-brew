@@ -33,6 +33,11 @@ final readonly class DemoSeeder
     {
     }
 
+    /**
+     * Seeds demo data for a given user.
+     *
+     * @param User $user the user entity to seed demo data for
+     */
     public function seedFor(User $user): void
     {
         $faker = Factory::create();
