@@ -230,6 +230,12 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[ORM\OneToMany(targetEntity: EvaluationTemplate::class, mappedBy: 'user', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $templates;
 
+    /**
+     * @var Collection<int, EvaluationTemplate>
+     */
+    #[ORM\OneToMany(targetEntity: Role::class, mappedBy: 'user', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $employeeRoles;
+
     #[ORM\Column(type: 'string', nullable: true)]
     private ?string $authCode;
 
@@ -238,6 +244,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         $this->criterias = new ArrayCollection();
         $this->stores = new ArrayCollection();
         $this->templates = new ArrayCollection();
+        $this->employeeRoles = new ArrayCollection();
     }
 
     /**
@@ -832,6 +839,33 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     {
         if ($this->templates->removeElement($template) && $template->getUser() === $this) {
             $template->setUser(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Role>
+     */
+    public function getEmployeeRoles(): Collection
+    {
+        return $this->employeeRoles;
+    }
+
+    public function addEmployeeRole(Role $role): User
+    {
+        if (!$this->employeeRoles->contains($role)) {
+            $this->employeeRoles->add($role);
+            $role->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEmployeeRole(Role $role): User
+    {
+        if ($this->employeeRoles->removeElement($role) && $role->getUser() === $this) {
+            $role->setUser(null);
         }
 
         return $this;

@@ -19,8 +19,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
  */
 #[ORM\Table(name: 'daily_brew_roles')]
 #[ORM\Entity(repositoryClass: RoleRepository::class)]
-#[ORM\UniqueConstraint(name: 'UNQ_ROLE_NAME', columns: ['name'])]
-#[ORM\UniqueConstraint(name: 'UNQ_ROLE_NAME_CANONICAL', columns: ['canonical_name'])]
+#[ORM\UniqueConstraint(name: 'UNQ_ROLE_NAME', fields: ['name', 'user'])]
+#[ORM\UniqueConstraint(name: 'UNQ_ROLE_NAME_CANONICAL', fields: ['canonicalName', 'user'])]
 #[ORM\HasLifecycleCallbacks]
 class Role extends AbstractEntity
 {
@@ -41,6 +41,10 @@ class Role extends AbstractEntity
      */
     #[ORM\ManyToMany(targetEntity: Employee::class, mappedBy: 'roles')]
     private Collection $employees;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'employeeRoles')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
 
     public function __construct()
     {
@@ -134,5 +138,23 @@ class Role extends AbstractEntity
     public function __toString(): string
     {
         return $this->name ?? '';
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param User|null $user
+     * @return Role
+     */
+    public function setUser(?User $user): Role
+    {
+        $this->user = $user;
+        return $this;
     }
 }
