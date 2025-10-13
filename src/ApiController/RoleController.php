@@ -17,8 +17,9 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class RoleController.
+ * Class RoleController
  *
+ * @package App\ApiController
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 #[Route('/roles', name: 'roles_')]
@@ -46,7 +47,7 @@ class RoleController extends AbstractController
     #[Route(name: 'gets', methods: ['GET'])]
     public function gets(): JsonResponse
     {
-        $roles = $this->roleRepository->findAll();
+        $roles = $this->roleRepository->findByUser($this->getUser());
 
         return $this->json($roles, context: ['groups' => 'role:read']);
     }
@@ -87,6 +88,7 @@ class RoleController extends AbstractController
         $form = $this->createForm(RoleFormType::class, $role);
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
+            $role->setUser($this->getUser());
             $this->roleRepository->update($role);
 
             return $this->json([
