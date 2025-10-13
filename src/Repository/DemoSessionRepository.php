@@ -60,5 +60,17 @@ class DemoSessionRepository extends AbstractRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * Finds a demo session by its deviceId.
+     *
+     * @param string $deviceId the unique deviceId of the demo session
+     *
+     * @return DemoSession|null the found demo session or null if not found
+     */
+    public function findDeviceId(string $deviceId): ?DemoSession
+    {
+        return $this->findOneBy(['deviceId' => $deviceId]);
+    }
+
 
 }

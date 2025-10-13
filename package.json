@@ -100,7 +100,7 @@
         "@tanstack/react-table-devtools": "^8.21.3",
         "@tanstack/router-cli": "^1.132.51",
         "@tanstack/router-generator": "^1.121.2",
-        "@tanstack/router-plugin": "^1.132.51",
+        "@tanstack/router-plugin": "^1.132.56",
         "@types/node": "^24.7.2",
         "@types/react": "^19.2.2",
         "@types/react-copy-to-clipboard": "^5.0.7",

@@ -12,41 +12,69 @@ use App\Util\UserManipulatorInterface;
 use DateMalformedStringException;
 use DateTimeImmutable;
 use Faker\Factory;
+use OpenApi\Attributes as OA;
 use Random\RandomException;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class DemoController
+ * Class DemoSessionController
  *
  * @package App\ApiController
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-#[Route('/demo', name: 'demo_')]
-class DemoController extends AbstractController
+#[Route('/demo-sessions', name: 'demo_sessions_')]
+class DemoSessionController extends AbstractController
 {
     public function __construct(
-        TranslatorInterface                       $translator,
-        private readonly DemoSessionRepository    $demoSessionRepository,
-        private readonly UserManipulatorInterface $userManipulator,
-        private readonly Security                 $security,
-        private readonly DemoSeeder               $demoSeeder
+        TranslatorInterface                          $translator,
+        private readonly DemoSessionRepository       $demoSessionRepository,
+        private readonly UserManipulatorInterface    $userManipulator,
+        private readonly Security                    $security,
+        private readonly DemoSeeder                  $demoSeeder,
+        #[Target('anonymous_demo_session.limiter')]
+        private readonly RateLimiterFactoryInterface $anonymousLimiter,
     )
     {
         parent::__construct($translator);
     }
 
     /**
+     * Start or refresh a demo session for a device.
+     *
+     * Cases:
+     * - Found & active  -> reuse (login + return existing expiresAt)
+     * - Found & expired -> deactivate + wipe old demo data, then create fresh
+     * - Not found       -> create fresh
+     *
      * @throws DateMalformedStringException
      * @throws RandomException
      */
+    #[OA\RequestBody(
+        description: 'Start or refresh a demo session for a device',
+        required: true,
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'deviceId', description: 'The device ID', type: 'string'),
+            ]
+        )
+    )]
     #[Route('/start', name: 'start', methods: ['POST'])]
     public function start(Request $request): JsonResponse
     {
+        $limiter = $this->anonymousLimiter->create($request->getClientIp());
+
+        if (false === $limiter->consume(1)->isAccepted()) {
+            throw new TooManyRequestsHttpException();
+        }
+
         $payload = $request->getPayload()->all();
         $deviceId = (string)($payload['deviceId'] ?? '');
         if ($deviceId === '') {
@@ -54,7 +82,7 @@ class DemoController extends AbstractController
         }
 
         $now = new DateTimeImmutable();
-        $session = $this->demoSessionRepository->findActiveDeviceId($deviceId);
+        $session = $this->demoSessionRepository->findDeviceId($deviceId);
         if ($session && $session->getExpiresAt() > $now) {
             $this->security->login($session->getUser(), 'json_login', 'console_area');
             return $this->createDemoSessionResponse(['demoSession' => $session, 'message' => 'Demo session found']);
