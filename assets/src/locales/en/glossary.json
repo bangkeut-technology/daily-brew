@@ -296,13 +296,19 @@
         }
     },
     "recent_evaluations": "Recent evaluations",
-    "role": {
+    "roles": {
         "new": {
             "title": "New Role",
             "description": "Create a new role to assign specific responsibilities to your employees."
         },
         "name": "Role Name",
-        "description": "Role Description"
+        "description": "Role Description",
+        "delete": {
+            "title": "Delete Role",
+            "description": "Are you sure you want to delete this role? This action cannot be undone.",
+            "confirm": "Yes, Delete Role",
+            "button": "Delete Role"
+        }
     },
     "see_all_evaluations": "See all evaluations",
     "settings": {

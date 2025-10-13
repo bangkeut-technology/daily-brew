@@ -15,7 +15,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { roleSchema } from '@/schema/role-schema';
 import { Form } from '@/components/ui/form';
-import { PartialRole } from '@/types/role';
+import { PartialRole, Role } from '@/types/role';
 import { TextField } from '@/components/field/text-field';
 import { TextAreaField } from '@/components/field/textarea-field';
 import { isAxiosError } from 'axios';
@@ -26,18 +26,28 @@ import { useBoolean } from 'react-use';
 import { Loader2Icon, Save } from 'lucide-react';
 
 interface NewRoleDialogProps {
+    buttonText?: string;
+    title?: string;
+    description?: string;
+    role?: Role;
     queryKey?: string[];
 }
 
-export const NewRoleDialog: React.FunctionComponent<NewRoleDialogProps> = ({ queryKey }) => {
+export const NewRoleDialog: React.FunctionComponent<NewRoleDialogProps> = ({
+    role,
+    description,
+    title,
+    buttonText,
+    queryKey,
+}) => {
     const { t } = useTranslation();
     const [open, setOpen] = useBoolean(false);
     const queryClient = useQueryClient();
     const form = useForm<PartialRole>({
         resolver: yupResolver(roleSchema),
         defaultValues: {
-            name: '',
-            description: '',
+            name: role?.name || '',
+            description: role?.description || '',
         },
     });
     const { mutate, isPending } = useMutation({
@@ -60,7 +70,6 @@ export const NewRoleDialog: React.FunctionComponent<NewRoleDialogProps> = ({ que
 
     const onSubmit = React.useCallback(
         (data: PartialRole) => {
-            console.log('Submitting new role:', data);
             mutate(data);
         },
         [mutate],
@@ -70,25 +79,27 @@ export const NewRoleDialog: React.FunctionComponent<NewRoleDialogProps> = ({ que
         <Dialog open={open} onOpenChange={setOpen}>
             <Form {...form}>
                 <DialogTrigger asChild>
-                    <Button variant="outline">{t('new_role')}</Button>
+                    <Button variant="outline">{buttonText || t('new_role')}</Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle>{t('role.new.title', { ns: 'glossary' })}</DialogTitle>
-                        <DialogDescription>{t('role.new.description', { ns: 'glossary' })}</DialogDescription>
+                        <DialogTitle>{title || t('roles.new.title', { ns: 'glossary' })}</DialogTitle>
+                        <DialogDescription>
+                            {description || t('roles.new.description', { ns: 'glossary' })}
+                        </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4">
                         <TextField
                             disabled={isPending}
                             control={form.control}
                             name="name"
-                            label={t('role.name', { ns: 'glossary' })}
+                            label={t('roles.name', { ns: 'glossary' })}
                         />
                         <TextAreaField
                             disabled={isPending}
                             control={form.control}
                             name="description"
-                            label={t('role.description', { ns: 'glossary' })}
+                            label={t('roles.description', { ns: 'glossary' })}
                         />
                     </div>
                     <DialogFooter>
@@ -97,13 +108,7 @@ export const NewRoleDialog: React.FunctionComponent<NewRoleDialogProps> = ({ que
                                 {t('cancel')}
                             </Button>
                         </DialogClose>
-                        <Button
-                            disabled={isPending}
-                            type="button"
-                            onClick={form.handleSubmit(onSubmit, (errors) => {
-                                console.error(errors);
-                            })}
-                        >
+                        <Button disabled={isPending} type="button" onClick={form.handleSubmit(onSubmit)}>
                             {isPending ? (
                                 <React.Fragment>
                                     <Loader2Icon className="animate-spin" />

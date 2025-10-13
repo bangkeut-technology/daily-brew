@@ -137,6 +137,8 @@
     "view": "View",
     "view_all": "View All",
     "view_kpi": "View KPI",
+    "role_name": "Role Name",
+    "description": "Description",
     "weight": "Weight",
     "yearly": "Yearly"
 }
