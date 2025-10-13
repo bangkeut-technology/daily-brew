@@ -231,7 +231,10 @@ class AttendanceController extends AbstractController
 
 //            $this->eventDispatcher->dispatch(new RebalanceLeaveCycleEvent($attendance));
 
-            return $this->createAttendanceResponse($attendance, Response::HTTP_CREATED);
+            return $this->createAttendanceResponse([
+                'message' => $this->translator->trans('created.attendance'),
+                'attendance' => $attendance
+            ], Response::HTTP_CREATED);
         }
 
         return $this->createBadRequestResponse($this->translator->trans('invalid.attendance', domain: 'errors'));

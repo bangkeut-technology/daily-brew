@@ -532,7 +532,7 @@ class AttendanceRepository extends AbstractRepository
      */
     public function existsForUserOnDay(User $user, DateTimeImmutable $attendanceDate): bool
     {
-        return $this->createQueryBuilder('attendance')
+        return (bool) $this->createQueryBuilder('attendance')
             ->select('COUNT(attendance.id)')
             ->where('attendance.attendanceDate = :attendanceDate')
             ->andWhere('attendance.user = :user')
