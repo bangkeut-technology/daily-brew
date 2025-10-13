@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * Class EmployeeRepository.
  *
+ * @package App\Repository
  * @author  Vandeth THO <thovandeth@gmail.com>
  *
  * @extends ServiceEntityRepository<Employee>
@@ -24,6 +25,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @method Employee      create()
  * @method Employee|null find($id, $lockMode = null, $lockVersion = null)
  * @method Employee|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Employee|null findByPublicId(string $publicId)
  * @method Employee[]    findAll()
  * @method Employee[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */

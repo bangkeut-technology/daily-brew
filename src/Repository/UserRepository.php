@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * Class UserRepository.
  *
+ * @package App\Repository
  * @author  Vandeth THO <thovandeth@gmail.com>
  *
  * @extends ServiceEntityRepository<User>
@@ -24,6 +25,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @method User      create()
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
  * @method User|null findOneBy(array $criteria, array $orderBy = null)
+ * @method User|null findByPublicId(string $publicId)
  * @method User[]    findAll()
  * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */

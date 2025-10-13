@@ -9,6 +9,7 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * Class EmployeeScoreRepository.
  *
+ * @package App\Repository
  * @author  Vandeth THO <thovandeth@gmail.com>
  *
  * @extends ServiceEntityRepository<EmployeeScore>
@@ -16,6 +17,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method EmployeeScore      create()
  * @method EmployeeScore|null find($id, $lockMode = null, $lockVersion = null)
  * @method EmployeeScore|null findOneBy(array $criteria, array $orderBy = null)
+ * @method EmployeeScore|null findByPublicId(string $publicId)
  * @method EmployeeScore[]    findAll()
  * @method EmployeeScore[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */

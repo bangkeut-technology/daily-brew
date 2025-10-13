@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * Class EvaluationTemplateRepository.
  *
+ * @package App\Repository
  * @author  Vandeth THO <thovandeth@gmail.com>
  *
  * @extends ServiceEntityRepository<EvaluationTemplate>
@@ -24,6 +25,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @method EvaluationTemplate      create()
  * @method EvaluationTemplate|null find($id, $lockMode = null, $lockVersion = null)
  * @method EvaluationTemplate|null findOneBy(array $criteria, array $orderBy = null)
+ * @method EvaluationTemplate|null findByPublicId(string $publicId)
  * @method EvaluationTemplate[]    findAll()
  * @method EvaluationTemplate[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
@@ -33,16 +35,6 @@ class EvaluationTemplateRepository extends AbstractRepository
         ManagerRegistry $registry,
     ) {
         parent::__construct($registry, EvaluationTemplate::class);
-    }
-
-    /**
-     * Find an evaluation template by its publicId.
-     *
-     * @param string $publicId the publicId of the evaluation template
-     */
-    public function findByPublicId(string $publicId): ?EvaluationTemplate
-    {
-        return $this->findOneBy(['publicId' => $publicId]);
     }
 
     /**

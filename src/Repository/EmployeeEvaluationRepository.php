@@ -25,6 +25,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method EmployeeEvaluation      create()
  * @method EmployeeEvaluation|null find($id, $lockMode = null, $lockVersion = null)
  * @method EmployeeEvaluation|null findOneBy(array $criteria, array $orderBy = null)
+ * @method EmployeeEvaluation|null findByPublicId(string $publicId)
  * @method EmployeeEvaluation[]    findAll()
  * @method EmployeeEvaluation[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */

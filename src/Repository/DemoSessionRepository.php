@@ -21,6 +21,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method DemoSession      create()
  * @method DemoSession|null find($id, $lockMode = null, $lockVersion = null)
  * @method DemoSession|null findOneBy(array $criteria, array $orderBy = null)
+ * @method DemoSession|null findByPublicId(string $publicId)
  * @method DemoSession[]    findAll()
  * @method DemoSession[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */

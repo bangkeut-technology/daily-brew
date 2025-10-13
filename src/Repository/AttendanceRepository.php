@@ -39,6 +39,7 @@ use Exception;
  * @method Attendance      create()
  * @method Attendance|null find($id, $lockMode = null, $lockVersion = null)
  * @method Attendance|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Attendance|null findByPublicId(string $publicId)
  * @method Attendance[]    findAll()
  * @method Attendance[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
@@ -707,6 +708,26 @@ class AttendanceRepository extends AbstractRepository
             ->delete()
             ->andWhere('a.batch = :batch')
             ->setParameter('batch', $batch)
+            ->getQuery()
+            ->execute();
+    }
+
+    /**
+     * Deletes attendance records associated with a specific user.
+     *
+     * This method constructs a query to delete all attendance records
+     * where the associated user matches the given user instance.
+     *
+     * @param User $user The user entity whose attendance records should be deleted.
+     *
+     * @return int The number of records affected by the delete operation.
+     */
+    public function deleteByUser(User $user): int
+    {
+        return $this->createQueryBuilder('a')
+            ->delete()
+            ->andWhere('a.user = :user')
+            ->setParameter('user', $user)
             ->getQuery()
             ->execute();
     }

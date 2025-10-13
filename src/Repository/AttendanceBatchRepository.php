@@ -25,6 +25,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method AttendanceBatch      create()
  * @method AttendanceBatch|null find($id, $lockMode = null, $lockVersion = null)
  * @method AttendanceBatch|null findOneBy(array $criteria, array $orderBy = null)
+ * @method AttendanceBatch|null findByPublicId(string $publicId)
  * @method AttendanceBatch[]    findAll()
  * @method AttendanceBatch[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
@@ -155,10 +156,10 @@ class AttendanceBatchRepository extends AbstractRepository
     /**
      * Retrieves a list of upcoming attendance batches filtered by type, user, date range, and optionally by employee public ID.
      *
-     * @param User                    $user             The user to which the attendances are associated.
-     * @param DateTimeImmutable       $from             The start date of the date range.
-     * @param DateTimeImmutable       $to               The end date of the date range.
-     * @param AttendanceTypeEnum|null $type             The type of attendance to filter by; null includes all types.
+     * @param User                    $user The user to which the attendances are associated.
+     * @param DateTimeImmutable       $from The start date of the date range.
+     * @param DateTimeImmutable       $to   The end date of the date range.
+     * @param AttendanceTypeEnum|null $type The type of attendance to filter by; null includes all types.
      *
      * @return array                Returns an array of attendance batches matching the criteria.
      */
@@ -185,5 +186,25 @@ class AttendanceBatchRepository extends AbstractRepository
             ]));
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Deletes attendance batches associated with a specific user.
+     *
+     * This method constructs a query to delete all attendance batches
+     * where the associated user matches the given user instance.
+     *
+     * @param User $user The user entity whose attendance batches should be deleted.
+     *
+     * @return int The number of records affected by the delete operation.
+     */
+    public function deleteByUser(User $user): int
+    {
+        return $this->createQueryBuilder('ab')
+            ->delete()
+            ->where('ab.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->execute();
     }
 }

@@ -17,6 +17,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * Class EvaluationCriteriaRepository.
  *
+ * @package App\Repository
  * @author  Vandeth THO <thovandeth@gmail.com>
  *
  * @extends ServiceEntityRepository<EvaluationCriteria>
@@ -24,6 +25,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @method EvaluationCriteria      create()
  * @method EvaluationCriteria|null find($id, $lockMode = null, $lockVersion = null)
  * @method EvaluationCriteria|null findOneBy(array $criteria, array $orderBy = null)
+ * @method EvaluationCriteria|null findByPublicId(string $publicId)
  * @method EvaluationCriteria[]    findAll()
  * @method EvaluationCriteria[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */

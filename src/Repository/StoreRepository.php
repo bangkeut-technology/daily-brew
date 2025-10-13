@@ -14,6 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * Class StoreRepository.
  *
+ * @package App\Repository
  * @author  Vandeth THO <thovandeth@gmail.com>
  *
  * @extends ServiceEntityRepository<Store>
@@ -21,6 +22,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Store      create()
  * @method Store|null find($id, $lockMode = null, $lockVersion = null)
  * @method Store|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Store|null findByPublicId(string $publicId)
  * @method Store[]    findAll()
  * @method Store[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
@@ -29,11 +31,12 @@ class StoreRepository extends AbstractRepository
     /**
      * StoreRepository constructor.
      *
-     * @param ManagerRegistry        $registry      the registry
+     * @param ManagerRegistry $registry the registry
      */
     public function __construct(
         ManagerRegistry $registry,
-    ) {
+    )
+    {
         parent::__construct($registry, Store::class);
     }
 
@@ -47,6 +50,7 @@ class StoreRepository extends AbstractRepository
     {
         return $this->findOneBy(['canonicalName' => $canonicalName, 'user' => $user]);
     }
+
     /**
      * Finds all stores by user.
      *
@@ -121,7 +125,7 @@ class StoreRepository extends AbstractRepository
      * Finds a store by its publicId and user.
      *
      * @param string $publicId the publicId of the store to retrieve
-     * @param User   $user       the user
+     * @param User   $user     the user
      */
     public function findByPublicIdAndUser(string $publicId, User $user): ?Store
     {

@@ -20,6 +20,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Setting      create()
  * @method Setting|null find($id, $lockMode = null, $lockVersion = null)
  * @method Setting|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Setting|null findByPublicId(string $publicId)
  * @method Setting[]    findAll()
  * @method Setting[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */

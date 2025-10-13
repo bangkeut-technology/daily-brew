@@ -12,6 +12,7 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * Class RoleRepository.
  *
+ * @package App\Repository
  * @author  Vandeth THO <thovandeth@gmail.com>
  *
  * @extends ServiceEntityRepository<Role>
@@ -19,6 +20,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Role      create()
  * @method Role|null find($id, $lockMode = null, $lockVersion = null)
  * @method Role|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Role|null findByPublicId(string $publicId)
  * @method Role[]    findAll()
  * @method Role[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
@@ -32,12 +34,32 @@ class RoleRepository extends AbstractRepository
     /**
      * Find roles by user.
      *
-     * @param User $user
+     * @param User $user the user entity
      *
-     * @return Role[]
+     * @return Role[] returns the list of role entities associated with the user
      */
     public function findByUser(User $user): array
     {
         return $this->findBy(['user' => $user]);
+    }
+
+    /**
+     * Deletes roles associated with a specific user.
+     *
+     * This method constructs a query to delete all roles
+     * where the associated user matches the given user instance.
+     *
+     * @param User $user The user entity whose roles should be deleted.
+     *
+     * @return int The number of records affected by the delete operation.
+     */
+    public function deleteByUser(User $user): int
+    {
+        return $this->createQueryBuilder('r')
+            ->delete()
+            ->where('r.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->execute();
     }
 }
