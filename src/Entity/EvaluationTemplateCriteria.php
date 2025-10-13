@@ -22,9 +22,11 @@ class EvaluationTemplateCriteria extends AbstractEntity
         #[Groups(['template_criteria:read'])]
         private ?int                $weight = null,
         #[ORM\ManyToOne(targetEntity: EvaluationTemplate::class, inversedBy: 'criterias')]
+        #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
         #[Groups(['template_criteria:read'])]
         private ?EvaluationTemplate $template = null,
         #[ORM\ManyToOne(targetEntity: EvaluationCriteria::class, inversedBy: 'templates')]
+        #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
         #[Groups(['template_criteria:read'])]
         private ?EvaluationCriteria $criteria = null,
     )

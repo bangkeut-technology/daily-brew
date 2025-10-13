@@ -29,6 +29,9 @@ class DemoCleanUpCommand extends Command
         parent::__construct();
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $now = new DateTimeImmutable();
