@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\ApiController;
 
+use App\ApiController\Trait\EmployeeTrait;
 use App\Controller\AbstractController;
+use App\Entity\Employee;
 use App\Entity\Role;
 use App\Form\RoleFormType;
 use App\Repository\RoleRepository;
@@ -26,6 +28,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[OA\Tag(name: 'Roles')]
 class RoleController extends AbstractController
 {
+    use EmployeeTrait;
+
     public function __construct(
         TranslatorInterface             $translator,
         private readonly RoleRepository $roleRepository,
@@ -238,6 +242,36 @@ class RoleController extends AbstractController
             'message' => $this->translator->trans('deleted.role', ['%name%' => $role]),
             'role' => $role,
         ]);
+    }
+
+    /**
+     * Retrieves employees associated with a specific role and creates a JSON response.
+     *
+     * @param string $publicId The public identifier of the role.
+     *
+     * @return JsonResponse The JSON response containing the employees of the specified role.
+     */
+    #[OA\Parameter(
+        name: 'publicId',
+        description: 'The public identifier of the role.',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns a list of employees associated with the specified role',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Employee::class, groups: ['employee:read']))
+        )
+    )]
+    #[Route('/{publicId}/employees', name: 'employees', methods: ['GET'])]
+    public function getEmployees(string $publicId): JsonResponse
+    {
+        $role = $this->getRole($publicId);
+
+        return $this->createEmployeeResponse($role->getEmployees());
     }
 
     /**

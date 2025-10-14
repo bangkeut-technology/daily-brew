@@ -1,6 +1,6 @@
 import React from 'react';
 import { Role } from '@/types/role';
-import { createColumnHelper, RowSelectionTableState } from '@tanstack/table-core';
+import { createColumnHelper } from '@tanstack/table-core';
 import { useQuery } from '@tanstack/react-query';
 import { fetchRoles } from '@/services/role';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,9 @@ import { RowSelectionState } from '@tanstack/react-table';
 
 const columnHelper = createColumnHelper<Role>();
 
-interface RolesDataTableProps {}
+interface RolesDataTableProps {
+    className?: string;
+}
 
 export const RolesDataTable: React.FC<RolesDataTableProps> = () => {
     const { t } = useTranslation();
