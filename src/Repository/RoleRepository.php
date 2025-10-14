@@ -62,4 +62,23 @@ class RoleRepository extends AbstractRepository
             ->getQuery()
             ->execute();
     }
+
+    /**
+     * Retrieves a single entity by its public ID and associated user.
+     *
+     * @param string $publicId The public identifier of the entity.
+     * @param User   $user     The user associated with the entity.
+     *
+     * @return Role|null The entity object if found, or null if no match is found.
+     */
+    public function findByPublicIdAndUser(string $publicId, User $user): ?Role
+    {
+        return $this->createQueryBuilder('r')
+            ->where('r.publicId = :publicId')
+            ->andWhere('r.user = :user')
+            ->setParameter('publicId', $publicId)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

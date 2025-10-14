@@ -6,6 +6,7 @@ not_found:
     attendance:                   'Attendance %publicId% not found.'
     setting:                      'Setting %name% not found.'
     attendance_batch:             'Attendance batch %publicId% not found.'
+    role:                         'Role %publicId% not found.'
 invalid:
     user:                'Invalid user information'
     user_password:       'The current password is incorrect.'

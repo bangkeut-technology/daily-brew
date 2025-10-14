@@ -10,6 +10,7 @@ updated:
     settings:            'Settings have been updated successfully'
     setting:             'Setting %name% has been updated successfully'
     attendance_batch:    'Attendance batch %label% has been updated successfully'
+    role:                'Role %name% has been updated successfully'
 deleted:
     user:                         'User has been deleted successfully'
     evaluation_template:          'Evaluation template %name% has been deleted successfully'
@@ -17,8 +18,9 @@ deleted:
     employee:                     'Employee %name% has been deleted successfully'
     evaluation_template_criteria: 'Evaluation criteria %criteria% has been deleted successfully from template %template%'
     evaluation_template_employee: 'Employees have been removed successfully from evaluation template %template%'
-    attendance:       'Attendance has been deleted successfully'
-    attendance_batch: 'Attendance batch %label% has been deleted successfully'
+    attendance:                   'Attendance has been deleted successfully'
+    attendance_batch:             'Attendance batch %label% has been deleted successfully'
+    role:                         'Role %name% has been deleted successfully'
 added:
     evaluation_template:           'Evaluation template %template% has been added successfully'
     evaluation_template_criterias: 'Evaluation criterias have been added successfully to template %template%'
