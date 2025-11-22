@@ -219,10 +219,10 @@ class AttendanceController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $attendance->setUser($this->getUser());
 
-            $exists = $this->attendanceRepository->existsForUserOnDay($this->getUser(), $attendance->getAttendanceDate());
+            $exists = $this->attendanceRepository->existsForEmployeeOnDay($attendance->getEmployee(), $attendance->getAttendanceDate());
             if ($exists) {
                 return $this->json(
-                    ['message' => $this->translator->trans('attendance.duplicate_for_day', ['%date%' => $attendance->getAttendanceDate()], domain: 'errors')],
+                    ['message' => $this->translator->trans('attendance.duplicate_for_day', ['%date%' => $attendance->getAttendanceDate()->format('Y-m-d')], domain: 'errors')],
                     Response::HTTP_CONFLICT
                 );
             }

@@ -546,6 +546,28 @@ class AttendanceRepository extends AbstractRepository
     }
 
     /**
+     * Checks if an attendance record exists for a specific employee on a given date.
+     *
+     * @param Employee          $employee       The employee whose attendance record is being checked.
+     * @param DateTimeImmutable $attendanceDate The date for which the attendance record is being checked.
+     *
+     * @return bool True if an attendance record exists for the employee on the specified date, false otherwise.
+     */
+    public function existsForEmployeeOnDay(Employee $employee, DateTimeImmutable $attendanceDate): bool
+    {
+        return (bool) $this->createQueryBuilder('attendance')
+            ->select('COUNT(attendance.id)')
+            ->where('attendance.attendanceDate = :attendanceDate')
+            ->andWhere('attendance.employee = :employee')
+            ->setParameters(new ArrayCollection([
+                new Parameter('attendanceDate', $attendanceDate, Types::DATE_IMMUTABLE),
+                new Parameter('employee', $employee),
+            ]))
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
      * Checks if attendance records exist for a user within a specified period.
      *
      * @param User                   $user The user for whom attendance records are being checked.
