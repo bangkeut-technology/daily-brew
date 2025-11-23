@@ -17,14 +17,14 @@ Encore.setOutputPath('public/build/')
     .splitEntryChunks()
     .enableSingleRuntimeChunk()
     .cleanupOutputBeforeBuild()
-    .enableBuildNotifications()
+    // .enableBuildNotifications()
     .enableSourceMaps(Encore.isProduction())
     .enableVersioning(Encore.isProduction())
     .configureBabelPresetEnv((config) => {
         config.useBuiltIns = 'usage';
         config.corejs = '3.23';
     })
-    .enableTypeScriptLoader(function (_) {})
+    .enableTypeScriptLoader(function () {})
     .enableReactPreset()
     .enableIntegrityHashes(Encore.isProduction())
     .enableForkedTypeScriptTypesChecking()
