@@ -54,8 +54,8 @@ export const AttendanceDialog: React.FunctionComponent<AttendanceDialogProps> = 
         defaultValues: {
             ...defaultValues,
             attendanceDate: attendance?.attendanceDate ? new Date(attendance?.attendanceDate) : attendanceDate,
-            note: attendance?.note ?? '',
-            type: attendance?.type ?? AttendanceTypeEnum.present,
+            note: attendance?.note || '',
+            type: attendance?.type || AttendanceTypeEnum.present,
             employee: employee?.id ? employee.id.toString() : '_null',
         },
     });
