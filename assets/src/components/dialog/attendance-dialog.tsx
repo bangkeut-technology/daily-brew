@@ -20,7 +20,7 @@ import { AttendanceForm } from '@/components/form/attendance-form';
 import { useMutation } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
-import { postAttendance } from '@/services/attendance';
+import { postAttendance, putAttendance } from '@/services/attendance';
 import { ClockPlus, Loader2Icon, Save } from 'lucide-react';
 
 const defaultValues: PartialAttendance = {
@@ -72,13 +72,33 @@ export const AttendanceDialog: React.FunctionComponent<AttendanceDialogProps> = 
             toast.error(errorMessage);
         },
     });
+    const { mutate: putMutate, isPending: isPutPending } = useMutation({
+        mutationFn: putAttendance,
+        onSuccess: (data) => {
+            toast.success(data.message);
+            setOpen(false);
+            form.reset({ ...defaultValues, attendanceDate });
+            onSuccess?.(data.attendance);
+        },
+        onError: (error) => {
+            const errorMessage = isAxiosError(error) ? error.response?.data.message : t('occurred', { ns: 'error' });
+            toast.error(errorMessage);
+        },
+    });
 
     const onSubmit = React.useCallback(
         (data: PartialAttendance) => {
+            if (attendance) {
+                putMutate({ publicId: attendance.publicId, attendance: data });
+                return;
+            }
             mutate(data);
         },
-        [mutate],
+        [attendance, mutate, putMutate],
     );
+
+    const isLoading = isPending || isPutPending;
+    const isEdit = attendance !== undefined;
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -93,19 +113,27 @@ export const AttendanceDialog: React.FunctionComponent<AttendanceDialogProps> = 
                 )}
             </DialogTrigger>
             <DialogContent>
-                <DialogTitle>{t('attendances.new.title', { ns: 'glossary' })}</DialogTitle>
-                <DialogDescription>{t('attendances.new.description', { ns: 'glossary' })}</DialogDescription>
+                <DialogTitle>
+                    {isEdit
+                        ? t('attendances.edit.title', { ns: 'glossary' })
+                        : t('attendances.new.title', { ns: 'glossary' })}
+                </DialogTitle>
+                <DialogDescription>
+                    {isEdit
+                        ? t('attendances.edit.description', { ns: 'glossary' })
+                        : t('attendances.new.description', { ns: 'glossary' })}
+                </DialogDescription>
                 <div className="grid gap-4">
-                    <AttendanceForm form={form} isPending={isPending} />
+                    <AttendanceForm form={form} isPending={isLoading} />
                 </div>
                 <DialogFooter>
                     <DialogClose asChild>
-                        <Button disabled={isPending} variant="outline">
+                        <Button disabled={isLoading} variant="outline">
                             {t('cancel')}
                         </Button>
                     </DialogClose>
-                    <Button disabled={isPending} type="button" onClick={form.handleSubmit(onSubmit)}>
-                        {isPending ? (
+                    <Button disabled={isLoading} type="button" onClick={form.handleSubmit(onSubmit)}>
+                        {isLoading ? (
                             <React.Fragment>
                                 <Loader2Icon className="animate-spin" />
                                 {t('saving')}
