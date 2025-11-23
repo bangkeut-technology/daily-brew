@@ -39,82 +39,90 @@ interface NewAttendanceDialogProps {
     button?: React.ReactNode;
 }
 
-export const NewAttendanceDialog: React.FunctionComponent<NewAttendanceDialogProps> = ({
-    attendanceDate = new Date(),
-    employee,
-    button,
-}) => {
-    const { t } = useTranslation();
-    const [open, setOpen] = useBoolean(false);
-    const form = useForm<PartialAttendance>({
-        resolver: yupResolver(attendanceSchema),
-        defaultValues: {
-            ...defaultValues,
-            attendanceDate,
-            employee: employee?.id ? employee.id.toString() : '_null',
-        },
-    });
-    const { mutate, isPending } = useMutation({
-        mutationFn: postAttendance,
-        onSuccess: (data) => {
-            toast.success(data.message);
-            setOpen(false);
-            form.reset({ ...defaultValues, attendanceDate });
-        },
-        onError: (error) => {
-            const errorMessage = isAxiosError(error) ? error.response?.data.message : t('occurred', { ns: 'error' });
-            toast.error(errorMessage);
-        },
-    });
+export interface NewAttendanceDialogRefProps {
+    openDialog: () => void;
+}
 
-    const onSubmit = React.useCallback(
-        (data: PartialAttendance) => {
-            mutate(data);
-        },
-        [mutate],
-    );
+export const NewAttendanceDialog = React.forwardRef<NewAttendanceDialogRefProps, NewAttendanceDialogProps>(
+    ({ attendanceDate = new Date(), employee, button }, ref) => {
+        const { t } = useTranslation();
+        const [open, setOpen] = useBoolean(false);
+        const form = useForm<PartialAttendance>({
+            resolver: yupResolver(attendanceSchema),
+            defaultValues: {
+                ...defaultValues,
+                attendanceDate,
+                employee: employee?.id ? employee.id.toString() : '_null',
+            },
+        });
+        const { mutate, isPending } = useMutation({
+            mutationFn: postAttendance,
+            onSuccess: (data) => {
+                toast.success(data.message);
+                setOpen(false);
+                form.reset({ ...defaultValues, attendanceDate });
+            },
+            onError: (error) => {
+                const errorMessage = isAxiosError(error)
+                    ? error.response?.data.message
+                    : t('occurred', { ns: 'error' });
+                toast.error(errorMessage);
+            },
+        });
 
-    return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                {button ? (
-                    button
-                ) : (
-                    <Button className="bg-amber-500 hover:bg-amber-500/90">
-                        <ClockPlus />
-                        {t('attendances.new.title', { ns: 'glossary' })}
-                    </Button>
-                )}
-            </DialogTrigger>
-            <DialogContent>
-                <DialogTitle>{t('attendances.new.title', { ns: 'glossary' })}</DialogTitle>
-                <DialogDescription>{t('attendances.new.description', { ns: 'glossary' })}</DialogDescription>
-                <div className="grid gap-4">
-                    <AttendanceForm form={form} isPending={isPending} />
-                </div>
-                <DialogFooter>
-                    <DialogClose asChild>
-                        <Button disabled={isPending} variant="outline">
-                            {t('cancel')}
+        React.useImperativeHandle(ref, () => ({
+            openDialog: () => setOpen(true),
+        }));
+
+        const onSubmit = React.useCallback(
+            (data: PartialAttendance) => {
+                mutate(data);
+            },
+            [mutate],
+        );
+
+        return (
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>
+                    {button ? (
+                        button
+                    ) : (
+                        <Button className="bg-amber-500 hover:bg-amber-500/90">
+                            <ClockPlus />
+                            {t('attendances.new.title', { ns: 'glossary' })}
                         </Button>
-                    </DialogClose>
-                    <Button disabled={isPending} type="button" onClick={form.handleSubmit(onSubmit)}>
-                        {isPending ? (
-                            <React.Fragment>
-                                <Loader2Icon className="animate-spin" />
-                                {t('saving')}
-                            </React.Fragment>
-                        ) : (
-                            <React.Fragment>
-                                <Save />
-                                {t('attendances.new.save', { ns: 'glossary' })}
-                            </React.Fragment>
-                        )}
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    );
-};
+                    )}
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogTitle>{t('attendances.new.title', { ns: 'glossary' })}</DialogTitle>
+                    <DialogDescription>{t('attendances.new.description', { ns: 'glossary' })}</DialogDescription>
+                    <div className="grid gap-4">
+                        <AttendanceForm form={form} isPending={isPending} />
+                    </div>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button disabled={isPending} variant="outline">
+                                {t('cancel')}
+                            </Button>
+                        </DialogClose>
+                        <Button disabled={isPending} type="button" onClick={form.handleSubmit(onSubmit)}>
+                            {isPending ? (
+                                <React.Fragment>
+                                    <Loader2Icon className="animate-spin" />
+                                    {t('saving')}
+                                </React.Fragment>
+                            ) : (
+                                <React.Fragment>
+                                    <Save />
+                                    {t('attendances.new.save', { ns: 'glossary' })}
+                                </React.Fragment>
+                            )}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        );
+    },
+);
 
 NewAttendanceDialog.displayName = 'NewAttendanceDialog';

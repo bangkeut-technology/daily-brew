@@ -156,5 +156,6 @@ abstract class AbstractEntity
     public function __clone()
     {
         $this->id = null;
+        $this->publicId = null;
     }
 }
