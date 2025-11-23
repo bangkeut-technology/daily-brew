@@ -12,7 +12,7 @@ import { AttendanceGantt } from '@/components/attendance/attendance-gantt';
 import { MetricSection } from '@/routes/console/_authenticated/_layout/-components/metric-section';
 import { UpcomingLeaves } from '@/routes/console/_authenticated/_layout/-components/upcoming-leaves';
 import { RecentEvaluations } from '@/routes/console/_authenticated/_layout/-components/recent-evaluations';
-import { QuickActions, QuickActionsRefProps } from '@/routes/console/_authenticated/_layout/-components/quick-actions';
+import { QuickActions } from '@/routes/console/_authenticated/_layout/-components/quick-actions';
 import { UpcomingAttendanceBatches } from '@/routes/console/_authenticated/_layout/-components/upcoming-attendance-batches';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/')({
@@ -22,7 +22,6 @@ export const Route = createFileRoute('/console/_authenticated/_layout/')({
 function DashboardPage() {
     const { t } = useTranslation();
     const [month, setMonth] = React.useState<Date>(startOfMonth(new Date()));
-    const quickActionsRef = React.useRef<QuickActionsRefProps>(null);
     const { data: employees = [] } = useQuery({
         queryKey: ['employees', month],
         queryFn: () =>
@@ -72,7 +71,7 @@ function DashboardPage() {
 
             <MetricSection month={month} />
 
-            <QuickActions ref={quickActionsRef} />
+            <QuickActions />
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                 <div className="xl:col-span-2 space-y-6">
@@ -94,17 +93,7 @@ function DashboardPage() {
                             </Link>
                         }
                     />
-                    <AttendanceGantt
-                        month={month}
-                        employees={employees}
-                        onCellClick={({ employee, dateISO }) => {
-                            if (quickActionsRef.current) {
-                                quickActionsRef.current.setEmployee(employee);
-                                quickActionsRef.current.setAttendanceDate(new Date(dateISO));
-                                quickActionsRef.current.opensNewAttendanceDialog();
-                            }
-                        }}
-                    />
+                    <AttendanceGantt month={month} employees={employees} />
                 </div>
 
                 <div className="space-y-6">

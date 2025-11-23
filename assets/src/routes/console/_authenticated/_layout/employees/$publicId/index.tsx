@@ -11,7 +11,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2, UserRoundX } from 'lucide-react';
 import { EditEmployeeDialog } from '@/components/dialog/edit-employee-dialog';
 import { EmployeeAttendanceCalendar } from '@/components/calendar/employee-attendance-calendar';
-import { NewAttendanceDialog } from '@/components/dialog/new-attendance-dialog';
+import { AttendanceDialog } from '@/components/dialog/attendance-dialog';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/employees/$publicId/')({
     component: EmployeeDetails,
@@ -57,7 +57,7 @@ function EmployeeDetails() {
                     </h1>
                     <EditEmployeeDialog employee={employee} onSuccess={onSuccess} />
                     <EmployeeEvaluationButton employee={employee} />
-                    <NewAttendanceDialog employee={employee} />
+                    <AttendanceDialog employee={employee} />
                 </div>
 
                 <div className="flex flex-col gap-6 sm:grid sm:grid-cols-1 md:grid-cols-2">

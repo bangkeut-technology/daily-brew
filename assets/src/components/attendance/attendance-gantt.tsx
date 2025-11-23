@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { fetchGanttAttendances } from '@/services/attendance';
 import { DATE_FORMAT } from '@/constants/date';
+import { AttendanceDialog } from '@/components/dialog/attendance-dialog';
 
 export type CellClickFunc = (args: { employee: Employee; dateISO: string; type: AttendanceType | undefined }) => void;
 
@@ -48,7 +49,7 @@ export const AttendanceGantt: React.FunctionComponent<AttendanceGanttProps> = ({
     const { t } = useTranslation();
     const start = React.useMemo(() => rangeStart ?? startOfMonth(month), [rangeStart, month]);
     const end = React.useMemo(() => rangeEnd ?? endOfMonth(month), [rangeEnd, month]);
-    const { data } = useQuery({
+    const { data, refetch } = useQuery({
         queryKey: ['attendance-gantt', start, end, employees],
         queryFn: () =>
             fetchGanttAttendances({ from: format(start, DATE_FORMAT), to: format(end, DATE_FORMAT), employees }),
@@ -76,13 +77,13 @@ export const AttendanceGantt: React.FunctionComponent<AttendanceGanttProps> = ({
         [onCellClick],
     );
 
-    const getStatus = React.useCallback(
+    const getAttendance = React.useCallback(
         (employeePublicId: string, date: string) => {
             if (!data && !Array.isArray(data)) return undefined;
             if (data[employeePublicId]) {
                 const employee = data[employeePublicId];
                 if (employee.attendances[date]) {
-                    return employee.attendances[date].type;
+                    return employee.attendances[date];
                 }
             }
             return undefined;
@@ -142,7 +143,8 @@ export const AttendanceGantt: React.FunctionComponent<AttendanceGanttProps> = ({
                             <div className="px-3 py-2 border-r bg-card sticky left-0 z-10">{employee.fullName}</div>
                             {days.map((d, i) => {
                                 const dateISO = format(d, 'yyyy-MM-dd');
-                                const type = getStatus(employee.publicId, dateISO);
+                                const attendance = getAttendance(employee.publicId, dateISO);
+                                const type = attendance?.type;
                                 const isWknd = isWeekend(d);
 
                                 const chip =
@@ -163,22 +165,29 @@ export const AttendanceGantt: React.FunctionComponent<AttendanceGanttProps> = ({
                                     );
 
                                 return (
-                                    <div
+                                    <AttendanceDialog
                                         key={`${employee.id}_${i}`}
-                                        role="button"
-                                        tabIndex={0}
-                                        onClick={() => onCellClick?.({ employee, dateISO, type })}
-                                        onKeyDown={(e) => handleKeyDown(e, employee, dateISO, type)}
-                                        className={cn(
-                                            'h-10 border-r grid place-items-center text-[10px] cursor-pointer transition-colors',
-                                            'hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                                            isWknd ? 'bg-muted/60' : 'bg-background',
-                                        )}
-                                        title={type ? STATUS_UI[type].title : t('no_records')}
-                                        aria-label={`Cell ${employee.fullName} ${dateISO} ${type ?? 'empty'}`}
-                                    >
-                                        {chip}
-                                    </div>
+                                        attendance={attendance}
+                                        employee={employee}
+                                        attendanceDate={new Date(dateISO)}
+                                        onSuccess={() => refetch()}
+                                        button={
+                                            <div
+                                                role="button"
+                                                tabIndex={0}
+                                                onKeyDown={(e) => handleKeyDown(e, employee, dateISO, type)}
+                                                className={cn(
+                                                    'h-10 border-r grid place-items-center text-[10px] cursor-pointer transition-colors',
+                                                    'hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                                                    isWknd ? 'bg-muted/60' : 'bg-background',
+                                                )}
+                                                title={type ? STATUS_UI[type].title : t('no_records')}
+                                                aria-label={`Cell ${employee.fullName} ${dateISO} ${type ?? 'empty'}`}
+                                            >
+                                                {chip}
+                                            </div>
+                                        }
+                                    />
                                 );
                             })}
                         </div>
