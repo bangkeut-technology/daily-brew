@@ -22,7 +22,7 @@ interface EmployeeDataTableProps {
     templatePublicId?: string;
     employees: Employee[];
     loading?: boolean;
-
+    onRowClick?: (employee: Employee) => void;
     onRemoveEmployee?: () => void;
 }
 
@@ -30,6 +30,7 @@ export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> 
     employees,
     loading,
     templatePublicId,
+    onRowClick,
     onRemoveEmployee,
 }) => {
     const { t } = useTranslation();
@@ -140,6 +141,7 @@ export const EmployeeDataTable: React.FunctionComponent<EmployeeDataTableProps> 
             columns={columns}
             loading={loading}
             rowSelection={rowSelection}
+            onRowClick={onRowClick}
             onRowSelectionChange={setRowSelection}
         />
     );

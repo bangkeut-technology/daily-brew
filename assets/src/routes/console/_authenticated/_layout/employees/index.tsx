@@ -14,6 +14,7 @@ import {
 import { DATE_FORMAT } from '@/constants/date';
 import { useApplication } from '@/hooks/use-application';
 import { EmployeeDataTable } from '@/components/data-table/employee-data-table';
+import { Employee } from '@/types/employee';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/employees/')({
     validateSearch: z.object({
@@ -74,6 +75,17 @@ function EmployeesPage() {
         });
     }, [from, navigate, q, role, status, to]);
 
+    const onRowClick = React.useCallback(
+        (employee: Employee) => {
+            navigate({
+                to: '/console/employees/$publicId',
+                params: { publicId: employee.publicId },
+                search: { from, to },
+            });
+        },
+        [from, navigate, to],
+    );
+
     return (
         <div className="w-full px-6 py-5 space-y-6">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -100,7 +112,7 @@ function EmployeesPage() {
                 onChange={(patch) => setParams((prevState) => ({ ...prevState, ...patch }))}
             />
 
-            <EmployeeDataTable employees={employees} loading={isFetching} />
+            <EmployeeDataTable employees={employees} loading={isFetching} onRowClick={onRowClick} />
         </div>
     );
 }

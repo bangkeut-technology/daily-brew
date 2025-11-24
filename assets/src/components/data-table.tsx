@@ -20,6 +20,7 @@ interface DataTableProps<T> {
     loading?: boolean;
     valueProps?: keyof T;
     columns: ColumnDef<T, any>[];
+    onRowClick?: (row: T) => void;
     rowSelection: RowSelectionState;
     sorting?: SortingState;
     columnFilters?: ColumnFiltersState;
@@ -38,6 +39,7 @@ export const DataTable = <T,>({
     sorting,
     columnFilters,
     columnVisibility,
+    onRowClick,
     onRowSelectionChange,
     onSortingChange,
     onColumnFiltersChange,
@@ -95,7 +97,11 @@ export const DataTable = <T,>({
                             </TableRow>
                         ) : table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                                <TableRow
+                                    key={row.id}
+                                    data-state={row.getIsSelected() && 'selected'}
+                                    onClick={() => onRowClick?.(row.original)}
+                                >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id} style={cell.column.columnDef.meta?.style}>
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
