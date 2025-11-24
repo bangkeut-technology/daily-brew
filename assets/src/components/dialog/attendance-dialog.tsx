@@ -101,7 +101,21 @@ export const AttendanceDialog: React.FunctionComponent<AttendanceDialogProps> = 
     const isEdit = attendance !== undefined;
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog
+            open={open}
+            onOpenChange={(open) => {
+                if (open && attendance && employee) {
+                    form.reset({
+                        ...defaultValues,
+                        attendanceDate: new Date(attendance.attendanceDate),
+                        note: attendance.note || '',
+                        type: attendance.type,
+                        employee: employee.id.toString(),
+                    });
+                }
+                setOpen(open);
+            }}
+        >
             <DialogTrigger asChild>
                 {button ? (
                     button
