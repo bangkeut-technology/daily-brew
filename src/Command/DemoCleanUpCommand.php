@@ -51,7 +51,7 @@ class DemoCleanUpCommand extends Command
             $output->writeln(sprintf('<info>Deleted %d batches</info>', $tot['batches']));
             $output->writeln(sprintf('<info>Deleted %d roles</info>', $tot['roles']));
             $output->writeln('');
-            $output->writeln(sprintf('<info>Setting demo session for demo session: %s</info>', $demoSession->getUser()->getUserIdentifier()));
+            $output->writeln(sprintf('<info>UserSetting demo session for demo session: %s</info>', $demoSession->getUser()->getUserIdentifier()));
 
             $demoSession->setActive(false);
             $this->demoSessionRepository->update($demoSession, false);

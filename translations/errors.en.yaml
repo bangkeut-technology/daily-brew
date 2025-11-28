@@ -4,7 +4,7 @@ not_found:
     employee:                     'Employee %publicId% not found.'
     evaluation_template_criteria: 'Evaluation template criteria %publicId% not found in template %template%.'
     attendance:                   'Attendance %publicId% not found.'
-    setting:                      'Setting %name% not found.'
+    setting:                      'UserSetting %name% not found.'
     attendance_batch:             'Attendance batch %publicId% not found.'
     role:                         'Role %publicId% not found.'
 invalid:

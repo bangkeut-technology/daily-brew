@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Repository\SettingRepository;
+use App\Repository\UserSettingRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
- * Class Setting
+ * Class UserSetting
  *
  * @package App\Entity
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-#[ORM\Table(name: 'daily_brew_settings')]
-#[ORM\Entity(repositoryClass: SettingRepository::class)]
-#[ORM\UniqueConstraint(name: 'UNIQ_SETTING_NAME', fields: ['name'])]
-class Setting extends AbstractEntity
+#[ORM\Table(name: 'daily_brew_user_settings')]
+#[ORM\Entity(repositoryClass: UserSettingRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQ_SETTING_NAME', fields: ['name', 'user'])]
+class UserSetting extends AbstractEntity
 {
     /**
      * @var string|null The name of the setting
@@ -36,7 +36,7 @@ class Setting extends AbstractEntity
     // Optional relation to company or user
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private ?User $owner = null;
+    private ?User $user = null;
 
     /**
      * @return string|null
@@ -48,9 +48,9 @@ class Setting extends AbstractEntity
 
     /**
      * @param string|null $name
-     * @return Setting
+     * @return UserSetting
      */
-    public function setName(?string $name): Setting
+    public function setName(?string $name): UserSetting
     {
         $this->name = $name;
         return $this;
@@ -66,9 +66,9 @@ class Setting extends AbstractEntity
 
     /**
      * @param string|null $value
-     * @return Setting
+     * @return UserSetting
      */
-    public function setValue(?string $value): Setting
+    public function setValue(?string $value): UserSetting
     {
         $this->value = $value;
         return $this;
@@ -77,18 +77,18 @@ class Setting extends AbstractEntity
     /**
      * @return User|null
      */
-    public function getOwner(): ?User
+    public function getUser(): ?User
     {
-        return $this->owner;
+        return $this->user;
     }
 
     /**
-     * @param User|null $owner
-     * @return Setting
+     * @param User|null $user
+     * @return UserSetting
      */
-    public function setOwner(?User $owner): Setting
+    public function setUser(?User $user): UserSetting
     {
-        $this->owner = $owner;
+        $this->user = $user;
         return $this;
     }
 }

@@ -8,7 +8,7 @@ updated:
     attendance:          'Attendance has been updated successfully'
     employee_evaluation: 'Employee evaluation has been updated successfully'
     settings:            'Settings have been updated successfully'
-    setting:             'Setting %name% has been updated successfully'
+    setting:             'UserSetting %name% has been updated successfully'
     attendance_batch:    'Attendance batch %label% has been updated successfully'
     role:                'Role %name% has been updated successfully'
 deleted:

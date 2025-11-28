@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\User;
-use App\Repository\SettingRepository;
+use App\Repository\UserSettingRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 
 /**
@@ -22,8 +22,8 @@ class SettingService
     private ?User $user;
 
     public function __construct(
-        private readonly SettingRepository $settingRepository,
-        private readonly Security $security,
+        private readonly UserSettingRepository $settingRepository,
+        private readonly Security              $security,
     ) {
         $this->user = $this->security->getUser();
     }

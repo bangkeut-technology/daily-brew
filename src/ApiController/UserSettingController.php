@@ -5,8 +5,8 @@ namespace App\ApiController;
 
 use App\ApiController\Trait\SettingTrait;
 use App\Controller\AbstractController;
-use App\Entity\Setting;
-use App\Repository\SettingRepository;
+use App\Entity\UserSetting;
+use App\Repository\UserSettingRepository;
 use App\Repository\StoreRepository;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
@@ -17,28 +17,28 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class SettingController
+ * Class UserSettingController
  *
  * @package App\ApiController
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-#[Route('/settings', name: 'setting_')]
-#[OA\Tag(name: 'Setting')]
-class SettingController extends AbstractController
+#[Route('/users/settings', name: 'setting_')]
+#[OA\Tag(name: 'User Setting')]
+class UserSettingController extends AbstractController
 {
     use SettingTrait;
 
     /**
      * SettingController constructor.
      *
-     * @param TranslatorInterface $translator        The translator service
-     * @param SettingRepository   $settingRepository The setting repository
-     * @param StoreRepository     $storeRepository   The store repository
+     * @param TranslatorInterface   $translator        The translator service
+     * @param UserSettingRepository $settingRepository The setting repository
+     * @param StoreRepository       $storeRepository   The store repository
      */
     public function __construct(
-        TranslatorInterface                $translator,
-        private readonly SettingRepository $settingRepository,
-        private readonly StoreRepository   $storeRepository
+        TranslatorInterface                    $translator,
+        private readonly UserSettingRepository $settingRepository,
+        private readonly StoreRepository       $storeRepository
     )
     {
         parent::__construct($translator);
@@ -86,7 +86,7 @@ class SettingController extends AbstractController
             description: 'The list of updated settings',
             type: 'array',
             items: new OA\Items(
-                ref: new Model(type: Setting::class, groups: ['setting:read'])
+                ref: new Model(type: UserSetting::class, groups: ['setting:read'])
             )
         )
     )]
@@ -111,10 +111,10 @@ class SettingController extends AbstractController
                 $setting = $settingsByName[$name];
                 $setting->setValue($value);
             } else {
-                $setting = (new Setting())
+                $setting = new UserSetting()
                     ->setName($name)
                     ->setValue($value)
-                    ->setOwner($user);
+                    ->setUser($user);
                 $this->settingRepository->update($setting, false);
             }
 
@@ -145,7 +145,7 @@ class SettingController extends AbstractController
     )]
     #[OA\Response(
         response: Response::HTTP_NOT_FOUND,
-        description: 'Setting not found',
+        description: 'UserSetting not found',
         content: new OA\JsonContent(
             properties: [
                 new OA\Property(property: 'message', type: 'string')
@@ -188,7 +188,7 @@ class SettingController extends AbstractController
             description: 'The list of updated settings',
             type: 'array',
             items: new OA\Items(
-                ref: new Model(type: Setting::class, groups: ['setting:read'])
+                ref: new Model(type: UserSetting::class, groups: ['setting:read'])
             )
         )
     )]

@@ -3,9 +3,12 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber;
 
-use App\Constant\SettingConstant;
+use App\Entity\Account;
+use App\Entity\User;
+use App\Enum\AccountRoleEnum;
 use App\Event\User\UserRegisteredEvent;
-use App\Repository\SettingRepository;
+use App\Repository\AccountRepository;
+use App\Repository\AccountUserRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -17,7 +20,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 readonly class UserSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private SettingRepository $settingRepository,
+        private AccountRepository     $accountRepository,
+        private AccountUserRepository $accountUserRepository
     )
     {
     }
@@ -42,17 +46,31 @@ readonly class UserSubscriber implements EventSubscriberInterface
      */
     public function onUserRegistered(UserRegisteredEvent $event): void
     {
-        $settings = SettingConstant::getConstantsWithDefaults();
+        $user = $event->user;
 
-        foreach ($settings as $name => $value) {
-            $setting = $this->settingRepository->create();
-            $setting->setName($name);
-            $setting->setValue((string)$value);
-            $setting->setOwner($event->user);
+        $this->createAccount($user);
+    }
 
-            $this->settingRepository->update($setting, false);
-        }
+    /**
+     * Creates an account for the given user.
+     *
+     * @param User $user The user for whom the account is to be created.
+     *
+     * @return Account The created account.
+     */
+    private function createAccount(User $user): Account
+    {
+        $account = $this->accountRepository->create();
 
-        $this->settingRepository->flush();
+        $this->accountRepository->update($account);
+
+        $accountUser = $this->accountUserRepository->create()
+            ->setRole(AccountRoleEnum::OWNER)
+            ->setUser($user)
+            ->setAccount($account);
+
+        $this->accountUserRepository->update($accountUser);
+
+        return $account;
     }
 }
