@@ -39,6 +39,9 @@ class Store extends AbstractEntity
     #[ORM\OneToMany(targetEntity: Employee::class, mappedBy: 'store', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $employees;
 
+    #[ORM\ManyToOne(inversedBy: 'stores')]
+    private ?Account $account = null;
+
     public function __construct()
     {
         $this->employees = new ArrayCollection();
@@ -138,5 +141,17 @@ class Store extends AbstractEntity
     public function __toString(): string
     {
         return $this->name ?? '';
+    }
+
+    public function getAccount(): ?Account
+    {
+        return $this->account;
+    }
+
+    public function setAccount(?Account $account): static
+    {
+        $this->account = $account;
+
+        return $this;
     }
 }

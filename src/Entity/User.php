@@ -239,12 +239,19 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[ORM\Column(type: 'string', nullable: true)]
     private ?string $authCode;
 
+    /**
+     * @var Collection<int, AccountUser>
+     */
+    #[ORM\OneToMany(targetEntity: AccountUser::class, mappedBy: 'user')]
+    private Collection $account;
+
     public function __construct()
     {
         $this->criterias = new ArrayCollection();
         $this->stores = new ArrayCollection();
         $this->templates = new ArrayCollection();
         $this->employeeRoles = new ArrayCollection();
+        $this->account = new ArrayCollection();
     }
 
     /**
@@ -903,5 +910,35 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function setEmailAuthCode(string $authCode): void
     {
         $this->authCode = $authCode;
+    }
+
+    /**
+     * @return Collection<int, AccountUser>
+     */
+    public function getAccount(): Collection
+    {
+        return $this->account;
+    }
+
+    public function addAccount(AccountUser $account): static
+    {
+        if (!$this->account->contains($account)) {
+            $this->account->add($account);
+            $account->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAccount(AccountUser $account): static
+    {
+        if ($this->account->removeElement($account)) {
+            // set the owning side to null (unless already changed)
+            if ($account->getUser() === $this) {
+                $account->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }
