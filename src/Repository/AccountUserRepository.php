@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 
 namespace App\Repository;
 
@@ -7,9 +9,21 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
+ * Class AccountUserRepository
+ *
+ * @package App\Repository
+ * @author  Vandeth THO <thovandeth@gmail.com>
+ *
  * @extends ServiceEntityRepository<AccountUser>
+ *
+ * @method AccountUser      create()
+ * @method AccountUser|null find($id, $lockMode = null, $lockVersion = null)
+ * @method AccountUser|null findOneBy(array $criteria, array $orderBy = null)
+ * @method AccountUser|null findByPublicId(string $publicId)
+ * @method AccountUser[]    findAll()
+ * @method AccountUser[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class AccountUserRepository extends ServiceEntityRepository
+class AccountUserRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
