@@ -18,8 +18,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
  */
 #[ORM\Table(name: 'daily_brew_evaluation_templates')]
 #[ORM\Entity(repositoryClass: EvaluationTemplateRepository::class)]
-#[ORM\UniqueConstraint(name: 'UQ_EVALUATION_TEMPLATE_NAME', fields: ['name', 'user'])]
-#[ORM\UniqueConstraint(name: 'UQ_EVALUATION_TEMPLATE_CANONICAL_NAME', fields: ['canonicalName', 'user'])]
+#[ORM\UniqueConstraint(name: 'UQ_EVALUATION_TEMPLATE_NAME', fields: ['name', 'account'])]
+#[ORM\UniqueConstraint(name: 'UQ_EVALUATION_TEMPLATE_CANONICAL_NAME', fields: ['canonicalName', 'account'])]
 #[ORM\HasLifecycleCallbacks]
 class EvaluationTemplate extends AbstractEntity
 {
@@ -54,6 +54,10 @@ class EvaluationTemplate extends AbstractEntity
      */
     #[ORM\ManyToMany(targetEntity: Employee::class, mappedBy: 'templates')]
     private Collection $employees;
+
+    #[ORM\ManyToOne(inversedBy: 'evaluationTemplates')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    private ?Account $account = null;
 
     public function __construct()
     {
@@ -239,5 +243,17 @@ class EvaluationTemplate extends AbstractEntity
     public function canonicalize(): void
     {
         $this->canonicalName = Canonicalizer::canonicalize($this->name);
+    }
+
+    public function getAccount(): ?Account
+    {
+        return $this->account;
+    }
+
+    public function setAccount(?Account $account): static
+    {
+        $this->account = $account;
+
+        return $this;
     }
 }

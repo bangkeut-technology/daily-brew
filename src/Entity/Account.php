@@ -55,6 +55,30 @@ class Account extends AbstractEntity
     #[ORM\OneToMany(targetEntity: Attendance::class, mappedBy: 'account')]
     private Collection $attendances;
 
+    /**
+     * @var Collection<int, EvaluationCriteria>
+     */
+    #[ORM\OneToMany(targetEntity: EvaluationCriteria::class, mappedBy: 'account')]
+    private Collection $evaluationCriterias;
+
+    /**
+     * @var Collection<int, EvaluationTemplate>
+     */
+    #[ORM\OneToMany(targetEntity: EvaluationTemplate::class, mappedBy: 'account')]
+    private Collection $evaluationTemplates;
+
+    /**
+     * @var Collection<int, EvaluationTemplateCriteria>
+     */
+    #[ORM\OneToMany(targetEntity: EvaluationTemplateCriteria::class, mappedBy: 'account')]
+    private Collection $evaluationTemplateCriterias;
+
+    /**
+     * @var Collection<int, EmployeeEvaluation>
+     */
+    #[ORM\OneToMany(targetEntity: EmployeeEvaluation::class, mappedBy: 'account')]
+    private Collection $employeeEvaluations;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -62,6 +86,10 @@ class Account extends AbstractEntity
         $this->employees = new ArrayCollection();
         $this->attendanceBatches = new ArrayCollection();
         $this->attendances = new ArrayCollection();
+        $this->evaluationCriterias = new ArrayCollection();
+        $this->evaluationTemplates = new ArrayCollection();
+        $this->evaluationTemplateCriterias = new ArrayCollection();
+        $this->employeeEvaluations = new ArrayCollection();
     }
 
     /**
@@ -244,6 +272,126 @@ class Account extends AbstractEntity
             // set the owning side to null (unless already changed)
             if ($attendance->getAccount() === $this) {
                 $attendance->setAccount(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, EvaluationCriteria>
+     */
+    public function getEvaluationCriterias(): Collection
+    {
+        return $this->evaluationCriterias;
+    }
+
+    public function addEvaluationCriteria(EvaluationCriteria $evaluationCriteria): static
+    {
+        if (!$this->evaluationCriterias->contains($evaluationCriteria)) {
+            $this->evaluationCriterias->add($evaluationCriteria);
+            $evaluationCriteria->setAccount($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvaluationCriteria(EvaluationCriteria $evaluationCriteria): static
+    {
+        if ($this->evaluationCriterias->removeElement($evaluationCriteria)) {
+            // set the owning side to null (unless already changed)
+            if ($evaluationCriteria->getAccount() === $this) {
+                $evaluationCriteria->setAccount(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, EvaluationTemplate>
+     */
+    public function getEvaluationTemplates(): Collection
+    {
+        return $this->evaluationTemplates;
+    }
+
+    public function addEvaluationTemplate(EvaluationTemplate $evaluationTemplate): static
+    {
+        if (!$this->evaluationTemplates->contains($evaluationTemplate)) {
+            $this->evaluationTemplates->add($evaluationTemplate);
+            $evaluationTemplate->setAccount($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvaluationTemplate(EvaluationTemplate $evaluationTemplate): static
+    {
+        if ($this->evaluationTemplates->removeElement($evaluationTemplate)) {
+            // set the owning side to null (unless already changed)
+            if ($evaluationTemplate->getAccount() === $this) {
+                $evaluationTemplate->setAccount(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, EvaluationTemplateCriteria>
+     */
+    public function getEvaluationTemplateCriterias(): Collection
+    {
+        return $this->evaluationTemplateCriterias;
+    }
+
+    public function addEvaluationTemplateCriteria(EvaluationTemplateCriteria $evaluationTemplateCriteria): static
+    {
+        if (!$this->evaluationTemplateCriterias->contains($evaluationTemplateCriteria)) {
+            $this->evaluationTemplateCriterias->add($evaluationTemplateCriteria);
+            $evaluationTemplateCriteria->setAccount($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvaluationTemplateCriteria(EvaluationTemplateCriteria $evaluationTemplateCriteria): static
+    {
+        if ($this->evaluationTemplateCriterias->removeElement($evaluationTemplateCriteria)) {
+            // set the owning side to null (unless already changed)
+            if ($evaluationTemplateCriteria->getAccount() === $this) {
+                $evaluationTemplateCriteria->setAccount(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, EmployeeEvaluation>
+     */
+    public function getEmployeeEvaluations(): Collection
+    {
+        return $this->employeeEvaluations;
+    }
+
+    public function addEmployeeEvaluation(EmployeeEvaluation $employeeEvaluation): static
+    {
+        if (!$this->employeeEvaluations->contains($employeeEvaluation)) {
+            $this->employeeEvaluations->add($employeeEvaluation);
+            $employeeEvaluation->setAccount($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEmployeeEvaluation(EmployeeEvaluation $employeeEvaluation): static
+    {
+        if ($this->employeeEvaluations->removeElement($employeeEvaluation)) {
+            // set the owning side to null (unless already changed)
+            if ($employeeEvaluation->getAccount() === $this) {
+                $employeeEvaluation->setAccount(null);
             }
         }
 

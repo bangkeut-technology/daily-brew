@@ -60,6 +60,10 @@ class EmployeeEvaluation extends AbstractEntity
     #[Groups(['employee_evaluation:read'])]
     private Collection $scores;
 
+    #[ORM\ManyToOne(inversedBy: 'employeeEvaluations')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    private ?Account $account = null;
+
     public function __construct()
     {
         $this->scores = new ArrayCollection();
@@ -226,6 +230,18 @@ class EmployeeEvaluation extends AbstractEntity
         if ($this->scores->removeElement($score) && $score->getEvaluation() === $this) {
             $score->setEvaluation(null);
         }
+
+        return $this;
+    }
+
+    public function getAccount(): ?Account
+    {
+        return $this->account;
+    }
+
+    public function setAccount(?Account $account): static
+    {
+        $this->account = $account;
 
         return $this;
     }

@@ -17,6 +17,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\Entity(repositoryClass: EvaluationTemplateCriteriaRepository::class)]
 class EvaluationTemplateCriteria extends AbstractEntity
 {
+    #[ORM\ManyToOne(inversedBy: 'evaluationTemplateCriterias')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    private ?Account $account = null;
+
     public function __construct(
         #[ORM\Column]
         #[Groups(['template_criteria:read'])]
@@ -84,6 +88,18 @@ class EvaluationTemplateCriteria extends AbstractEntity
     public function setCriteria(?EvaluationCriteria $criteria): EvaluationTemplateCriteria
     {
         $this->criteria = $criteria;
+        return $this;
+    }
+
+    public function getAccount(): ?Account
+    {
+        return $this->account;
+    }
+
+    public function setAccount(?Account $account): static
+    {
+        $this->account = $account;
+
         return $this;
     }
 }

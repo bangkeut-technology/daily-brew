@@ -19,8 +19,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
  */
 #[ORM\Table(name: 'daily_brew_evaluation_criterias')]
 #[ORM\Entity(repositoryClass: EvaluationCriteriaRepository::class)]
-#[ORM\UniqueConstraint(name: 'UQ_EVALUATION_CRITERIA_LABEL', fields: ['label', 'user'])]
-#[ORM\UniqueConstraint(name: 'UQ_EVALUATION_CRITERIA_CANONICAL_LABEL', fields: ['canonicalLabel', 'user'])]
+#[ORM\UniqueConstraint(name: 'UQ_EVALUATION_CRITERIA_LABEL', fields: ['label', 'account'])]
+#[ORM\UniqueConstraint(name: 'UQ_EVALUATION_CRITERIA_CANONICAL_LABEL', fields: ['canonicalLabel', 'account'])]
 #[ORM\HasLifecycleCallbacks]
 class EvaluationCriteria extends AbstractEntity
 {
@@ -61,6 +61,10 @@ class EvaluationCriteria extends AbstractEntity
      */
     #[ORM\OneToMany(targetEntity: EvaluationTemplateCriteria::class, mappedBy: 'criteria', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $templates;
+
+    #[ORM\ManyToOne(inversedBy: 'evaluationCriterias')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    private ?Account $account = null;
 
     public function __construct()
     {
@@ -215,5 +219,17 @@ class EvaluationCriteria extends AbstractEntity
     public function canonicalize(): void
     {
         $this->canonicalLabel = Canonicalizer::canonicalize($this->label);
+    }
+
+    public function getAccount(): ?Account
+    {
+        return $this->account;
+    }
+
+    public function setAccount(?Account $account): static
+    {
+        $this->account = $account;
+
+        return $this;
     }
 }
