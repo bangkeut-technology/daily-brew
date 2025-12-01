@@ -29,6 +29,9 @@ class AccountUser extends AbstractEntity
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $customName = null;
+
     public function getRole(): ?AccountRoleEnum
     {
         return $this->role;
@@ -61,6 +64,18 @@ class AccountUser extends AbstractEntity
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getCustomName(): ?string
+    {
+        return $this->customName;
+    }
+
+    public function setCustomName(?string $customName): static
+    {
+        $this->customName = $customName;
 
         return $this;
     }

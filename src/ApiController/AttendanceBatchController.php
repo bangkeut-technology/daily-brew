@@ -111,7 +111,7 @@ class AttendanceBatchController extends AbstractController
             if (null !== $this->attendanceBatchRepository->findByLabelAndUser($attendanceBatch->getLabel(), $user)) {
                 return $this->createBadRequestResponse($this->translator->trans('existed.attendance_batch', ['%label%' => $attendanceBatch->getLabel()], domain: 'errors'));
             }
-            $attendanceBatch->setAccount($user->getAccount());
+            $attendanceBatch->setAccount($user->getCurrentAccount());
             $attendanceBatch->setUser($user);
             $this->attendanceBatchRepository->update($attendanceBatch);
 

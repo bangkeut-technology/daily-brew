@@ -245,13 +245,17 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[ORM\OneToMany(targetEntity: AccountUser::class, mappedBy: 'user')]
     private Collection $accounts;
 
+    #[ORM\ManyToOne(targetEntity: AccountUser::class)]
+    #[ORM\JoinColumn(name: 'current_account_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    private ?Account $currentAccount = null;
+
     public function __construct()
     {
         $this->criterias = new ArrayCollection();
         $this->stores = new ArrayCollection();
         $this->templates = new ArrayCollection();
         $this->employeeRoles = new ArrayCollection();
-        $this->account = new ArrayCollection();
+        $this->accounts = new ArrayCollection();
     }
 
     /**
@@ -932,12 +936,21 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
 
     public function removeAccount(AccountUser $account): static
     {
-        if ($this->account->removeElement($account)) {
-            // set the owning side to null (unless already changed)
-            if ($account->getUser() === $this) {
-                $account->setUser(null);
-            }
+        if ($this->accounts->removeElement($account) && $account->getUser() === $this) {
+            $account->setUser(null);
         }
+
+        return $this;
+    }
+
+    public function getCurrentAccount(): ?Account
+    {
+        return $this->currentAccount;
+    }
+
+    public function setCurrentAccount(?Account $currentAccount): static
+    {
+        $this->currentAccount = $currentAccount;
 
         return $this;
     }
