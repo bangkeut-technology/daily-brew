@@ -243,7 +243,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
      * @var Collection<int, AccountUser>
      */
     #[ORM\OneToMany(targetEntity: AccountUser::class, mappedBy: 'user')]
-    private Collection $account;
+    private Collection $accounts;
 
     public function __construct()
     {
@@ -915,15 +915,15 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     /**
      * @return Collection<int, AccountUser>
      */
-    public function getAccount(): Collection
+    public function getAccounts(): Collection
     {
-        return $this->account;
+        return $this->accounts;
     }
 
     public function addAccount(AccountUser $account): static
     {
-        if (!$this->account->contains($account)) {
-            $this->account->add($account);
+        if (!$this->accounts->contains($account)) {
+            $this->accounts->add($account);
             $account->setUser($this);
         }
 

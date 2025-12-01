@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 
 namespace App\Entity;
 
@@ -6,14 +8,16 @@ use App\Enum\AccountRoleEnum;
 use App\Repository\AccountUserRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Class AccountUser
+ *
+ * @package App\Entity
+ * @author  Vandeth THO <thovandeth@gmail.com>
+ */
 #[ORM\Entity(repositoryClass: AccountUserRepository::class)]
-class AccountUser
+#[ORM\Table(name: 'daily_brew_account_users')]
+class AccountUser extends AbstractEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
     #[ORM\Column(enumType: AccountRoleEnum::class)]
     private ?AccountRoleEnum $role = null;
 
@@ -21,14 +25,9 @@ class AccountUser
     #[ORM\JoinColumn(nullable: false)]
     private ?Account $account = null;
 
-    #[ORM\ManyToOne(inversedBy: 'account')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'accounts')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getRole(): ?AccountRoleEnum
     {
