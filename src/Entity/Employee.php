@@ -93,6 +93,10 @@ class Employee extends AbstractEntity
     #[ORM\ManyToMany(targetEntity: AttendanceBatch::class, mappedBy: 'employees')]
     private Collection $attendanceBatches;
 
+    #[ORM\ManyToOne(inversedBy: 'employees')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    private ?Account $account = null;
+
     public function __construct()
     {
         $this->attendances = new ArrayCollection();
@@ -181,6 +185,10 @@ class Employee extends AbstractEntity
     public function setStore(?Store $store): Employee
     {
         $this->store = $store;
+
+        if ($store !== null) {
+            $this->account = $store->getAccount();
+        }
 
         return $this;
     }
@@ -364,5 +372,17 @@ class Employee extends AbstractEntity
     public function getFullName(): string
     {
         return sprintf('%s %s', $this->lastName, $this->firstName);
+    }
+
+    public function getAccount(): ?Account
+    {
+        return $this->account;
+    }
+
+    public function setAccount(?Account $account): static
+    {
+        $this->account = $account;
+
+        return $this;
     }
 }

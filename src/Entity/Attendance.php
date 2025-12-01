@@ -99,6 +99,14 @@ class Attendance extends AbstractEntity
     #[ORM\ManyToOne(inversedBy: 'attendances')]
     private ?AttendanceBatch $batch = null;
 
+    #[ORM\ManyToOne(inversedBy: 'attendances')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Store $store = null;
+
+    #[ORM\ManyToOne(inversedBy: 'attendances')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    private ?Account $account = null;
+
     /**
      * @return DateTimeImmutable|null
      */
@@ -256,6 +264,30 @@ class Attendance extends AbstractEntity
     public function setBatch(?AttendanceBatch $batch): static
     {
         $this->batch = $batch;
+
+        return $this;
+    }
+
+    public function getStore(): ?Store
+    {
+        return $this->store;
+    }
+
+    public function setStore(?Store $store): static
+    {
+        $this->store = $store;
+
+        return $this;
+    }
+
+    public function getAccount(): ?Account
+    {
+        return $this->account;
+    }
+
+    public function setAccount(?Account $account): static
+    {
+        $this->account = $account;
 
         return $this;
     }

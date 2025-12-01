@@ -40,11 +40,26 @@ class Store extends AbstractEntity
     private Collection $employees;
 
     #[ORM\ManyToOne(inversedBy: 'stores')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     private ?Account $account = null;
+
+    /**
+     * @var Collection<int, AttendanceBatch>
+     */
+    #[ORM\OneToMany(targetEntity: AttendanceBatch::class, mappedBy: 'store')]
+    private Collection $attendanceBatches;
+
+    /**
+     * @var Collection<int, Attendance>
+     */
+    #[ORM\OneToMany(targetEntity: Attendance::class, mappedBy: 'store')]
+    private Collection $attendances;
 
     public function __construct()
     {
         $this->employees = new ArrayCollection();
+        $this->attendanceBatches = new ArrayCollection();
+        $this->attendances = new ArrayCollection();
     }
 
     /**
@@ -151,6 +166,66 @@ class Store extends AbstractEntity
     public function setAccount(?Account $account): static
     {
         $this->account = $account;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AttendanceBatch>
+     */
+    public function getAttendanceBatches(): Collection
+    {
+        return $this->attendanceBatches;
+    }
+
+    public function addAttendanceBatch(AttendanceBatch $attendanceBatch): static
+    {
+        if (!$this->attendanceBatches->contains($attendanceBatch)) {
+            $this->attendanceBatches->add($attendanceBatch);
+            $attendanceBatch->setStore($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAttendanceBatch(AttendanceBatch $attendanceBatch): static
+    {
+        if ($this->attendanceBatches->removeElement($attendanceBatch)) {
+            // set the owning side to null (unless already changed)
+            if ($attendanceBatch->getStore() === $this) {
+                $attendanceBatch->setStore(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Attendance>
+     */
+    public function getAttendances(): Collection
+    {
+        return $this->attendances;
+    }
+
+    public function addAttendance(Attendance $attendance): static
+    {
+        if (!$this->attendances->contains($attendance)) {
+            $this->attendances->add($attendance);
+            $attendance->setStore($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAttendance(Attendance $attendance): static
+    {
+        if ($this->attendances->removeElement($attendance)) {
+            // set the owning side to null (unless already changed)
+            if ($attendance->getStore() === $this) {
+                $attendance->setStore(null);
+            }
+        }
 
         return $this;
     }

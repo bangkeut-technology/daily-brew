@@ -22,8 +22,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
  */
 #[ORM\Table(name: 'daily_brew_attendance_batches')]
 #[ORM\Entity(repositoryClass: AttendanceBatchRepository::class)]
-#[ORM\UniqueConstraint(name: 'UNIQ_ATTENDANCE_BATCH_LABEL', fields: ['label', 'user'])]
-#[ORM\UniqueConstraint(name: 'UNIQ_ATTENDANCE_BATCH_CANONICAL_LABEL', fields: ['canonicalLabel', 'user'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_ATTENDANCE_BATCH_LABEL', fields: ['label', 'account'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_ATTENDANCE_BATCH_CANONICAL_LABEL', fields: ['canonicalLabel', 'account'])]
 #[ORM\HasLifecycleCallbacks]
 class AttendanceBatch extends AbstractEntity
 {
@@ -65,6 +65,14 @@ class AttendanceBatch extends AbstractEntity
     #[ORM\JoinTable(name: 'daily_brew_employee_attendance_batches')]
     #[Groups('attendance_batch:read')]
     private Collection $employees;
+
+    #[ORM\ManyToOne(inversedBy: 'attendanceBatches')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    private ?Account $account = null;
+
+    #[ORM\ManyToOne(inversedBy: 'attendanceBatches')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Store $store = null;
 
     public function __construct()
     {
@@ -288,5 +296,29 @@ class AttendanceBatch extends AbstractEntity
     public function canonicalize(): void
     {
         $this->canonicalLabel = Canonicalizer::canonicalize($this->label);
+    }
+
+    public function getAccount(): ?Account
+    {
+        return $this->account;
+    }
+
+    public function setAccount(?Account $account): static
+    {
+        $this->account = $account;
+
+        return $this;
+    }
+
+    public function getStore(): ?Store
+    {
+        return $this->store;
+    }
+
+    public function setStore(?Store $store): static
+    {
+        $this->store = $store;
+
+        return $this;
     }
 }

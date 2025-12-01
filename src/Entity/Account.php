@@ -37,10 +37,31 @@ class Account extends AbstractEntity
     #[ORM\OneToMany(targetEntity: Store::class, mappedBy: 'account')]
     private Collection $stores;
 
+    /**
+     * @var Collection<int, Employee>
+     */
+    #[ORM\OneToMany(targetEntity: Employee::class, mappedBy: 'account')]
+    private Collection $employees;
+
+    /**
+     * @var Collection<int, AttendanceBatch>
+     */
+    #[ORM\OneToMany(targetEntity: AttendanceBatch::class, mappedBy: 'account')]
+    private Collection $attendanceBatches;
+
+    /**
+     * @var Collection<int, Attendance>
+     */
+    #[ORM\OneToMany(targetEntity: Attendance::class, mappedBy: 'account')]
+    private Collection $attendances;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->stores = new ArrayCollection();
+        $this->employees = new ArrayCollection();
+        $this->attendanceBatches = new ArrayCollection();
+        $this->attendances = new ArrayCollection();
     }
 
     /**
@@ -133,6 +154,96 @@ class Account extends AbstractEntity
             // set the owning side to null (unless already changed)
             if ($store->getAccount() === $this) {
                 $store->setAccount(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Employee>
+     */
+    public function getEmployees(): Collection
+    {
+        return $this->employees;
+    }
+
+    public function addEmployee(Employee $employee): static
+    {
+        if (!$this->employees->contains($employee)) {
+            $this->employees->add($employee);
+            $employee->setAccount($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEmployee(Employee $employee): static
+    {
+        if ($this->employees->removeElement($employee)) {
+            // set the owning side to null (unless already changed)
+            if ($employee->getAccount() === $this) {
+                $employee->setAccount(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AttendanceBatch>
+     */
+    public function getAttendanceBatches(): Collection
+    {
+        return $this->attendanceBatches;
+    }
+
+    public function addAttendanceBatch(AttendanceBatch $attendanceBatch): static
+    {
+        if (!$this->attendanceBatches->contains($attendanceBatch)) {
+            $this->attendanceBatches->add($attendanceBatch);
+            $attendanceBatch->setAccount($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAttendanceBatch(AttendanceBatch $attendanceBatch): static
+    {
+        if ($this->attendanceBatches->removeElement($attendanceBatch)) {
+            // set the owning side to null (unless already changed)
+            if ($attendanceBatch->getAccount() === $this) {
+                $attendanceBatch->setAccount(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Attendance>
+     */
+    public function getAttendances(): Collection
+    {
+        return $this->attendances;
+    }
+
+    public function addAttendance(Attendance $attendance): static
+    {
+        if (!$this->attendances->contains($attendance)) {
+            $this->attendances->add($attendance);
+            $attendance->setAccount($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAttendance(Attendance $attendance): static
+    {
+        if ($this->attendances->removeElement($attendance)) {
+            // set the owning side to null (unless already changed)
+            if ($attendance->getAccount() === $this) {
+                $attendance->setAccount(null);
             }
         }
 
