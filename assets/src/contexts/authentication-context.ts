@@ -7,7 +7,7 @@ export interface AuthenticationState {
     user: User | undefined;
 }
 
-export type AuthenticationAction = { type: 'LOGIN'; user: User } | { type: 'LOGOUT' };
+export type AuthenticationAction = { type: 'SIGN_IN'; user: User } | { type: 'SIGN_OUT' };
 
 export const AuthenticationContextState = React.createContext<AuthenticationState>({
     isAuthenticated: false,

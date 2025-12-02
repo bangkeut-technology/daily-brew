@@ -7,7 +7,7 @@ export const authenticationInitialState: AuthenticationState = {
 };
 export const authenticationReducer = (state: AuthenticationState, action: AuthenticationAction) => {
     switch (action.type) {
-        case 'LOGIN': {
+        case 'SIGN_IN': {
             const { user } = action;
             return {
                 ...state,
@@ -16,7 +16,7 @@ export const authenticationReducer = (state: AuthenticationState, action: Authen
                 demo: user.roles.includes('ROLE_DEMO'),
             };
         }
-        case 'LOGOUT':
+        case 'SIGN_OUT':
             return { ...state, user: undefined };
     }
     return state;

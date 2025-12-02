@@ -49,7 +49,7 @@ function SignUpPage() {
         onSuccess: (data) => {
             sessionStorage.setItem('email', data.user.email);
             sessionStorage.setItem('locale', data.user.locale || 'en');
-            dispatch({ type: 'LOGIN', user: data.user });
+            dispatch({ type: 'SIGN_IN', user: data.user });
         },
         onError: (data) => {
             const message = isAxiosError(data) ? data.response?.data.message : t('sign_up.failed', { ns: 'glossary' });

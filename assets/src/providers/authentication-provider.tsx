@@ -15,7 +15,7 @@ export const AuthenticationProvider = ({ children }: { children: React.ReactNode
 
     React.useEffect(() => {
         if (isSuccess && data) {
-            dispatch({ type: 'LOGIN', user: data });
+            dispatch({ type: 'SIGN_IN', user: data });
         }
     }, [data, isSuccess]);
 

@@ -1,3 +1,4 @@
+import React from 'react';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { PageNotFound } from '@/components/page-not-found';
 
