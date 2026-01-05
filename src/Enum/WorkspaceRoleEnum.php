@@ -4,12 +4,13 @@ declare(strict_types=1);
 namespace App\Enum;
 
 /**
- * Class AccountRoleEnum
+ * Class WorkspaceRoleEnum
  *
  * @package App\Enum
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-enum AccountRoleEnum: string
+enum WorkspaceRoleEnum: string
 {
     case OWNER = 'OWNER';
+    case EMPLOYEE = 'EMPLOYEE';
 }

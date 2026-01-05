@@ -19,7 +19,7 @@ class EvaluationTemplateCriteria extends AbstractEntity
 {
     #[ORM\ManyToOne(inversedBy: 'evaluationTemplateCriterias')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
-    private ?Account $account = null;
+    private ?Workspace $workspace = null;
 
     public function __construct(
         #[ORM\Column]
@@ -91,14 +91,14 @@ class EvaluationTemplateCriteria extends AbstractEntity
         return $this;
     }
 
-    public function getAccount(): ?Account
+    public function getWorkspace(): ?Workspace
     {
-        return $this->account;
+        return $this->workspace;
     }
 
-    public function setAccount(?Account $account): static
+    public function setWorkspace(?Workspace $workspace): static
     {
-        $this->account = $account;
+        $this->workspace = $workspace;
 
         return $this;
     }

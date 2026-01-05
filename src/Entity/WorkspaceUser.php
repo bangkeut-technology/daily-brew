@@ -4,54 +4,54 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Enum\AccountRoleEnum;
-use App\Repository\AccountUserRepository;
+use App\Enum\WorkspaceRoleEnum;
+use App\Repository\WorkspaceUserRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class AccountUser
+ * Class WorkspaceUser
  *
  * @package App\Entity
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-#[ORM\Entity(repositoryClass: AccountUserRepository::class)]
-#[ORM\Table(name: 'daily_brew_account_users')]
-class AccountUser extends AbstractEntity
+#[ORM\Entity(repositoryClass: WorkspaceUserRepository::class)]
+#[ORM\Table(name: 'daily_brew_workspace_users')]
+class WorkspaceUser extends AbstractEntity
 {
-    #[ORM\Column(enumType: AccountRoleEnum::class)]
-    private ?AccountRoleEnum $role = null;
+    #[ORM\Column(enumType: WorkspaceRoleEnum::class)]
+    private ?WorkspaceRoleEnum $role = null;
 
     #[ORM\ManyToOne(inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Account $account = null;
+    private ?Workspace $workspace = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'accounts')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'workspaces')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $customName = null;
 
-    public function getRole(): ?AccountRoleEnum
+    public function getRole(): ?WorkspaceRoleEnum
     {
         return $this->role;
     }
 
-    public function setRole(AccountRoleEnum $role): static
+    public function setRole(WorkspaceRoleEnum $role): static
     {
         $this->role = $role;
 
         return $this;
     }
 
-    public function getAccount(): ?Account
+    public function getWorkspace(): ?Workspace
     {
-        return $this->account;
+        return $this->workspace;
     }
 
-    public function setAccount(?Account $account): static
+    public function setWorkspace(?Workspace $workspace): static
     {
-        $this->account = $account;
+        $this->workspace = $workspace;
 
         return $this;
     }

@@ -5,19 +5,20 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Enum\PlanEnum;
-use App\Repository\AccountRepository;
+use App\Repository\WorkspaceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class Account
+ * Class Workspace
  *
  * @package App\Entity
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-#[ORM\Entity(repositoryClass: AccountRepository::class)]
-class Account extends AbstractEntity
+#[ORM\Entity(repositoryClass: WorkspaceRepository::class)]
+#[ORM\Table(name: 'daily_brew_workspaces')]
+class Workspace extends AbstractEntity
 {
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $name = null;
@@ -26,57 +27,57 @@ class Account extends AbstractEntity
     private ?PlanEnum $plan = null;
 
     /**
-     * @var Collection<int, AccountUser>
+     * @var Collection<int, WorkspaceUser>
      */
-    #[ORM\OneToMany(targetEntity: AccountUser::class, mappedBy: 'account')]
+    #[ORM\OneToMany(targetEntity: WorkspaceUser::class, mappedBy: 'workspace')]
     private Collection $users;
 
     /**
      * @var Collection<int, Store>
      */
-    #[ORM\OneToMany(targetEntity: Store::class, mappedBy: 'account')]
+    #[ORM\OneToMany(targetEntity: Store::class, mappedBy: 'workspace')]
     private Collection $stores;
 
     /**
      * @var Collection<int, Employee>
      */
-    #[ORM\OneToMany(targetEntity: Employee::class, mappedBy: 'account')]
+    #[ORM\OneToMany(targetEntity: Employee::class, mappedBy: 'workspace')]
     private Collection $employees;
 
     /**
      * @var Collection<int, AttendanceBatch>
      */
-    #[ORM\OneToMany(targetEntity: AttendanceBatch::class, mappedBy: 'account')]
+    #[ORM\OneToMany(targetEntity: AttendanceBatch::class, mappedBy: 'workspace')]
     private Collection $attendanceBatches;
 
     /**
      * @var Collection<int, Attendance>
      */
-    #[ORM\OneToMany(targetEntity: Attendance::class, mappedBy: 'account')]
+    #[ORM\OneToMany(targetEntity: Attendance::class, mappedBy: 'workspace')]
     private Collection $attendances;
 
     /**
      * @var Collection<int, EvaluationCriteria>
      */
-    #[ORM\OneToMany(targetEntity: EvaluationCriteria::class, mappedBy: 'account')]
+    #[ORM\OneToMany(targetEntity: EvaluationCriteria::class, mappedBy: 'workspace')]
     private Collection $evaluationCriterias;
 
     /**
      * @var Collection<int, EvaluationTemplate>
      */
-    #[ORM\OneToMany(targetEntity: EvaluationTemplate::class, mappedBy: 'account')]
+    #[ORM\OneToMany(targetEntity: EvaluationTemplate::class, mappedBy: 'workspace')]
     private Collection $evaluationTemplates;
 
     /**
      * @var Collection<int, EvaluationTemplateCriteria>
      */
-    #[ORM\OneToMany(targetEntity: EvaluationTemplateCriteria::class, mappedBy: 'account')]
+    #[ORM\OneToMany(targetEntity: EvaluationTemplateCriteria::class, mappedBy: 'workspace')]
     private Collection $evaluationTemplateCriterias;
 
     /**
      * @var Collection<int, EmployeeEvaluation>
      */
-    #[ORM\OneToMany(targetEntity: EmployeeEvaluation::class, mappedBy: 'account')]
+    #[ORM\OneToMany(targetEntity: EmployeeEvaluation::class, mappedBy: 'workspace')]
     private Collection $employeeEvaluations;
 
     public function __construct()
@@ -102,9 +103,9 @@ class Account extends AbstractEntity
 
     /**
      * @param string|null $name
-     * @return Account
+     * @return Workspace
      */
-    public function setName(?string $name): Account
+    public function setName(?string $name): Workspace
     {
         $this->name = $name;
         return $this;
@@ -120,38 +121,38 @@ class Account extends AbstractEntity
 
     /**
      * @param PlanEnum|null $plan
-     * @return Account
+     * @return Workspace
      */
-    public function setPlan(?PlanEnum $plan): Account
+    public function setPlan(?PlanEnum $plan): Workspace
     {
         $this->plan = $plan;
         return $this;
     }
 
     /**
-     * @return Collection<int, AccountUser>
+     * @return Collection<int, WorkspaceUser>
      */
     public function getUsers(): Collection
     {
         return $this->users;
     }
 
-    public function addUser(AccountUser $user): static
+    public function addUser(WorkspaceUser $user): static
     {
         if (!$this->users->contains($user)) {
             $this->users->add($user);
-            $user->setAccount($this);
+            $user->setWorkspace($this);
         }
 
         return $this;
     }
 
-    public function removeUser(AccountUser $user): static
+    public function removeUser(WorkspaceUser $user): static
     {
         if ($this->users->removeElement($user)) {
             // set the owning side to null (unless already changed)
-            if ($user->getAccount() === $this) {
-                $user->setAccount(null);
+            if ($user->getWorkspace() === $this) {
+                $user->setWorkspace(null);
             }
         }
 
@@ -170,7 +171,7 @@ class Account extends AbstractEntity
     {
         if (!$this->stores->contains($store)) {
             $this->stores->add($store);
-            $store->setAccount($this);
+            $store->setWorkspace($this);
         }
 
         return $this;
@@ -180,8 +181,8 @@ class Account extends AbstractEntity
     {
         if ($this->stores->removeElement($store)) {
             // set the owning side to null (unless already changed)
-            if ($store->getAccount() === $this) {
-                $store->setAccount(null);
+            if ($store->getWorkspace() === $this) {
+                $store->setWorkspace(null);
             }
         }
 
@@ -200,7 +201,7 @@ class Account extends AbstractEntity
     {
         if (!$this->employees->contains($employee)) {
             $this->employees->add($employee);
-            $employee->setAccount($this);
+            $employee->setWorkspace($this);
         }
 
         return $this;
@@ -210,8 +211,8 @@ class Account extends AbstractEntity
     {
         if ($this->employees->removeElement($employee)) {
             // set the owning side to null (unless already changed)
-            if ($employee->getAccount() === $this) {
-                $employee->setAccount(null);
+            if ($employee->getWorkspace() === $this) {
+                $employee->setWorkspace(null);
             }
         }
 
@@ -230,7 +231,7 @@ class Account extends AbstractEntity
     {
         if (!$this->attendanceBatches->contains($attendanceBatch)) {
             $this->attendanceBatches->add($attendanceBatch);
-            $attendanceBatch->setAccount($this);
+            $attendanceBatch->setWorkspace($this);
         }
 
         return $this;
@@ -240,8 +241,8 @@ class Account extends AbstractEntity
     {
         if ($this->attendanceBatches->removeElement($attendanceBatch)) {
             // set the owning side to null (unless already changed)
-            if ($attendanceBatch->getAccount() === $this) {
-                $attendanceBatch->setAccount(null);
+            if ($attendanceBatch->getWorkspace() === $this) {
+                $attendanceBatch->setWorkspace(null);
             }
         }
 
@@ -260,7 +261,7 @@ class Account extends AbstractEntity
     {
         if (!$this->attendances->contains($attendance)) {
             $this->attendances->add($attendance);
-            $attendance->setAccount($this);
+            $attendance->setWorkspace($this);
         }
 
         return $this;
@@ -270,8 +271,8 @@ class Account extends AbstractEntity
     {
         if ($this->attendances->removeElement($attendance)) {
             // set the owning side to null (unless already changed)
-            if ($attendance->getAccount() === $this) {
-                $attendance->setAccount(null);
+            if ($attendance->getWorkspace() === $this) {
+                $attendance->setWorkspace(null);
             }
         }
 
@@ -290,7 +291,7 @@ class Account extends AbstractEntity
     {
         if (!$this->evaluationCriterias->contains($evaluationCriteria)) {
             $this->evaluationCriterias->add($evaluationCriteria);
-            $evaluationCriteria->setAccount($this);
+            $evaluationCriteria->setWorkspace($this);
         }
 
         return $this;
@@ -300,8 +301,8 @@ class Account extends AbstractEntity
     {
         if ($this->evaluationCriterias->removeElement($evaluationCriteria)) {
             // set the owning side to null (unless already changed)
-            if ($evaluationCriteria->getAccount() === $this) {
-                $evaluationCriteria->setAccount(null);
+            if ($evaluationCriteria->getWorkspace() === $this) {
+                $evaluationCriteria->setWorkspace(null);
             }
         }
 
@@ -320,7 +321,7 @@ class Account extends AbstractEntity
     {
         if (!$this->evaluationTemplates->contains($evaluationTemplate)) {
             $this->evaluationTemplates->add($evaluationTemplate);
-            $evaluationTemplate->setAccount($this);
+            $evaluationTemplate->setWorkspace($this);
         }
 
         return $this;
@@ -330,8 +331,8 @@ class Account extends AbstractEntity
     {
         if ($this->evaluationTemplates->removeElement($evaluationTemplate)) {
             // set the owning side to null (unless already changed)
-            if ($evaluationTemplate->getAccount() === $this) {
-                $evaluationTemplate->setAccount(null);
+            if ($evaluationTemplate->getWorkspace() === $this) {
+                $evaluationTemplate->setWorkspace(null);
             }
         }
 
@@ -350,7 +351,7 @@ class Account extends AbstractEntity
     {
         if (!$this->evaluationTemplateCriterias->contains($evaluationTemplateCriteria)) {
             $this->evaluationTemplateCriterias->add($evaluationTemplateCriteria);
-            $evaluationTemplateCriteria->setAccount($this);
+            $evaluationTemplateCriteria->setWorkspace($this);
         }
 
         return $this;
@@ -360,8 +361,8 @@ class Account extends AbstractEntity
     {
         if ($this->evaluationTemplateCriterias->removeElement($evaluationTemplateCriteria)) {
             // set the owning side to null (unless already changed)
-            if ($evaluationTemplateCriteria->getAccount() === $this) {
-                $evaluationTemplateCriteria->setAccount(null);
+            if ($evaluationTemplateCriteria->getWorkspace() === $this) {
+                $evaluationTemplateCriteria->setWorkspace(null);
             }
         }
 
@@ -380,7 +381,7 @@ class Account extends AbstractEntity
     {
         if (!$this->employeeEvaluations->contains($employeeEvaluation)) {
             $this->employeeEvaluations->add($employeeEvaluation);
-            $employeeEvaluation->setAccount($this);
+            $employeeEvaluation->setWorkspace($this);
         }
 
         return $this;
@@ -390,8 +391,8 @@ class Account extends AbstractEntity
     {
         if ($this->employeeEvaluations->removeElement($employeeEvaluation)) {
             // set the owning side to null (unless already changed)
-            if ($employeeEvaluation->getAccount() === $this) {
-                $employeeEvaluation->setAccount(null);
+            if ($employeeEvaluation->getWorkspace() === $this) {
+                $employeeEvaluation->setWorkspace(null);
             }
         }
 

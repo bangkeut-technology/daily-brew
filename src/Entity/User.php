@@ -34,7 +34,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL_CANONICAL', fields: ['emailCanonical'])]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL_SECRET', fields: ['secret'])]
-#[UniqueEntity(fields: ['emailCanonical'], message: 'There is already an account with this emailCanonical')]
+#[UniqueEntity(fields: ['emailCanonical'], message: 'There is already a workspace with this emailCanonical')]
 #[Vich\Uploadable]
 #[ORM\HasLifecycleCallbacks]
 class User extends AbstractEntity implements UserInterface, PasswordAuthenticatedUserInterface, Serializable, TwoFactorInterface
@@ -194,7 +194,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
 
     /**
      * The enabled status of the user.
-     * This indicates whether the user account is active or not.
+     * This indicates whether the user workspace is active or not.
      *
      * @var bool
      */
@@ -240,14 +240,14 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     private ?string $authCode;
 
     /**
-     * @var Collection<int, AccountUser>
+     * @var Collection<int, WorkspaceUser>
      */
-    #[ORM\OneToMany(targetEntity: AccountUser::class, mappedBy: 'user')]
-    private Collection $accounts;
+    #[ORM\OneToMany(targetEntity: WorkspaceUser::class, mappedBy: 'user')]
+    private Collection $workspaces;
 
-    #[ORM\ManyToOne(targetEntity: AccountUser::class)]
-    #[ORM\JoinColumn(name: 'current_account_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
-    private ?Account $currentAccount = null;
+    #[ORM\ManyToOne(targetEntity: WorkspaceUser::class)]
+    #[ORM\JoinColumn(name: 'current_workspace_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    private ?Workspace $currentWorkspace = null;
 
     public function __construct()
     {
@@ -255,7 +255,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         $this->stores = new ArrayCollection();
         $this->templates = new ArrayCollection();
         $this->employeeRoles = new ArrayCollection();
-        $this->accounts = new ArrayCollection();
+        $this->workspaces = new ArrayCollection();
     }
 
     /**
@@ -917,40 +917,40 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     }
 
     /**
-     * @return Collection<int, AccountUser>
+     * @return Collection<int, WorkspaceUser>
      */
-    public function getAccounts(): Collection
+    public function getWorkspaces(): Collection
     {
-        return $this->accounts;
+        return $this->workspaces;
     }
 
-    public function addAccount(AccountUser $account): static
+    public function addWorkspace(WorkspaceUser $workspace): static
     {
-        if (!$this->accounts->contains($account)) {
-            $this->accounts->add($account);
-            $account->setUser($this);
+        if (!$this->workspaces->contains($workspace)) {
+            $this->workspaces->add($workspace);
+            $workspace->setUser($this);
         }
 
         return $this;
     }
 
-    public function removeAccount(AccountUser $account): static
+    public function removeWorkspace(WorkspaceUser $workspace): static
     {
-        if ($this->accounts->removeElement($account) && $account->getUser() === $this) {
-            $account->setUser(null);
+        if ($this->workspaces->removeElement($workspace) && $workspace->getUser() === $this) {
+            $workspace->setUser(null);
         }
 
         return $this;
     }
 
-    public function getCurrentAccount(): ?Account
+    public function getCurrentWorkspace(): ?Workspace
     {
-        return $this->currentAccount;
+        return $this->currentWorkspace;
     }
 
-    public function setCurrentAccount(?Account $currentAccount): static
+    public function setCurrentWorkspace(?Workspace $currentWorkspace): static
     {
-        $this->currentAccount = $currentAccount;
+        $this->currentWorkspace = $currentWorkspace;
 
         return $this;
     }

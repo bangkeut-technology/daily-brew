@@ -18,8 +18,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
  */
 #[ORM\Table(name: 'daily_brew_evaluation_templates')]
 #[ORM\Entity(repositoryClass: EvaluationTemplateRepository::class)]
-#[ORM\UniqueConstraint(name: 'UQ_EVALUATION_TEMPLATE_NAME', fields: ['name', 'account'])]
-#[ORM\UniqueConstraint(name: 'UQ_EVALUATION_TEMPLATE_CANONICAL_NAME', fields: ['canonicalName', 'account'])]
+#[ORM\UniqueConstraint(name: 'UQ_EVALUATION_TEMPLATE_NAME', fields: ['name', 'workspace'])]
+#[ORM\UniqueConstraint(name: 'UQ_EVALUATION_TEMPLATE_CANONICAL_NAME', fields: ['canonicalName', 'workspace'])]
 #[ORM\HasLifecycleCallbacks]
 class EvaluationTemplate extends AbstractEntity
 {
@@ -57,7 +57,7 @@ class EvaluationTemplate extends AbstractEntity
 
     #[ORM\ManyToOne(inversedBy: 'evaluationTemplates')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
-    private ?Account $account = null;
+    private ?Workspace $workspace = null;
 
     public function __construct()
     {
@@ -245,14 +245,14 @@ class EvaluationTemplate extends AbstractEntity
         $this->canonicalName = Canonicalizer::canonicalize($this->name);
     }
 
-    public function getAccount(): ?Account
+    public function getWorkspace(): ?Workspace
     {
-        return $this->account;
+        return $this->workspace;
     }
 
-    public function setAccount(?Account $account): static
+    public function setWorkspace(?Workspace $workspace): static
     {
-        $this->account = $account;
+        $this->workspace = $workspace;
 
         return $this;
     }

@@ -22,8 +22,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
  */
 #[ORM\Table(name: 'daily_brew_attendance_batches')]
 #[ORM\Entity(repositoryClass: AttendanceBatchRepository::class)]
-#[ORM\UniqueConstraint(name: 'UNIQ_ATTENDANCE_BATCH_LABEL', fields: ['label', 'account'])]
-#[ORM\UniqueConstraint(name: 'UNIQ_ATTENDANCE_BATCH_CANONICAL_LABEL', fields: ['canonicalLabel', 'account'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_ATTENDANCE_BATCH_LABEL', fields: ['label', 'workspace'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_ATTENDANCE_BATCH_CANONICAL_LABEL', fields: ['canonicalLabel', 'workspace'])]
 #[ORM\HasLifecycleCallbacks]
 class AttendanceBatch extends AbstractEntity
 {
@@ -68,7 +68,7 @@ class AttendanceBatch extends AbstractEntity
 
     #[ORM\ManyToOne(inversedBy: 'attendanceBatches')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
-    private ?Account $account = null;
+    private ?Workspace $workspace = null;
 
     #[ORM\ManyToOne(inversedBy: 'attendanceBatches')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
@@ -298,14 +298,14 @@ class AttendanceBatch extends AbstractEntity
         $this->canonicalLabel = Canonicalizer::canonicalize($this->label);
     }
 
-    public function getAccount(): ?Account
+    public function getWorkspace(): ?Workspace
     {
-        return $this->account;
+        return $this->workspace;
     }
 
-    public function setAccount(?Account $account): static
+    public function setWorkspace(?Workspace $workspace): static
     {
-        $this->account = $account;
+        $this->workspace = $workspace;
 
         return $this;
     }

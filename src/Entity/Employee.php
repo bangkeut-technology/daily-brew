@@ -95,7 +95,7 @@ class Employee extends AbstractEntity
 
     #[ORM\ManyToOne(inversedBy: 'employees')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
-    private ?Account $account = null;
+    private ?Workspace $workspace = null;
 
     public function __construct()
     {
@@ -187,7 +187,7 @@ class Employee extends AbstractEntity
         $this->store = $store;
 
         if ($store !== null) {
-            $this->account = $store->getAccount();
+            $this->workspace = $store->getWorkspace();
         }
 
         return $this;
@@ -374,14 +374,14 @@ class Employee extends AbstractEntity
         return sprintf('%s %s', $this->lastName, $this->firstName);
     }
 
-    public function getAccount(): ?Account
+    public function getWorkspace(): ?Workspace
     {
-        return $this->account;
+        return $this->workspace;
     }
 
-    public function setAccount(?Account $account): static
+    public function setWorkspace(?Workspace $workspace): static
     {
-        $this->account = $account;
+        $this->workspace = $workspace;
 
         return $this;
     }
