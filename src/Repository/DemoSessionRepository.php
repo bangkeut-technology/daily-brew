@@ -85,4 +85,27 @@ class DemoSessionRepository extends AbstractRepository
     {
         return $this->findOneBy(['user' => $user, 'active' => true]);
     }
+
+    /**
+     * Deletes all demo data associated with a specific user.
+     *
+     * @param User $user the user entity to delete demo data for
+     *
+     *                   The demo data includes:
+     *                   - demo sessions
+     *                   - demo evaluations
+     *                   - demo evaluation results
+     *                   - demo evaluation criteria
+     *                   - demo evaluation template
+     *                   - demo evaluation template criteria
+     *                   - demo evaluation template scores
+     *                   - demo evaluation template employees
+     */
+    public function deleteDemoDataForUser(User $user): void
+    {
+        $qb = $this->createQueryBuilder('ds')
+            ->delete()
+            ->where('ds.user = :user')
+            ->setParameter('user', $user);
+    }
 }

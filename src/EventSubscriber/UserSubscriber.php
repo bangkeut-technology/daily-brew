@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber;
 
-use App\Entity\Account;
+use App\Entity\Workspace;
 use App\Entity\User;
-use App\Enum\AccountRoleEnum;
+use App\Enum\WorkspaceRoleEnum;
 use App\Event\User\UserRegisteredEvent;
-use App\Repository\AccountRepository;
-use App\Repository\AccountUserRepository;
+use App\Repository\WorkspaceRepository;
+use App\Repository\WorkspaceUserRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -20,8 +20,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 readonly class UserSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private AccountRepository     $accountRepository,
-        private AccountUserRepository $accountUserRepository
+        private WorkspaceRepository     $workspaceRepository,
+        private WorkspaceUserRepository $workspaceUserRepository
     )
     {
     }
@@ -48,29 +48,28 @@ readonly class UserSubscriber implements EventSubscriberInterface
     {
         $user = $event->user;
 
-        $this->createAccount($user);
+        $this->createWorkspace($user);
     }
 
     /**
-     * Creates an account for the given user.
+     * Creates a workspace for the given user.
      *
-     * @param User $user The user for whom the account is to be created.
+     * @param User $user The user for whom the workspace is to be created.
      *
-     * @return Account The created account.
+     * @return void The created workspace.
      */
-    private function createAccount(User $user): Account
+    private function createWorkspace(User $user): void
     {
-        $account = $this->accountRepository->create();
+        $workspace = $this->workspaceRepository->create();
 
-        $this->accountRepository->update($account);
+        $this->workspaceRepository->update($workspace);
 
-        $accountUser = $this->accountUserRepository->create()
-            ->setRole(AccountRoleEnum::OWNER)
+        $workspaceUser = $this->workspaceUserRepository->create()
+            ->setRole(WorkspaceRoleEnum::OWNER)
             ->setUser($user)
-            ->setAccount($account);
+            ->setWorkspace($workspace);
 
-        $this->accountUserRepository->update($accountUser);
+        $this->workspaceUserRepository->update($workspaceUser);
 
-        return $account;
     }
 }

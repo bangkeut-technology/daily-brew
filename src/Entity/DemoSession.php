@@ -5,6 +5,7 @@ namespace App\Entity;
 
 use App\Repository\DemoSessionRepository;
 use DateTimeImmutable;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -20,6 +21,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\HasLifecycleCallbacks]
 class DemoSession extends AbstractEntity
 {
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $lastSeenAt = null;
+
     public function __construct(
         #[ORM\Column]
         #[Groups('demo_session:read')]
@@ -39,6 +43,25 @@ class DemoSession extends AbstractEntity
     }
 
     /**
+     * @return DateTimeImmutable|null
+     */
+    public function getLastSeenAt(): ?DateTimeImmutable
+    {
+        return $this->lastSeenAt;
+    }
+
+    /**
+     * @param DateTimeImmutable|null $lastSeenAt
+     *
+     * @return DemoSession
+     */
+    public function setLastSeenAt(?DateTimeImmutable $lastSeenAt): DemoSession
+    {
+        $this->lastSeenAt = $lastSeenAt;
+        return $this;
+    }
+
+    /**
      * @return string|null
      */
     public function getDeviceId(): ?string
@@ -48,6 +71,7 @@ class DemoSession extends AbstractEntity
 
     /**
      * @param string|null $deviceId
+     *
      * @return DemoSession
      */
     public function setDeviceId(?string $deviceId): DemoSession
@@ -66,6 +90,7 @@ class DemoSession extends AbstractEntity
 
     /**
      * @param DateTimeImmutable|null $expiresAt
+     *
      * @return DemoSession
      */
     public function setExpiresAt(?DateTimeImmutable $expiresAt): DemoSession
@@ -84,6 +109,7 @@ class DemoSession extends AbstractEntity
 
     /**
      * @param bool|null $active
+     *
      * @return DemoSession
      */
     public function setActive(?bool $active): DemoSession
@@ -102,6 +128,7 @@ class DemoSession extends AbstractEntity
 
     /**
      * @param User|null $user
+     *
      * @return DemoSession
      */
     public function setUser(?User $user): DemoSession

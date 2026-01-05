@@ -59,7 +59,7 @@ class RegistrationFormType extends AbstractFormType
                 ],
                 'documentation' => [
                     'type' => 'string',
-                    'description' => 'The password for the user account.',
+                    'description' => 'The password for the user workspace.',
                 ],
             ]);
     }

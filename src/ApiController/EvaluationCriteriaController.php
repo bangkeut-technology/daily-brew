@@ -39,7 +39,8 @@ class EvaluationCriteriaController extends AbstractController
     public function __construct(
         TranslatorInterface                           $translator,
         private readonly EvaluationCriteriaRepository $evaluationCriteriaRepository,
-        private readonly EventDispatcherInterface     $dispatcher, private readonly EvaluationTemplateRepository $evaluationTemplateRepository,
+        private readonly EventDispatcherInterface     $dispatcher,
+        private readonly EvaluationTemplateRepository $evaluationTemplateRepository,
     )
     {
         parent::__construct($translator);
@@ -100,13 +101,15 @@ class EvaluationCriteriaController extends AbstractController
             if (null !== $this->evaluationCriteriaRepository->findByLabelAndUser($criteria->getLabel(), $this->getUser())) {
                 return $this->createBadRequestResponse($this->translator->trans('existed.evaluation_criteria', ['%label%' => $criteria->getLabel()], domain: 'errors'));
             }
-            $criteria->setUser($this->getUser());
+            $user = $this->getUser();
+            $criteria->setUser($user);
+            $criteria->setWorkspace($user->getCurrentWorkspace());
             $this->evaluationCriteriaRepository->update($criteria);
 
             $this->dispatcher->dispatch(new EvaluationCriteriaCreatedEvent($criteria, $form->get('templates')->getData()));
 
             return $this->createCriteriaResponse([
-                'message' => $this->translator->trans('created.evaluation_criteria', ['%label%' => $criteria->getLabel()]),
+                'message'  => $this->translator->trans('created.evaluation_criteria', ['%label%' => $criteria->getLabel()]),
                 'criteria' => $criteria,
             ], Response::HTTP_CREATED);
         }

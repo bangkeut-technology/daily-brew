@@ -141,7 +141,9 @@ class EmployeeController extends AbstractController
         $form = $this->createForm(EmployeeFormType::class, $employee);
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
-            $employee->setUser($this->getUser());
+            $user = $this->getUser();
+            $employee->setUser($user);
+            $employee->setWorkspace($user->getCurrentWorkspace());
             $this->employeeRepository->update($employee);
 
             return $this->createEmployeeResponse([
@@ -424,8 +426,10 @@ class EmployeeController extends AbstractController
         $form = $this->createForm(AttendanceFormType::class, $attendance);
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->getUser();
             $attendance->setEmployee($employee);
-            $attendance->setUser($this->getUser());
+            $attendance->setUser($user);
+            $attendance->setWorkspace($user->getCurrentWorkspace());
             $this->employeeRepository->update($attendance);
 
             return $this->createAttendanceResponse([

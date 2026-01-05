@@ -4,12 +4,12 @@ declare(strict_types=1);
 namespace App\Constant;
 
 /**
- * Class AccountSettingConstant
+ * Class WorkspaceSettingConstant
  *
  * @package App\Constant
  * @author Vandeth THO <thovandeth@gmail.com>
  */
-final class AccountSettingConstant extends AbstractConstant
+final class WorkspaceSettingConstant extends AbstractConstant
 {
     public const string NUMBER_OF_PAID_LEAVE = 'number_of_paid_leave';
     public const string PAID_LEAVE_CYCLE = 'paid_leave_cycle';

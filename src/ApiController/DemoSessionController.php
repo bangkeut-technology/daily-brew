@@ -152,7 +152,7 @@ class DemoSessionController extends AbstractController
     }
 
     /**
-     * Optional: re-seed current demo space without creating a new account.
+     * Optional: re-seed the current demo space without creating a new workspace.
      */
     #[Route('/reset', name: 'reset', methods: ['POST'])]
     public function reset(): JsonResponse
@@ -172,7 +172,7 @@ class DemoSessionController extends AbstractController
 
         // Optionally extend TTL a bit (sliding window)
         $now = new DateTimeImmutable();
-        $session->setLastSeen($now);
+        $session->setLastSeenAt($now);
         $this->demoSessionRepository->update($session);
 
         return $this->json(['message' => 'Demo data has been refreshed']);

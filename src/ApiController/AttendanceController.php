@@ -217,7 +217,9 @@ class AttendanceController extends AbstractController
         $form = $this->createForm(AttendanceFormType::class, $attendance);
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
-            $attendance->setUser($this->getUser());
+            $user  = $this->getUser();
+            $attendance->setUser($user);
+            $attendance->setWorkspace($user->getCurrentWorkspace());
 
             $exists = $this->attendanceRepository->existsForEmployeeOnDay($attendance->getEmployee(), $attendance->getAttendanceDate());
             if ($exists) {
