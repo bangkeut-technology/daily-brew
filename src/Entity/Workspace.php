@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use App\Enum\PlanEnum;
 use App\Repository\WorkspaceRepository;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -25,6 +26,9 @@ class Workspace extends AbstractEntity
 
     #[ORM\Column(enumType: PlanEnum::class)]
     private ?PlanEnum $plan = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $deletedAt = null;
 
     /**
      * @var Collection<int, WorkspaceUser>
@@ -396,6 +400,25 @@ class Workspace extends AbstractEntity
             }
         }
 
+        return $this;
+    }
+
+    /**
+     * @return DateTimeImmutable|null
+     */
+    public function getDeletedAt(): ?DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    /**
+     * @param DateTimeImmutable|null $deletedAt
+     *
+     * @return Workspace
+     */
+    public function setDeletedAt(?DateTimeImmutable $deletedAt): Workspace
+    {
+        $this->deletedAt = $deletedAt;
         return $this;
     }
 }

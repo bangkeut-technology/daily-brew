@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use App\Repository\StoreRepository;
 use App\Util\Canonicalizer;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -35,6 +36,9 @@ class Store extends AbstractEntity
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'stores')]
     private ?User $user = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?DateTimeImmutable $deletedAt = null;
 
     #[ORM\OneToMany(targetEntity: Employee::class, mappedBy: 'store', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $employees;
@@ -227,6 +231,25 @@ class Store extends AbstractEntity
             }
         }
 
+        return $this;
+    }
+
+    /**
+     * @return DateTimeImmutable|null
+     */
+    public function getDeletedAt(): ?DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    /**
+     * @param DateTimeImmutable|null $deletedAt
+     *
+     * @return Store
+     */
+    public function setDeletedAt(?DateTimeImmutable $deletedAt): Store
+    {
+        $this->deletedAt = $deletedAt;
         return $this;
     }
 }

@@ -212,6 +212,9 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[Groups(['user:read'])]
     private ?string $locale = 'en';
 
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $deletedAt = null;
+
     /**
      * @var Collection<int, EvaluationCriteria>
      */
@@ -952,6 +955,25 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     {
         $this->currentWorkspace = $currentWorkspace;
 
+        return $this;
+    }
+
+    /**
+     * @return DateTimeImmutable|null
+     */
+    public function getDeletedAt(): ?DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    /**
+     * @param DateTimeImmutable|null $deletedAt
+     *
+     * @return User
+     */
+    public function setDeletedAt(?DateTimeImmutable $deletedAt): User
+    {
+        $this->deletedAt = $deletedAt;
         return $this;
     }
 }

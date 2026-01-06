@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use App\Repository\EvaluationCriteriaRepository;
 use App\Util\Canonicalizer;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -51,6 +52,9 @@ class EvaluationCriteria extends AbstractEntity
     #[ORM\Column]
     #[Groups(['criteria:read'])]
     private int $weight = 1;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?DateTimeImmutable $deletedAt = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'criterias')]
     #[ORM\JoinColumn(nullable: false)]
@@ -230,6 +234,25 @@ class EvaluationCriteria extends AbstractEntity
     {
         $this->workspace = $workspace;
 
+        return $this;
+    }
+
+    /**
+     * @return DateTimeImmutable|null
+     */
+    public function getDeletedAt(): ?DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    /**
+     * @param DateTimeImmutable|null $deletedAt
+     *
+     * @return EvaluationCriteria
+     */
+    public function setDeletedAt(?DateTimeImmutable $deletedAt): EvaluationCriteria
+    {
+        $this->deletedAt = $deletedAt;
         return $this;
     }
 }

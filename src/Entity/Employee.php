@@ -44,6 +44,9 @@ class Employee extends AbstractEntity
     #[Groups(['employee:read'])]
     private ?DateTimeImmutable $joinedAt = null;
 
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?DateTimeImmutable $deletedAt = null;
+
     #[ORM\Column(type: 'string', enumType: EmployeeStatusEnum::class)]
     #[Groups(['employee:read'])]
     private EmployeeStatusEnum $status = EmployeeStatusEnum::ACTIVE;
@@ -383,6 +386,25 @@ class Employee extends AbstractEntity
     {
         $this->workspace = $workspace;
 
+        return $this;
+    }
+
+    /**
+     * @return DateTimeImmutable|null
+     */
+    public function getDeletedAt(): ?DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    /**
+     * @param DateTimeImmutable|null $deletedAt
+     *
+     * @return Employee
+     */
+    public function setDeletedAt(?DateTimeImmutable $deletedAt): Employee
+    {
+        $this->deletedAt = $deletedAt;
         return $this;
     }
 }

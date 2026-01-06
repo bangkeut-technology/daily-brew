@@ -51,6 +51,9 @@ class AttendanceBatch extends AbstractEntity
     #[Groups('attendance_batch:read')]
     private ?DateTimeImmutable $toDate = null;
 
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?DateTimeImmutable $deletedAt = null;
+
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[Groups('attendance_batch:read')]
     private ?User $user = null;
@@ -319,6 +322,25 @@ class AttendanceBatch extends AbstractEntity
     {
         $this->store = $store;
 
+        return $this;
+    }
+
+    /**
+     * @return DateTimeImmutable|null
+     */
+    public function getDeletedAt(): ?DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    /**
+     * @param DateTimeImmutable|null $deletedAt
+     *
+     * @return AttendanceBatch
+     */
+    public function setDeletedAt(?DateTimeImmutable $deletedAt): AttendanceBatch
+    {
+        $this->deletedAt = $deletedAt;
         return $this;
     }
 }

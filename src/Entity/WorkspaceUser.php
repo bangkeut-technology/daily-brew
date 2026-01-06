@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use App\Enum\WorkspaceRoleEnum;
 use App\Repository\WorkspaceUserRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -31,6 +32,9 @@ class WorkspaceUser extends AbstractEntity
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $customName = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?DateTimeImmutable $deletedAt = null;
 
     public function getRole(): ?WorkspaceRoleEnum
     {
@@ -78,5 +82,40 @@ class WorkspaceUser extends AbstractEntity
         $this->customName = $customName;
 
         return $this;
+    }
+
+    /**
+     * @return DateTimeImmutable|null
+     */
+    public function getDeletedAt(): ?DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    /**
+     * @param DateTimeImmutable|null $deletedAt
+     *
+     * @return WorkspaceUser
+     */
+    public function setDeletedAt(?DateTimeImmutable $deletedAt): WorkspaceUser
+    {
+        $this->deletedAt = $deletedAt;
+        return $this;
+    }
+
+    //--------------
+    // Helpers
+    //--------------
+    public function __toString(): string
+    {
+        return $this->customName ?? (string)$this->user;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOwner(): bool
+    {
+        return $this->role === WorkspaceRoleEnum::OWNER;
     }
 }

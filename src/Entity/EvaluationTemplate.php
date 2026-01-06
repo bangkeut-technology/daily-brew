@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use App\Repository\EvaluationTemplateRepository;
 use App\Util\Canonicalizer;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -38,6 +39,9 @@ class EvaluationTemplate extends AbstractEntity
     #[ORM\Column]
     #[Groups(['template:read'])]
     private bool $active = true;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?DateTimeImmutable $deletedAt = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'templates')]
     #[ORM\JoinColumn(nullable: false)]
@@ -254,6 +258,25 @@ class EvaluationTemplate extends AbstractEntity
     {
         $this->workspace = $workspace;
 
+        return $this;
+    }
+
+    /**
+     * @return DateTimeImmutable|null
+     */
+    public function getDeletedAt(): ?DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    /**
+     * @param DateTimeImmutable|null $deletedAt
+     *
+     * @return EvaluationTemplate
+     */
+    public function setDeletedAt(?DateTimeImmutable $deletedAt): EvaluationTemplate
+    {
+        $this->deletedAt = $deletedAt;
         return $this;
     }
 }

@@ -41,6 +41,9 @@ class EmployeeEvaluation extends AbstractEntity
     #[Groups(['employee_evaluation:read'])]
     private ?string $templateName = null;
 
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?DateTimeImmutable $deletedAt = null;
+
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: false)]
     #[Groups(['employee_evaluation:read'])]
     private DateTimeImmutable $evaluatedAt;
@@ -243,6 +246,25 @@ class EmployeeEvaluation extends AbstractEntity
     {
         $this->workspace = $workspace;
 
+        return $this;
+    }
+
+    /**
+     * @return DateTimeImmutable|null
+     */
+    public function getDeletedAt(): ?DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    /**
+     * @param DateTimeImmutable|null $deletedAt
+     *
+     * @return EmployeeEvaluation
+     */
+    public function setDeletedAt(?DateTimeImmutable $deletedAt): EmployeeEvaluation
+    {
+        $this->deletedAt = $deletedAt;
         return $this;
     }
 }

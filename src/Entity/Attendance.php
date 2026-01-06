@@ -76,6 +76,9 @@ class Attendance extends AbstractEntity
     #[ORM\Column(nullable: true, enumType: LeaveTypeEnum::class)]
     private ?LeaveTypeEnum $leaveType = null;
 
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?DateTimeImmutable $deletedAt = null;
+
     /**
      * The employee associated with this attendance.
      *
@@ -289,6 +292,25 @@ class Attendance extends AbstractEntity
     {
         $this->workspace = $workspace;
 
+        return $this;
+    }
+
+    /**
+     * @return DateTimeImmutable|null
+     */
+    public function getDeletedAt(): ?DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    /**
+     * @param DateTimeImmutable|null $deletedAt
+     *
+     * @return Attendance
+     */
+    public function setDeletedAt(?DateTimeImmutable $deletedAt): Attendance
+    {
+        $this->deletedAt = $deletedAt;
         return $this;
     }
 }

@@ -33,6 +33,96 @@ class WorkspaceUserRepository extends AbstractRepository
     }
 
     /**
+     * Find active WorkspaceUser entries by User
+     *
+     * @param User $user The user entity
+     *
+     * @return WorkspaceUser[] The list of active WorkspaceUser entries
+     */
+    public function findActiveByUser(User $user): array
+    {
+        return $this->createQueryBuilder('wu')
+            ->andWhere('wu.user = :user')
+            ->andWhere('wu.deletedAt IS NULL')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Count active members in a workspace
+     *
+     * @param Workspace $workspace The workspace entity
+     *
+     * @return int The count of active members
+     */
+    public function countActiveMembers(Workspace $workspace): int
+    {
+        return $this->createQueryBuilder('wu')
+            ->select('COUNT(wu.id)')
+            ->andWhere('wu.workspace = :workspace')
+            ->andWhere('wu.deletedAt IS NULL')
+            ->setParameter('workspace', $workspace)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Find active membership for a workspace and user
+     *
+     * @param Workspace $workspace The workspace entity
+     * @param User      $actor     The user entity
+     *
+     * @return WorkspaceUser|null
+     */
+    public function findActiveMembership(Workspace $workspace, User $actor): ?WorkspaceUser
+    {
+        return $this->findOneBy(['workspace' => $workspace, 'user' => $actor]);
+    }
+
+    /**
+     * Count other active members in a workspace excluding the given actor
+     *
+     * @param Workspace $workspace The workspace entity
+     * @param User      $actor     The user entity
+     *
+     * @return int The count of other active members
+     */
+    public function countOtherActiveMembers(Workspace $workspace, User $actor): int
+    {
+        return $this->createQueryBuilder('wu')
+            ->select('COUNT(wu.id)')
+            ->andWhere('wu.workspace = :workspace')
+            ->andWhere('wu.user <> :actor')
+            ->andWhere('wu.deletedAt IS NULL')
+            ->setParameter('workspace', $workspace)
+            ->setParameter('actor', $actor)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Check if a user is a member of a workspace
+     *
+     * @param Workspace $workspace The workspace entity
+     * @param User      $user      The user entity
+     *
+     * @return bool True if the user is a member, false otherwise
+     */
+    public function isMember(Workspace $workspace, User $user): bool
+    {
+        return $this->createQueryBuilder('wu')
+                ->select('COUNT(wu.id)')
+                ->andWhere('wu.workspace = :workspace')
+                ->andWhere('wu.user = :user')
+                ->andWhere('wu.deletedAt IS NULL')
+                ->setParameter('workspace', $workspace)
+                ->setParameter('user', $user)
+                ->getQuery()
+                ->getSingleScalarResult() > 0;
+    }
+
+    /**
      * Find a workspace user by workspace and user.
      *
      * @param Workspace $workspace The workspace to search for.
