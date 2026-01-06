@@ -51,6 +51,14 @@ class WorkspaceInviteController extends AbstractController
         parent::__construct($translator);
     }
 
+    /**
+     * Create a new workspace invite.
+     *
+     * @param string  $publicId The workspace public ID.
+     * @param Request $request  The HTTP request.
+     *
+     * @return Response The HTTP response.
+     */
     #[Route(name: 'create', methods: ['POST'])]
     public function create(
         string  $publicId,
@@ -63,8 +71,7 @@ class WorkspaceInviteController extends AbstractController
 
         $payload = $request->getPayload();
 
-        $roleStr = (string)($payload['role'] ?? '');
-        if ($roleStr === '') {
+        if ('' === $roleStr = (string)($payload['role'] ?? '')) {
             throw $this->createApiErrorException(ApiErrorCodeEnum::BAD_REQUEST, ['%field%' => 'role']);
         }
 
@@ -119,8 +126,8 @@ class WorkspaceInviteController extends AbstractController
 
     #[Route('/{invitePublicId}', name: 'revoke', methods: ['DELETE'])]
     public function revoke(
-        string               $publicId,
-        string               $invitePublicId,
+        string $publicId,
+        string $invitePublicId,
     ): Response
     {
         $workspace = $this->getWorkspaceByPublicId($publicId);
