@@ -19,10 +19,13 @@ use App\Controller\AbstractController;
 use App\DTO\WorkspaceUserDTO;
 use App\Entity\User;
 use App\Enum\ApiErrorCodeEnum;
+use App\Enum\WorkspaceRoleEnum;
 use App\Repository\WorkspaceRepository;
+use App\Repository\WorkspaceUserRepository;
+use App\Security\Voter\WorkspaceVoter;
 use App\Service\WorkspaceService;
+use App\Service\WorkspaceUserService;
 use OpenApi\Attributes as OA;
-use Random\RandomException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -45,9 +48,11 @@ class WorkspaceController extends AbstractController
     use WorkspaceTrait;
 
     public function __construct(
-        TranslatorInterface                  $translator,
-        private readonly WorkspaceRepository $workspaceRepository,
-        private readonly WorkspaceService    $workspaceService,
+        TranslatorInterface                      $translator,
+        private readonly WorkspaceRepository     $workspaceRepository,
+        private readonly WorkspaceService        $workspaceService,
+        private readonly WorkspaceUserRepository $workspaceUserRepository,
+        private readonly WorkspaceUserService    $memberService,
     )
     {
         parent::__construct($translator);
@@ -132,5 +137,44 @@ class WorkspaceController extends AbstractController
         $this->workspaceService->deleteWorkspace($workspace, $this->getUser());
 
         return new JsonResponse(['message' => 'Workspace deleted successfully'], Response::HTTP_OK);
+    }
+
+    #[Route('/{publicId}/members', methods: ['POST'])]
+    public function addMember(
+        string  $publicId,
+        Request $request,
+    ): Response
+    {
+        $workspace = $this->getWorkspaceByPublicId($publicId);
+
+        $this->denyAccessUnlessGranted(WorkspaceVoter::ADD_MEMBER, $workspace);
+
+        $payload = $request->toArray();
+
+        if ('' === $userPublicId = ($payload['userPublicId'] ?? '')) {
+            throw $this->createApiErrorException(ApiErrorCodeEnum::BAD_REQUEST, ['user' => 'userPublicId is required.']);
+        }
+
+        if ('' === $roleStr = ($payload['role'] ?? '')) {
+            throw $this->createApiErrorException(ApiErrorCodeEnum::BAD_REQUEST, ['user' => 'role is required.']);
+        }
+
+        $role = WorkspaceRoleEnum::from($roleStr);
+
+        // Enforce role assignment constraint (manager cannot add admin, etc.)
+        $employeePublicId = isset($payload['employeePublicId']) ? (string)$payload['employeePublicId'] : null;
+
+        $membership = $this->memberService->addByUserPublicId(
+            workspace: $workspace,
+            userPublicId: $userPublicId,
+            role: $role,
+            employeePublicId: $employeePublicId
+        );
+
+        return $this->json([
+            'message'               => 'Member added.',
+            'workspaceUserPublicId' => $membership->publicId,
+            'role'                  => $membership->getRole()->value,
+        ], 201);
     }
 }

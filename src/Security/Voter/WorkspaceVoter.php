@@ -22,16 +22,16 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 /**
  *
- * Class WorkspaceInviteVoter
+ * Class WorkspaceVoter
  *
  * @package App\Security\Voter;
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-class WorkspaceInviteVoter extends Voter
+class WorkspaceVoter extends Voter
 {
-    public const string CREATE = 'WORKSPACE_INVITE_CREATE';
-    public const string LIST = 'WORKSPACE_INVITE_LIST';
-    public const string REVOKE = 'WORKSPACE_INVITE_REVOKE';
+    public const string ADD_MEMBER = 'WORKSPACE_INVITE_CREATE';
+    public const string VIEW_INVITES = 'WORKSPACE_INVITE_LIST';
+    public const string REVOKE_INVITE = 'WORKSPACE_INVITE_REVOKE';
 
     public function __construct(
         private readonly WorkspaceUserRepository $workspaceUserRepository,
@@ -41,7 +41,7 @@ class WorkspaceInviteVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        if (!in_array($attribute, [self::CREATE, self::LIST, self::REVOKE], true)) {
+        if (!in_array($attribute, [self::ADD_MEMBER, self::VIEW_INVITES, self::REVOKE_INVITE], true)) {
             return false;
         }
 
@@ -62,9 +62,9 @@ class WorkspaceInviteVoter extends Voter
         $role = $membership->getRole();
 
         return match ($attribute) {
-            self::LIST => $this->canList($role),
-            self::CREATE => $this->canCreate($role),
-            self::REVOKE => $this->canRevoke($role),
+            self::VIEW_INVITES => $this->canList($role),
+            self::ADD_MEMBER => $this->canCreate($role),
+            self::REVOKE_INVITE => $this->canRevoke($role),
             default => false,
         };
     }

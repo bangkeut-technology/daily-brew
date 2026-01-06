@@ -21,7 +21,7 @@ use App\Enum\WorkspaceRoleEnum;
 use App\Repository\WorkspaceInviteRepository;
 use App\Repository\WorkspaceRepository;
 use App\Repository\WorkspaceUserRepository;
-use App\Security\Voter\WorkspaceInviteVoter;
+use App\Security\Voter\WorkspaceVoter;
 use App\Service\WorkspaceInviteService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -67,7 +67,7 @@ class WorkspaceInviteController extends AbstractController
     {
         $workspace = $this->getWorkspaceByPublicId($publicId);
 
-        $this->denyAccessUnlessGranted(WorkspaceInviteVoter::CREATE, $workspace);
+        $this->denyAccessUnlessGranted(WorkspaceVoter::ADD_MEMBER, $workspace);
 
         $payload = $request->getPayload();
 
@@ -109,7 +109,7 @@ class WorkspaceInviteController extends AbstractController
     ): Response
     {
         $workspace = $this->getWorkspaceByPublicId($publicId);
-        $this->denyAccessUnlessGranted(WorkspaceInviteVoter::LIST, $workspace);
+        $this->denyAccessUnlessGranted(WorkspaceVoter::VIEW_INVITES, $workspace);
 
         $invites = $this->workspaceInviteRepository->findByWorkspace($workspace);
 
@@ -131,7 +131,7 @@ class WorkspaceInviteController extends AbstractController
     ): Response
     {
         $workspace = $this->getWorkspaceByPublicId($publicId);
-        $this->denyAccessUnlessGranted(WorkspaceInviteVoter::REVOKE, $workspace);
+        $this->denyAccessUnlessGranted(WorkspaceVoter::REVOKE_INVITE, $workspace);
 
         if (null === $invite = $this->workspaceInviteRepository->findByPublicId($invitePublicId)) {
             throw $this->createApiErrorException(ApiErrorCodeEnum::NOT_FOUND, ['invite' => 'Invite not found.']);
