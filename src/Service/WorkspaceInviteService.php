@@ -21,8 +21,10 @@ use App\Enum\WorkspaceInviteStatusEnum;
 use App\Enum\WorkspaceRoleEnum;
 use App\Exception\ApiException;
 use App\Repository\EmployeeRepository;
+use App\Repository\UserRepository;
 use App\Repository\WorkspaceInviteRepository;
 use App\Repository\WorkspaceUserRepository;
+use App\Util\Canonicalizer;
 use App\Util\TokenGeneratorInterface;
 use DateInterval;
 use DateTimeImmutable;
@@ -43,21 +45,38 @@ readonly class WorkspaceInviteService
         private WorkspaceUserRepository   $workspaceUserRepository,
         private WorkspaceInviteRepository $workspaceInviteRepository,
         private EmployeeRepository        $employeeRepository,
+        private UserRepository $userRepository,
     )
     {
     }
 
+    /**
+     * Creates an invite for a user to join a workspace.
+     *
+     * @param Workspace         $workspace        The workspace to which the invite applies.
+     * @param User              $invitedBy        The user who initiates the invite.
+     * @param WorkspaceRoleEnum $role             The role to be assigned upon accepting the invite.
+     * @param string|null       $email            The email address of the user being invited.
+     * @param string|null       $employeePublicId The public identifier of the employee, if applicable.
+     * @param DateInterval      $ttl              Time-to-live for the invitation token, default is 7 days.
+     *
+     * @return array                                Contains the invite object and raw token.
+     */
     public function createInvite(
         Workspace         $workspace,
         User              $invitedBy,
         WorkspaceRoleEnum $role,
-        ?string           $email,
+        ?string           $email = null,
         ?string           $employeePublicId = null,
         DateInterval      $ttl = new DateInterval('P7D'),
     ): array
     {
-        $employee = null;
+        $emailCanonical = Canonicalizer::canonicalize(trim($email));
+        if ($emailCanonical === '') {
+            throw new ApiException(ApiErrorCodeEnum::BAD_REQUEST, ['email' => 'email is required.']);
+        }
 
+        $employee = null;
         if ($employeePublicId) {
             /** @var Employee|null $employee */
             $employee = $this->employeeRepository->findByPublicId($employeePublicId);
@@ -69,26 +88,32 @@ readonly class WorkspaceInviteService
                 throw new ApiException(ApiErrorCodeEnum::BAD_REQUEST, ['employee' => 'Employee does not belong to this workspace.']);
             }
 
-            // If employee is already linked to a user, block
             if (method_exists($employee, 'getLinkedUser') && $employee->getLinkedUser() !== null) {
                 throw new ApiException(ApiErrorCodeEnum::CONFLICT, ['employee' => 'Employee is already linked to a user.']);
             }
         }
 
-        $rawToken = $this->tokenGenerator->generateTokenWithoutUnderscore();
+        $invitedUser = $this->userRepository->findByIdentifier($email);
 
-        // Store hash in DB (recommended)
+        $rawToken = $this->tokenGenerator->generateTokenWithoutUnderscore();
         $tokenStored = hash('sha256', $rawToken);
 
-        $invite = $this->workspaceInviteRepository->create()
+        $invite = $this->workspaceInviteRepository
+            ->create()
             ->setWorkspace($workspace)
             ->setInvitedBy($invitedBy)
             ->setRole($role)
             ->setEmail($email)
+            ->setEmailCanonical($emailCanonical)
             ->setEmployee($employee)
             ->setToken($tokenStored)
             ->setStatus(WorkspaceInviteStatusEnum::PENDING)
             ->setExpiresAt(new DateTimeImmutable()->add($ttl));
+
+        // new field
+        if (method_exists($invite, 'setInvitedUser')) {
+            $invite->setInvitedUser($invitedUser);
+        }
 
         $this->workspaceInviteRepository->update($invite);
 
@@ -105,45 +130,49 @@ readonly class WorkspaceInviteService
      */
     public function acceptInvite(string $rawToken, User $user): WorkspaceInvite
     {
-        $tokenStored = hash('sha256', $rawToken);
+        $tokenStored = hash('sha256', $rawToken);;
 
-        $invite = $this->workspaceInviteRepository->findByToken($tokenStored);
-
-        if (!$invite) {
-            throw new ApiException(ApiErrorCodeEnum::NOT_FOUND, ['invite' =>'Invite not found.']);
+        if (null === $invite = $this->workspaceInviteRepository->findByToken($tokenStored)) {
+            throw new ApiException(ApiErrorCodeEnum::NOT_FOUND, ['invite' => 'Invite not found.']);
         }
 
         if (!$invite->isAcceptableNow()) {
             throw new ApiException(ApiErrorCodeEnum::BAD_REQUEST, ['invite' => 'Invite is not valid anymore (expired or not pending).']);
         }
 
-        $workspace = $invite->getWorkspace();
-        if (!$workspace) {
+        ;
+        if (null === $workspace = $invite->getWorkspace()) {
             throw new ApiException(ApiErrorCodeEnum::BAD_REQUEST, ['invite' => 'Invite has no workspace.']);
         }
 
-        // Prevent duplicate membership
-        $existingMembership = $this->workspaceUserRepository->findByWorkspaceAndUser($workspace, $user);
+        // If invite targets a specific user, enforce it
+        if (method_exists($invite, 'getInvitedUser') && $invite->getInvitedUser()) {
+            if ($invite->getInvitedUser()->id !== $user->id) {
+                throw new ApiException(ApiErrorCodeEnum::BAD_REQUEST, ['invite' => 'This invite is not for your account.']);
+            }
+        } else {
+            if ($invite->getEmailCanonical() !== $user->getEmailCanonical()) {
+                throw new ApiException(ApiErrorCodeEnum::BAD_REQUEST, ['invite' => 'Email does not match invite.']);
+            }
+        }
 
-        if (!$existingMembership) {
+        if (null === $membership = $this->workspaceUserRepository->findByWorkspaceAndUser($workspace, $user)) {
             $membership = $this->workspaceUserRepository->create()
                 ->setWorkspace($workspace)
                 ->setUser($user)
                 ->setRole($invite->getRole());
 
-            $this->workspaceInviteRepository->update($membership, false);
+            $this->workspaceUserRepository->persist($membership);
         }
 
-        // Link employee to user if exists
-        if ($invite->getEmployee()) {
-            $employee = $invite->getEmployee();
-
+        // Link employee if exists
+        if (null !== $employee = $invite->getEmployee()) {
             if ($employee->getWorkspace()?->id !== $workspace->id) {
                 throw new ApiException(ApiErrorCodeEnum::BAD_REQUEST, ['employee' => 'Employee does not belong to this workspace.']);
             }
 
             if (method_exists($employee, 'getLinkedUser') && $employee->getLinkedUser() !== null) {
-                throw new ApiException(ApiErrorCodeEnum::CONFLICT, ['employee' => 'Employee already linked to another user.']);
+                throw new ApiException(ApiErrorCodeEnum::CONFLICT, ['employee' => 'Employee is already linked to a user.']);
             }
 
             if (method_exists($employee, 'setLinkedUser')) {
@@ -164,7 +193,6 @@ readonly class WorkspaceInviteService
      * Revokes a workspace invite.
      *
      * @param WorkspaceInvite $invite The invite to revoke.
-
      */
     public function revokeInvite(WorkspaceInvite $invite): void
     {

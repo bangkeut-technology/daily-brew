@@ -12,6 +12,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Workspace;
 use App\Entity\WorkspaceInvite;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -50,5 +51,17 @@ class WorkspaceInviteRepository extends AbstractRepository
     public function findByToken(string $token): ?WorkspaceInvite
     {
         return $this->findOneBy(['token' => $token]);
+    }
+
+    /**
+     * Finds all WorkspaceInvite entities for a specific workspace.
+     *
+     * @param Workspace $workspace The workspace to search for.
+     *
+     * @return WorkspaceInvite[] The found WorkspaceInvite entities or an empty array if none found.
+     */
+    public function findByWorkspace(Workspace $workspace): array
+    {
+        return $this->findBy(['workspace' => $workspace]);
     }
 }

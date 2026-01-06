@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Enum\ApiErrorCodeEnum;
+use App\Exception\ApiException;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as BaseAbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -155,5 +157,22 @@ abstract class AbstractController extends BaseAbstractController
     protected function createFormErrorsResponse(FormInterface $form): JsonResponse
     {
         return $this->json($this->getFormErrors($form), Response::HTTP_BAD_REQUEST);
+    }
+
+    /**
+     * Creates a JSON response for API errors.
+     *
+     * This method is used to generate a JSON response containing API error details with the appropriate HTTP status
+     * code.
+     *
+     * @param ApiErrorCodeEnum $code    The API error code enum.
+     * @param array            $context Optional contextual data to include in the response. Defaults to an empty
+     *                                  array.
+     *
+     * @return ApiException The created ApiException instance.
+     */
+    protected function createApiErrorException(ApiErrorCodeEnum $code, array $context = []): ApiException
+    {
+        return new ApiException($code, $context);
     }
 }

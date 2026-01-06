@@ -29,12 +29,15 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
  */
 class WorkspaceInviteVoter extends Voter
 {
-    public const CREATE = 'WORKSPACE_INVITE_CREATE';
-    public const LIST   = 'WORKSPACE_INVITE_LIST';
-    public const REVOKE = 'WORKSPACE_INVITE_REVOKE';
+    public const string CREATE = 'WORKSPACE_INVITE_CREATE';
+    public const string LIST = 'WORKSPACE_INVITE_LIST';
+    public const string REVOKE = 'WORKSPACE_INVITE_REVOKE';
+
     public function __construct(
         private readonly WorkspaceUserRepository $workspaceUserRepository,
-    ) {}
+    )
+    {
+    }
 
     protected function supports(string $attribute, mixed $subject): bool
     {
@@ -55,9 +58,7 @@ class WorkspaceInviteVoter extends Voter
         $workspace = $subject instanceof WorkspaceInvite ? $subject->getWorkspace() : $subject;
         if (!$workspace instanceof Workspace) {
             return false;
-        }
-
-        ;
+        };
 
         if (null === $membership = $this->workspaceUserRepository->findByWorkspaceAndUser($workspace, $user)) {
             return false;
@@ -66,10 +67,10 @@ class WorkspaceInviteVoter extends Voter
         $role = $membership->getRole();
 
         return match ($attribute) {
-            self::LIST   => $this->canList($role),
+            self::LIST => $this->canList($role),
             self::CREATE => $this->canCreate($role),
             self::REVOKE => $this->canRevoke($role),
-            default      => false,
+            default => false,
         };
     }
 
@@ -86,22 +87,5 @@ class WorkspaceInviteVoter extends Voter
     private function canRevoke(WorkspaceRoleEnum $role): bool
     {
         return in_array($role, [WorkspaceRoleEnum::OWNER, WorkspaceRoleEnum::ADMIN, WorkspaceRoleEnum::MANAGER], true);
-    }
-
-    public function canAssignRole(WorkspaceRoleEnum $actorRole, WorkspaceRoleEnum $targetRole): bool
-    {
-        if ($actorRole === WorkspaceRoleEnum::MANAGER) {
-            return $targetRole === WorkspaceRoleEnum::EMPLOYEE;
-        }
-
-        if ($actorRole === WorkspaceRoleEnum::ADMIN) {
-            return in_array($targetRole, [WorkspaceRoleEnum::MANAGER, WorkspaceRoleEnum::EMPLOYEE, WorkspaceRoleEnum::ADMIN], true);
-        }
-
-        if ($actorRole === WorkspaceRoleEnum::OWNER) {
-            return true;
-        }
-
-        return false;
     }
 }

@@ -38,6 +38,9 @@ class WorkspaceInvite extends AbstractEntity
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $email = null;
 
+    #[ORM\Column(length: 180, nullable: true)]
+    private ?string $emailCanonical = null;
+
     #[ORM\Column(length: 50, enumType: WorkspaceRoleEnum::class)]
     private WorkspaceRoleEnum $role = WorkspaceRoleEnum::EMPLOYEE; // member, admin
 
@@ -56,6 +59,10 @@ class WorkspaceInvite extends AbstractEntity
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     private ?User $invitedBy = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $invitedUser = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true)]
@@ -102,6 +109,25 @@ class WorkspaceInvite extends AbstractEntity
     public function setEmail(?string $email): WorkspaceInvite
     {
         $this->email = $email;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEmailCanonical(): ?string
+    {
+        return $this->emailCanonical;
+    }
+
+    /**
+     * @param string|null $emailCanonical
+     *
+     * @return WorkspaceInvite
+     */
+    public function setEmailCanonical(?string $emailCanonical): WorkspaceInvite
+    {
+        $this->emailCanonical = $emailCanonical;
         return $this;
     }
 
@@ -216,6 +242,25 @@ class WorkspaceInvite extends AbstractEntity
     public function setInvitedBy(?User $invitedBy): WorkspaceInvite
     {
         $this->invitedBy = $invitedBy;
+        return $this;
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getInvitedUser(): ?User
+    {
+        return $this->invitedUser;
+    }
+
+    /**
+     * @param User|null $invitedUser
+     *
+     * @return WorkspaceInvite
+     */
+    public function setInvitedUser(?User $invitedUser): WorkspaceInvite
+    {
+        $this->invitedUser = $invitedUser;
         return $this;
     }
 
