@@ -15,6 +15,7 @@ namespace App\Service;
 use App\Entity\Employee;
 use App\Entity\User;
 use App\Entity\Workspace;
+use App\Entity\WorkspaceInvite;
 use App\Enum\ApiErrorCodeEnum;
 use App\Enum\WorkspaceInviteStatusEnum;
 use App\Enum\WorkspaceRoleEnum;
@@ -25,6 +26,7 @@ use App\Repository\WorkspaceUserRepository;
 use App\Util\TokenGeneratorInterface;
 use DateInterval;
 use DateTimeImmutable;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  *
@@ -50,7 +52,6 @@ readonly class WorkspaceInviteService
         User              $invitedBy,
         WorkspaceRoleEnum $role,
         ?string           $email,
-        ?string           $phone,
         ?string           $employeePublicId = null,
         DateInterval      $ttl = new DateInterval('P7D'),
     ): array
@@ -84,7 +85,6 @@ readonly class WorkspaceInviteService
             ->setInvitedBy($invitedBy)
             ->setRole($role)
             ->setEmail($email)
-            ->setPhone($phone)
             ->setEmployee($employee)
             ->setToken($tokenStored)
             ->setStatus(WorkspaceInviteStatusEnum::PENDING)
@@ -93,5 +93,86 @@ readonly class WorkspaceInviteService
         $this->workspaceInviteRepository->update($invite);
 
         return ['invite' => $invite, 'rawToken' => $rawToken];
+    }
+
+    /**
+     * Accept a workspace invite using the provided token and link it to the given user.
+     *
+     * @param string $rawToken The raw invite token provided by the user.
+     * @param User   $user     The user who is accepting the invite.
+     *
+     * @return WorkspaceInvite The accepted workspace invite.
+     */
+    public function acceptInvite(string $rawToken, User $user): WorkspaceInvite
+    {
+        $tokenStored = hash('sha256', $rawToken);
+
+        $invite = $this->workspaceInviteRepository->findByToken($tokenStored);
+
+        if (!$invite) {
+            throw new ApiException(ApiErrorCodeEnum::NOT_FOUND, ['invite' =>'Invite not found.']);
+        }
+
+        if (!$invite->isAcceptableNow()) {
+            throw new ApiException(ApiErrorCodeEnum::BAD_REQUEST, ['invite' => 'Invite is not valid anymore (expired or not pending).']);
+        }
+
+        $workspace = $invite->getWorkspace();
+        if (!$workspace) {
+            throw new ApiException(ApiErrorCodeEnum::BAD_REQUEST, ['invite' => 'Invite has no workspace.']);
+        }
+
+        // Prevent duplicate membership
+        $existingMembership = $this->workspaceUserRepository->findByWorkspaceAndUser($workspace, $user);
+
+        if (!$existingMembership) {
+            $membership = $this->workspaceUserRepository->create()
+                ->setWorkspace($workspace)
+                ->setUser($user)
+                ->setRole($invite->getRole());
+
+            $this->workspaceInviteRepository->update($membership, false);
+        }
+
+        // Link employee to user if exists
+        if ($invite->getEmployee()) {
+            $employee = $invite->getEmployee();
+
+            if ($employee->getWorkspace()?->id !== $workspace->id) {
+                throw new ApiException(ApiErrorCodeEnum::BAD_REQUEST, ['employee' => 'Employee does not belong to this workspace.']);
+            }
+
+            if (method_exists($employee, 'getLinkedUser') && $employee->getLinkedUser() !== null) {
+                throw new ApiException(ApiErrorCodeEnum::CONFLICT, ['employee' => 'Employee already linked to another user.']);
+            }
+
+            if (method_exists($employee, 'setLinkedUser')) {
+                $employee->setLinkedUser($user);
+            } elseif (method_exists($employee, 'setUser')) {
+                $employee->setUser($user);
+            }
+        }
+
+        $invite->markAccepted($user);
+
+        $this->workspaceInviteRepository->flush();
+
+        return $invite;
+    }
+
+    /**
+     * Revokes a workspace invite.
+     *
+     * @param WorkspaceInvite $invite The invite to revoke.
+
+     */
+    public function revokeInvite(WorkspaceInvite $invite): void
+    {
+        if ($invite->getStatus() !== WorkspaceInviteStatusEnum::PENDING) {
+            throw new ApiException(ApiErrorCodeEnum::BAD_REQUEST, ['invite' => 'Only pending invites can be revoked.']);
+        }
+
+        $invite->markRevoked();
+        $this->workspaceInviteRepository->flush();
     }
 }

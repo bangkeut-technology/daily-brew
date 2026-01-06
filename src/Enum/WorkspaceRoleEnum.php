@@ -12,5 +12,7 @@ namespace App\Enum;
 enum WorkspaceRoleEnum: string
 {
     case OWNER = 'OWNER';
+    case ADMIN = 'ADMIN';
+    case MANAGER = 'MANAGER';
     case EMPLOYEE = 'EMPLOYEE';
 }

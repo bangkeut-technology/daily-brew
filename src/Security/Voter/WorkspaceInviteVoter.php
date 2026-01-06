@@ -1,0 +1,107 @@
+<?php
+/**
+ * This file is part of the Adora project.
+ *
+ * (c) Vandeth THO <thovandeth@gmail.com>
+ *
+ * @author  Vandeth THO
+ * @created 1/6/26 12:43 PM
+ *
+ * @see     https://adora.media
+ */
+
+namespace App\Security\Voter;
+
+use App\Entity\User;
+use App\Entity\Workspace;
+use App\Entity\WorkspaceInvite;
+use App\Enum\WorkspaceRoleEnum;
+use App\Repository\WorkspaceUserRepository;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+
+/**
+ *
+ * Class WorkspaceInviteVoter
+ *
+ * @package App\Security\Voter;
+ * @author  Vandeth THO <thovandeth@gmail.com>
+ */
+class WorkspaceInviteVoter extends Voter
+{
+    public const CREATE = 'WORKSPACE_INVITE_CREATE';
+    public const LIST   = 'WORKSPACE_INVITE_LIST';
+    public const REVOKE = 'WORKSPACE_INVITE_REVOKE';
+    public function __construct(
+        private readonly WorkspaceUserRepository $workspaceUserRepository,
+    ) {}
+
+    protected function supports(string $attribute, mixed $subject): bool
+    {
+        if (!in_array($attribute, [self::CREATE, self::LIST, self::REVOKE], true)) {
+            return false;
+        }
+
+        return $subject instanceof Workspace || $subject instanceof WorkspaceInvite;
+    }
+
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
+    {
+        $user = $token->getUser();
+        if (!$user instanceof User) {
+            return false;
+        }
+
+        $workspace = $subject instanceof WorkspaceInvite ? $subject->getWorkspace() : $subject;
+        if (!$workspace instanceof Workspace) {
+            return false;
+        }
+
+        ;
+
+        if (null === $membership = $this->workspaceUserRepository->findByWorkspaceAndUser($workspace, $user)) {
+            return false;
+        }
+
+        $role = $membership->getRole();
+
+        return match ($attribute) {
+            self::LIST   => $this->canList($role),
+            self::CREATE => $this->canCreate($role),
+            self::REVOKE => $this->canRevoke($role),
+            default      => false,
+        };
+    }
+
+    private function canList(WorkspaceRoleEnum $role): bool
+    {
+        return in_array($role, [WorkspaceRoleEnum::OWNER, WorkspaceRoleEnum::ADMIN, WorkspaceRoleEnum::MANAGER], true);
+    }
+
+    private function canCreate(WorkspaceRoleEnum $role): bool
+    {
+        return in_array($role, [WorkspaceRoleEnum::OWNER, WorkspaceRoleEnum::ADMIN, WorkspaceRoleEnum::MANAGER], true);
+    }
+
+    private function canRevoke(WorkspaceRoleEnum $role): bool
+    {
+        return in_array($role, [WorkspaceRoleEnum::OWNER, WorkspaceRoleEnum::ADMIN, WorkspaceRoleEnum::MANAGER], true);
+    }
+
+    public function canAssignRole(WorkspaceRoleEnum $actorRole, WorkspaceRoleEnum $targetRole): bool
+    {
+        if ($actorRole === WorkspaceRoleEnum::MANAGER) {
+            return $targetRole === WorkspaceRoleEnum::EMPLOYEE;
+        }
+
+        if ($actorRole === WorkspaceRoleEnum::ADMIN) {
+            return in_array($targetRole, [WorkspaceRoleEnum::MANAGER, WorkspaceRoleEnum::EMPLOYEE, WorkspaceRoleEnum::ADMIN], true);
+        }
+
+        if ($actorRole === WorkspaceRoleEnum::OWNER) {
+            return true;
+        }
+
+        return false;
+    }
+}

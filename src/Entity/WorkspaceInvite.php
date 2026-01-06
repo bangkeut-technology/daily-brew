@@ -38,9 +38,6 @@ class WorkspaceInvite extends AbstractEntity
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $email = null;
 
-    #[ORM\Column(length: 30, nullable: true)]
-    private ?string $phone = null;
-
     #[ORM\Column(length: 50, enumType: WorkspaceRoleEnum::class)]
     private WorkspaceRoleEnum $role = WorkspaceRoleEnum::EMPLOYEE; // member, admin
 
@@ -48,7 +45,7 @@ class WorkspaceInvite extends AbstractEntity
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Employee $employee = null;
 
-    #[ORM\Column(length: 64)]
+    #[ORM\Column(length: 255)]
     private ?string $token = null;
 
     #[ORM\Column(length: 20, enumType: WorkspaceInviteStatusEnum::class)]
@@ -105,25 +102,6 @@ class WorkspaceInvite extends AbstractEntity
     public function setEmail(?string $email): WorkspaceInvite
     {
         $this->email = $email;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getPhone(): ?string
-    {
-        return $this->phone;
-    }
-
-    /**
-     * @param string|null $phone
-     *
-     * @return WorkspaceInvite
-     */
-    public function setPhone(?string $phone): WorkspaceInvite
-    {
-        $this->phone = $phone;
         return $this;
     }
 
