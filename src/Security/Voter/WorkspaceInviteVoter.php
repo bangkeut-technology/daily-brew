@@ -55,12 +55,7 @@ class WorkspaceInviteVoter extends Voter
             return false;
         }
 
-        $workspace = $subject instanceof WorkspaceInvite ? $subject->getWorkspace() : $subject;
-        if (!$workspace instanceof Workspace) {
-            return false;
-        };
-
-        if (null === $membership = $this->workspaceUserRepository->findByWorkspaceAndUser($workspace, $user)) {
+        if (null === $membership = $this->workspaceUserRepository->findByWorkspaceAndUser($subject, $user)) {
             return false;
         }
 

@@ -42,20 +42,21 @@ use ValueError;
 class WorkspaceInviteController extends AbstractController
 {
     public function __construct(
-        TranslatorInterface $translator,
-        private readonly WorkspaceRepository $workspaceRepository,
+        TranslatorInterface                        $translator,
+        private readonly WorkspaceRepository       $workspaceRepository,
         private readonly WorkspaceInviteRepository $workspaceInviteRepository,
-        private readonly WorkspaceUserRepository $workspaceUserRepository,
-        private readonly WorkspaceInviteService $inviteService,
-    ) {
+        private readonly WorkspaceInviteService    $workspaceInviteService,
+    )
+    {
         parent::__construct($translator);
     }
 
     #[Route(name: 'create', methods: ['POST'])]
     public function create(
-        string $publicId,
+        string  $publicId,
         Request $request,
-    ): Response {
+    ): Response
+    {
         $workspace = $this->getWorkspaceByPublicId($publicId);
 
         $this->denyAccessUnlessGranted(WorkspaceInviteVoter::CREATE, $workspace);
@@ -76,7 +77,7 @@ class WorkspaceInviteController extends AbstractController
         $email = isset($payload['email']) ? (string)$payload['email'] : null;
         $employeePublicId = isset($payload['employeePublicId']) ? (string)$payload['employeePublicId'] : null;
 
-        $result = $this->inviteService->createInvite(
+        $result = $this->workspaceInviteService->createInvite(
             workspace: $workspace,
             invitedBy: $this->getUser(),
             role: $targetRole,
@@ -88,59 +89,58 @@ class WorkspaceInviteController extends AbstractController
         $rawToken = $result['rawToken'];
 
         return $this->json([
-            'publicId' => $invite->getPublicId(),
-            'status' => $invite->getStatus()->value,
+            'publicId'  => $invite->getPublicId(),
+            'status'    => $invite->getStatus()->value,
             'expiresAt' => $invite->getExpiresAt()?->format(DATE_ATOM),
-            'token' => $rawToken,
+            'token'     => $rawToken,
         ], Response::HTTP_CREATED);
     }
 
     #[Route('/invites', name: 'list', methods: ['GET'])]
     public function list(
         string $publicId,
-    ): Response {
+    ): Response
+    {
         $workspace = $this->getWorkspaceByPublicId($publicId);
         $this->denyAccessUnlessGranted(WorkspaceInviteVoter::LIST, $workspace);
 
         $invites = $this->workspaceInviteRepository->findByWorkspace($workspace);
 
         return $this->json(array_map(static fn(WorkspaceInvite $invite) => [
-            'publicId' => $invite->publicId,
-            'email' => $invite->getEmail(),
-            'role' => $invite->getRole()->value,
-            'status' => $invite->getStatus()->value,
-            'expiresAt' => $invite->getExpiresAt()?->format(DATE_ATOM),
-            'createdAt' => $invite->getCreatedAt()?->format(DATE_ATOM),
+            'publicId'   => $invite->publicId,
+            'email'      => $invite->getEmail(),
+            'role'       => $invite->getRole()->value,
+            'status'     => $invite->getStatus()->value,
+            'expiresAt'  => $invite->getExpiresAt()?->format(DATE_ATOM),
+            'createdAt'  => $invite->getCreatedAt()?->format(DATE_ATOM),
             'acceptedAt' => $invite->getAcceptedAt()?->format(DATE_ATOM),
         ], $invites));
     }
 
-    #[Route('/workspace-invites/{publicId}', name: 'workspace_invites_revoke', methods: ['DELETE'])]
+    #[Route('/{invitePublicId}', name: 'revoke', methods: ['DELETE'])]
     public function revoke(
-        string $publicId,
-        #[CurrentUser] ?User $user,
-    ): Response {
-        if (!$user) {
-            return $this->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+        string               $publicId,
+        string               $invitePublicId,
+    ): Response
+    {
+        $workspace = $this->getWorkspaceByPublicId($publicId);
+        $this->denyAccessUnlessGranted(WorkspaceInviteVoter::REVOKE, $workspace);
+
+        if (null === $invite = $this->workspaceInviteRepository->findByPublicId($invitePublicId)) {
+            throw $this->createApiErrorException(ApiErrorCodeEnum::NOT_FOUND, ['invite' => 'Invite not found.']);
         }
 
-        $invite = $this->inviteRepo->findOneBy(['publicId' => $publicId]);
-        if (!$invite) {
-            throw new NotFoundHttpException('Invite not found.');
-        }
-
-        $this->denyAccessUnlessGranted(WorkspaceInviteVoter::REVOKE, $invite);
-
-        $this->inviteService->revokeInvite($invite);
+        $this->workspaceInviteService->revokeInvite($invite);
 
         return $this->json(['message' => 'Invite revoked.'], Response::HTTP_OK);
     }
 
-    #[Route('/workspace-invites/accept', name: 'workspace_invites_accept', methods: ['POST'])]
+    #[Route('/{invitePublicId}', name: 'accept', methods: ['POST'])]
     public function accept(
-        Request $request,
+        Request              $request,
         #[CurrentUser] ?User $user,
-    ): Response {
+    ): Response
+    {
         if (!$user) {
             return $this->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
         }
@@ -149,15 +149,15 @@ class WorkspaceInviteController extends AbstractController
         $token = (string)($payload['token'] ?? '');
 
         if ($token === '') {
-            throw new BadRequestHttpException('token is required.');
+            throw $this->createApiErrorException(ApiErrorCodeEnum::VALIDATION_ERROR, ['token' => 'token is required.']);
         }
 
-        $invite = $this->inviteService->acceptInvite($token, $user);
+        $invite = $this->workspaceInviteService->acceptInvite($token, $user);
 
         return $this->json([
-            'message' => 'Invite accepted.',
-            'workspacePublicId' => $invite->getWorkspace()?->getPublicId(),
-            'role' => $invite->getRole()->value,
+            'message'           => 'Invite accepted.',
+            'workspacePublicId' => $invite->getWorkspace()?->publicId,
+            'role'              => $invite->getRole()->value,
         ], Response::HTTP_OK);
     }
 

@@ -28,7 +28,6 @@ use App\Util\Canonicalizer;
 use App\Util\TokenGeneratorInterface;
 use DateInterval;
 use DateTimeImmutable;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  *
@@ -51,7 +50,7 @@ readonly class WorkspaceInviteService
     }
 
     /**
-     * Creates an invite for a user to join a workspace.
+     * Creates an invitation for a user to join a workspace.
      *
      * @param Workspace         $workspace        The workspace to which the invite applies.
      * @param User              $invitedBy        The user who initiates the invite.
@@ -130,7 +129,7 @@ readonly class WorkspaceInviteService
      */
     public function acceptInvite(string $rawToken, User $user): WorkspaceInvite
     {
-        $tokenStored = hash('sha256', $rawToken);;
+        $tokenStored = hash('sha256', $rawToken);
 
         if (null === $invite = $this->workspaceInviteRepository->findByToken($tokenStored)) {
             throw new ApiException(ApiErrorCodeEnum::NOT_FOUND, ['invite' => 'Invite not found.']);
@@ -140,7 +139,6 @@ readonly class WorkspaceInviteService
             throw new ApiException(ApiErrorCodeEnum::BAD_REQUEST, ['invite' => 'Invite is not valid anymore (expired or not pending).']);
         }
 
-        ;
         if (null === $workspace = $invite->getWorkspace()) {
             throw new ApiException(ApiErrorCodeEnum::BAD_REQUEST, ['invite' => 'Invite has no workspace.']);
         }
@@ -156,7 +154,7 @@ readonly class WorkspaceInviteService
             }
         }
 
-        if (null === $membership = $this->workspaceUserRepository->findByWorkspaceAndUser($workspace, $user)) {
+        if (null === $this->workspaceUserRepository->findByWorkspaceAndUser($workspace, $user)) {
             $membership = $this->workspaceUserRepository->create()
                 ->setWorkspace($workspace)
                 ->setUser($user)
