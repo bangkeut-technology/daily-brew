@@ -15,13 +15,10 @@ import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
 import { ArrowRight, Lock, LockOpen, LogIn, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 
 export const SignInCard = () => {
     const { t } = useTranslation();
-    const [rememberMe, setRememberMe] = React.useState(false);
     const [showPassword, onToggle] = React.useState(false);
     const dispatch = useAuthenticationDispatch();
 
@@ -37,7 +34,7 @@ export const SignInCard = () => {
         onSuccess: (data) => {
             sessionStorage.setItem('email', data.user.email);
             sessionStorage.setItem('locale', data.user.locale || 'en');
-            dispatch({ type: 'LOGIN', user: data.user });
+            dispatch({ type: 'SIGN_IN', user: data.user });
         },
         onError: (data) => {
             const message = isAxiosError(data) ? data.response?.data.message : t('sign_in.failed', { ns: 'glossary' });
@@ -47,9 +44,9 @@ export const SignInCard = () => {
 
     const onSubmit = React.useCallback(
         (data: SignIn) => {
-            mutate({ ...data, remember_me: rememberMe });
+            mutate(data);
         },
-        [mutate, rememberMe],
+        [mutate],
     );
 
     return (
@@ -107,17 +104,6 @@ export const SignInCard = () => {
                                 required
                                 autoComplete="current-password"
                             />
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <Checkbox
-                                id="remember"
-                                checked={rememberMe}
-                                onCheckedChange={() => setRememberMe((prevState) => !prevState)}
-                            />
-                            <Label htmlFor="remember" className="text-xs text-muted-foreground">
-                                {t('remember_me')}
-                            </Label>
                         </div>
 
                         <Button type="submit" className="w-full">

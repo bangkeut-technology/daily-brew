@@ -12,7 +12,7 @@ export const Logo: React.FunctionComponent<LogoProps> = ({ to }) => (
             <img src={LogoImage} alt="DailyBrew" className="h-5 w-5" />
         </div>
         <span className="text-lg font-bold tracking-tight">
-            <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">DailyBrew</span>
+            <span className="bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">DailyBrew</span>
             <span className="text-muted-foreground">.work</span>
         </span>
     </Link>

@@ -11,7 +11,7 @@ interface LanguageProviderProps {
 
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
     const [locale, setLocale] = React.useState<Locale>('en');
-    const { user, isAuthenticated } = useAuthenticationState();
+    const { user, status } = useAuthenticationState();
 
     const updateLocale = React.useCallback((locale: Locale) => {
         i18next
@@ -25,10 +25,10 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     }, []);
 
     React.useEffect(() => {
-        if (isAuthenticated && user) {
+        if (status === 'authenticated' && user) {
             updateLocale((user.locale as Locale) || 'en');
         }
-    }, [isAuthenticated, user, updateLocale]);
+    }, [status, user, updateLocale]);
 
     return <LanguageContext.Provider value={{ locale, updateLocale }}>{children}</LanguageContext.Provider>;
 };

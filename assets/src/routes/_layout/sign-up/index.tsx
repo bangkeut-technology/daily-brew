@@ -21,7 +21,7 @@ export const Route = createFileRoute('/_layout/sign-up/')({
         redirect: z.string().optional().default('/console'),
     }),
     beforeLoad: ({ context, search }) => {
-        if (context.authentication?.isAuthenticated) {
+        if (context.authentication?.status === 'authenticated') {
             throw redirect({ to: (search.redirect as any) || '/console' });
         }
     },
@@ -72,7 +72,7 @@ function SignUpPage() {
     );
 
     return (
-        <div className="relative min-h-dvh bg-gradient-to-b from-background via-background to-muted/30">
+        <div className="relative min-h-dvh bg-linear-to-b from-background via-background to-muted/30">
             {/* Main */}
             <main className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-center">

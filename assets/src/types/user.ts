@@ -1,5 +1,6 @@
 export type User = {
     id: number;
+    publicId: string;
     avatarUrl?: string;
     firstName: string;
     lastName: string;
@@ -10,14 +11,22 @@ export type User = {
     fullName: string;
 };
 
-export type SignIn = Omit<
-    User,
-    'id' | 'firstName' | 'lastName' | 'canonicalEmail' | 'locale' | 'fullName' | 'avatarUrl' | 'roles'
-> & {
+export type PartialUser = Pick<User, 'firstName' | 'lastName' | 'email'> & {
+    dob: Date | null;
+    role: string;
+} & ChangePassword;
+
+export type PartialUserWithoutPassword = Omit<PartialUser, 'password' | 'confirmPassword'>;
+
+export type SignIn = {
+    email: string;
     password: string;
 };
 
-export type SignUp = Omit<User, 'id' | 'canonicalEmail' | 'locale' | 'fullName' | 'avatarUrl' | 'roles'> & {
+export type SignUp = {
+    email: string;
+    firstName: string;
+    lastName: string;
     password: string;
     confirmPassword: string;
     acceptedTerms: boolean;

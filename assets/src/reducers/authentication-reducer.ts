@@ -1,23 +1,37 @@
 import { AuthenticationAction, AuthenticationState } from '@/contexts/authentication-context';
 
 export const authenticationInitialState: AuthenticationState = {
-    isAuthenticated: false,
-    demo: false,
+    status: 'loading',
     user: undefined,
+    demo: false,
+    workspace: undefined,
 };
-export const authenticationReducer = (state: AuthenticationState, action: AuthenticationAction) => {
+export const authenticationReducer = (
+    state: AuthenticationState,
+    action: AuthenticationAction,
+): AuthenticationState => {
     switch (action.type) {
         case 'SIGN_IN': {
             const { user } = action;
             return {
                 ...state,
-                user: action.user,
-                isAuthenticated: true,
-                demo: user.roles.includes('ROLE_DEMO'),
+                user: user,
+                status: 'authenticated',
+            };
+        }
+        case 'SET_WORKSPACE': {
+            const { workspace } = action;
+            return {
+                ...state,
+                workspace: workspace,
             };
         }
         case 'SIGN_OUT':
-            return { ...state, user: undefined };
+            return {
+                ...state,
+                user: undefined,
+                workspace: undefined,
+                status: 'unauthenticated',
+            };
     }
-    return state;
 };
