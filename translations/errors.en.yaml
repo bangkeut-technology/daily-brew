@@ -26,3 +26,55 @@ existed:
     attendance_batch:    'Attendance batch ''%label%'' already exists.'
 attendance:
     duplicate_for_day: 'Attendance for %date% already exists.'
+api:
+    VALIDATION_ERROR:
+        message: 'An error occurred during validation.'
+        description: 'Please check the provided data and try again.'
+    UNAUTHORIZED:
+        message: 'You are not authorized to access this resource.'
+        description: 'Please check your credentials and try again.'
+    FORBIDDEN:
+        message: 'You do not have permission to access this resource.'
+        description: 'You do not have the necessary permissions to perform this action.'
+    NOT_FOUND:
+        message: 'You have requested a resource that does not exist.'
+        description: 'The requested resource could not be found.'
+    CONFLICT:
+        message: 'A conflict occurred while processing your request.'
+        description: 'There was a conflict with the current state of the resource.'
+    BAD_REQUEST:
+        message: 'The request was malformed or contained invalid parameters.'
+        description: 'The request could not be understood or was missing required parameters.'
+    INTERNAL_ERROR:
+        message: 'An internal server error occurred.'
+        description: 'An unexpected error occurred on the server. Please try again later.'
+    OWNERSHIP_TRANSFER_REQUIRED:
+        message: 'You must transfer ownership of this resource before performing this action.'
+        description: 'You must transfer ownership of this resource before performing this action.'
+    OWNERSHIP_TRANSFER_NOT_ALLOWED:
+        message: 'You are not allowed to transfer ownership of this resource.'
+        description: 'You are not allowed to transfer ownership of this resource.'
+    WORKSPACE_MEMBER_NOT_FOUND:
+        message: 'The workspace member was not found.'
+        description: 'The workspace member could not be found.'
+    WORKSPACE_NOT_FOUND:
+        message: 'The workspace was not found.'
+        description: 'The requested workspace could not be found.'
+    WORKSPACE_DELETED:
+        message: 'The workspace has been deleted.'
+        description: 'The workspace has been deleted and is no longer available.'
+    USER_DELETED:
+        message: 'The user has been deleted.'
+        description: 'The user has been deleted and is no longer available.'
+    ACCOUNT_DELETION_BLOCKED:
+        message: 'Account deletion is blocked.'
+        description: 'Account deletion is currently blocked for this user.'
+    INVALID_PASSWORD:
+        message: 'The provided password is invalid.'
+        description: 'The provided password does not match the stored password.'
+    ACCESS_DENIED:
+        message: 'Access denied.'
+        description: 'You do not have permission to access this resource.'
+    LIMIT_REACHED:
+        message: 'You have reached your plan limit.'
+        description: 'You have exceeded your plan limit and cannot perform this action.'
