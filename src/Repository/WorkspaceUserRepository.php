@@ -33,13 +33,13 @@ class WorkspaceUserRepository extends AbstractRepository
     }
 
     /**
-     * Find active WorkspaceUser entries by User
+     * Find WorkspaceUser entries by User
      *
      * @param User $user The user entity
      *
      * @return WorkspaceUser[] The list of active WorkspaceUser entries
      */
-    public function findActiveByUser(User $user): array
+    public function findByUser(User $user): array
     {
         return $this->createQueryBuilder('wu')
             ->andWhere('wu.user = :user')

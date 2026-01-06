@@ -7,13 +7,17 @@ namespace App\ApiController;
 use App\ApiController\Trait\EmployeeTrait;
 use App\ApiController\Trait\UserTrait;
 use App\Controller\AbstractController;
+use App\DTO\WorkspaceDTO;
 use App\Entity\User;
+use App\Factory\DTO\WorkspaceDTOFactory;
 use App\Form\ChangePasswordFormType;
 use App\Form\ImageProfileFormType;
 use App\Form\UserFormType;
 use App\Repository\EmployeeRepository;
 use App\Repository\StoreRepository;
 use App\Repository\UserRepository;
+use App\Repository\WorkspaceUserRepository;
+use App\Service\AccountDeletionService;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -38,16 +42,22 @@ class UserController extends AbstractController
     /**
      * Constructs a new instance of the class.
      *
-     * @param TranslatorInterface $translator         the translator component
-     * @param UserRepository      $userRepository     the repository for user data
-     * @param StoreRepository     $storeRepository    the repository for store data
-     * @param EmployeeRepository  $employeeRepository the repository for employee data
+     * @param TranslatorInterface     $translator              the translator component
+     * @param UserRepository          $userRepository          the repository for user data
+     * @param StoreRepository         $storeRepository         the repository for store data
+     * @param EmployeeRepository      $employeeRepository      the repository for employee data
+     * @param WorkspaceUserRepository $workspaceUserRepository the repository for workspace user data
+     * @param WorkspaceDTOFactory     $workspaceDTOFactory     the factory for workspace DTOs
+     * @param AccountDeletionService  $accountDeletionService  the service for account deletion
      */
     public function __construct(
-        TranslatorInterface                 $translator,
-        private readonly UserRepository     $userRepository,
-        private readonly StoreRepository    $storeRepository,
-        private readonly EmployeeRepository $employeeRepository,
+        TranslatorInterface                      $translator,
+        private readonly UserRepository          $userRepository,
+        private readonly StoreRepository         $storeRepository,
+        private readonly EmployeeRepository      $employeeRepository,
+        private readonly WorkspaceUserRepository $workspaceUserRepository,
+        private readonly WorkspaceDTOFactory     $workspaceDTOFactory,
+        private readonly AccountDeletionService $accountDeletionService,
     )
     {
         parent::__construct($translator);
@@ -138,7 +148,8 @@ class UserController extends AbstractController
      * @param Request $request the request object containing the payload data
      * @param User    $user    the current user, if authenticated, or null if not authenticated
      *
-     * @return JsonResponse the JSON response object with a message indicating whether the locale has been updated or not
+     * @return JsonResponse the JSON response object with a message indicating whether the locale has been updated or
+     *                      not
      */
     #[OA\RequestBody(content: new OA\MediaType(
         mediaType: 'application/json',
@@ -173,7 +184,8 @@ class UserController extends AbstractController
      * and a JSON response with an "OK" status code, a message, and the user data is returned.
      *
      * @param Request $request the request object containing the payload with the new email and password
-     * @param User    $user    The user whose email is to be updated. If null, the authenticated user will be considered.
+     * @param User    $user    The user whose email is to be updated. If null, the authenticated user will be
+     *                         considered.
      *
      * @return Response the JSON response containing the result of the operation
      */
@@ -220,8 +232,8 @@ class UserController extends AbstractController
      * Deletes a user from the application. The user is identified by the password provided in the request payload.
      * If the password is not valid for the user, a JSON response with an "Unauthorized" status code and a message
      * indicating that the password is not valid is returned. If the password is valid, the user is deleted from the
-     *  application, and a JSON response with an "OK" status code and a message indicating that the user has been deleted
-     * is returned.
+     *  application, and a JSON response with an "OK" status code and a message indicating that the user has been
+     *  deleted is returned.
      *
      * @param Request $request the request object containing the payload with the password
      * @param User    $user    The user to delete it. If null, the authenticated user will be deleted.
@@ -255,9 +267,9 @@ class UserController extends AbstractController
             throw $this->createUnauthorizedException($this->translator->trans('invalid.current_password', domain: 'validators'));
         }
 
-        $this->userRepository->delete($user);
+        $result = $this->accountDeletionService->deleteAccount($user);
 
-        return $this->createUserResponse(['message' => $this->translator->trans('deleted.user')]);
+        return $this->createUserResponse(['message' => $this->translator->trans('deleted.user'), 'result' => $result]);
     }
 
     /**
@@ -357,5 +369,40 @@ class UserController extends AbstractController
         }
 
         throw $this->createBadRequestException($this->translator->trans('invalid.user_picture', domain: 'errors'));
+    }
+
+    /**
+     * Get the current workspace of the authenticated user.
+     *
+     * @return JsonResponse
+     */
+    #[OA\Response(
+        response: Response::HTTP_OK,
+        description: 'Returns the current workspace of the authenticated user.',
+        content: new OA\JsonContent(ref: new Model(type: WorkspaceDTO::class))
+    )]
+    #[Route(path: '/me/current-workspace', name: 'current_workspace', methods: ['GET'])]
+    public function currentWorkspace(): JsonResponse
+    {
+        $user = $this->getUser();
+        $workspace = $user->getCurrentWorkspace();
+        if (null === $workspaceUser = $this->workspaceUserRepository->findOneBy(['workspace' => $workspace, 'user' => $user])) {
+            return $this->json([], Response::HTTP_NO_CONTENT);
+        }
+        $dto = $this->workspaceDTOFactory->create($workspace, $workspaceUser);
+        return $this->json($dto);
+    }
+
+    /**
+     * Get the workspaces of the authenticated user.
+     *
+     * @return JsonResponse
+     */
+    #[Route(path: '/me/workspaces', name: 'workspaces', methods: ['GET'])]
+    public function workspaces(): JsonResponse
+    {
+        $workspaces = $this->workspaceUserRepository->findByUser($this->getUser());
+
+        return $this->json(array_map(fn($workspace) => $this->workspaceDTOFactory->create($workspace->getWorkspace(), $workspace), $workspaces));
     }
 }

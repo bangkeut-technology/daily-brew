@@ -7,7 +7,7 @@
  * @author  Vandeth THO
  *
  * @created 12/9/25 7:13PM
- * @see     https://adora.media
+ * @see     https://dailybrew.work
  * Copyright (c) 2025 Adora. All rights reserved.
  */
 declare(strict_types=1);
@@ -17,7 +17,6 @@ namespace App\ApiController;
 use App\ApiController\Trait\WorkspaceTrait;
 use App\Controller\AbstractController;
 use App\DTO\WorkspaceUserDTO;
-use App\Entity\User;
 use App\Enum\ApiErrorCodeEnum;
 use App\Enum\WorkspaceRoleEnum;
 use App\Repository\WorkspaceRepository;
@@ -31,7 +30,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -86,11 +84,10 @@ class WorkspaceController extends AbstractController
      * @return JsonResponse The JSON response indicating the result of the operation.
      *
      */
+    #[Route('/{publicId}/transfer-ownership', name: 'transfer_ownership', methods: ['POST'])]
     public function transferOwnership(
         string  $publicId,
         Request $request,
-        #[CurrentUser]
-        User    $user,
     ): JsonResponse
     {
         $workspace = $this->getWorkspaceByPublicId($publicId);
@@ -109,7 +106,7 @@ class WorkspaceController extends AbstractController
 
         $result = $this->workspaceService->transferOwnership(
             $workspace,
-            $user,
+            $this->getUser(),
             $targetUserPublicId
         );
 

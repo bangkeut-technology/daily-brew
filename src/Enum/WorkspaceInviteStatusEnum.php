@@ -7,7 +7,7 @@
  * @author  Vandeth THO
  * @created 1/6/26 8:37AM
  *
- * @see     https://adora.media
+ * @see     https://dailybrew.work
  */
 
 namespace App\Enum;
