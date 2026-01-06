@@ -6,6 +6,7 @@ namespace App\ApiController;
 
 use App\ApiController\Trait\EmployeeTrait;
 use App\ApiController\Trait\UserTrait;
+use App\ApiController\Trait\WorkspaceTrait;
 use App\Controller\AbstractController;
 use App\DTO\WorkspaceDTO;
 use App\Entity\User;
@@ -38,6 +39,7 @@ class UserController extends AbstractController
 {
     use UserTrait;
     use EmployeeTrait;
+    use WorkspaceTrait;
 
     /**
      * Constructs a new instance of the class.
@@ -391,6 +393,33 @@ class UserController extends AbstractController
         }
         $dto = $this->workspaceDTOFactory->create($workspace, $workspaceUser);
         return $this->json($dto);
+    }
+
+    /**
+     * Get the workspaces of the authenticated user.
+     *
+     * @param string $workspacePublicId
+     *
+     * @return JsonResponse
+     */
+    #[Route(path: '/me/workspaces/{workspacePublicId}', name: 'switch_workspaces', methods: ['PATCH'])]
+    public function switchWorkspaces(string $workspacePublicId): JsonResponse
+    {
+        $workspace = $this->getWorkspaceByPublicId($workspacePublicId);
+        $user = $this->getUser();
+        $user->setCurrentWorkspace($workspace);
+
+        $this->workspaceUserRepository->update($user);
+
+        if (null === $workspaceUser = $this->workspaceUserRepository->findOneBy(['workspace' => $workspace, 'user' => $user])) {
+            return $this->json([], Response::HTTP_NO_CONTENT);
+        }
+
+        $dto = $this->workspaceDTOFactory->create($workspace, $workspaceUser);
+        return $this->json([
+            'message' => 'Workspace switched',
+            'workspace' => $dto
+        ]);
     }
 
     /**

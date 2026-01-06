@@ -50,7 +50,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { signOut } from '@/services/auth';
 import { toast } from 'sonner';
 import { Logo } from '@/components/logo';
-import { Button } from '@/components/ui/button';
+import { WorkspaceSwitcher } from '@/routes/console/_authenticated/-workspace-switcher';
 
 type NavItem = {
     key: string;
@@ -200,15 +200,14 @@ export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) =
                             size="lg"
                             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         >
-                            <Button variant="ghost">
-                                <div className="flex flex-col">
-                                    <div className="flex items-center gap-2">
-                                        <Logo to="/console" />
-                                    </div>
-                                    <p className="text-xs text-muted-foreground">{workspace?.name}</p>
+                            <div className="flex flex-col">
+                                <div className="flex items-center gap-2">
+                                    <Logo to="/console" />
                                 </div>
-                                {demo && <DemoPill />}
-                            </Button>
+                                <p className="text-xs text-muted-foreground">{workspace?.name}</p>
+                            </div>
+                            {demo && <DemoPill />}
+                            <WorkspaceSwitcher />
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>

@@ -35,3 +35,8 @@ export const fetchCurrentWorkspace = () =>
 
 export const fetchWorkspaces = () =>
     apiAxios.get<Workspace[]>('/users/me/workspaces').then((response) => response.data);
+
+export const switchWorkspace = (workspacePublicId: string) =>
+    apiAxios
+        .patch<{ message: string; workspace: Workspace }>('/users/me/workspaces', { workspacePublicId })
+        .then((response) => response.data);
