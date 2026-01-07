@@ -76,7 +76,7 @@ class RegistrationController extends AbstractController
             new OA\Property('message', type: 'string'),
         ])
     )]
-    #[Route('/console/sign-up', name: 'daily_brew_console_sign_up', methods: ['POST'])]
+    #[Route('/sign-up', name: 'daily_brew_sign_up', methods: ['POST'])]
     public function register(Request $request, Security $security, UserRepository $userRepository): Response
     {
         $user = $userRepository->create();

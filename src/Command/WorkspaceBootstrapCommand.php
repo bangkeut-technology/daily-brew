@@ -17,15 +17,19 @@ use App\Entity\Workspace;
 use App\Entity\WorkspaceUser;
 use App\Enum\PlanEnum;
 use App\Enum\WorkspaceRoleEnum;
+use App\Repository\AttendanceBatchRepository;
+use App\Repository\AttendanceRepository;
+use App\Repository\EmployeeEvaluationRepository;
+use App\Repository\EmployeeRepository;
+use App\Repository\EvaluationCriteriaRepository;
+use App\Repository\EvaluationTemplateCriteriaRepository;
+use App\Repository\EvaluationTemplateRepository;
+use App\Repository\StoreRepository;
 use App\Repository\UserRepository;
 use App\Repository\WorkspaceRepository;
 use App\Repository\WorkspaceUserRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
-use Symfony\Component\Console\Exception\RuntimeException;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -46,8 +50,17 @@ use function assert;
 final class WorkspaceBootstrapCommand extends Command
 {
     public function __construct(
-        private readonly UserRepository         $userRepository,
-        private readonly EntityManagerInterface $em,
+        private readonly UserRepository                       $userRepository,
+        private readonly WorkspaceRepository                  $workspaceRepository,
+        private readonly WorkspaceUserRepository              $workspaceUserRepository,
+        private readonly EmployeeRepository                   $employeeRepository,
+        private readonly AttendanceBatchRepository            $attendanceBatchRepository,
+        private readonly AttendanceRepository                 $attendanceRepository,
+        private readonly EvaluationCriteriaRepository         $evaluationCriteriaRepository,
+        private readonly EvaluationTemplateCriteriaRepository $evaluationTemplateCriteriaRepository,
+        private readonly EvaluationTemplateRepository         $evaluationTemplateRepository,
+        private readonly EmployeeEvaluationRepository         $employeeEvaluationRepository,
+        private readonly StoreRepository                      $storeRepository,
     )
     {
         parent::__construct();
@@ -66,7 +79,7 @@ final class WorkspaceBootstrapCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $dryRun = (bool)$input->getOption('dry-run');
-        $batchSize = max(1, (int)$input->getOption('batch-size'));
+        $batchSize = max(30, (int)$input->getOption('batch-size'));
 
         $planName = strtoupper(trim((string)$input->getOption('plan')));
         $plan = PlanEnum::tryFrom($planName) ?? PlanEnum::FREE;
@@ -83,15 +96,14 @@ final class WorkspaceBootstrapCommand extends Command
             ->andWhere('wu.id IS NULL')
             ->orderBy('u.id', 'ASC')
             ->getQuery()
-            ->toIterable();
+            ->getResult();
 
         $created = 0;
         $processed = 0;
 
         foreach ($users as $user) {
-            \assert($user instanceof User);
+            assert($user instanceof User);
 
-            // Safety: if currentWorkspace already set for some reason, skip
             if ($user->getCurrentWorkspace() instanceof Workspace) {
                 continue;
             }
@@ -110,16 +122,85 @@ final class WorkspaceBootstrapCommand extends Command
 
             $user->setCurrentWorkspace($workspace);
 
-            $this->em->persist($workspace);
-            $this->em->persist($workspaceUser);
-            $this->em->persist($user);
+            $this->workspaceRepository->update($workspace, false);
+            $this->workspaceUserRepository->update($workspaceUser, false);
+
+            $stores = $this->storeRepository->findByUserWithoutWorkspace($user);
+            foreach ($stores as $index => $store) {
+                $store->setWorkspace($workspace);
+                $this->storeRepository->update($store, false);
+                if ($index % $batchSize === 0) {
+                    $this->storeRepository->flush();
+                }
+            }
+            $employees = $this->employeeRepository->findByUserWithoutWorkspace($user);
+            foreach ($employees as $index => $employee) {
+                $employee->setWorkspace($workspace);
+                $this->employeeRepository->update($employee, false);
+                if ($index % $batchSize === 0) {
+                    $this->employeeRepository->flush();
+                }
+            }
+
+            $employeeEvaluations = $this->employeeEvaluationRepository->findByUserWithoutWorkspace($user);
+            foreach ($employeeEvaluations as $index => $employeeEvaluation) {
+                $employeeEvaluation->setWorkspace($workspace);
+                $this->employeeEvaluationRepository->update($employeeEvaluation, false);
+                if ($index % $batchSize === 0) {
+                    $this->employeeEvaluationRepository->flush();
+                }
+            }
+
+            $attendanceBatches = $this->attendanceBatchRepository->findByUserWithoutWorkspace($user);
+            foreach ($attendanceBatches as $index => $attendanceBatch) {
+                $attendanceBatch->setWorkspace($workspace);
+                $this->attendanceBatchRepository->update($attendanceBatch, false);
+                if ($index % $batchSize === 0) {
+                    $this->attendanceBatchRepository->flush();
+                }
+            }
+
+            $attendances = $this->attendanceRepository->findByUserWithoutWorkspace($user);
+            foreach ($attendances as $index => $attendance) {
+                $attendance->setWorkspace($workspace);
+                $this->attendanceRepository->update($attendance, false);
+                if ($index % $batchSize === 0) {
+                    $this->attendanceRepository->flush();
+                }
+            }
+
+            $evaluationCriterias = $this->evaluationCriteriaRepository->findByUserWithoutWorkspace($user);
+            foreach ($evaluationCriterias as $index => $evaluationCriteria) {
+                $evaluationCriteria->setWorkspace($workspace);
+                $this->evaluationCriteriaRepository->update($evaluationCriteria, false);
+                if ($index % $batchSize === 0) {
+                    $this->evaluationCriteriaRepository->flush();
+                }
+            }
+
+            $evaluationTemplates = $this->evaluationTemplateRepository->findByUserWithoutWorkspace($user);
+            foreach ($evaluationTemplates as $index => $evaluationTemplate) {
+                $evaluationTemplate->setWorkspace($workspace);
+                $this->evaluationTemplateRepository->update($evaluationTemplate, false);
+                if ($index % $batchSize === 0) {
+                    $this->evaluationTemplateRepository->flush();
+                }
+            }
+
+            $evaluationTemplateCriterias = $this->evaluationTemplateCriteriaRepository->findByUserWithoutWorkspace($user);
+            foreach ($evaluationTemplateCriterias as $index => $evaluationTemplateCriteria) {
+                $evaluationTemplateCriteria->setWorkspace($workspace);
+                $this->evaluationTemplateCriteriaRepository->update($evaluationTemplateCriteria, false);
+                if ($index % $batchSize === 0) {
+                    $this->evaluationTemplateCriteriaRepository->flush();
+                }
+            }
 
             $created++;
             $processed++;
 
             if (!$dryRun && $processed % $batchSize === 0) {
-                $this->em->flush();
-                $this->em->clear();
+                $this->workspaceRepository->flush();
             }
         }
 
@@ -128,8 +209,7 @@ final class WorkspaceBootstrapCommand extends Command
             return Command::SUCCESS;
         }
 
-        $this->em->flush();
-        $this->em->clear();
+        $this->workspaceRepository->flush();
 
         $io->success(sprintf('Bootstrap complete. Workspaces created: %d', $created));
         $io->warning('This command is intended for one-time launch usage. Remove it after running.');

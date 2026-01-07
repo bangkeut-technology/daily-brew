@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\ORMInvalidArgumentException;
+use Doctrine\ORM\TransactionRequiredException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -28,9 +31,10 @@ abstract class AbstractRepository extends ServiceEntityRepository
      * @param string          $entityClass the class name of the entity
      */
     public function __construct(
-        ManagerRegistry $registry,
+        ManagerRegistry         $registry,
         private readonly string $entityClass,
-    ) {
+    )
+    {
         parent::__construct($registry, $entityClass);
     }
 
@@ -57,7 +61,10 @@ abstract class AbstractRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param T $entity
+     * Updates an entity instance.
+     *
+     * @param T    $entity   the entity to update
+     * @param bool $andFlush tell the manager whether the object needs to be flush or not
      */
     public function update(mixed $entity, bool $andFlush = true): void
     {
@@ -68,6 +75,8 @@ abstract class AbstractRepository extends ServiceEntityRepository
     }
 
     /**
+     * Persists an entity instance.
+     *
      * @param T $entity
      */
     public function persist(mixed $entity): void
@@ -76,6 +85,8 @@ abstract class AbstractRepository extends ServiceEntityRepository
     }
 
     /**
+     * Removes an entity instance.
+     *
      * @param T $entity
      */
     public function remove(mixed $entity): void
@@ -84,6 +95,9 @@ abstract class AbstractRepository extends ServiceEntityRepository
     }
 
     /**
+     * Reloads the state of the given entity from the database.
+     * This effectively refreshes the state of the entity in the current session.
+     *
      * @param T $entity
      *
      * @throws ORMException
@@ -101,6 +115,58 @@ abstract class AbstractRepository extends ServiceEntityRepository
     public function flush(): void
     {
         $this->getEntityManager()->flush();
+    }
+
+    /**
+     * Clears the persistence context, causing all managed entities to become detached.
+     * It is useful to explicitly free memory from managed entities that do not need
+     * to stay in memory.
+     */
+    public function clear(): void
+    {
+        $this->getEntityManager()->clear();
+    }
+
+    /**
+     * Detaches an entity from the persistence context, causing a managed entity to
+     * become detached. Unflushed changes made to the entity if any
+     * (including removal of the entity), will not be synchronized to the database.
+     * Entities which previously referenced the detached entity will continue to
+     * reference it.
+     *
+     * @param T $entity
+     */
+    public function detach(mixed $entity): void
+    {
+        $this->getEntityManager()->detach($entity);
+    }
+
+    /**
+     * Refreshes the persistent state of an object from the database,
+     * overriding any local changes that have not yet been persisted.
+     *
+     * @param LockMode|int|null $lockMode One of the \Doctrine\DBAL\LockMode::* constants
+     *                                    or NULL if no specific lock mode should be used
+     *                                    during the search.
+     * @phpstan-param LockMode::*|null $lockMode
+     *
+     * @throws ORMInvalidArgumentException
+     * @throws ORMException
+     * @throws TransactionRequiredException
+     */
+    public function refresh(mixed $entity, LockMode|int|null $lockMode): void
+    {
+        $this->getEntityManager()->refresh($entity, $lockMode);
+    }
+
+    /**
+     * Counts all entities of the repository.
+     *
+     * @return int The total number of entities in the repository.
+     */
+    public function countAll(): int
+    {
+        return $this->count();
     }
 
     /**

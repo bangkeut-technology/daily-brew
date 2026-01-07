@@ -26,8 +26,8 @@ class SecurityController extends AbstractController
      *
      * @return JsonResponse the rendered login page
      */
-    #[Route('/login', name: 'login', methods: ['POST'])]
-    public function login(#[CurrentUser] ?User $user): JsonResponse
+    #[Route('/sign-in', name: 'sign_in', methods: ['POST'])]
+    public function signIn(#[CurrentUser] ?User $user): JsonResponse
     {
         if (null === $user) {
             return $this->json([

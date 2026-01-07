@@ -51,4 +51,55 @@ class WorkspaceRepository extends AbstractRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    public function inferWorkspaceForUser(User $user): ?Workspace
+    {
+        $em = $this->getEntityManager();
+
+        // 1) From Store (strongest signal)
+        $w = $em->createQueryBuilder()
+            ->select('w')
+            ->from(Workspace::class, 'w')
+            ->innerJoin('w.stores', 's')
+            ->andWhere('s.user = :user')
+            ->andWhere('w.deletedAt IS NULL')
+            ->setParameter('user', $user)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if ($w instanceof Workspace) {
+            return $w;
+        }
+
+        // 2) From EvaluationTemplate
+        $w = $em->createQueryBuilder()
+            ->select('w')
+            ->from(Workspace::class, 'w')
+            ->innerJoin('w.evaluationTemplates', 't')
+            ->andWhere('t.user = :user')
+            ->andWhere('w.deletedAt IS NULL')
+            ->setParameter('user', $user)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if ($w instanceof Workspace) {
+            return $w;
+        }
+
+        // 3) From EvaluationCriteria
+        $w = $em->createQueryBuilder()
+            ->select('w')
+            ->from(Workspace::class, 'w')
+            ->innerJoin('w.evaluationCriterias', 'c')
+            ->andWhere('c.user = :user')
+            ->andWhere('w.deletedAt IS NULL')
+            ->setParameter('user', $user)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $w instanceof Workspace ? $w : null;
+    }
 }
