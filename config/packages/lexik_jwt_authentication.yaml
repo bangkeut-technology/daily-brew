@@ -3,3 +3,14 @@ lexik_jwt_authentication:
     public_key: '%env(resolve:JWT_PUBLIC_KEY)%'
     pass_phrase: '%env(JWT_PASSPHRASE)%'
     token_ttl: '%env(int:JWT_TOKEN_TTL)%'
+    token_extractors:
+        cookie:
+            enabled: true
+            name: BEARER
+    set_cookies:
+        BEARER: ~
+
+    blocklist_token:
+        enabled: true
+        cache: cache.app
+    remove_token_from_body_when_cookies_used: false

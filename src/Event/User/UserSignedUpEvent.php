@@ -7,12 +7,12 @@ use App\Entity\User;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class UserRegisteredEvent
+ * Class UserSignedUpEvent
  *
  * @package App\Event\User
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-class UserRegisteredEvent extends Event
+class UserSignedUpEvent extends Event
 {
     public function __construct(
         public readonly User $user,

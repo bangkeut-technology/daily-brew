@@ -25,7 +25,7 @@ class Workspace extends AbstractEntity
     private ?string $name = null;
 
     #[ORM\Column(enumType: PlanEnum::class)]
-    private ?PlanEnum $plan = null;
+    private PlanEnum $plan = PlanEnum::FREE;
 
     #[ORM\Column(nullable: true)]
     private ?DateTimeImmutable $deletedAt = null;

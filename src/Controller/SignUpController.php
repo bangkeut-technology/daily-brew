@@ -5,25 +5,25 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Event\User\UserRegisteredEvent;
-use App\Form\RegistrationFormType;
+use App\Event\User\UserSignedUpEvent;
+use App\Form\SignUpFormType;
 use App\Repository\UserRepository;
-use Exception;
+use Lexik\Bundle\JWTAuthenticationBundle\Security\Http\Authentication\AuthenticationSuccessHandler;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class RegistrationController.
+ * Class SignUpController
  *
- * @author Vandeth THO <thovandeth@gmail.com>
+ * @package App\Controller
+ * @author  Vandeth THO <thovandeth@gmail.com>
  */
-class RegistrationController extends AbstractController
+class SignUpController extends AbstractController
 {
     public function __construct(
         TranslatorInterface                       $translator,
@@ -33,16 +33,15 @@ class RegistrationController extends AbstractController
         parent::__construct($translator);
     }
 
-    /**
+    /**dw
      * Registers a new user.
      *
-     * @param Request        $request        the HTTP request object
-     * @param Security       $security       the security service
-     * @param UserRepository $userRepository the user repository
+     * @param Request                      $request        the HTTP request object
+     * @param UserRepository               $userRepository the user repository
+     * @param AuthenticationSuccessHandler $authenticationSuccessHandler
      *
      * @return Response the HTTP response object
      *
-     * @throws Exception if an error occurs during registration
      */
     #[OA\RequestBody(
         description: 'User registration',
@@ -76,14 +75,12 @@ class RegistrationController extends AbstractController
             new OA\Property('message', type: 'string'),
         ])
     )]
-    #[Route('/sign-up', name: 'daily_brew_sign_up', methods: ['POST'])]
-    public function register(Request $request, Security $security, UserRepository $userRepository): Response
+    #[Route('/sign-up', name: 'adora_sign_up', methods: ['POST'], priority: 98)]
+    public function signUp(Request $request, UserRepository $userRepository, AuthenticationSuccessHandler $authenticationSuccessHandler): Response
     {
         $user = $userRepository->create();
-        $form = $this->createForm(RegistrationFormType::class, $user);
-        $content = $request->getPayload()->all();
-        $form->submit($content);
-
+        $form = $this->createForm(SignUpFormType::class, $user);
+        $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
             if ($userRepository->findByIdentifier($user->getEmail())) {
                 return $this->json(['message' => 'User already exists'], Response::HTTP_CONFLICT);
@@ -91,14 +88,9 @@ class RegistrationController extends AbstractController
 
             $userRepository->updateUser($user);
 
-            $this->dispatcher->dispatch(new UserRegisteredEvent($user));
+            $this->dispatcher->dispatch(new UserSignedUpEvent($user));
 
-            $security->login($user, 'json_login', 'console_area');
-
-            return $this->json([
-                'message' => 'You are now registered',
-                'user' => $user,
-            ], Response::HTTP_CREATED, context: ['groups' => 'user:read']);
+            return $authenticationSuccessHandler->handleAuthenticationSuccess($user);
         }
 
         return $this->json(['message' => 'Invalid data'], Response::HTTP_BAD_REQUEST);
