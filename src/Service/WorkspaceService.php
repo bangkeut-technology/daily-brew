@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the Adora project.
+ * This file is part of the DailyBrew project.
  *
  * (c) Vandeth THO <thovandeth@gmail.com>
  *
@@ -8,7 +8,7 @@
  *
  * @created 12/17/25 2:35PM
  * @see     https://dailybrew.work
- * Copyright (c) 2025 Adora. All rights reserved.
+ * Copyright (c) 2025 DailyBrew. All rights reserved.
  */
 declare(strict_types=1);
 

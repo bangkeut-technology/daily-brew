@@ -248,7 +248,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[ORM\OneToMany(targetEntity: WorkspaceUser::class, mappedBy: 'user')]
     private Collection $workspaces;
 
-    #[ORM\ManyToOne(targetEntity: WorkspaceUser::class)]
+    #[ORM\ManyToOne(targetEntity: Workspace::class)]
     #[ORM\JoinColumn(name: 'current_workspace_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
     private ?Workspace $currentWorkspace = null;
 

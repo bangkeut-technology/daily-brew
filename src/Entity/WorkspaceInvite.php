@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the Adora project.
+ * This file is part of the DailyBrew project.
  *
  * (c) Vandeth THO <thovandeth@gmail.com>
  *
