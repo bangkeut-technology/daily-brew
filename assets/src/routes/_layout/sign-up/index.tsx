@@ -33,6 +33,7 @@ function SignUpPage() {
     const { user } = useAuthenticationState();
     const dispatch = useAuthenticationDispatch();
     const { redirect } = Route.useSearch();
+
     const form = useForm<SignUp>({
         resolver: yupResolver(signUpSchema),
         defaultValues: {
@@ -44,11 +45,10 @@ function SignUpPage() {
             acceptedTerms: false,
         },
     });
+
     const { isPending, mutate } = useMutation({
         mutationFn: signUp,
         onSuccess: (data) => {
-            sessionStorage.setItem('email', data.user.email);
-            sessionStorage.setItem('locale', data.user.locale || 'en');
             dispatch({ type: 'SIGN_IN', user: data.user });
         },
         onError: (data) => {
@@ -73,7 +73,6 @@ function SignUpPage() {
 
     return (
         <div className="relative min-h-dvh bg-linear-to-b from-background via-background to-muted/30">
-            {/* Main */}
             <main className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-center">
                     {/* Copy */}
@@ -95,23 +94,13 @@ function SignUpPage() {
                     <div className="order-1 md:order-2">
                         <Card className="border-primary/20 shadow-sm backdrop-blur">
                             <CardHeader>
-                                <CardTitle className="text-2xl">Sign up</CardTitle>
-                                <CardDescription>Set up your DailyBrew account</CardDescription>
+                                <CardTitle className="text-2xl">{t('sign_up.title', { ns: 'glossary' })}</CardTitle>
+                                <CardDescription>{t('sign_up.description', { ns: 'glossary' })}</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-5">
                                 <SignUpForm form={form} onSubmit={onSubmit} isPending={isPending} />
 
                                 <Separator />
-
-                                {/* Optional SSO placeholders */}
-                                {/*<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">*/}
-                                {/*    <Button variant="outline" className="w-full">*/}
-                                {/*        Continue with Google*/}
-                                {/*    </Button>*/}
-                                {/*    <Button variant="outline" className="w-full">*/}
-                                {/*        Continue with Apple*/}
-                                {/*    </Button>*/}
-                                {/*</div>*/}
 
                                 <p className="text-xs text-muted-foreground text-center">
                                     Already have an account?{' '}
