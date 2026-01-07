@@ -15,6 +15,7 @@ namespace App\Command;
 use App\Entity\User;
 use App\Entity\Workspace;
 use App\Entity\WorkspaceUser;
+use App\Enum\PlanEnum;
 use App\Enum\WorkspaceRoleEnum;
 use App\Repository\UserRepository;
 use App\Repository\WorkspaceRepository;
@@ -45,8 +46,8 @@ use function assert;
 final class WorkspaceBootstrapCommand extends Command
 {
     public function __construct(
-        private readonly EntityManagerInterface $em,
         private readonly UserRepository         $userRepository,
+        private readonly EntityManagerInterface $em,
     )
     {
         parent::__construct();
@@ -55,74 +56,66 @@ final class WorkspaceBootstrapCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('set-current', null, InputOption::VALUE_NONE, 'Set created workspace as user current workspace')
-            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Do not write to DB')
-            ->addOption('batch-size', null, InputOption::VALUE_REQUIRED, 'Flush batch size', '200');
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Do not write to database')
+            ->addOption('batch-size', null, InputOption::VALUE_REQUIRED, 'Flush batch size', '200')
+            ->addOption('plan', null, InputOption::VALUE_REQUIRED, 'Plan for created workspaces (e.g. FREE)', PlanEnum::FREE->name);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
-        $setCurrent = (bool)$input->getOption('set-current');
         $dryRun = (bool)$input->getOption('dry-run');
         $batchSize = max(1, (int)$input->getOption('batch-size'));
 
+        $planName = strtoupper(trim((string)$input->getOption('plan')));
+        $plan = PlanEnum::tryFrom($planName) ?? PlanEnum::FREE;
+
         $io->note(sprintf(
-            'Mode: %s | set-current: %s',
+            'Mode: %s | plan: %s | batch-size: %d',
             $dryRun ? 'DRY-RUN' : 'WRITE',
-            $setCurrent ? 'yes' : 'no'
+            $plan->name,
+            $batchSize
         ));
 
-        /**
-         * This assumes ownership is stored via WorkspaceUser(role=OWNER).
-         * If your ownership model is Workspace.owner instead, tell me and I’ll rewrite the query.
-         */
-        $dql = sprintf(
-            'SELECT u
-             FROM %s u
-             WHERE NOT EXISTS (
-                 SELECT 1
-                 FROM %s wm
-                 WHERE wm.user = u AND wm.role = :ownerRole
-             )
-             ORDER BY u.id',
-            User::class,
-            WorkspaceUser::class
-        );
-
-        $iterable = $this->userRepository->createQueryBuilder('u')
+        $users = $this->userRepository->createQueryBuilder('u')
             ->leftJoin('u.workspaces', 'wu')
             ->andWhere('wu.id IS NULL')
             ->orderBy('u.id', 'ASC')
             ->getQuery()
             ->toIterable();
 
-        $processed = 0;
         $created = 0;
+        $processed = 0;
 
-        foreach ($iterable as $user) {
-            assert($user instanceof User);
+        foreach ($users as $user) {
+            \assert($user instanceof User);
 
-            // Create workspace + owner membership
-            $workspace = new Workspace();
-            $workspace->setName($this->defaultWorkspaceName($user));
-
-            $member = new WorkspaceUser();
-            $member->setWorkspace($workspace);
-            $member->setUser($user);
-            $member->setRole(WorkspaceRoleEnum::OWNER);
-
-            if ($setCurrent && method_exists($user, 'setCurrentWorkspace')) {
-                $user->setCurrentWorkspace($workspace);
-                $this->em->persist($user);
+            // Safety: if currentWorkspace already set for some reason, skip
+            if ($user->getCurrentWorkspace() instanceof Workspace) {
+                continue;
             }
 
-            $this->em->persist($workspace);
-            $this->em->persist($member);
+            $workspace = new Workspace();
+            $workspace->setName($this->defaultWorkspaceName($user));
+            $workspace->setPlan($plan);
 
-            $processed++;
+            $workspaceUser = new WorkspaceUser()
+                ->setUser($user)
+                ->setWorkspace($workspace)
+                ->setRole(WorkspaceRoleEnum::OWNER);
+
+            $workspace->addUser($workspaceUser);
+            $user->addWorkspace($workspaceUser);
+
+            $user->setCurrentWorkspace($workspace);
+
+            $this->em->persist($workspace);
+            $this->em->persist($workspaceUser);
+            $this->em->persist($user);
+
             $created++;
+            $processed++;
 
             if (!$dryRun && $processed % $batchSize === 0) {
                 $this->em->flush();
@@ -146,43 +139,14 @@ final class WorkspaceBootstrapCommand extends Command
 
     private function defaultWorkspaceName(User $user): string
     {
-        if (method_exists($user, 'getFullName')) {
-            $fullName = trim((string)$user->getFullName());
-            if ($fullName !== '') {
-                return sprintf("%s's Workspace", $fullName);
-            }
+        $fullName = trim($user->getFullName());
+        if ($fullName !== '') {
+            return sprintf("%s's Workspace", $fullName);
         }
 
-        $email = (string)($user->getEmail() ?? '');
+        $email = $user->getEmail() ?? '';
         $prefix = ($email !== '' && str_contains($email, '@')) ? (string)strstr($email, '@', true) : 'User';
 
         return sprintf("%s's Workspace", $prefix ?: 'User');
-    }
-
-    private function uniqueSlugForUser(User $user, string $name): string
-    {
-        // Avoid extra DB queries for uniqueness: include user id/publicId suffix
-        $base = $this->slugify($name);
-
-        $suffix = null;
-        if (method_exists($user, 'getPublicId') && $user->getPublicId()) {
-            $suffix = (string)$user->getPublicId();
-        } else {
-            $suffix = (string)$user->getId();
-        }
-
-        $suffix = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $suffix) ?? $suffix;
-
-        return sprintf('%s-%s', $base, substr($suffix, 0, 12));
-    }
-
-    private function slugify(string $value): string
-    {
-        $value = mb_strtolower(trim($value));
-        $value = preg_replace('~[^\pL\d]+~u', '-', $value) ?? $value;
-        $value = trim($value, '-');
-        $value = preg_replace('~-+~', '-', $value) ?? $value;
-
-        return $value !== '' ? $value : 'workspace';
     }
 }
