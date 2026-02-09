@@ -12,6 +12,21 @@ security:
         ROLE_SUPER_ADMIN:
             - ROLE_ADMIN
     firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        oauth_auth:
+            pattern:   ^/oauth/auth
+            stateless: false
+            lazy:      true
+
+        oauth_connect:
+            pattern:   ^/oauth/connect
+            stateless: false
+            provider:  daily_brew_user_provider
+            context:   '%env(string:DAILY_BREW_CONTEXT)%'
+
         login:
             pattern: ^/api/login
             stateless: true
@@ -38,6 +53,8 @@ security:
         - { path: ^/api/v1/(en|fr|km)/(login),     roles: PUBLIC_ACCESS }
         - { path: ^/api/v1/(en|fr|km),             roles: [ ROLE_USER ] }
         - { path: ^/api/token/invalidate,          roles: PUBLIC_ACCESS }
+        - { path: ^/oauth/auth,                    roles: PUBLIC_ACCESS }
+        - { path: ^/oauth/connect,                 roles: ROLE_USER }
 
 when@test:
     security:

@@ -61,6 +61,18 @@
             "src/Entity/RefreshToken.php"
         ]
     },
+    "knpuniversity/oauth2-client-bundle": {
+        "version": "2.20",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "1.20",
+            "ref": "1ff300d8c030f55c99219cc55050b97a695af3f6"
+        },
+        "files": [
+            "config/packages/knpu_oauth2_client.yaml"
+        ]
+    },
     "lexik/jwt-authentication-bundle": {
         "version": "3.1",
         "recipe": {
@@ -114,7 +126,7 @@
         ]
     },
     "scheb/2fa-bundle": {
-        "version": "7.11",
+        "version": "7.13",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
@@ -122,8 +134,20 @@
             "ref": "1e6f68089146853a790b5da9946fc5974f6fcd49"
         },
         "files": [
-            "./config/packages/scheb_2fa.yaml",
-            "./config/routes/scheb_2fa.yaml"
+            "config/packages/scheb_2fa.yaml",
+            "config/routes/scheb_2fa.yaml"
+        ]
+    },
+    "symfony/ai-bundle": {
+        "version": "0.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "0.1",
+            "ref": "917b2a3da78a22e9488e99e1847d1f019d18da76"
+        },
+        "files": [
+            "config/packages/ai.yaml"
         ]
     },
     "symfony/console": {
@@ -206,6 +230,15 @@
         "files": [
             "config/packages/mailer.yaml"
         ]
+    },
+    "symfony/mailgun-mailer": {
+        "version": "7.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "4.4",
+            "ref": "addcb559b32d9dbb4843826b063565e1b15a2a57"
+        }
     },
     "symfony/maker-bundle": {
         "version": "1.64",
