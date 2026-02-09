@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the Adora project.
+ * This file is part of the DailyBrew project.
  *
  * (c) Vandeth THO <thovandeth@gmail.com>
  *
@@ -8,7 +8,7 @@
  *
  * @created 2/7/26 10:56AM
  * @see     https://dailybrew.work
- * Copyright (c) 2026 Adora. All rights reserved.
+ * Copyright (c) 2026 DailyBrew. All rights reserved.
  */
 declare(strict_types=1);
 
@@ -28,14 +28,14 @@ use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 
 /**
  *
- * Class AppleController
+ * Class MicrosoftController
  *
  * @package App\Controller\OAuth\Connect
  * @author  Vandeth THO <thovandeth@gmail.com>
  *
  */
-#[Route('/apple', name: 'apple_')]
-final class AppleController extends AbstractOAuthConnectController
+#[Route('/microsoft', name: 'microsoft_')]
+final class MicrosoftController extends AbstractOAuthConnectController
 {
     public function __construct(
         TranslatorInterface        $translator,
@@ -47,8 +47,8 @@ final class AppleController extends AbstractOAuthConnectController
     {
         parent::__construct(
             $translator,
-            'apple_connect',
-            OAuthProviderEnum::APPLE,
+            'microsoft_connect',
+            OAuthProviderEnum::MICROSOFT,
             $clientRegistry,
             $authenticationService,
             $roleHierarchy,

@@ -7,7 +7,7 @@
  * @author  Vandeth THO
  *
  * @created 2/7/26 11:16 AM
- * @see     https://adora.media
+ * @see     https://dailybrew.work
  * Copyright (c) 2026 Adora. All rights reserved.
  */
 
@@ -20,8 +20,8 @@ use App\Security\OAuthAuthenticationService;
 use Exception;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\OAuth2ClientInterface;
-use League\OAuth2\Client\Provider\GoogleUser;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
@@ -65,13 +65,11 @@ abstract class AbstractOAuthConnectController extends AbstractController
     /**
      * Returns the redirect route with optional query parameters.
      *
-     * @param OAuthProviderEnum $provider The OAuth provider for which to generate the redirect route.
-     *
      * @return Response The redirect response.
      */
-    protected function getRedirectRoute(OAuthProviderEnum $provider): Response
+    protected function getRedirectRoute(): Response
     {
-        return $this->redirect(sprintf('%s?%s', $this->redirectRoute, $provider->value));
+        return $this->redirect(sprintf('%s?%s', $this->redirectRoute, $this->provider->value));
     }
 
     /**
@@ -85,33 +83,21 @@ abstract class AbstractOAuthConnectController extends AbstractController
     }
 
     /**
-     * Handles the OAuth callback and connects the user.
-     *
-     * @return Response The redirect response.
-     */
-    protected function callbackHandler(): Response
-    {
-        $googleUser = $this->getClient()->fetchUser();
-
-        try {
-            $this->authenticationService->connect(
-                provider: $this->provider,
-                providerId: $googleUser->getId(),
-                user: $this->getUser()
-            );
-        } catch (Exception $e) {
-            throw $this->createBadRequestException($e->getMessage());
-        }
-
-        return $this->getRedirectRoute($this->provider);
-    }
-
-    /**
-     * Disconnects the user from the OAuth provider.
+     * Establishes a connection with an OAuth provider.
      *
      * @return Response The JSON response.
      */
-    protected function disconnectHandler(): Response
+    public function connect(): Response
+    {
+        return $this->getClient()->redirect();
+    }
+
+    /**
+     * Disconnects the OAuth provider from the current user.
+     *
+     * @return Response The JSON response.
+     */
+    public function disconnect(): Response
     {
         $user = $this->getUser();
 
@@ -130,23 +116,24 @@ abstract class AbstractOAuthConnectController extends AbstractController
     }
 
     /**
-     * Establishes a connection with an OAuth provider.
-     *
-     * @return Response The JSON response.
-     */
-    abstract public function connect(): Response;
-
-    /**
-     * Disconnects the OAuth provider from the current user.
-     *
-     * @return Response The JSON response.
-     */
-    abstract public function disconnect(): Response;
-
-    /**
      * Handles the callback from the OAuth provider after user consent.
      *
      * @return Response The redirect response.
      */
-    abstract public function callback(): Response;
+    public function callback(): Response
+    {
+        $googleUser = $this->getClient()->fetchUser();
+
+        try {
+            $this->authenticationService->connect(
+                provider: $this->provider,
+                providerId: $googleUser->getId(),
+                user: $this->getUser()
+            );
+        } catch (Exception $e) {
+            throw $this->createBadRequestException($e->getMessage());
+        }
+
+        return $this->getRedirectRoute();
+    }
 }

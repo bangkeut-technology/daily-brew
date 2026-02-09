@@ -7,7 +7,7 @@
  * @author  Vandeth THO
  *
  * @created 2/7/26 11:28AM
- * @see     https://adora.media
+ * @see     https://dailybrew.work
  * Copyright (c) 2026 Adora. All rights reserved.
  */
 declare(strict_types=1);
@@ -21,7 +21,6 @@ use App\Security\OAuthUserData;
 use Exception;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\OAuth2ClientInterface;
-use League\OAuth2\Client\Provider\AppleResourceOwner;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -40,7 +39,7 @@ abstract class AbstractOAuthAuthController extends AbstractController
      *
      * @param TranslatorInterface        $translator                The translator service for handling localization.
      * @param string                     $client                    The name of the OAuth client being used.
-     * @param OAuthProviderEnum          $provider                  The enum representing the OAuth provider.
+     * @param OAuthProviderEnum          $provider                  The OAuth provider being used.
      * @param ClientRegistry             $clientRegistry            The registry managing OAuth clients.
      * @param OAuthAuthenticationService $authAuthenticationService The service handling OAuth authentication logic.
      * @param string                     $redirectRoute             The route to redirect to after authentication. Defaults to '/auth/callback'.
@@ -67,17 +66,32 @@ abstract class AbstractOAuthAuthController extends AbstractController
         return $this->redirect($this->redirectRoute);
     }
 
+    /**
+     * Returns the OAuth client instance for the specified provider.
+     *
+     * @return OAuth2ClientInterface The OAuth client instance.
+     */
     protected function getClient(): OAuth2ClientInterface
     {
         return $this->clientRegistry->getClient($this->client);
     }
 
     /**
-     * Handles the OAuth authentication callback process after successful authentication.
+     * This method handles the OAuth authentication process connecting a user to an existing account.
      *
-     * @return RedirectResponse The redirect response object after processing the callback.
+     * @return Response The HTTP response object.
      */
-    protected function callbackHandler(): RedirectResponse
+    public function connect(): Response
+    {
+        return $this->getClient()->redirect();
+    }
+
+    /**
+     * This method handles the OAuth authentication callback process after successful authentication.
+     *
+     * @return Response The HTTP response object.
+     */
+    public function callback(): Response
     {
         $user = $this->getClient()->fetchUser();
 
@@ -100,18 +114,4 @@ abstract class AbstractOAuthAuthController extends AbstractController
 
         return $response;
     }
-
-    /**
-     * This method handles the OAuth authentication process connecting a user to an existing account.
-     *
-     * @return Response The HTTP response object.
-     */
-    abstract public function connect(): Response;
-
-    /**
-     * This method handles the OAuth authentication callback process after successful authentication.
-     *
-     * @return Response The HTTP response object.
-     */
-    abstract public function callback(): Response;
 }

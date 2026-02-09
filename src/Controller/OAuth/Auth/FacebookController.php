@@ -7,7 +7,7 @@
  * @author  Vandeth THO
  *
  * @created 2/3/26 2:36PM
- * @see     https://adora.media
+ * @see     https://dailybrew.work
  * Copyright (c) 2026 Adora. All rights reserved.
  */
 declare(strict_types=1);
@@ -25,11 +25,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * Class FacebookController
  *
- * @package App\Controller
+ * @package App\Controller\OAuth\Auth
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 #[Route('/facebook', name: 'facebook_')]
-class FacebookController extends AbstractOAuthAuthController
+final class FacebookController extends AbstractOAuthAuthController
 {
     public function __construct(
         TranslatorInterface        $translator,
@@ -37,7 +37,13 @@ class FacebookController extends AbstractOAuthAuthController
         OAuthAuthenticationService $authAuthenticationService,
     )
     {
-        parent::__construct($translator, 'facebook_auth', OAuthProviderEnum::FACEBOOK, $clientRegistry, $authAuthenticationService);
+        parent::__construct(
+            $translator,
+            'facebook_auth',
+            OAuthProviderEnum::FACEBOOK,
+            $clientRegistry,
+            $authAuthenticationService
+        );
     }
 
     /**
@@ -46,8 +52,7 @@ class FacebookController extends AbstractOAuthAuthController
     #[Route(name: 'connect', methods: ['GET'], priority: 1000)]
     public function connect(): Response
     {
-        return $this->getClient()
-            ->redirect(['email', 'public_profile']);
+        return parent::connect();
     }
 
     /**
@@ -56,6 +61,6 @@ class FacebookController extends AbstractOAuthAuthController
     #[Route('/callback', name: 'callback', methods: ['GET'], priority: 1000)]
     public function callback(): Response
     {
-        return $this->callbackHandler();
+        return parent::callback();
     }
 }

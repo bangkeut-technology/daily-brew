@@ -7,7 +7,7 @@
  * @author  Vandeth THO
  *
  * @created 2/3/26 2:36PM
- * @see     https://adora.media
+ * @see     https://dailybrew.work
  * Copyright (c) 2026 Adora. All rights reserved.
  */
 declare(strict_types=1);
@@ -16,10 +16,7 @@ namespace App\Controller\OAuth\Auth;
 
 use App\Enum\OAuthProviderEnum;
 use App\Security\OAuthAuthenticationService;
-use App\Security\OAuthUserData;
-use Exception;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
-use Stevenmaguire\OAuth2\Client\Provider\MicrosoftResourceOwner;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -28,11 +25,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * Class MicrosoftController
  *
- * @package App\Controller
+ * @package App\Controller\OAuth\Auth
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 #[Route('/microsoft', name: 'microsoft_')]
-class MicrosoftController extends AbstractOAuthAuthController
+final class MicrosoftController extends AbstractOAuthAuthController
 {
     public function __construct(
         TranslatorInterface        $translator,
@@ -40,19 +37,22 @@ class MicrosoftController extends AbstractOAuthAuthController
         OAuthAuthenticationService $authAuthenticationService,
     )
     {
-        parent::__construct($translator, 'microsoft_auth', OAuthProviderEnum::MICROSOFT, $clientRegistry, $authAuthenticationService);
+        parent::__construct(
+            $translator,
+            'microsoft_auth',
+            OAuthProviderEnum::MICROSOFT,
+            $clientRegistry,
+            $authAuthenticationService
+        );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     #[Route(name: 'connect', methods: ['GET'], priority: 1000)]
     public function connect(): Response
     {
-        return $this->getClient()
-            ->redirect([
-                'openid',
-                'email',
-                'profile',
-                'User.Read',
-            ]);
+        return parent::connect();
     }
 
     /**
@@ -61,6 +61,6 @@ class MicrosoftController extends AbstractOAuthAuthController
     #[Route('/callback', name: 'callback', methods: ['GET'], priority: 1000)]
     public function callback(): Response
     {
-        return $this->callbackHandler();
+        return parent::callback();
     }
 }

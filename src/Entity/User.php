@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\OAuthProviderEnum;
 use App\Enum\UserRoleEnum;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
@@ -12,6 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 use LogicException;
 use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
 use Serializable;
@@ -34,6 +36,11 @@ use Vich\UploaderBundle\Mapping\Attribute as Vich;
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL_CANONICAL', fields: ['emailCanonical'])]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL_SECRET', fields: ['secret'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_APPLE_ID', fields: ['appleId'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_FACEBOOK_ID', fields: ['facebookId'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_GOOGLE_ID', fields: ['googleId'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_MICROSOFT_ID', fields: ['microsoftId'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_LINKEDIN_ID', fields: ['linkedInId'])]
 #[UniqueEntity(fields: ['emailCanonical'], message: 'There is already a workspace with this emailCanonical')]
 #[Vich\Uploadable]
 #[ORM\HasLifecycleCallbacks]
@@ -251,6 +258,21 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     #[ORM\ManyToOne(targetEntity: Workspace::class)]
     #[ORM\JoinColumn(name: 'current_workspace_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
     private ?Workspace $currentWorkspace = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $appleId = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $facebookId = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $googleId = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $linkedInId = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $microsoftId = null;
 
     public function __construct()
     {
@@ -975,5 +997,195 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     {
         $this->deletedAt = $deletedAt;
         return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getAppleId(): ?string
+    {
+        return $this->appleId;
+    }
+
+    /**
+     * @param string|null $appleId
+     *
+     * @return User
+     */
+    public function setAppleId(?string $appleId): User
+    {
+        $this->appleId = $appleId;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFacebookId(): ?string
+    {
+        return $this->facebookId;
+    }
+
+    /**
+     * @param string|null $facebookId
+     *
+     * @return User
+     */
+    public function setFacebookId(?string $facebookId): User
+    {
+        $this->facebookId = $facebookId;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getGoogleId(): ?string
+    {
+        return $this->googleId;
+    }
+
+    /**
+     * @param string|null $googleId
+     *
+     * @return User
+     */
+    public function setGoogleId(?string $googleId): User
+    {
+        $this->googleId = $googleId;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getMicrosoftId(): ?string
+    {
+        return $this->microsoftId;
+    }
+
+    /**
+     * @param string|null $microsoftId
+     *
+     * @return User
+     */
+    public function setMicrosoftId(?string $microsoftId): User
+    {
+        $this->microsoftId = $microsoftId;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLinkedInId(): ?string
+    {
+        return $this->linkedInId;
+    }
+
+    /**
+     * @param string|null $linkedInId
+     *
+     * @return User
+     */
+    public function setLinkedInId(?string $linkedInId): User
+    {
+        $this->linkedInId = $linkedInId;
+        return $this;
+    }
+
+    /**
+     * Links the OAuth provider to the entity by setting the corresponding provider ID.
+     *
+     * @param OAuthProviderEnum $provider   The OAuth provider to link.
+     * @param string            $providerId The unique identifier from the provider.
+     *
+     * @return static
+     *
+     * @throws Exception If the specified provider is not supported.
+     */
+    public function linkOAuth(OAuthProviderEnum $provider, string $providerId): static
+    {
+        return match ($provider) {
+            OAuthProviderEnum::APPLE => $this->setAppleId($providerId),
+            OAuthProviderEnum::FACEBOOK => $this->setFacebookId($providerId),
+            OAuthProviderEnum::GITHUB => throw new Exception('To be implemented'),
+            OAuthProviderEnum::GOOGLE => $this->setGoogleId($providerId),
+            OAuthProviderEnum::MICROSOFT => $this->setMicrosoftId($providerId),
+            OAuthProviderEnum::LINKEDIN => $this->setLinkedInId($providerId),
+            OAuthProviderEnum::TWITTER => throw new Exception('To be implemented'),
+            default => throw new Exception('Provider not supported'),
+        };
+    }
+
+    /**
+     * Checks whether the user has an OAuth link for the provided provider.
+     *
+     * @param OAuthProviderEnum $provider The OAuth provider to check.
+     *
+     * @return bool True if the user has an OAuth link for the provider, false otherwise.
+     *
+     * @throws Exception If the specified provider is not implemented.
+     */
+    public function hasOAuth(OAuthProviderEnum $provider): bool
+    {
+        return match ($provider) {
+            OAuthProviderEnum::APPLE => $this->getAppleId() !== null,
+            OAuthProviderEnum::FACEBOOK => $this->getFacebookId() !== null,
+            OAuthProviderEnum::GITHUB => throw new Exception('To be implemented'),
+            OAuthProviderEnum::GOOGLE => $this->getGoogleId() !== null,
+            OAuthProviderEnum::MICROSOFT => $this->getMicrosoftId() !== null,
+            OAuthProviderEnum::LINKEDIN => $this->getLinkedInId() !== null,
+            OAuthProviderEnum::TWITTER => throw new Exception('To be implemented'),
+            default => throw new Exception('Provider not supported'),
+        };
+    }
+
+    /**
+     * Unlinks the OAuth link for the specified provider.
+     *
+     * @param OAuthProviderEnum $provider The OAuth provider to unlink.
+     *
+     * @return static The updated user entity.
+     *
+     * @throws Exception If the specified provider is not implemented.
+     */
+    public function unlinkOAuth(OAuthProviderEnum $provider): static
+    {
+        return match ($provider) {
+            OAuthProviderEnum::APPLE => $this->setAppleId(null),
+            OAuthProviderEnum::FACEBOOK => $this->setFacebookId(null),
+            OAuthProviderEnum::GITHUB => throw new Exception('To be implemented'),
+            OAuthProviderEnum::GOOGLE => $this->setGoogleId(null),
+            OAuthProviderEnum::MICROSOFT => $this->setMicrosoftId(null),
+            OAuthProviderEnum::LINKEDIN => $this->setLinkedInId(null),
+            OAuthProviderEnum::TWITTER => throw new Exception('To be implemented'),
+            default => throw new Exception('Provider not supported'),
+        };
+    }
+
+    /**
+     * Unlinks all OAuth providers for the user.
+     *
+     * @return static The updated user entity.
+     */
+    public function unlinkAllOAuth(): static
+    {
+        $this->setAppleId(null)
+            ->setFacebookId(null)
+            ->setGoogleId(null)
+            ->setMicrosoftId(null)
+            ->setLinkedInId(null);
+        return $this;
+    }
+
+    /**
+     * Checks if the user has a password set.
+     *
+     * @return bool True if the user has a password, false otherwise.
+     */
+    public function hasPassword(): bool
+    {
+        return (bool) $this->password;
     }
 }

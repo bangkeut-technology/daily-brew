@@ -36,3 +36,5 @@ created:
     attendance_batch:    'Attendance batch %label% have been submitted successfully'
 ownership:
     transferred: 'The ownership of %entity% has been transferred successfully to %user%'
+disconnected:
+    oauth_provider: 'You have been disconnected successfully from %provider%'

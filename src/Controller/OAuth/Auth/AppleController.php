@@ -7,7 +7,7 @@
  * @author  Vandeth THO
  *
  * @created 2/3/26 2:36PM
- * @see     https://adora.media
+ * @see     https://dailybrew.work
  * Copyright (c) 2026 Adora. All rights reserved.
  */
 declare(strict_types=1);
@@ -25,11 +25,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * Class AppleController
  *
- * @package App\Controller
+ * @package App\Controller\OAuth\Auth
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 #[Route('/apple', name: 'apple_')]
-class AppleController extends AbstractOAuthAuthController
+final class AppleController extends AbstractOAuthAuthController
 {
     public function __construct(
         TranslatorInterface        $translator,
@@ -37,7 +37,13 @@ class AppleController extends AbstractOAuthAuthController
         OAuthAuthenticationService $authAuthenticationService,
     )
     {
-        parent::__construct($translator, 'apple_auth', OAuthProviderEnum::APPLE, $clientRegistry, $authAuthenticationService);
+        parent::__construct(
+            $translator,
+            'apple_auth',
+            OAuthProviderEnum::APPLE,
+            $clientRegistry,
+            $authAuthenticationService
+        );
     }
 
     /**
@@ -46,8 +52,7 @@ class AppleController extends AbstractOAuthAuthController
     #[Route(name: 'connect', methods: ['GET'], priority: 1000)]
     public function connect(): Response
     {
-        return $this->getClient()
-            ->redirect(['name', 'email']);
+        return parent::connect();
     }
 
     /**
@@ -56,6 +61,6 @@ class AppleController extends AbstractOAuthAuthController
     #[Route('/callback', name: 'callback', methods: ['GET'], priority: 1000)]
     public function callback(): Response
     {
-        return $this->callbackHandler();
+        return parent::callback();
     }
 }

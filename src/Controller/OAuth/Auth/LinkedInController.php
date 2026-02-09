@@ -7,20 +7,16 @@
  * @author  Vandeth THO
  *
  * @created 2/3/26 2:36PM
- * @see     https://adora.media
+ * @see     https://dailybrew.work
  * Copyright (c) 2026 Adora. All rights reserved.
  */
 declare(strict_types=1);
 
 namespace App\Controller\OAuth\Auth;
 
-use App\Controller\AbstractController;
 use App\Enum\OAuthProviderEnum;
 use App\Security\OAuthAuthenticationService;
-use App\Security\OAuthUserData;
-use Exception;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
-use League\OAuth2\Client\Provider\LinkedInResourceOwner;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -29,11 +25,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * Class LinkedInController
  *
- * @package App\Controller
+ * @package App\Controller\OAuth\Auth
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-#[Route('/linkedin', name: 'linkedIn_')]
-class LinkedInController extends AbstractOAuthAuthController
+#[Route('/linkedin', name: 'linkedin_')]
+final class LinkedInController extends AbstractOAuthAuthController
 {
     public function __construct(
         TranslatorInterface        $translator,
@@ -41,14 +37,22 @@ class LinkedInController extends AbstractOAuthAuthController
         OAuthAuthenticationService $authAuthenticationService,
     )
     {
-        parent::__construct($translator, 'linkedIn_auth', OAuthProviderEnum::LINKEDIN, $clientRegistry, $authAuthenticationService);
+        parent::__construct(
+            $translator,
+            'linkedin_auth',
+            OAuthProviderEnum::LINKEDIN,
+            $clientRegistry,
+            $authAuthenticationService
+        );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     #[Route(name: 'connect', methods: ['GET'], priority: 1000)]
     public function connect(): Response
     {
-        return $this->getClient()
-            ->redirect(['r_liteprofile', 'r_emailaddress']);
+        return parent::connect();
     }
 
     /**
@@ -57,6 +61,6 @@ class LinkedInController extends AbstractOAuthAuthController
     #[Route('/callback', name: 'callback', methods: ['GET'], priority: 1000)]
     public function callback(): Response
     {
-        return $this->callbackHandler();
+        return parent::callback();
     }
 }

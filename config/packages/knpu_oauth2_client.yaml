@@ -4,60 +4,57 @@ knpu_oauth2_client:
         apple_auth:
             type:           apple
             client_id:      '%env(APPLE_CLIENT_ID)%'
-            redirect_route: adora_oauth_auth_apple_callback
             team_id:        '%env(APPLE_TEAM_ID)%'
             key_file_id:    '%env(APPLE_KEY_ID)%'
             key_file_path:  '%env(resolve:APPLE_PRIVATE_KEY)%'
+            redirect_route: dailybrew_oauth_auth_apple_callback
         apple_connect:
             type:           apple
             client_id:      '%env(APPLE_CLIENT_ID)%'
-            redirect_route: adora_oauth_connect_apple_callback
             team_id:        '%env(APPLE_TEAM_ID)%'
             key_file_id:    '%env(APPLE_KEY_ID)%'
             key_file_path:  '%env(resolve:APPLE_PRIVATE_KEY)%'
+            redirect_route: dailybrew_oauth_connect_apple_callback
         facebook_auth:
             type:              facebook
             client_id:         '%env(FACEBOOK_CLIENT_ID)%'
             client_secret:     '%env(FACEBOOK_CLIENT_SECRET)%'
-            redirect_route:    adora_oauth_auth_facebook_callback
             graph_api_version: v24.0
+            redirect_route:    dailybrew_oauth_auth_facebook_callback
         facebook_connect:
             type:              facebook
             client_id:         '%env(FACEBOOK_CLIENT_ID)%'
             client_secret:     '%env(FACEBOOK_CLIENT_SECRET)%'
-            redirect_route:    adora_oauth_connect_facebook_callback
             graph_api_version: v24.0
+            redirect_route:    dailybrew_oauth_connect_facebook_callback
         google_auth:
             type:           google
             client_id:      '%env(GOOGLE_CLIENT_ID)%'
             client_secret:  '%env(GOOGLE_CLIENT_SECRET)%'
-            redirect_route: adora_oauth_auth_google_callback
+            redirect_route: dailybrew_oauth_auth_google_callback
         google_connect:
             type:           google
             client_id:      '%env(GOOGLE_CLIENT_ID)%'
             client_secret:  '%env(GOOGLE_CLIENT_SECRET)%'
-            redirect_route: adora_oauth_connect_google_callback
+            redirect_route: dailybrew_oauth_connect_google_callback
         linkedIn_auth:
             type:           linkedin
             client_id:      '%env(LINKEDIN_CLIENT_ID)%'
             client_secret:  '%env(LINKEDIN_CLIENT_SECRET)%'
-            redirect_route: adora_oauth_auth_linkedin_callback
-            redirect_params: { }
+            redirect_route: dailybrew_oauth_auth_linkedin_callback
         linkedIn_connect:
             type:           linkedin
             client_id:      '%env(LINKEDIN_CLIENT_ID)%'
             client_secret:  '%env(LINKEDIN_CLIENT_SECRET)%'
-            redirect_route: adora_oauth_connect_linkedin_callback
-            redirect_params: { }
+            redirect_route: dailybrew_oauth_connect_linkedin_callback
         microsoft_auth:
             type:           microsoft
             client_id:      '%env(MICROSOFT_CLIENT_ID)%'
             client_secret:  '%env(MICROSOFT_CLIENT_SECRET)%'
-            redirect_route: adora_oauth_auth_microsoft_callback
-            redirect_params: { }
+            redirect_route: dailybrew_oauth_auth_microsoft_callback
         microsoft_connect:
             type:           microsoft
             client_id:      '%env(MICROSOFT_CLIENT_ID)%'
             client_secret:  '%env(MICROSOFT_CLIENT_SECRET)%'
-            redirect_route: adora_oauth_auth_microsoft_callback
-            redirect_params: { }
+            redirect_route: dailybrew_oauth_auth_microsoft_callback
+

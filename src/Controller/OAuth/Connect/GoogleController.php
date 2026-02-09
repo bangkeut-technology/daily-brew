@@ -7,7 +7,7 @@
  * @author  Vandeth THO
  *
  * @created 2/7/26 10:56AM
- * @see     https://adora.media
+ * @see     https://dailybrew.work
  * Copyright (c) 2026 Adora. All rights reserved.
  */
 declare(strict_types=1);
@@ -62,8 +62,7 @@ final class GoogleController extends AbstractOAuthConnectController
     #[Route(name: 'connect', methods: ['GET'], priority: 1000)]
     public function connect(): Response
     {
-        return $this->getClient()
-            ->redirect(['email', 'profile']);
+        return parent::connect();
     }
 
     /**
@@ -73,7 +72,7 @@ final class GoogleController extends AbstractOAuthConnectController
     #[Route(name: 'disconnect', methods: ['DELETE'], priority: 1000)]
     public function disconnect(): Response
     {
-        return $this->disconnectHandler();
+        return parent::disconnect();
     }
 
     /**
@@ -82,6 +81,6 @@ final class GoogleController extends AbstractOAuthConnectController
     #[Route('/callback', name: 'callback', methods: ['GET', 'POST'], priority: 1000)]
     public function callback(): Response
     {
-        return $this->callbackHandler();
+        return parent::callback();
     }
 }
