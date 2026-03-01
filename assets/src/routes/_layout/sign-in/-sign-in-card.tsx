@@ -15,7 +15,7 @@ import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
 import { ArrowRight, Lock, LockOpen, LogIn, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+import { TextSeparator } from '@/components/text-separator';
 
 export const SignInCard = () => {
     const { t } = useTranslation();
@@ -32,8 +32,6 @@ export const SignInCard = () => {
     const { isPending, mutate } = useMutation({
         mutationFn: signIn,
         onSuccess: (data) => {
-            sessionStorage.setItem('email', data.user.email);
-            sessionStorage.setItem('locale', data.user.locale || 'en');
             dispatch({ type: 'SIGN_IN', user: data.user });
         },
         onError: (data) => {
@@ -113,17 +111,17 @@ export const SignInCard = () => {
                     </form>
                 </Form>
 
-                <Separator />
+                <TextSeparator>Or continue with</TextSeparator>
 
                 {/* SSO placeholders (optional) */}
-                {/*<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">*/}
-                {/*    <Button variant="outline" className="w-full">*/}
-                {/*        Continue with Google*/}
-                {/*    </Button>*/}
-                {/*    <Button variant="outline" className="w-full">*/}
-                {/*        Continue with Apple*/}
-                {/*    </Button>*/}
-                {/*</div>*/}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <Button variant="outline" className="w-full">
+                        Continue with Google
+                    </Button>
+                    <Button variant="outline" className="w-full">
+                        Continue with Apple
+                    </Button>
+                </div>
 
                 <p className="text-xs text-muted-foreground text-center">
                     {t('dont_have_account')}?{' '}
