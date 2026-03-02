@@ -29,7 +29,7 @@ use App\Repository\WorkspaceUserRepository;
  * @package App\Service
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-readonly class WorkspaceUserService
+final readonly class WorkspaceUserService
 {
     public function __construct(
         private UserRepository          $userRepository,

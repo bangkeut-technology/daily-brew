@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Constant\SettingConstant;
+use App\Constant\WorkspaceSettingConstant;
 use App\Entity\Employee;
-use App\Enum\LeaveTypeEnum;
 use App\Repository\AttendanceRepository;
 use App\Util\DateHelper;
 use DateMalformedStringException;
@@ -17,11 +16,11 @@ use DateTimeImmutable;
  * @package App\Service
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-readonly class AttendanceRateCalculator
+final readonly class AttendanceRateCalculator
 {
     public function __construct(
-        private AttendanceRepository $attendanceRepository,
-        private SettingService       $settingService,
+        private AttendanceRepository    $attendanceRepository,
+        private WorkspaceSettingService $settingService,
     )
     {
     }
@@ -37,6 +36,7 @@ readonly class AttendanceRateCalculator
      * @param Employee          $employee The employee whose absences are being calculated.
      * @param DateTimeImmutable $start
      * @param DateTimeImmutable $end
+     *
      * @return int The total adjusted absences including penalty absences.
      */
     public function getAdjustedAbsences(Employee $employee, DateTimeImmutable $start, DateTimeImmutable $end): int
@@ -44,7 +44,7 @@ readonly class AttendanceRateCalculator
         $lates = $this->attendanceRepository->countLate($employee, $start, $end);
         $absences = $this->attendanceRepository->countAbsent($employee, $start, $end);
 
-        if (0 === $maxLateAllowed = $this->settingService->getInt(SettingConstant::MAXIMUM_LATE_COUNT, 3)) {
+        if (0 === $maxLateAllowed = $this->settingService->getInt(WorkspaceSettingConstant::MAXIMUM_LATE_COUNT, 3)) {
             return $absences;
         }
 
@@ -62,9 +62,9 @@ readonly class AttendanceRateCalculator
      * and rounded to two decimal places. If the total number of days is zero,
      * it returns 0.0.
      *
-     * @param Employee   $employee The employee for whom the attendance rate is calculated.
-     * @param DateTimeImmutable $start The start date of the period.
-     * @param DateTimeImmutable $end The end date of the period.
+     * @param Employee          $employee The employee for whom the attendance rate is calculated.
+     * @param DateTimeImmutable $start    The start date of the period.
+     * @param DateTimeImmutable $end      The end date of the period.
      *
      * @return float The attendance rate as a percentage, rounded to two decimal places.
      */
@@ -89,6 +89,7 @@ readonly class AttendanceRateCalculator
      * @param Employee          $employee The employee whose attendance is being summarized.
      * @param DateTimeImmutable $start    The start date of the period.
      * @param DateTimeImmutable $end      The end date of the period.
+     *
      * @return array An associative array containing attendance statistics:
      *                                    - 'Attendance_rate' (float): The percentage of days attended.
      *                                    - 'total_days' (int): The total number of days in the period.
@@ -101,13 +102,13 @@ readonly class AttendanceRateCalculator
     {
         $lates = $this->attendanceRepository->countLate($employee, $start, $end);
         $absences = $this->attendanceRepository->countAbsent($employee, $start, $end);
-        if (0 === $maxLateAllowed = $this->settingService->getInt(SettingConstant::MAXIMUM_LATE_COUNT, 3)) {
+        if (0 === $maxLateAllowed = $this->settingService->getInt(WorkspaceSettingConstant::MAXIMUM_LATE_COUNT, 3)) {
             return [
-                'attendance_rate' => 0.0,
-                'total_days' => 0,
-                'absences' => 0,
-                'lates' => 0,
-                'penalty_absences' => 0,
+                'attendance_rate'   => 0.0,
+                'total_days'        => 0,
+                'absences'          => 0,
+                'lates'             => 0,
+                'penalty_absences'  => 0,
                 'adjusted_absences' => 0,
             ];
         }
@@ -118,11 +119,11 @@ readonly class AttendanceRateCalculator
         $rate = $totalDays === 0 ? 0.0 : round((($totalDays - $adjustedAbsences) / $totalDays) * 100, 2);
 
         return [
-            'attendance_rate' => $rate,
-            'total_days' => $totalDays,
-            'absences' => $absences,
-            'lates' => $lates,
-            'penalty_absences' => $penaltyAbsences,
+            'attendance_rate'   => $rate,
+            'total_days'        => $totalDays,
+            'absences'          => $absences,
+            'lates'             => $lates,
+            'penalty_absences'  => $penaltyAbsences,
             'adjusted_absences' => $adjustedAbsences,
         ];
     }
@@ -137,6 +138,7 @@ readonly class AttendanceRateCalculator
      *
      * @param Employee          $employee The employee whose remaining paid leave is being calculated.
      * @param DateTimeImmutable $asOfDate The date as of which the remaining paid leave is determined.
+     *
      * @return int The calculated remaining balance of paid leave.
      * @throws DateMalformedStringException
      */
@@ -163,7 +165,7 @@ readonly class AttendanceRateCalculator
      */
     public function paidLeaveCycle(): string
     {
-        return $this->settingService->getString(SettingConstant::PAID_LEAVE_CYCLE, 'monthly');
+        return $this->settingService->getString(WorkspaceSettingConstant::PAID_LEAVE_CYCLE, 'monthly');
     }
 
     /**
@@ -173,6 +175,6 @@ readonly class AttendanceRateCalculator
      */
     public function numberOfPaidLeave(): int
     {
-        return $this->settingService->getInt(SettingConstant::NUMBER_OF_PAID_LEAVE, 3);
+        return $this->settingService->getInt(WorkspaceSettingConstant::NUMBER_OF_PAID_LEAVE, 3);
     }
 }

@@ -11,8 +11,6 @@ use App\Event\AttendanceBatch\AttendanceBatchCreatedEvent;
 use App\Event\AttendanceBatch\AttendanceBatchDeletedEvent;
 use App\Event\AttendanceBatch\AttendanceBatchUpdatedEvent;
 use App\Repository\AttendanceRepository;
-use App\Service\AttendanceRateCalculator;
-use App\Service\SettingService;
 use DateMalformedStringException;
 use DateTimeImmutable;
 use DateTimeInterface;

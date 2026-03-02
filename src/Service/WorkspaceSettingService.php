@@ -9,12 +9,12 @@ use App\Repository\UserSettingRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 
 /**
- * Class SettingService
+ * Class WorkspaceSettingService
  *
  * @package App\Service
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-class SettingService
+final readonly class WorkspaceSettingService
 {
     /**
      * @var User|null
@@ -22,9 +22,10 @@ class SettingService
     private ?User $user;
 
     public function __construct(
-        private readonly UserSettingRepository $settingRepository,
-        private readonly Security              $security,
-    ) {
+        private UserSettingRepository $settingRepository,
+        private Security              $security,
+    )
+    {
         $this->user = $this->security->getUser();
     }
 
@@ -46,7 +47,7 @@ class SettingService
 
         $setting = $this->settingRepository->findOneBy([
             'owner' => $this->user,
-            'name' => $key,
+            'name'  => $key,
         ]);
 
         return $setting?->getValue() ?? $default;
@@ -64,7 +65,7 @@ class SettingService
      */
     public function getInt(string $key, int $default = 0): int
     {
-        return (int) $this->get($key, $default);
+        return (int)$this->get($key, $default);
     }
 
     /**
@@ -77,6 +78,6 @@ class SettingService
      */
     public function getString(string $key, string $default = ''): string
     {
-        return (string) $this->get($key, $default);
+        return (string)$this->get($key, $default);
     }
 }

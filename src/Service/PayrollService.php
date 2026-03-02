@@ -26,13 +26,13 @@ use LogicException;
  * @package App\Service
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-class PayrollService
+final readonly class PayrollService
 {
     public function __construct(
-        private readonly PayrollRunRepository     $payrollRunRepository,
-        private readonly EmployeeRepository       $employeeRepository,
-        private readonly EmployeeSalaryRepository $employeeSalaryRepository,
-        private readonly AttendanceRepository     $attendanceRepository,
+        private PayrollRunRepository     $payrollRunRepository,
+        private EmployeeRepository       $employeeRepository,
+        private EmployeeSalaryRepository $employeeSalaryRepository,
+        private AttendanceRepository     $attendanceRepository,
     )
     {
     }

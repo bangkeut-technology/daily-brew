@@ -37,7 +37,7 @@ use DateTimeImmutable;
  *
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-readonly class WorkspaceInviteService
+final readonly class WorkspaceInviteService
 {
     public function __construct(
         private TokenGeneratorInterface   $tokenGenerator,

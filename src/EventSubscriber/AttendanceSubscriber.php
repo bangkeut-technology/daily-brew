@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber;
 
-use App\Constant\SettingConstant;
+use App\Constant\WorkspaceSettingConstant;
 use App\Enum\AttendanceTypeEnum;
 use App\Enum\LeaveTypeEnum;
 use App\Event\Attendance\RebalanceLeaveCycleEvent;
 use App\Repository\AttendanceRepository;
-use App\Service\SettingService;
+use App\Service\WorkspaceSettingService;
 use App\Util\DateHelper;
 use DateMalformedStringException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -22,8 +22,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 readonly class AttendanceSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private SettingService       $settingService,
-        private AttendanceRepository $attendanceRepository,
+        private WorkspaceSettingService $settingService,
+        private AttendanceRepository    $attendanceRepository,
     )
     {
     }
@@ -45,6 +45,7 @@ readonly class AttendanceSubscriber implements EventSubscriberInterface
      * (paid or unpaid) for a given time window (monthly or yearly) according to the cycle configuration.
      *
      * @param RebalanceLeaveCycleEvent $event
+     *
      * @return void
      * @throws DateMalformedStringException
      */
@@ -55,8 +56,8 @@ readonly class AttendanceSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $limit = $this->settingService->getInt(SettingConstant::NUMBER_OF_PAID_LEAVE, 3);
-        $cycle = $this->settingService->getString(SettingConstant::PAID_LEAVE_CYCLE, 'monthly');
+        $limit = $this->settingService->getInt(WorkspaceSettingConstant::NUMBER_OF_PAID_LEAVE, 3);
+        $cycle = $this->settingService->getString(WorkspaceSettingConstant::PAID_LEAVE_CYCLE, 'monthly');
         $attendanceDate = $attendance->getAttendanceDate();
 
         [$start, $end] = $cycle === 'yearly'
