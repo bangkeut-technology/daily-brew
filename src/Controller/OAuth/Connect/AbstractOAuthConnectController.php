@@ -7,7 +7,7 @@
  * @author  Vandeth THO
  *
  * @created 2/7/26 11:16 AM
- * @see     https://dailybrew.work
+ * @see     https://adora.media
  * Copyright (c) 2026 Adora. All rights reserved.
  */
 

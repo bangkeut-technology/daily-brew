@@ -7,7 +7,7 @@
  * @author  Vandeth THO
  *
  * @created 2/3/26 2:36PM
- * @see     https://dailybrew.work
+ * @see     https://adora.media
  * Copyright (c) 2026 Adora. All rights reserved.
  */
 declare(strict_types=1);
@@ -58,7 +58,7 @@ final class AppleController extends AbstractOAuthAuthController
     /**
      * {@inheritDoc}
      */
-    #[Route('/callback', name: 'callback', methods: ['GET'], priority: 1000)]
+    #[Route('/callback', name: 'callback', methods: ['GET', 'POST'], priority: 1000)]
     public function callback(): Response
     {
         return parent::callback();

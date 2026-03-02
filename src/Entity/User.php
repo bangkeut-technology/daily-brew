@@ -15,7 +15,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
 use LogicException;
-use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
 use Serializable;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\File;
@@ -44,7 +43,7 @@ use Vich\UploaderBundle\Mapping\Attribute as Vich;
 #[UniqueEntity(fields: ['emailCanonical'], message: 'There is already a workspace with this emailCanonical')]
 #[Vich\Uploadable]
 #[ORM\HasLifecycleCallbacks]
-class User extends AbstractEntity implements UserInterface, PasswordAuthenticatedUserInterface, Serializable, TwoFactorInterface
+class User extends AbstractEntity implements UserInterface, PasswordAuthenticatedUserInterface, Serializable
 {
     /**
      * The unique identifier of the user.
@@ -241,13 +240,10 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     private Collection $templates;
 
     /**
-     * @var Collection<int, EvaluationTemplate>
+     * @var Collection<int, Role>
      */
     #[ORM\OneToMany(targetEntity: Role::class, mappedBy: 'user', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $employeeRoles;
-
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $authCode;
 
     /**
      * @var Collection<int, WorkspaceUser>
@@ -263,16 +259,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     private ?string $appleId = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $facebookId = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
     private ?string $googleId = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $linkedInId = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $microsoftId = null;
 
     public function __construct()
     {
@@ -916,31 +903,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
         $this->secret = Uuid::v4()->toBase58();
     }
 
-    public function isEmailAuthEnabled(): bool
-    {
-        return true;
-    }
-
-    public function getEmailAuthRecipient(): string
-    {
-        return $this->email;
-    }
-
-    public function getEmailAuthCode(): string
-    {
-        return null === $this->authCode ? throw new LogicException('The email authentication code was not set') : $this->authCode;
-
-    }
-
-    /**
-     * @param string $authCode
-     * @return void
-     */
-    public function setEmailAuthCode(string $authCode): void
-    {
-        $this->authCode = $authCode;
-    }
-
     /**
      * @return Collection<int, WorkspaceUser>
      */
@@ -1021,25 +983,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     /**
      * @return string|null
      */
-    public function getFacebookId(): ?string
-    {
-        return $this->facebookId;
-    }
-
-    /**
-     * @param string|null $facebookId
-     *
-     * @return User
-     */
-    public function setFacebookId(?string $facebookId): User
-    {
-        $this->facebookId = $facebookId;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
     public function getGoogleId(): ?string
     {
         return $this->googleId;
@@ -1057,44 +1000,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     }
 
     /**
-     * @return string|null
-     */
-    public function getMicrosoftId(): ?string
-    {
-        return $this->microsoftId;
-    }
-
-    /**
-     * @param string|null $microsoftId
-     *
-     * @return User
-     */
-    public function setMicrosoftId(?string $microsoftId): User
-    {
-        $this->microsoftId = $microsoftId;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getLinkedInId(): ?string
-    {
-        return $this->linkedInId;
-    }
-
-    /**
-     * @param string|null $linkedInId
-     *
-     * @return User
-     */
-    public function setLinkedInId(?string $linkedInId): User
-    {
-        $this->linkedInId = $linkedInId;
-        return $this;
-    }
-
-    /**
      * Links the OAuth provider to the entity by setting the corresponding provider ID.
      *
      * @param OAuthProviderEnum $provider   The OAuth provider to link.
@@ -1108,13 +1013,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     {
         return match ($provider) {
             OAuthProviderEnum::APPLE => $this->setAppleId($providerId),
-            OAuthProviderEnum::FACEBOOK => $this->setFacebookId($providerId),
-            OAuthProviderEnum::GITHUB => throw new Exception('To be implemented'),
             OAuthProviderEnum::GOOGLE => $this->setGoogleId($providerId),
-            OAuthProviderEnum::MICROSOFT => $this->setMicrosoftId($providerId),
-            OAuthProviderEnum::LINKEDIN => $this->setLinkedInId($providerId),
-            OAuthProviderEnum::TWITTER => throw new Exception('To be implemented'),
-            default => throw new Exception('Provider not supported'),
         };
     }
 
@@ -1131,13 +1030,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     {
         return match ($provider) {
             OAuthProviderEnum::APPLE => $this->getAppleId() !== null,
-            OAuthProviderEnum::FACEBOOK => $this->getFacebookId() !== null,
-            OAuthProviderEnum::GITHUB => throw new Exception('To be implemented'),
             OAuthProviderEnum::GOOGLE => $this->getGoogleId() !== null,
-            OAuthProviderEnum::MICROSOFT => $this->getMicrosoftId() !== null,
-            OAuthProviderEnum::LINKEDIN => $this->getLinkedInId() !== null,
-            OAuthProviderEnum::TWITTER => throw new Exception('To be implemented'),
-            default => throw new Exception('Provider not supported'),
         };
     }
 
@@ -1154,13 +1047,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     {
         return match ($provider) {
             OAuthProviderEnum::APPLE => $this->setAppleId(null),
-            OAuthProviderEnum::FACEBOOK => $this->setFacebookId(null),
-            OAuthProviderEnum::GITHUB => throw new Exception('To be implemented'),
             OAuthProviderEnum::GOOGLE => $this->setGoogleId(null),
-            OAuthProviderEnum::MICROSOFT => $this->setMicrosoftId(null),
-            OAuthProviderEnum::LINKEDIN => $this->setLinkedInId(null),
-            OAuthProviderEnum::TWITTER => throw new Exception('To be implemented'),
-            default => throw new Exception('Provider not supported'),
         };
     }
 
@@ -1172,10 +1059,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function unlinkAllOAuth(): static
     {
         $this->setAppleId(null)
-            ->setFacebookId(null)
-            ->setGoogleId(null)
-            ->setMicrosoftId(null)
-            ->setLinkedInId(null);
+            ->setGoogleId(null);
         return $this;
     }
 

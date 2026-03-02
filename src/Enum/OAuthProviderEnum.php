@@ -16,10 +16,5 @@ namespace App\Enum;
 enum OAuthProviderEnum: string
 {
     case GOOGLE = 'google';
-    case FACEBOOK = 'facebook';
-    case LINKEDIN = 'linkedin';
     case APPLE = 'apple';
-    case GITHUB = 'github';
-    case MICROSOFT = 'microsoft';
-    case TWITTER = 'twitter';
 }
