@@ -29,7 +29,9 @@ export function DemoPill({ expiresAt, className }: Props) {
         <TooltipProvider>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Badge variant="destructive" className={className}>DEMO • {label}</Badge>
+                    <Badge variant="destructive" className={className}>
+                        DEMO • {label}
+                    </Badge>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
                     <p>Demo data is temporary and will be deleted after 1 day.</p>

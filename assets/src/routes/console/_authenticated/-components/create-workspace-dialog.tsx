@@ -75,7 +75,7 @@ export const CreateWorkspaceDialog: React.FC<CreateWorkspaceDialogProps> = ({ op
 
     return (
         <Dialog open={open} onOpenChange={handleClose}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-106.25">
                 <DialogTitle>New workspace</DialogTitle>
                 <DialogDescription>Create a new workspace for your team.</DialogDescription>
                 <Form {...form}>
