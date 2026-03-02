@@ -14,3 +14,19 @@ controllers:
         path:      ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+oauth_auth_controllers:
+    resource:
+        path:      ../src/Controller/OAuth/Auth
+        namespace: App\Controller\OAuth\Auth
+    type:        attribute
+    name_prefix: adora_oauth_auth_
+    prefix:      /oauth/auth
+
+oauth_connect_controllers:
+    resource:
+        path:      ../src/Controller/OAuth/Connect
+        namespace: App\Controller\OAuth\Connect
+    type:        attribute
+    name_prefix: adora_oauth_connect_
+    prefix:      /oauth/connect
