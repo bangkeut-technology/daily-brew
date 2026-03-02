@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Enum\OAuthProviderEnum;
 use App\Util\Canonicalizer;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -211,5 +213,62 @@ class UserRepository extends AbstractRepository implements PasswordUpgraderInter
                 ->setParameter('secret', $secret)
                 ->getQuery()
                 ->getSingleScalarResult() > 0;
+    }
+
+    /**
+     * Finds a user by their Apple ID.
+     *
+     * This method retrieves a user from the database using their Apple ID.
+     * It ensures that the user is not marked as deleted.
+     *
+     * @param string $appleId The Apple ID of the user to find.
+     *
+     * @return User|null The user object if found, or `null` if not found.
+     */
+    public function findByAppleId(string $appleId): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.appleId = :appleId')
+            ->andWhere('u.deletedAt IS NULL')
+            ->setParameter('appleId', $appleId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * Finds a user by their Google ID.
+     *
+     * This method retrieves a user from the database using their Google ID.
+     *
+     * @param string $googleId The Google ID of the user to find.
+     *
+     * @return User|null The user object if found, or `null` if not found.
+     */
+    public function findByGoogleId(string $googleId): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.googleId = :googleId')
+            ->andWhere('u.deletedAt IS NULL')
+            ->setParameter('googleId', $googleId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * Finds a user by their OAuth provider and provider ID.
+     *
+     * @param OAuthProviderEnum $provider   The OAuth provider to search for (e.g., Google, LinkedIn).
+     * @param string            $providerId The unique identifier of the user in the specified OAuth provider.
+     *
+     * @return User|null The user object if found, or `null` if not found.
+     *
+     * @throws Exception If the specified OAuth provider is not yet implemented.
+     */
+    public function findByOAuth(OAuthProviderEnum $provider, string $providerId): ?User
+    {
+        return match ($provider) {
+            OAuthProviderEnum::APPLE => $this->findByAppleId($providerId),
+            OAuthProviderEnum::GOOGLE => $this->findByGoogleId($providerId),
+        };
     }
 }
