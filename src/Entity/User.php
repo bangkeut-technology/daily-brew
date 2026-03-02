@@ -244,6 +244,7 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
 
     #[ORM\ManyToOne(targetEntity: Workspace::class)]
     #[ORM\JoinColumn(name: 'current_workspace_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    #[Groups(['user:read'])]
     private ?Workspace $currentWorkspace = null;
 
     #[ORM\Column(length: 255, nullable: true)]

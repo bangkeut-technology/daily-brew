@@ -126,6 +126,7 @@
         "prettier": "^3.8.1",
         "react-refresh": "^0.18.0",
         "regenerator-runtime": "^0.14.1",
+        "shadcn": "^3.8.5",
         "tailwindcss": "^4.1.8",
         "ts-loader": "^9.5.4",
         "tsconfig-paths-webpack-plugin": "^4.2.0",

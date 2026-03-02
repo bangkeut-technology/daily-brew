@@ -17,8 +17,11 @@ namespace App\ApiController;
 use App\ApiController\Trait\WorkspaceTrait;
 use App\Controller\AbstractController;
 use App\DTO\WorkspaceUserDTO;
+use App\Entity\Workspace;
 use App\Enum\ApiErrorCodeEnum;
 use App\Enum\WorkspaceRoleEnum;
+use App\Factory\DTO\WorkspaceDTOFactory;
+use App\Form\WorkspaceFormType;
 use App\Repository\WorkspaceRepository;
 use App\Repository\WorkspaceUserRepository;
 use App\Security\Voter\WorkspaceVoter;
@@ -51,9 +54,28 @@ class WorkspaceController extends AbstractController
         private readonly WorkspaceService        $workspaceService,
         private readonly WorkspaceUserRepository $workspaceUserRepository,
         private readonly WorkspaceUserService    $memberService,
+        private readonly WorkspaceDTOFactory     $workspaceDTOFactory,
     )
     {
         parent::__construct($translator);
+    }
+
+    #[Route('', name: 'create', methods: ['POST'])]
+    public function create(Request $request): JsonResponse
+    {
+        $workspace = new Workspace();
+        $form = $this->createForm(WorkspaceFormType::class, $workspace);
+        $form->submit($request->toArray());
+
+        if (!$form->isValid()) {
+            throw $this->createApiErrorException(ApiErrorCodeEnum::VALIDATION_ERROR, ['form' => (string) $form->getErrors(true)]);
+        }
+
+        $result = $this->workspaceService->createWorkspace($this->getUser(), $workspace->getName());
+
+        $dto = $this->workspaceDTOFactory->create($result['workspace'], $result['workspaceUser']);
+
+        return $this->json($dto, Response::HTTP_CREATED);
     }
 
     #[Route('/{publicId}/members', name: 'members', methods: ['GET'])]

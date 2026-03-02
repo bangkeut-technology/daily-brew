@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Constant\WorkspaceSettingConstant;
 use App\Entity\Employee;
 use App\Entity\Payslip;
 use App\Entity\PayrollRun;
@@ -17,6 +18,7 @@ use App\Repository\AttendanceRepository;
 use App\Repository\EmployeeRepository;
 use App\Repository\EmployeeSalaryRepository;
 use App\Repository\PayrollRunRepository;
+use App\Repository\WorkspaceSettingRepository;
 use DateTimeImmutable;
 use LogicException;
 
@@ -29,10 +31,11 @@ use LogicException;
 final readonly class PayrollService
 {
     public function __construct(
-        private PayrollRunRepository     $payrollRunRepository,
-        private EmployeeRepository       $employeeRepository,
-        private EmployeeSalaryRepository $employeeSalaryRepository,
-        private AttendanceRepository     $attendanceRepository,
+        private PayrollRunRepository        $payrollRunRepository,
+        private EmployeeRepository          $employeeRepository,
+        private EmployeeSalaryRepository    $employeeSalaryRepository,
+        private AttendanceRepository        $attendanceRepository,
+        private WorkspaceSettingRepository  $settingRepository,
     )
     {
     }
@@ -69,8 +72,14 @@ final readonly class PayrollService
         $from = $period;
         $to   = new DateTimeImmutable($period->format('Y-m-t')); // last day of month
 
-        // Count working days (Mon-Fri) in period
-        $workingDays = $this->countWorkingDays($from, $to);
+        // Read workspace settings
+        $workDaysOverride = (int) ($this->getWorkspaceSetting($workspace, WorkspaceSettingConstant::PAYROLL_WORK_DAYS_PER_MONTH) ?? '0');
+        $lateEnabled      = ($this->getWorkspaceSetting($workspace, WorkspaceSettingConstant::LATE_DEDUCTION_ENABLED) ?? '0') === '1';
+        $lateRate         = (float) ($this->getWorkspaceSetting($workspace, WorkspaceSettingConstant::LATE_DEDUCTION_RATE) ?? '0.5');
+        $maxLateCount     = (int) ($this->getWorkspaceSetting($workspace, WorkspaceSettingConstant::MAXIMUM_LATE_COUNT) ?? '3');
+
+        // Count working days (Mon-Fri) in period, or use override
+        $workingDays = $workDaysOverride > 0 ? $workDaysOverride : $this->countWorkingDays($from, $to);
 
         // Get all employees in workspace
         $employees = $this->employeeRepository->findBy(['workspace' => $workspace]);
@@ -107,7 +116,12 @@ final readonly class PayrollService
             // Deduction per absent/unpaid-leave day
             $deductionPerDay = $workingDays > 0 ? ($baseSalary / $workingDays) : 0;
             $totalDeductions = round($deductionPerDay * ($absentDays + $unpaidLeaveDays), 2);
-            $netPay = round($baseSalary - $totalDeductions, 2);
+
+            // Late deduction
+            if ($lateEnabled && $lateDays > $maxLateCount) {
+                $excessLate = $lateDays - $maxLateCount;
+                $totalDeductions = round($totalDeductions + $deductionPerDay * $lateRate * $excessLate, 2);
+            }
 
             $payslip = $this->findOrCreatePayslip($run, $employee);
             $payslip->setWorkspace($workspace);
@@ -190,5 +204,11 @@ final readonly class PayrollService
         $run->addPayslip($payslip);
 
         return $payslip;
+    }
+
+    private function getWorkspaceSetting(Workspace $workspace, string $key): ?string
+    {
+        $setting = $this->settingRepository->findByNameAndWorkspace($key, $workspace);
+        return $setting?->getValue() ?? WorkspaceSettingConstant::getDefaultValue($key);
     }
 }

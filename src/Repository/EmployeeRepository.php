@@ -248,11 +248,11 @@ class EmployeeRepository extends AbstractRepository
     /**
      * Finds employees associated with a specific user that do not have a workspace assigned.
      *
-     * @param User $user The user whose associated employees without workspace should be found.
+     * @param User $user The user whose associated employees without a workspace should be found.
      *
      * @return Employee[] Returns an array of Employee entities that match the criteria.
      */
-    public function findByUserWithoutWorkspace(User $user)
+    public function findByUserWithoutWorkspace(User $user): array
     {
         return $this->createQueryBuilder('e')
             ->where('e.user = :user')
@@ -260,5 +260,17 @@ class EmployeeRepository extends AbstractRepository
             ->setParameter('user', $user)
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Find an employee by its linked user (self-service user).
+     *
+     * @param User $user The linked user.
+     *
+     * @return Employee|null The employee entity if found, otherwise null.
+     */
+    public function findByLinkedUser(User $user): ?Employee
+    {
+        return $this->findOneBy(['linkedUser' => $user]);
     }
 }

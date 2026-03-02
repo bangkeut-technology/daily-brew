@@ -28,6 +28,7 @@ import {
     ListTodo,
     LogOut,
     SettingsIcon,
+    UserPlus,
     Users,
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from '@tanstack/react-router';
@@ -89,6 +90,7 @@ const NAV_ITEMS: NavItem[] = [
             { key: 'templates', url: '/console/manage/templates', icon: ListTodo },
             { key: 'criterias', url: '/console/manage/criterias', icon: ClipboardList },
             { key: 'roles', url: '/console/manage/roles', icon: Briefcase },
+            { key: 'members', url: '/console/manage/members', icon: UserPlus },
         ],
     },
     { key: 'billing', url: '/console/billing', icon: CreditCard, pro: true },

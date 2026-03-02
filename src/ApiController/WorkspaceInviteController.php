@@ -103,7 +103,7 @@ class WorkspaceInviteController extends AbstractController
         ], Response::HTTP_CREATED);
     }
 
-    #[Route('/invites', name: 'list', methods: ['GET'])]
+    #[Route('', name: 'list', methods: ['GET'])]
     public function list(
         string $publicId,
     ): Response

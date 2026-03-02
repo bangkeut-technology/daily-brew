@@ -546,6 +546,19 @@ class AttendanceRepository extends AbstractRepository
     }
 
     /**
+     * Find an attendance record for a specific employee on a given date.
+     *
+     * @param Employee          $employee       The employee whose attendance record is being looked up.
+     * @param DateTimeImmutable $attendanceDate The date of the attendance record.
+     *
+     * @return Attendance|null The attendance record if found, or null otherwise.
+     */
+    public function findByEmployeeAndDate(Employee $employee, DateTimeImmutable $attendanceDate): ?Attendance
+    {
+        return $this->findOneBy(['employee' => $employee, 'attendanceDate' => $attendanceDate]);
+    }
+
+    /**
      * Checks if an attendance record exists for a specific employee on a given date.
      *
      * @param Employee          $employee       The employee whose attendance record is being checked.

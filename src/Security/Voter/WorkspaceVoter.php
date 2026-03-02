@@ -36,6 +36,8 @@ class WorkspaceVoter extends Voter
     public const string MANAGE_ALLOWED_IPS = 'WORKSPACE_MANAGE_ALLOWED_IPS';
     public const string MANAGE_PAYROLL = 'WORKSPACE_MANAGE_PAYROLL';
     public const string VIEW_PAYROLL = 'WORKSPACE_VIEW_PAYROLL';
+    public const string MANAGE_SETTINGS = 'WORKSPACE_MANAGE_SETTINGS';
+    public const string MANAGE_LEAVE_REQUESTS = 'WORKSPACE_MANAGE_LEAVE_REQUESTS';
 
     public function __construct(
         private readonly WorkspaceUserRepository $workspaceUserRepository,
@@ -52,6 +54,8 @@ class WorkspaceVoter extends Voter
             self::MANAGE_ALLOWED_IPS,
             self::MANAGE_PAYROLL,
             self::VIEW_PAYROLL,
+            self::MANAGE_SETTINGS,
+            self::MANAGE_LEAVE_REQUESTS,
         ], true)) {
             return false;
         }
@@ -92,6 +96,8 @@ class WorkspaceVoter extends Voter
             self::MANAGE_ALLOWED_IPS => $this->canManageAllowedIps($role),
             self::MANAGE_PAYROLL => $this->canManagePayroll($role),
             self::VIEW_PAYROLL => $this->canViewPayroll($role),
+            self::MANAGE_SETTINGS => $this->canManageSettings($role),
+            self::MANAGE_LEAVE_REQUESTS => $this->canManageLeaveRequests($role),
             default => false,
         };
     }
@@ -122,6 +128,16 @@ class WorkspaceVoter extends Voter
     }
 
     private function canViewPayroll(WorkspaceRoleEnum $role): bool
+    {
+        return in_array($role, [WorkspaceRoleEnum::OWNER, WorkspaceRoleEnum::ADMIN, WorkspaceRoleEnum::MANAGER], true);
+    }
+
+    private function canManageSettings(WorkspaceRoleEnum $role): bool
+    {
+        return in_array($role, [WorkspaceRoleEnum::OWNER, WorkspaceRoleEnum::ADMIN], true);
+    }
+
+    private function canManageLeaveRequests(WorkspaceRoleEnum $role): bool
     {
         return in_array($role, [WorkspaceRoleEnum::OWNER, WorkspaceRoleEnum::ADMIN, WorkspaceRoleEnum::MANAGER], true);
     }

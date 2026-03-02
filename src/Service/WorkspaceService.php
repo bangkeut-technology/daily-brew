@@ -42,6 +42,23 @@ final readonly class WorkspaceService
         private UserRepository $userRepository,
     ) {}
 
+    public function createWorkspace(User $owner, string $name): array
+    {
+        $workspace = new Workspace();
+        $workspace->setName($name);
+
+        $workspaceUser = new WorkspaceUser();
+        $workspaceUser->setWorkspace($workspace);
+        $workspaceUser->setUser($owner);
+        $workspaceUser->setRole(WorkspaceRoleEnum::OWNER);
+
+        $this->em->persist($workspace);
+        $this->em->persist($workspaceUser);
+        $this->em->flush();
+
+        return ['workspace' => $workspace, 'workspaceUser' => $workspaceUser];
+    }
+
     public function transferOwnership(Workspace $workspace, User $actor, string $targetUserPublicId): array
     {
         return $this->em->wrapInTransaction(function () use ($workspace, $actor, $targetUserPublicId) {

@@ -8,7 +8,17 @@ export type Workspace = {
     subscription: WorkspaceSubscription;
 };
 
-export type WorkspaceUserRole = 'OWNER' | 'MEMBER' | 'VIEWER';
+export type WorkspaceUserRole = 'OWNER' | 'ADMIN' | 'MANAGER' | 'EMPLOYEE';
+
+export type WorkspaceInvite = {
+    publicId: string;
+    email: string | null;
+    role: string;
+    status: 'pending' | 'accepted' | 'revoked' | 'expired';
+    expiresAt: string | null;
+    createdAt: string | null;
+    acceptedAt: string | null;
+};
 
 export type WorkspaceUser = {
     publicId: string;

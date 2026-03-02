@@ -72,10 +72,11 @@ class AttendanceFormType extends AbstractFormType
             ])
             ->add('employee', EntityType::class, [
                 'class' => Employee::class,
-                'choice_label' => 'id',
+                'choice_label' => 'publicId',
+                'choice_value' => 'publicId',
                 'documentation' => [
-                    'type' => 'integer',
-                    'description' => 'The ID of the employee associated with this attendance record.',
+                    'type' => 'string',
+                    'description' => 'The public ID of the employee associated with this attendance record.',
                 ]
             ]);
     }
