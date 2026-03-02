@@ -139,4 +139,25 @@ class EvaluationCriteriaRepository extends AbstractRepository
             ->getQuery()
             ->execute();
     }
+
+    /**
+     * Finds evaluation criteria records associated with a specific user that do not have a workspace assigned.
+     *
+     * This method constructs a query to retrieve evaluation criteria records
+     * where the associated user matches the given user instance and the workspace is null.
+     *
+     * @param User $user The user entity whose evaluation criteria records should be retrieved.
+     *
+     * @return EvaluationCriteria[] An array of EvaluationCriteria entities representing evaluation criteria records without a workspace.
+     */
+    public function findByUserWithoutWorkspace(User $user): array
+    {
+        return $this->createQueryBuilder('ec')
+            ->andWhere('ec.user = :user')
+            ->andWhere('ec.workspace IS NULL')
+            ->setParameter('user', $user)
+            ->orderBy('ec.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

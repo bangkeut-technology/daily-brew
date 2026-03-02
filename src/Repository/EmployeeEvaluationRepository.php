@@ -282,4 +282,22 @@ class EmployeeEvaluationRepository extends AbstractRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Finds employee evaluations for a specific user without a workspace.
+     *
+     * @param User $user The user for whom evaluations need to be retrieved.
+     *
+     * @return array An array of EmployeeEvaluation entities ordered by ID in ascending order.
+     */
+    public function findByUserWithoutWorkspace(User $user): array
+    {
+        return $this->createQueryBuilder('ee')
+            ->andWhere('ee.user = :user')
+            ->andWhere('ee.workspace IS NULL')
+            ->setParameter('user', $user)
+            ->orderBy('ee.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

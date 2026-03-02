@@ -207,4 +207,22 @@ class AttendanceBatchRepository extends AbstractRepository
             ->getQuery()
             ->execute();
     }
+
+    /**
+     * Finds employees associated with a specific user that do not have a workspace assigned.
+     *
+     * @param User $user The user entity whose employees should be retrieved.
+     *
+     * @return AttendanceBatch[] An array of AttendanceBatch entities representing employees without a workspace.
+     */
+    public function findByUserWithoutWorkspace(User $user): array
+    {
+        return $this->createQueryBuilder('ab')
+            ->andWhere('ab.user = :user')
+            ->andWhere('ab.workspace IS NULL')
+            ->setParameter('user', $user)
+            ->orderBy('ab.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

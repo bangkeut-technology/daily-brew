@@ -766,4 +766,25 @@ class AttendanceRepository extends AbstractRepository
             ->getQuery()
             ->execute();
     }
+
+    /**
+     * Finds attendance records associated with a specific user that do not have a workspace assigned.
+     *
+     * This method constructs a query to retrieve attendance records
+     * where the associated user matches the given user instance and the workspace is null.
+     *
+     * @param User $user The user entity whose attendance records should be retrieved.
+     *
+     * @return Attendance[] An array of Attendance entities representing attendance records without a workspace.
+     */
+    public function findByUserWithoutWorkspace(User $user): array
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.user = :user')
+            ->andWhere('a.workspace IS NULL')
+            ->setParameter('user', $user)
+            ->orderBy('a.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
