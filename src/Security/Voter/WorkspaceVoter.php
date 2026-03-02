@@ -16,7 +16,6 @@ use App\Entity\User;
 use App\Entity\Workspace;
 use App\Entity\WorkspaceAllowedIp;
 use App\Entity\WorkspaceInvite;
-use App\Entity\WorkspaceUserRating;
 use App\Enum\WorkspaceRoleEnum;
 use App\Repository\WorkspaceUserRepository;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -37,7 +36,6 @@ class WorkspaceVoter extends Voter
     public const string MANAGE_ALLOWED_IPS = 'WORKSPACE_MANAGE_ALLOWED_IPS';
     public const string MANAGE_PAYROLL = 'WORKSPACE_MANAGE_PAYROLL';
     public const string VIEW_PAYROLL = 'WORKSPACE_VIEW_PAYROLL';
-    public const string RATE_MEMBER = 'WORKSPACE_RATE_MEMBER';
 
     public function __construct(
         private readonly WorkspaceUserRepository $workspaceUserRepository,
@@ -54,15 +52,13 @@ class WorkspaceVoter extends Voter
             self::MANAGE_ALLOWED_IPS,
             self::MANAGE_PAYROLL,
             self::VIEW_PAYROLL,
-            self::RATE_MEMBER,
         ], true)) {
             return false;
         }
 
         return $subject instanceof Workspace
             || $subject instanceof WorkspaceInvite
-            || $subject instanceof WorkspaceAllowedIp
-            || $subject instanceof WorkspaceUserRating;
+            || $subject instanceof WorkspaceAllowedIp;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
@@ -76,7 +72,6 @@ class WorkspaceVoter extends Voter
             $subject instanceof Workspace => $subject,
             $subject instanceof WorkspaceInvite => $subject->getWorkspace(),
             $subject instanceof WorkspaceAllowedIp => $subject->getWorkspace(),
-            $subject instanceof WorkspaceUserRating => $subject->getWorkspace(),
             default => null,
         };
 
@@ -97,7 +92,6 @@ class WorkspaceVoter extends Voter
             self::MANAGE_ALLOWED_IPS => $this->canManageAllowedIps($role),
             self::MANAGE_PAYROLL => $this->canManagePayroll($role),
             self::VIEW_PAYROLL => $this->canViewPayroll($role),
-            self::RATE_MEMBER => $this->canRateMember($role),
             default => false,
         };
     }
@@ -128,11 +122,6 @@ class WorkspaceVoter extends Voter
     }
 
     private function canViewPayroll(WorkspaceRoleEnum $role): bool
-    {
-        return in_array($role, [WorkspaceRoleEnum::OWNER, WorkspaceRoleEnum::ADMIN, WorkspaceRoleEnum::MANAGER], true);
-    }
-
-    private function canRateMember(WorkspaceRoleEnum $role): bool
     {
         return in_array($role, [WorkspaceRoleEnum::OWNER, WorkspaceRoleEnum::ADMIN, WorkspaceRoleEnum::MANAGER], true);
     }

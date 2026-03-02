@@ -36,7 +36,6 @@ abstract class AbstractEntity
         'payroll_run:read',
         'payslip:read',
         'payslip_item:read',
-        'workspace_user_rating:read',
     ])]
     public ?int $id = null {
         get {
@@ -59,7 +58,6 @@ abstract class AbstractEntity
         'payroll_run:read',
         'payslip:read',
         'payslip_item:read',
-        'workspace_user_rating:read',
     ])]
     public ?string $publicId = null {
         get {
@@ -82,7 +80,6 @@ abstract class AbstractEntity
         'payroll_run:read',
         'payslip:read',
         'payslip_item:read',
-        'workspace_user_rating:read',
     ])]
     protected ?DateTimeImmutable $createdAt = null;
 
@@ -101,7 +98,6 @@ abstract class AbstractEntity
         'payroll_run:read',
         'payslip:read',
         'payslip_item:read',
-        'workspace_user_rating:read',
     ])]
     protected ?DateTimeImmutable $updatedAt = null;
 
