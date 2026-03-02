@@ -13,6 +13,7 @@ import { Form } from '@/components/ui/form';
 import { TextField } from '@/components/field/text-field';
 import { SelectField } from '@/components/field/select-field';
 import { Button } from '@/components/ui/button';
+import { useAuthenticationState } from '@/hooks/use-authentication';
 
 export const Route = createFileRoute('/console/_authenticated/_layout/settings')({
     component: SettingsPage,
@@ -21,14 +22,16 @@ export const Route = createFileRoute('/console/_authenticated/_layout/settings')
 function SettingsPage() {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
+    const { workspace } = useAuthenticationState();
     const { data: settings, isSuccess } = useQuery({
-        queryKey: ['settings'],
-        queryFn: () => fetchSettings(),
+        queryKey: ['settings', workspace],
+        queryFn: () => workspace && fetchSettings(workspace?.publicId),
+        enabled: !!workspace,
     });
     const { mutate } = useMutation({
         mutationFn: updateSettings,
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: ['settings'] }).then(() => {
+            queryClient.invalidateQueries({ queryKey: ['settings', workspace] }).then(() => {
                 toast.success(data.message);
             });
         },
@@ -57,9 +60,10 @@ function SettingsPage() {
 
     const onSubmit = React.useCallback(
         (data: SettingType) => {
-            mutate(data);
+            if (!workspace) return;
+            mutate({ publicId: workspace.publicId, data });
         },
-        [mutate],
+        [mutate, workspace],
     );
 
     return (
