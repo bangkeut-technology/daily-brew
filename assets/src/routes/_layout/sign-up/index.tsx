@@ -14,6 +14,9 @@ import { toast } from 'sonner';
 import { useAuthenticationDispatch, useAuthenticationState } from '@/hooks/use-authentication';
 import { z } from 'zod';
 import { SignUpForm } from '@/routes/_layout/sign-up/-components/sign-up-form';
+import { TextSeparator } from '@/components/text-separator';
+import { AppleButton } from '@/routes/_layout/-components/apple-button';
+import { GoogleButton } from '@/routes/_layout/-components/google-button';
 
 export const Route = createFileRoute('/_layout/sign-up/')({
     component: SignUpPage,
@@ -99,6 +102,13 @@ function SignUpPage() {
                             </CardHeader>
                             <CardContent className="space-y-5">
                                 <SignUpForm form={form} onSubmit={onSubmit} isPending={isPending} />
+
+                                <TextSeparator>Or continue with</TextSeparator>
+
+                                <div className="space-y-2" data-testid="sign-up-social-buttons" aria-hidden="true">
+                                    <AppleButton />
+                                    <GoogleButton />
+                                </div>
 
                                 <Separator />
 

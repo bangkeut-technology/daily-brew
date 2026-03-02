@@ -16,6 +16,8 @@ import { toast } from 'sonner';
 import { ArrowRight, Lock, LockOpen, LogIn, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TextSeparator } from '@/components/text-separator';
+import { AppleButton } from '@/routes/_layout/-components/apple-button';
+import { GoogleButton } from '@/routes/_layout/-components/google-button';
 
 export const SignInCard = () => {
     const { t } = useTranslation();
@@ -115,12 +117,8 @@ export const SignInCard = () => {
 
                 {/* SSO placeholders (optional) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <Button variant="outline" className="w-full">
-                        Continue with Google
-                    </Button>
-                    <Button variant="outline" className="w-full">
-                        Continue with Apple
-                    </Button>
+                    <AppleButton />
+                    <GoogleButton />
                 </div>
 
                 <p className="text-xs text-muted-foreground text-center">
