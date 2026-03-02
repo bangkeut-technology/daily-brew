@@ -27,7 +27,7 @@ function AttendanceListPage() {
     const onChange = React.useCallback(
         (patch: Partial<AttendanceSearchParams>) => {
             navigate({
-                to: Route.fullPath,
+                to: '/console/attendance-batches',
                 search: { from, to, name, type, ...patch },
                 replace: true,
             });

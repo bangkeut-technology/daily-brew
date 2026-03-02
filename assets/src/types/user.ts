@@ -1,15 +1,26 @@
+import { Locale } from '@/types/locale';
+
 export type User = {
     id: number;
     publicId: string;
-    avatarUrl?: string;
+    email: string;
+    emailCanonical: string;
     firstName: string;
     lastName: string;
-    email: string;
-    canonicalEmail: string;
+    enabled: boolean;
+    dob?: string;
+    avatarUrl?: string;
     roles: string[];
-    locale: string;
+    locale: Locale;
     fullName: string;
+    authentications: {
+        password: boolean;
+        google: boolean;
+        apple: boolean;
+    };
 };
+
+export type UpdateUser = Pick<User, 'firstName' | 'lastName'>;
 
 export type PartialUser = Pick<User, 'firstName' | 'lastName' | 'email'> & {
     dob: Date | null;
@@ -33,6 +44,9 @@ export type SignUp = {
 };
 
 export type ChangePassword = {
-    password: string;
-    confirmPassword: string;
+    currentPassword?: string;
+    plainPassword: {
+        first: string;
+        second: string;
+    };
 };

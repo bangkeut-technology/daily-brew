@@ -26,6 +26,13 @@ export const authenticationReducer = (
                 workspace: workspace,
             };
         }
+        case 'UPDATE_USER': {
+            const { user } = action;
+            return {
+                ...state,
+                user: user,
+            };
+        }
         case 'SIGN_OUT':
             return {
                 ...state,

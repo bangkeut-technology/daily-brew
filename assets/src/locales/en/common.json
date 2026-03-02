@@ -10,6 +10,9 @@
     "attendance_type": "Attendance Status",
     "unknown_user": "Unknown User",
     "account": "Account",
+    "profile": "Profile",
+    "connections": "Connections",
+    "security": "Security",
     "attendance_types": {
         "absent": "Absent",
         "closure": "Closure",

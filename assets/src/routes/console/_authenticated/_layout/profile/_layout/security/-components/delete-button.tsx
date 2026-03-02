@@ -15,7 +15,7 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from '@/components/ui/form';
-import { TextField } from '@/components/text-field';
+import { TextField } from '@/components/field/text-field';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteUser } from '@/services/user';
 import { errorHandler } from '@/lib/utils';

@@ -27,7 +27,7 @@ function AttendanceListPage() {
     const onChange = React.useCallback(
         (patch: Partial<AttendanceSearchParams>) => {
             navigate({
-                to: Route.fullPath,
+                to: '/console/attendances',
                 search: { from, to, employee, type, ...patch },
                 replace: true,
             });

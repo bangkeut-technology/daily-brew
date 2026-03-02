@@ -19,7 +19,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
-import { TextField } from '@/components/text-field';
+import { TextField } from '@/components/field/text-field';
 import { useTranslation } from 'react-i18next';
 import { Pencil, User2 } from 'lucide-react';
 import { toast } from 'sonner';

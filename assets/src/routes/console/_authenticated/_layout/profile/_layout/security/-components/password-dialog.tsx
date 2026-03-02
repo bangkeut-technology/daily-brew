@@ -13,7 +13,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from '@/components/ui/form';
-import { TextField } from '@/components/text-field';
+import { TextField } from '@/components/field/text-field';
 import { Loader2 } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { changePassword } from '@/services/user';

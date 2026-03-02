@@ -14,6 +14,7 @@ export interface AuthenticationState {
 export type AuthenticationAction =
     | { type: 'SIGN_IN'; user: User }
     | { type: 'SET_WORKSPACE'; workspace: Workspace }
+    | { type: 'UPDATE_USER'; user: User }
     | { type: 'SIGN_OUT' };
 
 export const AuthenticationContextState = React.createContext<AuthenticationState>({

@@ -6,23 +6,17 @@ import { Separator } from '@/components/ui/separator';
 import { Link, ShieldCheck, Unlink } from 'lucide-react';
 import { AppleIcon } from '@/components/icons/apple-icon';
 import { GoogleIcon } from '@/components/icons/google-icon';
-import { LinkedinIcon } from '@/components/icons/linkedin-icon';
-import { FacebookIcon } from '@/components/icons/facebook-icon';
-import { MicrosoftIcon } from '@/components/icons/microsoft-icon';
 import { createFileRoute } from '@tanstack/react-router';
 import { useAuthenticationDispatch, useAuthenticationState } from '@/hooks/use-authentication';
 import { useMutation } from '@tanstack/react-query';
-import { Provider, ProviderKey } from '@/types/oauth';
 import { disconnectOAuth } from '@/services/user';
+import { Provider, ProviderKey } from '@/types/oauth';
 import { toast } from 'sonner';
 import { errorHandler } from '@/lib/utils';
 
 const PROVIDERS: Provider[] = [
     { key: 'apple', name: 'Apple', icon: <AppleIcon className="h-5 w-5" />, hide: false },
-    { key: 'facebook', name: 'Facebook', icon: <FacebookIcon className="h-5 w-5" />, hide: true },
     { key: 'google', name: 'Google', icon: <GoogleIcon className="h-5 w-5" />, hide: false },
-    { key: 'linkedin', name: 'LinkedIn', icon: <LinkedinIcon className="h-5 w-5" />, hide: false },
-    { key: 'microsoft', name: 'Microsoft', icon: <MicrosoftIcon className="h-5 w-5" />, hide: true },
 ];
 
 export const Route = createFileRoute('/console/_authenticated/_layout/profile/_layout/connections/')({
