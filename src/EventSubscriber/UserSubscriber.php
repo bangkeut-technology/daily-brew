@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber;
 
-use App\Entity\Workspace;
 use App\Entity\User;
 use App\Enum\WorkspaceRoleEnum;
-use App\Event\User\UserRegisteredEvent;
+use App\Event\User\UserSignedUpEvent;
 use App\Repository\WorkspaceRepository;
 use App\Repository\WorkspaceUserRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -32,7 +31,7 @@ readonly class UserSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            UserRegisteredEvent::class => 'onUserRegistered',
+            UserSignedUpEvent::class => 'onUserSignedUp',
         ];
     }
 
@@ -42,9 +41,9 @@ readonly class UserSubscriber implements EventSubscriberInterface
      * This method initializes settings with their default values for the newly registered user.
      * It creates and populates settings entities and persists them into the database.
      *
-     * @param UserRegisteredEvent $event The event object containing the user information.
+     * @param UserSignedUpEvent $event The event object containing the user information.
      */
-    public function onUserRegistered(UserRegisteredEvent $event): void
+    public function onUserSignedUp(UserSignedUpEvent $event): void
     {
         $user = $event->user;
 
