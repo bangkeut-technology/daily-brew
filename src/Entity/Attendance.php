@@ -74,6 +74,7 @@ class Attendance extends AbstractEntity
      * @var LeaveTypeEnum|null
      */
     #[ORM\Column(nullable: true, enumType: LeaveTypeEnum::class)]
+    #[Groups(['attendance:read'])]
     private ?LeaveTypeEnum $leaveType = null;
 
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
@@ -104,6 +105,7 @@ class Attendance extends AbstractEntity
 
     #[ORM\ManyToOne(inversedBy: 'attendances')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    #[Groups(['attendance:read'])]
     private ?Workspace $workspace = null;
 
     /**

@@ -62,6 +62,7 @@ class Employee extends AbstractEntity
 
     #[ORM\OneToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    #[Groups(['employee:read'])]
     private ?User $linkedUser = null;
 
     /**
