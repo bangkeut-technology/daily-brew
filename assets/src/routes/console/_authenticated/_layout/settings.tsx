@@ -1,7 +1,7 @@
 import React from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchSettings, updateSettings } from '@/services/setting';
+import { fetchSettings, updateSettings } from '@/services/workspace-setting';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { SettingType } from '@/types/setting';

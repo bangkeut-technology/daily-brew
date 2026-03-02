@@ -13,6 +13,8 @@
     "profile": "Profile",
     "connections": "Connections",
     "security": "Security",
+    "switch_workspace": "Switch Workspace",
+    "workspace": "Workspace",
     "attendance_types": {
         "absent": "Absent",
         "closure": "Closure",

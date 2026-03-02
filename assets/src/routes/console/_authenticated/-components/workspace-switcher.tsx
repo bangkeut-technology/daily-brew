@@ -16,7 +16,7 @@ import {
 import { useAuthenticationDispatch, useAuthenticationState } from '@/hooks/use-authentication';
 import { toast } from 'sonner';
 import { fetchWorkspaces, switchWorkspace } from '@/services/user';
-import { CreateWorkspaceDialog } from '@/routes/console/_authenticated/-create-workspace-dialog';
+import { CreateWorkspaceDialog } from '@/routes/console/_authenticated/-components/create-workspace-dialog';
 
 export function WorkspaceSwitcher() {
     const { workspace } = useAuthenticationState();

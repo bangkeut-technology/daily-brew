@@ -46,12 +46,12 @@ import { useTranslation } from 'react-i18next';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials, getUserFullName } from '@/lib/string';
-import { DemoPill } from '@/routes/console/_authenticated/-demo-pill';
+import { DemoPill } from '@/routes/console/_authenticated/-components/demo-pill';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { signOut } from '@/services/auth';
 import { toast } from 'sonner';
 import { Logo } from '@/components/logo';
-import { WorkspaceSwitcher } from '@/routes/console/_authenticated/-workspace-switcher';
+import { WorkspaceSwitcher } from '@/routes/console/_authenticated/-components/workspace-switcher';
 
 type NavItem = {
     key: string;
@@ -98,7 +98,7 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
-    const { workspace, user, demo } = useAuthenticationState();
+    const { user, demo } = useAuthenticationState();
     const dispatch = useAuthenticationDispatch();
     const { t } = useTranslation();
     const { pathname } = useLocation();
@@ -201,14 +201,29 @@ export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) =
                         <SidebarMenuButton
                             size="lg"
                             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                            asChild
                         >
-                            <div className="flex flex-col">
-                                <div className="flex items-center gap-2">
-                                    <Logo to="/console" />
-                                </div>
-                                <p className="text-xs text-muted-foreground">{workspace?.name}</p>
-                            </div>
-                            {demo && <DemoPill />}
+                            <Logo to="/console" />
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    {demo && (
+                        <SidebarMenuItem>
+                            <SidebarMenuButton
+                                size="lg"
+                                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                                asChild
+                            >
+                                <DemoPill />
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    )}
+
+                    <SidebarMenuItem>
+                        <SidebarMenuButton
+                            size="lg"
+                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                            asChild
+                        >
                             <WorkspaceSwitcher />
                         </SidebarMenuButton>
                     </SidebarMenuItem>
