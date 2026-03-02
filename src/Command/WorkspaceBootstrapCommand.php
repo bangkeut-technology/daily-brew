@@ -22,7 +22,6 @@ use App\Repository\AttendanceRepository;
 use App\Repository\EmployeeEvaluationRepository;
 use App\Repository\EmployeeRepository;
 use App\Repository\EvaluationCriteriaRepository;
-use App\Repository\EvaluationTemplateCriteriaRepository;
 use App\Repository\EvaluationTemplateRepository;
 use App\Repository\UserRepository;
 use App\Repository\WorkspaceRepository;
@@ -56,7 +55,6 @@ final class WorkspaceBootstrapCommand extends Command
         private readonly AttendanceBatchRepository            $attendanceBatchRepository,
         private readonly AttendanceRepository                 $attendanceRepository,
         private readonly EvaluationCriteriaRepository         $evaluationCriteriaRepository,
-        private readonly EvaluationTemplateCriteriaRepository $evaluationTemplateCriteriaRepository,
         private readonly EvaluationTemplateRepository         $evaluationTemplateRepository,
         private readonly EmployeeEvaluationRepository         $employeeEvaluationRepository,
     )
@@ -174,15 +172,6 @@ final class WorkspaceBootstrapCommand extends Command
                 $this->evaluationTemplateRepository->update($evaluationTemplate, false);
                 if ($index % $batchSize === 0) {
                     $this->evaluationTemplateRepository->flush();
-                }
-            }
-
-            $evaluationTemplateCriterias = $this->evaluationTemplateCriteriaRepository->findByUserWithoutWorkspace($user);
-            foreach ($evaluationTemplateCriterias as $index => $evaluationTemplateCriteria) {
-                $evaluationTemplateCriteria->setWorkspace($workspace);
-                $this->evaluationTemplateCriteriaRepository->update($evaluationTemplateCriteria, false);
-                if ($index % $batchSize === 0) {
-                    $this->evaluationTemplateCriteriaRepository->flush();
                 }
             }
 

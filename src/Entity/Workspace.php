@@ -9,8 +9,12 @@ use App\Repository\WorkspaceRepository;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Vich\UploaderBundle\Mapping\Attribute as Vich;
 
 /**
  * Class Workspace
@@ -20,6 +24,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
  */
 #[ORM\Entity(repositoryClass: WorkspaceRepository::class)]
 #[ORM\Table(name: 'daily_brew_workspaces')]
+#[Vich\Uploadable]
 class Workspace extends AbstractEntity
 {
     #[ORM\Column(length: 255, nullable: true)]
@@ -31,6 +36,49 @@ class Workspace extends AbstractEntity
 
     #[ORM\Column(nullable: true)]
     private ?DateTimeImmutable $deletedAt = null;
+
+    /**
+     * @var File|UploadedFile|null
+     */
+    #[Vich\UploadableField(
+        mapping: 'workspaces',
+        fileNameProperty: 'imageName',
+        size: 'fileSize',
+        mimeType: 'mimeType',
+        originalName: 'originalName',
+        dimensions: 'dimensions'
+    )]
+    private UploadedFile|File|null $imageFile = null;
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(name: 'image_name', type: Types::STRING, length: 255, nullable: true)]
+    private ?string $imageName = null;
+
+    /**
+     * @var int|null
+     */
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $fileSize = null;
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $originalName = null;
+
+    /**
+     * @var string|null
+     */
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $mimeType = null;
+
+    /**
+     * @var array<int, int>
+     */
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $dimensions = null;
 
     /**
      * @var Collection<int, WorkspaceUser>
@@ -69,12 +117,6 @@ class Workspace extends AbstractEntity
     private Collection $evaluationTemplates;
 
     /**
-     * @var Collection<int, EvaluationTemplateCriteria>
-     */
-    #[ORM\OneToMany(targetEntity: EvaluationTemplateCriteria::class, mappedBy: 'workspace')]
-    private Collection $evaluationTemplateCriterias;
-
-    /**
      * @var Collection<int, EmployeeEvaluation>
      */
     #[ORM\OneToMany(targetEntity: EmployeeEvaluation::class, mappedBy: 'workspace')]
@@ -95,7 +137,6 @@ class Workspace extends AbstractEntity
         $this->attendances = new ArrayCollection();
         $this->evaluationCriterias = new ArrayCollection();
         $this->evaluationTemplates = new ArrayCollection();
-        $this->evaluationTemplateCriterias = new ArrayCollection();
         $this->employeeEvaluations = new ArrayCollection();
     }
 
@@ -316,36 +357,6 @@ class Workspace extends AbstractEntity
     }
 
     /**
-     * @return Collection<int, EvaluationTemplateCriteria>
-     */
-    public function getEvaluationTemplateCriterias(): Collection
-    {
-        return $this->evaluationTemplateCriterias;
-    }
-
-    public function addEvaluationTemplateCriteria(EvaluationTemplateCriteria $evaluationTemplateCriteria): static
-    {
-        if (!$this->evaluationTemplateCriterias->contains($evaluationTemplateCriteria)) {
-            $this->evaluationTemplateCriterias->add($evaluationTemplateCriteria);
-            $evaluationTemplateCriteria->setWorkspace($this);
-        }
-
-        return $this;
-    }
-
-    public function removeEvaluationTemplateCriteria(EvaluationTemplateCriteria $evaluationTemplateCriteria): static
-    {
-        if ($this->evaluationTemplateCriterias->removeElement($evaluationTemplateCriteria)) {
-            // set the owning side to null (unless already changed)
-            if ($evaluationTemplateCriteria->getWorkspace() === $this) {
-                $evaluationTemplateCriteria->setWorkspace(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, EmployeeEvaluation>
      */
     public function getEmployeeEvaluations(): Collection
@@ -420,6 +431,125 @@ class Workspace extends AbstractEntity
     public function setDeletedAt(?DateTimeImmutable $deletedAt): Workspace
     {
         $this->deletedAt = $deletedAt;
+        return $this;
+    }
+
+    /**
+     * @return File|UploadedFile|null
+     */
+    public function getImageFile(): File|UploadedFile|null
+    {
+        return $this->imageFile;
+    }
+
+    /**
+     * @param File|UploadedFile|null $imageFile
+     *
+     * @return Workspace
+     */
+    public function setImageFile(File|UploadedFile|null $imageFile): static
+    {
+        $this->imageFile = $imageFile;
+
+        if (null !== $imageFile) {
+            $this->updatedAt = new DateTimeImmutable();
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getImageName(): ?string
+    {
+        return $this->imageName;
+    }
+
+    /**
+     * @param string|null $imageName
+     *
+     * @return Workspace
+     */
+    public function setImageName(?string $imageName): Workspace
+    {
+        $this->imageName = $imageName;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getFileSize(): ?int
+    {
+        return $this->fileSize;
+    }
+
+    /**
+     * @param int|null $fileSize
+     *
+     * @return Workspace
+     */
+    public function setFileSize(?int $fileSize): Workspace
+    {
+        $this->fileSize = $fileSize;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getOriginalName(): ?string
+    {
+        return $this->originalName;
+    }
+
+    /**
+     * @param string|null $originalName
+     *
+     * @return Workspace
+     */
+    public function setOriginalName(?string $originalName): Workspace
+    {
+        $this->originalName = $originalName;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getMimeType(): ?string
+    {
+        return $this->mimeType;
+    }
+
+    /**
+     * @param string|null $mimeType
+     *
+     * @return Workspace
+     */
+    public function setMimeType(?string $mimeType): Workspace
+    {
+        $this->mimeType = $mimeType;
+        return $this;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getDimensions(): ?array
+    {
+        return $this->dimensions;
+    }
+
+    /**
+     * @param array|null $dimensions
+     *
+     * @return Workspace
+     */
+    public function setDimensions(?array $dimensions): Workspace
+    {
+        $this->dimensions = $dimensions;
         return $this;
     }
 }

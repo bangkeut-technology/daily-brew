@@ -71,25 +71,4 @@ class EvaluationTemplateCriteriaRepository extends AbstractRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
-
-    /**
-     * Finds evaluation template criteria records associated with a specific user that do not have a workspace assigned.
-     *
-     * This method constructs a query to retrieve evaluation template criteria records
-     * where the associated user matches the given user instance and the workspace is null.
-     *
-     * @param User $user The user entity whose evaluation template criteria records should be retrieved.
-     *
-     * @return EvaluationTemplateCriteria[] An array of EvaluationTemplateCriteria entities representing evaluation template criteria records without a workspace.
-     */
-    public function findByUserWithoutWorkspace(User $user): array
-    {
-        return $this->createQueryBuilder('et')
-            ->andWhere('et.user = :user')
-            ->andWhere('et.workspace IS NULL')
-            ->setParameter('user', $user)
-            ->orderBy('et.id', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
 }

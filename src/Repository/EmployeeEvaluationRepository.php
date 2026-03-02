@@ -293,7 +293,7 @@ class EmployeeEvaluationRepository extends AbstractRepository
     public function findByUserWithoutWorkspace(User $user): array
     {
         return $this->createQueryBuilder('ee')
-            ->andWhere('ee.user = :user')
+            ->andWhere('ee.evaluator = :user')
             ->andWhere('ee.workspace IS NULL')
             ->setParameter('user', $user)
             ->orderBy('ee.id', 'ASC')

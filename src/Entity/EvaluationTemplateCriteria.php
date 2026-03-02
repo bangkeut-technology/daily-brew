@@ -17,10 +17,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\Entity(repositoryClass: EvaluationTemplateCriteriaRepository::class)]
 class EvaluationTemplateCriteria extends AbstractEntity
 {
-    #[ORM\ManyToOne(inversedBy: 'evaluationTemplateCriterias')]
-    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
-    private ?Workspace $workspace = null;
-
     public function __construct(
         #[ORM\Column]
         #[Groups(['template_criteria:read'])]
@@ -47,6 +43,7 @@ class EvaluationTemplateCriteria extends AbstractEntity
 
     /**
      * @param int|null $weight
+     *
      * @return EvaluationTemplateCriteria
      */
     public function setWeight(?int $weight): EvaluationTemplateCriteria
@@ -65,6 +62,7 @@ class EvaluationTemplateCriteria extends AbstractEntity
 
     /**
      * @param EvaluationTemplate|null $template
+     *
      * @return EvaluationTemplateCriteria
      */
     public function setTemplate(?EvaluationTemplate $template): EvaluationTemplateCriteria
@@ -83,23 +81,12 @@ class EvaluationTemplateCriteria extends AbstractEntity
 
     /**
      * @param EvaluationCriteria|null $criteria
+     *
      * @return EvaluationTemplateCriteria
      */
     public function setCriteria(?EvaluationCriteria $criteria): EvaluationTemplateCriteria
     {
         $this->criteria = $criteria;
-        return $this;
-    }
-
-    public function getWorkspace(): ?Workspace
-    {
-        return $this->workspace;
-    }
-
-    public function setWorkspace(?Workspace $workspace): static
-    {
-        $this->workspace = $workspace;
-
         return $this;
     }
 }
