@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Employee;
-use App\Entity\Store;
 use App\Entity\User;
+use App\Entity\Workspace;
 use App\Enum\EmployeeStatusEnum;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -37,36 +37,36 @@ class EmployeeRepository extends AbstractRepository
     }
 
     /**
-     * Finds an Employee entity based on the provided store and user publicIds.
+     * Finds an Employee entity based on the provided workspace and user.
      *
-     * @param Store|int $store the store entity or its publicId
-     * @param User|int  $user  the user entity or its publicId
+     * @param Workspace|int $workspace the workspace entity or its id
+     * @param User|int      $user      the user entity or its id
      *
      * @return Employee|null returns the Employee entity if found, otherwise null
      */
-    public function findByStoreAndUser(Store|int $store, User|int $user): ?Employee
+    public function findByWorkspaceAndUser(Workspace|int $workspace, User|int $user): ?Employee
     {
         return $this->findOneBy([
-            'store' => $store,
+            'workspace' => $workspace,
             'user' => $user,
         ]);
     }
 
     /**
-     * Find employee by publicIds and store.
+     * Find employee by publicIds and workspace.
      *
-     * @param array $publicIds the list of employee publicIds
-     * @param Store $store     the store entity
+     * @param array     $publicIds the list of employee publicIds
+     * @param Workspace $workspace the workspace entity
      *
      * @return Employee[] returns the list of employee entities
      */
-    public function findByPublicIdsAndStore(array $publicIds, Store $store): array
+    public function findByPublicIdsAndWorkspace(array $publicIds, Workspace $workspace): array
     {
         return $this->createQueryBuilder('e')
             ->where('e.publicId IN (:publicIds)')
-            ->andWhere('e.store = :store')
+            ->andWhere('e.workspace = :workspace')
             ->setParameter('publicIds', $publicIds)
-            ->setParameter('store', $store)
+            ->setParameter('workspace', $workspace)
             ->getQuery()
             ->getResult();
     }
@@ -92,16 +92,16 @@ class EmployeeRepository extends AbstractRepository
     /**
      * Create a new employee entity.
      *
-     * @param User  $user  the user entity
-     * @param Store $store the store entity
+     * @param User      $user      the user entity
+     * @param Workspace $workspace the workspace entity
      *
      * @return Employee returns the created employee entity
      */
-    public function createEmployee(User $user, Store $store): Employee
+    public function createEmployee(User $user, Workspace $workspace): Employee
     {
         $employee = new Employee();
         $employee->setUser($user);
-        $employee->setStore($store);
+        $employee->setWorkspace($workspace);
 
         $this->update($employee);
 
@@ -109,18 +109,18 @@ class EmployeeRepository extends AbstractRepository
     }
 
     /**
-     * Find an employee by publicId and store.
+     * Find an employee by publicId and workspace.
      *
-     * @param string $publicId the employee publicId
-     * @param Store  $store    the store entity
+     * @param string    $publicId  the employee publicId
+     * @param Workspace $workspace the workspace entity
      *
      * @return Employee|null returns the employee entity if found, otherwise null
      */
-    public function findByPublicIdAndStore(string $publicId, Store $store): ?Employee
+    public function findByPublicIdAndWorkspace(string $publicId, Workspace $workspace): ?Employee
     {
         return $this->findOneBy([
             'publicId' => $publicId,
-            'store' => $store,
+            'workspace' => $workspace,
         ]);
     }
 
@@ -134,8 +134,6 @@ class EmployeeRepository extends AbstractRepository
     public function findByUser(User $user): array
     {
         return $this->createQueryBuilder('e')
-            ->select('e, s')
-            ->leftJoin('e.store', 's')
             ->where('e.user = :user')
             ->setParameter('user', $user)
             ->getQuery()

@@ -73,10 +73,6 @@ class AttendanceBatch extends AbstractEntity
     #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     private ?Workspace $workspace = null;
 
-    #[ORM\ManyToOne(inversedBy: 'attendanceBatches')]
-    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
-    private ?Store $store = null;
-
     public function __construct()
     {
         $this->attendances = new ArrayCollection();
@@ -309,18 +305,6 @@ class AttendanceBatch extends AbstractEntity
     public function setWorkspace(?Workspace $workspace): static
     {
         $this->workspace = $workspace;
-
-        return $this;
-    }
-
-    public function getStore(): ?Store
-    {
-        return $this->store;
-    }
-
-    public function setStore(?Store $store): static
-    {
-        $this->store = $store;
 
         return $this;
     }

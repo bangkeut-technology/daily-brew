@@ -24,7 +24,6 @@ use App\Repository\EmployeeRepository;
 use App\Repository\EvaluationCriteriaRepository;
 use App\Repository\EvaluationTemplateCriteriaRepository;
 use App\Repository\EvaluationTemplateRepository;
-use App\Repository\StoreRepository;
 use App\Repository\UserRepository;
 use App\Repository\WorkspaceRepository;
 use App\Repository\WorkspaceUserRepository;
@@ -60,7 +59,6 @@ final class WorkspaceBootstrapCommand extends Command
         private readonly EvaluationTemplateCriteriaRepository $evaluationTemplateCriteriaRepository,
         private readonly EvaluationTemplateRepository         $evaluationTemplateRepository,
         private readonly EmployeeEvaluationRepository         $employeeEvaluationRepository,
-        private readonly StoreRepository                      $storeRepository,
     )
     {
         parent::__construct();
@@ -125,14 +123,6 @@ final class WorkspaceBootstrapCommand extends Command
             $this->workspaceRepository->update($workspace, false);
             $this->workspaceUserRepository->update($workspaceUser, false);
 
-            $stores = $this->storeRepository->findByUserWithoutWorkspace($user);
-            foreach ($stores as $index => $store) {
-                $store->setWorkspace($workspace);
-                $this->storeRepository->update($store, false);
-                if ($index % $batchSize === 0) {
-                    $this->storeRepository->flush();
-                }
-            }
             $employees = $this->employeeRepository->findByUserWithoutWorkspace($user);
             foreach ($employees as $index => $employee) {
                 $employee->setWorkspace($workspace);

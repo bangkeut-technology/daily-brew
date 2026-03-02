@@ -31,6 +31,12 @@ abstract class AbstractEntity
         'employee:read',
         'employee_evaluation:read',
         'employee_score:read',
+        'workspace_allowed_ip:read',
+        'employee_salary:read',
+        'payroll_run:read',
+        'payslip:read',
+        'payslip_item:read',
+        'workspace_user_rating:read',
     ])]
     public ?int $id = null {
         get {
@@ -48,6 +54,12 @@ abstract class AbstractEntity
         'employee:read',
         'employee_evaluation:read',
         'employee_score:read',
+        'workspace_allowed_ip:read',
+        'employee_salary:read',
+        'payroll_run:read',
+        'payslip:read',
+        'payslip_item:read',
+        'workspace_user_rating:read',
     ])]
     public ?string $publicId = null {
         get {
@@ -65,6 +77,12 @@ abstract class AbstractEntity
         'employee:read',
         'employee_evaluation:read',
         'employee_score:read',
+        'workspace_allowed_ip:read',
+        'employee_salary:read',
+        'payroll_run:read',
+        'payslip:read',
+        'payslip_item:read',
+        'workspace_user_rating:read',
     ])]
     protected ?DateTimeImmutable $createdAt = null;
 
@@ -78,6 +96,12 @@ abstract class AbstractEntity
         'employee:read',
         'employee_evaluation:read',
         'employee_score:read',
+        'workspace_allowed_ip:read',
+        'employee_salary:read',
+        'payroll_run:read',
+        'payslip:read',
+        'payslip_item:read',
+        'workspace_user_rating:read',
     ])]
     protected ?DateTimeImmutable $updatedAt = null;
 

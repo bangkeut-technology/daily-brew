@@ -37,12 +37,6 @@ class Workspace extends AbstractEntity
     private Collection $users;
 
     /**
-     * @var Collection<int, Store>
-     */
-    #[ORM\OneToMany(targetEntity: Store::class, mappedBy: 'workspace')]
-    private Collection $stores;
-
-    /**
      * @var Collection<int, Employee>
      */
     #[ORM\OneToMany(targetEntity: Employee::class, mappedBy: 'workspace')]
@@ -84,11 +78,17 @@ class Workspace extends AbstractEntity
     #[ORM\OneToMany(targetEntity: EmployeeEvaluation::class, mappedBy: 'workspace')]
     private Collection $employeeEvaluations;
 
+    /**
+     * @var Collection<int, WorkspaceAllowedIp>
+     */
+    #[ORM\OneToMany(targetEntity: WorkspaceAllowedIp::class, mappedBy: 'workspace', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $allowedIps;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
-        $this->stores = new ArrayCollection();
         $this->employees = new ArrayCollection();
+        $this->allowedIps = new ArrayCollection();
         $this->attendanceBatches = new ArrayCollection();
         $this->attendances = new ArrayCollection();
         $this->evaluationCriterias = new ArrayCollection();
@@ -157,36 +157,6 @@ class Workspace extends AbstractEntity
             // set the owning side to null (unless already changed)
             if ($user->getWorkspace() === $this) {
                 $user->setWorkspace(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Store>
-     */
-    public function getStores(): Collection
-    {
-        return $this->stores;
-    }
-
-    public function addStore(Store $store): static
-    {
-        if (!$this->stores->contains($store)) {
-            $this->stores->add($store);
-            $store->setWorkspace($this);
-        }
-
-        return $this;
-    }
-
-    public function removeStore(Store $store): static
-    {
-        if ($this->stores->removeElement($store)) {
-            // set the owning side to null (unless already changed)
-            if ($store->getWorkspace() === $this) {
-                $store->setWorkspace(null);
             }
         }
 
@@ -397,6 +367,35 @@ class Workspace extends AbstractEntity
             // set the owning side to null (unless already changed)
             if ($employeeEvaluation->getWorkspace() === $this) {
                 $employeeEvaluation->setWorkspace(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, WorkspaceAllowedIp>
+     */
+    public function getAllowedIps(): Collection
+    {
+        return $this->allowedIps;
+    }
+
+    public function addAllowedIp(WorkspaceAllowedIp $allowedIp): static
+    {
+        if (!$this->allowedIps->contains($allowedIp)) {
+            $this->allowedIps->add($allowedIp);
+            $allowedIp->setWorkspace($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAllowedIp(WorkspaceAllowedIp $allowedIp): static
+    {
+        if ($this->allowedIps->removeElement($allowedIp)) {
+            if ($allowedIp->getWorkspace() === $this) {
+                $allowedIp->setWorkspace(null);
             }
         }
 

@@ -15,7 +15,6 @@ use App\Form\ChangePasswordFormType;
 use App\Form\ImageProfileFormType;
 use App\Form\UserFormType;
 use App\Repository\EmployeeRepository;
-use App\Repository\StoreRepository;
 use App\Repository\UserRepository;
 use App\Repository\WorkspaceUserRepository;
 use App\Service\AccountDeletionService;
@@ -46,7 +45,6 @@ class UserController extends AbstractController
      *
      * @param TranslatorInterface     $translator              the translator component
      * @param UserRepository          $userRepository          the repository for user data
-     * @param StoreRepository         $storeRepository         the repository for store data
      * @param EmployeeRepository      $employeeRepository      the repository for employee data
      * @param WorkspaceUserRepository $workspaceUserRepository the repository for workspace user data
      * @param WorkspaceDTOFactory     $workspaceDTOFactory     the factory for workspace DTOs
@@ -55,7 +53,6 @@ class UserController extends AbstractController
     public function __construct(
         TranslatorInterface                      $translator,
         private readonly UserRepository          $userRepository,
-        private readonly StoreRepository         $storeRepository,
         private readonly EmployeeRepository      $employeeRepository,
         private readonly WorkspaceUserRepository $workspaceUserRepository,
         private readonly WorkspaceDTOFactory     $workspaceDTOFactory,

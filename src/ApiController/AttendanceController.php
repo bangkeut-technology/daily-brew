@@ -12,6 +12,7 @@ use App\Enum\AttendanceTypeEnum;
 use App\Event\Attendance\RebalanceLeaveCycleEvent;
 use App\Form\AttendanceFormType;
 use App\Repository\AttendanceRepository;
+use App\Repository\WorkspaceAllowedIpRepository;
 use App\Util\DateHelper;
 use DateMalformedStringException;
 use DateTimeImmutable;
@@ -38,9 +39,10 @@ class AttendanceController extends AbstractController
     use AttendanceTrait;
 
     public function __construct(
-        TranslatorInterface                       $translator,
-        private readonly AttendanceRepository     $attendanceRepository,
-        private readonly EventDispatcherInterface $eventDispatcher
+        TranslatorInterface                            $translator,
+        private readonly AttendanceRepository          $attendanceRepository,
+        private readonly WorkspaceAllowedIpRepository  $allowedIpRepository,
+        private readonly EventDispatcherInterface      $eventDispatcher
     )
     {
         parent::__construct($translator);
@@ -218,8 +220,23 @@ class AttendanceController extends AbstractController
         $form->submit($request->getPayload()->all());
         if ($form->isSubmitted() && $form->isValid()) {
             $user  = $this->getUser();
+            $workspace = $user->getCurrentWorkspace();
             $attendance->setUser($user);
-            $attendance->setWorkspace($user->getCurrentWorkspace());
+            $attendance->setWorkspace($workspace);
+
+            if (null !== $workspace) {
+                $activeIps = $this->allowedIpRepository->findActiveByWorkspace($workspace);
+                if (!empty($activeIps)) {
+                    $clientIp = $request->getClientIp();
+                    $allowed = array_filter($activeIps, fn($entry) => $entry->getIp() === $clientIp);
+                    if (empty($allowed)) {
+                        return $this->json(
+                            ['message' => $this->translator->trans('attendance.ip_not_allowed', domain: 'errors')],
+                            Response::HTTP_FORBIDDEN
+                        );
+                    }
+                }
+            }
 
             $exists = $this->attendanceRepository->existsForEmployeeOnDay($attendance->getEmployee(), $attendance->getAttendanceDate());
             if ($exists) {

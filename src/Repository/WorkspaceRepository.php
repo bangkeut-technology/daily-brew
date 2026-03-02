@@ -56,23 +56,7 @@ class WorkspaceRepository extends AbstractRepository
     {
         $em = $this->getEntityManager();
 
-        // 1) From Store (strongest signal)
-        $w = $em->createQueryBuilder()
-            ->select('w')
-            ->from(Workspace::class, 'w')
-            ->innerJoin('w.stores', 's')
-            ->andWhere('s.user = :user')
-            ->andWhere('w.deletedAt IS NULL')
-            ->setParameter('user', $user)
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
-
-        if ($w instanceof Workspace) {
-            return $w;
-        }
-
-        // 2) From EvaluationTemplate
+        // 1) From EvaluationTemplate
         $w = $em->createQueryBuilder()
             ->select('w')
             ->from(Workspace::class, 'w')
@@ -88,7 +72,7 @@ class WorkspaceRepository extends AbstractRepository
             return $w;
         }
 
-        // 3) From EvaluationCriteria
+        // 2) From EvaluationCriteria
         $w = $em->createQueryBuilder()
             ->select('w')
             ->from(Workspace::class, 'w')

@@ -36,10 +36,7 @@ use Vich\UploaderBundle\Mapping\Attribute as Vich;
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL_CANONICAL', fields: ['emailCanonical'])]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL_SECRET', fields: ['secret'])]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_APPLE_ID', fields: ['appleId'])]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_FACEBOOK_ID', fields: ['facebookId'])]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_GOOGLE_ID', fields: ['googleId'])]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_MICROSOFT_ID', fields: ['microsoftId'])]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_LINKEDIN_ID', fields: ['linkedInId'])]
 #[UniqueEntity(fields: ['emailCanonical'], message: 'There is already a workspace with this emailCanonical')]
 #[Vich\Uploadable]
 #[ORM\HasLifecycleCallbacks]
@@ -228,12 +225,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     private Collection $criterias;
 
     /**
-     * @var Collection<int, Store>
-     */
-    #[ORM\OneToMany(targetEntity: Store::class, mappedBy: 'user', cascade: ['persist', 'remove'], orphanRemoval: true)]
-    private Collection $stores;
-
-    /**
      * @var Collection<int, EvaluationTemplate>
      */
     #[ORM\OneToMany(targetEntity: EvaluationTemplate::class, mappedBy: 'user', cascade: ['persist', 'remove'], orphanRemoval: true)]
@@ -264,7 +255,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     public function __construct()
     {
         $this->criterias = new ArrayCollection();
-        $this->stores = new ArrayCollection();
         $this->templates = new ArrayCollection();
         $this->employeeRoles = new ArrayCollection();
         $this->workspaces = new ArrayCollection();
@@ -798,43 +788,6 @@ class User extends AbstractEntity implements UserInterface, PasswordAuthenticate
     {
         if ($this->criterias->removeElement($criteria) && $criteria->getUser() === $this) {
             $criteria->setUser(null);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Store>
-     */
-    public function getStores(): Collection
-    {
-        return $this->stores;
-    }
-
-    /**
-     * @param Collection<int, Store> $stores
-     * @return User
-     */
-    public function setStores(Collection $stores): User
-    {
-        $this->stores = $stores;
-        return $this;
-    }
-
-    public function addStore(Store $store): User
-    {
-        if (!$this->stores->contains($store)) {
-            $this->stores->add($store);
-            $store->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeStore(Store $store): User
-    {
-        if ($this->stores->removeElement($store) && $store->getUser() === $this) {
-            $store->setUser(null);
         }
 
         return $this;

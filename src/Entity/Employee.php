@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+
 /**
  * Class Employee.
  *
@@ -53,11 +54,6 @@ class Employee extends AbstractEntity
 
     #[Groups(['employee:read'])]
     public float $averageScore = 0;
-
-    #[ORM\ManyToOne(targetEntity: Store::class, inversedBy: 'employees')]
-    #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['employee:read'])]
-    private ?Store $store = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
@@ -176,22 +172,6 @@ class Employee extends AbstractEntity
     public function setStatus(EmployeeStatusEnum $status): Employee
     {
         $this->status = $status;
-
-        return $this;
-    }
-
-    public function getStore(): ?Store
-    {
-        return $this->store;
-    }
-
-    public function setStore(?Store $store): Employee
-    {
-        $this->store = $store;
-
-        if ($store !== null) {
-            $this->workspace = $store->getWorkspace();
-        }
 
         return $this;
     }

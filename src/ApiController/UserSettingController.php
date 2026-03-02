@@ -7,7 +7,6 @@ use App\ApiController\Trait\SettingTrait;
 use App\Controller\AbstractController;
 use App\Entity\UserSetting;
 use App\Repository\UserSettingRepository;
-use App\Repository\StoreRepository;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -33,12 +32,10 @@ class UserSettingController extends AbstractController
      *
      * @param TranslatorInterface   $translator        The translator service
      * @param UserSettingRepository $settingRepository The setting repository
-     * @param StoreRepository       $storeRepository   The store repository
      */
     public function __construct(
         TranslatorInterface                    $translator,
         private readonly UserSettingRepository $settingRepository,
-        private readonly StoreRepository       $storeRepository
     )
     {
         parent::__construct($translator);
