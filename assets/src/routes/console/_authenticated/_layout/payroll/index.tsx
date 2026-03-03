@@ -199,7 +199,7 @@ function PayrollRunRow({ run, workspacePublicId }: { run: PayrollRun; workspaceP
             </div>
             <div className="flex items-center gap-2">
                 <Button asChild variant="outline" size="sm">
-                    <Link to="/console/payroll/$runPublicId" params={{ runPublicId: run.publicId }}>
+                    <Link to="/console/payroll/$publicId" params={{ publicId: run.publicId }}>
                         {t('view')}
                     </Link>
                 </Button>
@@ -208,7 +208,7 @@ function PayrollRunRow({ run, workspacePublicId }: { run: PayrollRun; workspaceP
                         variant="outline"
                         size="sm"
                         disabled={isFinalizing}
-                        onClick={() => finalize({ workspacePublicId, runPublicId: run.publicId })}
+                        onClick={() => finalize({ workspacePublicId, publicId: run.publicId })}
                     >
                         <BadgeCheck className="h-4 w-4" />
                         {t('payroll.finalize', { ns: 'glossary', defaultValue: 'Finalize' })}
@@ -219,7 +219,7 @@ function PayrollRunRow({ run, workspacePublicId }: { run: PayrollRun; workspaceP
                         variant="destructive"
                         size="sm"
                         disabled={isDeleting}
-                        onClick={() => remove({ workspacePublicId, runPublicId: run.publicId })}
+                        onClick={() => remove({ workspacePublicId, publicId: run.publicId })}
                     >
                         <Trash2 className="h-4 w-4" />
                     </Button>

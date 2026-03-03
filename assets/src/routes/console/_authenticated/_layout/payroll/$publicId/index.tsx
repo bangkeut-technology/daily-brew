@@ -25,7 +25,7 @@ import {
 } from '@/types/payroll';
 import { DISPLAY_DATE_FORMAT } from '@/constants/date';
 
-export const Route = createFileRoute('/console/_authenticated/_layout/payroll/$runPublicId/')({
+export const Route = createFileRoute('/console/_authenticated/_layout/payroll/$publicId/')({
     component: PayrollRunDetailPage,
 });
 
@@ -45,12 +45,12 @@ function PayslipStatusBadge({ status }: { status: PayslipStatusEnum }) {
 
 function AddPayslipItemDialog({
     workspacePublicId,
-    runPublicId,
+    publicId,
     slip,
     onDone,
 }: {
     workspacePublicId: string;
-    runPublicId: string;
+    publicId: string;
     slip: Payslip;
     onDone: () => void;
 }) {
@@ -78,7 +78,7 @@ function AddPayslipItemDialog({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        mutate({ workspacePublicId, runPublicId, slipPublicId: slip.publicId, data: form });
+        mutate({ workspacePublicId, publicId, slipPublicId: slip.publicId, data: form });
     };
 
     return (
@@ -192,7 +192,7 @@ function PayslipCard({
                         {isDraft && (
                             <AddPayslipItemDialog
                                 workspacePublicId={workspacePublicId}
-                                runPublicId={run.publicId}
+                                publicId={run.publicId}
                                 slip={slip}
                                 onDone={onRefresh}
                             />
@@ -204,7 +204,7 @@ function PayslipCard({
                                 onClick={() =>
                                     pay({
                                         workspacePublicId,
-                                        runPublicId: run.publicId,
+                                        publicId: run.publicId,
                                         slipPublicId: slip.publicId,
                                     })
                                 }
@@ -299,7 +299,7 @@ function PayslipCard({
                                             onClick={() =>
                                                 removeItem({
                                                     workspacePublicId,
-                                                    runPublicId: run.publicId,
+                                                    publicId: run.publicId,
                                                     slipPublicId: slip.publicId,
                                                     itemPublicId: item.publicId,
                                                 })
@@ -321,14 +321,14 @@ function PayslipCard({
 }
 
 function PayrollRunDetailPage() {
-    const { runPublicId } = Route.useParams();
+    const { publicId } = Route.useParams();
     const { workspace } = useAuthenticationState();
     const { t } = useTranslation();
     const queryClient = useQueryClient();
 
     const queryKey = React.useMemo(
-        () => ['payroll-run', workspace?.publicId, runPublicId],
-        [workspace?.publicId, runPublicId],
+        () => ['payroll-run', workspace?.publicId, publicId],
+        [workspace?.publicId, publicId],
     );
 
     const { data: run, isLoading } = useQuery({
@@ -336,7 +336,7 @@ function PayrollRunDetailPage() {
         queryFn: () =>
             fetchPayrollRun({
                 workspacePublicId: workspace!.publicId,
-                runPublicId,
+                publicId,
             }),
         enabled: !!workspace,
     });
@@ -397,7 +397,7 @@ function PayrollRunDetailPage() {
                             onClick={() =>
                                 finalize({
                                     workspacePublicId: workspace!.publicId,
-                                    runPublicId: run.publicId,
+                                    publicId: run.publicId,
                                 })
                             }
                         >

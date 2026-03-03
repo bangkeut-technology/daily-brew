@@ -7,80 +7,72 @@ export const fetchPayrollRuns = (workspacePublicId: string) =>
 export const createPayrollRun = ({ workspacePublicId, period }: { workspacePublicId: string; period: string }) =>
     apiAxios.post<PayrollRun>(`/workspaces/${workspacePublicId}/payroll`, { period }).then((response) => response.data);
 
-export const fetchPayrollRun = ({
-    workspacePublicId,
-    runPublicId,
-}: {
-    workspacePublicId: string;
-    runPublicId: string;
-}) =>
-    apiAxios
-        .get<PayrollRun>(`/workspaces/${workspacePublicId}/payroll/${runPublicId}`)
-        .then((response) => response.data);
+export const fetchPayrollRun = ({ workspacePublicId, publicId }: { workspacePublicId: string; publicId: string }) =>
+    apiAxios.get<PayrollRun>(`/workspaces/${workspacePublicId}/payroll/${publicId}`).then((response) => response.data);
 
 export const finalizePayrollRun = ({
     workspacePublicId,
-    runPublicId,
+    publicId,
 }: {
     workspacePublicId: string;
-    runPublicId: string;
+    publicId: string;
 }) =>
     apiAxios
-        .post<{ message: string }>(`/workspaces/${workspacePublicId}/payroll/${runPublicId}/finalize`)
+        .post<{ message: string }>(`/workspaces/${workspacePublicId}/payroll/${publicId}/finalize`)
         .then((response) => response.data);
 
 export const deletePayrollRun = ({
     workspacePublicId,
-    runPublicId,
+    publicId,
 }: {
     workspacePublicId: string;
-    runPublicId: string;
+    publicId: string;
 }) =>
     apiAxios
-        .delete<{ message: string }>(`/workspaces/${workspacePublicId}/payroll/${runPublicId}`)
+        .delete<{ message: string }>(`/workspaces/${workspacePublicId}/payroll/${publicId}`)
         .then((response) => response.data);
 
 export const addPayslipItem = ({
     workspacePublicId,
-    runPublicId,
+    publicId,
     slipPublicId,
     data,
 }: {
     workspacePublicId: string;
-    runPublicId: string;
+    publicId: string;
     slipPublicId: string;
     data: PartialPayslipItem;
 }) =>
     apiAxios
-        .post<Payslip>(`/workspaces/${workspacePublicId}/payroll/${runPublicId}/payslips/${slipPublicId}/items`, data)
+        .post<Payslip>(`/workspaces/${workspacePublicId}/payroll/${publicId}/payslips/${slipPublicId}/items`, data)
         .then((response) => response.data);
 
 export const deletePayslipItem = ({
     workspacePublicId,
-    runPublicId,
+    publicId,
     slipPublicId,
     itemPublicId,
 }: {
     workspacePublicId: string;
-    runPublicId: string;
+    publicId: string;
     slipPublicId: string;
     itemPublicId: string;
 }) =>
     apiAxios
         .delete<{
             message: string;
-        }>(`/workspaces/${workspacePublicId}/payroll/${runPublicId}/payslips/${slipPublicId}/items/${itemPublicId}`)
+        }>(`/workspaces/${workspacePublicId}/payroll/${publicId}/payslips/${slipPublicId}/items/${itemPublicId}`)
         .then((response) => response.data);
 
 export const payPayslip = ({
     workspacePublicId,
-    runPublicId,
+    publicId,
     slipPublicId,
 }: {
     workspacePublicId: string;
-    runPublicId: string;
+    publicId: string;
     slipPublicId: string;
 }) =>
     apiAxios
-        .post<Payslip>(`/workspaces/${workspacePublicId}/payroll/${runPublicId}/payslips/${slipPublicId}/pay`)
+        .post<Payslip>(`/workspaces/${workspacePublicId}/payroll/${publicId}/payslips/${slipPublicId}/pay`)
         .then((response) => response.data);
