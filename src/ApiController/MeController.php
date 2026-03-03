@@ -14,6 +14,7 @@ use App\Repository\AttendanceRepository;
 use App\Repository\EmployeeEvaluationRepository;
 use App\Repository\EmployeeRepository;
 use App\Repository\LeaveRequestRepository;
+use App\Repository\WorkspaceAllowedIpRepository;
 use App\Service\LeaveRequestService;
 use App\Service\ShiftAttendanceService;
 use DateTimeImmutable;
@@ -40,6 +41,7 @@ class MeController extends AbstractController
         private readonly AttendanceRepository         $attendanceRepository,
         private readonly EmployeeEvaluationRepository $evaluationRepository,
         private readonly LeaveRequestRepository       $leaveRequestRepository,
+        private readonly WorkspaceAllowedIpRepository $allowedIpRepository,
         private readonly ShiftAttendanceService       $shiftAttendanceService,
     )
     {
@@ -62,9 +64,14 @@ class MeController extends AbstractController
     }
 
     #[Route('/attendance/check-in', name: 'attendance_check_in', methods: ['POST'])]
-    public function checkIn(): JsonResponse
+    public function checkIn(Request $request): JsonResponse
     {
         $employee = $this->resolveEmployee();
+
+        if ($blocked = $this->checkIpRestriction($request, $employee->getWorkspace())) {
+            return $blocked;
+        }
+
         $today = new DateTimeImmutable('today');
 
         if ($this->attendanceRepository->existsForEmployeeOnDay($employee, $today)) {
@@ -87,9 +94,14 @@ class MeController extends AbstractController
     }
 
     #[Route('/attendance/check-out', name: 'attendance_check_out', methods: ['POST'])]
-    public function checkOut(): JsonResponse
+    public function checkOut(Request $request): JsonResponse
     {
         $employee = $this->resolveEmployee();
+
+        if ($blocked = $this->checkIpRestriction($request, $employee->getWorkspace())) {
+            return $blocked;
+        }
+
         $today = new DateTimeImmutable('today');
 
         $attendance = $this->attendanceRepository->findOneBy([
@@ -185,6 +197,28 @@ class MeController extends AbstractController
     }
 
     // ── Helper ───────────────────────────────────────────────────────────────
+
+    private function checkIpRestriction(Request $request, \App\Entity\Workspace $workspace): ?JsonResponse
+    {
+        $allowedIps = $this->allowedIpRepository->findActiveByWorkspace($workspace);
+
+        if (empty($allowedIps)) {
+            return null;
+        }
+
+        $clientIp = $request->getClientIp();
+
+        foreach ($allowedIps as $allowedIp) {
+            if ($allowedIp->getIp() === $clientIp) {
+                return null;
+            }
+        }
+
+        return $this->json(
+            ['message' => 'Attendance check-in/out is not allowed from your current network.'],
+            Response::HTTP_FORBIDDEN,
+        );
+    }
 
     private function resolveEmployee(): \App\Entity\Employee
     {

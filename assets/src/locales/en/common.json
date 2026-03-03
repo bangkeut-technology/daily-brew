@@ -1,6 +1,7 @@
 {
     "actions": "Actions",
     "active": "Active",
+    "allowed_ips": "Allowed IPs",
     "add": "Add",
     "amount": "Amount",
     "create": "Create",

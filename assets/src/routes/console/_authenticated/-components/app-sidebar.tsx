@@ -30,6 +30,7 @@ import {
     ListTodo,
     LogOut,
     SettingsIcon,
+    Shield,
     UserPlus,
     Users,
 } from 'lucide-react';
@@ -103,6 +104,7 @@ const NAV_ITEMS: NavItem[] = [
             { key: 'criterias', url: '/console/manage/criterias', icon: ClipboardList },
             { key: 'roles', url: '/console/manage/roles', icon: Briefcase },
             { key: 'members', url: '/console/manage/members', icon: UserPlus },
+            { key: 'allowed_ips', url: '/console/manage/allowed-ips', icon: Shield },
         ],
     },
     { key: 'billing', url: '/console/billing', icon: CreditCard, pro: true },
