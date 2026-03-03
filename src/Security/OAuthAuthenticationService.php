@@ -86,9 +86,10 @@ final readonly class OAuthAuthenticationService
             $this->eventDispatcher->dispatch(new UserSignedUpEvent($user));
         }
 
+        $refreshTokenTtl = 60 * 60 * 24 * 30;
         // 4. Issue tokens
         $jwt = $this->jwtManager->create($user);
-        $rt = $this->refreshTokenGenerator->createForUserWithTtl($user, 60 * 60 * 24 * 30);
+        $rt = $this->refreshTokenGenerator->createForUserWithTtl($user, $refreshTokenTtl);
 
         // 5. Cookies
         $response->headers->setCookie(Cookie::create('BEARER', $jwt, secure: true));

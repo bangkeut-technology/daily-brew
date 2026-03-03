@@ -59,7 +59,8 @@ readonly class UserSubscriber implements EventSubscriberInterface
      */
     private function createWorkspace(User $user): void
     {
-        $workspace = $this->workspaceRepository->create();
+        $workspace = $this->workspaceRepository->create()
+            ->setName(sprintf("%s's Workspace", $user->getFirstName()));
 
         $this->workspaceRepository->update($workspace);
 
