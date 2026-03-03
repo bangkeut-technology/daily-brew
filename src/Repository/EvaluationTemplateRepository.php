@@ -105,7 +105,7 @@ class EvaluationTemplateRepository extends AbstractRepository
             ->where('et.canonicalName = :name')
             ->andWhere('et.user = :user')
             ->setParameters(new ArrayCollection([
-                new Parameter('name', Canonicalizer::canonicalize($name)),
+                new Parameter('name', Canonicalizer::asciiCanonicalize($name)),
                 new Parameter('user', $user),
             ]))
             ->getQuery()

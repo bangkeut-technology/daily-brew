@@ -84,7 +84,7 @@ class EvaluationCriteriaRepository extends AbstractRepository
             ->andWhere('ec.user = :user')
             ->setParameters(
                 new ArrayCollection([
-                    new Parameter('label', Canonicalizer::canonicalize($label)),
+                    new Parameter('label', Canonicalizer::asciiCanonicalize($label)),
                     new Parameter('user', $user),
                 ])
             )

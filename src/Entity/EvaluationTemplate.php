@@ -246,7 +246,7 @@ class EvaluationTemplate extends AbstractEntity
     #[ORM\PreUpdate]
     public function canonicalize(): void
     {
-        $this->canonicalName = Canonicalizer::canonicalize($this->name);
+        $this->canonicalName = Canonicalizer::asciiCanonicalize($this->name);
     }
 
     public function getWorkspace(): ?Workspace

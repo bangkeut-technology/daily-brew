@@ -294,7 +294,7 @@ class AttendanceBatch extends AbstractEntity
     #[ORM\PreUpdate]
     public function canonicalize(): void
     {
-        $this->canonicalLabel = Canonicalizer::canonicalize($this->label);
+        $this->canonicalLabel = Canonicalizer::asciiCanonicalize($this->label);
     }
 
     public function getWorkspace(): ?Workspace
