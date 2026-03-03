@@ -46,6 +46,7 @@ config.plugins.push(
         swDest: 'service-worker.js',
         clientsClaim: true,
         skipWaiting: true,
+        maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
     }),
 );
 
