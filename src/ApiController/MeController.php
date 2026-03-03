@@ -15,6 +15,7 @@ use App\Repository\EmployeeEvaluationRepository;
 use App\Repository\EmployeeRepository;
 use App\Repository\LeaveRequestRepository;
 use App\Service\LeaveRequestService;
+use App\Service\ShiftAttendanceService;
 use DateTimeImmutable;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -39,6 +40,7 @@ class MeController extends AbstractController
         private readonly AttendanceRepository         $attendanceRepository,
         private readonly EmployeeEvaluationRepository $evaluationRepository,
         private readonly LeaveRequestRepository       $leaveRequestRepository,
+        private readonly ShiftAttendanceService       $shiftAttendanceService,
     )
     {
         parent::__construct($translator);
@@ -69,12 +71,15 @@ class MeController extends AbstractController
             return $this->json(['message' => 'Already checked in today.'], Response::HTTP_CONFLICT);
         }
 
+        $clockIn = new DateTimeImmutable();
+        $type    = $this->shiftAttendanceService->detectCheckInType($employee, $clockIn);
+
         $attendance = $this->attendanceRepository->create()
             ->setEmployee($employee)
             ->setWorkspace($employee->getWorkspace())
             ->setAttendanceDate($today)
-            ->setClockIn(new DateTimeImmutable())
-            ->setType(AttendanceTypeEnum::PRESENT)
+            ->setClockIn($clockIn)
+            ->setType($type)
             ->setUser($this->getUser());
         $this->attendanceRepository->update($attendance);
 
@@ -101,7 +106,10 @@ class MeController extends AbstractController
             return $this->json(['message' => 'Already checked out today.'], Response::HTTP_CONFLICT);
         }
 
-        $attendance->setClockOut(new DateTimeImmutable());
+        $clockOut    = new DateTimeImmutable();
+        $updatedType = $this->shiftAttendanceService->detectCheckOutType($employee, $clockOut, $attendance->getType());
+
+        $attendance->setClockOut($clockOut)->setType($updatedType);
         $this->attendanceRepository->update($attendance);
 
         return $this->json($attendance, Response::HTTP_OK, [], ['groups' => ['attendance:read']]);

@@ -21,6 +21,7 @@
     "attendance_types": {
         "absent": "Absent",
         "closure": "Closure",
+        "early_leave": "Early Leave",
         "holiday": "Holiday",
         "late": "Late",
         "leave": "Leave",
@@ -118,6 +119,8 @@
     "password": "Password",
     "payroll": "Payroll",
     "payslips": "Payslips",
+    "required": "This field is required.",
+    "shifts": "Shifts",
     "performance": "Performance",
     "phone_number": "Phone Number",
     "pricing": "Pricing",

@@ -97,6 +97,10 @@ class Employee extends AbstractEntity
     #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     private ?Workspace $workspace = null;
 
+    #[ORM\ManyToOne(targetEntity: Shift::class, inversedBy: 'employees')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Shift $shift = null;
+
     public function __construct()
     {
         $this->attendances = new ArrayCollection();
@@ -366,6 +370,18 @@ class Employee extends AbstractEntity
     public function setWorkspace(?Workspace $workspace): static
     {
         $this->workspace = $workspace;
+
+        return $this;
+    }
+
+    public function getShift(): ?Shift
+    {
+        return $this->shift;
+    }
+
+    public function setShift(?Shift $shift): static
+    {
+        $this->shift = $shift;
 
         return $this;
     }

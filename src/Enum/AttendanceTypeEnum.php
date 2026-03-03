@@ -14,6 +14,7 @@ enum AttendanceTypeEnum: string
     case PRESENT = 'present';
     case ABSENT = 'absent';
     case LATE = 'late';
+    case EARLY_LEAVE = 'early_leave';
     case LEAVE = 'leave';
     case SICK = 'sick';
     case HOLIDAY = 'holiday';

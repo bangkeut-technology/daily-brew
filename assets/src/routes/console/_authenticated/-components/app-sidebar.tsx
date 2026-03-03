@@ -21,6 +21,7 @@ import {
     ChevronRight,
     CircleUser,
     ClipboardList,
+    Clock,
     CreditCard,
     DollarSign,
     EllipsisVertical,
@@ -88,6 +89,11 @@ const NAV_ITEMS: NavItem[] = [
         key: 'payroll',
         icon: DollarSign,
         url: '/console/payroll',
+    },
+    {
+        key: 'shifts',
+        icon: Clock,
+        url: '/console/shifts',
     },
     {
         key: 'manage',

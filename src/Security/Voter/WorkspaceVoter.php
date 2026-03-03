@@ -38,6 +38,7 @@ class WorkspaceVoter extends Voter
     public const string VIEW_PAYROLL = 'WORKSPACE_VIEW_PAYROLL';
     public const string MANAGE_SETTINGS = 'WORKSPACE_MANAGE_SETTINGS';
     public const string MANAGE_LEAVE_REQUESTS = 'WORKSPACE_MANAGE_LEAVE_REQUESTS';
+    public const string MANAGE_SHIFTS = 'WORKSPACE_MANAGE_SHIFTS';
 
     public function __construct(
         private readonly WorkspaceUserRepository $workspaceUserRepository,
@@ -56,6 +57,7 @@ class WorkspaceVoter extends Voter
             self::VIEW_PAYROLL,
             self::MANAGE_SETTINGS,
             self::MANAGE_LEAVE_REQUESTS,
+            self::MANAGE_SHIFTS,
         ], true)) {
             return false;
         }
@@ -98,6 +100,7 @@ class WorkspaceVoter extends Voter
             self::VIEW_PAYROLL => $this->canViewPayroll($role),
             self::MANAGE_SETTINGS => $this->canManageSettings($role),
             self::MANAGE_LEAVE_REQUESTS => $this->canManageLeaveRequests($role),
+            self::MANAGE_SHIFTS => $this->canManageShifts($role),
             default => false,
         };
     }
@@ -138,6 +141,11 @@ class WorkspaceVoter extends Voter
     }
 
     private function canManageLeaveRequests(WorkspaceRoleEnum $role): bool
+    {
+        return in_array($role, [WorkspaceRoleEnum::OWNER, WorkspaceRoleEnum::ADMIN, WorkspaceRoleEnum::MANAGER], true);
+    }
+
+    private function canManageShifts(WorkspaceRoleEnum $role): bool
     {
         return in_array($role, [WorkspaceRoleEnum::OWNER, WorkspaceRoleEnum::ADMIN, WorkspaceRoleEnum::MANAGER], true);
     }
