@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AlertCircle, CheckCircle2, Clock } from 'lucide-react';
 import { createFileRoute } from '@tanstack/react-router';
+import { Helmet } from 'react-helmet-async';
 
 export const Route = createFileRoute('/_layout/status/')({
     component: StatusPage,
@@ -59,6 +60,10 @@ function StatusPage() {
 
     return (
         <div className="max-w-3xl mx-auto py-16 px-6">
+            <Helmet>
+                <title>System Status — DailyBrew</title>
+                <meta name="robots" content="noindex" />
+            </Helmet>
             <h1 className="text-4xl font-bold mb-6">System Status</h1>
             <p className="text-lg text-muted-foreground mb-12">
                 Real-time information about the status of our services.

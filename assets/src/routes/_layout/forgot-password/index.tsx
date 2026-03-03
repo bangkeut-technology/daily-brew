@@ -1,5 +1,6 @@
 import React from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { Helmet } from 'react-helmet-async';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -49,6 +50,10 @@ function ForgotPasswordPage() {
 
     return (
         <div className="relative min-h-dvh bg-gradient-to-b from-background via-background to-muted/30">
+            <Helmet>
+                <title>Reset Password — DailyBrew</title>
+                <meta name="robots" content="noindex, nofollow" />
+            </Helmet>
             {/* Top bar */}
             <header className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
                 <Link to="/" className="flex items-center gap-2">

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { Helmet } from 'react-helmet-async';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,6 +28,20 @@ export const Route = createFileRoute('/_layout/features/')({
 function FeaturesPage() {
     return (
         <div className="min-h-dvh bg-background">
+            <Helmet>
+                <title>Features — DailyBrew</title>
+                <meta
+                    name="description"
+                    content="Explore DailyBrew's features: attendance tracking, KPI evaluations, leave management, payroll, shift scheduling, and more — built for cafés and small teams."
+                />
+                <meta property="og:title" content="Features — DailyBrew" />
+                <meta
+                    property="og:description"
+                    content="Explore DailyBrew's features: attendance tracking, KPI evaluations, leave management, payroll, shift scheduling, and more — built for cafés and small teams."
+                />
+                <meta property="og:url" content="https://dailybrew.work/features" />
+                <link rel="canonical" href="https://dailybrew.work/features" />
+            </Helmet>
             {/* Hero */}
             <section className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
                 <div className="flex flex-col items-start gap-6 sm:gap-8">

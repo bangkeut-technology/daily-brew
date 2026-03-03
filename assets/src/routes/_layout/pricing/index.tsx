@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { Helmet } from 'react-helmet-async';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +14,20 @@ export const Route = createFileRoute('/_layout/pricing/')({
 function PricingPage() {
     return (
         <div className="min-h-dvh bg-background">
+            <Helmet>
+                <title>Pricing — DailyBrew</title>
+                <meta
+                    name="description"
+                    content="Simple, transparent pricing for DailyBrew. Start free with Starter, upgrade to Pro for reports and multi-store, or contact us for Business."
+                />
+                <meta property="og:title" content="Pricing — DailyBrew" />
+                <meta
+                    property="og:description"
+                    content="Simple, transparent pricing for DailyBrew. Start free with Starter, upgrade to Pro for reports and multi-store, or contact us for Business."
+                />
+                <meta property="og:url" content="https://dailybrew.work/pricing" />
+                <link rel="canonical" href="https://dailybrew.work/pricing" />
+            </Helmet>
             {/* Hero */}
             <section className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
                 <div className="flex flex-col gap-4">

@@ -6,15 +6,29 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Coffee, HelpCircle } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 
 export const Route = createFileRoute('/_layout/faq/')({
     component: FAQPage,
-    // meta: () => [{ title: "FAQ — DailyBrew" }, { name: "description", content: "Frequently asked questions about DailyBrew." }],
 });
 
 function FAQPage() {
     return (
         <div className="min-h-dvh bg-background">
+            <Helmet>
+                <title>FAQ — DailyBrew</title>
+                <meta
+                    name="description"
+                    content="Frequently asked questions about DailyBrew — pricing, free limits, features, data, and how to get started."
+                />
+                <meta property="og:title" content="FAQ — DailyBrew" />
+                <meta
+                    property="og:description"
+                    content="Frequently asked questions about DailyBrew — pricing, free limits, features, data, and how to get started."
+                />
+                <meta property="og:url" content="https://dailybrew.work/faq" />
+                <link rel="canonical" href="https://dailybrew.work/faq" />
+            </Helmet>
             {/* Hero */}
             <section className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
                 <div className="flex flex-col gap-3">

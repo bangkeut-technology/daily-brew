@@ -1,5 +1,6 @@
 import React from 'react';
 import { createFileRoute, Link, useSearch } from '@tanstack/react-router';
+import { Helmet } from 'react-helmet-async';
 import { z } from 'zod';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -42,6 +43,9 @@ function MagicSignInInvalidPage() {
 
     return (
         <div className="flex min-h-[calc(85vh-64px)] items-center justify-center px-4">
+            <Helmet>
+                <meta name="robots" content="noindex" />
+            </Helmet>
             <Card className="w-full max-w-105">
                 <CardHeader className="flex flex-col items-center gap-2 text-center">
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">

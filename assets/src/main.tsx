@@ -1,6 +1,7 @@
 import React, { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
+import { HelmetProvider } from 'react-helmet-async';
 
 import { routeTree } from './routeTree.gen';
 import { useAuthenticationState } from '@/hooks/use-authentication';
@@ -44,19 +45,21 @@ if (rootElement && !rootElement.innerHTML) {
     const root = ReactDOM.createRoot(rootElement);
     root.render(
         <StrictMode>
-            <QueryClientProvider client={queryClient}>
-                <ThemeProvider>
-                    <ApplicationProvider>
-                        <DemoSessionProvider>
-                            <AuthenticationProvider>
-                                <LanguageProvider>
-                                    <Application />
-                                </LanguageProvider>
-                            </AuthenticationProvider>
-                        </DemoSessionProvider>
-                    </ApplicationProvider>
-                </ThemeProvider>
-            </QueryClientProvider>
+            <HelmetProvider>
+                <QueryClientProvider client={queryClient}>
+                    <ThemeProvider>
+                        <ApplicationProvider>
+                            <DemoSessionProvider>
+                                <AuthenticationProvider>
+                                    <LanguageProvider>
+                                        <Application />
+                                    </LanguageProvider>
+                                </AuthenticationProvider>
+                            </DemoSessionProvider>
+                        </ApplicationProvider>
+                    </ThemeProvider>
+                </QueryClientProvider>
+            </HelmetProvider>
         </StrictMode>,
     );
 }

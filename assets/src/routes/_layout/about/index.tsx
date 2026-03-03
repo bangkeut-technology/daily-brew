@@ -1,6 +1,7 @@
 // routes/about.tsx
 import * as React from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { Helmet } from 'react-helmet-async';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -17,12 +18,25 @@ import {
 
 export const Route = createFileRoute('/_layout/about/')({
     component: AboutPage,
-    // meta: () => [{ title: "About — DailyBrew" }, { name: "description", content: "About DailyBrew: simple daily ops for cafés and small teams." }],
 });
 
 function AboutPage() {
     return (
         <div className="min-h-dvh bg-background">
+            <Helmet>
+                <title>About — DailyBrew</title>
+                <meta
+                    name="description"
+                    content="Learn how DailyBrew was built to help cafés and small teams manage attendance, KPIs, and daily operations without the complexity."
+                />
+                <meta property="og:title" content="About — DailyBrew" />
+                <meta
+                    property="og:description"
+                    content="Learn how DailyBrew was built to help cafés and small teams manage attendance, KPIs, and daily operations without the complexity."
+                />
+                <meta property="og:url" content="https://dailybrew.work/about" />
+                <link rel="canonical" href="https://dailybrew.work/about" />
+            </Helmet>
             {/* Hero */}
             <section className="mx-auto max-w-6xl px-6 md:px-8 py-12 md:py-16">
                 <div className="flex flex-col gap-4">
