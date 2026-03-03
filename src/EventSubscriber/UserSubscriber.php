@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace App\EventSubscriber;
 
 use App\Entity\User;
+use App\Entity\Workspace;
 use App\Enum\WorkspaceRoleEnum;
 use App\Event\User\UserSignedUpEvent;
+use App\Repository\UserRepository;
 use App\Repository\WorkspaceRepository;
 use App\Repository\WorkspaceUserRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -18,9 +20,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 readonly class UserSubscriber implements EventSubscriberInterface
 {
+
     public function __construct(
         private WorkspaceRepository     $workspaceRepository,
-        private WorkspaceUserRepository $workspaceUserRepository
+        private WorkspaceUserRepository $workspaceUserRepository,
+        private UserRepository          $userRepository,
     )
     {
     }
@@ -57,12 +61,14 @@ readonly class UserSubscriber implements EventSubscriberInterface
      *
      * @return void The created workspace.
      */
-    private function createWorkspace(User $user): void
+    private function createWorkspace(User $user): Workspace
     {
         $workspace = $this->workspaceRepository->create()
             ->setName(sprintf("%s's Workspace", $user->getFirstName()));
 
         $this->workspaceRepository->update($workspace);
+
+        $user->setCurrentWorkspace($workspace);
 
         $workspaceUser = $this->workspaceUserRepository->create()
             ->setRole(WorkspaceRoleEnum::OWNER)
@@ -70,6 +76,8 @@ readonly class UserSubscriber implements EventSubscriberInterface
             ->setWorkspace($workspace);
 
         $this->workspaceUserRepository->update($workspaceUser);
+        $this->userRepository->update($user);
 
+        return $workspace;
     }
 }
