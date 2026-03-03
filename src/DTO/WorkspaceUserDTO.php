@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace App\DTO;
 
+use App\Entity\WorkspaceUser;
 use App\Enum\WorkspaceRoleEnum;
 
 /**
@@ -26,11 +27,27 @@ use App\Enum\WorkspaceRoleEnum;
 final class WorkspaceUserDTO
 {
     public function __construct(
-        public string $publicId,
-        public string $email,
-        public string $fullName,
+        public string            $publicId,
+        public string            $email,
+        public string            $fullName,
         public WorkspaceRoleEnum $role,
+        public ?EmployeeDTO      $employee = null,
     )
     {
+    }
+
+    public static function fromEntity(WorkspaceUser $member): self
+    {
+        $user = $member->getUser();
+
+        return new self(
+            publicId: $member->publicId,
+            email: $user->getEmail(),
+            fullName: $user->getFullName(),
+            role: $member->getRole(),
+            employee: $member->getEmployee() !== null
+                ? EmployeeDTO::fromEntity($member->getEmployee())
+                : null,
+        );
     }
 }

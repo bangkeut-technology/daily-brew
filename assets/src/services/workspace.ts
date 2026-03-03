@@ -10,7 +10,10 @@ export const fetchMembers = (workspacePublicId: string) =>
 export const fetchInvites = (workspacePublicId: string) =>
     apiAxios.get<WorkspaceInvite[]>(`/workspaces/${workspacePublicId}/invites`).then((response) => response.data);
 
-export const createInvite = (workspacePublicId: string, data: { email?: string; role: string }) =>
+export const createInvite = (
+    workspacePublicId: string,
+    data: { email?: string; role: string; employeePublicId?: string },
+) =>
     apiAxios
         .post<{
             publicId: string;

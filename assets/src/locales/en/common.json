@@ -1,6 +1,9 @@
 {
     "actions": "Actions",
     "active": "Active",
+    "add": "Add",
+    "amount": "Amount",
+    "create": "Create",
     "admin_console": "Admin Console",
     "all": "All",
     "application": "Application",
@@ -83,6 +86,7 @@
     "joined_at": "Joined At",
     "kpi": "KPI",
     "label": "Label",
+    "loading": "Loading…",
     "last_name": "Last Name",
     "light": "Light",
     "manage": "Manage",
@@ -112,6 +116,8 @@
         "leave_board": "Open leave board"
     },
     "password": "Password",
+    "payroll": "Payroll",
+    "payslips": "Payslips",
     "performance": "Performance",
     "phone_number": "Phone Number",
     "pricing": "Pricing",

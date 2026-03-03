@@ -83,16 +83,10 @@ class WorkspaceController extends AbstractController
     {
         $workspace = $this->getWorkspaceByPublicId($publicId);
 
-        $members = [];
-        foreach ($workspace->getUsers() as $member) {
-            $user = $member->getUser();
-            $members[] = new WorkspaceUserDTO(
-                publicId: $member->publicId,
-                email: $user->getEmail(),
-                fullName: $user->getFullName(),
-                role: $member->getRole(),
-            );
-        }
+        $members = array_map(
+            static fn($member) => WorkspaceUserDTO::fromEntity($member),
+            $workspace->getUsers()->toArray(),
+        );
 
         return $this->json($members);
     }

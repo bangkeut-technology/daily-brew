@@ -9,17 +9,23 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createInvite } from '@/services/workspace';
+import { fetchAllEmployees } from '@/services/employee';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Form } from '@/components/ui/form';
-import { Loader2Icon, Send } from 'lucide-react';
+import { Check, ChevronsUpDown, Loader2Icon, Send } from 'lucide-react';
 import { TextField } from '@/components/field/text-field';
 import { SelectField } from '@/components/field/select-field';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { cn } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
+import { useAuthenticationState } from '@/hooks/use-authentication';
 
 const schema = yup.object({
     email: yup.string().email().required(),
@@ -42,16 +48,25 @@ const ROLE_OPTIONS = [
 
 export const InviteMemberDialog: React.FC<InviteMemberDialogProps> = ({ open, onOpenChange, workspacePublicId }) => {
     const { t } = useTranslation();
+    const { workspace } = useAuthenticationState();
     const queryClient = useQueryClient();
     const [token, setToken] = React.useState<string | null>(null);
+    const [employeePublicId, setEmployeePublicId] = React.useState<string | undefined>(undefined);
+    const [employeeOpen, setEmployeeOpen] = React.useState(false);
 
     const form = useForm<InviteFormValues>({
         resolver: yupResolver(schema),
         defaultValues: { email: '', role: 'EMPLOYEE' },
     });
 
+    const { data: employees = [] } = useQuery({
+        queryKey: ['employees-all', workspace?.publicId],
+        queryFn: fetchAllEmployees,
+        enabled: open && !!workspace,
+    });
+
     const { mutate, isPending } = useMutation({
-        mutationFn: (data: InviteFormValues) => createInvite(workspacePublicId, data),
+        mutationFn: (data: InviteFormValues) => createInvite(workspacePublicId, { ...data, employeePublicId }),
         onSuccess: (data) => {
             setToken(data.token);
             queryClient.invalidateQueries({ queryKey: ['workspace', workspacePublicId, 'invites'] });
@@ -67,6 +82,7 @@ export const InviteMemberDialog: React.FC<InviteMemberDialogProps> = ({ open, on
         (nextOpen: boolean) => {
             if (!nextOpen) {
                 setToken(null);
+                setEmployeePublicId(undefined);
                 form.reset();
             }
             onOpenChange(nextOpen);
@@ -80,6 +96,8 @@ export const InviteMemberDialog: React.FC<InviteMemberDialogProps> = ({ open, on
         },
         [mutate],
     );
+
+    const selectedEmployee = employees.find((e) => e.publicId === employeePublicId);
 
     return (
         <Dialog open={open} onOpenChange={handleClose}>
@@ -114,6 +132,69 @@ export const InviteMemberDialog: React.FC<InviteMemberDialogProps> = ({ open, on
                                 options={ROLE_OPTIONS}
                                 placeholder="Select a role"
                             />
+
+                            {/* Employee combobox */}
+                            <div className="space-y-2">
+                                <Label>
+                                    Link to employee{' '}
+                                    <span className="text-muted-foreground font-normal">(optional)</span>
+                                </Label>
+                                <Popover open={employeeOpen} onOpenChange={setEmployeeOpen}>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            role="combobox"
+                                            aria-expanded={employeeOpen}
+                                            className="w-full justify-between font-normal"
+                                        >
+                                            {selectedEmployee ? selectedEmployee.fullName : 'Select an employee…'}
+                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-full p-0" align="start">
+                                        <Command>
+                                            <CommandInput placeholder="Search employee…" />
+                                            <CommandList>
+                                                <CommandEmpty>No employees found.</CommandEmpty>
+                                                <CommandGroup>
+                                                    {employeePublicId && (
+                                                        <CommandItem
+                                                            value=""
+                                                            onSelect={() => {
+                                                                setEmployeePublicId(undefined);
+                                                                setEmployeeOpen(false);
+                                                            }}
+                                                            className="text-muted-foreground italic"
+                                                        >
+                                                            Clear selection
+                                                        </CommandItem>
+                                                    )}
+                                                    {employees.map((employee) => (
+                                                        <CommandItem
+                                                            key={employee.publicId}
+                                                            value={employee.fullName}
+                                                            onSelect={() => {
+                                                                setEmployeePublicId(employee.publicId);
+                                                                setEmployeeOpen(false);
+                                                            }}
+                                                        >
+                                                            <Check
+                                                                className={cn(
+                                                                    'mr-2 h-4 w-4',
+                                                                    employeePublicId === employee.publicId
+                                                                        ? 'opacity-100'
+                                                                        : 'opacity-0',
+                                                                )}
+                                                            />
+                                                            {employee.fullName}
+                                                        </CommandItem>
+                                                    ))}
+                                                </CommandGroup>
+                                            </CommandList>
+                                        </Command>
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
                         </div>
                         <DialogFooter className="mt-4">
                             <DialogClose asChild>

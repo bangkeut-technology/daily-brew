@@ -6,6 +6,8 @@ namespace App\ApiController;
 
 use App\ApiController\Trait\WorkspaceTrait;
 use App\Controller\AbstractController;
+use App\DTO\PayrollRunDTO;
+use App\DTO\PayslipDTO;
 use App\Enum\ApiErrorCodeEnum;
 use App\Enum\PayrollRunStatusEnum;
 use App\Form\PayslipItemFormType;
@@ -55,7 +57,10 @@ class PayrollController extends AbstractController
 
         $runs = $this->payrollRunRepository->findByWorkspace($workspace);
 
-        return $this->json($runs, Response::HTTP_OK, [], ['groups' => ['payroll_run:read']]);
+        return $this->json(array_map(
+            static fn($run) => PayrollRunDTO::fromEntity($run),
+            $runs,
+        ));
     }
 
     #[Route(name: 'create', methods: ['POST'])]
@@ -83,7 +88,7 @@ class PayrollController extends AbstractController
             return $this->json(['message' => $e->getMessage()], Response::HTTP_CONFLICT);
         }
 
-        return $this->json($run, Response::HTTP_CREATED, [], ['groups' => ['payroll_run:read']]);
+        return $this->json(PayrollRunDTO::fromEntity($run), Response::HTTP_CREATED);
     }
 
     #[Route('/{runPublicId}', name: 'get', methods: ['GET'])]
@@ -97,7 +102,7 @@ class PayrollController extends AbstractController
             throw $this->createApiErrorException(ApiErrorCodeEnum::NOT_FOUND, ['%publicId%' => $runPublicId]);
         }
 
-        return $this->json($run, Response::HTTP_OK, [], ['groups' => ['payroll_run:read', 'payslip:read', 'payslip_item:read']]);
+        return $this->json(PayrollRunDTO::fromEntity($run, withPayslips: true));
     }
 
     #[Route('/{runPublicId}/finalize', name: 'finalize', methods: ['POST'])]
@@ -156,7 +161,7 @@ class PayrollController extends AbstractController
             throw $this->createApiErrorException(ApiErrorCodeEnum::NOT_FOUND, ['%publicId%' => $slipPublicId]);
         }
 
-        return $this->json($payslip, Response::HTTP_OK, [], ['groups' => ['payslip:read', 'payslip_item:read']]);
+        return $this->json(PayslipDTO::fromEntity($payslip));
     }
 
     #[Route('/{runPublicId}/payslips/{slipPublicId}/items', name: 'add_payslip_item', methods: ['POST'])]
@@ -190,7 +195,7 @@ class PayrollController extends AbstractController
             $this->recalculatePayslipTotals($payslip);
             $this->payslipRepository->update($payslip);
 
-            return $this->json($payslip, Response::HTTP_CREATED, [], ['groups' => ['payslip:read', 'payslip_item:read']]);
+            return $this->json(PayslipDTO::fromEntity($payslip), Response::HTTP_CREATED);
         }
 
         return $this->createBadRequestResponse($this->translator->trans('invalid.payslip_item', domain: 'errors'));
@@ -246,7 +251,7 @@ class PayrollController extends AbstractController
 
         $this->payrollService->markPayslipAsPaid($payslip);
 
-        return $this->json($payslip, Response::HTTP_OK, [], ['groups' => ['payslip:read', 'payslip_item:read']]);
+        return $this->json(PayslipDTO::fromEntity($payslip));
     }
 
     /**

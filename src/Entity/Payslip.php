@@ -11,7 +11,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Class Payslip
@@ -30,7 +29,6 @@ class Payslip extends AbstractEntity
 
     #[ORM\ManyToOne(targetEntity: Employee::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    #[Groups(['payslip:read'])]
     private ?Employee $employee = null;
 
     #[ORM\ManyToOne(targetEntity: Workspace::class)]
@@ -38,66 +36,51 @@ class Payslip extends AbstractEntity
     private ?Workspace $workspace = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    #[Groups(['payslip:read'])]
     private string $baseSalary = '0.00';
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    #[Groups(['payslip:read'])]
     private string $totalAllowances = '0.00';
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    #[Groups(['payslip:read'])]
     private string $totalDeductions = '0.00';
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    #[Groups(['payslip:read'])]
     private string $netPay = '0.00';
 
     #[ORM\Column(length: 3)]
-    #[Groups(['payslip:read'])]
     private string $currency = 'USD';
 
     #[ORM\Column]
-    #[Groups(['payslip:read'])]
     private int $workingDays = 0;
 
     #[ORM\Column]
-    #[Groups(['payslip:read'])]
     private int $presentDays = 0;
 
     #[ORM\Column]
-    #[Groups(['payslip:read'])]
     private int $absentDays = 0;
 
     #[ORM\Column]
-    #[Groups(['payslip:read'])]
     private int $lateDays = 0;
 
     #[ORM\Column]
-    #[Groups(['payslip:read'])]
     private int $paidLeaveDays = 0;
 
     #[ORM\Column]
-    #[Groups(['payslip:read'])]
     private int $unpaidLeaveDays = 0;
 
     #[ORM\Column(enumType: PayslipStatusEnum::class)]
-    #[Groups(['payslip:read'])]
     private PayslipStatusEnum $status = PayslipStatusEnum::PENDING;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
-    #[Groups(['payslip:read'])]
     private ?DateTimeImmutable $paidAt = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['payslip:read'])]
     private ?string $notes = null;
 
     /**
      * @var Collection<int, PayslipItem>
      */
     #[ORM\OneToMany(targetEntity: PayslipItem::class, mappedBy: 'payslip', cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[Groups(['payslip:read'])]
     private Collection $items;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]

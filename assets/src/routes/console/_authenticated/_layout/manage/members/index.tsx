@@ -68,6 +68,10 @@ function MembersPage() {
                 header: 'Role',
                 cell: (info) => info.getValue(),
             }),
+            memberColumnHelper.accessor('employee', {
+                header: 'Employee',
+                cell: (info) => info.getValue()?.fullName ?? '—',
+            }),
         ],
         [],
     );

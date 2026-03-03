@@ -30,6 +30,10 @@ class WorkspaceUser extends AbstractEntity
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
+    #[ORM\ManyToOne(targetEntity: Employee::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Employee $employee = null;
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $customName = null;
 
@@ -100,6 +104,18 @@ class WorkspaceUser extends AbstractEntity
     public function setDeletedAt(?DateTimeImmutable $deletedAt): WorkspaceUser
     {
         $this->deletedAt = $deletedAt;
+        return $this;
+    }
+
+    public function getEmployee(): ?Employee
+    {
+        return $this->employee;
+    }
+
+    public function setEmployee(?Employee $employee): static
+    {
+        $this->employee = $employee;
+
         return $this;
     }
 

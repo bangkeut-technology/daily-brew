@@ -82,6 +82,8 @@ final readonly class WorkspaceUserService
                 // Fallback if your Employee does not have linkedUser
                 $employee->setUser($targetUser);
             }
+
+            $membership->setEmployee($employee);
         }
 
         $this->workspaceUserRepository->flush();

@@ -25,6 +25,10 @@ export type WorkspaceUser = {
     email: string;
     fullName: string;
     role: WorkspaceUserRole;
+    employee?: {
+        publicId: string;
+        fullName: string;
+    } | null;
 };
 
 export type SubscriptionStatus = 'trialing' | 'active' | 'canceled' | 'expired';

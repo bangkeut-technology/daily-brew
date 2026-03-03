@@ -8,7 +8,6 @@ use App\Enum\PayslipItemTypeEnum;
 use App\Repository\PayslipItemRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Class PayslipItem
@@ -25,15 +24,12 @@ class PayslipItem extends AbstractEntity
     private ?Payslip $payslip = null;
 
     #[ORM\Column(enumType: PayslipItemTypeEnum::class)]
-    #[Groups(['payslip_item:read'])]
     private PayslipItemTypeEnum $type;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['payslip_item:read'])]
     private string $label;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    #[Groups(['payslip_item:read'])]
     private string $amount;
 
     public function getPayslip(): ?Payslip

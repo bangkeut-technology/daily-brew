@@ -22,6 +22,7 @@ import {
     CircleUser,
     ClipboardList,
     CreditCard,
+    DollarSign,
     EllipsisVertical,
     Gauge,
     LayoutDashboard,
@@ -82,6 +83,11 @@ const NAV_ITEMS: NavItem[] = [
         key: 'attendance_batches',
         icon: CalendarRange,
         url: '/console/attendance-batches',
+    },
+    {
+        key: 'payroll',
+        icon: DollarSign,
+        url: '/console/payroll',
     },
     {
         key: 'manage',

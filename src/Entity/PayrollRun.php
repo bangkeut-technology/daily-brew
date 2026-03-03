@@ -11,7 +11,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Class PayrollRun
@@ -29,20 +28,16 @@ class PayrollRun extends AbstractEntity
     private ?Workspace $workspace = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
-    #[Groups(['payroll_run:read'])]
     private DateTimeImmutable $period;
 
     #[ORM\Column(enumType: PayrollRunStatusEnum::class)]
-    #[Groups(['payroll_run:read'])]
     private PayrollRunStatusEnum $status = PayrollRunStatusEnum::DRAFT;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
-    #[Groups(['payroll_run:read'])]
     private ?DateTimeImmutable $processedAt = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
-    #[Groups(['payroll_run:read'])]
     private ?User $processedBy = null;
 
     /**

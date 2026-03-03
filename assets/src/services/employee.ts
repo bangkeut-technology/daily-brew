@@ -15,6 +15,8 @@ export const fetchEmployees = async ({ from, to }: EmployeeSearchParams) =>
         })
         .then((response) => response.data);
 
+export const fetchAllEmployees = async () => apiAxios.get<Employee[]>(`/employees`).then((response) => response.data);
+
 export const fetchEmployee = async ({ publicId, from, to }: { publicId: string; from: string; to: string }) =>
     apiAxios
         .get<Employee>(`/employees/${publicId}`, {
@@ -42,7 +44,9 @@ export const putEmployee = async ({ publicId, data }: { publicId: string; data: 
         .then((response) => response.data);
 
 export const deleteEmployee = async (publicId: string) =>
-    apiAxios.delete<{ message: string, employee: Employee }>(`/employees/${publicId}`).then((response) => response.data);
+    apiAxios
+        .delete<{ message: string; employee: Employee }>(`/employees/${publicId}`)
+        .then((response) => response.data);
 
 export const fetchEmployeeEvaluation = async ({ publicId, date = new Date() }: { publicId: string; date: Date }) =>
     apiAxios

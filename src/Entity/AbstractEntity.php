@@ -33,9 +33,6 @@ abstract class AbstractEntity
         'employee_score:read',
         'workspace_allowed_ip:read',
         'employee_salary:read',
-        'payroll_run:read',
-        'payslip:read',
-        'payslip_item:read',
         'workspace_setting:read',
         'leave_request:read',
     ])]
@@ -57,9 +54,6 @@ abstract class AbstractEntity
         'employee_score:read',
         'workspace_allowed_ip:read',
         'employee_salary:read',
-        'payroll_run:read',
-        'payslip:read',
-        'payslip_item:read',
         'workspace_setting:read',
         'leave_request:read',
     ])]
@@ -81,9 +75,6 @@ abstract class AbstractEntity
         'employee_score:read',
         'workspace_allowed_ip:read',
         'employee_salary:read',
-        'payroll_run:read',
-        'payslip:read',
-        'payslip_item:read',
         'workspace_setting:read',
         'leave_request:read',
     ])]
@@ -101,9 +92,6 @@ abstract class AbstractEntity
         'employee_score:read',
         'workspace_allowed_ip:read',
         'employee_salary:read',
-        'payroll_run:read',
-        'payslip:read',
-        'payslip_item:read',
         'workspace_setting:read',
         'leave_request:read',
     ])]

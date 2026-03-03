@@ -154,7 +154,8 @@ final readonly class WorkspaceInviteService
             }
         }
 
-        if (null === $this->workspaceUserRepository->findByWorkspaceAndUser($workspace, $user)) {
+        $membership = $this->workspaceUserRepository->findByWorkspaceAndUser($workspace, $user);
+        if (null === $membership) {
             $membership = $this->workspaceUserRepository->create()
                 ->setWorkspace($workspace)
                 ->setUser($user)
@@ -178,6 +179,8 @@ final readonly class WorkspaceInviteService
             } elseif (method_exists($employee, 'setUser')) {
                 $employee->setUser($user);
             }
+
+            $membership->setEmployee($employee);
         }
 
         $invite->markAccepted($user);
