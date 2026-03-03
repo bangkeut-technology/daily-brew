@@ -22,6 +22,8 @@ invalid:
     workspace_allowed_ip:  'Invalid IP Address'
     payslip_item:          'Invalid payslip item information.'
     workspace_user_rating: 'Invalid workspace user rating information.'
+    shift:           'Invalid shift information.'
+    shift_time_rule: 'Invalid shift time rule information.'
 max_free_employees: 'You have reached the maximum number of %count% free employees allowed. Please upgrade your plan to add more employees.'
 existed:
     evaluation_template: 'Evaluation template ''%name%'' already exists.'
