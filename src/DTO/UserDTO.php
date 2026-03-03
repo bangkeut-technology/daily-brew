@@ -34,11 +34,8 @@ final readonly class UserDTO
         public ?string $avatarUrl = null,
         public array   $authentications = [
             'password'  => false,
-            'linkedin'  => false,
-            'facebook'  => false,
             'google'    => false,
             'apple'     => false,
-            'microsoft' => false,
         ],
 
     )
@@ -71,11 +68,8 @@ final readonly class UserDTO
             avatarUrl: $avatarUrl,
             authentications: [
                 'password'  => $user->getPassword() !== null,
-                'linkedin'  => $user->getLinkedInId() !== null,
-                'facebook'  => $user->getFacebookId() !== null,
                 'google'    => $user->getGoogleId() !== null,
                 'apple'     => $user->getAppleId() !== null,
-                'microsoft' => $user->getMicrosoftId() !== null,
             ]
         );
     }
