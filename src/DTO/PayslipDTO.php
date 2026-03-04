@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\DTO;
 
+use App\DTO\Trait\HasEntityMapper;
 use App\Entity\Payslip;
 use App\Enum\PayslipStatusEnum;
 use DateTimeImmutable;
@@ -16,6 +17,8 @@ use DateTimeImmutable;
  */
 final class PayslipDTO
 {
+    use HasEntityMapper;
+
     public function __construct(
         public readonly int                $id,
         public readonly string             $publicId,

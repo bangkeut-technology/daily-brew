@@ -26,7 +26,7 @@ trait AttendanceTrait
      */
     private function createAttendanceResponse(mixed $data, int $statusCode = Response::HTTP_OK): JsonResponse
     {
-        return $this->json($data, $statusCode, context: ['groups' => ['attendance:read', 'employee:read', 'user:read']]);
+        return $this->json($data, $statusCode);
     }
 
     /**

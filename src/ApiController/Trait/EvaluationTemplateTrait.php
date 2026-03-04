@@ -18,11 +18,7 @@ trait EvaluationTemplateTrait
      */
     private function createTemplateResponse(mixed $data, int $statusCode = Response::HTTP_OK): JsonResponse
     {
-        return $this->json(
-            $data,
-            $statusCode,
-            context: ['groups' => ['template:read']]
-        );
+        return $this->json($data, $statusCode);
     }
 
     /**

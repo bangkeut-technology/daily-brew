@@ -18,11 +18,7 @@ trait EvaluationCriteriaTrait
      */
     private function createCriteriaResponse(mixed $data, int $statusCode = Response::HTTP_OK): JsonResponse
     {
-        return $this->json(
-            $data,
-            $statusCode,
-            context: ['groups' => ['criteria:read']]
-        );
+        return $this->json($data, $statusCode);
     }
 
     /**

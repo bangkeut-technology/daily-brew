@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\DTO;
 
+use App\DTO\Trait\HasEntityMapper;
 use App\Entity\ShiftTimeRule;
 use App\Enum\DayOfWeekEnum;
 use DateTimeImmutable;
@@ -16,6 +17,8 @@ use DateTimeImmutable;
  */
 final readonly class ShiftTimeRuleDTO
 {
+    use HasEntityMapper;
+
     public function __construct(
         public int              $id,
         public string           $publicId,

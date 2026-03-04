@@ -24,13 +24,7 @@ trait EvaluationTemplateCriteriaTrait
      */
     private function createTemplateCriteriaResponse(mixed $data, int $statusCode = Response::HTTP_OK): JsonResponse
     {
-        return $this->json(
-            $data,
-            $statusCode,
-            context: [
-                'groups' => ['template_criteria:read', 'template:read', 'criteria:read'],
-            ]
-        );
+        return $this->json($data, $statusCode);
     }
 
     /**

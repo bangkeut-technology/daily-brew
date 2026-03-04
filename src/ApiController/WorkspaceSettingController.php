@@ -133,6 +133,6 @@ class WorkspaceSettingController extends AbstractController
         $setting->setValue((string) $value);
         $this->settingRepository->update($setting);
 
-        return $this->json($setting, Response::HTTP_OK, [], ['groups' => ['workspace_setting:read']]);
+        return $this->json([$name => $setting->getValue()]);
     }
 }

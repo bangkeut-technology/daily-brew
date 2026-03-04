@@ -6,6 +6,7 @@ namespace App\ApiController;
 
 use App\ApiController\Trait\WorkspaceTrait;
 use App\Controller\AbstractController;
+use App\DTO\LeaveRequestDTO;
 use App\Enum\ApiErrorCodeEnum;
 use App\Repository\LeaveRequestRepository;
 use App\Repository\WorkspaceRepository;
@@ -56,7 +57,7 @@ class WorkspaceLeaveRequestController extends AbstractController
             $requests = $this->leaveRequestRepository->findByWorkspace($workspace);
         }
 
-        return $this->json($requests, Response::HTTP_OK, [], ['groups' => ['leave_request:read']]);
+        return $this->json(LeaveRequestDTO::fromEntities($requests));
     }
 
     #[Route('/{requestPublicId}/approve', name: 'approve', methods: ['POST'])]
@@ -73,7 +74,7 @@ class WorkspaceLeaveRequestController extends AbstractController
         $note = $request->getPayload()->get('note');
         $this->leaveRequestService->approve($leaveRequest, $this->getUser(), $note);
 
-        return $this->json($leaveRequest, Response::HTTP_OK, [], ['groups' => ['leave_request:read']]);
+        return $this->json(LeaveRequestDTO::fromEntity($leaveRequest));
     }
 
     #[Route('/{requestPublicId}/reject', name: 'reject', methods: ['POST'])]
@@ -90,6 +91,6 @@ class WorkspaceLeaveRequestController extends AbstractController
         $note = $request->getPayload()->get('note');
         $this->leaveRequestService->reject($leaveRequest, $this->getUser(), $note);
 
-        return $this->json($leaveRequest, Response::HTTP_OK, [], ['groups' => ['leave_request:read']]);
+        return $this->json(LeaveRequestDTO::fromEntity($leaveRequest));
     }
 }

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\DTO;
 
+use App\DTO\Trait\HasEntityMapper;
 use App\Entity\EmployeeScore;
 
 /**
@@ -13,6 +14,8 @@ use App\Entity\EmployeeScore;
  */
 final readonly class EmployeeScoreDTO
 {
+    use HasEntityMapper;
+
     public function __construct(
         public string $publicId,
         public string $criteriaLabel,

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\DTO;
 
+use App\DTO\Trait\HasEntityMapper;
 use App\Entity\Attendance;
 use App\Enum\AttendanceTypeEnum;
 use DateTimeImmutable;
@@ -15,6 +16,8 @@ use DateTimeImmutable;
  */
 final readonly class AttendanceDTO
 {
+    use HasEntityMapper;
+
     public function __construct(
         public int                $id,
         public string             $publicId,
@@ -38,7 +41,7 @@ final readonly class AttendanceDTO
      */
     public static function fromEntity(Attendance $attendance, bool $withEmployee = true): self
     {
-        $class = new self(
+        return new self(
             id: $attendance->id,
             publicId: $attendance->publicId,
             attendanceDate: $attendance->getAttendanceDate(),
@@ -46,13 +49,8 @@ final readonly class AttendanceDTO
             clockIn: $attendance->getClockIn(),
             clockOut: $attendance->getClockOut(),
             note: $attendance->getNote(),
+            employee: $withEmployee ? EmployeeDTO::fromEntity($attendance->getEmployee()) : null,
         );
-
-        if ($withEmployee) {
-            $class->employee = EmployeeDTO::fromEntity($attendance->getEmployee());
-        }
-
-        return $class;
     }
 }
 

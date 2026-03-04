@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\DTO;
 
+use App\DTO\Trait\HasEntityMapper;
 use App\Entity\Employee;
 use App\Enum\EmployeeStatusEnum;
 use DateTimeImmutable;
@@ -13,8 +14,10 @@ use DateTimeImmutable;
  * @package App\DTO
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
-final  class EmployeeDTO
+final class EmployeeDTO
 {
+    use HasEntityMapper;
+
     public function __construct(
         public readonly int                $id,
         public readonly string             $publicId,
@@ -26,6 +29,7 @@ final  class EmployeeDTO
         public readonly ?DateTimeImmutable $joinedAt = null,
         public readonly EmployeeStatusEnum $status,
         public ?array                      $attendances = null,
+        public ?float                      $averageScore = null,
     )
     {
     }

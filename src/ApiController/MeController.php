@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\ApiController;
 
 use App\Controller\AbstractController;
-use App\Entity\Attendance;
+use App\DTO\AttendanceDTO;
+use App\DTO\EmployeeEvaluationDTO;
+use App\DTO\LeaveRequestDTO;
 use App\Enum\ApiErrorCodeEnum;
 use App\Enum\AttendanceTypeEnum;
 use App\Enum\LeaveRequestStatusEnum;
@@ -60,7 +62,7 @@ class MeController extends AbstractController
             ['attendanceDate' => 'DESC']
         );
 
-        return $this->json($attendances, Response::HTTP_OK, [], ['groups' => ['attendance:read']]);
+        return $this->json(AttendanceDTO::fromEntities($attendances));
     }
 
     #[Route('/attendance/check-in', name: 'attendance_check_in', methods: ['POST'])]
@@ -90,7 +92,7 @@ class MeController extends AbstractController
             ->setUser($this->getUser());
         $this->attendanceRepository->update($attendance);
 
-        return $this->json($attendance, Response::HTTP_CREATED, [], ['groups' => ['attendance:read']]);
+        return $this->json(AttendanceDTO::fromEntity($attendance), Response::HTTP_CREATED);
     }
 
     #[Route('/attendance/check-out', name: 'attendance_check_out', methods: ['POST'])]
@@ -124,7 +126,7 @@ class MeController extends AbstractController
         $attendance->setClockOut($clockOut)->setType($updatedType);
         $this->attendanceRepository->update($attendance);
 
-        return $this->json($attendance, Response::HTTP_OK, [], ['groups' => ['attendance:read']]);
+        return $this->json(AttendanceDTO::fromEntity($attendance));
     }
 
     // ── Evaluations ─────────────────────────────────────────────────────────
@@ -139,7 +141,7 @@ class MeController extends AbstractController
             ['evaluatedAt' => 'DESC']
         );
 
-        return $this->json($evaluations, Response::HTTP_OK, [], ['groups' => ['employee_evaluation:read']]);
+        return $this->json(EmployeeEvaluationDTO::fromEntities($evaluations, true));
     }
 
     // ── Leave Requests ───────────────────────────────────────────────────────
@@ -151,7 +153,7 @@ class MeController extends AbstractController
 
         $requests = $this->leaveRequestRepository->findByEmployee($employee);
 
-        return $this->json($requests, Response::HTTP_OK, [], ['groups' => ['leave_request:read']]);
+        return $this->json(LeaveRequestDTO::fromEntities($requests));
     }
 
     #[Route('/leave-requests', name: 'leave_requests_create', methods: ['POST'])]
@@ -170,7 +172,7 @@ class MeController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->leaveRequestRepository->update($leaveRequest);
 
-            return $this->json($leaveRequest, Response::HTTP_CREATED, [], ['groups' => ['leave_request:read']]);
+            return $this->json(LeaveRequestDTO::fromEntity($leaveRequest), Response::HTTP_CREATED);
         }
 
         return $this->createFormErrorsResponse($form);

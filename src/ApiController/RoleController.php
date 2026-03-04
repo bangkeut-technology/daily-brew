@@ -6,6 +6,8 @@ namespace App\ApiController;
 
 use App\ApiController\Trait\EmployeeTrait;
 use App\Controller\AbstractController;
+use App\DTO\EmployeeDTO;
+use App\DTO\RoleDTO;
 use App\Entity\Employee;
 use App\Entity\Role;
 use App\Form\RoleFormType;
@@ -56,7 +58,7 @@ class RoleController extends AbstractController
     {
         $roles = $this->roleRepository->findByUser($this->getUser());
 
-        return $this->createRoleResponse($roles);
+        return $this->createRoleResponse(RoleDTO::fromEntities($roles));
     }
 
     /**
@@ -101,7 +103,7 @@ class RoleController extends AbstractController
 
             return $this->createRoleResponse([
                 'message' => $this->translator->trans('created.role', ['%name%' => $role]),
-                'role' => $role,
+                'role'    => RoleDTO::fromEntity($role),
             ], Response::HTTP_CREATED);
         }
 
@@ -158,7 +160,7 @@ class RoleController extends AbstractController
             $this->roleRepository->update($role);
             return $this->createRoleResponse([
                 'message' => $this->translator->trans('updated.role', ['%name%' => $role]),
-                'role' => $role,
+                'role'    => RoleDTO::fromEntity($role),
             ]);
         }
 
@@ -198,7 +200,7 @@ class RoleController extends AbstractController
     #[Route('/{publicId}', name: 'get', methods: ['GET'])]
     public function get(string $publicId): JsonResponse
     {
-        return $this->createRoleResponse($this->getRole($publicId));
+        return $this->createRoleResponse(RoleDTO::fromEntity($this->getRole($publicId)));
     }
 
     /**
@@ -240,7 +242,7 @@ class RoleController extends AbstractController
 
         return $this->createRoleResponse([
             'message' => $this->translator->trans('deleted.role', ['%name%' => $role]),
-            'role' => $role,
+            'role'    => RoleDTO::fromEntity($role),
         ]);
     }
 
@@ -263,7 +265,7 @@ class RoleController extends AbstractController
         description: 'Returns a list of employees associated with the specified role',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Employee::class, groups: ['employee:read']))
+            items: new OA\Items(ref: new Model(type: EmployeeDTO::class, groups: ['employee:read']))
         )
     )]
     #[Route('/{publicId}/employees', name: 'employees', methods: ['GET'])]
@@ -271,7 +273,7 @@ class RoleController extends AbstractController
     {
         $role = $this->getRole($publicId);
 
-        return $this->createEmployeeResponse($role->getEmployees());
+        return $this->createEmployeeResponse(EmployeeDTO::fromEntities($role->getEmployees()));
     }
 
     /**
@@ -300,6 +302,6 @@ class RoleController extends AbstractController
      */
     private function createRoleResponse(mixed $data, int $statusCode = Response::HTTP_OK): JsonResponse
     {
-        return $this->json($data, status: $statusCode, context: ['groups' => 'role:read']);
+        return $this->json($data, $statusCode);
     }
 }

@@ -18,13 +18,14 @@ trait EmployeeTrait
     /**
      * This method is used to create an employee response.
      *
-     * @param mixed $data    the data to return in the response
-     * @param int   $status  the status publicId of the response
-     * @param array $context The context of the response. The default is ['groups' => ['employee:read', 'user:read', 'store:read', 'role:read', 'template:read']].
+     * @param mixed $data   the data to return in the response
+     * @param int   $status the status publicId of the response
+     *
+     * @return JsonResponse the created JSON response
      */
-    private function createEmployeeResponse(mixed $data, int $status = Response::HTTP_OK, array $context = ['groups' => ['employee:read', 'user:read', 'store:read', 'role:read', 'template:read']]): JsonResponse
+    private function createEmployeeResponse(mixed $data, int $status = Response::HTTP_OK): JsonResponse
     {
-        return $this->json($data, $status, context: $context);
+        return $this->json($data, $status);
     }
 
     /**

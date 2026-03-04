@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class EvaluationTemplateController.
+ * Class EvaluationTemplateCriteriaController.
  *
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
@@ -31,13 +31,6 @@ class EvaluationTemplateCriteriaController extends AbstractController
         parent::__construct($translator);
     }
 
-    /**
-     * Remove an evaluation template criteria.
-     *
-     * @param string $publicId The publicId of the evaluation template criteria
-     *
-     * @return JsonResponse
-     */
     #[Route('/{publicId}', name: 'deletes', methods: ['DELETE'])]
     public function deletes(string $publicId): JsonResponse
     {

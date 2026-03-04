@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace App\DTO;
 
+use App\DTO\Trait\HasEntityMapper;
 use App\Entity\WorkspaceUser;
 use App\Enum\WorkspaceRoleEnum;
 
@@ -26,6 +27,8 @@ use App\Enum\WorkspaceRoleEnum;
  */
 final class WorkspaceUserDTO
 {
+    use HasEntityMapper;
+
     public function __construct(
         public string            $publicId,
         public string            $email,

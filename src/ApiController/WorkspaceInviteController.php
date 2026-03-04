@@ -13,9 +13,9 @@
 namespace App\ApiController;
 
 use App\Controller\AbstractController;
+use App\DTO\WorkspaceInviteDTO;
 use App\Entity\User;
 use App\Entity\Workspace;
-use App\Entity\WorkspaceInvite;
 use App\Enum\ApiErrorCodeEnum;
 use App\Enum\WorkspaceRoleEnum;
 use App\Repository\WorkspaceInviteRepository;
@@ -113,15 +113,7 @@ class WorkspaceInviteController extends AbstractController
 
         $invites = $this->workspaceInviteRepository->findByWorkspace($workspace);
 
-        return $this->json(array_map(static fn(WorkspaceInvite $invite) => [
-            'publicId'   => $invite->publicId,
-            'email'      => $invite->getEmail(),
-            'role'       => $invite->getRole()->value,
-            'status'     => $invite->getStatus()->value,
-            'expiresAt'  => $invite->getExpiresAt()?->format(DATE_ATOM),
-            'createdAt'  => $invite->getCreatedAt()?->format(DATE_ATOM),
-            'acceptedAt' => $invite->getAcceptedAt()?->format(DATE_ATOM),
-        ], $invites));
+        return $this->json(WorkspaceInviteDTO::fromEntities($invites));
     }
 
     #[Route('/{invitePublicId}', name: 'revoke', methods: ['DELETE'])]

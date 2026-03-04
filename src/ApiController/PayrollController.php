@@ -57,10 +57,7 @@ class PayrollController extends AbstractController
 
         $runs = $this->payrollRunRepository->findByWorkspace($workspace);
 
-        return $this->json(array_map(
-            static fn($run) => PayrollRunDTO::fromEntity($run),
-            $runs,
-        ));
+        return $this->json(PayrollRunDTO::fromEntities($runs));
     }
 
     #[Route(name: 'create', methods: ['POST'])]

@@ -6,6 +6,7 @@ namespace App\ApiController;
 
 use App\ApiController\Trait\WorkspaceTrait;
 use App\Controller\AbstractController;
+use App\DTO\AllowedIpDTO;
 use App\Enum\ApiErrorCodeEnum;
 use App\Form\WorkspaceAllowedIpFormType;
 use App\Repository\WorkspaceAllowedIpRepository;
@@ -47,7 +48,7 @@ class WorkspaceAllowedIpController extends AbstractController
 
         $ips = $this->allowedIpRepository->findBy(['workspace' => $workspace, 'deletedAt' => null]);
 
-        return $this->json($ips, Response::HTTP_OK, [], ['groups' => ['workspace_allowed_ip:read']]);
+        return $this->json(AllowedIpDTO::fromEntities($ips));
     }
 
     #[Route(name: 'create', methods: ['POST'])]
@@ -65,7 +66,7 @@ class WorkspaceAllowedIpController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->allowedIpRepository->update($allowedIp);
 
-            return $this->json($allowedIp, Response::HTTP_CREATED, [], ['groups' => ['workspace_allowed_ip:read']]);
+            return $this->json(AllowedIpDTO::fromEntity($allowedIp), Response::HTTP_CREATED);
         }
 
         return $this->createBadRequestResponse($this->translator->trans('invalid.workspace_allowed_ip', domain: 'errors'));
@@ -88,7 +89,7 @@ class WorkspaceAllowedIpController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->allowedIpRepository->update($allowedIp);
 
-            return $this->json($allowedIp, Response::HTTP_OK, [], ['groups' => ['workspace_allowed_ip:read']]);
+            return $this->json(AllowedIpDTO::fromEntity($allowedIp));
         }
 
         return $this->createBadRequestResponse($this->translator->trans('invalid.workspace_allowed_ip', domain: 'errors'));

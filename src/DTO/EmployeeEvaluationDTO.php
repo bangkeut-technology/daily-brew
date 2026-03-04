@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\DTO;
 
+use App\DTO\Trait\HasEntityMapper;
 use App\Entity\EmployeeEvaluation;
 use DateTimeImmutable;
 
@@ -14,6 +15,8 @@ use DateTimeImmutable;
  */
 final class EmployeeEvaluationDTO
 {
+    use HasEntityMapper;
+
     public function __construct(
         public readonly string            $publicId,
         public readonly string            $templateName,

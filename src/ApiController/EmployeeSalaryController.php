@@ -6,6 +6,7 @@ namespace App\ApiController;
 
 use App\ApiController\Trait\EmployeeTrait;
 use App\Controller\AbstractController;
+use App\DTO\EmployeeSalaryDTO;
 use App\Enum\ApiErrorCodeEnum;
 use App\Form\EmployeeSalaryFormType;
 use App\Repository\EmployeeRepository;
@@ -48,7 +49,7 @@ class EmployeeSalaryController extends AbstractController
             return $this->json(['message' => 'No salary configured for this employee.'], Response::HTTP_NOT_FOUND);
         }
 
-        return $this->json($salary, Response::HTTP_OK, [], ['groups' => ['employee_salary:read']]);
+        return $this->json(EmployeeSalaryDTO::fromEntity($salary));
     }
 
     #[Route(name: 'upsert', methods: ['POST'])]
@@ -66,7 +67,7 @@ class EmployeeSalaryController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->employeeSalaryRepository->update($salary);
 
-            return $this->json($salary, Response::HTTP_OK, [], ['groups' => ['employee_salary:read']]);
+            return $this->json(EmployeeSalaryDTO::fromEntity($salary));
         }
 
         return $this->createBadRequestResponse($this->translator->trans('invalid.employee_salary', domain: 'errors'));

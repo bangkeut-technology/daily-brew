@@ -27,21 +27,9 @@ trait EmployeeEvaluationTrait
      * @param int   $status  The HTTP status code (default: 200 OK)
      * @param array $context The serialization context (default: employee, user, store, role, template read groups)
      */
-    private function createEmployeeEvaluationResponse(
-        mixed $data,
-        int   $status = Response::HTTP_OK,
-        array $context = ['groups' => [
-            'employee_evaluation:read',
-            'employee_score:read',
-            'employee:read',
-            'user:read',
-            'store:read',
-            'role:read',
-            'template:read'
-        ]],
-    ): JsonResponse
+    private function createEmployeeEvaluationResponse(mixed $data, int $status = Response::HTTP_OK): JsonResponse
     {
-        return $this->json($data, $status, context: $context);
+        return $this->json($data, $status);
     }
 
     /**

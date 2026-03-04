@@ -10,8 +10,11 @@
  * @see     https://adora.media
  */
 
+declare(strict_types=1);
+
 namespace App\DTO;
 
+use App\DTO\Trait\HasEntityMapper;
 use App\Entity\User;
 
 /**
@@ -23,6 +26,8 @@ use App\Entity\User;
  */
 final readonly class UserDTO
 {
+    use HasEntityMapper;
+
     public function __construct(
         public string  $publicId,
         public string  $email,

@@ -9,9 +9,9 @@ use App\ApiController\Trait\EmployeeEvaluationTrait;
 use App\ApiController\Trait\EmployeeTrait;
 use App\ApiController\Trait\EvaluationTemplateTrait;
 use App\Controller\AbstractController;
-use App\Entity\Attendance;
-use App\Entity\EmployeeEvaluation;
-use App\Entity\User;
+use App\DTO\AttendanceDTO;
+use App\DTO\EmployeeDTO;
+use App\DTO\EmployeeEvaluationDTO;
 use App\Event\Employee\CheckEmployeeLimitEvent;
 use App\Event\EmployeeEvaluation\FinalizeEmployeeEvaluationEvent;
 use App\Form\AttendanceFormType;
@@ -25,7 +25,6 @@ use DateMalformedStringException;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Exception;
-use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -34,6 +33,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use App\Entity\User;
 
 /**
  * Class EmployeeController.
@@ -65,14 +65,6 @@ class EmployeeController extends AbstractController
      *
      * @throws Exception
      */
-    #[OA\Response(
-        response: Response::HTTP_OK,
-        description: 'Returns a list of employees for the current user',
-        content: new OA\JsonContent(
-            type: 'array',
-            items: new OA\Items(ref: new Model(type: User::class, groups: ['employee:read']))
-        )
-    )]
     #[Route(name: 'gets', methods: ['GET'])]
     public function gets(
         Request             $request,
@@ -83,58 +75,35 @@ class EmployeeController extends AbstractController
         $now = new DateTimeImmutable();
         $from = new DateTimeImmutable($request->query->get('from', DateHelper::startOfMonth($now)->format('Y-m-d')));
         $to = new DateTimeImmutable($request->query->get('to', DateHelper::endOfMonth($now)->format('Y-m-d')));
+
         $listEmployees = [];
         foreach ($employees as $employee) {
             $listEmployees[$employee->id] = $employee;
         }
+
+        $averageScoreMap = [];
         if (count($listEmployees) > 0) {
             $averageScores = $this->employeeEvaluationRepository->getAverageScoresForPeriod($employees, $from, $to);
             foreach ($averageScores as $averageScore) {
-                if (null !== $listEmployees[$averageScore['employeeId']]) {
-                    $listEmployees[$averageScore['employeeId']]->averageScore = (float)($averageScore['averageScore'] ?? 0);
-                }
+                $averageScoreMap[$averageScore['employeeId']] = (float)($averageScore['averageScore'] ?? 0);
             }
         }
 
-        return $this->createEmployeeResponse(array_values($listEmployees));
+        $dtos = [];
+        foreach ($listEmployees as $employee) {
+            $dto = EmployeeDTO::fromEntity($employee);
+            $dto->averageScore = $averageScoreMap[$employee->id] ?? null;
+            $dtos[] = $dto;
+        }
+
+        return $this->createEmployeeResponse($dtos);
     }
 
     /**
      * Create a new employee for the current user.
-     *
-     * @param Request $request The request object containing the employee data.
-     *
-     * @return JsonResponse The JSON response containing the created employee data or an error message.
      */
-    #[OA\RequestBody(
-        description: 'Employee data',
-        content: new OA\JsonContent(
-            ref: new Model(type: EmployeeFormType::class),
-        )
-    )]
-    #[OA\Response(
-        response: Response::HTTP_CREATED,
-        description: 'Creates a new employee for the current user',
-        content: new OA\JsonContent(ref: new Model(type: User::class, groups: ['employee:read']))
-    )]
-    #[OA\Response(
-        response: Response::HTTP_BAD_REQUEST,
-        description: 'Invalid input data',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(
-                    property: 'message',
-                    type: 'string',
-                    example: 'Invalid input data'
-                ),
-            ],
-            type: 'object'
-        )
-    )]
     #[Route(name: 'post', methods: ['POST'])]
-    public function post(
-        Request $request,
-    ): JsonResponse
+    public function post(Request $request): JsonResponse
     {
         $this->dispatcher->dispatch(new CheckEmployeeLimitEvent($this->getUser()));
         $employee = $this->employeeRepository->create();
@@ -147,8 +116,8 @@ class EmployeeController extends AbstractController
             $this->employeeRepository->update($employee);
 
             return $this->createEmployeeResponse([
-                'employee' => $employee,
-                'message' => $this->translator->trans('created.employee', ['%name%' => $employee], 'messages'),
+                'employee' => EmployeeDTO::fromEntity($employee),
+                'message'  => $this->translator->trans('created.employee', ['%name%' => $employee], 'messages'),
             ], Response::HTTP_CREATED);
         }
 
@@ -161,50 +130,8 @@ class EmployeeController extends AbstractController
     /**
      * Get employee details by publicId.
      *
-     * @param string $publicId The unique publicId of the employee
-     *
      * @throws Exception
      */
-    #[OA\Parameter(
-        name: 'publicId',
-        description: 'The unique publicId of the employee',
-        in: 'path',
-        required: true,
-        schema: new OA\Schema(type: 'string', example: 'emp123')
-    )]
-    #[OA\Parameter(
-        name: 'from',
-        description: 'The start date of the evaluation period in YYYY-MM-DD format',
-        in: 'query',
-        required: false,
-        schema: new OA\Schema(type: 'string', example: '2023-01-01')
-    )]
-    #[OA\Parameter(
-        name: 'to',
-        description: 'The end date of the evaluation period in YYYY-MM-DD format',
-        in: 'query',
-        required: false,
-        schema: new OA\Schema(type: 'string', example: '2023-12-31')
-    )]
-    #[OA\Response(
-        response: Response::HTTP_OK,
-        description: 'Returns employee details by publicId',
-        content: new OA\JsonContent(ref: new Model(type: User::class, groups: ['employee:read', 'user:read', 'store:read', 'role:read']))
-    )]
-    #[OA\Response(
-        response: Response::HTTP_NOT_FOUND,
-        description: 'Employee not found',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(
-                    property: 'message',
-                    type: 'string',
-                    example: 'Employee not found'
-                ),
-            ],
-            type: 'object'
-        )
-    )]
     #[Route('/{publicId}', name: 'get', methods: ['GET'])]
     public function get(string $publicId, Request $request): JsonResponse
     {
@@ -212,65 +139,17 @@ class EmployeeController extends AbstractController
         $now = new DateTimeImmutable();
         $from = new DateTimeImmutable($request->query->get('from', DateHelper::startOfMonth($now)->format('Y-m-d')));
         $to = new DateTimeImmutable($request->query->get('to', DateHelper::endOfMonth($now)->format('Y-m-d')));
-        $employee->averageScore = $this->employeeEvaluationRepository->getAverageScoreForPeriod($employee, $from, $to);
+        $averageScore = $this->employeeEvaluationRepository->getAverageScoreForPeriod($employee, $from, $to);
 
-        return $this->createEmployeeResponse($employee);
+        $dto = EmployeeDTO::fromEntity($employee);
+        $dto->averageScore = $averageScore;
+
+        return $this->createEmployeeResponse($dto);
     }
 
     /**
      * Update employee details by publicId.
-     *
-     * @param Request $request
-     * @param string  $publicId The unique publicId of the employee
-     *
-     * @return JsonResponse
      */
-    #[OA\Parameter(
-        name: 'publicId',
-        description: 'The unique publicId of the employee',
-        in: 'path',
-        required: true,
-        schema: new OA\Schema(type: 'string', example: 'emp123')
-    )]
-    #[OA\RequestBody(
-        description: 'Employee data',
-        content: new OA\JsonContent(
-            ref: new Model(type: EmployeeFormType::class),
-        )
-    )]
-    #[OA\Response(
-        response: Response::HTTP_OK,
-        description: 'Updates employee details by publicId',
-        content: new OA\JsonContent(ref: new Model(type: User::class, groups: ['employee:read']))
-    )]
-    #[OA\Response(
-        response: Response::HTTP_NOT_FOUND,
-        description: 'Employee not found',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(
-                    property: 'message',
-                    type: 'string',
-                    example: 'Employee not found'
-                ),
-            ],
-            type: 'object'
-        )
-    )]
-    #[OA\Response(
-        response: Response::HTTP_BAD_REQUEST,
-        description: 'Invalid input data',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(
-                    property: 'message',
-                    type: 'string',
-                    example: 'Invalid input data'
-                ),
-            ],
-            type: 'object'
-        )
-    )]
     #[Route('/{publicId}', name: 'put', methods: ['PUT'])]
     public function put(Request $request, string $publicId): JsonResponse
     {
@@ -280,7 +159,7 @@ class EmployeeController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->employeeRepository->update($employee);
 
-            return $this->createEmployeeResponse($employee);
+            return $this->createEmployeeResponse(EmployeeDTO::fromEntity($employee));
         }
 
         return $this->json(
@@ -292,54 +171,8 @@ class EmployeeController extends AbstractController
     /**
      * Get attendances for the employee by publicId and period.
      *
-     * @param string  $publicId The unique publicId of the employee
-     * @param Request $request  The HTTP request
-     *
      * @throws Exception
      */
-    #[OA\Parameter(
-        name: 'publicId',
-        description: 'The unique publicId of the employee',
-        in: 'path',
-        required: true,
-        schema: new OA\Schema(type: 'string', example: 'emp123')
-    )]
-    #[OA\Parameter(
-        name: 'from',
-        description: 'The start date of the attendance period in YYYY-MM-DD format',
-        in: 'query',
-        required: false,
-        schema: new OA\Schema(type: 'string', example: '2023-01-01')
-    )]
-    #[OA\Parameter(
-        name: 'to',
-        description: 'The end date of the attendance period in YYYY-MM-DD format',
-        in: 'query',
-        required: false,
-        schema: new OA\Schema(type: 'string', example: '2023-12-31')
-    )]
-    #[OA\Response(
-        response: Response::HTTP_OK,
-        description: 'Returns all attendances for the employee',
-        content: new OA\JsonContent(
-            type: 'array',
-            items: new OA\Items(ref: new Model(type: Attendance::class, groups: ['attendance:read']))
-        )
-    )]
-    #[OA\Response(
-        response: Response::HTTP_NOT_FOUND,
-        description: 'Employee not found',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(
-                    property: 'message',
-                    type: 'string',
-                    example: 'Employee not found'
-                ),
-            ],
-            type: 'object'
-        )
-    )]
     #[Route('/{publicId}/attendance', name: 'get_attendances', methods: ['GET'])]
     public function getAttendances(string $publicId, Request $request): JsonResponse
     {
@@ -348,76 +181,12 @@ class EmployeeController extends AbstractController
         $to = new DateTimeImmutable($request->query->get('to', DateHelper::endOfMonth()->format('Y-m-d')));
         $attendances = $this->attendanceRepository->findByEmployeeAndPeriod($employee, $from, $to);
 
-        return $this->createAttendanceResponse($attendances);
+        return $this->createAttendanceResponse(AttendanceDTO::fromEntities($attendances));
     }
 
     /**
      * Post attendance for the employee by publicId.
-     *
-     * @param string  $publicId The unique publicId of the employee
-     * @param Request $request  The HTTP request containing the attendance data
-     *
-     * @return JsonResponse The JSON response containing the created attendance data or an error message
      */
-    #[OA\Parameter(
-        name: 'publicId',
-        description: 'The unique publicId of the employee',
-        in: 'path',
-        required: true,
-        schema: new OA\Schema(type: 'string', example: 'emp123')
-    )]
-    #[OA\RequestBody(
-        description: 'Attendance data',
-        content: new OA\JsonContent(
-            ref: new Model(type: AttendanceFormType::class),
-        )
-    )]
-    #[OA\Response(
-        response: Response::HTTP_CREATED,
-        description: 'Creates a new attendance for the employee',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(
-                    property: 'message',
-                    type: 'string',
-                    example: 'Attendance created successfully'
-                ),
-                new OA\Property(
-                    property: 'attendance',
-                    ref: new Model(type: Attendance::class, groups: ['attendance:read'])
-                ),
-            ],
-            type: 'object'
-        )
-    )]
-    #[OA\Response(
-        response: Response::HTTP_BAD_REQUEST,
-        description: 'Invalid input data',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(
-                    property: 'message',
-                    type: 'string',
-                    example: 'Invalid input data'
-                ),
-            ],
-            type: 'object'
-        )
-    )]
-    #[OA\Response(
-        response: Response::HTTP_NOT_FOUND,
-        description: 'Employee not found',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(
-                    property: 'message',
-                    type: 'string',
-                    example: 'Employee not found'
-                ),
-            ],
-            type: 'object'
-        )
-    )]
     #[Route('/{publicId}/attendance', name: 'post_attendance', methods: ['POST'])]
     public function postAttendance(string $publicId, Request $request): JsonResponse
     {
@@ -433,43 +202,17 @@ class EmployeeController extends AbstractController
             $this->employeeRepository->update($attendance);
 
             return $this->createAttendanceResponse([
-                'message' => $this->translator->trans('created.attendance', ['%name%' => $employee], domain: 'messages'),
-                'attendance' => $attendance,
+                'message'    => $this->translator->trans('created.attendance', ['%name%' => $employee], domain: 'messages'),
+                'attendance' => AttendanceDTO::fromEntity($attendance),
             ], Response::HTTP_CREATED);
         }
+
         return $this->createBadRequestResponse($this->translator->trans('invalid.attendance', domain: 'errors'));
     }
 
     /**
      * Delete employee by publicId.
-     *
-     * @param string $publicId The unique publicId of the employee
      */
-    #[OA\Parameter(
-        name: 'publicId',
-        description: 'The unique publicId of the employee',
-        in: 'path',
-        required: true,
-        schema: new OA\Schema(type: 'string', example: 'emp123')
-    )]
-    #[OA\Response(
-        response: Response::HTTP_NO_CONTENT,
-        description: 'Deletes employee by publicId'
-    )]
-    #[OA\Response(
-        response: Response::HTTP_NOT_FOUND,
-        description: 'Employee not found',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(
-                    property: 'message',
-                    type: 'string',
-                    example: 'Employee not found'
-                ),
-            ],
-            type: 'object'
-        )
-    )]
     #[Route('/{publicId}', name: 'delete', methods: ['DELETE'])]
     public function delete(string $publicId): JsonResponse
     {
@@ -489,65 +232,17 @@ class EmployeeController extends AbstractController
 
         $employee->setTemplates(new ArrayCollection([$template]));
 
-        return $this->createTemplateResponse([
-            'employee' => $employee,
-            $this->translator->trans('added.evaluation_template', ['%template%' => $template], 'messages'),
+        return $this->createEmployeeResponse([
+            'employee' => EmployeeDTO::fromEntity($employee),
+            'message'  => $this->translator->trans('added.evaluation_template', ['%template%' => $template], 'messages'),
         ]);
     }
 
     /**
      * Post an evaluation for the employee by publicId.
      *
-     * @param string  $publicId The unique publicId of the employee
-     * @param Request $request  The HTTP request containing the evaluation data
-     *
-     * @return JsonResponse The JSON response containing the created evaluation data or an error message
-     *
      * @throws DateMalformedStringException
      */
-    #[OA\Parameter(
-        name: 'publicId',
-        description: 'The unique publicId of the employee',
-        in: 'path',
-        required: true,
-        schema: new OA\Schema(type: 'string', example: 'emp123')
-    )]
-    #[OA\RequestBody(
-        description: 'Evaluation data',
-        content: new OA\JsonContent(
-            ref: new Model(type: EmployeeEvaluationFormType::class),
-        )
-    )]
-    #[OA\Response(
-        response: Response::HTTP_CREATED,
-        description: 'Creates a new evaluation for the employee',
-        content: new OA\JsonContent(ref: new Model(
-            type: EmployeeEvaluation::class,
-            groups: [
-                'user:read',
-                'store:read',
-                'role:read',
-                'employee:read',
-                'template:read',
-                'employee_evaluation:read',
-                'employee_criteria:read',
-            ]
-        ))
-    )]
-    #[OA\Response(
-        response: Response::HTTP_BAD_REQUEST,
-        description: 'Invalid input data',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(
-                    property: 'message',
-                    type: 'string',
-                    example: 'Invalid input data'
-                ),
-            ],
-            type: 'object'
-        )
-    )]
     #[Route('/{publicId}/evaluations', name: 'post_evaluations', methods: ['POST'])]
     public function postEvaluation(string $publicId, Request $request): JsonResponse
     {
@@ -561,12 +256,11 @@ class EmployeeController extends AbstractController
             $evaluation->setEvaluator($this->getUser());
 
             $this->dispatcher->dispatch(new FinalizeEmployeeEvaluationEvent($evaluation));
-
             $this->employeeEvaluationRepository->update($evaluation);
 
             return $this->createEmployeeEvaluationResponse([
-                'message' => $this->translator->trans('created.employee_evaluation'),
-                'evaluation' => $evaluation,
+                'message'    => $this->translator->trans('created.employee_evaluation'),
+                'evaluation' => EmployeeEvaluationDTO::fromEntity($evaluation, true),
             ], Response::HTTP_CREATED);
         }
 
@@ -576,31 +270,8 @@ class EmployeeController extends AbstractController
     /**
      * Get employee evaluation by publicId and date.
      *
-     * @param string  $publicId The unique publicId of the employee
-     * @param Request $request  The HTTP request containing the date parameter
-     *
      * @throws Exception
      */
-    #[OA\Parameter(
-        name: 'publicId',
-        description: 'The unique publicId of the employee',
-        in: 'path',
-        required: true,
-        schema: new OA\Schema(type: 'string', example: 'emp123')
-    )]
-    #[OA\Parameter(
-        name: 'date',
-        description: 'The date of the evaluation in YYYY-MM-DD format',
-        in: 'query',
-        required: false,
-        schema: new OA\Schema(type: 'string', example: '2023-10-01')
-    )]
-    #[OA\Response(
-        response: Response::HTTP_OK,
-        description: 'Returns the employee evaluation for the specified date',
-        content: new OA\JsonContent(ref: new Model(type: EmployeeEvaluation::class, groups: [
-            'employee_evaluation:read', 'employee_criteria:read', 'employee:read', 'user:read', 'store:read', 'role:read', 'template:read']))
-    )]
     #[Route('/{publicId}/evaluation', name: 'get_evaluation', methods: ['GET'])]
     public function getEmployeeEvaluation(string $publicId, Request $request): JsonResponse
     {
@@ -608,46 +279,16 @@ class EmployeeController extends AbstractController
         $date = $request->query->get('date', (new DateTimeImmutable())->format('Y-m-d'));
         $evaluation = $this->employeeEvaluationRepository->findByEvaluatedAtAndEmployee(new DateTimeImmutable($date), $employee);
 
-        return $this->createEmployeeEvaluationResponse($evaluation);
+        return $this->createEmployeeEvaluationResponse(
+            $evaluation ? EmployeeEvaluationDTO::fromEntity($evaluation, true) : null
+        );
     }
 
     /**
      * Get all evaluations for the employee by publicId and period.
      *
-     * @param string  $publicId The unique publicId of the employee
-     * @param Request $request  The HTTP request
-     *
      * @throws Exception
      */
-    #[OA\Parameter(
-        name: 'publicId',
-        description: 'The unique publicId of the employee',
-        in: 'path',
-        required: true,
-        schema: new OA\Schema(type: 'string', example: 'emp123')
-    )]
-    #[OA\Parameter(
-        name: 'from',
-        description: 'The start date of the evaluation period in YYYY-MM-DD format',
-        in: 'query',
-        required: false,
-        schema: new OA\Schema(type: 'string', example: '2023-01-01')
-    )]
-    #[OA\Parameter(
-        name: 'to',
-        description: 'The end date of the evaluation period in YYYY-MM-DD format',
-        in: 'query',
-        required: false,
-        schema: new OA\Schema(type: 'string', example: '2023-12-31')
-    )]
-    #[OA\Response(
-        response: Response::HTTP_OK,
-        description: 'Returns all evaluations for the employee',
-        content: new OA\JsonContent(
-            type: 'array',
-            items: new OA\Items(ref: new Model(type: EmployeeEvaluation::class, groups: ['employee_evaluation:read', 'employee_criteria:read', 'employee:read', 'user:read', 'store:read', 'role:read', 'template:read']))
-        )
-    )]
     #[Route('/{publicId}/evaluations', name: 'get_evaluations', methods: ['GET'])]
     public function getEmployeeEvaluations(string $publicId, Request $request): JsonResponse
     {
@@ -657,43 +298,12 @@ class EmployeeController extends AbstractController
 
         $evaluations = $this->employeeEvaluationRepository->findByPeriodAndEmployee(new DateTimeImmutable($from), new DateTimeImmutable($to), $employee);
 
-        return $this->createEmployeeEvaluationResponse($evaluations);
+        return $this->createEmployeeEvaluationResponse(EmployeeEvaluationDTO::fromEntities($evaluations, true));
     }
 
     /**
      * @throws Exception
      */
-    #[OA\Parameter(
-        name: 'publicId',
-        description: 'The unique publicId of the employee',
-        in: 'path',
-        required: true,
-        schema: new OA\Schema(type: 'string', example: 'emp123')
-    )]
-    #[OA\Parameter(
-        name: 'from',
-        description: 'The start date of the evaluation period in YYYY-MM-DD format',
-        in: 'query',
-        required: false,
-        schema: new OA\Schema(type: 'string', example: '2023-01-01')
-    )]
-    #[OA\Parameter(
-        name: 'to',
-        description: 'The end date of the evaluation period in YYYY-MM-DD format',
-        in: 'query',
-        required: false,
-        schema: new OA\Schema(type: 'string', example: '2023-12-31')
-    )]
-    #[OA\Response(
-        response: Response::HTTP_OK,
-        description: 'Returns the average score of evaluations for the employee',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(property: 'averageScore', type: 'number', format: 'float', example: 85.5),
-            ],
-            type: 'object'
-        )
-    )]
     #[Route('/{publicId}/evaluations/evaluations/average-score', name: 'get_evaluation_by_id', methods: ['GET'])]
     public function getAverageScore(string $publicId, Request $request): JsonResponse
     {

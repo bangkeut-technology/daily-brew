@@ -7,14 +7,13 @@ namespace App\ApiController;
 use App\ApiController\Trait\EvaluationCriteriaTrait;
 use App\ApiController\Trait\EvaluationTemplateCriteriaTrait;
 use App\Controller\AbstractController;
-use App\Entity\EvaluationCriteria;
-use App\Entity\EvaluationTemplateCriteria;
+use App\DTO\EvaluationCriteriaDTO;
+use App\DTO\EvaluationTemplateCriteriaDTO;
 use App\Entity\User;
 use App\Event\EvaluationCriteria\EvaluationCriteriaCreatedEvent;
 use App\Form\EvaluationCriteriaFormType;
 use App\Repository\EvaluationCriteriaRepository;
 use App\Repository\EvaluationTemplateRepository;
-use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -46,51 +45,14 @@ class EvaluationCriteriaController extends AbstractController
         parent::__construct($translator);
     }
 
-    /**
-     * Retrieves all evaluation criterias.
-     *
-     * @return JsonResponse the JSON response containing the list of evaluation criterias
-     */
-    #[OA\Response(
-        response: Response::HTTP_OK,
-        description: 'Returns a list of evaluation criterias.',
-        content: new OA\JsonContent(
-            type: 'array',
-            items: new OA\Items(ref: new Model(type: EvaluationCriteria::class, groups: ['criteria:read']))
-        )
-    )]
     #[Route(name: 'gets', methods: ['GET'])]
-    public function gets(
-        #[CurrentUser]
-        User $user,
-    ): JsonResponse
+    public function gets(#[CurrentUser] User $user): JsonResponse
     {
         $criterias = $this->evaluationCriteriaRepository->findByUser($user);
 
-        return $this->createCriteriaResponse($criterias);
+        return $this->createCriteriaResponse(EvaluationCriteriaDTO::fromEntities($criterias));
     }
 
-    /**
-     * Creates a new evaluation criteria.
-     *
-     * @param Request $request the HTTP request containing the evaluation criteria data
-     *
-     * @return JsonResponse the JSON response containing the created evaluation criteria
-     */
-    #[OA\Response(
-        response: Response::HTTP_CREATED,
-        description: 'Creates a new evaluation criteria.',
-        content: new OA\JsonContent(ref: new Model(type: EvaluationCriteria::class, groups: ['criteria:read']))
-    )]
-    #[OA\RequestBody(
-        description: 'The evaluation criteria data to create.',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(property: 'name', description: 'The name of the evaluation criteria', type: 'string'),
-                new OA\Property(property: 'description', description: 'The description of the evaluation criteria', type: 'string'),
-            ]
-        )
-    )]
     #[Route(name: 'post', methods: ['POST'])]
     public function post(Request $request): JsonResponse
     {
@@ -110,50 +72,17 @@ class EvaluationCriteriaController extends AbstractController
 
             return $this->createCriteriaResponse([
                 'message'  => $this->translator->trans('created.evaluation_criteria', ['%label%' => $criteria->getLabel()]),
-                'criteria' => $criteria,
+                'criteria' => EvaluationCriteriaDTO::fromEntity($criteria),
             ], Response::HTTP_CREATED);
         }
 
         return $this->createBadRequestResponse($this->translator->trans('invalid.evaluation_criteria', domain: 'errors'));
     }
 
-    /**
-     * Deletes an evaluation criteria.
-     *
-     * @param string $publicId the publicId of the evaluation criteria to delete
-     *
-     * @return JsonResponse the JSON response indicating the deletion status
-     */
-    #[OA\Parameter(
-        name: 'publicId',
-        description: 'The publicId of the evaluation criteria to delete.',
-        in: 'path',
-        required: true,
-        schema: new OA\Schema(type: 'string')
-    )]
-    #[OA\Response(
-        response: Response::HTTP_OK,
-        description: 'Deletes an evaluation criteria.',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(property: 'message', description: 'Confirmation message after deletion', type: 'string'),
-            ]
-        )
-    )]
-    #[OA\Response(
-        response: Response::HTTP_NOT_FOUND,
-        description: 'Evaluation criteria not found.',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(property: 'message', description: 'Error message', type: 'string'),
-            ]
-        )
-    )]
     #[Route('/{publicId}', name: 'delete', methods: ['DELETE'])]
     public function delete(string $publicId): JsonResponse
     {
         $criteria = $this->getEvaluationCriteriaByPublicId($publicId);
-
         $this->evaluationCriteriaRepository->remove($criteria);
 
         return $this->createCriteriaResponse([
@@ -161,71 +90,14 @@ class EvaluationCriteriaController extends AbstractController
         ]);
     }
 
-    /**
-     * Retrieves an evaluation criteria by its publicId.
-     *
-     * @param string $publicId the publicId of the evaluation criteria
-     *
-     * @return JsonResponse the JSON response containing the evaluation criteria
-     */
-    #[OA\Parameter(
-        name: 'publicId',
-        description: 'The publicId of the evaluation criteria to retrieve.',
-        in: 'path',
-        required: true,
-        schema: new OA\Schema(type: 'string')
-    )]
-    #[OA\Response(
-        response: Response::HTTP_OK,
-        description: 'Returns an evaluation criteria by its publicId.',
-        content: new OA\JsonContent(ref: new Model(type: EvaluationCriteria::class, groups: ['criteria:read']))
-    )]
-    #[OA\Response(
-        response: Response::HTTP_NOT_FOUND,
-        description: 'Evaluation criteria not found.',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(property: 'message', description: 'Error message', type: 'string'),
-            ]
-        )
-    )]
     #[Route('/{publicId}', name: 'get', methods: ['GET'])]
     public function get(string $publicId): JsonResponse
     {
         $criteria = $this->getEvaluationCriteriaByPublicId($publicId);
 
-        return $this->createCriteriaResponse($criteria);
+        return $this->createCriteriaResponse(EvaluationCriteriaDTO::fromEntity($criteria));
     }
 
-    /**
-     * Updates an existing evaluation criteria.
-     *
-     * @param Request $request  the HTTP request containing the updated evaluation criteria data
-     * @param string  $publicId the publicId of the evaluation criteria to update
-     *
-     * @return JsonResponse the JSON response containing the updated evaluation criteria
-     */
-    #[OA\Parameter(
-        name: 'publicId',
-        description: 'The publicId of the evaluation criteria to update.',
-        in: 'path',
-        required: true,
-        schema: new OA\Schema(type: 'string')
-    )]
-    #[OA\Response(
-        response: Response::HTTP_OK,
-        description: 'Updates an existing evaluation criteria.',
-        content: new OA\JsonContent(ref: new Model(type: EvaluationCriteria::class, groups: ['criteria:read']))
-    )]
-    #[OA\RequestBody(
-        description: 'The evaluation criteria data to update.',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(property: 'name', description: 'The name of the evaluation criteria', type: 'string'),
-                new OA\Property(property: 'description', description: 'The description of the evaluation criteria', type: 'string'),
-            ]
-        )
-    )]
     #[Route('/{publicId}', name: 'put', methods: ['PUT'])]
     public function put(Request $request, string $publicId): JsonResponse
     {
@@ -236,89 +108,17 @@ class EvaluationCriteriaController extends AbstractController
             $this->evaluationCriteriaRepository->update($criteria);
         }
 
-        return $this->createCriteriaResponse($criteria);
+        return $this->createCriteriaResponse(EvaluationCriteriaDTO::fromEntity($criteria));
     }
 
-    /**
-     * Retrieves the templates associated with the evaluation criteria.
-     *
-     * @param string $publicId the publicId of the evaluation criteria
-     *
-     * @return JsonResponse the list of template associated with the evaluation criteria
-     */
-    #[OA\Parameter(
-        name: 'publicId',
-        description: 'The publicId of the evaluation criteria to retrieve template for.',
-        in: 'path',
-        required: true,
-        schema: new OA\Schema(type: 'string')
-    )]
-    #[OA\Response(
-        response: Response::HTTP_OK,
-        description: 'Returns the templates associated with the evaluation criteria.',
-        content: new OA\JsonContent(
-            type: 'array',
-            items: new OA\Items(ref: new Model(type: EvaluationTemplateCriteria::class, groups: ['template:read']))
-        )
-    )]
-    #[OA\Response(
-        response: Response::HTTP_NOT_FOUND,
-        description: 'Evaluation criteria not found.',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(property: 'message', description: 'Error message', type: 'string'),
-            ]
-        )
-    )]
     #[Route('/{publicId}/templates', name: 'get_templates', methods: ['GET'])]
     public function getTemplates(string $publicId): JsonResponse
     {
         $criteria = $this->getEvaluationCriteriaByPublicId($publicId);
 
-        return $this->createTemplateCriteriaResponse($criteria->getTemplates());
+        return $this->createTemplateCriteriaResponse(EvaluationTemplateCriteriaDTO::fromEntities($criteria->getTemplates()));
     }
 
-    /**
-     * Adds templates to the evaluation criteria.
-     *
-     * @param string  $publicId the publicId of the evaluation criteria
-     * @param Request $request  the HTTP request containing the template data
-     *
-     * @return JsonResponse the JSON response containing the updated evaluation criteria with templates
-     */
-    #[OA\Parameter(
-        name: 'publicId',
-        description: 'The publicId of the evaluation criteria to add templates to.',
-        in: 'path',
-        required: true,
-        schema: new OA\Schema(type: 'string')
-    )]
-    #[OA\Response(
-        response: Response::HTTP_OK,
-        description: 'Adds templates to the evaluation criteria.',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(property: 'message', description: 'Confirmation message after adding criteria', type: 'string'),
-            ]
-        )
-    )]
-    #[OA\Response(
-        response: Response::HTTP_NOT_FOUND,
-        description: 'Evaluation template not found.',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(property: 'message', description: 'Error message', type: 'string'),
-            ]
-        )
-    )]
-    #[OA\RequestBody(
-        description: 'The template data to add to the evaluation criteria.',
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(property: 'templates', type: 'array', items: new OA\Items(ref: new Model(type: EvaluationTemplateCriteria::class, groups: ['template:read']))),
-            ]
-        )
-    )]
     #[Route('/{publicId}/templates', name: 'post_templates', methods: ['POST'])]
     public function postTemplates(string $publicId, Request $request): JsonResponse
     {
