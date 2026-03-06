@@ -8,6 +8,7 @@ use App\Controller\AbstractController;
 use App\DTO\AttendanceDTO;
 use App\DTO\EmployeeEvaluationDTO;
 use App\DTO\LeaveRequestDTO;
+use App\DTO\PayslipDTO;
 use App\Enum\ApiErrorCodeEnum;
 use App\Enum\AttendanceTypeEnum;
 use App\Enum\LeaveRequestStatusEnum;
@@ -16,6 +17,7 @@ use App\Repository\AttendanceRepository;
 use App\Repository\EmployeeEvaluationRepository;
 use App\Repository\EmployeeRepository;
 use App\Repository\LeaveRequestRepository;
+use App\Repository\PayslipRepository;
 use App\Repository\WorkspaceAllowedIpRepository;
 use App\Service\LeaveRequestService;
 use App\Service\ShiftAttendanceService;
@@ -43,6 +45,7 @@ class MeController extends AbstractController
         private readonly AttendanceRepository         $attendanceRepository,
         private readonly EmployeeEvaluationRepository $evaluationRepository,
         private readonly LeaveRequestRepository       $leaveRequestRepository,
+        private readonly PayslipRepository            $payslipRepository,
         private readonly WorkspaceAllowedIpRepository $allowedIpRepository,
         private readonly ShiftAttendanceService       $shiftAttendanceService,
     )
@@ -196,6 +199,19 @@ class MeController extends AbstractController
         $this->leaveRequestRepository->update($leaveRequest);
 
         return $this->json(null, Response::HTTP_NO_CONTENT);
+    }
+
+    // ── Payslips ─────────────────────────────────────────────────────────────
+
+    #[Route('/payslips', name: 'payslips_list', methods: ['GET'])]
+    public function payslipsList(Request $request): JsonResponse
+    {
+        $employee = $this->resolveEmployee();
+        $year = (int) ($request->query->get('year', (int) date('Y')));
+
+        $payslips = $this->payslipRepository->findByEmployeeAndYear($employee, $year);
+
+        return $this->json(PayslipDTO::fromEntities($payslips));
     }
 
     // ── Helper ───────────────────────────────────────────────────────────────

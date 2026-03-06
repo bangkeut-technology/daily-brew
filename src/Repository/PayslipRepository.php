@@ -54,6 +54,32 @@ class PayslipRepository extends AbstractRepository
     }
 
     /**
+     * Find all payslips for an employee filtered by year.
+     *
+     * @param Employee $employee
+     * @param int      $year
+     * @return Payslip[]
+     */
+    public function findByEmployeeAndYear(Employee $employee, int $year): array
+    {
+        $start = new \DateTimeImmutable("$year-01-01");
+        $end   = new \DateTimeImmutable("$year-12-31");
+
+        return $this->createQueryBuilder('p')
+            ->join('p.payrollRun', 'pr')
+            ->where('p.employee = :employee')
+            ->andWhere('pr.period >= :start')
+            ->andWhere('pr.period <= :end')
+            ->andWhere('p.deletedAt IS NULL')
+            ->setParameter('employee', $employee)
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->orderBy('pr.period', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * Find a payslip by public ID and payroll run.
      *
      * @param string     $publicId

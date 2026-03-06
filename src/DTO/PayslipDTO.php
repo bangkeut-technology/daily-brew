@@ -40,6 +40,7 @@ final class PayslipDTO
         public array                       $items = [],
         public readonly ?DateTimeImmutable $createdAt = null,
         public readonly ?DateTimeImmutable $updatedAt = null,
+        public readonly ?DateTimeImmutable $period = null,
     )
     {
     }
@@ -66,6 +67,7 @@ final class PayslipDTO
             notes: $payslip->getNotes(),
             createdAt: $payslip->getCreatedAt(),
             updatedAt: $payslip->getUpdatedAt(),
+            period: $payslip->getPayrollRun()?->getPeriod(),
         );
 
         if ($withItems) {
