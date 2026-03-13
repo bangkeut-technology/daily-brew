@@ -9,10 +9,6 @@
         {
             "type": "vcs",
             "url": "https://github.com/vandetho/oauth2-apple"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/vandetho/oauth2-google"
         }
     ],
     "require": {
@@ -36,7 +32,7 @@
         "guzzlehttp/guzzle": "^7.10",
         "knpuniversity/oauth2-client-bundle": "^2.20",
         "league/oauth2-client": "^2.9",
-        "league/oauth2-google": "dev-main",
+        "league/oauth2-google": "^4.2",
         "lexik/jwt-authentication-bundle": "^3.2",
         "matomo/device-detector": "^6.5",
         "nelmio/api-doc-bundle": "^4.38",
