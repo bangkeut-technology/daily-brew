@@ -4,15 +4,15 @@ import { useCheckinStatus, useCheckinAction } from '@/hooks/queries/useCheckin';
 import { useState, useEffect } from 'react';
 import { MapPin } from 'lucide-react';
 
-export const Route = createFileRoute('/checkin/$qrToken')({
+export const Route = createFileRoute('/checkin/$publicId')({
   component: CheckinPage,
 });
 
 function CheckinPage() {
   const { t } = useTranslation();
-  const { qrToken } = Route.useParams();
-  const { data, isLoading, error, refetch } = useCheckinStatus(qrToken);
-  const checkinAction = useCheckinAction(qrToken);
+  const { publicId } = Route.useParams();
+  const { data, isLoading, error, refetch } = useCheckinStatus(publicId);
+  const checkinAction = useCheckinAction(publicId);
   const [actionResult, setActionResult] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
@@ -108,11 +108,7 @@ function CheckinPage() {
 
       {/* Avatar */}
       <div
-        className="w-16 h-16 rounded-[20px] flex items-center justify-center text-2xl font-bold text-white mb-4"
-        style={{
-          background: 'linear-gradient(135deg, #E8A85A, #6B4226)',
-          boxShadow: '0 4px 14px rgba(107,66,38,0.25)',
-        }}
+        className="w-16 h-16 rounded-[20px] flex items-center justify-center text-2xl font-bold text-white mb-4 bg-gradient-to-br from-amber-light to-coffee shadow-[0_4px_14px_rgba(107,66,38,0.25)]"
       >
         {initials}
       </div>

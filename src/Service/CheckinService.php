@@ -74,6 +74,8 @@ class CheckinService
             $attendance->setWorkspace($workspace);
             $attendance->setDate($today);
             $attendance->setCheckInAt($now);
+            $attendance->setCheckInLat($latitude);
+            $attendance->setCheckInLng($longitude);
             $attendance->setIpAddress($clientIp);
 
             // Late detection (ShiftTimeRule-aware)
@@ -95,6 +97,8 @@ class CheckinService
         } elseif ($attendance->getCheckOutAt() === null) {
             // Check out
             $attendance->setCheckOutAt($now);
+            $attendance->setCheckOutLat($latitude);
+            $attendance->setCheckOutLng($longitude);
             $attendance->setIpAddress($clientIp);
 
             // Left early detection (ShiftTimeRule-aware)

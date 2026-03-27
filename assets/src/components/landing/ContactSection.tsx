@@ -26,7 +26,7 @@ export function ContactSection() {
       </motion.div>
 
       <motion.div
-        className="group relative bg-white/60 backdrop-blur-md border border-white/85 rounded-2xl p-8 shadow-[0_2px_12px_rgba(107,66,38,0.05)] max-w-lg mx-auto overflow-hidden"
+        className="group relative bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-8 shadow-[0_2px_12px_rgba(107,66,38,0.05)] max-w-lg mx-auto overflow-hidden"
         initial={{ opacity: 0, y: 25 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}

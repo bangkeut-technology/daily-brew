@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\Employee;
 use App\Entity\Shift;
 use App\Entity\User;
 use App\Entity\Workspace;
+use App\Enum\EmployeeStatusEnum;
 use Doctrine\ORM\EntityManagerInterface;
 
 class EmployeeService
@@ -14,13 +17,21 @@ class EmployeeService
         private EntityManagerInterface $em,
     ) {}
 
-    public function create(Workspace $workspace, string $name, ?string $phone = null, ?Shift $shift = null): Employee
-    {
+    public function create(
+        Workspace $workspace,
+        string $firstName,
+        string $lastName,
+        ?string $phoneNumber = null,
+        ?Shift $shift = null,
+    ): Employee {
         $employee = new Employee();
         $employee->setWorkspace($workspace);
-        $employee->setName($name);
-        $employee->setPhone($phone);
+        $employee->setFirstName($firstName);
+        $employee->setLastName($lastName);
+        $employee->setPhoneNumber($phoneNumber);
         $employee->setShift($shift);
+        // Set the workspace owner as the creator
+        $employee->setUser($workspace->getOwner());
 
         $this->em->persist($employee);
         $this->em->flush();
@@ -28,13 +39,20 @@ class EmployeeService
         return $employee;
     }
 
-    public function update(Employee $employee, string $name, ?string $phone, ?Shift $shift, ?bool $active = null): Employee
-    {
-        $employee->setName($name);
-        $employee->setPhone($phone);
+    public function update(
+        Employee $employee,
+        string $firstName,
+        string $lastName,
+        ?string $phoneNumber,
+        ?Shift $shift,
+        ?bool $active = null,
+    ): Employee {
+        $employee->setFirstName($firstName);
+        $employee->setLastName($lastName);
+        $employee->setPhoneNumber($phoneNumber);
         $employee->setShift($shift);
         if ($active !== null) {
-            $employee->setActive($active);
+            $employee->setStatus($active ? EmployeeStatusEnum::ACTIVE : EmployeeStatusEnum::INACTIVE);
         }
         $this->em->flush();
 
@@ -43,7 +61,7 @@ class EmployeeService
 
     public function linkUser(Employee $employee, User $user): Employee
     {
-        $employee->setUser($user);
+        $employee->setLinkedUser($user);
         $this->em->flush();
 
         return $employee;

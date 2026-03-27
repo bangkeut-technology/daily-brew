@@ -20,12 +20,12 @@ export function OwnerDashboard() {
         <PageHeader title={t('nav.dashboard')} />
         <GlassCard hover={false}>
           <div className="p-8 text-center">
-            <p className="text-[13.5px] text-[#7C6860] mb-4 font-sans">
+            <p className="text-[13.5px] text-text-secondary mb-4 font-sans">
               {t('dashboard.noWorkspace', 'No workspace selected. Create one to get started.')}
             </p>
             <Link
               to="/console/settings"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-[#6B4226] text-white no-underline transition-all duration-150 hover:bg-[#9B6B45] hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white no-underline transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
             >
               {t('dashboard.goToSettings', 'Go to settings')}
             </Link>
@@ -39,7 +39,7 @@ export function OwnerDashboard() {
     return (
       <div className="page-enter">
         <PageHeader title={t('nav.dashboard')} />
-        <p className="text-[#AE9D95] text-[13px] font-sans">{t('common.loading', 'Loading...')}</p>
+        <p className="text-text-tertiary text-[13px] font-sans">{t('common.loading', 'Loading...')}</p>
       </div>
     );
   }
@@ -54,8 +54,8 @@ export function OwnerDashboard() {
               to="/console/leave"
               className="inline-flex items-center gap-2 no-underline"
             >
-              <CalendarOff size={14} className="text-[#C17F3B]" />
-              <span className="text-[13px] text-[#7C6860] font-sans">
+              <CalendarOff size={14} className="text-amber" />
+              <span className="text-[13px] text-text-secondary font-sans">
                 {t('dashboard.pendingLeaves', 'Pending leaves')}
               </span>
               <StatusBadge
@@ -73,28 +73,28 @@ export function OwnerDashboard() {
           label={t('dashboard.present', 'Present today')}
           value={data.present}
           subtitle={t('dashboard.ofEmployees', { count: data.totalEmployees, defaultValue: `of ${data.totalEmployees} employees` })}
-          accent="#4A7C59"
+          accent="green"
           emoji="&#10004;"
         />
         <StatCard
           label={t('dashboard.late', 'Late')}
           value={data.late}
           subtitle={t('dashboard.ofEmployees', { count: data.totalEmployees, defaultValue: `of ${data.totalEmployees} employees` })}
-          accent="#C17F3B"
+          accent="amber"
           emoji="&#9200;"
         />
         <StatCard
           label={t('dashboard.onLeave', 'On leave')}
           value={data.onLeave}
           subtitle={`${data.pendingLeaves} ${t('dashboard.pending', 'pending')}`}
-          accent="#3B6FA0"
+          accent="blue"
           emoji="&#127796;"
         />
         <StatCard
           label={t('dashboard.absent', 'Absent')}
           value={data.absent}
           subtitle={t('dashboard.ofEmployees', { count: data.totalEmployees, defaultValue: `of ${data.totalEmployees} employees` })}
-          accent="#C0392B"
+          accent="red"
           emoji="&#10060;"
         />
       </div>
@@ -106,7 +106,7 @@ export function OwnerDashboard() {
           action={
             <Link
               to="/console/attendance"
-              className="text-xs text-[#C17F3B] font-medium cursor-pointer no-underline"
+              className="text-xs text-amber font-medium cursor-pointer no-underline"
             >
               {t('dashboard.viewAll', 'View all')} &rarr;
             </Link>
@@ -114,7 +114,7 @@ export function OwnerDashboard() {
         />
         <div>
           {data.recentAttendance.length === 0 ? (
-            <p className="px-5 py-8 text-center text-[13px] text-[#AE9D95] font-sans">
+            <p className="px-5 py-8 text-center text-[13px] text-text-tertiary font-sans">
               {t('dashboard.noAttendance', 'No attendance records yet today')}
             </p>
           ) : (
@@ -138,14 +138,14 @@ export function OwnerDashboard() {
       <div className="flex flex-wrap gap-3">
         <Link
           to="/console/employees/new"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-[#6B4226] text-white no-underline border-none cursor-pointer transition-all duration-150 hover:bg-[#9B6B45] hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white no-underline border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
         >
           <UserPlus size={14} />
           {t('dashboard.addEmployee', 'Add employee')}
         </Link>
         <Link
           to="/console/attendance"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-white/62 backdrop-blur-sm text-[#2C2420] border border-[#EBE2D6] no-underline cursor-pointer transition-all duration-150 hover:bg-[#EBE2D6]"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 no-underline cursor-pointer transition-all duration-150 hover:bg-cream-3"
         >
           <ClipboardList size={14} />
           {t('dashboard.viewAttendance', 'View attendance')}

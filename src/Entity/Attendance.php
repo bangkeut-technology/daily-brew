@@ -42,6 +42,18 @@ class Attendance extends AbstractBaseEntity
     #[Groups(['attendance:read'])]
     private bool $leftEarly = false;
 
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $checkInLat = null;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $checkInLng = null;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $checkOutLat = null;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    private ?float $checkOutLng = null;
+
     #[ORM\Column(length: 45, nullable: true)]
     private ?string $ipAddress = null;
 
@@ -91,6 +103,20 @@ class Attendance extends AbstractBaseEntity
         $this->checkOutAt = $checkOutAt;
         return $this;
     }
+
+    // ── Geolocation ──────────────────────────────────────────────
+
+    public function getCheckInLat(): ?float { return $this->checkInLat; }
+    public function setCheckInLat(?float $v): static { $this->checkInLat = $v; return $this; }
+
+    public function getCheckInLng(): ?float { return $this->checkInLng; }
+    public function setCheckInLng(?float $v): static { $this->checkInLng = $v; return $this; }
+
+    public function getCheckOutLat(): ?float { return $this->checkOutLat; }
+    public function setCheckOutLat(?float $v): static { $this->checkOutLat = $v; return $this; }
+
+    public function getCheckOutLng(): ?float { return $this->checkOutLng; }
+    public function setCheckOutLng(?float $v): static { $this->checkOutLng = $v; return $this; }
 
     // ── Flags ──────────────────────────────────────────────────
 

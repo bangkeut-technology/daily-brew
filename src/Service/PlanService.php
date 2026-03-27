@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\Workspace;
-use App\Enum\Plan;
+use App\Enum\PlanEnum;
 use App\Repository\EmployeeRepository;
 use App\Repository\SubscriptionRepository;
 
@@ -18,24 +18,24 @@ class PlanService
         private EmployeeRepository $employeeRepository,
     ) {}
 
-    public function getPlan(Workspace $workspace): Plan
+    public function getPlan(Workspace $workspace): PlanEnum
     {
         $subscription = $this->subscriptionRepository->findByWorkspace($workspace);
         if ($subscription === null) {
-            return Plan::Free;
+            return PlanEnum::Free;
         }
 
-        return $subscription->isBrewPlus() ? Plan::BrewPlus : Plan::Free;
+        return $subscription->isEspresso() ? PlanEnum::Espresso : PlanEnum::Free;
     }
 
-    public function isBrewPlus(Workspace $workspace): bool
+    public function isEspresso(Workspace $workspace): bool
     {
-        return $this->getPlan($workspace) === Plan::BrewPlus;
+        return $this->getPlan($workspace) === PlanEnum::Espresso;
     }
 
     public function canAddEmployee(Workspace $workspace): bool
     {
-        if ($this->isBrewPlus($workspace)) {
+        if ($this->isEspresso($workspace)) {
             return true;
         }
 
@@ -45,28 +45,28 @@ class PlanService
 
     public function canUseIpRestriction(Workspace $workspace): bool
     {
-        return $this->isBrewPlus($workspace);
+        return $this->isEspresso($workspace);
     }
 
     public function canUseGeofencing(Workspace $workspace): bool
     {
-        return $this->isBrewPlus($workspace);
+        return $this->isEspresso($workspace);
     }
 
     public function canUseLeaveRequests(Workspace $workspace): bool
     {
-        return $this->isBrewPlus($workspace);
+        return $this->isEspresso($workspace);
     }
 
     public function canUseShiftTimeRules(Workspace $workspace): bool
     {
-        return $this->isBrewPlus($workspace);
+        return $this->isEspresso($workspace);
     }
 
     public function getRemainingEmployeeSlots(Workspace $workspace): ?int
     {
-        if ($this->isBrewPlus($workspace)) {
-            return null; // unlimited
+        if ($this->isEspresso($workspace)) {
+            return null;
         }
 
         $count = $this->employeeRepository->countActiveByWorkspace($workspace);
@@ -81,8 +81,8 @@ class PlanService
         return [
             'plan' => $plan->value,
             'planLabel' => $plan->label(),
-            'isBrewPlus' => $plan === Plan::BrewPlus,
-            'employeeLimit' => $plan === Plan::Free ? self::FREE_EMPLOYEE_LIMIT : null,
+            'isEspresso' => $plan === PlanEnum::Espresso,
+            'employeeLimit' => $plan === PlanEnum::Free ? self::FREE_EMPLOYEE_LIMIT : null,
             'remainingEmployeeSlots' => $this->getRemainingEmployeeSlots($workspace),
             'canUseIpRestriction' => $this->canUseIpRestriction($workspace),
             'canUseGeofencing' => $this->canUseGeofencing($workspace),

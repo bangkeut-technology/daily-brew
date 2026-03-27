@@ -29,13 +29,13 @@ export function AttendanceRow({
   const status = getStatus();
 
   return (
-    <div className="flex items-center gap-3 px-5 py-2.5 transition-colors duration-[120ms] hover:bg-[#EBE2D6]/35 cursor-default">
+    <div className="flex items-center gap-3 px-5 py-2.5 transition-colors duration-[120ms] hover:bg-cream-3/35 cursor-default">
       <Avatar name={employee} index={index} size={32} />
       <div className="flex-1">
-        <div className="text-[13.5px] font-medium text-[#2C2420] font-sans">{employee}</div>
-        <div className="text-[11px] text-[#AE9D95] font-sans">{shift || 'No shift'}</div>
+        <div className="text-[13.5px] font-medium text-text-primary font-sans">{employee}</div>
+        <div className="text-[11px] text-text-tertiary font-sans">{shift || 'No shift'}</div>
       </div>
-      <div className="text-[12.5px] text-[#7C6860] font-mono tabular-nums">
+      <div className="text-[12.5px] text-text-secondary font-mono tabular-nums">
         {time}
         {checkOut ? ` \u2192 ${checkOut}` : ''}
       </div>

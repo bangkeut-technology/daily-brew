@@ -44,7 +44,7 @@ const coreFeatures = [
   },
 ];
 
-const brewPlusFeatures = [
+const espressoFeatures = [
   {
     icon: <Shield size={28} strokeWidth={1.6} />,
     title: 'IP restriction',
@@ -112,7 +112,7 @@ function FeaturesPage() {
           </div>
         </div>
 
-        {/* Brew+ features */}
+        {/* Espresso features */}
         <div className="mb-20">
           <motion.div
             className="flex items-center justify-center gap-2 mb-8"
@@ -122,12 +122,12 @@ function FeaturesPage() {
           >
             <Crown size={16} className="text-amber" />
             <h2 className="text-[11px] uppercase tracking-[2px] font-medium text-amber">
-              Brew+ features
+              Espresso features
             </h2>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {brewPlusFeatures.map((f, i) => (
-              <FeatureCard key={f.title} feature={f} index={i} brewPlus />
+            {espressoFeatures.map((f, i) => (
+              <FeatureCard key={f.title} feature={f} index={i} espresso />
             ))}
           </div>
         </div>
@@ -155,7 +155,7 @@ function FeaturesPage() {
             </Link>
             <Link
               to="/pricing"
-              className="px-6 py-2.5 rounded-lg text-[13px] font-medium bg-white/60 backdrop-blur-sm text-text-primary border border-cream-3 no-underline transition-all hover:bg-cream-3"
+              className="px-6 py-2.5 rounded-lg text-[13px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 no-underline transition-all hover:bg-cream-3"
             >
               View pricing
             </Link>
@@ -171,15 +171,15 @@ function FeaturesPage() {
 function FeatureCard({
   feature,
   index,
-  brewPlus,
+  espresso,
 }: {
   feature: { icon: React.ReactNode; title: string; desc: string; accent: string };
   index: number;
-  brewPlus?: boolean;
+  espresso?: boolean;
 }) {
   return (
     <motion.div
-      className="group relative bg-white/60 backdrop-blur-md border border-white/85 rounded-2xl p-6 shadow-[0_2px_12px_rgba(107,66,38,0.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(107,66,38,0.10)] overflow-hidden"
+      className="group relative glass-card !rounded-2xl p-6 hover:!-translate-y-1"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -207,9 +207,9 @@ function FeatureCard({
           <h3 className="text-[14px] font-semibold text-text-primary">
             {feature.title}
           </h3>
-          {brewPlus && (
+          {espresso && (
             <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-amber/10 text-amber uppercase tracking-wider">
-              Brew+
+              Espresso
             </span>
           )}
         </div>

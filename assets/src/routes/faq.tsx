@@ -49,19 +49,19 @@ const faqSections: FaqSection[] = [
           'The Free plan includes up to 5 employees, QR check-in, shift tracking, closure periods, and the attendance dashboard. It is free forever with no time limit.',
       },
       {
-        question: "What's included in Brew+?",
+        question: "What's included in Espresso?",
         answer:
-          'Brew+ gives you unlimited employees, leave request management, IP restriction for check-in, geofencing, per-day shift schedules, and priority support from our team.',
+          'Espresso gives you unlimited employees, leave request management, IP restriction for check-in, geofencing, per-day shift schedules, and priority support from our team.',
       },
       {
-        question: 'How much does Brew+ cost?',
+        question: 'How much does Espresso cost?',
         answer:
-          'Brew+ costs $12.99 per month, or $129 per year if you choose annual billing. The yearly plan saves you $26.88 compared to paying monthly.',
+          'Espresso costs $12.99 per month, or $129 per year if you choose annual billing. The yearly plan saves you $26.88 compared to paying monthly.',
       },
       {
         question: 'Can I cancel anytime?',
         answer:
-          'Yes, there are no contracts or lock-in periods. You can cancel your Brew+ subscription at any time from your dashboard Settings. After cancellation, you will continue to have access until the end of your current billing period.',
+          'Yes, there are no contracts or lock-in periods. You can cancel your Espresso subscription at any time from your dashboard Settings. After cancellation, you will continue to have access until the end of your current billing period.',
       },
     ],
   },
@@ -212,7 +212,7 @@ function FaqPage() {
               <h2 className="text-[11px] uppercase tracking-[2px] font-medium text-text-tertiary mb-4 px-6">
                 {section.title}
               </h2>
-              <div className="bg-white/60 backdrop-blur-md border border-white/85 rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(107,66,38,0.05)]">
+              <div className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(107,66,38,0.05)]">
                 {section.items.map((item, itemIndex) => (
                   <AccordionItem
                     key={item.question}

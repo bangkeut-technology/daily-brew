@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\UniqueConstraint;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -25,12 +26,16 @@ use Vich\UploaderBundle\Mapping\Attribute as Vich;
  */
 #[ORM\Entity(repositoryClass: WorkspaceRepository::class)]
 #[ORM\Table(name: 'daily_brew_workspaces')]
+#[UniqueConstraint(name: 'UNIQ_OWNER_WORKSPACE', fields: ['owner', 'name'])]
 #[Vich\Uploadable]
 class Workspace extends AbstractBaseEntity
 {
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['user:read', 'attendance:read', 'employee:read'])]
     private ?string $name = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $nameCanonical = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
@@ -109,6 +114,17 @@ class Workspace extends AbstractBaseEntity
     public function setName(?string $name): static
     {
         $this->name = $name;
+        return $this;
+    }
+
+    public function getNameCanonical(): ?string
+    {
+        return $this->nameCanonical;
+    }
+
+    public function setNameCanonical(?string $nameCanonical): static
+    {
+        $this->nameCanonical = $nameCanonical;
         return $this;
     }
 

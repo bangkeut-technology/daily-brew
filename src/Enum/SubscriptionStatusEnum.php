@@ -2,7 +2,7 @@
 
 namespace App\Enum;
 
-enum SubscriptionStatus: string
+enum SubscriptionStatusEnum: string
 {
     case Active = 'active';
     case PastDue = 'past_due';

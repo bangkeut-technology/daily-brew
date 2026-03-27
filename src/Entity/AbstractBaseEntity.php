@@ -13,16 +13,16 @@ abstract class AbstractBaseEntity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    protected ?int $id = null;
 
     #[ORM\Column(type: UuidType::NAME, unique: true)]
-    private Uuid $publicId;
+    protected Uuid $publicId;
 
     #[ORM\Column]
-    private \DateTimeImmutable $createdAt;
+    protected \DateTimeImmutable $createdAt;
 
     #[ORM\Column]
-    private \DateTimeImmutable $updatedAt;
+    protected \DateTimeImmutable $updatedAt;
 
     public function __construct()
     {

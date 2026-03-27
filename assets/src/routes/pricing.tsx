@@ -37,12 +37,12 @@ const faqItems = [
   {
     question: 'Is there a free trial?',
     answer:
-      'The Free plan is free forever with no time limit. If you want to try Brew+, you get a 14-day free trial with full access to all features.',
+      'The Free plan is free forever with no time limit. If you want to try Espresso, you get a 14-day free trial with full access to all features.',
   },
   {
     question: 'Can I cancel anytime?',
     answer:
-      'Yes, there are no contracts or lock-in periods. You can cancel your Brew+ subscription at any time and continue using the Free plan.',
+      'Yes, there are no contracts or lock-in periods. You can cancel your Espresso subscription at any time and continue using the Free plan.',
   },
 ];
 
@@ -72,7 +72,7 @@ function FaqItem({
 
   return (
     <motion.div
-      className="bg-white/60 backdrop-blur-md border border-white/85 rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(107,66,38,0.05)] transition-all duration-200 hover:shadow-[0_4px_16px_rgba(107,66,38,0.08)]"
+      className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(107,66,38,0.05)] transition-all duration-200 hover:shadow-[0_4px_16px_rgba(107,66,38,0.08)]"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -143,7 +143,7 @@ function PricingPage() {
           </motion.div>
 
           <motion.div
-            className="bg-white/60 backdrop-blur-md border border-white/85 rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(107,66,38,0.05)]"
+            className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(107,66,38,0.05)]"
             initial={{ opacity: 0, y: 25 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -158,7 +158,7 @@ function PricingPage() {
                 Free
               </span>
               <span className="text-[11px] uppercase tracking-[1.5px] font-medium text-amber text-center">
-                Brew+
+                Espresso
               </span>
             </div>
 

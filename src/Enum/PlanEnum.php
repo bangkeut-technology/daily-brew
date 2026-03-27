@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Enum;
 
-enum Plan: string
+enum PlanEnum: string
 {
     case Free = 'free';
-    case BrewPlus = 'brew_plus';
+    case Espresso = 'espresso';
 
     public function label(): string
     {
         return match ($this) {
             self::Free => 'Free',
-            self::BrewPlus => 'Brew+',
+            self::Espresso => 'Espresso',
         };
     }
 }

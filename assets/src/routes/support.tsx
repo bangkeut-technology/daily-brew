@@ -45,7 +45,7 @@ const supportChannels = [
     description: 'Suggest a feature you would like to see',
     link: '#',
     linkLabel: 'Submit idea',
-    iconBg: 'bg-[#4A7C59]/10',
+    iconBg: 'bg-green/10',
     iconColor: 'text-green',
   },
 ];
@@ -78,7 +78,7 @@ const commonTopics = [
   {
     icon: CreditCard,
     title: 'Billing & plans',
-    description: 'Understand Free vs Brew+, manage subscriptions, and update payment details.',
+    description: 'Understand Free vs Espresso, manage subscriptions, and update payment details.',
     link: '#',
   },
   {
@@ -128,7 +128,7 @@ function SupportPage() {
               <input
                 type="text"
                 placeholder="Search for help articles..."
-                className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-white/60 backdrop-blur-md border border-white/85 text-[14px] text-text-primary placeholder:text-text-tertiary shadow-[0_2px_12px_rgba(107,66,38,0.05)] outline-none focus:border-amber/40 focus:shadow-[0_4px_16px_rgba(193,127,59,0.10)] transition-all duration-200"
+                className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-glass-bg backdrop-blur-md border border-glass-border text-[14px] text-text-primary placeholder:text-text-tertiary shadow-[0_2px_12px_rgba(107,66,38,0.05)] outline-none focus:border-amber/40 focus:shadow-[0_4px_16px_rgba(193,127,59,0.10)] transition-all duration-200"
                 readOnly
               />
             </div>
@@ -142,7 +142,7 @@ function SupportPage() {
               <motion.a
                 key={channel.title}
                 href={channel.link}
-                className="group relative bg-white/60 backdrop-blur-md border border-white/85 rounded-2xl p-6 shadow-[0_2px_12px_rgba(107,66,38,0.05)] no-underline overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(107,66,38,0.10)]"
+                className="group relative bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 shadow-[0_2px_12px_rgba(107,66,38,0.05)] no-underline overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(107,66,38,0.10)]"
                 initial={{ opacity: 0, y: 25 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -200,7 +200,7 @@ function SupportPage() {
               <motion.a
                 key={topic.title}
                 href={topic.link}
-                className="group relative bg-white/60 backdrop-blur-md border border-white/85 rounded-2xl p-6 shadow-[0_2px_12px_rgba(107,66,38,0.05)] no-underline overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_6px_20px_rgba(107,66,38,0.10)]"
+                className="group relative bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 shadow-[0_2px_12px_rgba(107,66,38,0.05)] no-underline overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_6px_20px_rgba(107,66,38,0.10)]"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -232,7 +232,7 @@ function SupportPage() {
         {/* Bottom contact section */}
         <section className="py-16 px-6 md:px-8 max-w-2xl mx-auto">
           <motion.div
-            className="bg-white/60 backdrop-blur-md border border-white/85 rounded-2xl p-8 text-center shadow-[0_2px_12px_rgba(107,66,38,0.05)]"
+            className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-8 text-center shadow-[0_2px_12px_rgba(107,66,38,0.05)]"
             initial={{ opacity: 0, y: 25 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}

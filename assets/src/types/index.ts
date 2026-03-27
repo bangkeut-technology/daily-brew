@@ -58,15 +58,15 @@ export interface ClosurePeriod {
 
 export interface Employee {
   publicId: string;
+  firstName: string;
+  lastName: string;
   name: string;
-  firstName?: string;
-  lastName?: string;
-  phone: string | null;
   phoneNumber: string | null;
   active: boolean;
-  qrToken: string | null;
   shiftName: string | null;
   shiftPublicId: string | null;
+  linkedUserPublicId: string | null;
+  linkedUserEmail: string | null;
   createdAt: string;
   attendance?: AttendanceRecord[];
 }
@@ -87,7 +87,6 @@ export interface LeaveRequest {
   publicId: string;
   employeePublicId: string;
   employeeName: string;
-  date: string;
   startDate: string;
   endDate: string;
   reason: string | null;
@@ -136,9 +135,9 @@ export interface CheckinResponse {
 }
 
 export interface PlanDetails {
-  plan: 'free' | 'brew_plus';
+  plan: 'free' | 'espresso';
   planLabel: string;
-  isBrewPlus: boolean;
+  isEspresso: boolean;
   employeeLimit: number | null;
   remainingEmployeeSlots: number | null;
   canUseIpRestriction: boolean;
@@ -160,6 +159,5 @@ export interface RoleContext {
     name: string;
     workspacePublicId: string | null;
     workspaceName: string | null;
-    qrToken: string | null;
   } | null;
 }

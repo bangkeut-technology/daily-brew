@@ -2,10 +2,11 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import { Inbox } from 'lucide-react';
 import { useLeaveRequests, useUpdateLeaveRequest } from '@/hooks/queries/useLeaveRequests';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { GlassCard } from '@/components/shared/GlassCard';
+import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { Avatar } from '@/components/shared/Avatar';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 
@@ -13,91 +14,123 @@ export const Route = createFileRoute('/console/leave/')({
   component: LeaveRequestsPage,
 });
 
+type StatusFilter = '' | 'pending' | 'approved' | 'rejected';
+
+const FILTER_TABS: { value: StatusFilter; labelKey: string; fallback: string }[] = [
+  { value: '', labelKey: 'leave.all', fallback: 'All' },
+  { value: 'pending', labelKey: 'leave.pending', fallback: 'Pending' },
+  { value: 'approved', labelKey: 'leave.approved', fallback: 'Approved' },
+  { value: 'rejected', labelKey: 'leave.rejected', fallback: 'Rejected' },
+];
+
 function LeaveRequestsPage() {
   const { t } = useTranslation();
   const workspaceId = getWorkspacePublicId() || '';
-  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('');
   const { data: requests, isLoading } = useLeaveRequests(workspaceId, statusFilter || undefined);
   const updateLeave = useUpdateLeaveRequest(workspaceId);
 
-  const handleAction = async (publicId: string, status: string) => {
+  const handleAction = async (publicId: string, status: 'approved' | 'rejected') => {
     try {
       await updateLeave.mutateAsync({ publicId, status });
-      toast.success(`Leave request ${status}`);
+      toast.success(
+        t(`leave.${status}Success`, `Leave request ${status}`),
+      );
     } catch {
-      toast.error('Failed to update leave request');
+      toast.error(t('leave.updateError', 'Failed to update leave request'));
     }
   };
 
-  const statusVariant = (s: string) => {
+  const statusVariant = (s: string): 'green' | 'amber' | 'red' => {
     if (s === 'approved') return 'green';
     if (s === 'rejected') return 'red';
     return 'amber';
+  };
+
+  const formatDateRange = (startDate: string, endDate: string) => {
+    if (startDate === endDate) return startDate;
+    return `${startDate} - ${endDate}`;
   };
 
   return (
     <div className="page-enter">
       <PageHeader title={t('nav.leaveRequests')} />
 
-      <div className="flex gap-2 mb-4">
-        {['', 'pending', 'approved', 'rejected'].map((s) => (
+      <div className="flex gap-2 mb-6">
+        {FILTER_TABS.map((tab) => (
           <button
-            key={s}
-            onClick={() => setStatusFilter(s)}
+            key={tab.value}
+            onClick={() => setStatusFilter(tab.value)}
             className={`px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors ${
-              statusFilter === s
+              statusFilter === tab.value
                 ? 'bg-coffee text-white'
-                : 'bg-white/62 text-text-secondary hover:bg-cream-3'
+                : 'bg-glass-bg text-text-secondary hover:bg-cream-3'
             }`}
           >
-            {s || 'All'}
+            {t(tab.labelKey, tab.fallback)}
           </button>
         ))}
       </div>
 
       {isLoading ? (
-        <p className="text-text-tertiary">{t('common.loading')}</p>
+        <div className="flex items-center justify-center py-12">
+          <p className="text-[13px] text-text-tertiary">{t('common.loading')}</p>
+        </div>
+      ) : requests?.length === 0 ? (
+        <div className="border-[1.5px] border-dashed border-cream-3 rounded-2xl bg-white/30 flex flex-col items-center justify-center min-h-[200px]">
+          <Inbox size={28} className="text-text-tertiary mb-2" />
+          <span className="text-[13px] text-text-tertiary">
+            {t('leave.noRequests', 'No leave requests found')}
+          </span>
+        </div>
       ) : (
         <GlassCard hover={false}>
-          {requests?.length === 0 ? (
-            <p className="px-5 py-8 text-center text-[13px] text-text-tertiary">
-              {t('common.noResults')}
-            </p>
-          ) : (
-            requests?.map((lr, i) => (
+          <GlassCardHeader
+            title={t('leave.requests', 'Leave requests')}
+            action={
+              <span className="text-[12px] text-text-tertiary">
+                {requests?.length} {t('leave.total', 'total')}
+              </span>
+            }
+          />
+          <div>
+            {requests?.map((lr, i) => (
               <div
                 key={lr.publicId}
-                className="flex items-center gap-3 px-5 py-3 border-b border-cream-3/50 last:border-0"
+                className="flex items-center gap-3 px-5 py-3 border-b border-cream-3/50 last:border-0 transition-colors hover:bg-cream-3/20"
               >
                 <Avatar name={lr.employeeName} index={i} size={32} />
-                <div className="flex-1">
-                  <div className="text-[13.5px] font-medium text-text-primary">
+                <div className="flex-1 min-w-0">
+                  <div className="text-[13.5px] font-medium text-text-primary truncate">
                     {lr.employeeName}
                   </div>
                   <div className="text-[11px] text-text-tertiary">
-                    {lr.date} {lr.reason ? `\u2014 ${lr.reason}` : ''}
+                    {formatDateRange(lr.startDate, lr.endDate)}
+                    {lr.reason ? ` \u2014 ${lr.reason}` : ''}
                   </div>
                 </div>
-                <StatusBadge label={lr.status} variant={statusVariant(lr.status)} />
+                <StatusBadge label={t(`leave.${lr.status}`, lr.status)} variant={statusVariant(lr.status)} />
                 {lr.status === 'pending' && (
                   <div className="flex gap-1.5 ml-2">
                     <button
                       onClick={() => handleAction(lr.publicId, 'approved')}
-                      className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-[#4A7C59]/12 text-[#4A7C59] transition-colors hover:bg-[#4A7C59]/20"
+                      disabled={updateLeave.isPending}
+                      className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-green/12 text-green transition-colors hover:bg-green/20 disabled:opacity-50"
                     >
-                      &#10003; {t('leave.approve')}
+                      &#10003; {t('leave.approve', 'Approve')}
                     </button>
                     <button
                       onClick={() => handleAction(lr.publicId, 'rejected')}
-                      className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-[#C0392B]/10 text-[#C0392B] transition-colors hover:bg-[#C0392B]/18"
+                      disabled={updateLeave.isPending}
+                      className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-red/10 text-red transition-colors hover:bg-red/18 disabled:opacity-50"
                     >
-                      &#10005; {t('leave.reject')}
+                      &#10005; {t('leave.reject', 'Reject')}
                     </button>
                   </div>
                 )}
               </div>
-            ))
-          )}
+            ))}
+          </div>
         </GlassCard>
       )}
     </div>

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\ApiController\Employee;
 
 use App\ApiController\Trait\ApiResponseTrait;
@@ -36,16 +38,7 @@ class EmployeeController extends AbstractController
 
         $employees = $employeeRepository->findByWorkspace($workspace);
 
-        return $this->jsonSuccess(array_map(fn ($e) => [
-            'publicId' => (string) $e->getPublicId(),
-            'name' => $e->getName(),
-            'phone' => $e->getPhone(),
-            'active' => $e->isActive(),
-            'qrToken' => $e->getQrToken(),
-            'shiftName' => $e->getShift()?->getName(),
-            'shiftPublicId' => $e->getShift() ? (string) $e->getShift()->getPublicId() : null,
-            'createdAt' => $e->getCreatedAt()->format('c'),
-        ], $employees));
+        return $this->jsonSuccess(array_map(fn ($e) => $this->serializeEmployee($e), $employees));
     }
 
     #[Route('', name: 'employees_create', methods: ['POST'])]
@@ -65,17 +58,15 @@ class EmployeeController extends AbstractController
         $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
 
         if (!$planService->canAddEmployee($workspace)) {
-            return $this->jsonError(
-                'Employee limit reached. Upgrade to Brew+ for unlimited employees.',
-                402
-            );
+            return $this->jsonError('Employee limit reached. Upgrade to Espresso for unlimited employees.', 402);
         }
 
         $data = json_decode($request->getContent(), true);
-        $name = $data['name'] ?? '';
+        $firstName = $data['firstName'] ?? '';
+        $lastName = $data['lastName'] ?? '';
 
-        if (empty($name)) {
-            return $this->jsonError('Name is required');
+        if (empty($firstName) || empty($lastName)) {
+            return $this->jsonError('First name and last name are required');
         }
 
         $shift = null;
@@ -83,16 +74,15 @@ class EmployeeController extends AbstractController
             $shift = $shiftRepository->findByPublicId($data['shiftPublicId']);
         }
 
-        $employee = $employeeService->create($workspace, $name, $data['phone'] ?? null, $shift);
+        $employee = $employeeService->create(
+            $workspace,
+            $firstName,
+            $lastName,
+            $data['phoneNumber'] ?? null,
+            $shift,
+        );
 
-        return $this->jsonCreated([
-            'publicId' => (string) $employee->getPublicId(),
-            'name' => $employee->getName(),
-            'phone' => $employee->getPhone(),
-            'qrToken' => $employee->getQrToken(),
-            'active' => $employee->isActive(),
-            'shiftName' => $employee->getShift()?->getName(),
-        ]);
+        return $this->jsonCreated($this->serializeEmployee($employee));
     }
 
     #[Route('/{publicId}', name: 'employees_show', methods: ['GET'])]
@@ -111,30 +101,23 @@ class EmployeeController extends AbstractController
         $this->denyAccessUnlessGranted(WorkspaceVoter::VIEW, $workspace);
 
         $employee = $employeeRepository->findByPublicId($publicId);
-        if ($employee === null || $employee->getWorkspace()->getId() !== $workspace->getId()) {
+        if ($employee === null || $employee->getWorkspace()?->getId() !== $workspace->getId()) {
             throw new NotFoundHttpException('Employee not found');
         }
 
         $recentAttendance = $attendanceRepository->findByEmployee($employee, 30);
 
-        return $this->jsonSuccess([
-            'publicId' => (string) $employee->getPublicId(),
-            'name' => $employee->getName(),
-            'phone' => $employee->getPhone(),
-            'active' => $employee->isActive(),
-            'qrToken' => $employee->getQrToken(),
-            'shiftName' => $employee->getShift()?->getName(),
-            'shiftPublicId' => $employee->getShift() ? (string) $employee->getShift()->getPublicId() : null,
-            'createdAt' => $employee->getCreatedAt()->format('c'),
-            'attendance' => array_map(fn ($a) => [
-                'publicId' => (string) $a->getPublicId(),
-                'date' => $a->getDate()->format('Y-m-d'),
-                'checkInAt' => $a->getCheckInAt()?->format('H:i'),
-                'checkOutAt' => $a->getCheckOutAt()?->format('H:i'),
-                'isLate' => $a->isLate(),
-                'leftEarly' => $a->hasLeftEarly(),
-            ], $recentAttendance),
-        ]);
+        $data = $this->serializeEmployee($employee);
+        $data['attendance'] = array_map(fn ($a) => [
+            'publicId' => (string) $a->getPublicId(),
+            'date' => $a->getDate()->format('Y-m-d'),
+            'checkInAt' => $a->getCheckInAt()?->format('H:i'),
+            'checkOutAt' => $a->getCheckOutAt()?->format('H:i'),
+            'isLate' => $a->isLate(),
+            'leftEarly' => $a->hasLeftEarly(),
+        ], $recentAttendance);
+
+        return $this->jsonSuccess($data);
     }
 
     #[Route('/{publicId}', name: 'employees_update', methods: ['PUT'])]
@@ -155,12 +138,11 @@ class EmployeeController extends AbstractController
         $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
 
         $employee = $employeeRepository->findByPublicId($publicId);
-        if ($employee === null || $employee->getWorkspace()->getId() !== $workspace->getId()) {
+        if ($employee === null || $employee->getWorkspace()?->getId() !== $workspace->getId()) {
             throw new NotFoundHttpException('Employee not found');
         }
 
         $data = json_decode($request->getContent(), true);
-        $name = $data['name'] ?? $employee->getName();
 
         $shift = $employee->getShift();
         if (array_key_exists('shiftPublicId', $data)) {
@@ -169,19 +151,14 @@ class EmployeeController extends AbstractController
 
         $employee = $employeeService->update(
             $employee,
-            $name,
-            $data['phone'] ?? $employee->getPhone(),
+            $data['firstName'] ?? $employee->getFirstName(),
+            $data['lastName'] ?? $employee->getLastName(),
+            $data['phoneNumber'] ?? $employee->getPhoneNumber(),
             $shift,
             isset($data['active']) ? (bool) $data['active'] : null,
         );
 
-        return $this->jsonSuccess([
-            'publicId' => (string) $employee->getPublicId(),
-            'name' => $employee->getName(),
-            'phone' => $employee->getPhone(),
-            'active' => $employee->isActive(),
-            'shiftName' => $employee->getShift()?->getName(),
-        ]);
+        return $this->jsonSuccess($this->serializeEmployee($employee));
     }
 
     #[Route('/{publicId}', name: 'employees_delete', methods: ['DELETE'])]
@@ -200,12 +177,29 @@ class EmployeeController extends AbstractController
         $this->denyAccessUnlessGranted(WorkspaceVoter::DELETE, $workspace);
 
         $employee = $employeeRepository->findByPublicId($publicId);
-        if ($employee === null || $employee->getWorkspace()->getId() !== $workspace->getId()) {
+        if ($employee === null || $employee->getWorkspace()?->getId() !== $workspace->getId()) {
             throw new NotFoundHttpException('Employee not found');
         }
 
         $employeeService->delete($employee);
 
         return $this->jsonNoContent();
+    }
+
+    private function serializeEmployee(\App\Entity\Employee $e): array
+    {
+        return [
+            'publicId' => (string) $e->getPublicId(),
+            'firstName' => $e->getFirstName(),
+            'lastName' => $e->getLastName(),
+            'name' => $e->getName(),
+            'phoneNumber' => $e->getPhoneNumber(),
+            'active' => $e->isActive(),
+            'linkedUserPublicId' => $e->getLinkedUser() ? (string) $e->getLinkedUser()->getPublicId() : null,
+            'linkedUserEmail' => $e->getLinkedUser()?->getEmail(),
+            'shiftName' => $e->getShift()?->getName(),
+            'shiftPublicId' => $e->getShift() ? (string) $e->getShift()->getPublicId() : null,
+            'createdAt' => $e->getCreatedAt()->format('c'),
+        ];
     }
 }

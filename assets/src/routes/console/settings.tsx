@@ -134,7 +134,7 @@ function SettingsPage() {
               action={
                 <StatusBadge
                   label={plan.planLabel}
-                  variant={plan.isBrewPlus ? 'green' : 'gray'}
+                  variant={plan.isEspresso ? 'green' : 'gray'}
                 />
               }
             />
@@ -143,7 +143,7 @@ function SettingsPage() {
                 {/* Free plan */}
                 <div
                   className={`rounded-xl border-2 p-5 transition-colors ${
-                    !plan.isBrewPlus
+                    !plan.isEspresso
                       ? 'border-coffee bg-coffee/5'
                       : 'border-cream-3 bg-white/30'
                   }`}
@@ -164,7 +164,7 @@ function SettingsPage() {
                       </li>
                     ))}
                   </ul>
-                  {!plan.isBrewPlus && (
+                  {!plan.isEspresso && (
                     <div className="mt-4 text-[11px] text-text-tertiary">
                       {plan.remainingEmployeeSlots !== null &&
                         `${plan.remainingEmployeeSlots} employee slot${plan.remainingEmployeeSlots !== 1 ? 's' : ''} remaining`}
@@ -172,10 +172,10 @@ function SettingsPage() {
                   )}
                 </div>
 
-                {/* Brew+ plan */}
+                {/* Espresso plan */}
                 <div
                   className={`rounded-xl border-2 p-5 relative overflow-hidden transition-colors ${
-                    plan.isBrewPlus
+                    plan.isEspresso
                       ? 'border-amber bg-amber/5'
                       : 'border-cream-3 bg-white/30'
                   }`}
@@ -183,7 +183,7 @@ function SettingsPage() {
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber to-amber-light" />
                   <div className="flex items-center gap-2 mb-1">
                     <Crown size={16} className="text-amber" />
-                    <h3 className="text-[15px] font-semibold text-text-primary">Brew+</h3>
+                    <h3 className="text-[15px] font-semibold text-text-primary">Espresso</h3>
                   </div>
                   <p className="text-[12px] text-text-tertiary mb-4">Everything you need</p>
                   <ul className="space-y-2">
@@ -201,12 +201,12 @@ function SettingsPage() {
                       </li>
                     ))}
                   </ul>
-                  {!plan.isBrewPlus && (
+                  {!plan.isEspresso && (
                     <button className="mt-4 w-full px-4 py-2.5 rounded-lg text-[13px] font-semibold bg-gradient-to-r from-amber to-coffee text-white border-none cursor-pointer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(193,127,59,0.3)]">
-                      Upgrade to Brew+
+                      Upgrade to Espresso
                     </button>
                   )}
-                  {plan.isBrewPlus && plan.currentPeriodEnd && (
+                  {plan.isEspresso && plan.currentPeriodEnd && (
                     <div className="mt-4 text-[11px] text-text-tertiary">
                       Renews {new Date(plan.currentPeriodEnd).toLocaleDateString()}
                     </div>
@@ -231,7 +231,7 @@ function SettingsPage() {
                 className={`block w-full text-left px-3 py-2 rounded-lg text-[13.5px] border cursor-pointer transition-colors ${
                   ws.publicId === currentWsId
                     ? 'bg-coffee/10 border-coffee text-coffee font-medium'
-                    : 'bg-white/62 border-cream-3 text-text-primary hover:bg-cream-3'
+                    : 'bg-glass-bg border-cream-3 text-text-primary hover:bg-cream-3'
                 }`}
               >
                 {ws.name}
@@ -244,7 +244,7 @@ function SettingsPage() {
                 value={newWsName}
                 onChange={(e) => setNewWsName(e.target.value)}
                 required
-                className="flex-1 px-3 py-2 rounded-lg text-[13.5px] bg-white/62 border border-cream-3 text-text-primary outline-none focus:border-coffee"
+                className="flex-1 px-3 py-2 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee"
               />
               <button
                 type="submit"
@@ -273,7 +273,7 @@ function SettingsPage() {
                   Enable IP restriction
                   {!plan?.canUseIpRestriction && (
                     <span className="ml-1.5 text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
-                      Brew+
+                      Espresso
                     </span>
                   )}
                 </span>
@@ -287,7 +287,7 @@ function SettingsPage() {
                     value={allowedIps}
                     onChange={(e) => setAllowedIps(e.target.value)}
                     rows={4}
-                    className="w-full px-3 py-2 rounded-lg text-[13px] bg-white/62 border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono"
+                    className="w-full px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono"
                   />
                 </div>
               )}
@@ -300,7 +300,7 @@ function SettingsPage() {
                     type="text"
                     value={timezone}
                     onChange={(e) => setTimezone(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg text-[13px] bg-white/62 border border-cream-3 text-text-primary outline-none focus:border-coffee"
+                    className="w-full px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee"
                   />
                 </div>
                 <div className="flex-1">
@@ -310,7 +310,7 @@ function SettingsPage() {
                   <select
                     value={locale}
                     onChange={(e) => setLocale(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg text-[13px] bg-white/62 border border-cream-3 text-text-primary outline-none focus:border-coffee"
+                    className="w-full px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee"
                   >
                     <option value="en">English</option>
                     <option value="fr">Fran&#231;ais</option>
@@ -356,7 +356,7 @@ function SettingsPage() {
                   Enable geofencing for check-in
                   {!plan?.canUseGeofencing && (
                     <span className="ml-1.5 text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
-                      Brew+
+                      Espresso
                     </span>
                   )}
                 </span>
@@ -372,7 +372,7 @@ function SettingsPage() {
                     type="button"
                     onClick={handleUseCurrentLocation}
                     disabled={locatingPosition}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-medium bg-white/62 backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3 disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3 disabled:opacity-50"
                   >
                     <Navigation size={14} className={locatingPosition ? 'animate-pulse text-amber' : 'text-coffee'} />
                     {locatingPosition ? 'Detecting location...' : 'Use current location'}
@@ -391,7 +391,7 @@ function SettingsPage() {
                           setGeofencingLat(e.target.value === '' ? null : parseFloat(e.target.value))
                         }
                         placeholder="11.5564"
-                        className="w-full px-3 py-2 rounded-lg text-[13px] bg-white/62 border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono"
+                        className="w-full px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono"
                       />
                     </div>
                     <div>
@@ -406,7 +406,7 @@ function SettingsPage() {
                           setGeofencingLng(e.target.value === '' ? null : parseFloat(e.target.value))
                         }
                         placeholder="104.9282"
-                        className="w-full px-3 py-2 rounded-lg text-[13px] bg-white/62 border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono"
+                        className="w-full px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono"
                       />
                     </div>
                     <div>
@@ -419,7 +419,7 @@ function SettingsPage() {
                         max={5000}
                         value={geofencingRadius}
                         onChange={(e) => setGeofencingRadius(parseInt(e.target.value, 10) || 100)}
-                        className="w-full px-3 py-2 rounded-lg text-[13px] bg-white/62 border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono"
+                        className="w-full px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono"
                       />
                     </div>
                   </div>

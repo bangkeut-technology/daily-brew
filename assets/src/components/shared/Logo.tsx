@@ -79,7 +79,7 @@ export function LogoBrand({ size = 32, className = '' }: LogoProps) {
     <div className={`flex items-center gap-2.5 ${className}`}>
       <Logo size={size} />
       <span
-        className="font-semibold text-[#6B4226]"
+        className="font-semibold text-coffee"
         style={{
           fontFamily: "'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif",
           fontSize: size * 0.56,

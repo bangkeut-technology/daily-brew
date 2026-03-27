@@ -28,7 +28,7 @@ export function LandingNav() {
     <motion.nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-[#FAF7F2]/75 backdrop-blur-2xl shadow-[0_1px_8px_rgba(107,66,38,0.06)]'
+          ? 'bg-cream/75 backdrop-blur-2xl shadow-[0_1px_8px_rgba(107,66,38,0.06)]'
           : 'bg-transparent backdrop-blur-none'
       }`}
       initial={{ y: -20, opacity: 0 }}
@@ -90,7 +90,7 @@ export function LandingNav() {
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            className="md:hidden bg-[#FAF7F2]/90 backdrop-blur-2xl border-b border-cream-3/60 px-6 pb-4 space-y-3"
+            className="md:hidden bg-cream/90 backdrop-blur-2xl border-b border-cream-3/60 px-6 pb-4 space-y-3"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}

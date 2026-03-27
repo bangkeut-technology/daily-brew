@@ -73,14 +73,14 @@ function SignInPage() {
           <div className="space-y-2.5 mb-5">
             <a
               href="/oauth/auth/google"
-              className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg text-[13px] font-medium bg-white/70 border border-cream-3 text-text-primary no-underline transition-all hover:bg-cream-3/50"
+              className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg text-[13px] font-medium bg-glass-bg border border-cream-3 text-text-primary no-underline transition-all hover:bg-cream-3/50"
             >
               <GoogleIcon />
               {t('auth.signIn')} with {t('auth.google')}
             </a>
             <a
               href="/oauth/auth/apple"
-              className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg text-[13px] font-medium bg-white/70 border border-cream-3 text-text-primary no-underline transition-all hover:bg-cream-3/50"
+              className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg text-[13px] font-medium bg-glass-bg border border-cream-3 text-text-primary no-underline transition-all hover:bg-cream-3/50"
             >
               <AppleIcon />
               {t('auth.signIn')} with {t('auth.apple')}
@@ -102,7 +102,7 @@ function SignInPage() {
                 type="email"
                 {...register('email')}
                 placeholder="you@restaurant.com"
-                className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-white/60 border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
+                className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
               />
               {errors.email && (
                 <p className="text-[11px] text-red mt-1">{errors.email.message}</p>
@@ -124,7 +124,7 @@ function SignInPage() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   {...register('password')}
-                  className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-white/60 border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
+                  className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
                 />
                 <button
                   type="button"

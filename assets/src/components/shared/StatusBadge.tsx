@@ -1,11 +1,11 @@
 type BadgeVariant = 'green' | 'amber' | 'red' | 'blue' | 'gray';
 
 const badgeStyles: Record<BadgeVariant, string> = {
-  green: 'bg-[#4A7C59]/10 text-[#4A7C59]',
-  amber: 'bg-[#C17F3B]/10 text-[#C17F3B]',
-  red: 'bg-[#C0392B]/10 text-[#C0392B]',
-  blue: 'bg-[#3B6FA0]/10 text-[#3B6FA0]',
-  gray: 'bg-[#AE9D95]/15 text-[#7C6860]',
+  green: 'bg-green/10 text-green',
+  amber: 'bg-amber/10 text-amber',
+  red: 'bg-red/10 text-red',
+  blue: 'bg-[#3B6FA0]/10 text-blue',
+  gray: 'bg-[#AE9D95]/15 text-text-secondary',
 };
 
 interface StatusBadgeProps {

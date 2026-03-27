@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Class Shift
  *
  * Represents a named work-time block within a workspace (e.g. "Morning 07–14").
- * Default startTime/endTime apply to all days; ShiftTimeRules provide per-day overrides (Brew+).
+ * Default startTime/endTime apply to all days; ShiftTimeRules provide per-day overrides (Espresso).
  *
  * @package App\Entity
  * @author  Vandeth THO <thovandeth@gmail.com>
@@ -24,6 +24,9 @@ class Shift extends AbstractBaseEntity
 {
     #[ORM\Column(length: 100)]
     private string $name;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $nameCanonical = null;
 
     #[ORM\ManyToOne(targetEntity: Workspace::class, inversedBy: 'shifts')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -68,6 +71,17 @@ class Shift extends AbstractBaseEntity
     public function setName(string $name): static
     {
         $this->name = $name;
+        return $this;
+    }
+
+    public function getNameCanonical(): ?string
+    {
+        return $this->nameCanonical;
+    }
+
+    public function setNameCanonical(?string $nameCanonical): static
+    {
+        $this->nameCanonical = $nameCanonical;
         return $this;
     }
 
@@ -130,7 +144,7 @@ class Shift extends AbstractBaseEntity
         return $this;
     }
 
-    // ── Time rules (Brew+ per-day overrides) ───────────────────
+    // ── Time rules (Espresso per-day overrides) ───────────────────
 
     /** @return Collection<int, ShiftTimeRule> */
     public function getTimeRules(): Collection

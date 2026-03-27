@@ -2,24 +2,25 @@
 
 namespace App\Entity;
 
-use App\Enum\Plan;
-use App\Enum\SubscriptionStatus;
+use App\Enum\PlanEnum;
+use App\Enum\SubscriptionStatusEnum;
 use App\Repository\SubscriptionRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SubscriptionRepository::class)]
 #[ORM\Table(name: 'daily_brew_subscriptions')]
+#[ORM\UniqueConstraint(name: 'UNIQ_SUBSCRIPTION_WORKSPACE', fields: ['workspace'])]
 class Subscription extends AbstractBaseEntity
 {
     #[ORM\OneToOne(targetEntity: Workspace::class)]
-    #[ORM\JoinColumn(nullable: false, unique: true)]
+    #[ORM\JoinColumn(nullable: false)]
     private Workspace $workspace;
 
-    #[ORM\Column(length: 20, enumType: Plan::class)]
-    private Plan $plan = Plan::Free;
+    #[ORM\Column(length: 20, enumType: PlanEnum::class)]
+    private PlanEnum $plan = PlanEnum::Free;
 
-    #[ORM\Column(length: 20, enumType: SubscriptionStatus::class)]
-    private SubscriptionStatus $status = SubscriptionStatus::Active;
+    #[ORM\Column(length: 20, enumType: SubscriptionStatusEnum::class)]
+    private SubscriptionStatusEnum $status = SubscriptionStatusEnum::Active;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $paddleSubscriptionId = null;
@@ -44,23 +45,23 @@ class Subscription extends AbstractBaseEntity
         return $this;
     }
 
-    public function getPlan(): Plan
+    public function getPlan(): PlanEnum
     {
         return $this->plan;
     }
 
-    public function setPlan(Plan $plan): static
+    public function setPlan(PlanEnum $plan): static
     {
         $this->plan = $plan;
         return $this;
     }
 
-    public function getStatus(): SubscriptionStatus
+    public function getStatus(): SubscriptionStatusEnum
     {
         return $this->status;
     }
 
-    public function setStatus(SubscriptionStatus $status): static
+    public function setStatus(SubscriptionStatusEnum $status): static
     {
         $this->status = $status;
         return $this;
@@ -110,9 +111,9 @@ class Subscription extends AbstractBaseEntity
         return $this;
     }
 
-    public function isBrewPlus(): bool
+    public function isEspresso(): bool
     {
-        return $this->plan === Plan::BrewPlus
-            && in_array($this->status, [SubscriptionStatus::Active, SubscriptionStatus::Trialing]);
+        return $this->plan === PlanEnum::Espresso
+            && in_array($this->status, [SubscriptionStatusEnum::Active, SubscriptionStatusEnum::Trialing]);
     }
 }

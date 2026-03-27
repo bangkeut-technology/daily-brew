@@ -67,7 +67,7 @@ export function useDeleteShift(workspacePublicId: string) {
   });
 }
 
-// ── ShiftTimeRule mutations (Brew+ only) ───────────────────
+// ── ShiftTimeRule mutations (Espresso only) ───────────────────
 
 export function useCreateShiftTimeRule(workspacePublicId: string, shiftPublicId: string) {
   const queryClient = useQueryClient();

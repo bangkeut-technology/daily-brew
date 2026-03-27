@@ -185,46 +185,46 @@ function ProfilePage() {
           <form onSubmit={handleProfileSubmit} className="p-6">
             <div className="flex flex-col items-center mb-6">
               <Avatar name={displayName} index={0} size={64} radius="20px" />
-              <p className="text-[16px] font-semibold text-[#2C2420] mt-3">{displayName}</p>
-              <p className="text-[12px] text-[#AE9D95] mt-1">{user?.email}</p>
+              <p className="text-[16px] font-semibold text-text-primary mt-3">{displayName}</p>
+              <p className="text-[12px] text-text-tertiary mt-1">{user?.email}</p>
             </div>
 
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[12px] font-medium text-[#7C6860] mb-1.5">
+                  <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
                     {t('profile.firstName', 'First name')}
                   </label>
                   <input
                     type="text"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-white/60 border border-[#EBE2D6] text-[#2C2420] outline-none focus:border-[#6B4226] focus:ring-1 focus:ring-[#6B4226]/20 transition-all"
+                    className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-[#6B4226]/20 transition-all"
                     placeholder={t('profile.firstNamePlaceholder', 'Your first name')}
                   />
                 </div>
                 <div>
-                  <label className="block text-[12px] font-medium text-[#7C6860] mb-1.5">
+                  <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
                     {t('profile.lastName', 'Last name')}
                   </label>
                   <input
                     type="text"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-white/60 border border-[#EBE2D6] text-[#2C2420] outline-none focus:border-[#6B4226] focus:ring-1 focus:ring-[#6B4226]/20 transition-all"
+                    className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-[#6B4226]/20 transition-all"
                     placeholder={t('profile.lastNamePlaceholder', 'Your last name')}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[12px] font-medium text-[#7C6860] mb-1.5">
+                <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
                   {t('profile.locale', 'Language')}
                 </label>
                 <select
                   value={locale}
                   onChange={(e) => setLocale(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-white/60 border border-[#EBE2D6] text-[#2C2420] outline-none focus:border-[#6B4226] focus:ring-1 focus:ring-[#6B4226]/20 transition-all cursor-pointer appearance-none"
+                  className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-[#6B4226]/20 transition-all cursor-pointer appearance-none"
                   style={{
                     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237C6860' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
                     backgroundRepeat: 'no-repeat',
@@ -244,7 +244,7 @@ function ProfilePage() {
               <button
                 type="submit"
                 disabled={updateProfile.isPending}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-[#6B4226] text-white border-none cursor-pointer transition-all duration-150 hover:bg-[#9B6B45] hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {updateProfile.isPending
                   ? t('common.saving', 'Saving...')
@@ -262,7 +262,7 @@ function ProfilePage() {
               {/* Show current password field only if user has a password */}
               {oauthData?.hasPassword !== false && (
                 <div>
-                  <label className="block text-[12px] font-medium text-[#7C6860] mb-1.5">
+                  <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
                     {t('profile.currentPassword', 'Current password')}
                   </label>
                   <div className="relative">
@@ -270,12 +270,12 @@ function ProfilePage() {
                       type={showCurrentPassword ? 'text' : 'password'}
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-white/60 border border-[#EBE2D6] text-[#2C2420] outline-none focus:border-[#6B4226] focus:ring-1 focus:ring-[#6B4226]/20 transition-all"
+                      className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-[#6B4226]/20 transition-all"
                     />
                     <button
                       type="button"
                       onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#AE9D95] hover:text-[#7C6860] transition-colors cursor-pointer bg-transparent border-none p-0"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary transition-colors cursor-pointer bg-transparent border-none p-0"
                     >
                       {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
@@ -284,7 +284,7 @@ function ProfilePage() {
               )}
 
               <div>
-                <label className="block text-[12px] font-medium text-[#7C6860] mb-1.5">
+                <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
                   {t('profile.newPassword', 'New password')}
                 </label>
                 <div className="relative">
@@ -295,13 +295,13 @@ function ProfilePage() {
                       setNewPassword(e.target.value);
                       if (passwordErrors.length) setPasswordErrors([]);
                     }}
-                    className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-white/60 border border-[#EBE2D6] text-[#2C2420] outline-none focus:border-[#6B4226] focus:ring-1 focus:ring-[#6B4226]/20 transition-all"
+                    className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-[#6B4226]/20 transition-all"
                     placeholder={t('profile.newPasswordPlaceholder', 'At least 8 characters')}
                   />
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#AE9D95] hover:text-[#7C6860] transition-colors cursor-pointer bg-transparent border-none p-0"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary transition-colors cursor-pointer bg-transparent border-none p-0"
                   >
                     {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -309,7 +309,7 @@ function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-[12px] font-medium text-[#7C6860] mb-1.5">
+                <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
                   {t('profile.confirmPassword', 'Confirm new password')}
                 </label>
                 <div className="relative">
@@ -320,13 +320,13 @@ function ProfilePage() {
                       setConfirmPassword(e.target.value);
                       if (passwordErrors.length) setPasswordErrors([]);
                     }}
-                    className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-white/60 border border-[#EBE2D6] text-[#2C2420] outline-none focus:border-[#6B4226] focus:ring-1 focus:ring-[#6B4226]/20 transition-all"
+                    className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-[#6B4226]/20 transition-all"
                     placeholder={t('profile.confirmPasswordPlaceholder', 'Re-enter your new password')}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#AE9D95] hover:text-[#7C6860] transition-colors cursor-pointer bg-transparent border-none p-0"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary transition-colors cursor-pointer bg-transparent border-none p-0"
                   >
                     {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -335,9 +335,9 @@ function ProfilePage() {
 
               {/* Validation errors */}
               {passwordErrors.length > 0 && (
-                <div className="rounded-lg bg-[#C0392B]/8 border border-[#C0392B]/15 px-3 py-2.5">
+                <div className="rounded-lg bg-red/8 border border-[#C0392B]/15 px-3 py-2.5">
                   {passwordErrors.map((err, i) => (
-                    <p key={i} className="text-[12px] text-[#C0392B] leading-relaxed">
+                    <p key={i} className="text-[12px] text-red leading-relaxed">
                       {err}
                     </p>
                   ))}
@@ -349,7 +349,7 @@ function ProfilePage() {
               <button
                 type="submit"
                 disabled={changePassword.isPending || (!newPassword && !confirmPassword)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-[#6B4226] text-white border-none cursor-pointer transition-all duration-150 hover:bg-[#9B6B45] hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {changePassword.isPending
                   ? t('common.saving', 'Saving...')
@@ -365,19 +365,19 @@ function ProfilePage() {
           <div className="p-6 space-y-4">
             {oauthLoading ? (
               <div className="flex items-center justify-center py-4">
-                <p className="text-[13px] text-[#AE9D95]">{t('common.loading', 'Loading...')}</p>
+                <p className="text-[13px] text-text-tertiary">{t('common.loading', 'Loading...')}</p>
               </div>
             ) : (
               <>
                 {/* Google row */}
-                <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-white/40 border border-[#EBE2D6]/60">
+                <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-white/40 border border-cream-3/60">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-white/80 border border-[#EBE2D6] flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-lg bg-white/80 border border-cream-3 flex items-center justify-center">
                       <GoogleIcon />
                     </div>
                     <div>
-                      <p className="text-[13.5px] font-medium text-[#2C2420]">Google</p>
-                      <p className="text-[11px] text-[#AE9D95] mt-0.5">
+                      <p className="text-[13.5px] font-medium text-text-primary">Google</p>
+                      <p className="text-[11px] text-text-tertiary mt-0.5">
                         {oauthData?.google
                           ? t('profile.connected', 'Connected')
                           : t('profile.notConnected', 'Not connected')}
@@ -391,7 +391,7 @@ function ProfilePage() {
                         type="button"
                         onClick={() => handleDisconnect('google')}
                         disabled={disconnectOAuth.isPending}
-                        className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-[#C0392B]/10 text-[#C0392B] transition-colors hover:bg-[#C0392B]/18 disabled:opacity-50"
+                        className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-red/10 text-red transition-colors hover:bg-red/18 disabled:opacity-50"
                       >
                         {t('profile.disconnect', 'Disconnect')}
                       </button>
@@ -399,7 +399,7 @@ function ProfilePage() {
                       <button
                         type="button"
                         onClick={() => handleConnect('google')}
-                        className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-[#6B4226]/10 text-[#6B4226] transition-colors hover:bg-[#6B4226]/18"
+                        className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-coffee/10 text-coffee transition-colors hover:bg-coffee/18"
                       >
                         {t('profile.connect', 'Connect')}
                       </button>
@@ -408,14 +408,14 @@ function ProfilePage() {
                 </div>
 
                 {/* Apple row */}
-                <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-white/40 border border-[#EBE2D6]/60">
+                <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-white/40 border border-cream-3/60">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-white/80 border border-[#EBE2D6] flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-lg bg-white/80 border border-cream-3 flex items-center justify-center">
                       <AppleIcon />
                     </div>
                     <div>
-                      <p className="text-[13.5px] font-medium text-[#2C2420]">Apple</p>
-                      <p className="text-[11px] text-[#AE9D95] mt-0.5">
+                      <p className="text-[13.5px] font-medium text-text-primary">Apple</p>
+                      <p className="text-[11px] text-text-tertiary mt-0.5">
                         {oauthData?.apple
                           ? t('profile.connected', 'Connected')
                           : t('profile.notConnected', 'Not connected')}
@@ -429,7 +429,7 @@ function ProfilePage() {
                         type="button"
                         onClick={() => handleDisconnect('apple')}
                         disabled={disconnectOAuth.isPending}
-                        className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-[#C0392B]/10 text-[#C0392B] transition-colors hover:bg-[#C0392B]/18 disabled:opacity-50"
+                        className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-red/10 text-red transition-colors hover:bg-red/18 disabled:opacity-50"
                       >
                         {t('profile.disconnect', 'Disconnect')}
                       </button>
@@ -437,7 +437,7 @@ function ProfilePage() {
                       <button
                         type="button"
                         onClick={() => handleConnect('apple')}
-                        className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-[#6B4226]/10 text-[#6B4226] transition-colors hover:bg-[#6B4226]/18"
+                        className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-coffee/10 text-coffee transition-colors hover:bg-coffee/18"
                       >
                         {t('profile.connect', 'Connect')}
                       </button>
@@ -447,8 +447,8 @@ function ProfilePage() {
 
                 {/* Warning if only one method left */}
                 {oauthData && !oauthData.hasPassword && [oauthData.google, oauthData.apple].filter(Boolean).length <= 1 && (
-                  <div className="rounded-lg bg-[#C17F3B]/8 border border-[#C17F3B]/15 px-4 py-3">
-                    <p className="text-[12px] text-[#C17F3B] leading-relaxed">
+                  <div className="rounded-lg bg-amber/8 border border-[#C17F3B]/15 px-4 py-3">
+                    <p className="text-[12px] text-amber leading-relaxed">
                       {t(
                         'profile.singleMethodWarning',
                         'You have only one login method. Set a password or connect another provider before disconnecting.',
@@ -476,24 +476,24 @@ function ProfilePage() {
                     onClick={() => setTheme(opt.value)}
                     className={`relative flex flex-col items-center gap-2 py-4 px-3 rounded-xl border cursor-pointer transition-all duration-200 ${
                       isActive
-                        ? 'bg-[#6B4226]/8 border-[#6B4226]/40 shadow-[0_2px_8px_rgba(107,66,38,0.10)]'
-                        : 'bg-white/40 border-[#EBE2D6] hover:bg-[#EBE2D6]/40 hover:border-[#EBE2D6]'
+                        ? 'bg-coffee/8 border-coffee/40 shadow-[0_2px_8px_rgba(107,66,38,0.10)]'
+                        : 'bg-white/40 border-cream-3 hover:bg-cream-3/40 hover:border-cream-3'
                     }`}
                   >
                     <Icon
                       size={20}
-                      className={isActive ? 'text-[#6B4226]' : 'text-[#7C6860]'}
+                      className={isActive ? 'text-coffee' : 'text-text-secondary'}
                     />
                     <span
                       className={`text-[12px] font-medium ${
-                        isActive ? 'text-[#6B4226]' : 'text-[#7C6860]'
+                        isActive ? 'text-coffee' : 'text-text-secondary'
                       }`}
                     >
                       {opt.label}
                     </span>
                     {isActive && (
                       <span className="absolute top-2 right-2">
-                        <Check size={14} className="text-[#6B4226]" />
+                        <Check size={14} className="text-coffee" />
                       </span>
                     )}
                   </button>
@@ -532,7 +532,7 @@ function GoogleIcon() {
 
 function AppleIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-[#2C2420]">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-text-primary">
       <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
     </svg>
   );

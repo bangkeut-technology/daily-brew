@@ -1,10 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { CalendarDays, ClipboardList } from 'lucide-react';
 import { useAttendance } from '@/hooks/queries/useAttendance';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { GlassCard } from '@/components/shared/GlassCard';
+import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { AttendanceRow } from '@/components/shared/AttendanceRow';
 
 export const Route = createFileRoute('/console/attendance/')({
@@ -23,37 +24,55 @@ function AttendancePage() {
     <div className="page-enter">
       <PageHeader title={t('nav.attendance')} />
 
-      <div className="flex gap-3 mb-4">
+      <div className="flex items-end gap-3 mb-6">
         <div>
-          <label className="block text-[11px] font-medium text-text-secondary mb-1">From</label>
+          <label className="block text-[11px] font-medium text-text-secondary mb-1">
+            {t('attendance.from', 'From')}
+          </label>
           <input
             type="date"
             value={from}
             onChange={(e) => setFrom(e.target.value)}
-            className="px-3 py-2 rounded-lg text-[13px] bg-white/62 border border-cream-3 text-text-primary outline-none focus:border-coffee transition-colors"
+            className="px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee transition-colors"
           />
         </div>
         <div>
-          <label className="block text-[11px] font-medium text-text-secondary mb-1">To</label>
+          <label className="block text-[11px] font-medium text-text-secondary mb-1">
+            {t('attendance.to', 'To')}
+          </label>
           <input
             type="date"
             value={to}
             onChange={(e) => setTo(e.target.value)}
-            className="px-3 py-2 rounded-lg text-[13px] bg-white/62 border border-cream-3 text-text-primary outline-none focus:border-coffee transition-colors"
+            className="px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee transition-colors"
           />
         </div>
       </div>
 
       {isLoading ? (
-        <p className="text-text-tertiary">{t('common.loading')}</p>
+        <div className="flex items-center justify-center py-12">
+          <p className="text-[13px] text-text-tertiary">{t('common.loading')}</p>
+        </div>
+      ) : attendance?.length === 0 ? (
+        <div className="border-[1.5px] border-dashed border-cream-3 rounded-2xl bg-white/30 flex flex-col items-center justify-center min-h-[200px]">
+          <ClipboardList size={28} className="text-text-tertiary mb-2" />
+          <span className="text-[13px] text-text-tertiary">
+            {t('attendance.noRecords', 'No attendance records for this period')}
+          </span>
+        </div>
       ) : (
         <GlassCard hover={false}>
-          {attendance?.length === 0 ? (
-            <p className="px-5 py-8 text-center text-[13px] text-text-tertiary">
-              {t('common.noResults')}
-            </p>
-          ) : (
-            attendance?.map((a, i) => (
+          <GlassCardHeader
+            title={t('attendance.log', 'Attendance log')}
+            action={
+              <span className="flex items-center gap-1.5 text-[12px] text-text-tertiary">
+                <CalendarDays size={13} />
+                {from === to ? from : `${from} - ${to}`}
+              </span>
+            }
+          />
+          <div>
+            {attendance?.map((a, i) => (
               <AttendanceRow
                 key={a.publicId}
                 employee={a.employeeName || ''}
@@ -64,8 +83,8 @@ function AttendancePage() {
                 leftEarly={a.leftEarly}
                 index={i}
               />
-            ))
-          )}
+            ))}
+          </div>
         </GlassCard>
       )}
     </div>

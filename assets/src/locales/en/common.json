@@ -103,7 +103,7 @@
     "timeRules": "Day-of-week schedule",
     "override": "Override",
     "default": "Default",
-    "timeRulesBrewPlus": "Per-day schedules require Brew+",
+    "timeRulesEspresso": "Per-day schedules require Espresso",
     "addRule": "Add override",
     "monday": "Monday",
     "tuesday": "Tuesday",
@@ -121,7 +121,7 @@
     "longitude": "Longitude",
     "radius": "Radius (meters)",
     "useCurrentLocation": "Use current location",
-    "geofencingBrewPlus": "Geofencing requires Brew+"
+    "geofencingEspresso": "Geofencing requires Espresso"
   },
   "checkin": {
     "checkIn": "Check In",

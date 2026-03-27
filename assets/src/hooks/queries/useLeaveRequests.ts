@@ -21,7 +21,8 @@ export function useCreateLeaveRequest(workspacePublicId: string) {
   return useMutation({
     mutationFn: async (leaveRequest: {
       employeePublicId: string;
-      date: string;
+      startDate: string;
+      endDate: string;
       reason?: string;
     }) => {
       const { data } = await apiAxios.post<LeaveRequest>(

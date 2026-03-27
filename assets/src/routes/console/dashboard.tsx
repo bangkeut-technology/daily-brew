@@ -19,7 +19,7 @@ function DashboardPage() {
     return (
       <div className="page-enter">
         <PageHeader title={t('nav.dashboard')} />
-        <div className="bg-white/60 backdrop-blur-md border border-white/85 rounded-2xl p-8 text-center">
+        <div className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-8 text-center">
           <p className="text-text-secondary mb-4">
             No workspace selected. Create one or link to an employee to get started.
           </p>

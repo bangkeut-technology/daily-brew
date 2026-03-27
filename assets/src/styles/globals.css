@@ -34,55 +34,48 @@
     --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
     --color-sidebar-border: hsl(var(--sidebar-border));
 
-    /* DailyBrew palette */
-    --color-cream: #FAF7F2;
-    --color-cream-2: #F3EDE3;
-    --color-cream-3: #EBE2D6;
-
-    --color-coffee: #6B4226;
-    --color-coffee-light: #9B6B45;
-
-    --color-amber: #C17F3B;
-    --color-amber-light: #E8A85A;
-
-    --color-text-primary: #2C2420;
-    --color-text-secondary: #7C6860;
-    --color-text-tertiary: #AE9D95;
-
-    --color-green: #4A7C59;
-    --color-red: #C0392B;
-    --color-blue: #3B6FA0;
-
-    /* Glass */
-    --color-glass-bg: rgba(255,255,255,0.62);
-    --color-glass-border: rgba(255,255,255,0.85);
+    /* DailyBrew semantic palette — switches via CSS vars */
+    --color-cream: var(--db-cream);
+    --color-cream-2: var(--db-cream-2);
+    --color-cream-3: var(--db-cream-3);
+    --color-coffee: var(--db-coffee);
+    --color-coffee-light: var(--db-coffee-light);
+    --color-amber: var(--db-amber);
+    --color-amber-light: var(--db-amber-light);
+    --color-text-primary: var(--db-text-primary);
+    --color-text-secondary: var(--db-text-secondary);
+    --color-text-tertiary: var(--db-text-tertiary);
+    --color-green: var(--db-green);
+    --color-red: var(--db-red);
+    --color-blue: var(--db-blue);
+    --color-glass-bg: var(--db-glass-bg);
+    --color-glass-border: var(--db-glass-border);
 }
 
+/* ===================== LIGHT THEME ===================== */
 :root {
-    /* DailyBrew cream theme */
-    --background: 36 43% 96%;       /* #FAF7F2 */
-    --foreground: 18 19% 14%;       /* #2C2420 */
+    --background: 36 43% 96%;
+    --foreground: 18 19% 14%;
     --card: 36 43% 96%;
     --card-foreground: 18 19% 14%;
     --popover: 0 0% 100%;
     --popover-foreground: 18 19% 14%;
-    --primary: 22 32% 28%;          /* #6B4226 - coffee */
+    --primary: 22 32% 28%;
     --primary-foreground: 36 43% 96%;
-    --secondary: 30 27% 90%;        /* cream-2 */
+    --secondary: 30 27% 90%;
     --secondary-foreground: 18 19% 14%;
-    --muted: 30 22% 88%;            /* cream-3 */
-    --muted-foreground: 16 12% 44%; /* text-secondary */
-    --accent: 28 54% 49%;           /* #C17F3B - amber */
+    --muted: 30 22% 88%;
+    --muted-foreground: 16 12% 44%;
+    --accent: 28 54% 49%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 6 63% 46%;       /* #C0392B */
+    --destructive: 6 63% 46%;
     --destructive-foreground: 0 0% 100%;
     --border: 30 22% 88%;
     --input: 30 22% 88%;
     --ring: 22 32% 28%;
     --radius: 0.75rem;
 
-    /* Sidebar */
-    --sidebar-background: 30 27% 92%;  /* cream-2 */
+    --sidebar-background: 30 27% 92%;
     --sidebar-foreground: 16 12% 44%;
     --sidebar-primary: 22 32% 28%;
     --sidebar-primary-foreground: 0 0% 100%;
@@ -90,8 +83,26 @@
     --sidebar-accent-foreground: 18 19% 14%;
     --sidebar-border: 30 22% 88%;
     --sidebar-ring: 22 32% 28%;
+
+    /* DailyBrew light */
+    --db-cream: #FAF7F2;
+    --db-cream-2: #F3EDE3;
+    --db-cream-3: #EBE2D6;
+    --db-coffee: #6B4226;
+    --db-coffee-light: #9B6B45;
+    --db-amber: #C17F3B;
+    --db-amber-light: #E8A85A;
+    --db-text-primary: #2C2420;
+    --db-text-secondary: #7C6860;
+    --db-text-tertiary: #AE9D95;
+    --db-green: #4A7C59;
+    --db-red: #C0392B;
+    --db-blue: #3B6FA0;
+    --db-glass-bg: rgba(255, 255, 255, 0.62);
+    --db-glass-border: rgba(255, 255, 255, 0.85);
 }
 
+/* ===================== DARK THEME ===================== */
 .dark {
     --background: 18 19% 8%;
     --foreground: 36 20% 90%;
@@ -121,6 +132,23 @@
     --sidebar-accent-foreground: 36 20% 90%;
     --sidebar-border: 18 15% 20%;
     --sidebar-ring: 28 54% 49%;
+
+    /* DailyBrew dark — warm dark coffee tones */
+    --db-cream: #1A1614;
+    --db-cream-2: #221E1A;
+    --db-cream-3: #2E2822;
+    --db-coffee: #E8A85A;
+    --db-coffee-light: #D49A4E;
+    --db-amber: #E8A85A;
+    --db-amber-light: #D49A4E;
+    --db-text-primary: #F0EAE2;
+    --db-text-secondary: #B0A498;
+    --db-text-tertiary: #7A6E64;
+    --db-green: #6BB87A;
+    --db-red: #E05A4E;
+    --db-blue: #5A9AD6;
+    --db-glass-bg: rgba(30, 26, 22, 0.72);
+    --db-glass-border: rgba(60, 52, 44, 0.6);
 }
 
 /* ---- Base ---- */
@@ -132,8 +160,10 @@ body {
     margin: 0;
     font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
-    background: #FAF7F2;
+    background: var(--db-cream);
+    color: var(--db-text-primary);
     overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ---- Animated gradient background ---- */
@@ -145,40 +175,30 @@ body::before {
     z-index: 0;
     background:
         radial-gradient(ellipse 600px 600px at var(--grad-x1, 0%) var(--grad-y1, 0%),
-            rgba(193,127,59,0.14) 0%, transparent 70%),
+            rgba(193, 127, 59, 0.14) 0%, transparent 70%),
         radial-gradient(ellipse 500px 500px at var(--grad-x2, 100%) var(--grad-y2, 100%),
-            rgba(107,66,38,0.12) 0%, transparent 70%),
+            rgba(107, 66, 38, 0.12) 0%, transparent 70%),
         radial-gradient(ellipse 400px 400px at var(--grad-x3, 80%) var(--grad-y3, 10%),
-            rgba(232,168,90,0.10) 0%, transparent 60%);
+            rgba(232, 168, 90, 0.10) 0%, transparent 60%);
     animation: gradientDrift 20s ease-in-out infinite alternate;
 }
 
+html.dark body::before {
+    background:
+        radial-gradient(ellipse 600px 600px at var(--grad-x1, 0%) var(--grad-y1, 0%),
+            rgba(193, 127, 59, 0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 500px 500px at var(--grad-x2, 100%) var(--grad-y2, 100%),
+            rgba(107, 66, 38, 0.04) 0%, transparent 70%),
+        radial-gradient(ellipse 400px 400px at var(--grad-x3, 80%) var(--grad-y3, 10%),
+            rgba(232, 168, 90, 0.03) 0%, transparent 60%);
+}
+
 @keyframes gradientDrift {
-    0% {
-        --grad-x1: 5%;  --grad-y1: 5%;
-        --grad-x2: 95%; --grad-y2: 95%;
-        --grad-x3: 75%; --grad-y3: 10%;
-    }
-    25% {
-        --grad-x1: 15%; --grad-y1: 30%;
-        --grad-x2: 80%; --grad-y2: 70%;
-        --grad-x3: 50%; --grad-y3: 5%;
-    }
-    50% {
-        --grad-x1: 30%; --grad-y1: 10%;
-        --grad-x2: 70%; --grad-y2: 85%;
-        --grad-x3: 90%; --grad-y3: 30%;
-    }
-    75% {
-        --grad-x1: 10%; --grad-y1: 40%;
-        --grad-x2: 85%; --grad-y2: 60%;
-        --grad-x3: 60%; --grad-y3: 15%;
-    }
-    100% {
-        --grad-x1: 20%; --grad-y1: 15%;
-        --grad-x2: 90%; --grad-y2: 80%;
-        --grad-x3: 70%; --grad-y3: 25%;
-    }
+    0%   { --grad-x1: 5%;  --grad-y1: 5%;  --grad-x2: 95%; --grad-y2: 95%; --grad-x3: 75%; --grad-y3: 10%; }
+    25%  { --grad-x1: 15%; --grad-y1: 30%; --grad-x2: 80%; --grad-y2: 70%; --grad-x3: 50%; --grad-y3: 5%;  }
+    50%  { --grad-x1: 30%; --grad-y1: 10%; --grad-x2: 70%; --grad-y2: 85%; --grad-x3: 90%; --grad-y3: 30%; }
+    75%  { --grad-x1: 10%; --grad-y1: 40%; --grad-x2: 85%; --grad-y2: 60%; --grad-x3: 60%; --grad-y3: 15%; }
+    100% { --grad-x1: 20%; --grad-y1: 15%; --grad-x2: 90%; --grad-y2: 80%; --grad-x3: 70%; --grad-y3: 25%; }
 }
 
 @property --grad-x1 { syntax: '<percentage>'; inherits: false; initial-value: 5%; }
@@ -194,21 +214,29 @@ body::before {
     z-index: 1;
 }
 
-/* ---- Glass card utility ---- */
+/* ---- Glass card ---- */
 .glass-card {
-    background: rgba(255,255,255,0.62);
+    background: var(--db-glass-bg);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255,255,255,0.85);
+    border: 1px solid var(--db-glass-border);
     border-radius: 14px;
-    box-shadow: 0 2px 12px rgba(107,66,38,0.05);
+    box-shadow: 0 2px 12px rgba(107, 66, 38, 0.05);
     overflow: hidden;
     transition: all 0.2s ease;
 }
 
+html.dark .glass-card {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
 .glass-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(107,66,38,0.10);
+    box-shadow: 0 6px 20px rgba(107, 66, 38, 0.10);
+}
+
+html.dark .glass-card:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 /* ---- Page transition ---- */
@@ -216,59 +244,41 @@ body::before {
     from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
 }
+.page-enter { animation: pageIn 0.25s ease forwards; }
 
-.page-enter {
-    animation: pageIn 0.25s ease forwards;
-}
-
-/* ---- Floating animation for hero ---- */
+/* ---- Floating animation ---- */
 @keyframes float {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-8px); }
 }
-
-.animate-float {
-    animation: float 4s ease-in-out infinite;
-}
+.animate-float { animation: float 4s ease-in-out infinite; }
 
 /* ---- Staggered fade in ---- */
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(16px); }
     to   { opacity: 1; transform: translateY(0); }
 }
-
-.animate-fade-in-up {
-    animation: fadeInUp 0.6s ease forwards;
-    opacity: 0;
-}
+.animate-fade-in-up { animation: fadeInUp 0.6s ease forwards; opacity: 0; }
 
 /* ---- Pulse glow ring ---- */
 @keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(193,127,59,0.3); }
-    50% { box-shadow: 0 0 0 12px rgba(193,127,59,0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(193, 127, 59, 0.3); }
+    50% { box-shadow: 0 0 0 12px rgba(193, 127, 59, 0); }
 }
-
-.animate-pulse-glow {
-    animation: pulseGlow 3s ease-in-out infinite;
-}
+.animate-pulse-glow { animation: pulseGlow 3s ease-in-out infinite; }
 
 /* ---- Shimmer for CTA ---- */
 @keyframes shimmer {
     0% { background-position: -200% center; }
     100% { background-position: 200% center; }
 }
-
 .btn-shimmer {
     background-size: 200% auto;
-    background-image: linear-gradient(
-        90deg,
-        #6B4226 0%,
-        #9B6B45 25%,
-        #C17F3B 50%,
-        #9B6B45 75%,
-        #6B4226 100%
-    );
+    background-image: linear-gradient(90deg, #6B4226 0%, #9B6B45 25%, #C17F3B 50%, #9B6B45 75%, #6B4226 100%);
     animation: shimmer 4s linear infinite;
+}
+html.dark .btn-shimmer {
+    background-image: linear-gradient(90deg, #9B6B45 0%, #C17F3B 25%, #E8A85A 50%, #C17F3B 75%, #9B6B45 100%);
 }
 
 /* ---- Serif headings ---- */

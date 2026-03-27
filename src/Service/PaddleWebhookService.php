@@ -3,8 +3,8 @@
 namespace App\Service;
 
 use App\Entity\Subscription;
-use App\Enum\Plan;
-use App\Enum\SubscriptionStatus;
+use App\Enum\PlanEnum;
+use App\Enum\SubscriptionStatusEnum;
 use App\Repository\SubscriptionRepository;
 use App\Repository\WorkspaceRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -59,7 +59,7 @@ class PaddleWebhookService
             $this->em->persist($subscription);
         }
 
-        $subscription->setPlan(Plan::BrewPlus);
+        $subscription->setPlan(PlanEnum::Espresso);
         $subscription->setStatus($this->mapStatus($data['status'] ?? 'active'));
         $subscription->setPaddleSubscriptionId($paddleSubId);
         $subscription->setPaddleCustomerId($data['customer_id'] ?? null);
@@ -90,7 +90,7 @@ class PaddleWebhookService
         $subscription = $this->findByPaddleId($data['id'] ?? '');
         if ($subscription === null) return;
 
-        $subscription->setStatus(SubscriptionStatus::Canceled);
+        $subscription->setStatus(SubscriptionStatusEnum::Canceled);
         $subscription->setCanceledAt(new \DateTimeImmutable());
         $this->em->flush();
     }
@@ -100,7 +100,7 @@ class PaddleWebhookService
         $subscription = $this->findByPaddleId($data['id'] ?? '');
         if ($subscription === null) return;
 
-        $subscription->setStatus(SubscriptionStatus::Paused);
+        $subscription->setStatus(SubscriptionStatusEnum::Paused);
         $this->em->flush();
     }
 
@@ -109,7 +109,7 @@ class PaddleWebhookService
         $subscription = $this->findByPaddleId($data['id'] ?? '');
         if ($subscription === null) return;
 
-        $subscription->setStatus(SubscriptionStatus::Active);
+        $subscription->setStatus(SubscriptionStatusEnum::Active);
         $this->em->flush();
     }
 
@@ -118,7 +118,7 @@ class PaddleWebhookService
         $subscription = $this->findByPaddleId($data['id'] ?? '');
         if ($subscription === null) return;
 
-        $subscription->setStatus(SubscriptionStatus::PastDue);
+        $subscription->setStatus(SubscriptionStatusEnum::PastDue);
         $this->em->flush();
     }
 
@@ -131,15 +131,14 @@ class PaddleWebhookService
         return $subscription;
     }
 
-    private function mapStatus(string $paddleStatus): SubscriptionStatus
+    private function mapStatus(string $paddleStatus): SubscriptionStatusEnum
     {
         return match ($paddleStatus) {
-            'active' => SubscriptionStatus::Active,
-            'past_due' => SubscriptionStatus::PastDue,
-            'canceled' => SubscriptionStatus::Canceled,
-            'paused' => SubscriptionStatus::Paused,
-            'trialing' => SubscriptionStatus::Trialing,
-            default => SubscriptionStatus::Active,
+            'active' => SubscriptionStatusEnum::Active,
+            'past_due' => SubscriptionStatusEnum::PastDue,
+            'canceled' => SubscriptionStatusEnum::Canceled,
+            'paused' => SubscriptionStatusEnum::Paused,
+            'trialing' => SubscriptionStatusEnum::Trialing,
         };
     }
 }

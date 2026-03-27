@@ -3,7 +3,7 @@
 namespace App\ApiController\LeaveRequest;
 
 use App\ApiController\Trait\ApiResponseTrait;
-use App\Enum\LeaveRequestStatus;
+use App\Enum\LeaveRequestStatusEnum;
 use App\Repository\EmployeeRepository;
 use App\Repository\LeaveRequestRepository;
 use App\Repository\WorkspaceRepository;
@@ -37,11 +37,11 @@ class LeaveRequestController extends AbstractController
         $this->denyAccessUnlessGranted(WorkspaceVoter::VIEW, $workspace);
 
         if (!$planService->canUseLeaveRequests($workspace)) {
-            return $this->jsonError('Leave requests require the Brew+ plan', 402);
+            return $this->jsonError('Leave requests require the Espresso plan', 402);
         }
 
         $status = $request->query->get('status');
-        $statusEnum = $status ? LeaveRequestStatus::tryFrom($status) : null;
+        $statusEnum = $status ? LeaveRequestStatusEnum::tryFrom($status) : null;
 
         $leaveRequests = $leaveRequestRepository->findByWorkspace($workspace, $statusEnum);
 

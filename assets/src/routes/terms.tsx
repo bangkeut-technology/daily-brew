@@ -38,7 +38,7 @@ function TermsPage() {
 
           <Section title="3. Free and paid plans">
             <p>
-              The free plan allows up to 5 active employees. The Brew+ plan
+              The free plan allows up to 5 active employees. The Espresso plan
               removes this limit and adds additional features. Paid plans are
               billed monthly through Paddle. You may cancel at any time; access
               continues until the end of the billing period.

@@ -90,7 +90,7 @@ function ShiftsPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full px-3 py-2 rounded-lg text-[13.5px] bg-white/62 border border-cream-3 text-text-primary outline-none focus:border-coffee"
+              className="w-full px-3 py-2 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee"
             />
             <div className="flex gap-3">
               <div className="flex-1">
@@ -101,7 +101,7 @@ function ShiftsPage() {
                   type="time"
                   value={startTime}
                   onChange={(e) => setStartTime(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg text-[13px] bg-white/62 border border-cream-3 text-text-primary outline-none focus:border-coffee"
+                  className="w-full px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee"
                 />
               </div>
               <div className="flex-1">
@@ -112,7 +112,7 @@ function ShiftsPage() {
                   type="time"
                   value={endTime}
                   onChange={(e) => setEndTime(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg text-[13px] bg-white/62 border border-cream-3 text-text-primary outline-none focus:border-coffee"
+                  className="w-full px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee"
                 />
               </div>
             </div>
@@ -127,7 +127,7 @@ function ShiftsPage() {
         </GlassCard>
       )}
 
-      {/* Brew+ per-day schedules banner for free plan */}
+      {/* Espresso per-day schedules banner for free plan */}
       {plan && !plan.canUseShiftTimeRules && (
         <div className="mb-4">
           <GlassCard hover={false}>
@@ -138,11 +138,11 @@ function ShiftsPage() {
               <div className="flex-1">
                 <p className="text-[13px] font-medium text-text-primary">Per-day shift schedules</p>
                 <p className="text-[11.5px] text-text-tertiary mt-0.5">
-                  Override shift hours for specific days of the week. Available with Brew+.
+                  Override shift hours for specific days of the week. Available with Espresso.
                 </p>
               </div>
               <span className="text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber flex-shrink-0">
-                Brew+
+                Espresso
               </span>
             </div>
           </GlassCard>
@@ -208,7 +208,7 @@ function ShiftCard({
       </div>
 
       {/* Day schedule toggle */}
-      <div className="border-t border-[#EBE2D6]/80">
+      <div className="border-t border-cream-3/80">
         <button
           onClick={onToggleExpand}
           disabled={!canUseTimeRules}
@@ -222,7 +222,7 @@ function ShiftCard({
             Day schedule
             {!canUseTimeRules && (
               <span className="text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
-                Brew+
+                Espresso
               </span>
             )}
             {canUseTimeRules && shift.timeRules.length > 0 && (
@@ -361,14 +361,14 @@ function DayRow({
           type="time"
           value={ruleStart}
           onChange={(e) => setRuleStart(e.target.value)}
-          className="px-2 py-1 rounded-md text-[12px] bg-white/62 border border-cream-3 text-text-primary outline-none focus:border-coffee w-[90px]"
+          className="px-2 py-1 rounded-md text-[12px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee w-[90px]"
         />
         <span className="text-[11px] text-text-tertiary">&ndash;</span>
         <input
           type="time"
           value={ruleEnd}
           onChange={(e) => setRuleEnd(e.target.value)}
-          className="px-2 py-1 rounded-md text-[12px] bg-white/62 border border-cream-3 text-text-primary outline-none focus:border-coffee w-[90px]"
+          className="px-2 py-1 rounded-md text-[12px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee w-[90px]"
         />
         <div className="flex items-center gap-1 ml-auto">
           <button

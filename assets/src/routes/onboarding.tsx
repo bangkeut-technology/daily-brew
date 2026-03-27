@@ -217,11 +217,7 @@ function WelcomeStep({ onContinue }: { onContinue: () => void }) {
         initial={{ scale: 0, rotate: -30 }}
         animate={{ scale: 1, rotate: 0 }}
         transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.1 }}
-        className="w-20 h-20 rounded-[24px] flex items-center justify-center mb-6"
-        style={{
-          background: 'linear-gradient(135deg, #E8A85A, #6B4226)',
-          boxShadow: '0 6px 20px rgba(107,66,38,0.30)',
-        }}
+        className="w-20 h-20 rounded-[24px] flex items-center justify-center mb-6 bg-gradient-to-br from-amber-light to-coffee shadow-[0_6px_20px_rgba(107,66,38,0.30)]"
       >
         <motion.div
           animate={{ y: [0, -4, 0] }}
@@ -265,15 +261,9 @@ function RoleSelectionStep({ onSelect }: { onSelect: (role: 'owner' | 'employee'
         {/* Owner card */}
         <button
           onClick={() => onSelect('owner')}
-          className="group relative bg-white/60 backdrop-blur-md border border-white/85 rounded-2xl p-6 shadow-[0_2px_12px_rgba(107,66,38,0.05)] cursor-pointer text-left transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_6px_20px_rgba(107,66,38,0.12)] hover:border-coffee/30"
+          className="group relative glass-card p-6 cursor-pointer text-left transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_6px_20px_rgba(107,66,38,0.12)] hover:border-coffee/30"
         >
-          <div
-            className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-            style={{
-              background: 'linear-gradient(135deg, #C17F3B, #6B4226)',
-              boxShadow: '0 3px 10px rgba(107,66,38,0.20)',
-            }}
-          >
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-gradient-to-br from-amber to-coffee shadow-[0_3px_10px_rgba(107,66,38,0.20)]">
             <Building2 size={22} color="white" strokeWidth={1.8} />
           </div>
           <p className="text-[14px] font-semibold text-text-primary font-sans mb-1">
@@ -290,15 +280,9 @@ function RoleSelectionStep({ onSelect }: { onSelect: (role: 'owner' | 'employee'
         {/* Employee card */}
         <button
           onClick={() => onSelect('employee')}
-          className="group relative bg-white/60 backdrop-blur-md border border-white/85 rounded-2xl p-6 shadow-[0_2px_12px_rgba(107,66,38,0.05)] cursor-pointer text-left transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_6px_20px_rgba(107,66,38,0.12)] hover:border-coffee/30"
+          className="group relative glass-card p-6 cursor-pointer text-left transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_6px_20px_rgba(107,66,38,0.12)] hover:border-coffee/30"
         >
-          <div
-            className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-            style={{
-              background: 'linear-gradient(135deg, #3B6FA0, #1a3a5c)',
-              boxShadow: '0 3px 10px rgba(59,111,160,0.20)',
-            }}
-          >
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-gradient-to-br from-blue to-[#1a3a5c] shadow-[0_3px_10px_rgba(59,111,160,0.20)]">
             <UserCircle size={22} color="white" strokeWidth={1.8} />
           </div>
           <p className="text-[14px] font-semibold text-text-primary font-sans mb-1">
@@ -333,13 +317,7 @@ function OwnerFormStep({
 
   return (
     <div className="text-center">
-      <div
-        className="w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-5"
-        style={{
-          background: 'linear-gradient(135deg, #C17F3B, #6B4226)',
-          boxShadow: '0 3px 10px rgba(107,66,38,0.20)',
-        }}
-      >
+      <div className="w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-5 bg-gradient-to-br from-amber to-coffee shadow-[0_3px_10px_rgba(107,66,38,0.20)]">
         <Building2 size={24} color="white" strokeWidth={1.8} />
       </div>
 
@@ -353,7 +331,7 @@ function OwnerFormStep({
         )}
       </p>
 
-      <div className="bg-white/60 backdrop-blur-md border border-white/85 rounded-2xl shadow-[0_2px_12px_rgba(107,66,38,0.05)] p-6">
+      <div className="glass-card p-6">
         <form onSubmit={onSubmit} className="space-y-5">
           <div className="text-left">
             <label className="block text-[12px] font-medium text-text-secondary mb-1.5 font-sans">
@@ -365,7 +343,7 @@ function OwnerFormStep({
               onChange={(e) => onWorkspaceNameChange(e.target.value)}
               placeholder={t('onboarding.restaurantPlaceholder', 'e.g. Caf\u00e9 Mekong')}
               autoFocus
-              className="w-full px-3.5 py-3 rounded-xl text-[14px] bg-white/60 border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-2 focus:ring-coffee/15 transition-all font-sans placeholder:text-text-tertiary"
+              className="w-full px-3.5 py-3 rounded-xl text-[14px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-2 focus:ring-coffee/15 transition-all font-sans placeholder:text-text-tertiary"
             />
           </div>
 
@@ -417,13 +395,7 @@ function EmployeeLinkStep({
 
   return (
     <div className="text-center">
-      <div
-        className="w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-5"
-        style={{
-          background: 'linear-gradient(135deg, #3B6FA0, #1a3a5c)',
-          boxShadow: '0 3px 10px rgba(59,111,160,0.20)',
-        }}
-      >
+      <div className="w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-5 bg-gradient-to-br from-blue to-[#1a3a5c] shadow-[0_3px_10px_rgba(59,111,160,0.20)]">
         <UserCircle size={24} color="white" strokeWidth={1.8} />
       </div>
 
@@ -433,11 +405,11 @@ function EmployeeLinkStep({
       <p className="text-[13px] text-text-secondary font-sans mb-8">
         {t(
           'onboarding.employeeLinkSubtitle',
-          'Share your ID with your manager, or enter the employee ID they gave you.',
+          'Ask your employer for your Employee ID, then enter it below to link your account.',
         )}
       </p>
 
-      <div className="bg-white/60 backdrop-blur-md border border-white/85 rounded-2xl shadow-[0_2px_12px_rgba(107,66,38,0.05)] p-6 space-y-6">
+      <div className="glass-card p-6 space-y-6">
         {/* Your public ID section */}
         <div className="text-left">
           <label className="block text-[11px] font-medium uppercase tracking-wider text-text-tertiary mb-2 font-sans">
@@ -487,13 +459,13 @@ function EmployeeLinkStep({
               type="text"
               value={employeePublicId}
               onChange={(e) => onEmployeePublicIdChange(e.target.value)}
-              placeholder={t('onboarding.employeeIdPlaceholder', 'Paste employee ID here')}
-              className="w-full px-3.5 py-3 rounded-xl text-[14px] bg-white/60 border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-2 focus:ring-coffee/15 transition-all font-sans placeholder:text-text-tertiary"
+              placeholder={t('onboarding.employeeIdPlaceholder', 'Ask your employer for your Employee ID')}
+              className="w-full px-3.5 py-3 rounded-xl text-[14px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-2 focus:ring-coffee/15 transition-all font-sans placeholder:text-text-tertiary"
             />
             <p className="text-[11px] text-text-tertiary mt-1.5 font-sans leading-relaxed">
               {t(
                 'onboarding.employeeIdHint',
-                'If your manager already created your employee profile, they can share this ID with you.',
+                'Your employer creates your employee profile and gives you this ID to link your account.',
               )}
             </p>
           </div>
@@ -531,4 +503,3 @@ function EmployeeLinkStep({
     </div>
   );
 }
-

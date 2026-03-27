@@ -54,23 +54,23 @@ export const AuthenticationProvider = ({ children }: { children: React.ReactNode
 AuthenticationProvider.displayName = 'AuthenticationProvider';
 
 const BrewingLoader = () => (
-    <div className="flex min-h-screen items-center justify-center" style={{ background: '#FAF7F2' }}>
+    <div className="flex min-h-screen items-center justify-center bg-cream">
         <div className="flex flex-col items-center gap-5">
             <div className="relative">
                 {/* Steam */}
                 <div className="absolute -top-6 left-1/2 -translate-x-1/2 flex gap-1.5">
-                    <div className="w-[2px] h-4 bg-[#C17F3B]/30 rounded-full animate-steam-1" />
-                    <div className="w-[2px] h-5 bg-[#C17F3B]/20 rounded-full animate-steam-2" />
-                    <div className="w-[2px] h-4 bg-[#C17F3B]/30 rounded-full animate-steam-3" />
+                    <div className="w-[2px] h-4 bg-amber/30 rounded-full animate-steam-1" />
+                    <div className="w-[2px] h-5 bg-amber/20 rounded-full animate-steam-2" />
+                    <div className="w-[2px] h-4 bg-amber/30 rounded-full animate-steam-3" />
                 </div>
                 {/* Cup */}
-                <div className="w-12 h-10 rounded-b-xl border-[2.5px] border-[#6B4226] relative overflow-hidden" style={{ borderTop: 'none' }}>
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#6B4226] to-[#9B6B45] animate-brew-fill rounded-b-lg" />
+                <div className="w-12 h-10 rounded-b-xl border-[2.5px] border-coffee relative overflow-hidden" style={{ borderTop: 'none' }}>
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-coffee to-coffee-light animate-brew-fill rounded-b-lg" />
                 </div>
                 {/* Handle */}
-                <div className="absolute top-1 -right-2.5 w-3 h-5 border-[2.5px] border-[#6B4226] rounded-r-full border-l-0" />
+                <div className="absolute top-1 -right-2.5 w-3 h-5 border-[2.5px] border-coffee rounded-r-full border-l-0" />
             </div>
-            <span className="text-[13px] text-[#AE9D95] font-sans tracking-wide">Brewing...</span>
+            <span className="text-[13px] text-text-tertiary font-sans tracking-wide">Brewing...</span>
         </div>
         <style>{`
             @keyframes steam1 { 0%,100% { opacity:0; transform:translateY(0) scaleY(1); } 50% { opacity:1; transform:translateY(-8px) scaleY(1.3); } }

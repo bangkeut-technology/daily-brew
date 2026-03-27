@@ -82,7 +82,7 @@ function ResetPasswordPage() {
                   required
                   minLength={8}
                   placeholder="8+ characters"
-                  className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-white/60 border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
+                  className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
                 />
                 <button
                   type="button"
@@ -105,7 +105,7 @@ function ResetPasswordPage() {
                   required
                   minLength={8}
                   placeholder="8+ characters"
-                  className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-white/60 border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
+                  className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
                 />
                 <button
                   type="button"

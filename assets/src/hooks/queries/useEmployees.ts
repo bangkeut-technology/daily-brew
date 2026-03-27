@@ -31,7 +31,12 @@ export function useEmployee(workspacePublicId: string, publicId: string) {
 export function useCreateEmployee(workspacePublicId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (employee: { name: string; phone?: string; shiftPublicId?: string }) => {
+    mutationFn: async (employee: {
+      firstName: string;
+      lastName: string;
+      phoneNumber?: string;
+      shiftPublicId?: string;
+    }) => {
       const { data } = await apiAxios.post<Employee>(
         `/workspaces/${workspacePublicId}/employees`,
         employee,
@@ -52,8 +57,9 @@ export function useUpdateEmployee(workspacePublicId: string) {
       ...employee
     }: {
       publicId: string;
-      name?: string;
-      phone?: string;
+      firstName?: string;
+      lastName?: string;
+      phoneNumber?: string;
       shiftPublicId?: string | null;
       active?: boolean;
     }) => {
@@ -63,8 +69,11 @@ export function useUpdateEmployee(workspacePublicId: string) {
       );
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['employees', workspacePublicId] });
+      queryClient.invalidateQueries({
+        queryKey: ['employees', workspacePublicId, variables.publicId],
+      });
     },
   });
 }

@@ -24,7 +24,7 @@ import { Route as ConsoleRouteRouteImport } from './routes/console/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ConsoleSettingsRouteImport } from './routes/console/settings'
 import { Route as ConsoleDashboardRouteImport } from './routes/console/dashboard'
-import { Route as CheckinQrTokenRouteImport } from './routes/checkin/$qrToken'
+import { Route as CheckinPublicIdRouteImport } from './routes/checkin/$publicId'
 import { Route as ConsoleShiftsIndexRouteImport } from './routes/console/shifts/index'
 import { Route as ConsoleProfileIndexRouteImport } from './routes/console/profile/index'
 import { Route as ConsoleLeaveIndexRouteImport } from './routes/console/leave/index'
@@ -109,9 +109,9 @@ const ConsoleDashboardRoute = ConsoleDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => ConsoleRouteRoute,
 } as any)
-const CheckinQrTokenRoute = CheckinQrTokenRouteImport.update({
-  id: '/checkin/$qrToken',
-  path: '/checkin/$qrToken',
+const CheckinPublicIdRoute = CheckinPublicIdRouteImport.update({
+  id: '/checkin/$publicId',
+  path: '/checkin/$publicId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConsoleShiftsIndexRoute = ConsoleShiftsIndexRouteImport.update({
@@ -170,7 +170,7 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof SignUpRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
-  '/checkin/$qrToken': typeof CheckinQrTokenRoute
+  '/checkin/$publicId': typeof CheckinPublicIdRoute
   '/console/dashboard': typeof ConsoleDashboardRoute
   '/console/settings': typeof ConsoleSettingsRoute
   '/console/employees/new': typeof ConsoleEmployeesNewRoute
@@ -196,7 +196,7 @@ export interface FileRoutesByTo {
   '/sign-up': typeof SignUpRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
-  '/checkin/$qrToken': typeof CheckinQrTokenRoute
+  '/checkin/$publicId': typeof CheckinPublicIdRoute
   '/console/dashboard': typeof ConsoleDashboardRoute
   '/console/settings': typeof ConsoleSettingsRoute
   '/console/employees/new': typeof ConsoleEmployeesNewRoute
@@ -223,7 +223,7 @@ export interface FileRoutesById {
   '/sign-up': typeof SignUpRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
-  '/checkin/$qrToken': typeof CheckinQrTokenRoute
+  '/checkin/$publicId': typeof CheckinPublicIdRoute
   '/console/dashboard': typeof ConsoleDashboardRoute
   '/console/settings': typeof ConsoleSettingsRoute
   '/console/employees/new': typeof ConsoleEmployeesNewRoute
@@ -251,7 +251,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/support'
     | '/terms'
-    | '/checkin/$qrToken'
+    | '/checkin/$publicId'
     | '/console/dashboard'
     | '/console/settings'
     | '/console/employees/new'
@@ -277,7 +277,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/support'
     | '/terms'
-    | '/checkin/$qrToken'
+    | '/checkin/$publicId'
     | '/console/dashboard'
     | '/console/settings'
     | '/console/employees/new'
@@ -303,7 +303,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/support'
     | '/terms'
-    | '/checkin/$qrToken'
+    | '/checkin/$publicId'
     | '/console/dashboard'
     | '/console/settings'
     | '/console/employees/new'
@@ -330,7 +330,7 @@ export interface RootRouteChildren {
   SignUpRoute: typeof SignUpRoute
   SupportRoute: typeof SupportRoute
   TermsRoute: typeof TermsRoute
-  CheckinQrTokenRoute: typeof CheckinQrTokenRoute
+  CheckinPublicIdRoute: typeof CheckinPublicIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -440,11 +440,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleDashboardRouteImport
       parentRoute: typeof ConsoleRouteRoute
     }
-    '/checkin/$qrToken': {
-      id: '/checkin/$qrToken'
-      path: '/checkin/$qrToken'
-      fullPath: '/checkin/$qrToken'
-      preLoaderRoute: typeof CheckinQrTokenRouteImport
+    '/checkin/$publicId': {
+      id: '/checkin/$publicId'
+      path: '/checkin/$publicId'
+      fullPath: '/checkin/$publicId'
+      preLoaderRoute: typeof CheckinPublicIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/console/shifts/': {
@@ -550,7 +550,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignUpRoute: SignUpRoute,
   SupportRoute: SupportRoute,
   TermsRoute: TermsRoute,
-  CheckinQrTokenRoute: CheckinQrTokenRoute,
+  CheckinPublicIdRoute: CheckinPublicIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

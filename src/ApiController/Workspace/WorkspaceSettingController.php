@@ -64,10 +64,10 @@ class WorkspaceSettingController extends AbstractController
             $em->persist($setting);
         }
 
-        // IP restriction (Brew+ gated)
+        // IP restriction (Espresso gated)
         if (isset($data['ipRestrictionEnabled']) && $data['ipRestrictionEnabled']) {
             if (!$planService->canUseIpRestriction($workspace)) {
-                return $this->jsonError('IP restriction requires the Brew+ plan', 402);
+                return $this->jsonError('IP restriction requires the Espresso plan', 402);
             }
             $setting->setIpRestrictionEnabled(true);
         } elseif (isset($data['ipRestrictionEnabled'])) {
@@ -78,10 +78,10 @@ class WorkspaceSettingController extends AbstractController
             $setting->setAllowedIps($data['allowedIps']);
         }
 
-        // Geofencing (Brew+ gated)
+        // Geofencing (Espresso gated)
         if (isset($data['geofencingEnabled']) && $data['geofencingEnabled']) {
             if (!$planService->canUseGeofencing($workspace)) {
-                return $this->jsonError('Geofencing requires the Brew+ plan', 402);
+                return $this->jsonError('Geofencing requires the Espresso plan', 402);
             }
             $setting->setGeofencingEnabled(true);
         } elseif (isset($data['geofencingEnabled'])) {

@@ -33,6 +33,9 @@ class Employee extends AbstractBaseEntity
     #[Groups(['employee:read'])]
     private string $lastName;
 
+    #[ORM\Column(length: 200, nullable: true)]
+    private ?string $nameCanonical = null;
+
     #[ORM\Column(length: 20, nullable: true)]
     #[Groups(['employee:read'])]
     private ?string $phoneNumber = null;
@@ -51,10 +54,6 @@ class Employee extends AbstractBaseEntity
     #[ORM\Column(type: 'string', enumType: EmployeeStatusEnum::class)]
     #[Groups(['employee:read'])]
     private EmployeeStatusEnum $status = EmployeeStatusEnum::ACTIVE;
-
-    /** Unique token used in QR code URL for check-in. */
-    #[ORM\Column(length: 64, unique: true, nullable: true)]
-    private ?string $qrToken = null;
 
     /** The user who created this employee (workspace owner). */
     #[ORM\ManyToOne(targetEntity: User::class)]
@@ -123,6 +122,17 @@ class Employee extends AbstractBaseEntity
         return $this->getName();
     }
 
+    public function getNameCanonical(): ?string
+    {
+        return $this->nameCanonical;
+    }
+
+    public function setNameCanonical(?string $nameCanonical): static
+    {
+        $this->nameCanonical = $nameCanonical;
+        return $this;
+    }
+
     // ── Contact / Details ──────────────────────────────────────
 
     public function getPhoneNumber(): ?string
@@ -186,19 +196,6 @@ class Employee extends AbstractBaseEntity
     public function isActive(): bool
     {
         return $this->status === EmployeeStatusEnum::ACTIVE;
-    }
-
-    // ── QR Token ───────────────────────────────────────────────
-
-    public function getQrToken(): ?string
-    {
-        return $this->qrToken;
-    }
-
-    public function setQrToken(?string $qrToken): static
-    {
-        $this->qrToken = $qrToken;
-        return $this;
     }
 
     // ── Relations ──────────────────────────────────────────────

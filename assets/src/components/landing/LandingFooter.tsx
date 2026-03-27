@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 export function LandingFooter() {
   return (
-    <footer className="relative bg-[#F3EDE3]/50 backdrop-blur-sm border-t border-cream-3/50 mt-10">
+    <footer className="relative bg-cream-2/50 backdrop-blur-sm border-t border-cream-3/50 mt-10">
       <div className="max-w-5xl mx-auto px-6 md:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {/* Brand */}

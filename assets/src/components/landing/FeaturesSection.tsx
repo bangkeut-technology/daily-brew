@@ -34,14 +34,14 @@ const features = [
     title: 'Leave requests',
     desc: 'Staff submit leave from their phone. Owners approve or reject with one tap from the dashboard.',
     accent: '#6B4226',
-    brewPlus: true,
+    espresso: true,
   },
   {
     icon: <Shield size={22} strokeWidth={1.8} />,
     title: 'IP restriction',
     desc: 'Lock check-ins to your restaurant Wi-Fi. Prevent staff from punching in from home.',
     accent: '#C0392B',
-    brewPlus: true,
+    espresso: true,
   },
   {
     icon: <LayoutDashboard size={22} strokeWidth={1.8} />,
@@ -54,14 +54,14 @@ const features = [
     title: 'Geofencing',
     desc: 'Restrict check-ins to a geographic area around your restaurant. Ensure staff are physically on-site.',
     accent: '#7C5C9B',
-    brewPlus: true,
+    espresso: true,
   },
   {
     icon: <CalendarDays size={22} strokeWidth={1.8} />,
     title: 'Per-day shift schedules',
     desc: 'Set different shift hours for each day of the week. Perfect for restaurants with varying opening times.',
     accent: '#3B6FA0',
-    brewPlus: true,
+    espresso: true,
   },
 ];
 
@@ -90,7 +90,7 @@ export function FeaturesSection() {
         {features.map((f, index) => (
           <motion.div
             key={f.title}
-            className="group relative bg-white/60 backdrop-blur-md border border-white/85 rounded-2xl p-6 cursor-default overflow-hidden shadow-[0_2px_12px_rgba(107,66,38,0.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(107,66,38,0.10)]"
+            className="group relative bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 cursor-default overflow-hidden shadow-[0_2px_12px_rgba(107,66,38,0.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(107,66,38,0.10)]"
             initial={{ opacity: 0, y: 25 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -118,9 +118,9 @@ export function FeaturesSection() {
               <h4 className="text-[14px] font-semibold text-text-primary">
                 {f.title}
               </h4>
-              {f.brewPlus && (
+              {f.espresso && (
                 <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
-                  Brew+
+                  Espresso
                 </span>
               )}
             </div>

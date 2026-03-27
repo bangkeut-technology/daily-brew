@@ -18,17 +18,17 @@ export function HeroSection() {
       {/* Parallax-esque background orbs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
-          className="absolute -top-20 -left-20 w-80 h-80 rounded-full bg-[#C17F3B]/[0.06] blur-3xl"
+          className="absolute -top-20 -left-20 w-80 h-80 rounded-full bg-amber/[0.06] blur-3xl"
           animate={{ y: [0, 20, 0], x: [0, 10, 0] }}
           transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
         />
         <motion.div
-          className="absolute -bottom-20 -right-20 w-96 h-96 rounded-full bg-[#6B4226]/[0.05] blur-3xl"
+          className="absolute -bottom-20 -right-20 w-96 h-96 rounded-full bg-coffee/[0.05] blur-3xl"
           animate={{ y: [0, -15, 0], x: [0, -10, 0] }}
           transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
         />
         <motion.div
-          className="absolute top-1/3 right-1/4 w-64 h-64 rounded-full bg-[#E8A85A]/[0.05] blur-3xl"
+          className="absolute top-1/3 right-1/4 w-64 h-64 rounded-full bg-amber-light/[0.05] blur-3xl"
           animate={{ y: [0, 12, 0] }}
           transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
         />
@@ -106,7 +106,7 @@ export function HeroSection() {
       <div className="relative z-10 mt-16 flex items-center justify-center gap-4 flex-wrap">
         {/* Stat card */}
         <motion.div
-          className="relative bg-white/60 backdrop-blur-md border border-white/85 rounded-2xl p-5 shadow-[0_2px_12px_rgba(107,66,38,0.05)] w-[180px] text-left"
+          className="relative bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-5 shadow-[0_2px_12px_rgba(107,66,38,0.05)] w-[180px] text-left"
           custom={0}
           variants={floatingCardVariants}
           initial="hidden"
@@ -114,14 +114,14 @@ export function HeroSection() {
           whileHover={{ y: -4, boxShadow: '0 12px 32px rgba(107,66,38,0.12)' }}
           transition={{ duration: 0.2 }}
         >
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#4A7C59] opacity-60 rounded-t-2xl" />
-          <p className="text-[10px] uppercase tracking-[0.8px] font-medium text-[#7C6860] mb-2">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-green opacity-60 rounded-t-2xl" />
+          <p className="text-[10px] uppercase tracking-[0.8px] font-medium text-text-secondary mb-2">
             Present today
           </p>
-          <p className="text-[28px] font-semibold text-[#2C2420] leading-none tracking-[-1px] mb-1">
+          <p className="text-[28px] font-semibold text-text-primary leading-none tracking-[-1px] mb-1">
             7
           </p>
-          <p className="text-[11px] text-[#AE9D95]">of 9 employees</p>
+          <p className="text-[11px] text-text-tertiary">of 9 employees</p>
           <span className="absolute top-3 right-3 text-lg opacity-[0.15] select-none">
             &#10003;
           </span>
@@ -129,7 +129,7 @@ export function HeroSection() {
 
         {/* Attendance row card */}
         <motion.div
-          className="relative bg-white/60 backdrop-blur-md border border-white/85 rounded-2xl p-4 shadow-[0_2px_12px_rgba(107,66,38,0.05)] w-[240px]"
+          className="relative bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-4 shadow-[0_2px_12px_rgba(107,66,38,0.05)] w-[240px]"
           custom={1}
           variants={floatingCardVariants}
           initial="hidden"
@@ -137,7 +137,7 @@ export function HeroSection() {
           whileHover={{ y: -4, boxShadow: '0 12px 32px rgba(107,66,38,0.12)' }}
           transition={{ duration: 0.2 }}
         >
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#C17F3B] opacity-60 rounded-t-2xl" />
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-amber opacity-60 rounded-t-2xl" />
           <div className="flex items-center gap-3">
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-semibold text-white shrink-0"
@@ -146,16 +146,16 @@ export function HeroSection() {
               SK
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[12.5px] font-medium text-[#2C2420] truncate">
+              <p className="text-[12.5px] font-medium text-text-primary truncate">
                 Sophea Keo
               </p>
-              <p className="text-[10px] text-[#AE9D95]">Morning shift</p>
+              <p className="text-[10px] text-text-tertiary">Morning shift</p>
             </div>
             <div className="text-right">
-              <p className="text-[11px] text-[#7C6860] font-mono tabular-nums">
+              <p className="text-[11px] text-text-secondary font-mono tabular-nums">
                 07:58
               </p>
-              <span className="text-[9px] font-medium px-1.5 py-0.5 rounded-full bg-[#4A7C59]/10 text-[#4A7C59]">
+              <span className="text-[9px] font-medium px-1.5 py-0.5 rounded-full bg-green/10 text-green">
                 On time
               </span>
             </div>
@@ -164,7 +164,7 @@ export function HeroSection() {
 
         {/* Late badge card */}
         <motion.div
-          className="relative bg-white/60 backdrop-blur-md border border-white/85 rounded-2xl p-4 shadow-[0_2px_12px_rgba(107,66,38,0.05)] w-[180px] hidden md:block"
+          className="relative bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-4 shadow-[0_2px_12px_rgba(107,66,38,0.05)] w-[180px] hidden md:block"
           custom={2}
           variants={floatingCardVariants}
           initial="hidden"
@@ -172,14 +172,14 @@ export function HeroSection() {
           whileHover={{ y: -4, boxShadow: '0 12px 32px rgba(107,66,38,0.12)' }}
           transition={{ duration: 0.2 }}
         >
-          <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#C0392B] opacity-60 rounded-t-2xl" />
-          <p className="text-[10px] uppercase tracking-[0.8px] font-medium text-[#7C6860] mb-2">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-red opacity-60 rounded-t-2xl" />
+          <p className="text-[10px] uppercase tracking-[0.8px] font-medium text-text-secondary mb-2">
             Late today
           </p>
-          <p className="text-[28px] font-semibold text-[#C0392B] leading-none tracking-[-1px] mb-1">
+          <p className="text-[28px] font-semibold text-red leading-none tracking-[-1px] mb-1">
             1
           </p>
-          <p className="text-[11px] text-[#AE9D95]">flagged automatically</p>
+          <p className="text-[11px] text-text-tertiary">flagged automatically</p>
         </motion.div>
       </div>
 
@@ -190,7 +190,7 @@ export function HeroSection() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.9 }}
       >
-        <p className="text-[13px] font-medium text-[#7C6860] mb-1">
+        <p className="text-[13px] font-medium text-text-secondary mb-1">
           Join 1,200+ restaurants already using DailyBrew
         </p>
         <p className="text-[12px] text-text-tertiary">

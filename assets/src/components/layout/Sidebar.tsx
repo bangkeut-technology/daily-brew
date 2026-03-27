@@ -18,12 +18,14 @@ import { usePlan } from '@/hooks/queries/usePlan';
 import { useRoleContext } from '@/hooks/queries/useRoleContext';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { LogoBrand } from '@/components/shared/Logo';
+import { useTheme } from 'next-themes';
+import { Sun, Moon } from 'lucide-react';
 
 interface NavItemDef {
     to: string;
     icon: React.ComponentType<{ size?: number }>;
     label: string;
-    brewPlus?: boolean;
+    espresso?: boolean;
     badge?: number;
 }
 
@@ -31,7 +33,7 @@ const ownerMainNav: NavItemDef[] = [
     { to: '/console/dashboard', icon: LayoutDashboard, label: 'nav.dashboard' },
     { to: '/console/employees', icon: Users, label: 'nav.employees' },
     { to: '/console/attendance', icon: CalendarCheck, label: 'nav.attendance' },
-    { to: '/console/leave', icon: FileText, label: 'nav.leaveRequests', brewPlus: true },
+    { to: '/console/leave', icon: FileText, label: 'nav.leaveRequests', espresso: true },
 ];
 
 const ownerManageNav: NavItemDef[] = [
@@ -50,14 +52,14 @@ function NavItem({
     to,
     icon: Icon,
     label,
-    brewPlus,
+    espresso,
     canUseLeaveRequests,
     badge,
 }: {
     to: string;
     icon: React.ComponentType<{ size?: number }>;
     label: string;
-    brewPlus?: boolean;
+    espresso?: boolean;
     canUseLeaveRequests?: boolean;
     badge?: number;
 }) {
@@ -73,26 +75,26 @@ function NavItem({
                 font-sans text-[13.5px] transition-all duration-[180ms] no-underline
                 ${
                     active
-                        ? 'bg-white/62 backdrop-blur-sm text-[#6B4226] font-medium border border-white/85 shadow-[0_1px_4px_rgba(107,66,38,0.08)]'
-                        : 'text-[#7C6860] hover:bg-[#EBE2D6] hover:text-[#2C2420] border border-transparent'
+                        ? 'bg-glass-bg backdrop-blur-sm text-coffee font-medium border border-glass-border shadow-sm'
+                        : 'text-text-secondary hover:bg-cream-3 hover:text-text-primary border border-transparent'
                 }
             `}
         >
             <Icon size={16} />
             <span className="flex-1">{t(label)}</span>
-            {brewPlus && !canUseLeaveRequests && (
-                <span className="ml-auto flex items-center gap-1 text-[10px] font-semibold text-[#C17F3B]">
+            {espresso && !canUseLeaveRequests && (
+                <span className="ml-auto flex items-center gap-1 text-[10px] font-semibold text-amber">
                     <Crown size={12} className="opacity-60" />
-                    <span>Brew+</span>
+                    <span>Espresso</span>
                 </span>
             )}
             {badge != null && badge > 0 && (
-                <span className="ml-auto bg-[#C17F3B] text-white text-[10px] font-semibold px-1.5 py-px rounded-full leading-normal">
+                <span className="ml-auto bg-amber text-white text-[10px] font-semibold px-1.5 py-px rounded-full leading-normal">
                     {badge}
                 </span>
             )}
             <span
-                className={`absolute right-2.5 w-1 h-1 rounded-full bg-[#C17F3B] transition-opacity ${
+                className={`absolute right-2.5 w-1 h-1 rounded-full bg-amber transition-opacity ${
                     active ? 'opacity-100' : 'opacity-0'
                 }`}
             />
@@ -109,7 +111,7 @@ function NavSection({ items, canUseLeaveRequests }: { items: NavItemDef[]; canUs
                     to={item.to}
                     icon={item.icon}
                     label={item.label}
-                    brewPlus={item.brewPlus}
+                    espresso={item.espresso}
                     canUseLeaveRequests={canUseLeaveRequests}
                     badge={item.badge}
                 />
@@ -119,7 +121,7 @@ function NavSection({ items, canUseLeaveRequests }: { items: NavItemDef[]; canUs
 }
 
 function Divider() {
-    return <div className="my-3 border-t border-[#EBE2D6]" />;
+    return <div className="my-3 border-t border-cream-3" />;
 }
 
 export function Sidebar() {
@@ -141,7 +143,7 @@ export function Sidebar() {
     const canUseLeaveRequests = plan?.canUseLeaveRequests ?? false;
 
     return (
-        <aside className="fixed left-0 top-0 bottom-0 w-[220px] bg-[#F3EDE3] border-r border-[#EBE2D6] flex flex-col z-10">
+        <aside className="fixed left-0 top-0 bottom-0 w-[220px] bg-cream-2 border-r border-cream-3 flex flex-col z-10">
             {/* Logo */}
             <div className="px-5 py-5">
                 <LogoBrand size={28} />
@@ -181,16 +183,11 @@ export function Sidebar() {
                     />
                 </div>
 
-                <div className="mt-auto mb-4">
+                <div className="mt-auto mb-4 space-y-1">
+                    <ThemeToggle />
                     <button
                         onClick={signOut}
-                        className="
-                            flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer
-                            w-full font-sans text-[13.5px] text-[#7C6860]
-                            hover:bg-[#EBE2D6] hover:text-[#2C2420]
-                            transition-all duration-[180ms]
-                            border-none bg-transparent
-                        "
+                        className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer w-full font-sans text-[13.5px] text-text-secondary hover:bg-cream-3 hover:text-text-primary transition-all duration-[180ms] border-none bg-transparent"
                     >
                         <LogOut size={16} />
                         {t('nav.signOut')}
@@ -198,5 +195,20 @@ export function Sidebar() {
                 </div>
             </nav>
         </aside>
+    );
+}
+
+function ThemeToggle() {
+    const { theme, setTheme } = useTheme();
+    const isDark = theme === 'dark';
+
+    return (
+        <button
+            onClick={() => setTheme(isDark ? 'light' : 'dark')}
+            className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer w-full font-sans text-[13.5px] text-text-secondary hover:bg-cream-3 hover:text-text-primary transition-all duration-[180ms] border-none bg-transparent"
+        >
+            {isDark ? <Sun size={16} /> : <Moon size={16} />}
+            {isDark ? 'Light mode' : 'Dark mode'}
+        </button>
     );
 }

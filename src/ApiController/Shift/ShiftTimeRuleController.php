@@ -59,7 +59,7 @@ class ShiftTimeRuleController extends AbstractController
         $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
 
         if (!$planService->canUseShiftTimeRules($workspace)) {
-            return $this->jsonError('Per-day shift schedules require the Brew+ plan', 402);
+            return $this->jsonError('Per-day shift schedules require the Espresso plan', 402);
         }
 
         $data = json_decode($request->getContent(), true);
@@ -100,7 +100,7 @@ class ShiftTimeRuleController extends AbstractController
         $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
 
         if (!$planService->canUseShiftTimeRules($workspace)) {
-            return $this->jsonError('Per-day shift schedules require the Brew+ plan', 402);
+            return $this->jsonError('Per-day shift schedules require the Espresso plan', 402);
         }
 
         $rule = $ruleRepository->findOneBy(['publicId' => $rulePublicId]);
@@ -139,7 +139,7 @@ class ShiftTimeRuleController extends AbstractController
         $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
 
         if (!$planService->canUseShiftTimeRules($workspace)) {
-            return $this->jsonError('Per-day shift schedules require the Brew+ plan', 402);
+            return $this->jsonError('Per-day shift schedules require the Espresso plan', 402);
         }
 
         $rule = $ruleRepository->findOneBy(['publicId' => $rulePublicId]);
