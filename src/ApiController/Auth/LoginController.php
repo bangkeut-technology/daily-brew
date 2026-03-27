@@ -4,7 +4,7 @@ namespace App\ApiController\Auth;
 
 use App\ApiController\Trait\ApiResponseTrait;
 use App\Repository\UserRepository;
-use App\Service\JwtResponseService;
+use Lexik\Bundle\JWTAuthenticationBundle\Security\Http\Authentication\AuthenticationSuccessHandler;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +21,7 @@ class LoginController extends AbstractController
         Request $request,
         UserRepository $userRepository,
         UserPasswordHasherInterface $passwordHasher,
-        JwtResponseService $jwtResponse,
+        AuthenticationSuccessHandler $authenticationSuccessHandler,
     ): Response {
         $data = json_decode($request->getContent(), true);
         $email = $data['email'] ?? '';
@@ -36,6 +36,6 @@ class LoginController extends AbstractController
             return $this->jsonError('Invalid credentials', 401);
         }
 
-        return $jwtResponse->createAuthResponse($user);
+        return $authenticationSuccessHandler->handleAuthenticationSuccess($user);
     }
 }

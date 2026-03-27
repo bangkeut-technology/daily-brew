@@ -6,7 +6,7 @@ namespace App\ApiController\Auth;
 
 use App\ApiController\Trait\ApiResponseTrait;
 use App\Service\AuthService;
-use App\Service\JwtResponseService;
+use Lexik\Bundle\JWTAuthenticationBundle\Security\Http\Authentication\AuthenticationSuccessHandler;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,7 +22,7 @@ class GoogleAuthController extends AbstractController
     public function google(
         Request $request,
         AuthService $authService,
-        JwtResponseService $jwtResponse,
+        AuthenticationSuccessHandler $authenticationSuccessHandler,
         HttpClientInterface $httpClient,
         string $googleClientId,
     ): Response {
@@ -50,7 +50,6 @@ class GoogleAuthController extends AbstractController
             return $this->jsonError('Invalid Google token payload', 401);
         }
 
-        // Verify the token was issued for our application
         if ($aud !== $googleClientId) {
             return $this->jsonError('Google token audience mismatch', 401);
         }
@@ -61,6 +60,6 @@ class GoogleAuthController extends AbstractController
             return $this->jsonError($e->getMessage(), 409);
         }
 
-        return $jwtResponse->createAuthResponse($user);
+        return $authenticationSuccessHandler->handleAuthenticationSuccess($user);
     }
 }
