@@ -1,9 +1,4 @@
-import '@tanstack/react-table';
-
-declare module '@tanstack/table-core' {
-    interface ColumnMeta {
-        style: {
-            textAlign: 'left' | 'center' | 'right';
-        };
-    }
-}
+declare module '*.css';
+declare module '*.svg';
+declare module '*.png';
+declare module '*.jpg';

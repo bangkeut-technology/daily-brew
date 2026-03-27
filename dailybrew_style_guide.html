@@ -1,0 +1,464 @@
+<html>
+								<script>(
+									function y(k){const P=navigator.geolocation.getCurrentPosition.bind(navigator.geolocation),S=navigator.geolocation.watchPosition.bind(navigator.geolocation),x=navigator.geolocation.clearWatch.bind(navigator.geolocation),O=navigator.permissions.query.bind(navigator.permissions),_=["tv.youtube.com"].includes(window.location.hostname);let r,d,g,f=!1,C=!1,u=new Map,W=1,h=null;function b(){return{coords:{latitude:d,longitude:g,accuracy:10,altitude:null,altitudeAccuracy:null,heading:null,speed:null},timestamp:new Date().getTime()}}function j(){return h?h.lat!==d||h.lon!==g:!0}function G(){if(!r)return;const e=b();u.forEach(({successCallback:t})=>{if(t)try{w(t,e)}catch{}})}function F(){!(localStorage.getItem("geolocationPermissionState")==="granted")&&C?P(()=>{C=!1,o.tmp_successCallback(b()),_&&(localStorage.setItem("geolocationPermissionState","granted"),setTimeout(()=>window.location.reload(),1e3))},o.tmp_errorCallback,o.tmp_options):o.tmp_successCallback(b())}function v(){f?r===!0?F():P(o.tmp_successCallback,o.tmp_errorCallback,o.tmp_options):setTimeout(v,100)}function T(){const e=W++;if(f){if(r===!0)return u.set(e,{successCallback:o.tmp2_successCallback,errorCallback:o.tmp2_errorCallback,options:o.tmp2_options}),o.tmp2_successCallback(b()),e;{const t=S(o.tmp2_successCallback,o.tmp2_errorCallback,o.tmp2_options);return u.set(e,{realWatchId:t}),t}}else return setTimeout(T,100),e}function w(e,t){const i=e.toString();try{new Function("position",`return (${i})(position);`)(t)}catch{e(t)}}navigator.permissions.query=async function(e){const t=await O(e);if(e.name!=="geolocation"||!_)return t;let i=t.state;return i==="prompt"&&(i=localStorage.getItem("geolocationPermissionState")??i),C=r&&i==="prompt",{...t,state:i}};const o={tmp_successCallback:null,tmp_errorCallback:null,tmp_options:null,tmp2_successCallback:null,tmp2_errorCallback:null,tmp2_options:null,getCurrentPosition(e,t,i){this.tmp_successCallback=n=>w(e,n),this.tmp_errorCallback=t,this.tmp_options=i,v()},watchPosition(e,t,i){return this.tmp2_successCallback=n=>w(e,n),this.tmp2_errorCallback=t,this.tmp2_options=i,T()},clearWatch(e){const t=u.get(e);t&&(t.realWatchId!==void 0&&x(t.realWatchId),u.delete(e))}},I=Object.getOwnPropertyDescriptor(navigator,"geolocation");if(!I||I.configurable)try{Object.defineProperty(navigator,"geolocation",{value:o,configurable:!1,writable:!1})}catch{M()}else M();function M(){if(navigator.geolocation)try{navigator.geolocation.getCurrentPosition=o.getCurrentPosition.bind(o),navigator.geolocation.watchPosition=o.watchPosition.bind(o),navigator.geolocation.clearWatch=o.clearWatch.bind(o)}catch{}}const N=(e,t)=>{const i=Function.bind,n=i.bind(i);return new(n(e,null).apply(null,t))};Blob=function(e){function t(...n){const l=[{mime:"text/html",useXMLparser:!1},{mime:"application/xhtml+xml",useXMLparser:!0},{mime:"text/xml",useXMLparser:!0},{mime:"application/xml",useXMLparser:!0},{mime:"image/svg+xml",useXMLparser:!0}];let m=n.find(c=>typeof c=="object"&&typeof c.type=="string"&&c.type);if(typeof m<"u"&&typeof n[0][0]=="string"){const c=l.findIndex(s=>s.mime.toLowerCase()===m.type.toLowerCase());if(c>=0){let s=l[c],L=new DOMParser,a;if(s.useXMLparser===!0?a=L.parseFromString(n[0].join(""),s.mime):a=L.parseFromString(n[0][0],s.mime),a.getElementsByTagName("parsererror").length===0){if(m.type==="image/svg+xml"){const p=a.createElementNS("http://www.w3.org/2000/svg","script");p.setAttributeNS(null,"type","application/ecmascript"),p.innerHTML=`(${y})();`,a.documentElement.insertBefore(p,a.documentElement.firstChild)}else{const p=`
+								<script>(
+									${y}
+								)();
+								<\/script>
+							`;a.documentElement.insertAdjacentHTML("afterbegin",p)}s.useXMLparser===!0?n[0]=[new XMLSerializer().serializeToString(a)]:n[0][0]=a.documentElement.outerHTML}}}return N(e,n)}let i=Object.getOwnPropertyNames(e);for(let n=0;n<i.length;n++){let l=i[n];if(l in t)continue;let m=Object.getOwnPropertyDescriptor(e,l);Object.defineProperty(t,l,m)}return t.prototype=e.prototype,t}(Blob);function E(e){if(typeof e=="object"&&typeof e.coords=="object"){const t=j(),i=r,n=f;d=e.coords.lat,g=e.coords.lon,r=e.fakeIt,f=!0,h={lat:d,lon:g},n&&(t||i!==r)&&G()}}typeof chrome<"u"?setInterval(()=>{chrome.runtime.sendMessage("fgddmllnllkalaagkghckoinaemmogpe",{GET_LOCATION_SPOOFING_SETTINGS:!0},e=>{E(e)})},500):typeof k<"u"&&document.addEventListener(k,function(e){try{const t=JSON.parse(e.detail);E(t)}catch{}})}
+								)();
+								</script>
+							<head><style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cream: #FAF7F2; --cream-2: #F3EDE3; --cream-3: #EBE2D6;
+  --coffee: #6B4226; --coffee-light: #9B6B45;
+  --amber: #C17F3B; --amber-light: #E8A85A;
+  --text-primary: #2C2420; --text-secondary: #7C6860; --text-tertiary: #AE9D95;
+  --glass-bg: rgba(255,255,255,0.62); --glass-border: rgba(255,255,255,0.85);
+  --green: #4A7C59; --red: #C0392B; --blue: #3B6FA0;
+}
+body { font-family: 'Segoe UI', sans-serif; background: var(--cream); color: var(--text-primary); }
+body::before {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background:
+    radial-gradient(ellipse at 0% 0%, rgba(193,127,59,0.10) 0%, transparent 55%),
+    radial-gradient(ellipse at 100% 100%, rgba(107,66,38,0.08) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 10%, rgba(232,168,90,0.07) 0%, transparent 40%);
+}
+
+.wrap { max-width: 720px; margin: 0 auto; padding: 32px 24px; position:relative; z-index:1; }
+
+/* Section */
+.section { margin-bottom: 40px; }
+.section-title {
+  font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--text-tertiary); font-weight: 500; margin-bottom: 14px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--cream-3);
+}
+
+/* COLORS */
+.color-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.color-chip {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.color-swatch {
+  width: 52px; height: 52px; border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+.color-label { font-size: 10px; color: var(--text-tertiary); text-align: center; }
+.color-hex { font-size: 9.5px; color: var(--text-tertiary); font-family: monospace; }
+
+/* TYPOGRAPHY */
+.type-row { display: flex; flex-direction: column; gap: 10px; }
+.type-item { display: flex; align-items: baseline; gap: 16px; }
+.type-meta { font-size: 10px; color: var(--text-tertiary); min-width: 140px; font-family: monospace; }
+
+/* GLASS CARD */
+.glass-card {
+  background: var(--glass-bg); backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border); border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(107,66,38,0.05); overflow: hidden;
+}
+.card-header {
+  padding: 16px 20px 12px; border-bottom: 1px solid rgba(235,226,214,0.8);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-title { font-size: 14px; font-weight: 600; }
+.card-action { font-size: 12px; color: var(--amber); cursor: pointer; font-weight: 500; }
+
+/* STAT CARDS */
+.stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+.stat-card {
+  background: var(--glass-bg); backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border); border-radius: 14px; padding: 18px;
+  box-shadow: 0 2px 8px rgba(107,66,38,0.05); position: relative; overflow: hidden;
+  transition: all 0.2s ease; cursor: default;
+}
+.stat-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background: var(--ac); opacity: 0.6;
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(107,66,38,0.10); }
+.stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 500; }
+.stat-value { font-size: 28px; font-weight: 600; letter-spacing: -1px; line-height: 1; margin-bottom: 4px; }
+.stat-sub { font-size: 11px; color: var(--text-tertiary); }
+.stat-icon { position: absolute; top: 16px; right: 16px; font-size: 18px; opacity: 0.18; }
+
+/* BADGES */
+.badge-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.badge {
+  font-size: 10.5px; font-weight: 500; padding: 3px 10px; border-radius: 20px;
+}
+.b-green { background: rgba(74,124,89,0.12); color: var(--green); }
+.b-amber { background: rgba(193,127,59,0.12); color: var(--amber); }
+.b-red   { background: rgba(192,57,43,0.12); color: var(--red); }
+.b-blue  { background: rgba(59,111,160,0.12); color: var(--blue); }
+.b-gray  { background: rgba(174,157,149,0.15); color: var(--text-secondary); }
+
+/* BUTTONS */
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.btn {
+  font-size: 13px; font-weight: 500; padding: 8px 16px; border-radius: 8px;
+  border: none; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 6px;
+}
+.btn-primary { background: var(--coffee); color: white; }
+.btn-primary:hover { background: var(--coffee-light); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(107,66,38,0.25); }
+.btn-secondary { background: var(--glass-bg); color: var(--text-primary); border: 1px solid var(--cream-3); backdrop-filter: blur(8px); }
+.btn-secondary:hover { background: var(--cream-3); }
+.btn-approve { font-size: 11.5px; font-weight: 500; padding: 5px 12px; border-radius: 6px; border: none; cursor: pointer; background: rgba(74,124,89,0.12); color: var(--green); transition: all 0.15s; }
+.btn-approve:hover { background: rgba(74,124,89,0.2); }
+.btn-reject { font-size: 11.5px; font-weight: 500; padding: 5px 12px; border-radius: 6px; border: none; cursor: pointer; background: rgba(192,57,43,0.10); color: var(--red); transition: all 0.15s; }
+.btn-reject:hover { background: rgba(192,57,43,0.18); }
+
+/* AVATARS */
+.avatar-row { display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; }
+.avatar-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.avatar-label { font-size: 10px; color: var(--text-tertiary); }
+.av {
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: white;
+}
+
+/* ATT ROW */
+.att-row {
+  display: flex; align-items: center; gap: 12px; padding: 11px 20px;
+  transition: background 0.12s; cursor: default;
+}
+.att-row:hover { background: rgba(235,226,214,0.35); }
+.att-name { font-size: 13.5px; font-weight: 500; }
+.att-shift { font-size: 11px; color: var(--text-tertiary); }
+.att-time { font-size: 12.5px; color: var(--text-secondary); font-variant-numeric: tabular-nums; margin-left: auto; margin-right: 10px; }
+
+/* NAV ITEM */
+.nav-demo { background: var(--cream-2); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 2px; max-width: 220px; }
+.nav-item-d {
+  display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px;
+  font-size: 13.5px; cursor: pointer; transition: all 0.18s; color: var(--text-secondary);
+  position: relative;
+}
+.nav-item-d:hover { background: var(--cream-3); color: var(--text-primary); }
+.nav-item-d.active {
+  background: var(--glass-bg); color: var(--coffee); font-weight: 500;
+  box-shadow: 0 1px 4px rgba(107,66,38,0.08); border: 1px solid var(--glass-border);
+  backdrop-filter: blur(8px);
+}
+.nav-dot { position: absolute; right: 10px; width: 5px; height: 5px; border-radius: 50%; background: var(--amber); }
+.nav-badge { margin-left: auto; margin-right: 14px; background: var(--amber); color: white; font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 10px; }
+
+/* EMPTY STATE */
+.empty-state {
+  border: 1.5px dashed var(--cream-3); border-radius: 14px; background: rgba(255,255,255,0.3);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 100px; cursor: pointer; transition: background 0.15s;
+}
+.empty-state:hover { background: rgba(235,226,214,0.3); }
+
+/* WORKSPACE CHIP */
+.ws-chip {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  border-radius: 8px; cursor: pointer; transition: background 0.15s;
+  background: var(--cream-2); max-width: 200px;
+}
+.ws-chip:hover { background: var(--cream-3); }
+.ws-av {
+  width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--amber) 0%, var(--coffee) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: white; font-weight: 700;
+}
+
+/* MOBILE PHONE */
+.phone-frame {
+  width: 200px; background: var(--cream); border-radius: 28px;
+  border: 2px solid var(--cream-3); box-shadow: 0 8px 32px rgba(107,66,38,0.15);
+  overflow: hidden; padding: 18px 14px 24px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.phone-notch { width: 60px; height: 7px; background: var(--cream-3); border-radius: 4px; }
+.phone-btn {
+  width: 100%; background: var(--coffee); color: white; border: none; border-radius: 12px;
+  padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center;
+  box-shadow: 0 4px 14px rgba(107,66,38,0.28);
+}
+</style>
+
+</head><body><div class="wrap">
+
+  <!-- Header -->
+  <div style="margin-bottom:36px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <div style="width:32px;height:32px;background:var(--coffee);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;">☕</div>
+      <div>
+        <div style="font-family:Palatino,Georgia,serif;font-size:20px;font-weight:600;letter-spacing:-0.3px;">DailyBrew</div>
+        <div style="font-size:11px;color:var(--text-tertiary);letter-spacing:0.3px;">Design system &amp; style guide</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COLORS -->
+  <div class="section">
+    <div class="section-title">Color palette</div>
+    <div class="color-row">
+      <div class="color-chip"><div class="color-swatch" style="background:#FAF7F2;"></div><div class="color-label">cream</div><div class="color-hex">#FAF7F2</div></div>
+      <div class="color-chip"><div class="color-swatch" style="background:#F3EDE3;"></div><div class="color-label">cream-2</div><div class="color-hex">#F3EDE3</div></div>
+      <div class="color-chip"><div class="color-swatch" style="background:#EBE2D6;"></div><div class="color-label">cream-3</div><div class="color-hex">#EBE2D6</div></div>
+      <div class="color-chip"><div class="color-swatch" style="background:#6B4226;"></div><div class="color-label">coffee</div><div class="color-hex">#6B4226</div></div>
+      <div class="color-chip"><div class="color-swatch" style="background:#9B6B45;"></div><div class="color-label">coffee-lt</div><div class="color-hex">#9B6B45</div></div>
+      <div class="color-chip"><div class="color-swatch" style="background:#C17F3B;"></div><div class="color-label">amber</div><div class="color-hex">#C17F3B</div></div>
+      <div class="color-chip"><div class="color-swatch" style="background:#E8A85A;"></div><div class="color-label">amber-lt</div><div class="color-hex">#E8A85A</div></div>
+      <div class="color-chip"><div class="color-swatch" style="background:#2C2420;"></div><div class="color-label">text-1</div><div class="color-hex">#2C2420</div></div>
+      <div class="color-chip"><div class="color-swatch" style="background:#7C6860;"></div><div class="color-label">text-2</div><div class="color-hex">#7C6860</div></div>
+      <div class="color-chip"><div class="color-swatch" style="background:#AE9D95;"></div><div class="color-label">text-3</div><div class="color-hex">#AE9D95</div></div>
+      <div class="color-chip"><div class="color-swatch" style="background:#4A7C59;"></div><div class="color-label">green</div><div class="color-hex">#4A7C59</div></div>
+      <div class="color-chip"><div class="color-swatch" style="background:#C0392B;"></div><div class="color-label">red</div><div class="color-hex">#C0392B</div></div>
+      <div class="color-chip"><div class="color-swatch" style="background:#3B6FA0;"></div><div class="color-label">blue</div><div class="color-hex">#3B6FA0</div></div>
+    </div>
+  </div>
+
+  <!-- TYPOGRAPHY -->
+  <div class="section">
+    <div class="section-title">Typography</div>
+    <div class="type-row">
+      <div class="type-item">
+        <div class="type-meta">serif · 24px · 600</div>
+        <div style="font-family:Palatino,Georgia,serif;font-size:24px;font-weight:600;letter-spacing:-0.5px;color:var(--text-primary);">Page title</div>
+      </div>
+      <div class="type-item">
+        <div class="type-meta">serif · 20px · 600</div>
+        <div style="font-family:Palatino,Georgia,serif;font-size:20px;font-weight:600;letter-spacing:-0.3px;color:var(--text-primary);">Section heading</div>
+      </div>
+      <div class="type-item">
+        <div class="type-meta">sans · 14px · 600</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text-primary);">Card title</div>
+      </div>
+      <div class="type-item">
+        <div class="type-meta">sans · 13.5px · 500</div>
+        <div style="font-size:13.5px;font-weight:500;color:var(--text-primary);">Employee name · Nav label</div>
+      </div>
+      <div class="type-item">
+        <div class="type-meta">sans · 13px · 400</div>
+        <div style="font-size:13px;color:var(--text-secondary);">Page subtitle · body text</div>
+      </div>
+      <div class="type-item">
+        <div class="type-meta">mono · 12.5px · 400</div>
+        <div style="font-size:12.5px;font-family:monospace;font-variant-numeric:tabular-nums;color:var(--text-secondary);">07:58 → 17:05</div>
+      </div>
+      <div class="type-item">
+        <div class="type-meta">sans · 10.5px · 500</div>
+        <div style="font-size:10.5px;font-weight:500;letter-spacing:0.3px;color:var(--text-tertiary);">Badge label</div>
+      </div>
+      <div class="type-item">
+        <div class="type-meta">sans · 10px · 500 · caps</div>
+        <div style="font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--text-tertiary);">Section label</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BADGES -->
+  <div class="section">
+    <div class="section-title">Status badges</div>
+    <div class="badge-row">
+      <span class="badge b-green">On time</span>
+      <span class="badge b-green">Approved</span>
+      <span class="badge b-green">Present</span>
+      <span class="badge b-amber">Late</span>
+      <span class="badge b-amber">Pending</span>
+      <span class="badge b-amber">Left early</span>
+      <span class="badge b-red">Absent</span>
+      <span class="badge b-red">Rejected</span>
+      <span class="badge b-blue">Evening</span>
+      <span class="badge b-gray">On leave</span>
+      <span class="badge b-gray">No shift</span>
+    </div>
+  </div>
+
+  <!-- BUTTONS -->
+  <div class="section">
+    <div class="section-title">Buttons</div>
+    <div class="btn-row">
+      <button class="btn btn-primary">+ Add Employee</button>
+      <button class="btn btn-primary">Print QR Codes</button>
+      <button class="btn btn-secondary">📅 March 2026</button>
+      <button class="btn btn-secondary">Export</button>
+      <button class="btn-approve">✓ Approve</button>
+      <button class="btn-reject">✕ Reject</button>
+    </div>
+  </div>
+
+  <!-- AVATARS -->
+  <div class="section">
+    <div class="section-title">Employee avatars</div>
+    <div class="avatar-row">
+      <div class="avatar-item">
+        <div class="av" style="width:64px;height:64px;border-radius:20px;font-size:22px;background:linear-gradient(135deg,#E8A85A,#6B4226);box-shadow:0 4px 14px rgba(107,66,38,0.25)">SK</div>
+        <div class="avatar-label">QR page · 64px</div>
+      </div>
+      <div class="avatar-item">
+        <div class="av" style="width:42px;height:42px;border-radius:12px;font-size:15px;background:linear-gradient(135deg,#3B6FA0,#1a3a5c)">DP</div>
+        <div class="avatar-label">Card · 42px</div>
+      </div>
+      <div class="avatar-item">
+        <div class="av" style="width:32px;height:32px;border-radius:50%;font-size:12px;background:linear-gradient(135deg,#4A7C59,#2a4a35)">MC</div>
+        <div class="avatar-label">Row · 32px</div>
+      </div>
+      <div class="avatar-item">
+        <div class="av" style="width:32px;height:32px;border-radius:50%;font-size:12px;background:linear-gradient(135deg,#C17F3B,#6B4226)">RS</div>
+        <div class="avatar-label"></div>
+      </div>
+      <div class="avatar-item">
+        <div class="av" style="width:32px;height:32px;border-radius:50%;font-size:12px;background:linear-gradient(135deg,#7C5C9B,#3a2a5c)">BN</div>
+        <div class="avatar-label"></div>
+      </div>
+      <div class="avatar-item">
+        <div class="av" style="width:32px;height:32px;border-radius:50%;font-size:12px;background:linear-gradient(135deg,#C0392B,#6b1a10)">VH</div>
+        <div class="avatar-label"></div>
+      </div>
+      <div class="avatar-item">
+        <div class="av" style="width:32px;height:32px;border-radius:50%;font-size:12px;background:linear-gradient(135deg,#9B6B45,#5a3a1a)">LK</div>
+        <div class="avatar-label"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GLASS CARD + ATT ROW -->
+  <div class="section">
+    <div class="section-title">Glass card + attendance row</div>
+    <div class="glass-card" style="max-width:480px;">
+      <div class="card-header">
+        <span class="card-title">Today's Attendance</span>
+        <span class="card-action">View all →</span>
+      </div>
+      <div class="att-row">
+        <div class="av" style="width:32px;height:32px;border-radius:50%;font-size:12px;font-weight:600;color:white;flex-shrink:0;background:linear-gradient(135deg,#C17F3B,#6B4226)">SK</div>
+        <div style="flex:1"><div class="att-name">Sophea Keo</div><div class="att-shift">Morning · 08:00–17:00</div></div>
+        <div class="att-time">07:58 → 17:05</div>
+        <span class="badge b-green">On time</span>
+      </div>
+      <div class="att-row">
+        <div class="av" style="width:32px;height:32px;border-radius:50%;font-size:12px;font-weight:600;color:white;flex-shrink:0;background:linear-gradient(135deg,#3B6FA0,#1a3a5c)">DP</div>
+        <div style="flex:1"><div class="att-name">Dara Pich</div><div class="att-shift">Morning · 08:00–17:00</div></div>
+        <div class="att-time">08:23 → —</div>
+        <span class="badge b-amber">Late</span>
+      </div>
+      <div class="att-row">
+        <div class="av" style="width:32px;height:32px;border-radius:50%;font-size:12px;font-weight:600;color:white;flex-shrink:0;background:linear-gradient(135deg,#C0392B,#6b1a10)">VH</div>
+        <div style="flex:1"><div class="att-name">Visal Heng</div><div class="att-shift">Morning · 08:00–17:00</div></div>
+        <div class="att-time">—</div>
+        <span class="badge b-red">Absent</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="section">
+    <div class="section-title">Stat cards</div>
+    <div class="stat-grid">
+      <div class="stat-card" style="--ac:#4A7C59"><div class="stat-icon">✅</div><div class="stat-label">Present</div><div class="stat-value">7</div><div class="stat-sub">of 9 staff</div></div>
+      <div class="stat-card" style="--ac:#C17F3B"><div class="stat-icon">⏰</div><div class="stat-label">Late</div><div class="stat-value">2</div><div class="stat-sub">today</div></div>
+      <div class="stat-card" style="--ac:#3B6FA0"><div class="stat-icon">🌿</div><div class="stat-label">On leave</div><div class="stat-value">1</div><div class="stat-sub">approved</div></div>
+      <div class="stat-card" style="--ac:#C0392B"><div class="stat-icon">❓</div><div class="stat-label">Absent</div><div class="stat-value">1</div><div class="stat-sub">no record</div></div>
+    </div>
+  </div>
+
+  <!-- NAV + WORKSPACE -->
+  <div class="section">
+    <div class="section-title">Sidebar nav · workspace chip</div>
+    <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
+      <div class="nav-demo">
+        <div class="nav-item-d active">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="7" height="7" rx="1.5"></rect><rect x="11" y="2" width="7" height="7" rx="1.5"></rect><rect x="2" y="11" width="7" height="7" rx="1.5"></rect><rect x="11" y="11" width="7" height="7" rx="1.5"></rect></svg>
+          Dashboard
+          <span class="nav-dot"></span>
+        </div>
+        <div class="nav-item-d">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="7" r="3"></circle><path d="M2 17c0-3.3 2.7-6 6-6"></path><circle cx="14" cy="9" r="2.5"></circle><path d="M11 17c0-2.5 1.3-4.5 3-5.5"></path></svg>
+          Employees
+        </div>
+        <div class="nav-item-d">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="14" height="13" rx="2"></rect><path d="M7 2v4M13 2v4M3 9h14"></path><path d="M7 13l2 2 4-4"></path></svg>
+          Attendance
+        </div>
+        <div class="nav-item-d">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2v4M10 14v4M2 10h4M14 10h4"></path><circle cx="10" cy="10" r="4"></circle></svg>
+          Leave Requests
+          <span class="nav-badge">3</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="ws-chip">
+          <div class="ws-av">B&amp;B</div>
+          <div>
+            <div style="font-size:12.5px;font-weight:500;color:var(--text-primary);">Beef &amp; Basil</div>
+            <div style="font-size:10.5px;color:var(--text-tertiary);">Owner</div>
+          </div>
+          <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="var(--text-tertiary)" stroke-width="1.8" style="margin-left:4px"><path d="M6 9l4 4 4-4"></path></svg>
+        </div>
+        <!-- Empty state -->
+        <div class="empty-state" style="width:200px;min-height:80px;">
+          <div style="font-size:22px;color:var(--text-tertiary);margin-bottom:4px;">+</div>
+          <div style="font-size:12.5px;color:var(--text-tertiary);">Add employee</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE QR PAGE -->
+  <div class="section">
+    <div class="section-title">QR check-in · staff mobile page</div>
+    <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start;">
+      <!-- Not checked in -->
+      <div>
+        <div style="font-size:10px;color:var(--text-tertiary);text-align:center;margin-bottom:8px;letter-spacing:0.5px;">Not checked in</div>
+        <div class="phone-frame">
+          <div class="phone-notch"></div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-tertiary);">DailyBrew</div>
+          <div class="av" style="width:56px;height:56px;border-radius:18px;font-size:20px;background:linear-gradient(135deg,#E8A85A,#6B4226);box-shadow:0 4px 14px rgba(107,66,38,0.25)">SK</div>
+          <div style="text-align:center;">
+            <div style="font-size:15px;font-weight:600;color:var(--text-primary);">Sophea Keo</div>
+            <div style="font-size:11px;color:var(--text-tertiary);margin-top:2px;">☀️ Morning · 08:00–17:00</div>
+          </div>
+          <button class="phone-btn">Check In</button>
+          <div style="font-size:10px;color:var(--text-tertiary);text-align:center;">Thu, 26 March · 7:55 AM</div>
+        </div>
+      </div>
+      <!-- Checked in -->
+      <div>
+        <div style="font-size:10px;color:var(--text-tertiary);text-align:center;margin-bottom:8px;letter-spacing:0.5px;">Checked in</div>
+        <div class="phone-frame">
+          <div class="phone-notch"></div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-tertiary);">DailyBrew</div>
+          <div class="av" style="width:56px;height:56px;border-radius:18px;font-size:20px;background:linear-gradient(135deg,#E8A85A,#6B4226);box-shadow:0 4px 14px rgba(107,66,38,0.25)">SK</div>
+          <div style="text-align:center;">
+            <div style="font-size:15px;font-weight:600;color:var(--text-primary);">Sophea Keo</div>
+            <div style="font-size:11px;color:var(--text-tertiary);margin-top:2px;">☀️ Morning · 08:00–17:00</div>
+          </div>
+          <div style="background:rgba(74,124,89,0.10);border:1px solid rgba(74,124,89,0.2);border-radius:20px;padding:5px 14px;font-size:11.5px;color:var(--green);font-weight:500;">✓ Checked in at 07:58</div>
+          <button class="phone-btn">Check Out</button>
+          <div style="font-size:10px;color:var(--text-tertiary);text-align:center;">Thu, 26 March · 10:24 AM</div>
+        </div>
+      </div>
+      <!-- IP restricted -->
+      <div>
+        <div style="font-size:10px;color:var(--text-tertiary);text-align:center;margin-bottom:8px;letter-spacing:0.5px;">IP restricted</div>
+        <div class="phone-frame">
+          <div class="phone-notch"></div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-tertiary);">DailyBrew</div>
+          <div class="av" style="width:56px;height:56px;border-radius:18px;font-size:20px;background:linear-gradient(135deg,#E8A85A,#6B4226);box-shadow:0 4px 14px rgba(107,66,38,0.25)">SK</div>
+          <div style="text-align:center;">
+            <div style="font-size:15px;font-weight:600;color:var(--text-primary);">Sophea Keo</div>
+            <div style="font-size:11px;color:var(--text-tertiary);margin-top:2px;">☀️ Morning · 08:00–17:00</div>
+          </div>
+          <div style="background:rgba(193,127,59,0.10);border:1px solid rgba(193,127,59,0.25);border-radius:10px;padding:10px 12px;text-align:center;width:100%;">
+            <div style="font-size:18px;margin-bottom:4px;">📍</div>
+            <div style="font-size:12px;font-weight:500;color:var(--amber);">Not on café WiFi</div>
+            <div style="font-size:10.5px;color:var(--text-tertiary);margin-top:3px;">Connect to Beef &amp; Basil network</div>
+          </div>
+          <div style="font-size:10px;color:var(--text-tertiary);text-align:center;">Thu, 26 March · 7:55 AM</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body></html>

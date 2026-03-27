@@ -1,39 +1,23 @@
 {
     "compilerOptions": {
-        "lib": [
-            "dom",
-            "dom.iterable",
-            "esnext"
-        ],
-        "typeRoots": [
-            "./node_modules/@types",
-            "./assets/src/types"
-        ],
+        "lib": ["dom", "dom.iterable", "esnext"],
+        "typeRoots": ["./node_modules/@types", "./assets/src/types"],
         "allowJs": true,
         "skipLibCheck": true,
         "strict": true,
+        "ignoreDeprecations": "6.0",
         "strictNullChecks": true,
         "noEmit": true,
         "module": "ESNext",
         "moduleResolution": "Bundler",
         "target": "ESNext",
-        "esModuleInterop": true,
-        "resolveJsonModule": true,
-        "isolatedModules": true,
         "jsx": "preserve",
         "incremental": true,
         "baseUrl": "./",
         "paths": {
-            "@/*": [
-                "./assets/src/*"
-            ]
+            "@/*": ["./assets/src/*"]
         }
     },
-    "include": [
-        "**/*.ts",
-        "**/*.tsx"
-    ],
-    "exclude": [
-        "node_modules"
-    ]
+    "include": ["assets/**/*.ts", "assets/**/*.tsx"],
+    "exclude": ["node_modules"]
 }

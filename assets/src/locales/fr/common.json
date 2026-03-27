@@ -1,1 +1,57 @@
-{}
+{
+  "app": "DailyBrew",
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "employees": "Employ\u00e9s",
+    "attendance": "Pr\u00e9sence",
+    "leaveRequests": "Demandes de cong\u00e9",
+    "shifts": "Horaires",
+    "closures": "Fermetures",
+    "settings": "Param\u00e8tres",
+    "profile": "Profil",
+    "signOut": "D\u00e9connexion"
+  },
+  "auth": {
+    "signIn": "Connexion",
+    "signUp": "Inscription",
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "forgotPassword": "Mot de passe oubli\u00e9 ?",
+    "noAccount": "Pas encore de compte ?",
+    "hasAccount": "D\u00e9j\u00e0 un compte ?",
+    "orContinueWith": "Ou continuer avec",
+    "google": "Google",
+    "apple": "Apple"
+  },
+  "dashboard": {
+    "present": "Pr\u00e9sents aujourd'hui",
+    "late": "Arriv\u00e9es en retard",
+    "onLeave": "En cong\u00e9",
+    "absent": "Absents",
+    "todayAttendance": "Pr\u00e9sence du jour",
+    "viewAll": "Tout voir",
+    "ofEmployees": "sur {count} employ\u00e9s"
+  },
+  "employee": {
+    "add": "Ajouter un employ\u00e9",
+    "name": "Nom",
+    "phone": "T\u00e9l\u00e9phone",
+    "shift": "Horaire",
+    "status": "Statut",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "qrCode": "Code QR",
+    "attendanceHistory": "Historique de pr\u00e9sence"
+  },
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Cr\u00e9er",
+    "search": "Rechercher",
+    "loading": "Chargement...",
+    "noResults": "Aucun r\u00e9sultat"
+  }
+}

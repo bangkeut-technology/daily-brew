@@ -1,15 +1,9 @@
-import * as defaultAxios from 'axios';
-import { joinPaths } from '@tanstack/react-router';
-import { AxiosResponse } from 'axios';
-import { User } from '@/types/user';
+import axios from 'axios';
 
-const host = '/api';
-const apiVersion = '/v1';
+const locale = () => sessionStorage.getItem('locale') || 'en';
 
-const locale = sessionStorage.getItem('locale') || 'en';
-
-export const apiAxios = defaultAxios.default.create({
-    baseURL: joinPaths([host, apiVersion, locale]),
+export const apiAxios = axios.create({
+    baseURL: '/api/v1',
     headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -17,39 +11,41 @@ export const apiAxios = defaultAxios.default.create({
     withCredentials: true,
 });
 
-export const axios = defaultAxios.default.create({
-    baseURL: host,
+apiAxios.interceptors.request.use((config) => {
+    if (config.url && !config.url.startsWith('/checkin') && !config.url.startsWith('/webhooks')) {
+        config.url = `/${locale()}${config.url}`;
+    }
+    return config;
 });
 
-const ResponseHandler = (response: AxiosResponse) => {
-    return response;
-};
-
-const ResponseErrorHandler = async (error: any) => {
-    const {
-        response: { status, data },
-        config,
-    } = error;
-
-    console.log(error);
-
-    if (
-        status === 401 &&
-        ['Invalid JWT Token', 'Expired JWT Token', 'JWT Token not found'].includes(data.message) &&
-        !config.__isRetryRequest
-    ) {
-        config.__isRetryRequest = true;
-        try {
-            await axios.post<{ refreshToken: string; token: string; user: User }>('/token/refresh');
-            return apiAxios(config);
-        } catch (error) {
-            return Promise.reject(error);
-        }
-    }
-    return Promise.reject(error);
-};
-
 apiAxios.interceptors.response.use(
-    (response) => ResponseHandler(response),
-    (error) => ResponseErrorHandler(error),
+    (response) => response,
+    async (error) => {
+        const originalRequest = error.config;
+        const status = error.response?.status;
+        const message = error.response?.data?.message;
+
+        if (
+            status === 401 &&
+            ['Invalid JWT Token', 'Expired JWT Token', 'JWT Token not found'].includes(message) &&
+            !originalRequest._retry
+        ) {
+            originalRequest._retry = true;
+            try {
+                await axios.post('/api/v1/token/refresh', {}, { withCredentials: true });
+                return apiAxios(originalRequest);
+            } catch {
+                window.location.href = '/sign-in';
+                return Promise.reject(error);
+            }
+        }
+
+        if (status === 401) {
+            window.location.href = '/sign-in';
+        }
+
+        return Promise.reject(error);
+    },
 );
+
+export default apiAxios;

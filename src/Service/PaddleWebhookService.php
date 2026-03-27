@@ -1,0 +1,145 @@
+<?php
+
+namespace App\Service;
+
+use App\Entity\Subscription;
+use App\Enum\Plan;
+use App\Enum\SubscriptionStatus;
+use App\Repository\SubscriptionRepository;
+use App\Repository\WorkspaceRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
+
+class PaddleWebhookService
+{
+    public function __construct(
+        private EntityManagerInterface $em,
+        private SubscriptionRepository $subscriptionRepository,
+        private WorkspaceRepository $workspaceRepository,
+        private LoggerInterface $logger,
+    ) {}
+
+    public function handleEvent(array $event): void
+    {
+        $eventType = $event['event_type'] ?? '';
+        $data = $event['data'] ?? [];
+
+        match ($eventType) {
+            'subscription.created' => $this->handleSubscriptionCreated($data),
+            'subscription.updated' => $this->handleSubscriptionUpdated($data),
+            'subscription.canceled' => $this->handleSubscriptionCanceled($data),
+            'subscription.paused' => $this->handleSubscriptionPaused($data),
+            'subscription.resumed' => $this->handleSubscriptionResumed($data),
+            'subscription.past_due' => $this->handleSubscriptionPastDue($data),
+            default => $this->logger->info('Unhandled Paddle event: ' . $eventType),
+        };
+    }
+
+    private function handleSubscriptionCreated(array $data): void
+    {
+        $paddleSubId = $data['id'] ?? '';
+        $customData = $data['custom_data'] ?? [];
+        $workspacePublicId = $customData['workspace_public_id'] ?? null;
+
+        if (!$workspacePublicId) {
+            $this->logger->warning('Paddle subscription.created missing workspace_public_id');
+            return;
+        }
+
+        $workspace = $this->workspaceRepository->findByPublicId($workspacePublicId);
+        if ($workspace === null) {
+            $this->logger->warning('Workspace not found: ' . $workspacePublicId);
+            return;
+        }
+
+        $subscription = $this->subscriptionRepository->findByWorkspace($workspace);
+        if ($subscription === null) {
+            $subscription = new Subscription();
+            $subscription->setWorkspace($workspace);
+            $this->em->persist($subscription);
+        }
+
+        $subscription->setPlan(Plan::BrewPlus);
+        $subscription->setStatus($this->mapStatus($data['status'] ?? 'active'));
+        $subscription->setPaddleSubscriptionId($paddleSubId);
+        $subscription->setPaddleCustomerId($data['customer_id'] ?? null);
+
+        if (isset($data['current_billing_period']['ends_at'])) {
+            $subscription->setCurrentPeriodEnd(new \DateTimeImmutable($data['current_billing_period']['ends_at']));
+        }
+
+        $this->em->flush();
+    }
+
+    private function handleSubscriptionUpdated(array $data): void
+    {
+        $subscription = $this->findByPaddleId($data['id'] ?? '');
+        if ($subscription === null) return;
+
+        $subscription->setStatus($this->mapStatus($data['status'] ?? 'active'));
+
+        if (isset($data['current_billing_period']['ends_at'])) {
+            $subscription->setCurrentPeriodEnd(new \DateTimeImmutable($data['current_billing_period']['ends_at']));
+        }
+
+        $this->em->flush();
+    }
+
+    private function handleSubscriptionCanceled(array $data): void
+    {
+        $subscription = $this->findByPaddleId($data['id'] ?? '');
+        if ($subscription === null) return;
+
+        $subscription->setStatus(SubscriptionStatus::Canceled);
+        $subscription->setCanceledAt(new \DateTimeImmutable());
+        $this->em->flush();
+    }
+
+    private function handleSubscriptionPaused(array $data): void
+    {
+        $subscription = $this->findByPaddleId($data['id'] ?? '');
+        if ($subscription === null) return;
+
+        $subscription->setStatus(SubscriptionStatus::Paused);
+        $this->em->flush();
+    }
+
+    private function handleSubscriptionResumed(array $data): void
+    {
+        $subscription = $this->findByPaddleId($data['id'] ?? '');
+        if ($subscription === null) return;
+
+        $subscription->setStatus(SubscriptionStatus::Active);
+        $this->em->flush();
+    }
+
+    private function handleSubscriptionPastDue(array $data): void
+    {
+        $subscription = $this->findByPaddleId($data['id'] ?? '');
+        if ($subscription === null) return;
+
+        $subscription->setStatus(SubscriptionStatus::PastDue);
+        $this->em->flush();
+    }
+
+    private function findByPaddleId(string $paddleSubId): ?Subscription
+    {
+        $subscription = $this->subscriptionRepository->findByPaddleSubscriptionId($paddleSubId);
+        if ($subscription === null) {
+            $this->logger->warning('Paddle subscription not found: ' . $paddleSubId);
+        }
+        return $subscription;
+    }
+
+    private function mapStatus(string $paddleStatus): SubscriptionStatus
+    {
+        return match ($paddleStatus) {
+            'active' => SubscriptionStatus::Active,
+            'past_due' => SubscriptionStatus::PastDue,
+            'canceled' => SubscriptionStatus::Canceled,
+            'paused' => SubscriptionStatus::Paused,
+            'trialing' => SubscriptionStatus::Trialing,
+            default => SubscriptionStatus::Active,
+        };
+    }
+}

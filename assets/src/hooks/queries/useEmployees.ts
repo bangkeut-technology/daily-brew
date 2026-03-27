@@ -1,0 +1,82 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiAxios } from '@/lib/apiAxios';
+import type { Employee } from '@/types';
+
+export function useEmployees(workspacePublicId: string) {
+  return useQuery({
+    queryKey: ['employees', workspacePublicId],
+    queryFn: async () => {
+      const { data } = await apiAxios.get<Employee[]>(
+        `/workspaces/${workspacePublicId}/employees`,
+      );
+      return data;
+    },
+    enabled: !!workspacePublicId,
+  });
+}
+
+export function useEmployee(workspacePublicId: string, publicId: string) {
+  return useQuery({
+    queryKey: ['employees', workspacePublicId, publicId],
+    queryFn: async () => {
+      const { data } = await apiAxios.get<Employee>(
+        `/workspaces/${workspacePublicId}/employees/${publicId}`,
+      );
+      return data;
+    },
+    enabled: !!workspacePublicId && !!publicId,
+  });
+}
+
+export function useCreateEmployee(workspacePublicId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (employee: { name: string; phone?: string; shiftPublicId?: string }) => {
+      const { data } = await apiAxios.post<Employee>(
+        `/workspaces/${workspacePublicId}/employees`,
+        employee,
+      );
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['employees', workspacePublicId] });
+    },
+  });
+}
+
+export function useUpdateEmployee(workspacePublicId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      publicId,
+      ...employee
+    }: {
+      publicId: string;
+      name?: string;
+      phone?: string;
+      shiftPublicId?: string | null;
+      active?: boolean;
+    }) => {
+      const { data } = await apiAxios.put<Employee>(
+        `/workspaces/${workspacePublicId}/employees/${publicId}`,
+        employee,
+      );
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['employees', workspacePublicId] });
+    },
+  });
+}
+
+export function useDeleteEmployee(workspacePublicId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (publicId: string) => {
+      await apiAxios.delete(`/workspaces/${workspacePublicId}/employees/${publicId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['employees', workspacePublicId] });
+    },
+  });
+}

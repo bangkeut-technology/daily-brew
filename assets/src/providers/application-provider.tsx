@@ -1,29 +1,37 @@
-import React from 'react';
-import { ApplicationContext, ApplicationContextValue } from '@/contexts/application-context';
+import React, { useMemo, type ReactNode } from 'react';
+import { ApplicationContext, type ApplicationConfig } from '@/contexts/application-context';
 
-export const ApplicationProvider = ({ children }: { children: React.ReactNode }) => {
-    const state = React.useMemo<ApplicationContextValue>(() => {
-        const application = sessionStorage.getItem('application');
-        if (application) {
-            try {
-                const applicationState = JSON.parse(application);
-                return {
-                    maxFreeEmployees: applicationState.maxFreeEmployees || 10,
-                    maxFreeTemplates: applicationState.maxFreeTemplates || 5,
-                    storeAllowed: applicationState.storeAllowed === 'true',
-                    contactEmail: applicationState.contactEmail,
-                };
-            } catch (error) {
-                console.error('Failed to parse application setting:', error);
-            }
-        }
+declare global {
+    interface Window {
+        __DAILYBREW__?: {
+            user?: unknown;
+            maxFreeEmployees?: number;
+            contactEmail?: string;
+        };
+    }
+}
+
+interface Props {
+    children: ReactNode;
+}
+
+export function ApplicationProvider({ children }: Props) {
+    const config = useMemo<ApplicationConfig>(() => {
+        let data: Record<string, unknown> | undefined;
+        try {
+            const raw = sessionStorage.getItem('application');
+            if (raw) data = JSON.parse(raw);
+        } catch { /* ignore */ }
+        data ??= window.__DAILYBREW__;
         return {
-            maxFreeEmployees: 0,
-            maxFreeTemplates: 0,
-            storeAllowed: false,
-            contactEmail: undefined,
+            maxFreeEmployees: (data?.maxFreeEmployees as number) ?? 5,
+            contactEmail: (data?.contactEmail as string) ?? 'support@dailybrew.work',
         };
     }, []);
 
-    return <ApplicationContext.Provider value={state}>{children}</ApplicationContext.Provider>;
-};
+    return (
+        <ApplicationContext.Provider value={config}>
+            {children}
+        </ApplicationContext.Provider>
+    );
+}

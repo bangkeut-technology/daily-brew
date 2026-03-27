@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
  */
 #[ORM\Table(name: 'daily_brew_leave_requests')]
 #[ORM\Entity(repositoryClass: LeaveRequestRepository::class)]
-class LeaveRequest extends AbstractEntity
+class LeaveRequest extends AbstractBaseEntity
 {
     #[ORM\ManyToOne(targetEntity: Employee::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]

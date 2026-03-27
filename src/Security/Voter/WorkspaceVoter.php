@@ -1,152 +1,67 @@
 <?php
-/**
- * This file is part of the DailyBrew project.
- *
- * (c) Vandeth THO <thovandeth@gmail.com>
- *
- * @author  Vandeth THO
- * @created 1/6/26 12:43 PM
- *
- * @see     https://dailybrew.work
- */
 
 namespace App\Security\Voter;
 
+use App\Entity\Attendance;
+use App\Entity\ClosurePeriod;
+use App\Entity\Employee;
+use App\Entity\LeaveRequest;
+use App\Entity\Shift;
 use App\Entity\User;
 use App\Entity\Workspace;
-use App\Entity\WorkspaceAllowedIp;
-use App\Entity\WorkspaceInvite;
-use App\Enum\WorkspaceRoleEnum;
-use App\Repository\WorkspaceUserRepository;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
-/**
- *
- * Class WorkspaceVoter
- *
- * @package App\Security\Voter;
- * @author  Vandeth THO <thovandeth@gmail.com>
- */
 class WorkspaceVoter extends Voter
 {
-    public const string ADD_MEMBER = 'WORKSPACE_INVITE_CREATE';
-    public const string VIEW_INVITES = 'WORKSPACE_INVITE_LIST';
-    public const string REVOKE_INVITE = 'WORKSPACE_INVITE_REVOKE';
-    public const string MANAGE_ALLOWED_IPS = 'WORKSPACE_MANAGE_ALLOWED_IPS';
-    public const string MANAGE_PAYROLL = 'WORKSPACE_MANAGE_PAYROLL';
-    public const string VIEW_PAYROLL = 'WORKSPACE_VIEW_PAYROLL';
-    public const string MANAGE_SETTINGS = 'WORKSPACE_MANAGE_SETTINGS';
-    public const string MANAGE_LEAVE_REQUESTS = 'WORKSPACE_MANAGE_LEAVE_REQUESTS';
-    public const string MANAGE_SHIFTS = 'WORKSPACE_MANAGE_SHIFTS';
-
-    public function __construct(
-        private readonly WorkspaceUserRepository $workspaceUserRepository,
-    )
-    {
-    }
+    public const string VIEW = 'WORKSPACE_VIEW';
+    public const string EDIT = 'WORKSPACE_EDIT';
+    public const string DELETE = 'WORKSPACE_DELETE';
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        if (!in_array($attribute, [
-            self::ADD_MEMBER,
-            self::VIEW_INVITES,
-            self::REVOKE_INVITE,
-            self::MANAGE_ALLOWED_IPS,
-            self::MANAGE_PAYROLL,
-            self::VIEW_PAYROLL,
-            self::MANAGE_SETTINGS,
-            self::MANAGE_LEAVE_REQUESTS,
-            self::MANAGE_SHIFTS,
-        ], true)) {
+        if (!in_array($attribute, [self::VIEW, self::EDIT, self::DELETE])) {
             return false;
         }
 
         return $subject instanceof Workspace
-            || $subject instanceof WorkspaceInvite
-            || $subject instanceof WorkspaceAllowedIp;
+            || $subject instanceof Employee
+            || $subject instanceof Shift
+            || $subject instanceof ClosurePeriod
+            || $subject instanceof Attendance
+            || $subject instanceof LeaveRequest;
     }
 
-    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool
     {
         $user = $token->getUser();
         if (!$user instanceof User) {
             return false;
         }
 
-        $workspace = match (true) {
-            $subject instanceof Workspace => $subject,
-            $subject instanceof WorkspaceInvite => $subject->getWorkspace(),
-            $subject instanceof WorkspaceAllowedIp => $subject->getWorkspace(),
-            default => null,
-        };
-
-        if (null === $workspace) {
+        $workspace = $this->resolveWorkspace($subject);
+        if ($workspace === null) {
             return false;
         }
 
-        if (null === $membership = $this->workspaceUserRepository->findByWorkspaceAndUser($workspace, $user)) {
-            return false;
+        return $workspace->getOwner()->getId() === $user->getId();
+    }
+
+    private function resolveWorkspace(mixed $subject): ?Workspace
+    {
+        if ($subject instanceof Workspace) {
+            return $subject;
         }
 
-        $role = $membership->getRole();
+        if ($subject instanceof Employee || $subject instanceof Shift || $subject instanceof ClosurePeriod) {
+            return $subject->getWorkspace();
+        }
 
-        return match ($attribute) {
-            self::VIEW_INVITES => $this->canList($role),
-            self::ADD_MEMBER => $this->canCreate($role),
-            self::REVOKE_INVITE => $this->canRevoke($role),
-            self::MANAGE_ALLOWED_IPS => $this->canManageAllowedIps($role),
-            self::MANAGE_PAYROLL => $this->canManagePayroll($role),
-            self::VIEW_PAYROLL => $this->canViewPayroll($role),
-            self::MANAGE_SETTINGS => $this->canManageSettings($role),
-            self::MANAGE_LEAVE_REQUESTS => $this->canManageLeaveRequests($role),
-            self::MANAGE_SHIFTS => $this->canManageShifts($role),
-            default => false,
-        };
-    }
+        if ($subject instanceof Attendance || $subject instanceof LeaveRequest) {
+            return $subject->getEmployee()->getWorkspace();
+        }
 
-    private function canList(WorkspaceRoleEnum $role): bool
-    {
-        return in_array($role, [WorkspaceRoleEnum::OWNER, WorkspaceRoleEnum::ADMIN, WorkspaceRoleEnum::MANAGER], true);
-    }
-
-    private function canCreate(WorkspaceRoleEnum $role): bool
-    {
-        return in_array($role, [WorkspaceRoleEnum::OWNER, WorkspaceRoleEnum::ADMIN, WorkspaceRoleEnum::MANAGER], true);
-    }
-
-    private function canRevoke(WorkspaceRoleEnum $role): bool
-    {
-        return in_array($role, [WorkspaceRoleEnum::OWNER, WorkspaceRoleEnum::ADMIN, WorkspaceRoleEnum::MANAGER], true);
-    }
-
-    private function canManageAllowedIps(WorkspaceRoleEnum $role): bool
-    {
-        return in_array($role, [WorkspaceRoleEnum::OWNER, WorkspaceRoleEnum::ADMIN], true);
-    }
-
-    private function canManagePayroll(WorkspaceRoleEnum $role): bool
-    {
-        return in_array($role, [WorkspaceRoleEnum::OWNER, WorkspaceRoleEnum::ADMIN], true);
-    }
-
-    private function canViewPayroll(WorkspaceRoleEnum $role): bool
-    {
-        return in_array($role, [WorkspaceRoleEnum::OWNER, WorkspaceRoleEnum::ADMIN, WorkspaceRoleEnum::MANAGER], true);
-    }
-
-    private function canManageSettings(WorkspaceRoleEnum $role): bool
-    {
-        return in_array($role, [WorkspaceRoleEnum::OWNER, WorkspaceRoleEnum::ADMIN], true);
-    }
-
-    private function canManageLeaveRequests(WorkspaceRoleEnum $role): bool
-    {
-        return in_array($role, [WorkspaceRoleEnum::OWNER, WorkspaceRoleEnum::ADMIN, WorkspaceRoleEnum::MANAGER], true);
-    }
-
-    private function canManageShifts(WorkspaceRoleEnum $role): bool
-    {
-        return in_array($role, [WorkspaceRoleEnum::OWNER, WorkspaceRoleEnum::ADMIN, WorkspaceRoleEnum::MANAGER], true);
+        return null;
     }
 }

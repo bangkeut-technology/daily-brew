@@ -1,44 +1,46 @@
-import { AuthenticationAction, AuthenticationState } from '@/contexts/authentication-context';
+import type { AuthenticationState } from '@/contexts/authentication-context';
+import type { User, Workspace } from '@/types/user';
 
-export const authenticationInitialState: AuthenticationState = {
+export type AuthenticationAction =
+    | { type: 'SIGN_IN'; user: User; workspace: Workspace | null }
+    | { type: 'SIGN_OUT' }
+    | { type: 'SET_WORKSPACE'; workspace: Workspace }
+    | { type: 'LOADING' };
+
+export const initialAuthenticationState: AuthenticationState = {
     status: 'loading',
-    user: undefined,
-    demo: false,
-    workspace: undefined,
+    user: null,
+    workspace: null,
 };
-export const authenticationReducer = (
+
+export function authenticationReducer(
     state: AuthenticationState,
     action: AuthenticationAction,
-): AuthenticationState => {
+): AuthenticationState {
     switch (action.type) {
-        case 'SIGN_IN': {
-            const { user } = action;
+        case 'SIGN_IN':
             return {
-                ...state,
-                user: user,
                 status: 'authenticated',
+                user: action.user,
+                workspace: action.workspace,
             };
-        }
-        case 'SET_WORKSPACE': {
-            const { workspace } = action;
-            return {
-                ...state,
-                workspace: workspace,
-            };
-        }
-        case 'UPDATE_USER': {
-            const { user } = action;
-            return {
-                ...state,
-                user: user,
-            };
-        }
         case 'SIGN_OUT':
             return {
-                ...state,
-                user: undefined,
-                workspace: undefined,
                 status: 'unauthenticated',
+                user: null,
+                workspace: null,
             };
+        case 'SET_WORKSPACE':
+            return {
+                ...state,
+                workspace: action.workspace,
+            };
+        case 'LOADING':
+            return {
+                ...state,
+                status: 'loading',
+            };
+        default:
+            return state;
     }
-};
+}

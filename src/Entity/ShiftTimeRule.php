@@ -19,7 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'daily_brew_shift_time_rules')]
 #[ORM\Entity(repositoryClass: ShiftTimeRuleRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_SHIFT_DAY', fields: ['shift', 'dayOfWeek'])]
-class ShiftTimeRule extends AbstractEntity
+class ShiftTimeRule extends AbstractBaseEntity
 {
     #[ORM\ManyToOne(targetEntity: Shift::class, inversedBy: 'timeRules')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]

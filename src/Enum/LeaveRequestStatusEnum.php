@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace App\Enum;
 
-/**
- * Class LeaveRequestStatusEnum
- *
- * @package App\Enum
- * @author  Vandeth THO <thovandeth@gmail.com>
- */
 enum LeaveRequestStatusEnum: string
 {
-    case PENDING  = 'pending';
+    case PENDING = 'pending';
     case APPROVED = 'approved';
     case REJECTED = 'rejected';
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::PENDING => 'Pending',
+            self::APPROVED => 'Approved',
+            self::REJECTED => 'Rejected',
+        };
+    }
 }

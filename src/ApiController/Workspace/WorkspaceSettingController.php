@@ -1,0 +1,127 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\ApiController\Workspace;
+
+use App\ApiController\Trait\ApiResponseTrait;
+use App\Entity\WorkspaceSetting;
+use App\Repository\WorkspaceRepository;
+use App\Security\Voter\WorkspaceVoter;
+use App\Service\PlanService;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Attribute\Route;
+
+#[Route('/workspaces/{workspacePublicId}/settings')]
+class WorkspaceSettingController extends AbstractController
+{
+    use ApiResponseTrait;
+
+    #[Route('', name: 'workspace_settings_show', methods: ['GET'])]
+    public function show(
+        string $workspacePublicId,
+        WorkspaceRepository $workspaceRepository,
+    ): JsonResponse {
+        $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
+        if ($workspace === null) {
+            throw new NotFoundHttpException('Workspace not found');
+        }
+
+        $this->denyAccessUnlessGranted(WorkspaceVoter::VIEW, $workspace);
+
+        $setting = $workspace->getSetting();
+
+        return $this->jsonSuccess($this->serializeSetting($setting));
+    }
+
+    #[Route('', name: 'workspace_settings_update', methods: ['PUT'])]
+    public function update(
+        string $workspacePublicId,
+        Request $request,
+        WorkspaceRepository $workspaceRepository,
+        PlanService $planService,
+        EntityManagerInterface $em,
+    ): JsonResponse {
+        $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
+        if ($workspace === null) {
+            throw new NotFoundHttpException('Workspace not found');
+        }
+
+        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
+
+        $data = json_decode($request->getContent(), true);
+        $setting = $workspace->getSetting();
+
+        // Auto-create setting if none exists
+        if ($setting === null) {
+            $setting = new WorkspaceSetting();
+            $setting->setWorkspace($workspace);
+            $workspace->setSetting($setting);
+            $em->persist($setting);
+        }
+
+        // IP restriction (Brew+ gated)
+        if (isset($data['ipRestrictionEnabled']) && $data['ipRestrictionEnabled']) {
+            if (!$planService->canUseIpRestriction($workspace)) {
+                return $this->jsonError('IP restriction requires the Brew+ plan', 402);
+            }
+            $setting->setIpRestrictionEnabled(true);
+        } elseif (isset($data['ipRestrictionEnabled'])) {
+            $setting->setIpRestrictionEnabled(false);
+        }
+
+        if (array_key_exists('allowedIps', $data)) {
+            $setting->setAllowedIps($data['allowedIps']);
+        }
+
+        // Geofencing (Brew+ gated)
+        if (isset($data['geofencingEnabled']) && $data['geofencingEnabled']) {
+            if (!$planService->canUseGeofencing($workspace)) {
+                return $this->jsonError('Geofencing requires the Brew+ plan', 402);
+            }
+            $setting->setGeofencingEnabled(true);
+        } elseif (isset($data['geofencingEnabled'])) {
+            $setting->setGeofencingEnabled(false);
+        }
+
+        if (array_key_exists('geofencingLatitude', $data)) {
+            $setting->setGeofencingLatitude($data['geofencingLatitude'] !== null ? (float) $data['geofencingLatitude'] : null);
+        }
+        if (array_key_exists('geofencingLongitude', $data)) {
+            $setting->setGeofencingLongitude($data['geofencingLongitude'] !== null ? (float) $data['geofencingLongitude'] : null);
+        }
+        if (array_key_exists('geofencingRadiusMeters', $data)) {
+            $setting->setGeofencingRadiusMeters($data['geofencingRadiusMeters'] !== null ? (int) $data['geofencingRadiusMeters'] : null);
+        }
+
+        // General settings
+        if (isset($data['timezone'])) {
+            $setting->setTimezone($data['timezone']);
+        }
+        if (isset($data['locale'])) {
+            $setting->setLocale($data['locale']);
+        }
+
+        $em->flush();
+
+        return $this->jsonSuccess($this->serializeSetting($setting));
+    }
+
+    private function serializeSetting(?WorkspaceSetting $setting): array
+    {
+        return [
+            'ipRestrictionEnabled' => $setting?->isIpRestrictionEnabled() ?? false,
+            'allowedIps' => $setting?->getAllowedIps(),
+            'timezone' => $setting?->getTimezone() ?? 'Asia/Phnom_Penh',
+            'locale' => $setting?->getLocale() ?? 'en',
+            'geofencingEnabled' => $setting?->isGeofencingEnabled() ?? false,
+            'geofencingLatitude' => $setting?->getGeofencingLatitude(),
+            'geofencingLongitude' => $setting?->getGeofencingLongitude(),
+            'geofencingRadiusMeters' => $setting?->getGeofencingRadiusMeters() ?? 100,
+        ];
+    }
+}

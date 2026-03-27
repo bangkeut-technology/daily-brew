@@ -2,30 +2,31 @@ import React, { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 import { HelmetProvider } from 'react-helmet-async';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from 'sonner';
 
 import { routeTree } from './routeTree.gen';
 import { useAuthenticationState } from '@/hooks/use-authentication';
 import { AuthenticationProvider } from '@/providers/authentication-provider';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import '@/i18next';
-
-import './styles/globals.css';
 import { LanguageProvider } from '@/providers/language-provider';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { ApplicationProvider } from '@/providers/application-provider';
-import { PageNotFound } from '@/components/page-not-found';
-import { DemoSessionProvider } from '@/providers/demo-session-provider';
+
+import '@/i18next';
+import './styles/globals.css';
+
+import type { AuthenticationState } from '@/contexts/authentication-context';
+
+interface RouterContext {
+    authentication: AuthenticationState | undefined;
+}
 
 const router = createRouter({
     routeTree,
     defaultPreload: 'intent',
-    context: {
-        authentication: undefined,
-    },
-    defaultNotFoundComponent: () => <PageNotFound />,
+    context: { authentication: undefined } as RouterContext,
 });
 
-// Register the router instance for type safety
 declare module '@tanstack/react-router' {
     interface Register {
         router: typeof router;
@@ -37,9 +38,16 @@ const Application = () => {
     return <RouterProvider router={router} context={{ authentication }} />;
 };
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 30 * 1000,
+            gcTime: 5 * 60 * 1000,
+            retry: 1,
+        },
+    },
+});
 
-// Render the app
 const rootElement = document.querySelector('#daily_brew_application');
 if (rootElement && !rootElement.innerHTML) {
     const root = ReactDOM.createRoot(rootElement);
@@ -49,13 +57,12 @@ if (rootElement && !rootElement.innerHTML) {
                 <QueryClientProvider client={queryClient}>
                     <ThemeProvider>
                         <ApplicationProvider>
-                            <DemoSessionProvider>
-                                <AuthenticationProvider>
-                                    <LanguageProvider>
-                                        <Application />
-                                    </LanguageProvider>
-                                </AuthenticationProvider>
-                            </DemoSessionProvider>
+                            <AuthenticationProvider>
+                                <LanguageProvider>
+                                    <Application />
+                                    <Toaster position="top-right" richColors />
+                                </LanguageProvider>
+                            </AuthenticationProvider>
                         </ApplicationProvider>
                     </ThemeProvider>
                 </QueryClientProvider>

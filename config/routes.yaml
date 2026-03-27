@@ -1,32 +1,42 @@
-api_v1_controllers:
-    resource:
-        path:      ../src/ApiController/
-        namespace: App\ApiController
-    type:        attribute
-    name_prefix: daily_brew_api_v1_
-    prefix:      /api/v1/{_locale}
-    locale:      en
-    requirements:
-        _locale: en|fr|km
-
 controllers:
     resource:
-        path:      ../src/Controller/
+        path: '../src/Controller/'
         namespace: App\Controller
     type: attribute
+    name_prefix: dailybrew_
 
-oauth_auth_controllers:
+dailybrew_api_v1_:
     resource:
-        path:      ../src/Controller/OAuth/Auth
-        namespace: App\Controller\OAuth\Auth
-    type:        attribute
-    name_prefix: dailybrew_oauth_auth_
-    prefix:      /oauth/auth
+        path: '../src/ApiController/'
+        namespace: App\ApiController
+        exclude: '../src/ApiController/{Checkin,Paddle}'
+    type: attribute
+    prefix: /api/v1/{_locale}
+    requirements:
+        _locale: en|fr|km
+    name_prefix: dailybrew_api_v1_
+    options:
+        strict_requirements: true
 
-oauth_connect_controllers:
+dailybrew_api_v1_checkin_:
     resource:
-        path:      ../src/Controller/OAuth/Connect
-        namespace: App\Controller\OAuth\Connect
-    type:        attribute
-    name_prefix: dailybrew_oauth_connect_
-    prefix:      /oauth/connect
+        path: '../src/ApiController/Checkin/'
+        namespace: App\ApiController\Checkin
+    type: attribute
+    prefix: /api/v1
+    name_prefix: dailybrew_api_v1_
+    options:
+        strict_requirements: true
+
+dailybrew_api_v1_webhooks_:
+    resource:
+        path: '../src/ApiController/Paddle/'
+        namespace: App\ApiController\Paddle
+    type: attribute
+    prefix: /api/v1
+    name_prefix: dailybrew_api_v1_
+    options:
+        strict_requirements: true
+
+gesdinet_jwt_refresh_token:
+    path: /api/v1/token/refresh

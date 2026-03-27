@@ -1,94 +1,67 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Repository;
 
-use App\Entity\Employee;
 use App\Entity\LeaveRequest;
 use App\Entity\Workspace;
-use App\Enum\LeaveRequestStatusEnum;
+use App\Enum\LeaveRequestStatus;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * Class LeaveRequestRepository
- *
- * @package App\Repository
- * @author  Vandeth THO <thovandeth@gmail.com>
- *
- * @extends AbstractRepository<LeaveRequest>
- *
- * @method LeaveRequest      create()
- * @method LeaveRequest|null find($id, $lockMode = null, $lockVersion = null)
- * @method LeaveRequest|null findOneBy(array $criteria, array $orderBy = null)
- * @method LeaveRequest|null findByPublicId(string $publicId)
- * @method LeaveRequest[]    findAll()
- * @method LeaveRequest[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
-class LeaveRequestRepository extends AbstractRepository
+class LeaveRequestRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, LeaveRequest::class);
     }
 
-    /**
-     * Find all leave requests for an employee.
-     *
-     * @param Employee $employee
-     * @return LeaveRequest[]
-     */
-    public function findByEmployee(Employee $employee): array
+    public function findByPublicId(string $publicId): ?LeaveRequest
     {
-        return $this->findBy(['employee' => $employee, 'deletedAt' => null], ['createdAt' => 'DESC']);
+        return $this->findOneBy(['publicId' => $publicId]);
     }
 
-    /**
-     * Find all leave requests for a workspace.
-     *
-     * @param Workspace $workspace
-     * @return LeaveRequest[]
-     */
-    public function findByWorkspace(Workspace $workspace): array
+    /** @return LeaveRequest[] */
+    public function findByWorkspace(Workspace $workspace, ?LeaveRequestStatus $status = null): array
     {
-        return $this->findBy(['workspace' => $workspace, 'deletedAt' => null], ['createdAt' => 'DESC']);
+        $qb = $this->createQueryBuilder('lr')
+            ->join('lr.employee', 'e')
+            ->where('e.workspace = :workspace')
+            ->setParameter('workspace', $workspace)
+            ->orderBy('lr.createdAt', 'DESC');
+
+        if ($status !== null) {
+            $qb->andWhere('lr.status = :status')
+                ->setParameter('status', $status);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
-    /**
-     * Find all pending leave requests for a workspace.
-     *
-     * @param Workspace $workspace
-     * @return LeaveRequest[]
-     */
-    public function findPendingByWorkspace(Workspace $workspace): array
+    public function countPendingByWorkspace(Workspace $workspace): int
     {
-        return $this->findBy(
-            ['workspace' => $workspace, 'status' => LeaveRequestStatusEnum::PENDING, 'deletedAt' => null],
-            ['createdAt' => 'DESC']
-        );
+        return (int) $this->createQueryBuilder('lr')
+            ->select('COUNT(lr.id)')
+            ->join('lr.employee', 'e')
+            ->where('e.workspace = :workspace')
+            ->andWhere('lr.status = :status')
+            ->setParameter('workspace', $workspace)
+            ->setParameter('status', LeaveRequestStatus::Pending)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
-    /**
-     * Find a leave request by its public ID and workspace.
-     *
-     * @param string    $publicId
-     * @param Workspace $workspace
-     * @return LeaveRequest|null
-     */
-    public function findByPublicIdAndWorkspace(string $publicId, Workspace $workspace): ?LeaveRequest
+    public function countApprovedByWorkspaceAndDate(Workspace $workspace, \DateTimeInterface $date): int
     {
-        return $this->findOneBy(['publicId' => $publicId, 'workspace' => $workspace, 'deletedAt' => null]);
-    }
-
-    /**
-     * Find a leave request by its public ID and employee.
-     *
-     * @param string   $publicId
-     * @param Employee $employee
-     * @return LeaveRequest|null
-     */
-    public function findByPublicIdAndEmployee(string $publicId, Employee $employee): ?LeaveRequest
-    {
-        return $this->findOneBy(['publicId' => $publicId, 'employee' => $employee, 'deletedAt' => null]);
+        return (int) $this->createQueryBuilder('lr')
+            ->select('COUNT(lr.id)')
+            ->join('lr.employee', 'e')
+            ->where('e.workspace = :workspace')
+            ->andWhere('lr.date = :date')
+            ->andWhere('lr.status = :status')
+            ->setParameter('workspace', $workspace)
+            ->setParameter('date', $date)
+            ->setParameter('status', LeaveRequestStatus::Approved)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

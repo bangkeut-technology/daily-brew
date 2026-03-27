@@ -1,15 +1,11 @@
-import React from 'react';
+import { createContext } from 'react';
 
-export interface ApplicationContextValue {
+export interface ApplicationConfig {
     maxFreeEmployees: number;
-    maxFreeTemplates: number;
-    storeAllowed: boolean;
-    contactEmail?: string;
+    contactEmail: string;
 }
 
-export const ApplicationContext = React.createContext<ApplicationContextValue>({
-    maxFreeEmployees: 0,
-    maxFreeTemplates: 0,
-    storeAllowed: false,
-    contactEmail: undefined,
+export const ApplicationContext = createContext<ApplicationConfig>({
+    maxFreeEmployees: 5,
+    contactEmail: 'support@dailybrew.work',
 });

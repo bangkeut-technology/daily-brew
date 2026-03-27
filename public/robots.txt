@@ -1,7 +1,0 @@
-User-agent: *
-Allow: /
-
-Disallow: /console
-Disallow: /api/
-
-Sitemap: https://dailybrew.work/sitemap.xml

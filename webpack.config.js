@@ -1,53 +1,39 @@
 const Encore = require('@symfony/webpack-encore');
 const path = require('path');
-const WorkboxPlugin = require('workbox-webpack-plugin');
 
 if (!Encore.isRuntimeEnvironmentConfigured()) {
     Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
 }
 
-if (!Encore.isRuntimeEnvironmentConfigured()) {
-    Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
-}
-
-Encore.setOutputPath('public/build/')
+Encore
+    .setOutputPath('public/build/')
     .setPublicPath('/build')
     .setManifestKeyPrefix('build/')
+
     .addEntry('daily_brew_application', './assets/src/main.tsx')
+
     .splitEntryChunks()
     .enableSingleRuntimeChunk()
     .cleanupOutputBeforeBuild()
-    // .enableBuildNotifications()
-    .enableSourceMaps(Encore.isProduction())
+    .enableSourceMaps(!Encore.isProduction())
     .enableVersioning(Encore.isProduction())
+
     .configureBabelPresetEnv((config) => {
         config.useBuiltIns = 'usage';
-        config.corejs = '3.23';
+        config.corejs = '3.38';
     })
-    .enableTypeScriptLoader(function () {})
+
+    .enableTypeScriptLoader()
     .enableReactPreset()
     .enableIntegrityHashes(Encore.isProduction())
     .enableForkedTypeScriptTypesChecking()
-    .enablePostCssLoader();
+    .enablePostCssLoader()
+;
 
 const config = Encore.getWebpackConfig();
 
 config.resolve.alias = {
     '@': path.resolve(__dirname, 'assets/src'),
 };
-
-config.module.rules.push({
-    test: /\.worker\.js$/,
-    use: { loader: 'worker-loader' },
-});
-
-config.plugins.push(
-    new WorkboxPlugin.GenerateSW({
-        swDest: 'service-worker.js',
-        clientsClaim: true,
-        skipWaiting: true,
-        maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
-    }),
-);
 
 module.exports = config;

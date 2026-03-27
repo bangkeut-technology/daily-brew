@@ -1,54 +1,56 @@
-import React from 'react';
-import { AuthenticationContextDispatch, AuthenticationContextState } from '@/contexts/authentication-context';
-import { useQuery } from '@tanstack/react-query';
-import { fetchCurrentUser, fetchCurrentWorkspace } from '@/services/user';
-import { authenticationInitialState, authenticationReducer } from '@/reducers/authentication-reducer';
+import React, { useCallback, useEffect, useReducer, type ReactNode } from 'react';
+import { AuthenticationContext } from '@/contexts/authentication-context';
+import {
+    authenticationReducer,
+    initialAuthenticationState,
+} from '@/reducers/authentication-reducer';
+import { apiAxios } from '@/lib/apiAxios';
+import type { Workspace } from '@/types/user';
 
-export const AuthenticationProvider = ({ children }: { children: React.ReactNode }) => {
-    const [state, dispatch] = React.useReducer(authenticationReducer, authenticationInitialState);
+interface Props {
+    children: ReactNode;
+}
 
-    const { data, isSuccess, isError } = useQuery({
-        queryKey: ['me'],
-        queryFn: fetchCurrentUser,
-        enabled: state.status === 'loading',
-        retry: false,
-        staleTime: 0,
-    });
+export function AuthenticationProvider({ children }: Props) {
+    const [state, dispatch] = useReducer(authenticationReducer, initialAuthenticationState);
 
-    const { data: workspace } = useQuery({
-        queryKey: ['my-current-workspace'],
-        enabled: state.status === 'authenticated',
-        queryFn: fetchCurrentWorkspace,
-    });
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const { data: user } = await apiAxios.get('/users/me');
+                let workspace: Workspace | null = null;
+                try {
+                    const { data: ws } = await apiAxios.get('/users/me/current-workspace');
+                    workspace = ws;
+                } catch {
+                    // No workspace yet
+                }
+                dispatch({ type: 'SIGN_IN', user, workspace });
+            } catch {
+                dispatch({ type: 'SIGN_OUT' });
+            }
+        };
 
-    React.useEffect(() => {
-        if (isError) dispatch({ type: 'SIGN_OUT' });
-    }, [isError]);
+        fetchUser();
+    }, []);
 
-    React.useEffect(() => {
-        if (isSuccess && data) dispatch({ type: 'SIGN_IN', user: data });
-    }, [isSuccess, data]);
+    const setWorkspace = useCallback((workspace: Workspace) => {
+        dispatch({ type: 'SET_WORKSPACE', workspace });
+    }, []);
 
-    React.useEffect(() => {
-        if (workspace) dispatch({ type: 'SET_WORKSPACE', workspace });
-    }, [workspace]);
-
-    if (state.status === 'loading') return <FullScreenLoader />;
+    const signOut = useCallback(async () => {
+        try {
+            await apiAxios.post('/auth/logout');
+        } catch {
+            // Ignore logout errors
+        }
+        dispatch({ type: 'SIGN_OUT' });
+        window.location.href = '/sign-in';
+    }, []);
 
     return (
-        <AuthenticationContextState.Provider value={state}>
-            <AuthenticationContextDispatch.Provider value={dispatch}>{children}</AuthenticationContextDispatch.Provider>
-        </AuthenticationContextState.Provider>
+        <AuthenticationContext.Provider value={{ ...state, setWorkspace, signOut }}>
+            {children}
+        </AuthenticationContext.Provider>
     );
-};
-
-AuthenticationProvider.displayName = 'AuthenticationProvider';
-
-const FullScreenLoader = () => (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-            <div className="h-10 w-10 animate-spin rounded-full border-3 border-muted border-t-primary" />
-            <span className="text-sm text-muted-foreground">Checking session...</span>
-        </div>
-    </div>
-);
+}

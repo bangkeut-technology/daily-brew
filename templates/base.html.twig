@@ -2,42 +2,10 @@
 <html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8" />
-    <meta name="language" content="English">
-    <meta name="theme-color" content="#D3500E" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5" />
+    <title>{% block title %}DailyBrew — Staff Attendance{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}" />
 
-    <!-- Meta Description -->
-    <meta name="description"
-          content="DailyBrew is a simple HR tool for cafés and small restaurants. Track staff attendance, daily KPI scores, leave requests, and performance insights in one clean dashboard.">
-
-    <!-- Keywords -->
-    <meta name="keywords"
-          content="cafe staff management, staff KPI tracker, restaurant employee software, attendance tracking, leave management, daily KPI scoring, barista performance app, cafe shift tracker, F&B HR tool">
-
-    <!-- Open Graph / Social Preview -->
-    <meta property="og:title" content="DailyBrew – Staff KPI & Attendance Tracker for Cafés">
-    <meta property="og:description"
-          content="DailyBrew is a simple HR tool for cafés and small restaurants. Track staff attendance, daily KPI scores, leave requests, and performance insights in one clean dashboard.">
-    <meta property="og:image" content="https://dailybrew.work/og-cover.jpg"> <!-- Replace with your image -->
-    <meta property="og:url" content="https://dailybrew.work">
-    <meta property="og:type" content="website">
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="DailyBrew – Staff KPI & Attendance Tracker for Cafés">
-    <meta name="twitter:description"
-          content="DailyBrew is a simple HR tool for cafés and small restaurants. Track staff attendance, daily KPI scores, leave requests, and performance insights in one clean dashboard.">
-    <meta name="twitter:image" content="https://dailybrew.work/twitter-cover.jpg">
-    <title>{% block title %}DailyBrew – Staff KPI & Attendance Tracker for Cafés{% endblock %}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
-        rel="stylesheet" />
-    <link rel="manifest" href="{{ asset('manifest.json') }}" />
-    <link rel="shortcut icon" href="{{ asset('/favicon.ico') }}" type="image/x-icon" />
-    <link rel="apple-touch-icon" href="{{ asset('icons/icon-512x512.png') }}" />
     {% block stylesheets %}
         {{ encore_entry_link_tags('daily_brew_application') }}
     {% endblock %}
@@ -45,42 +13,19 @@
     {% block javascripts %}
         {{ encore_entry_script_tags('daily_brew_application') }}
         <script type="text/javascript">
-            function storeUserData(email) {
-                sessionStorage.setItem("email", email);
-            }
-
-            storeUserData('{{ user ? user.email : '' }}');
-
-            function storeLocale(locale) {
-                sessionStorage.setItem("locale", locale);
-            }
-
-            storeLocale('{{ user ? user.locale : 'en' }}');
-
-            function storeApplicationData(maxFreeEmployees, maxFreeTemplates, storeAllowed, $contactEmail) {
-                sessionStorage.setItem("application", `{"maxFreeEmployees": ${maxFreeEmployees}, "maxFreeTemplates": ${maxFreeTemplates}, "storeAllowed": "${storeAllowed}", "contactEmail": "${$contactEmail}"}`);
-            }
-
-            storeApplicationData(
-                {{ maxFreeEmployees }},
-                {{ maxFreeTemplates }},
-                {{ storeAllowed ? 'true' : 'false' }},
-                '{{ contactEmail }}'
-            );
+            (function() {
+                sessionStorage.setItem("email", '{{ user ? user.email|e('js') : '' }}');
+                sessionStorage.setItem("locale", '{{ user ? user.locale|default('en')|e('js') : 'en' }}');
+                sessionStorage.setItem("application", JSON.stringify({
+                    maxFreeEmployees: {{ maxFreeEmployees }},
+                    contactEmail: '{{ contactEmail|e('js') }}'
+                }));
+            })();
         </script>
-        <!-- Google tag (gtag.js) -->
-        {#        <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga_tracking }}"></script> #}
-        {#        <script type="text/javascript"> #}
-        {#            window.dataLayer = window.dataLayer || []; #}
-        {#            function gtag(){dataLayer.push(arguments);} #}
-        {#            gtag('js', new Date()); #}
-
-        {#            gtag('config', '{{ ga_tracking }}'); #}
-        {#        </script> #}
     {% endblock %}
 </head>
 <body class="h-full w-full">
-<div id="daily_brew_application" class="h-full w-full"></div>
-{% block body %}{% endblock %}
+    <div id="daily_brew_application" class="h-full w-full"></div>
+    {% block body %}{% endblock %}
 </body>
 </html>

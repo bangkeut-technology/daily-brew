@@ -1,34 +1,36 @@
-import React from 'react';
-import { LanguageContext } from '@/contexts/language-context';
-import { Locale } from '@/types/locale';
-import i18next from '@/i18next';
-import { toast } from 'sonner';
-import { useAuthenticationState } from '@/hooks/use-authentication';
+import React, { useCallback, useEffect, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAuthentication } from '@/hooks/use-authentication';
 
-interface LanguageProviderProps {
-    children: React.ReactNode;
+interface Props {
+    children: ReactNode;
 }
 
-export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
-    const [locale, setLocale] = React.useState<Locale>('en');
-    const { user, status } = useAuthenticationState();
+export function LanguageProvider({ children }: Props) {
+    const { i18n } = useTranslation();
+    const { user } = useAuthentication();
 
-    const updateLocale = React.useCallback((locale: Locale) => {
-        i18next
-            .changeLanguage(locale)
-            .then(() => {
-                setLocale(locale);
-            })
-            .catch((error) => {
-                toast.error(error.message);
-            });
-    }, []);
-
-    React.useEffect(() => {
-        if (status === 'authenticated' && user) {
-            updateLocale((user.locale as Locale) || 'en');
+    useEffect(() => {
+        const locale = user?.locale || sessionStorage.getItem('locale') || 'en';
+        if (i18n.language !== locale) {
+            i18n.changeLanguage(locale);
         }
-    }, [status, user, updateLocale]);
+        sessionStorage.setItem('locale', locale);
+    }, [user, i18n]);
 
-    return <LanguageContext.Provider value={{ locale, updateLocale }}>{children}</LanguageContext.Provider>;
-};
+    return <>{children}</>;
+}
+
+export function useLanguage() {
+    const { i18n } = useTranslation();
+
+    const changeLanguage = useCallback(
+        (locale: string) => {
+            i18n.changeLanguage(locale);
+            sessionStorage.setItem('locale', locale);
+        },
+        [i18n],
+    );
+
+    return { locale: i18n.language, changeLanguage };
+}

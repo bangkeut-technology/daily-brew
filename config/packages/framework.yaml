@@ -1,18 +1,9 @@
 # see https://symfony.com/doc/current/reference/configuration/framework.html
 framework:
     secret: '%env(APP_SECRET)%'
-    #csrf_protection: true
 
     # Note that the session will be started ONLY if you read or write from it.
-    session:
-        enabled: true
-        cookie_secure: auto
-        cookie_samesite: none
-        cookie_httponly: true
-        cookie_domain: 'dailybrew.work'
-
-    trusted_proxies: '%env(TRUSTED_PROXIES)%'
-    trusted_headers: ['x-forwarded-for', 'x-forwarded-proto', 'x-forwarded-host']
+    session: true
 
     #esi: true
     #fragments: true

@@ -1,271 +1,144 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
 
 namespace App\Entity;
 
-
-use App\Enum\AttendanceTypeEnum;
-use App\Enum\LeaveTypeEnum;
 use App\Repository\AttendanceRepository;
 use DateTimeImmutable;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-
 /**
  * Class Attendance
+ *
+ * One record per employee per day. Tracks check-in/out, late, early departure.
  *
  * @package App\Entity
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 #[ORM\Table(name: 'daily_brew_attendances')]
 #[ORM\Entity(repositoryClass: AttendanceRepository::class)]
-#[ORM\UniqueConstraint(name: 'UNIQ_ATTENDANCE_EMPLOYEE_DATE', fields: ['employee', 'attendanceDate'])]
-class Attendance extends AbstractEntity
+#[ORM\UniqueConstraint(name: 'UNIQ_ATTENDANCE_EMPLOYEE_DATE', fields: ['employee', 'date'])]
+class Attendance extends AbstractBaseEntity
 {
-    /**
-     * The date of the attendance.
-     *
-     * @var DateTimeImmutable|null
-     */
-    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[ORM\Column(type: 'date_immutable')]
     #[Groups(['attendance:read'])]
-    private ?DateTimeImmutable $attendanceDate = null;
-
-    /**
-     * A note for the attendance.
-     *
-     * @var string|null
-     */
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['attendance:read'])]
-    private ?string $note = null;
-
-    /**
-     * The time the employee clocked in.
-     *
-     * @var DateTimeImmutable|null
-     */
-    #[ORM\Column(nullable: true)]
-    #[Groups(['attendance:read'])]
-    private ?DateTimeImmutable $clockIn = null;
-
-    /**
-     * The time the employee clocked out.
-     *
-     * @var DateTimeImmutable|null
-     */
-    #[ORM\Column(nullable: true)]
-    #[Groups(['attendance:read'])]
-    private ?DateTimeImmutable $clockOut = null;
-
-    /**
-     * The type of the attendance.
-     *
-     * @var AttendanceTypeEnum
-     */
-    #[ORM\Column(enumType: AttendanceTypeEnum::class)]
-    #[Groups(['attendance:read'])]
-    private AttendanceTypeEnum $type = AttendanceTypeEnum::PRESENT;
-
-    /**
-     * @var LeaveTypeEnum|null
-     */
-    #[ORM\Column(nullable: true, enumType: LeaveTypeEnum::class)]
-    #[Groups(['attendance:read'])]
-    private ?LeaveTypeEnum $leaveType = null;
+    private ?DateTimeImmutable $date = null;
 
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    private ?DateTimeImmutable $deletedAt = null;
+    #[Groups(['attendance:read'])]
+    private ?DateTimeImmutable $checkInAt = null;
 
-    /**
-     * The employee associated with this attendance.
-     *
-     * @var Employee|null
-     */
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    #[Groups(['attendance:read'])]
+    private ?DateTimeImmutable $checkOutAt = null;
+
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    #[Groups(['attendance:read'])]
+    private bool $isLate = false;
+
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    #[Groups(['attendance:read'])]
+    private bool $leftEarly = false;
+
+    #[ORM\Column(length: 45, nullable: true)]
+    private ?string $ipAddress = null;
+
     #[ORM\ManyToOne(targetEntity: Employee::class, inversedBy: 'attendances')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     #[Groups(['attendance:read'])]
     private ?Employee $employee = null;
 
-    /**
-     * The user who created or modified this attendance record.
-     *
-     * @var User|null
-     */
-    #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
-    #[Groups(['attendance:read'])]
-    private ?User $user = null;
-
-    #[ORM\ManyToOne(inversedBy: 'attendances')]
-    private ?AttendanceBatch $batch = null;
-
-    #[ORM\ManyToOne(inversedBy: 'attendances')]
+    #[ORM\ManyToOne(targetEntity: Workspace::class, inversedBy: 'attendances')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     #[Groups(['attendance:read'])]
     private ?Workspace $workspace = null;
 
-    /**
-     * @return DateTimeImmutable|null
-     */
-    public function getAttendanceDate(): ?DateTimeImmutable
+    // ── Date ───────────────────────────────────────────────────
+
+    public function getDate(): ?DateTimeImmutable
     {
-        return $this->attendanceDate;
+        return $this->date;
     }
 
-    /**
-     * @param DateTimeImmutable|null $attendanceDate
-     * @return Attendance
-     */
-    public function setAttendanceDate(?DateTimeImmutable $attendanceDate): Attendance
+    public function setDate(?DateTimeImmutable $date): static
     {
-        $this->attendanceDate = $attendanceDate;
+        $this->date = $date;
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getNote(): ?string
+    // ── Check-in / Check-out ───────────────────────────────────
+
+    public function getCheckInAt(): ?DateTimeImmutable
     {
-        return $this->note;
+        return $this->checkInAt;
     }
 
-    /**
-     * @param string|null $note
-     * @return Attendance
-     */
-    public function setNote(?string $note): Attendance
+    public function setCheckInAt(?DateTimeImmutable $checkInAt): static
     {
-        $this->note = $note;
+        $this->checkInAt = $checkInAt;
         return $this;
     }
 
-    /**
-     * @return DateTimeImmutable|null
-     */
-    public function getClockIn(): ?DateTimeImmutable
+    public function getCheckOutAt(): ?DateTimeImmutable
     {
-        return $this->clockIn;
+        return $this->checkOutAt;
     }
 
-    /**
-     * @param DateTimeImmutable|null $clockIn
-     * @return Attendance
-     */
-    public function setClockIn(?DateTimeImmutable $clockIn): Attendance
+    public function setCheckOutAt(?DateTimeImmutable $checkOutAt): static
     {
-        $this->clockIn = $clockIn;
+        $this->checkOutAt = $checkOutAt;
         return $this;
     }
 
-    /**
-     * @return DateTimeImmutable|null
-     */
-    public function getClockOut(): ?DateTimeImmutable
+    // ── Flags ──────────────────────────────────────────────────
+
+    public function isLate(): bool
     {
-        return $this->clockOut;
+        return $this->isLate;
     }
 
-    /**
-     * @param DateTimeImmutable|null $clockOut
-     * @return Attendance
-     */
-    public function setClockOut(?DateTimeImmutable $clockOut): Attendance
+    public function setIsLate(bool $isLate): static
     {
-        $this->clockOut = $clockOut;
+        $this->isLate = $isLate;
         return $this;
     }
 
-    /**
-     * @return AttendanceTypeEnum
-     */
-    public function getType(): AttendanceTypeEnum
+    public function hasLeftEarly(): bool
     {
-        return $this->type;
+        return $this->leftEarly;
     }
 
-    /**
-     * @param AttendanceTypeEnum $type
-     * @return Attendance
-     */
-    public function setType(AttendanceTypeEnum $type): Attendance
+    public function setLeftEarly(bool $leftEarly): static
     {
-        $this->type = $type;
+        $this->leftEarly = $leftEarly;
         return $this;
     }
 
-    /**
-     * @return LeaveTypeEnum|null
-     */
-    public function getLeaveType(): ?LeaveTypeEnum
+    // ── IP address ─────────────────────────────────────────────
+
+    public function getIpAddress(): ?string
     {
-        return $this->leaveType;
+        return $this->ipAddress;
     }
 
-    /**
-     * @param LeaveTypeEnum|null $leaveType
-     * @return Attendance
-     */
-    public function setLeaveType(?LeaveTypeEnum $leaveType): self
+    public function setIpAddress(?string $ipAddress): static
     {
-        if ($this->type !== AttendanceTypeEnum::LEAVE) {
-            $leaveType = null;
-        }
-
-        $this->leaveType = $leaveType;
-
+        $this->ipAddress = $ipAddress;
         return $this;
     }
 
-    /**
-     * @return Employee|null
-     */
+    // ── Relations ──────────────────────────────────────────────
+
     public function getEmployee(): ?Employee
     {
         return $this->employee;
     }
 
-    /**
-     * @param Employee|null $employee
-     * @return Attendance
-     */
-    public function setEmployee(?Employee $employee): Attendance
+    public function setEmployee(?Employee $employee): static
     {
         $this->employee = $employee;
-        return $this;
-    }
-
-    /**
-     * @return User|null
-     */
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    /**
-     * @param User|null $user
-     * @return Attendance
-     */
-    public function setUser(?User $user): Attendance
-    {
-        $this->user = $user;
-        return $this;
-    }
-
-    public function getBatch(): ?AttendanceBatch
-    {
-        return $this->batch;
-    }
-
-    public function setBatch(?AttendanceBatch $batch): static
-    {
-        $this->batch = $batch;
-
         return $this;
     }
 
@@ -277,26 +150,6 @@ class Attendance extends AbstractEntity
     public function setWorkspace(?Workspace $workspace): static
     {
         $this->workspace = $workspace;
-
-        return $this;
-    }
-
-    /**
-     * @return DateTimeImmutable|null
-     */
-    public function getDeletedAt(): ?DateTimeImmutable
-    {
-        return $this->deletedAt;
-    }
-
-    /**
-     * @param DateTimeImmutable|null $deletedAt
-     *
-     * @return Attendance
-     */
-    public function setDeletedAt(?DateTimeImmutable $deletedAt): Attendance
-    {
-        $this->deletedAt = $deletedAt;
         return $this;
     }
 }

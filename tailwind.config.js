@@ -1,23 +1,16 @@
-/** @type {import('tailwindcss').Config} */
 module.exports = {
     darkMode: ['class'],
     content: [
-        './assets/pages/**/*.{ts,tsx}',
-        './assets/components/**/*.{ts,tsx}',
-        './assets/app/**/*.{ts,tsx}',
         './assets/src/**/*.{ts,tsx}',
-        './assets/**/*.js',
         './templates/**/*.html.twig',
     ],
     prefix: '',
     important: true,
     theme: {
         container: {
-            center: 'true',
+            center: true,
             padding: '2rem',
-            screens: {
-                '2xl': '1400px',
-            },
+            screens: { '2xl': '1400px' },
         },
         extend: {
             colors: {
@@ -64,6 +57,20 @@ module.exports = {
                     border: 'hsl(var(--sidebar-border))',
                     ring: 'hsl(var(--sidebar-ring))',
                 },
+                // DailyBrew custom colors
+                cream: {
+                    DEFAULT: '#FAF7F2',
+                    2: '#F3EDE3',
+                    3: '#EBE2D6',
+                },
+                coffee: {
+                    DEFAULT: '#6B4226',
+                    light: '#9B6B45',
+                },
+                amber: {
+                    DEFAULT: '#C17F3B',
+                    light: '#E8A85A',
+                },
             },
             borderRadius: {
                 lg: 'var(--radius)',
@@ -72,20 +79,12 @@ module.exports = {
             },
             keyframes: {
                 'accordion-down': {
-                    from: {
-                        height: '0',
-                    },
-                    to: {
-                        height: 'var(--radix-accordion-content-height)',
-                    },
+                    from: { height: '0' },
+                    to: { height: 'var(--radix-accordion-content-height)' },
                 },
                 'accordion-up': {
-                    from: {
-                        height: 'var(--radix-accordion-content-height)',
-                    },
-                    to: {
-                        height: '0',
-                    },
+                    from: { height: 'var(--radix-accordion-content-height)' },
+                    to: { height: '0' },
                 },
             },
             animation: {

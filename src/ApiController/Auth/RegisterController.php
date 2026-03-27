@@ -1,0 +1,44 @@
+<?php
+
+namespace App\ApiController\Auth;
+
+use App\ApiController\Trait\ApiResponseTrait;
+use App\Service\AuthService;
+use App\Service\JwtResponseService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+
+#[Route('/auth')]
+class RegisterController extends AbstractController
+{
+    use ApiResponseTrait;
+
+    #[Route('/register', name: 'auth_register', methods: ['POST'])]
+    public function register(
+        Request $request,
+        AuthService $authService,
+        JwtResponseService $jwtResponse,
+    ): Response {
+        $data = json_decode($request->getContent(), true);
+        $email = $data['email'] ?? '';
+        $password = $data['password'] ?? '';
+
+        if (empty($email) || empty($password)) {
+            return $this->jsonError('Email and password are required');
+        }
+
+        if (strlen($password) < 8) {
+            return $this->jsonError('Password must be at least 8 characters');
+        }
+
+        try {
+            $user = $authService->register($email, $password);
+        } catch (\InvalidArgumentException $e) {
+            return $this->jsonError($e->getMessage(), 409);
+        }
+
+        return $jwtResponse->createAuthResponse($user);
+    }
+}
