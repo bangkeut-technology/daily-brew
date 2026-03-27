@@ -6,7 +6,7 @@ use App\Repository\ClosurePeriodRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ClosurePeriodRepository::class)]
-#[ORM\Table(name: 'closure')]
+#[ORM\Table(name: 'daily_brew_closure_periods')]
 class ClosurePeriod extends AbstractBaseEntity
 {
     #[ORM\ManyToOne(targetEntity: Workspace::class)]

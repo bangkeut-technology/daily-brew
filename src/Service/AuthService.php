@@ -15,7 +15,7 @@ class AuthService
         private UserPasswordHasherInterface $passwordHasher,
     ) {}
 
-    public function register(string $email, string $password): User
+    public function register(string $email, string $password, ?string $firstName = null, ?string $lastName = null): User
     {
         $existing = $this->userRepository->findByEmail($email);
         if ($existing !== null) {
@@ -24,6 +24,9 @@ class AuthService
 
         $user = new User();
         $user->setEmail($email);
+        $user->setEmailCanonical(mb_strtolower($email));
+        $user->setFirstName($firstName);
+        $user->setLastName($lastName);
         $user->setPassword($this->passwordHasher->hashPassword($user, $password));
 
         $this->em->persist($user);

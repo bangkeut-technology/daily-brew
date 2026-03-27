@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { Check, Crown, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 
 const freePlan = {
   name: 'Free',
@@ -18,8 +19,8 @@ const freePlan = {
 
 const brewPlusPlan = {
   name: 'Brew+',
-  price: '$12.99',
-  period: '/month',
+  monthly: { price: '$12.99', period: '/month' },
+  yearly: { price: '$129', period: '/year', savings: 'Save $26.88' },
   subtitle: 'For growing restaurants',
   features: [
     'Everything in Free',
@@ -33,10 +34,13 @@ const brewPlusPlan = {
 };
 
 export function PricingSection() {
+  const [yearly, setYearly] = useState(true);
+  const pricing = yearly ? brewPlusPlan.yearly : brewPlusPlan.monthly;
+
   return (
     <section id="pricing" className="py-20 px-6 md:px-8 max-w-4xl mx-auto">
       <motion.div
-        className="text-center mb-14"
+        className="text-center mb-10"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -51,6 +55,44 @@ export function PricingSection() {
         <p className="text-[14px] text-text-secondary mt-3 max-w-md mx-auto">
           Start free. Upgrade when you need more.
         </p>
+      </motion.div>
+
+      {/* Billing toggle */}
+      <motion.div
+        className="flex items-center justify-center gap-3 mb-10"
+        initial={{ opacity: 0, y: 10 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+      >
+        <div className="relative flex bg-[#EBE2D6] rounded-full p-0.5">
+          {/* Sliding pill background */}
+          <div
+            className="absolute top-0.5 bottom-0.5 w-[calc(50%-2px)] rounded-full bg-[#6B4226] shadow-sm transition-all duration-300 ease-in-out"
+            style={{ left: yearly ? 'calc(50% + 2px)' : '2px' }}
+          />
+          <button
+            onClick={() => setYearly(false)}
+            className={`relative z-10 px-5 py-1.5 rounded-full text-[13px] font-medium border-none cursor-pointer bg-transparent transition-colors duration-300 ${
+              !yearly ? 'text-white' : 'text-text-secondary'
+            }`}
+          >
+            Monthly
+          </button>
+          <button
+            onClick={() => setYearly(true)}
+            className={`relative z-10 px-5 py-1.5 rounded-full text-[13px] font-medium border-none cursor-pointer bg-transparent transition-colors duration-300 ${
+              yearly ? 'text-white' : 'text-text-secondary'
+            }`}
+          >
+            Yearly
+          </button>
+        </div>
+        {yearly && (
+          <span className="text-[10.5px] font-semibold px-2 py-0.5 rounded-full bg-[#4A7C59]/10 text-[#4A7C59]">
+            {brewPlusPlan.yearly.savings}
+          </span>
+        )}
       </motion.div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
@@ -86,11 +128,7 @@ export function PricingSection() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.3, delay: 0.2 + i * 0.05 }}
               >
-                <Check
-                  size={15}
-                  className="text-green mt-0.5 shrink-0"
-                  strokeWidth={2.5}
-                />
+                <Check size={15} className="text-green mt-0.5 shrink-0" strokeWidth={2.5} />
                 <span className="text-[13px] text-text-secondary">{f}</span>
               </motion.li>
             ))}
@@ -105,16 +143,16 @@ export function PricingSection() {
 
         {/* Brew+ plan */}
         <motion.div
-          className="group relative bg-white/60 backdrop-blur-md border border-white/85 rounded-2xl p-7 flex flex-col overflow-visible shadow-[0_2px_12px_rgba(107,66,38,0.05)] ring-2 ring-amber/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(193,127,59,0.18)]"
+          className="group relative bg-white/60 backdrop-blur-md border border-white/85 rounded-2xl p-7 pt-10 flex flex-col overflow-visible shadow-[0_2px_12px_rgba(107,66,38,0.05)] ring-2 ring-amber/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(193,127,59,0.18)]"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          {/* Animated hover glow */}
+          {/* Hover glow */}
           <div className="absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-br from-[#C17F3B]/20 via-transparent to-[#E8A85A]/20 blur-sm" />
 
-          {/* Popular badge with pulse */}
+          {/* Popular badge */}
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
             <span className="relative text-[10px] font-semibold uppercase tracking-wider px-3 py-1 rounded-full bg-amber text-white shadow-[0_2px_8px_rgba(193,127,59,0.3)]">
               Most popular
@@ -132,13 +170,18 @@ export function PricingSection() {
             <Crown size={14} className="text-amber" />
           </div>
           <div className="relative flex items-baseline gap-1 mb-1">
-            <span className="text-[36px] font-bold text-text-primary tracking-tight">
-              {brewPlusPlan.price}
+            <span className="text-[36px] font-bold text-text-primary tracking-tight transition-all">
+              {pricing.price}
             </span>
             <span className="text-[13px] text-text-tertiary">
-              {brewPlusPlan.period}
+              {pricing.period}
             </span>
           </div>
+          {yearly && (
+            <p className="relative text-[11px] text-[#4A7C59] font-medium mb-4">
+              That's just $10.75/month
+            </p>
+          )}
           <p className="relative text-[12px] text-text-secondary mb-6">
             {brewPlusPlan.subtitle}
           </p>
@@ -152,11 +195,7 @@ export function PricingSection() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.3, delay: 0.3 + i * 0.05 }}
               >
-                <Check
-                  size={15}
-                  className="text-green mt-0.5 shrink-0"
-                  strokeWidth={2.5}
-                />
+                <Check size={15} className="text-green mt-0.5 shrink-0" strokeWidth={2.5} />
                 <span className="text-[13px] text-text-secondary">{f}</span>
               </motion.li>
             ))}

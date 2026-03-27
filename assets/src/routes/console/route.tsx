@@ -1,10 +1,11 @@
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import React from 'react';
+import { createFileRoute, Outlet, redirect, useRouter } from '@tanstack/react-router';
 import { Sidebar } from '@/components/layout/Sidebar';
-import type { AuthenticationState } from '@/contexts/authentication-context';
+import { useAuthenticationState } from '@/hooks/use-authentication';
 
 export const Route = createFileRoute('/console')({
-  beforeLoad: ({ context }) => {
-    const auth = (context as { authentication?: AuthenticationState }).authentication;
+  beforeLoad: ({ context, location }) => {
+    const auth = (context as { authentication?: { status: string } }).authentication;
     if (auth?.status === 'unauthenticated') {
       throw redirect({ to: '/sign-in', search: { redirect: location.href } });
     }
@@ -13,6 +14,21 @@ export const Route = createFileRoute('/console')({
 });
 
 function ConsoleLayout() {
+  const router = useRouter();
+  const auth = useAuthenticationState();
+
+  React.useEffect(() => {
+    if (auth.status === 'unauthenticated') {
+      router.navigate({
+        to: '/sign-in',
+        search: { redirect: router.state.location.href },
+        replace: true,
+      });
+    }
+  }, [auth.status, router]);
+
+  if (auth.status === 'loading') return null;
+
   return (
     <div className="min-h-screen">
       <Sidebar />

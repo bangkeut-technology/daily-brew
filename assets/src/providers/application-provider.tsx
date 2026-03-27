@@ -7,6 +7,8 @@ declare global {
             user?: unknown;
             maxFreeEmployees?: number;
             contactEmail?: string;
+            googleClientId?: string;
+            appleClientId?: string;
         };
     }
 }
@@ -26,6 +28,8 @@ export function ApplicationProvider({ children }: Props) {
         return {
             maxFreeEmployees: (data?.maxFreeEmployees as number) ?? 5,
             contactEmail: (data?.contactEmail as string) ?? 'support@dailybrew.work',
+            googleClientId: (data?.googleClientId as string) ?? '',
+            appleClientId: (data?.appleClientId as string) ?? '',
         };
     }, []);
 

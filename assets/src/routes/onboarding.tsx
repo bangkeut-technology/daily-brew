@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from 'next-themes';
 import { toast } from 'sonner';
 import {
   Coffee,
@@ -10,9 +9,6 @@ import {
   UserCircle,
   Copy,
   Check,
-  Sun,
-  Moon,
-  Monitor,
   ArrowRight,
 } from 'lucide-react';
 
@@ -38,8 +34,6 @@ function OnboardingPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuthentication();
-  const { theme, setTheme } = useTheme();
-
   const createWorkspace = useCreateWorkspace();
   const linkEmployee = useLinkEmployee();
   const completeOnboarding = useCompleteOnboarding();
@@ -204,10 +198,6 @@ function OnboardingPage() {
           )}
         </AnimatePresence>
 
-        {/* Theme toggle — always visible at the bottom */}
-        <div className="mt-10 flex items-center justify-center">
-          <ThemeToggle theme={theme} setTheme={setTheme} />
-        </div>
       </div>
     </div>
   );
@@ -542,48 +532,3 @@ function EmployeeLinkStep({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Theme toggle                                                              */
-/* -------------------------------------------------------------------------- */
-
-function ThemeToggle({
-  theme,
-  setTheme,
-}: {
-  theme: string | undefined;
-  setTheme: (theme: string) => void;
-}) {
-  const { t } = useTranslation();
-
-  const options: { value: string; icon: React.ReactNode; label: string }[] = [
-    { value: 'light', icon: <Sun size={14} />, label: t('theme.light', 'Light') },
-    { value: 'dark', icon: <Moon size={14} />, label: t('theme.dark', 'Dark') },
-    { value: 'system', icon: <Monitor size={14} />, label: t('theme.system', 'System') },
-  ];
-
-  return (
-    <div className="inline-flex items-center bg-white/50 backdrop-blur-sm border border-white/85 rounded-full p-1 shadow-[0_1px_6px_rgba(107,66,38,0.06)]">
-      {options.map((opt) => {
-        const isActive = theme === opt.value;
-        return (
-          <button
-            key={opt.value}
-            onClick={() => setTheme(opt.value)}
-            className={`
-              flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11.5px] font-medium font-sans
-              border-none cursor-pointer transition-all duration-150
-              ${
-                isActive
-                  ? 'bg-white/80 text-coffee shadow-[0_1px_4px_rgba(107,66,38,0.10)]'
-                  : 'bg-transparent text-text-tertiary hover:text-text-secondary'
-              }
-            `}
-          >
-            {opt.icon}
-            {opt.label}
-          </button>
-        );
-      })}
-    </div>
-  );
-}

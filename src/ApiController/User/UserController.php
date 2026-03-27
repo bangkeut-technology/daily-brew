@@ -6,12 +6,15 @@ namespace App\ApiController\User;
 
 use App\ApiController\Trait\ApiResponseTrait;
 use App\Entity\User;
+use App\Enum\OAuthProviderEnum;
 use App\Repository\EmployeeRepository;
 use App\Repository\WorkspaceRepository;
+use App\Service\AuthService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
@@ -139,5 +142,143 @@ class UserController extends AbstractController
         $em->flush();
 
         return $this->jsonSuccess(['onboardingCompleted' => true]);
+    }
+
+    // ── Profile ────────────────────────────────────────────────
+
+    #[Route('/me', name: 'users_me_update', methods: ['PUT'])]
+    public function updateProfile(
+        #[CurrentUser] User $user,
+        Request $request,
+        EntityManagerInterface $em,
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+
+        if (isset($data['firstName'])) {
+            $user->setFirstName($data['firstName']);
+        }
+        if (isset($data['lastName'])) {
+            $user->setLastName($data['lastName']);
+        }
+        if (isset($data['locale'])) {
+            $user->setLocale($data['locale']);
+        }
+
+        $em->flush();
+
+        return $this->jsonSuccess([
+            'publicId' => (string) $user->getPublicId(),
+            'email' => $user->getEmail(),
+            'firstName' => $user->getFirstName(),
+            'lastName' => $user->getLastName(),
+            'fullName' => $user->getFullName(),
+            'locale' => $user->getLocale(),
+            'onboardingCompleted' => $user->isOnboardingCompleted(),
+        ]);
+    }
+
+    #[Route('/me/change-password', name: 'users_me_change_password', methods: ['POST'])]
+    public function changePassword(
+        #[CurrentUser] User $user,
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface $em,
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+        $currentPassword = $data['currentPassword'] ?? '';
+        $newPassword = $data['newPassword'] ?? '';
+
+        if (empty($newPassword)) {
+            return $this->jsonError('New password is required');
+        }
+
+        if (strlen($newPassword) < 8) {
+            return $this->jsonError('Password must be at least 8 characters');
+        }
+
+        // If user has a password set, verify current password
+        if ($user->hasPassword()) {
+            if (empty($currentPassword) || !$passwordHasher->isPasswordValid($user, $currentPassword)) {
+                return $this->jsonError('Current password is incorrect', 403);
+            }
+        }
+
+        $user->setPassword($passwordHasher->hashPassword($user, $newPassword));
+        $em->flush();
+
+        return $this->jsonSuccess(['message' => 'Password updated']);
+    }
+
+    // ── OAuth connections ──────────────────────────────────────
+
+    #[Route('/me/oauth', name: 'users_me_oauth', methods: ['GET'])]
+    public function oauthConnections(
+        #[CurrentUser] User $user,
+    ): JsonResponse {
+        return $this->jsonSuccess([
+            'google' => $user->hasOAuth(OAuthProviderEnum::GOOGLE),
+            'apple' => $user->hasOAuth(OAuthProviderEnum::APPLE),
+            'hasPassword' => $user->hasPassword(),
+        ]);
+    }
+
+    #[Route('/me/oauth/{provider}', name: 'users_me_oauth_connect', methods: ['POST'])]
+    public function connectOAuth(
+        string $provider,
+        #[CurrentUser] User $user,
+        Request $request,
+        AuthService $authService,
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+
+        try {
+            $providerEnum = OAuthProviderEnum::from($provider);
+        } catch (\ValueError) {
+            return $this->jsonError('Invalid provider');
+        }
+
+        $providerId = match ($providerEnum) {
+            OAuthProviderEnum::GOOGLE => $data['googleId'] ?? '',
+            OAuthProviderEnum::APPLE => $data['appleId'] ?? '',
+        };
+
+        if (empty($providerId)) {
+            return $this->jsonError('Provider ID is required');
+        }
+
+        try {
+            match ($providerEnum) {
+                OAuthProviderEnum::GOOGLE => $authService->connectGoogle($user, $providerId),
+                OAuthProviderEnum::APPLE => $authService->connectApple($user, $providerId),
+            };
+        } catch (\InvalidArgumentException $e) {
+            return $this->jsonError($e->getMessage(), 409);
+        }
+
+        return $this->jsonSuccess(['connected' => true]);
+    }
+
+    #[Route('/me/oauth/{provider}', name: 'users_me_oauth_disconnect', methods: ['DELETE'])]
+    public function disconnectOAuth(
+        string $provider,
+        #[CurrentUser] User $user,
+        AuthService $authService,
+    ): JsonResponse {
+        try {
+            $providerEnum = OAuthProviderEnum::from($provider);
+        } catch (\ValueError) {
+            return $this->jsonError('Invalid provider');
+        }
+
+        try {
+            match ($providerEnum) {
+                OAuthProviderEnum::GOOGLE => $authService->disconnectGoogle($user),
+                OAuthProviderEnum::APPLE => $authService->disconnectApple($user),
+            };
+        } catch (\InvalidArgumentException $e) {
+            return $this->jsonError($e->getMessage(), 400);
+        }
+
+        return $this->jsonSuccess(['disconnected' => true]);
     }
 }

@@ -2,11 +2,13 @@ import { Link } from '@tanstack/react-router';
 import { useState, useEffect, useCallback } from 'react';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { LogoBrand } from '@/components/shared/Logo';
 
 const navLinks = [
-  { label: 'Features', href: '#features' },
-  { label: 'Pricing', href: '#pricing' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Features', href: '/features' },
+  { label: 'Pricing', href: '/pricing' },
+  { label: 'Support', href: '/support' },
+  { label: 'FAQ', href: '/faq' },
 ];
 
 export function LandingNav() {
@@ -46,21 +48,19 @@ export function LandingNav() {
 
       <div className="flex items-center justify-between px-6 md:px-8 py-4 max-w-6xl mx-auto">
         <Link to="/" className="no-underline">
-          <h1 className="text-[20px] font-semibold text-coffee font-serif tracking-[-0.3px]">
-            DailyBrew
-          </h1>
+          <LogoBrand size={30} />
         </Link>
 
         {/* Desktop links */}
         <div className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.href}
-              href={link.href}
+              to={link.href}
               className="text-[13px] font-medium text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
           <div className="w-px h-4 bg-cream-3" />
           <Link
@@ -97,14 +97,14 @@ export function LandingNav() {
             transition={{ duration: 0.25, ease: 'easeInOut' }}
           >
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.href}
-                href={link.href}
+                to={link.href}
                 onClick={() => setMobileOpen(false)}
                 className="block text-[14px] font-medium text-text-secondary hover:text-coffee no-underline py-1 transition-colors"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
             <div className="h-px bg-cream-3 my-2" />
             <Link

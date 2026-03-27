@@ -8,6 +8,7 @@ use App\Repository\SubscriptionRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SubscriptionRepository::class)]
+#[ORM\Table(name: 'daily_brew_subscriptions')]
 class Subscription extends AbstractBaseEntity
 {
     #[ORM\OneToOne(targetEntity: Workspace::class)]

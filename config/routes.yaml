@@ -2,8 +2,25 @@ controllers:
     resource:
         path: '../src/Controller/'
         namespace: App\Controller
+        exclude: '../src/Controller/OAuth/'
     type: attribute
     name_prefix: dailybrew_
+
+dailybrew_oauth_auth_:
+    resource:
+        path: '../src/Controller/OAuth/Auth/'
+        namespace: App\Controller\OAuth\Auth
+    type: attribute
+    prefix: /oauth/auth
+    name_prefix: dailybrew_oauth_auth_
+
+dailybrew_oauth_connect_:
+    resource:
+        path: '../src/Controller/OAuth/Connect/'
+        namespace: App\Controller\OAuth\Connect
+    type: attribute
+    prefix: /oauth/connect
+    name_prefix: dailybrew_oauth_connect_
 
 dailybrew_api_v1_:
     resource:

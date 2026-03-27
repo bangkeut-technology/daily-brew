@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Security\Voter;
 
 use App\Entity\Attendance;
@@ -9,6 +11,7 @@ use App\Entity\LeaveRequest;
 use App\Entity\Shift;
 use App\Entity\User;
 use App\Entity\Workspace;
+use App\Repository\EmployeeRepository;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -18,6 +21,10 @@ class WorkspaceVoter extends Voter
     public const string VIEW = 'WORKSPACE_VIEW';
     public const string EDIT = 'WORKSPACE_EDIT';
     public const string DELETE = 'WORKSPACE_DELETE';
+
+    public function __construct(
+        private readonly EmployeeRepository $employeeRepository,
+    ) {}
 
     protected function supports(string $attribute, mixed $subject): bool
     {
@@ -45,7 +52,23 @@ class WorkspaceVoter extends Voter
             return false;
         }
 
-        return $workspace->getOwner()->getId() === $user->getId();
+        $isOwner = $workspace->getOwner()?->getId() === $user->getId();
+
+        // Owner can do everything
+        if ($isOwner) {
+            return true;
+        }
+
+        // Employees can VIEW workspace resources (read-only)
+        if ($attribute === self::VIEW) {
+            $employee = $this->employeeRepository->findByLinkedUser($user);
+            if ($employee !== null && $employee->getWorkspace()?->getId() === $workspace->getId()) {
+                return true;
+            }
+        }
+
+        // EDIT and DELETE are owner-only
+        return false;
     }
 
     private function resolveWorkspace(mixed $subject): ?Workspace
@@ -59,7 +82,7 @@ class WorkspaceVoter extends Voter
         }
 
         if ($subject instanceof Attendance || $subject instanceof LeaveRequest) {
-            return $subject->getEmployee()->getWorkspace();
+            return $subject->getEmployee()?->getWorkspace();
         }
 
         return null;

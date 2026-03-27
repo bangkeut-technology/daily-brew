@@ -1,15 +1,16 @@
-import { useContext } from 'react';
-import { AuthenticationContext } from '@/contexts/authentication-context';
+import React from 'react';
+import { AuthenticationContextDispatch, AuthenticationContextState } from '@/contexts/authentication-context';
 
-export function useAuthentication() {
-    const context = useContext(AuthenticationContext);
-    if (!context) {
-        throw new Error('useAuthentication must be used within AuthenticationProvider');
-    }
-    return context;
-}
+export const useAuthenticationState = () => {
+    return React.useContext(AuthenticationContextState);
+};
 
-export function useAuthenticationState() {
-    const { status, user, workspace } = useAuthentication();
-    return { status, user, workspace };
-}
+export const useAuthenticationDispatch = () => {
+    return React.useContext(AuthenticationContextDispatch);
+};
+
+/** Convenience hook for components that just need user + workspace */
+export const useAuthentication = () => {
+    const state = useAuthenticationState();
+    return state;
+};

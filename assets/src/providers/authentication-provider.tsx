@@ -1,56 +1,86 @@
-import React, { useCallback, useEffect, useReducer, type ReactNode } from 'react';
-import { AuthenticationContext } from '@/contexts/authentication-context';
-import {
-    authenticationReducer,
-    initialAuthenticationState,
-} from '@/reducers/authentication-reducer';
+import React from 'react';
+import { AuthenticationContextDispatch, AuthenticationContextState } from '@/contexts/authentication-context';
+import { authenticationReducer, initialAuthenticationState } from '@/reducers/authentication-reducer';
+import { useQuery } from '@tanstack/react-query';
 import { apiAxios } from '@/lib/apiAxios';
-import type { Workspace } from '@/types/user';
 
-interface Props {
-    children: ReactNode;
-}
+export const AuthenticationProvider = ({ children }: { children: React.ReactNode }) => {
+    const [state, dispatch] = React.useReducer(authenticationReducer, initialAuthenticationState);
 
-export function AuthenticationProvider({ children }: Props) {
-    const [state, dispatch] = useReducer(authenticationReducer, initialAuthenticationState);
+    const { data, isSuccess, isError } = useQuery({
+        queryKey: ['me'],
+        queryFn: async () => {
+            const { data } = await apiAxios.get('/users/me');
+            return data;
+        },
+        enabled: state.status === 'loading',
+        retry: false,
+        staleTime: 0,
+    });
 
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const { data: user } = await apiAxios.get('/users/me');
-                let workspace: Workspace | null = null;
-                try {
-                    const { data: ws } = await apiAxios.get('/users/me/current-workspace');
-                    workspace = ws;
-                } catch {
-                    // No workspace yet
-                }
-                dispatch({ type: 'SIGN_IN', user, workspace });
-            } catch {
-                dispatch({ type: 'SIGN_OUT' });
-            }
-        };
+    const { data: workspace } = useQuery({
+        queryKey: ['my-current-workspace'],
+        queryFn: async () => {
+            const { data } = await apiAxios.get('/users/me/current-workspace');
+            return data;
+        },
+        enabled: state.status === 'authenticated',
+        retry: false,
+    });
 
-        fetchUser();
-    }, []);
+    React.useEffect(() => {
+        if (isError) dispatch({ type: 'SIGN_OUT' });
+    }, [isError]);
 
-    const setWorkspace = useCallback((workspace: Workspace) => {
-        dispatch({ type: 'SET_WORKSPACE', workspace });
-    }, []);
+    React.useEffect(() => {
+        if (isSuccess && data) dispatch({ type: 'SIGN_IN', user: data });
+    }, [isSuccess, data]);
 
-    const signOut = useCallback(async () => {
-        try {
-            await apiAxios.post('/auth/logout');
-        } catch {
-            // Ignore logout errors
-        }
-        dispatch({ type: 'SIGN_OUT' });
-        window.location.href = '/sign-in';
-    }, []);
+    React.useEffect(() => {
+        if (workspace) dispatch({ type: 'SET_WORKSPACE', workspace });
+    }, [workspace]);
+
+    if (state.status === 'loading') return <BrewingLoader />;
 
     return (
-        <AuthenticationContext.Provider value={{ ...state, setWorkspace, signOut }}>
-            {children}
-        </AuthenticationContext.Provider>
+        <AuthenticationContextState.Provider value={state}>
+            <AuthenticationContextDispatch.Provider value={dispatch}>
+                {children}
+            </AuthenticationContextDispatch.Provider>
+        </AuthenticationContextState.Provider>
     );
-}
+};
+
+AuthenticationProvider.displayName = 'AuthenticationProvider';
+
+const BrewingLoader = () => (
+    <div className="flex min-h-screen items-center justify-center" style={{ background: '#FAF7F2' }}>
+        <div className="flex flex-col items-center gap-5">
+            <div className="relative">
+                {/* Steam */}
+                <div className="absolute -top-6 left-1/2 -translate-x-1/2 flex gap-1.5">
+                    <div className="w-[2px] h-4 bg-[#C17F3B]/30 rounded-full animate-steam-1" />
+                    <div className="w-[2px] h-5 bg-[#C17F3B]/20 rounded-full animate-steam-2" />
+                    <div className="w-[2px] h-4 bg-[#C17F3B]/30 rounded-full animate-steam-3" />
+                </div>
+                {/* Cup */}
+                <div className="w-12 h-10 rounded-b-xl border-[2.5px] border-[#6B4226] relative overflow-hidden" style={{ borderTop: 'none' }}>
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#6B4226] to-[#9B6B45] animate-brew-fill rounded-b-lg" />
+                </div>
+                {/* Handle */}
+                <div className="absolute top-1 -right-2.5 w-3 h-5 border-[2.5px] border-[#6B4226] rounded-r-full border-l-0" />
+            </div>
+            <span className="text-[13px] text-[#AE9D95] font-sans tracking-wide">Brewing...</span>
+        </div>
+        <style>{`
+            @keyframes steam1 { 0%,100% { opacity:0; transform:translateY(0) scaleY(1); } 50% { opacity:1; transform:translateY(-8px) scaleY(1.3); } }
+            @keyframes steam2 { 0%,100% { opacity:0; transform:translateY(0) scaleY(1); } 50% { opacity:1; transform:translateY(-10px) scaleY(1.4); } }
+            @keyframes steam3 { 0%,100% { opacity:0; transform:translateY(0) scaleY(1); } 50% { opacity:1; transform:translateY(-6px) scaleY(1.2); } }
+            @keyframes brewFill { 0% { height:0%; } 60% { height:70%; } 100% { height:70%; } }
+            .animate-steam-1 { animation: steam1 2s ease-in-out infinite; }
+            .animate-steam-2 { animation: steam2 2s ease-in-out infinite 0.3s; }
+            .animate-steam-3 { animation: steam3 2s ease-in-out infinite 0.6s; }
+            .animate-brew-fill { animation: brewFill 2s ease-out infinite; }
+        `}</style>
+    </div>
+);

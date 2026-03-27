@@ -128,6 +128,12 @@ class User extends AbstractBaseEntity implements UserInterface, PasswordAuthenti
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $onboardingCompleted = false;
 
+    #[ORM\Column(length: 128, nullable: true)]
+    private ?string $passwordResetToken = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?DateTimeImmutable $passwordResetExpiresAt = null;
+
     // ── Identity ───────────────────────────────────────────────
 
     public function getSecret(): ?string
@@ -436,6 +442,30 @@ class User extends AbstractBaseEntity implements UserInterface, PasswordAuthenti
     public function setOnboardingCompleted(bool $onboardingCompleted): static
     {
         $this->onboardingCompleted = $onboardingCompleted;
+        return $this;
+    }
+
+    // ── Password reset ──────────────────────────────────────────
+
+    public function getPasswordResetToken(): ?string
+    {
+        return $this->passwordResetToken;
+    }
+
+    public function setPasswordResetToken(?string $passwordResetToken): static
+    {
+        $this->passwordResetToken = $passwordResetToken;
+        return $this;
+    }
+
+    public function getPasswordResetExpiresAt(): ?DateTimeImmutable
+    {
+        return $this->passwordResetExpiresAt;
+    }
+
+    public function setPasswordResetExpiresAt(?DateTimeImmutable $passwordResetExpiresAt): static
+    {
+        $this->passwordResetExpiresAt = $passwordResetExpiresAt;
         return $this;
     }
 

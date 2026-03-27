@@ -1,0 +1,26 @@
+knpu_oauth2_client:
+    clients:
+        google_auth:
+            type: google
+            client_id: '%env(GOOGLE_CLIENT_ID)%'
+            client_secret: '%env(GOOGLE_CLIENT_SECRET)%'
+            redirect_route: dailybrew_oauth_auth_google_callback
+        google_connect:
+            type: google
+            client_id: '%env(GOOGLE_CLIENT_ID)%'
+            client_secret: '%env(GOOGLE_CLIENT_SECRET)%'
+            redirect_route: dailybrew_oauth_connect_google_callback
+        apple_auth:
+            type: apple
+            client_id: '%env(APPLE_CLIENT_ID)%'
+            team_id: '%env(APPLE_TEAM_ID)%'
+            key_file_id: '%env(APPLE_KEY_ID)%'
+            key_file_path: '%env(resolve:APPLE_KEY_PATH)%'
+            redirect_route: dailybrew_oauth_auth_apple_callback
+        apple_connect:
+            type: apple
+            client_id: '%env(APPLE_CLIENT_ID)%'
+            team_id: '%env(APPLE_TEAM_ID)%'
+            key_file_id: '%env(APPLE_KEY_ID)%'
+            key_file_path: '%env(resolve:APPLE_KEY_PATH)%'
+            redirect_route: dailybrew_oauth_connect_apple_callback

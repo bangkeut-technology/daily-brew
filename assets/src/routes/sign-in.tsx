@@ -1,9 +1,20 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { Eye, EyeOff } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { LogoBrand } from '@/components/shared/Logo';
+
+const signInSchema = z.object({
+  email: z.string().email('Please enter a valid email'),
+  password: z.string().min(1, 'Password is required'),
+});
+
+type SignInForm = z.infer<typeof signInSchema>;
 
 export const Route = createFileRoute('/sign-in')({
   component: SignInPage,
@@ -13,97 +24,106 @@ function SignInPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SignInForm>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: { email: '', password: '' },
+  });
+
+  // Show error from OAuth redirect
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get('error');
+    if (error) {
+      toast.error(error);
+      window.history.replaceState({}, '', '/sign-in');
+    }
+  }, []);
+
+  const onSubmit = async (data: SignInForm) => {
     try {
-      await login(email, password);
-      navigate({ to: '/console/dashboard' });
+      const result = await login(data.email, data.password);
+      if (result?.user?.onboardingCompleted === false) {
+        navigate({ to: '/onboarding' });
+      } else {
+        navigate({ to: '/console/dashboard' });
+      }
     } catch {
       toast.error('Invalid email or password');
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-sm page-enter">
-        {/* Logo */}
         <div className="text-center mb-8">
-          <Link to="/" className="no-underline">
-            <h1 className="text-[24px] font-semibold text-coffee font-serif mb-1">
-              DailyBrew
-            </h1>
+          <Link to="/" className="no-underline inline-block">
+            <LogoBrand size={36} className="justify-center" />
           </Link>
-          <p className="text-[13px] text-text-secondary">
-            Welcome back
-          </p>
+          <p className="text-[13px] text-text-secondary mt-2">Welcome back</p>
         </div>
 
         <div className="glass-card !rounded-2xl p-6 hover:!transform-none">
-          {/* OAuth buttons */}
+          {/* OAuth */}
           <div className="space-y-2.5 mb-5">
-            <button
-              type="button"
-              className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg text-[13px] font-medium bg-white/70 border border-cream-3 text-text-primary cursor-pointer transition-all duration-150 hover:bg-cream-3/50 hover:border-cream-3"
+            <a
+              href="/oauth/auth/google"
+              className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg text-[13px] font-medium bg-white/70 border border-cream-3 text-text-primary no-underline transition-all hover:bg-cream-3/50"
             >
               <GoogleIcon />
-              {t('auth.orContinueWith')} {t('auth.google')}
-            </button>
-            <button
-              type="button"
-              className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg text-[13px] font-medium bg-white/70 border border-cream-3 text-text-primary cursor-pointer transition-all duration-150 hover:bg-cream-3/50 hover:border-cream-3"
+              {t('auth.signIn')} with {t('auth.google')}
+            </a>
+            <a
+              href="/oauth/auth/apple"
+              className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg text-[13px] font-medium bg-white/70 border border-cream-3 text-text-primary no-underline transition-all hover:bg-cream-3/50"
             >
               <AppleIcon />
-              {t('auth.orContinueWith')} {t('auth.apple')}
-            </button>
+              {t('auth.signIn')} with {t('auth.apple')}
+            </a>
           </div>
 
-          {/* Divider */}
           <div className="flex items-center gap-3 mb-5">
             <div className="flex-1 h-px bg-cream-3/80" />
-            <span className="text-[11px] text-text-tertiary uppercase tracking-wider">
-              or
-            </span>
+            <span className="text-[11px] text-text-tertiary uppercase tracking-wider">or</span>
             <div className="flex-1 h-px bg-cream-3/80" />
           </div>
 
-          {/* Email form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
                 {t('auth.email')}
               </label>
               <input
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-white/60 border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
+                {...register('email')}
                 placeholder="you@restaurant.com"
+                className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-white/60 border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
               />
+              {errors.email && (
+                <p className="text-[11px] text-red mt-1">{errors.email.message}</p>
+              )}
             </div>
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-[12px] font-medium text-text-secondary">
                   {t('auth.password')}
                 </label>
-                <span className="text-[11px] text-amber cursor-pointer hover:text-coffee transition-colors">
+                <Link
+                  to="/forgot-password"
+                  className="text-[11px] text-amber no-underline hover:text-coffee transition-colors"
+                >
                   {t('auth.forgotPassword')}
-                </span>
+                </Link>
               </div>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
+                  {...register('password')}
                   className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-white/60 border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
                 />
                 <button
@@ -114,13 +134,16 @@ function SignInPage() {
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
+              {errors.password && (
+                <p className="text-[11px] text-red mt-1">{errors.password.message}</p>
+              )}
             </div>
             <button
               type="submit"
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50"
+              disabled={isSubmitting}
+              className="w-full px-4 py-2.5 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50"
             >
-              {loading ? t('common.loading') : t('auth.signIn')}
+              {isSubmitting ? t('common.loading') : t('auth.signIn')}
             </button>
           </form>
 
@@ -134,15 +157,10 @@ function SignInPage() {
           </div>
         </div>
 
-        {/* Legal links */}
         <div className="mt-6 text-center space-x-3">
-          <Link to="/privacy" className="text-[11px] text-text-tertiary hover:text-text-secondary no-underline transition-colors">
-            Privacy
-          </Link>
+          <Link to="/privacy" className="text-[11px] text-text-tertiary hover:text-text-secondary no-underline transition-colors">Privacy</Link>
           <span className="text-[11px] text-text-tertiary">&middot;</span>
-          <Link to="/terms" className="text-[11px] text-text-tertiary hover:text-text-secondary no-underline transition-colors">
-            Terms
-          </Link>
+          <Link to="/terms" className="text-[11px] text-text-tertiary hover:text-text-secondary no-underline transition-colors">Terms</Link>
         </div>
       </div>
     </div>

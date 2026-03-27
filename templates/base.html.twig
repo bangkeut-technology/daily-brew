@@ -13,14 +13,12 @@
     {% block javascripts %}
         {{ encore_entry_script_tags('daily_brew_application') }}
         <script type="text/javascript">
-            (function() {
-                sessionStorage.setItem("email", '{{ user ? user.email|e('js') : '' }}');
-                sessionStorage.setItem("locale", '{{ user ? user.locale|default('en')|e('js') : 'en' }}');
-                sessionStorage.setItem("application", JSON.stringify({
-                    maxFreeEmployees: {{ maxFreeEmployees }},
-                    contactEmail: '{{ contactEmail|e('js') }}'
-                }));
-            })();
+            window.__DAILYBREW__ = {
+                maxFreeEmployees: {{ maxFreeEmployees }},
+                contactEmail: '{{ contactEmail|e('js') }}',
+                googleClientId: '{{ googleClientId|e('js') }}',
+                appleClientId: '{{ appleClientId|e('js') }}'
+            };
         </script>
     {% endblock %}
 </head>

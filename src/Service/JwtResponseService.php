@@ -1,63 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\User;
-use Gesdinet\JWTRefreshTokenBundle\Generator\RefreshTokenGeneratorInterface;
-use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenManagerInterface;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
-use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Lexik\Bundle\JWTAuthenticationBundle\Security\Http\Authentication\AuthenticationSuccessHandler;
+use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Delegates to Lexik's AuthenticationSuccessHandler which handles:
+ * - JWT creation
+ * - BEARER cookie (via set_cookies config)
+ * - Refresh token cookie (via Gesdinet listener on AUTHENTICATION_SUCCESS event)
+ * - Dispatching AuthenticationSuccessEvent for any custom listeners
+ */
 final readonly class JwtResponseService
 {
-    private const REFRESH_TOKEN_TTL = 2592000; // 30 days
-
     public function __construct(
-        private JWTTokenManagerInterface $jwtManager,
-        private RefreshTokenGeneratorInterface $refreshTokenGenerator,
-        private RefreshTokenManagerInterface $refreshTokenManager,
-        private int $jwtTokenTtl,
+        private AuthenticationSuccessHandler $successHandler,
     ) {}
 
-    public function createAuthResponse(User $user): JsonResponse
+    public function createAuthResponse(User $user): Response
     {
-        $jwt = $this->jwtManager->create($user);
-
-        $refreshToken = $this->refreshTokenGenerator->createForUserWithTtl(
-            $user,
-            self::REFRESH_TOKEN_TTL,
-        );
-        $this->refreshTokenManager->save($refreshToken);
-
-        $response = new JsonResponse([
-            'token' => $jwt,
-            'user' => [
-                'publicId' => (string) $user->getPublicId(),
-                'email' => $user->getEmail(),
-            ],
-        ]);
-
-        $response->headers->setCookie(
-            Cookie::create('BEARER')
-                ->withValue($jwt)
-                ->withExpires(time() + $this->jwtTokenTtl)
-                ->withPath('/')
-                ->withSameSite('lax')
-                ->withHttpOnly(true)
-                ->withSecure(isset($_SERVER['HTTPS']))
-        );
-
-        $response->headers->setCookie(
-            Cookie::create('refresh_token')
-                ->withValue($refreshToken->getRefreshToken())
-                ->withExpires(time() + self::REFRESH_TOKEN_TTL)
-                ->withPath('/')
-                ->withSameSite('lax')
-                ->withHttpOnly(true)
-                ->withSecure(isset($_SERVER['HTTPS']))
-        );
-
-        return $response;
+        return $this->successHandler->handleAuthenticationSuccess($user);
     }
 }

@@ -27,4 +27,12 @@ class UserRepository extends ServiceEntityRepository
     {
         return $this->findOneBy(['appleId' => $appleId]);
     }
+
+    public function findByOAuth(\App\Enum\OAuthProviderEnum $provider, string $providerId): ?User
+    {
+        return match ($provider) {
+            \App\Enum\OAuthProviderEnum::GOOGLE => $this->findByGoogleId($providerId),
+            \App\Enum\OAuthProviderEnum::APPLE => $this->findByAppleId($providerId),
+        };
+    }
 }

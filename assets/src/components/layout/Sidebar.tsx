@@ -12,10 +12,12 @@ import {
     Crown,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useAuthentication } from '@/hooks/use-authentication';
+import { useAuthenticationDispatch } from '@/hooks/use-authentication';
+import { apiAxios } from '@/lib/apiAxios';
 import { usePlan } from '@/hooks/queries/usePlan';
 import { useRoleContext } from '@/hooks/queries/useRoleContext';
 import { getWorkspacePublicId } from '@/lib/auth';
+import { LogoBrand } from '@/components/shared/Logo';
 
 interface NavItemDef {
     to: string;
@@ -122,7 +124,11 @@ function Divider() {
 
 export function Sidebar() {
     const { t } = useTranslation();
-    const { signOut } = useAuthentication();
+    const dispatch = useAuthenticationDispatch();
+    const signOut = async () => {
+        try { await apiAxios.post('/auth/logout'); } catch { /* ignore */ }
+        dispatch({ type: 'SIGN_OUT' });
+    };
     const workspacePublicId = getWorkspacePublicId() ?? '';
     const { data: plan } = usePlan(workspacePublicId);
     const { data: roleContext } = useRoleContext();
@@ -138,14 +144,7 @@ export function Sidebar() {
         <aside className="fixed left-0 top-0 bottom-0 w-[220px] bg-[#F3EDE3] border-r border-[#EBE2D6] flex flex-col z-10">
             {/* Logo */}
             <div className="px-5 py-5">
-                <h1
-                    className="text-[18px] font-semibold text-[#6B4226] m-0"
-                    style={{
-                        fontFamily: "'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif",
-                    }}
-                >
-                    DailyBrew
-                </h1>
+                <LogoBrand size={28} />
             </div>
 
             {/* Navigation */}

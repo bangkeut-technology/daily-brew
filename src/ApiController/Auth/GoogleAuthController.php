@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\ApiController\Auth;
 
 use App\ApiController\Trait\ApiResponseTrait;
@@ -22,6 +24,7 @@ class GoogleAuthController extends AbstractController
         AuthService $authService,
         JwtResponseService $jwtResponse,
         HttpClientInterface $httpClient,
+        string $googleClientId,
     ): Response {
         $data = json_decode($request->getContent(), true);
         $idToken = $data['idToken'] ?? '';
@@ -41,9 +44,15 @@ class GoogleAuthController extends AbstractController
         $googlePayload = $response->toArray();
         $googleId = $googlePayload['sub'] ?? '';
         $email = $googlePayload['email'] ?? '';
+        $aud = $googlePayload['aud'] ?? '';
 
         if (empty($googleId) || empty($email)) {
             return $this->jsonError('Invalid Google token payload', 401);
+        }
+
+        // Verify the token was issued for our application
+        if ($aud !== $googleClientId) {
+            return $this->jsonError('Google token audience mismatch', 401);
         }
 
         try {

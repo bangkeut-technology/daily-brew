@@ -24,6 +24,8 @@ class RegisterController extends AbstractController
         $data = json_decode($request->getContent(), true);
         $email = $data['email'] ?? '';
         $password = $data['password'] ?? '';
+        $firstName = $data['firstName'] ?? null;
+        $lastName = $data['lastName'] ?? null;
 
         if (empty($email) || empty($password)) {
             return $this->jsonError('Email and password are required');
@@ -34,7 +36,7 @@ class RegisterController extends AbstractController
         }
 
         try {
-            $user = $authService->register($email, $password);
+            $user = $authService->register($email, $password, $firstName, $lastName);
         } catch (\InvalidArgumentException $e) {
             return $this->jsonError($e->getMessage(), 409);
         }

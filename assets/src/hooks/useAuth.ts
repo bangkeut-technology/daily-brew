@@ -7,8 +7,8 @@ export function useAuth() {
         return data;
     }, []);
 
-    const register = useCallback(async (email: string, password: string) => {
-        const { data } = await apiAxios.post('/auth/register', { email, password });
+    const register = useCallback(async (email: string, password: string, firstName?: string, lastName?: string) => {
+        const { data } = await apiAxios.post('/auth/register', { email, password, firstName, lastName });
         return data;
     }, []);
 

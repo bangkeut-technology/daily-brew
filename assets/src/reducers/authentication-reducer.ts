@@ -1,46 +1,41 @@
-import type { AuthenticationState } from '@/contexts/authentication-context';
-import type { User, Workspace } from '@/types/user';
-
-export type AuthenticationAction =
-    | { type: 'SIGN_IN'; user: User; workspace: Workspace | null }
-    | { type: 'SIGN_OUT' }
-    | { type: 'SET_WORKSPACE'; workspace: Workspace }
-    | { type: 'LOADING' };
+import type { AuthenticationAction, AuthenticationState } from '@/contexts/authentication-context';
 
 export const initialAuthenticationState: AuthenticationState = {
     status: 'loading',
-    user: null,
-    workspace: null,
+    user: undefined,
+    workspace: undefined,
 };
 
-export function authenticationReducer(
+export const authenticationReducer = (
     state: AuthenticationState,
     action: AuthenticationAction,
-): AuthenticationState {
+): AuthenticationState => {
     switch (action.type) {
-        case 'SIGN_IN':
+        case 'SIGN_IN': {
             return {
-                status: 'authenticated',
+                ...state,
                 user: action.user,
+                status: 'authenticated',
+            };
+        }
+        case 'SET_WORKSPACE': {
+            return {
+                ...state,
                 workspace: action.workspace,
             };
+        }
+        case 'UPDATE_USER': {
+            return {
+                ...state,
+                user: action.user,
+            };
+        }
         case 'SIGN_OUT':
             return {
+                ...state,
+                user: undefined,
+                workspace: undefined,
                 status: 'unauthenticated',
-                user: null,
-                workspace: null,
             };
-        case 'SET_WORKSPACE':
-            return {
-                ...state,
-                workspace: action.workspace,
-            };
-        case 'LOADING':
-            return {
-                ...state,
-                status: 'loading',
-            };
-        default:
-            return state;
     }
-}
+};
