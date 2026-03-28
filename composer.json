@@ -1,4 +1,6 @@
 {
+    "name": "bangkeut-technology/daily-brew",
+    "description": "DailyBrew - Staff attendance and leave tracking for restaurants. Symfony backend + React frontend (Symfony Webpack Encore).",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",
