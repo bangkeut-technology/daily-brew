@@ -25,14 +25,21 @@ Symfony backend + React frontend (Symfony Webpack Encore).
 
 Any request to add the above should be deferred to a future milestone.
 
-### Brew+ Plan ($12.99/month)
-Premium features gated behind Brew+ subscription:
+### Espresso Plan ($12.99/month)
+Premium features gated behind Espresso subscription:
 - Unlimited employees (free = 5 max)
 - IP restriction for check-in
 - Geofencing for check-in (lat/lng + radius)
 - Per-day shift schedules (ShiftTimeRule per day-of-week)
 - Leave request management
 - Priority support
+
+### Dark Roast Plan (future roadmap — do NOT build)
+- Multiple QR codes per workspace (e.g. front door, kitchen, bar)
+- Per-QR geofence & WiFi rules
+- Employee assignment per QR code
+- Manager role (elevated Employee — can view team attendance & approve leave)
+- White-label branding (custom logo, colors, app name per workspace)
 
 ### Dual Role System
 Users can be owners (create workspaces) or employees (linked to an employee record).
