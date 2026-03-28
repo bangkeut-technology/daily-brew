@@ -40,18 +40,18 @@ security:
 
         api:
             pattern: ^/api
+            stateless: true
             entry_point: jwt
             jwt: ~
             refresh_jwt:
                 check_path: gesdinet_jwt_refresh_token
             provider: daily_brew_user_provider
-            context: '%env(string:DAILY_BREW_CONTEXT)%'
 
         main:
             pattern: ^/
+            stateless: true
             jwt: ~
             provider: daily_brew_user_provider
-            context: '%env(string:DAILY_BREW_CONTEXT)%'
 
     access_control:
         - path: '^/api/v1/webhooks'

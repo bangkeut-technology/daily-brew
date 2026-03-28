@@ -148,16 +148,15 @@ function Divider() {
 export function Sidebar() {
     const { t } = useTranslation();
     const dispatch = useAuthenticationDispatch();
-    const signOut = async () => {
-        const locale = sessionStorage.getItem('locale') || 'en';
+    const signOut = () => {
         sessionStorage.removeItem('workspace_public_id');
-        try {
-            await fetch(`/api/v1/${locale}/auth/logout`, {
-                method: 'POST',
-                credentials: 'include',
-            });
-        } catch { /* ignore network errors */ }
-        window.location.href = '/sign-in';
+        // Submit as a real form POST so the browser follows the redirect
+        // and processes Set-Cookie headers to clear the JWT cookies
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/api/v1/${sessionStorage.getItem('locale') || 'en'}/auth/logout`;
+        document.body.appendChild(form);
+        form.submit();
     };
     const workspacePublicId = getWorkspacePublicId() ?? '';
     const { data: plan } = usePlan(workspacePublicId);
