@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\ApiController\Employee;
 
 use App\ApiController\Trait\ApiResponseTrait;
+use App\DTO\AttendanceDTO;
+use App\DTO\EmployeeDTO;
 use App\Repository\AttendanceRepository;
 use App\Repository\EmployeeRepository;
 use App\Repository\ShiftRepository;
@@ -38,7 +40,7 @@ class EmployeeController extends AbstractController
 
         $employees = $employeeRepository->findByWorkspace($workspace);
 
-        return $this->jsonSuccess(array_map(fn ($e) => $this->serializeEmployee($e), $employees));
+        return $this->jsonSuccess(array_map(fn ($e) => EmployeeDTO::fromEntity($e)->toArray(), $employees));
     }
 
     #[Route('', name: 'employees_create', methods: ['POST'])]
@@ -107,15 +109,11 @@ class EmployeeController extends AbstractController
 
         $recentAttendance = $attendanceRepository->findByEmployee($employee, 30);
 
-        $data = $this->serializeEmployee($employee);
-        $data['attendance'] = array_map(fn ($a) => [
-            'publicId' => (string) $a->getPublicId(),
-            'date' => $a->getDate()->format('Y-m-d'),
-            'checkInAt' => $a->getCheckInAt()?->format('H:i'),
-            'checkOutAt' => $a->getCheckOutAt()?->format('H:i'),
-            'isLate' => $a->isLate(),
-            'leftEarly' => $a->hasLeftEarly(),
-        ], $recentAttendance);
+        $data = EmployeeDTO::fromEntity($employee)->toArray();
+        $data['attendance'] = array_map(
+            fn ($a) => AttendanceDTO::fromEntity($a)->toArray(),
+            $recentAttendance,
+        );
 
         return $this->jsonSuccess($data);
     }
@@ -186,20 +184,4 @@ class EmployeeController extends AbstractController
         return $this->jsonNoContent();
     }
 
-    private function serializeEmployee(\App\Entity\Employee $e): array
-    {
-        return [
-            'publicId' => (string) $e->getPublicId(),
-            'firstName' => $e->getFirstName(),
-            'lastName' => $e->getLastName(),
-            'name' => $e->getName(),
-            'phoneNumber' => $e->getPhoneNumber(),
-            'active' => $e->isActive(),
-            'linkedUserPublicId' => $e->getLinkedUser() ? (string) $e->getLinkedUser()->getPublicId() : null,
-            'linkedUserEmail' => $e->getLinkedUser()?->getEmail(),
-            'shiftName' => $e->getShift()?->getName(),
-            'shiftPublicId' => $e->getShift() ? (string) $e->getShift()->getPublicId() : null,
-            'createdAt' => $e->getCreatedAt()->format('c'),
-        ];
-    }
 }

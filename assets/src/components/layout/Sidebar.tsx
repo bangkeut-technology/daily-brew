@@ -18,6 +18,7 @@ import { usePlan } from '@/hooks/queries/usePlan';
 import { useRoleContext } from '@/hooks/queries/useRoleContext';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { LogoBrand } from '@/components/shared/Logo';
+import { WorkspaceSwitcher } from './WorkspaceSwitcher';
 import { useTheme } from 'next-themes';
 import { Sun, Moon } from 'lucide-react';
 
@@ -27,19 +28,20 @@ interface NavItemDef {
     label: string;
     espresso?: boolean;
     badge?: number;
+    tourId?: string;
 }
 
 const ownerMainNav: NavItemDef[] = [
     { to: '/console/dashboard', icon: LayoutDashboard, label: 'nav.dashboard' },
-    { to: '/console/employees', icon: Users, label: 'nav.employees' },
-    { to: '/console/attendance', icon: CalendarCheck, label: 'nav.attendance' },
+    { to: '/console/employees', icon: Users, label: 'nav.employees', tourId: 'nav-employees' },
+    { to: '/console/attendance', icon: CalendarCheck, label: 'nav.attendance', tourId: 'nav-attendance' },
     { to: '/console/leave', icon: FileText, label: 'nav.leaveRequests', espresso: true },
 ];
 
 const ownerManageNav: NavItemDef[] = [
-    { to: '/console/shifts', icon: Clock, label: 'nav.shifts' },
+    { to: '/console/shifts', icon: Clock, label: 'nav.shifts', tourId: 'nav-shifts' },
     { to: '/console/closures', icon: CalendarOff, label: 'nav.closures' },
-    { to: '/console/settings', icon: Settings, label: 'nav.settings' },
+    { to: '/console/settings', icon: Settings, label: 'nav.settings', tourId: 'nav-settings' },
 ];
 
 const employeeMainNav: NavItemDef[] = [
@@ -55,6 +57,8 @@ function NavItem({
     espresso,
     canUseLeaveRequests,
     badge,
+    tourId,
+    disabled,
 }: {
     to: string;
     icon: React.ComponentType<{ size?: number }>;
@@ -62,14 +66,29 @@ function NavItem({
     espresso?: boolean;
     canUseLeaveRequests?: boolean;
     badge?: number;
+    tourId?: string;
+    disabled?: boolean;
 }) {
     const { t } = useTranslation();
     const location = useLocation();
-    const active = location.pathname === to || location.pathname.startsWith(to + '/');
+    const active = !disabled && (location.pathname === to || location.pathname.startsWith(to + '/'));
+
+    if (disabled) {
+        return (
+            <div
+                {...(tourId ? { 'data-tour': tourId } : {})}
+                className="relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg mb-px font-sans text-[13.5px] text-text-tertiary/50 border border-transparent cursor-not-allowed select-none"
+            >
+                <Icon size={16} />
+                <span className="flex-1">{t(label)}</span>
+            </div>
+        );
+    }
 
     return (
         <Link
             to={to}
+            {...(tourId ? { 'data-tour': tourId } : {})}
             className={`
                 relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer mb-px
                 font-sans text-[13.5px] transition-all duration-[180ms] no-underline
@@ -102,7 +121,7 @@ function NavItem({
     );
 }
 
-function NavSection({ items, canUseLeaveRequests }: { items: NavItemDef[]; canUseLeaveRequests?: boolean }) {
+function NavSection({ items, canUseLeaveRequests, disabled }: { items: NavItemDef[]; canUseLeaveRequests?: boolean; disabled?: boolean }) {
     return (
         <div className="space-y-0.5">
             {items.map((item) => (
@@ -114,6 +133,8 @@ function NavSection({ items, canUseLeaveRequests }: { items: NavItemDef[]; canUs
                     espresso={item.espresso}
                     canUseLeaveRequests={canUseLeaveRequests}
                     badge={item.badge}
+                    tourId={item.tourId}
+                    disabled={disabled}
                 />
             ))}
         </div>
@@ -127,20 +148,27 @@ function Divider() {
 export function Sidebar() {
     const { t } = useTranslation();
     const dispatch = useAuthenticationDispatch();
-    const signOut = async () => {
-        try { await apiAxios.post('/auth/logout'); } catch { /* ignore */ }
-        dispatch({ type: 'SIGN_OUT' });
+    const signOut = () => {
+        sessionStorage.removeItem('workspace_public_id');
+        // Use fetch to avoid axios interceptors retrying on 401
+        fetch(`/api/v1/${sessionStorage.getItem('locale') || 'en'}/auth/logout`, {
+            method: 'POST',
+            credentials: 'include',
+        }).finally(() => {
+            window.location.href = '/sign-in';
+        });
     };
     const workspacePublicId = getWorkspacePublicId() ?? '';
     const { data: plan } = usePlan(workspacePublicId);
     const { data: roleContext } = useRoleContext();
 
-    const isOwner = roleContext?.isOwner ?? false;
+    const isOwner = roleContext?.isOwner ?? true; // default to owner view while loading
     const isEmployee = roleContext?.isEmployee ?? false;
-    const showOwnerView = isOwner || (isOwner && isEmployee);
+    const showOwnerView = isOwner || (!isOwner && !isEmployee); // fallback to owner view
     const showEmployeeView = isEmployee && !isOwner;
 
     const canUseLeaveRequests = plan?.canUseLeaveRequests ?? false;
+    const hasWorkspace = !!workspacePublicId;
 
     return (
         <aside className="fixed left-0 top-0 bottom-0 w-[220px] bg-cream-2 border-r border-cream-3 flex flex-col z-10">
@@ -149,18 +177,42 @@ export function Sidebar() {
                 <LogoBrand size={28} />
             </div>
 
+            {/* Workspace switcher */}
+            {roleContext?.ownedWorkspaces && roleContext.ownedWorkspaces.length > 0 && (
+                <div className="px-3 pb-2">
+                    <WorkspaceSwitcher workspaces={roleContext.ownedWorkspaces} />
+                </div>
+            )}
+
             {/* Navigation */}
             <nav className="flex-1 px-3 flex flex-col overflow-y-auto">
                 {showOwnerView && (
                     <>
-                        <NavSection items={ownerMainNav} canUseLeaveRequests={canUseLeaveRequests} />
+                        {/* Dashboard is always enabled */}
+                        <div className="space-y-0.5">
+                            <NavItem to="/console/dashboard" icon={LayoutDashboard} label="nav.dashboard" />
+                        </div>
+                        <NavSection
+                            items={ownerMainNav.filter((i) => i.to !== '/console/dashboard')}
+                            canUseLeaveRequests={canUseLeaveRequests}
+                            disabled={!hasWorkspace}
+                        />
                         <Divider />
-                        <NavSection items={ownerManageNav} />
+                        <NavSection items={ownerManageNav} disabled={!hasWorkspace} />
                     </>
                 )}
 
                 {showEmployeeView && (
-                    <NavSection items={employeeMainNav} canUseLeaveRequests={canUseLeaveRequests} />
+                    <>
+                        <div className="space-y-0.5">
+                            <NavItem to="/console/dashboard" icon={LayoutDashboard} label="nav.dashboard" />
+                        </div>
+                        <NavSection
+                            items={employeeMainNav.filter((i) => i.to !== '/console/dashboard')}
+                            canUseLeaveRequests={canUseLeaveRequests}
+                            disabled={!hasWorkspace}
+                        />
+                    </>
                 )}
 
                 {/* If role context hasn't loaded yet, show a minimal fallback */}

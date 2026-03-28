@@ -47,6 +47,12 @@ security:
             provider: daily_brew_user_provider
             context: '%env(string:DAILY_BREW_CONTEXT)%'
 
+        main:
+            pattern: ^/
+            jwt: ~
+            provider: daily_brew_user_provider
+            context: '%env(string:DAILY_BREW_CONTEXT)%'
+
     access_control:
         - path: '^/api/v1/webhooks'
           roles: PUBLIC_ACCESS

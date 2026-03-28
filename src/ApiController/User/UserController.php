@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\ApiController\User;
 
 use App\ApiController\Trait\ApiResponseTrait;
+use App\DTO\UserDTO;
 use App\Entity\User;
 use App\Enum\OAuthProviderEnum;
 use App\Repository\EmployeeRepository;
@@ -27,15 +28,7 @@ class UserController extends AbstractController
     public function me(
         #[CurrentUser] User $user,
     ): JsonResponse {
-        return $this->jsonSuccess([
-            'publicId' => (string) $user->getPublicId(),
-            'email' => $user->getEmail(),
-            'firstName' => $user->getFirstName(),
-            'lastName' => $user->getLastName(),
-            'fullName' => $user->getFullName(),
-            'locale' => $user->getLocale(),
-            'onboardingCompleted' => $user->isOnboardingCompleted(),
-        ]);
+        return $this->jsonSuccess(UserDTO::fromEntity($user)->toArray());
     }
 
     #[Route('/me/current-workspace', name: 'users_me_current_workspace', methods: ['GET'])]
@@ -165,15 +158,7 @@ class UserController extends AbstractController
 
         $em->flush();
 
-        return $this->jsonSuccess([
-            'publicId' => (string) $user->getPublicId(),
-            'email' => $user->getEmail(),
-            'firstName' => $user->getFirstName(),
-            'lastName' => $user->getLastName(),
-            'fullName' => $user->getFullName(),
-            'locale' => $user->getLocale(),
-            'onboardingCompleted' => $user->isOnboardingCompleted(),
-        ]);
+        return $this->jsonSuccess(UserDTO::fromEntity($user)->toArray());
     }
 
     #[Route('/me/change-password', name: 'users_me_change_password', methods: ['POST'])]

@@ -27,7 +27,7 @@ class LeaveRequest extends AbstractBaseEntity
     #[Groups(['leave_request:read'])]
     private ?Employee $employee = null;
 
-    #[ORM\ManyToOne(targetEntity: Workspace::class)]
+    #[ORM\ManyToOne(targetEntity: Workspace::class, inversedBy: 'leaveRequests')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Workspace $workspace = null;
 

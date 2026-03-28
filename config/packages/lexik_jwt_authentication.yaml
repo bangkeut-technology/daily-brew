@@ -9,6 +9,7 @@ lexik_jwt_authentication:
             samesite: lax
             path: /
             httpOnly: true
+            secure: auto
             split:  []
     token_extractors:
         cookie:

@@ -8,13 +8,26 @@ import {
   useOAuthConnections,
   useDisconnectOAuth,
 } from '@/hooks/queries/useProfile';
+import { useRoleContext, useLinkEmployee } from '@/hooks/queries/useRoleContext';
 import { useTheme } from 'next-themes';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { Avatar } from '@/components/shared/Avatar';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Sun, Moon, Monitor, Check } from 'lucide-react';
+import {
+  Eye,
+  EyeOff,
+  Sun,
+  Moon,
+  Monitor,
+  Check,
+  Copy,
+  Link2,
+  UserCheck,
+  Mail,
+  Globe,
+} from 'lucide-react';
 
 export const Route = createFileRoute('/console/profile/')({
   component: ProfilePage,
@@ -24,6 +37,7 @@ function ProfilePage() {
   const { t } = useTranslation();
   const { user } = useAuthentication();
   const { theme, setTheme } = useTheme();
+  const { data: roleContext } = useRoleContext();
 
   // Profile form state
   const [firstName, setFirstName] = useState(user?.firstName ?? '');
@@ -39,10 +53,15 @@ function ProfilePage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
 
+  // Employee linking state
+  const [employeeId, setEmployeeId] = useState('');
+  const [idCopied, setIdCopied] = useState(false);
+
   // Mutations
   const updateProfile = useUpdateProfile();
   const changePassword = useChangePassword();
   const disconnectOAuth = useDisconnectOAuth();
+  const linkEmployee = useLinkEmployee();
 
   // OAuth connections query
   const { data: oauthData, isLoading: oauthLoading } = useOAuthConnections();
@@ -71,12 +90,8 @@ function ProfilePage() {
         locale,
       },
       {
-        onSuccess: () => {
-          toast.success(t('profile.updateSuccess', 'Profile updated successfully'));
-        },
-        onError: () => {
-          toast.error(t('profile.updateError', 'Failed to update profile'));
-        },
+        onSuccess: () => toast.success(t('profile.updateSuccess', 'Profile updated')),
+        onError: () => toast.error(t('profile.updateError', 'Failed to update profile')),
       },
     );
   };
@@ -101,22 +116,17 @@ function ProfilePage() {
     if (!validatePassword()) return;
 
     changePassword.mutate(
-      {
-        currentPassword,
-        newPassword,
-      },
+      { currentPassword, newPassword },
       {
         onSuccess: () => {
-          toast.success(t('profile.passwordChanged', 'Password changed successfully'));
+          toast.success(t('profile.passwordChanged', 'Password changed'));
           setCurrentPassword('');
           setNewPassword('');
           setConfirmPassword('');
           setPasswordErrors([]);
         },
         onError: () => {
-          toast.error(
-            t('profile.passwordChangeError', 'Failed to change password. Check your current password.'),
-          );
+          toast.error(t('profile.passwordChangeError', 'Failed to change password'));
         },
       },
     );
@@ -124,43 +134,44 @@ function ProfilePage() {
 
   const handleDisconnect = (provider: 'google' | 'apple') => {
     if (!oauthData) return;
-
-    // Check if disconnecting would leave user with no login method
     const otherProvider = provider === 'google' ? 'apple' : 'google';
-    const hasOtherProvider = oauthData[otherProvider];
-    const hasPassword = oauthData.hasPassword;
-
-    if (!hasPassword && !hasOtherProvider) {
-      toast.error(
-        t(
-          'profile.cannotDisconnect',
-          'Cannot disconnect. You need at least one login method (password or another OAuth provider).',
-        ),
-      );
+    if (!oauthData.hasPassword && !oauthData[otherProvider]) {
+      toast.error(t('profile.cannotDisconnect', 'You need at least one login method.'));
       return;
     }
-
     disconnectOAuth.mutate(provider, {
+      onSuccess: () => toast.success(`${provider.charAt(0).toUpperCase() + provider.slice(1)} disconnected`),
+      onError: () => toast.error(t('profile.oauthDisconnectError', 'Failed to disconnect')),
+    });
+  };
+
+  const handleCopyPublicId = () => {
+    if (!user?.publicId) return;
+    navigator.clipboard.writeText(user.publicId);
+    setIdCopied(true);
+    setTimeout(() => setIdCopied(false), 2000);
+  };
+
+  const handleLinkEmployee = (e: React.FormEvent) => {
+    e.preventDefault();
+    const id = employeeId.trim();
+    if (!id) return;
+    linkEmployee.mutate(id, {
       onSuccess: () => {
-        toast.success(
-          t('profile.oauthDisconnected', '{{provider}} disconnected successfully', {
-            provider: provider.charAt(0).toUpperCase() + provider.slice(1),
-          }),
-        );
+        toast.success(t('profile.employeeLinked', 'Employee linked successfully'));
+        setEmployeeId('');
       },
       onError: () => {
-        toast.error(t('profile.oauthDisconnectError', 'Failed to disconnect provider'));
+        toast.error(t('profile.employeeLinkError', 'Failed to link employee. Check the ID.'));
       },
     });
   };
 
-  const handleConnect = (provider: 'google' | 'apple') => {
-    toast.info(
-      t('profile.connectViaSignIn', 'To connect {{provider}}, sign in with that provider from the sign-in page.', {
-        provider: provider.charAt(0).toUpperCase() + provider.slice(1),
-      }),
-    );
-  };
+  const localeOptions = [
+    { value: 'en', label: 'English' },
+    { value: 'fr', label: 'Fran\u00e7ais' },
+    { value: 'km', label: '\u1797\u17b6\u179f\u17b6\u1781\u17d2\u1798\u17c2\u179a' },
+  ];
 
   const themeOptions = [
     { value: 'light', icon: Sun, label: t('profile.themeLight', 'Light') },
@@ -168,27 +179,134 @@ function ProfilePage() {
     { value: 'system', icon: Monitor, label: t('profile.themeSystem', 'System') },
   ] as const;
 
-  const localeOptions = [
-    { value: 'en', label: 'English' },
-    { value: 'fr', label: 'Francais' },
-    { value: 'km', label: 'Khmer' },
-  ];
-
   return (
     <div className="page-enter">
       <PageHeader title={t('nav.profile', 'Profile')} />
 
       <div className="max-w-2xl space-y-6">
-        {/* Section 1: Profile Info Card */}
+        {/* Profile header card */}
+        <GlassCard hover={false}>
+          <div className="p-6">
+            <div className="flex items-start gap-5">
+              <Avatar name={displayName} index={0} size={64} radius="20px" />
+              <div className="flex-1 min-w-0">
+                <h2
+                  className="text-[20px] font-semibold text-text-primary leading-tight"
+                  style={{ fontFamily: "'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif" }}
+                >
+                  {displayName}
+                </h2>
+                <div className="flex items-center gap-1.5 mt-1.5">
+                  <Mail size={12} className="text-text-tertiary" />
+                  <span className="text-[12.5px] text-text-secondary">{user?.email}</span>
+                </div>
+                {roleContext && (
+                  <div className="flex items-center gap-2 mt-2.5">
+                    {roleContext.isOwner && <StatusBadge label="Owner" variant="amber" />}
+                    {roleContext.isEmployee && <StatusBadge label="Employee" variant="blue" />}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Public ID */}
+            <div className="mt-5 pt-5 border-t border-cream-3/60">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[11px] uppercase tracking-[1px] font-medium text-text-tertiary mb-1">
+                    {t('profile.yourPublicId', 'Your public ID')}
+                  </p>
+                  <p className="text-[13px] font-mono text-text-secondary tabular-nums">
+                    {user?.publicId}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCopyPublicId}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-medium bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer transition-all hover:bg-cream-3"
+                >
+                  {idCopied ? <Check size={13} className="text-green" /> : <Copy size={13} />}
+                  {idCopied ? t('onboarding.idCopied', 'Copied!') : t('onboarding.copyId', 'Copy')}
+                </button>
+              </div>
+              <p className="text-[11px] text-text-tertiary mt-1.5">
+                {t('profile.publicIdHint', 'Share this with your employer so they can link you as an employee.')}
+              </p>
+            </div>
+          </div>
+        </GlassCard>
+
+        {/* Employee linking (only if not already linked) */}
+        {roleContext && !roleContext.isEmployee && (
+          <GlassCard hover={false}>
+            <GlassCardHeader
+              title={t('profile.linkEmployee', 'Link to employee')}
+              action={
+                <div className="flex items-center gap-1.5">
+                  <Link2 size={13} className="text-amber" />
+                  <span className="text-[11px] text-amber font-medium">
+                    {t('profile.optional', 'Optional')}
+                  </span>
+                </div>
+              }
+            />
+            <form onSubmit={handleLinkEmployee} className="p-6">
+              <p className="text-[12.5px] text-text-secondary mb-4 leading-relaxed">
+                {t(
+                  'profile.linkEmployeeDesc',
+                  'If your employer gave you an employee public ID, enter it here to link your account. This lets you view your attendance and submit leave requests.',
+                )}
+              </p>
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  value={employeeId}
+                  onChange={(e) => setEmployeeId(e.target.value)}
+                  placeholder={t('onboarding.employeePublicId', 'Employee public ID')}
+                  className="flex-1 px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all font-mono"
+                />
+                <button
+                  type="submit"
+                  disabled={linkEmployee.isPending || !employeeId.trim()}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light disabled:opacity-50"
+                >
+                  <UserCheck size={14} />
+                  {t('profile.link', 'Link')}
+                </button>
+              </div>
+            </form>
+          </GlassCard>
+        )}
+
+        {/* Linked employee info (if linked) */}
+        {roleContext?.employee && (
+          <GlassCard hover={false}>
+            <GlassCardHeader title={t('profile.linkedEmployee', 'Linked employee')} />
+            <div className="p-6">
+              <div className="flex items-center gap-4 py-3 px-4 rounded-xl bg-green/5 border border-green/15">
+                <div className="w-10 h-10 rounded-xl bg-green/10 flex items-center justify-center">
+                  <UserCheck size={18} className="text-green" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13.5px] font-medium text-text-primary">
+                    {roleContext.employee.name}
+                  </p>
+                  {roleContext.employee.workspaceName && (
+                    <p className="text-[11px] text-text-tertiary mt-0.5">
+                      {roleContext.employee.workspaceName}
+                    </p>
+                  )}
+                </div>
+                <StatusBadge label="Linked" variant="green" />
+              </div>
+            </div>
+          </GlassCard>
+        )}
+
+        {/* Profile info form */}
         <GlassCard hover={false}>
           <GlassCardHeader title={t('profile.profileInfo', 'Profile information')} />
           <form onSubmit={handleProfileSubmit} className="p-6">
-            <div className="flex flex-col items-center mb-6">
-              <Avatar name={displayName} index={0} size={64} radius="20px" />
-              <p className="text-[16px] font-semibold text-text-primary mt-3">{displayName}</p>
-              <p className="text-[12px] text-text-tertiary mt-1">{user?.email}</p>
-            </div>
-
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -199,8 +317,7 @@ function ProfilePage() {
                     type="text"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-[#6B4226]/20 transition-all"
-                    placeholder={t('profile.firstNamePlaceholder', 'Your first name')}
+                    className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
                   />
                 </div>
                 <div>
@@ -211,20 +328,20 @@ function ProfilePage() {
                     type="text"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-[#6B4226]/20 transition-all"
-                    placeholder={t('profile.lastNamePlaceholder', 'Your last name')}
+                    className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+                <label className="flex items-center gap-1.5 text-[12px] font-medium text-text-secondary mb-1.5">
+                  <Globe size={12} />
                   {t('profile.locale', 'Language')}
                 </label>
                 <select
                   value={locale}
                   onChange={(e) => setLocale(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-[#6B4226]/20 transition-all cursor-pointer appearance-none"
+                  className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all cursor-pointer appearance-none"
                   style={{
                     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237C6860' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
                     backgroundRepeat: 'no-repeat',
@@ -244,215 +361,94 @@ function ProfilePage() {
               <button
                 type="submit"
                 disabled={updateProfile.isPending}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50"
               >
-                {updateProfile.isPending
-                  ? t('common.saving', 'Saving...')
-                  : t('common.save', 'Save changes')}
+                {updateProfile.isPending ? t('common.loading') : t('common.save')}
               </button>
             </div>
           </form>
         </GlassCard>
 
-        {/* Section 2: Change Password Card */}
+        {/* Change password */}
         <GlassCard hover={false}>
           <GlassCardHeader title={t('profile.changePassword', 'Change password')} />
           <form onSubmit={handlePasswordSubmit} className="p-6">
             <div className="space-y-4">
-              {/* Show current password field only if user has a password */}
               {oauthData?.hasPassword !== false && (
-                <div>
-                  <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
-                    {t('profile.currentPassword', 'Current password')}
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showCurrentPassword ? 'text' : 'password'}
-                      value={currentPassword}
-                      onChange={(e) => setCurrentPassword(e.target.value)}
-                      className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-[#6B4226]/20 transition-all"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary transition-colors cursor-pointer bg-transparent border-none p-0"
-                    >
-                      {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
-                  </div>
-                </div>
+                <PasswordField
+                  label={t('profile.currentPassword', 'Current password')}
+                  value={currentPassword}
+                  onChange={setCurrentPassword}
+                  show={showCurrentPassword}
+                  onToggle={() => setShowCurrentPassword(!showCurrentPassword)}
+                />
               )}
-
-              <div>
-                <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
-                  {t('profile.newPassword', 'New password')}
-                </label>
-                <div className="relative">
-                  <input
-                    type={showNewPassword ? 'text' : 'password'}
-                    value={newPassword}
-                    onChange={(e) => {
-                      setNewPassword(e.target.value);
-                      if (passwordErrors.length) setPasswordErrors([]);
-                    }}
-                    className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-[#6B4226]/20 transition-all"
-                    placeholder={t('profile.newPasswordPlaceholder', 'At least 8 characters')}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary transition-colors cursor-pointer bg-transparent border-none p-0"
-                  >
-                    {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
-                  {t('profile.confirmPassword', 'Confirm new password')}
-                </label>
-                <div className="relative">
-                  <input
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    value={confirmPassword}
-                    onChange={(e) => {
-                      setConfirmPassword(e.target.value);
-                      if (passwordErrors.length) setPasswordErrors([]);
-                    }}
-                    className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-[#6B4226]/20 transition-all"
-                    placeholder={t('profile.confirmPasswordPlaceholder', 'Re-enter your new password')}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary transition-colors cursor-pointer bg-transparent border-none p-0"
-                  >
-                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Validation errors */}
+              <PasswordField
+                label={t('profile.newPassword', 'New password')}
+                value={newPassword}
+                onChange={(v) => { setNewPassword(v); if (passwordErrors.length) setPasswordErrors([]); }}
+                show={showNewPassword}
+                onToggle={() => setShowNewPassword(!showNewPassword)}
+                placeholder={t('profile.newPasswordPlaceholder', 'At least 8 characters')}
+              />
+              <PasswordField
+                label={t('profile.confirmPassword', 'Confirm new password')}
+                value={confirmPassword}
+                onChange={(v) => { setConfirmPassword(v); if (passwordErrors.length) setPasswordErrors([]); }}
+                show={showConfirmPassword}
+                onToggle={() => setShowConfirmPassword(!showConfirmPassword)}
+                placeholder={t('profile.confirmPasswordPlaceholder', 'Re-enter your new password')}
+              />
               {passwordErrors.length > 0 && (
-                <div className="rounded-lg bg-red/8 border border-[#C0392B]/15 px-3 py-2.5">
+                <div className="rounded-lg bg-red/8 border border-red/15 px-3 py-2.5">
                   {passwordErrors.map((err, i) => (
-                    <p key={i} className="text-[12px] text-red leading-relaxed">
-                      {err}
-                    </p>
+                    <p key={i} className="text-[12px] text-red leading-relaxed">{err}</p>
                   ))}
                 </div>
               )}
             </div>
-
             <div className="mt-6 flex justify-end">
               <button
                 type="submit"
                 disabled={changePassword.isPending || (!newPassword && !confirmPassword)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50"
               >
-                {changePassword.isPending
-                  ? t('common.saving', 'Saving...')
-                  : t('profile.updatePassword', 'Update password')}
+                {changePassword.isPending ? t('common.loading') : t('profile.updatePassword', 'Update password')}
               </button>
             </div>
           </form>
         </GlassCard>
 
-        {/* Section 3: OAuth Connections Card */}
+        {/* Connected accounts */}
         <GlassCard hover={false}>
           <GlassCardHeader title={t('profile.oauthConnections', 'Connected accounts')} />
-          <div className="p-6 space-y-4">
+          <div className="p-6 space-y-3">
             {oauthLoading ? (
-              <div className="flex items-center justify-center py-4">
-                <p className="text-[13px] text-text-tertiary">{t('common.loading', 'Loading...')}</p>
-              </div>
+              <p className="text-[13px] text-text-tertiary text-center py-4">{t('common.loading')}</p>
             ) : (
               <>
-                {/* Google row */}
-                <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-white/40 border border-cream-3/60">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-white/80 border border-cream-3 flex items-center justify-center">
-                      <GoogleIcon />
-                    </div>
-                    <div>
-                      <p className="text-[13.5px] font-medium text-text-primary">Google</p>
-                      <p className="text-[11px] text-text-tertiary mt-0.5">
-                        {oauthData?.google
-                          ? t('profile.connected', 'Connected')
-                          : t('profile.notConnected', 'Not connected')}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    {oauthData?.google && <StatusBadge label={t('profile.connected', 'Connected')} variant="green" />}
-                    {oauthData?.google ? (
-                      <button
-                        type="button"
-                        onClick={() => handleDisconnect('google')}
-                        disabled={disconnectOAuth.isPending}
-                        className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-red/10 text-red transition-colors hover:bg-red/18 disabled:opacity-50"
-                      >
-                        {t('profile.disconnect', 'Disconnect')}
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => handleConnect('google')}
-                        className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-coffee/10 text-coffee transition-colors hover:bg-coffee/18"
-                      >
-                        {t('profile.connect', 'Connect')}
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Apple row */}
-                <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-white/40 border border-cream-3/60">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-white/80 border border-cream-3 flex items-center justify-center">
-                      <AppleIcon />
-                    </div>
-                    <div>
-                      <p className="text-[13.5px] font-medium text-text-primary">Apple</p>
-                      <p className="text-[11px] text-text-tertiary mt-0.5">
-                        {oauthData?.apple
-                          ? t('profile.connected', 'Connected')
-                          : t('profile.notConnected', 'Not connected')}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    {oauthData?.apple && <StatusBadge label={t('profile.connected', 'Connected')} variant="green" />}
-                    {oauthData?.apple ? (
-                      <button
-                        type="button"
-                        onClick={() => handleDisconnect('apple')}
-                        disabled={disconnectOAuth.isPending}
-                        className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-red/10 text-red transition-colors hover:bg-red/18 disabled:opacity-50"
-                      >
-                        {t('profile.disconnect', 'Disconnect')}
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => handleConnect('apple')}
-                        className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-coffee/10 text-coffee transition-colors hover:bg-coffee/18"
-                      >
-                        {t('profile.connect', 'Connect')}
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Warning if only one method left */}
+                <OAuthRow
+                  provider="google"
+                  icon={<GoogleIcon />}
+                  connected={!!oauthData?.google}
+                  onConnect={() => { window.location.href = '/oauth/connect/google'; }}
+                  onDisconnect={() => handleDisconnect('google')}
+                  isPending={disconnectOAuth.isPending}
+                  t={t}
+                />
+                <OAuthRow
+                  provider="apple"
+                  icon={<AppleIcon />}
+                  connected={!!oauthData?.apple}
+                  onConnect={() => { window.location.href = '/oauth/connect/apple'; }}
+                  onDisconnect={() => handleDisconnect('apple')}
+                  isPending={disconnectOAuth.isPending}
+                  t={t}
+                />
                 {oauthData && !oauthData.hasPassword && [oauthData.google, oauthData.apple].filter(Boolean).length <= 1 && (
-                  <div className="rounded-lg bg-amber/8 border border-[#C17F3B]/15 px-4 py-3">
+                  <div className="rounded-lg bg-amber/8 border border-amber/15 px-4 py-3 mt-2">
                     <p className="text-[12px] text-amber leading-relaxed">
-                      {t(
-                        'profile.singleMethodWarning',
-                        'You have only one login method. Set a password or connect another provider before disconnecting.',
-                      )}
+                      {t('profile.singleMethodWarning', 'You have only one login method. Set a password or connect another provider before disconnecting.')}
                     </p>
                   </div>
                 )}
@@ -461,7 +457,7 @@ function ProfilePage() {
           </div>
         </GlassCard>
 
-        {/* Section 4: Theme Preference Card */}
+        {/* Theme preference */}
         <GlassCard hover={false}>
           <GlassCardHeader title={t('profile.themePreference', 'Theme preference')} />
           <div className="p-6">
@@ -477,18 +473,11 @@ function ProfilePage() {
                     className={`relative flex flex-col items-center gap-2 py-4 px-3 rounded-xl border cursor-pointer transition-all duration-200 ${
                       isActive
                         ? 'bg-coffee/8 border-coffee/40 shadow-[0_2px_8px_rgba(107,66,38,0.10)]'
-                        : 'bg-white/40 border-cream-3 hover:bg-cream-3/40 hover:border-cream-3'
+                        : 'bg-glass-bg border-cream-3 hover:bg-cream-3/40'
                     }`}
                   >
-                    <Icon
-                      size={20}
-                      className={isActive ? 'text-coffee' : 'text-text-secondary'}
-                    />
-                    <span
-                      className={`text-[12px] font-medium ${
-                        isActive ? 'text-coffee' : 'text-text-secondary'
-                      }`}
-                    >
+                    <Icon size={20} className={isActive ? 'text-coffee' : 'text-text-secondary'} />
+                    <span className={`text-[12px] font-medium ${isActive ? 'text-coffee' : 'text-text-secondary'}`}>
                       {opt.label}
                     </span>
                     {isActive && (
@@ -507,25 +496,107 @@ function ProfilePage() {
   );
 }
 
+function PasswordField({
+  label,
+  value,
+  onChange,
+  show,
+  onToggle,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  show: boolean;
+  onToggle: () => void;
+  placeholder?: string;
+}) {
+  return (
+    <div>
+      <label className="block text-[12px] font-medium text-text-secondary mb-1.5">{label}</label>
+      <div className="relative">
+        <input
+          type={show ? 'text' : 'password'}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
+        />
+        <button
+          type="button"
+          onClick={onToggle}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary transition-colors cursor-pointer bg-transparent border-none p-0"
+        >
+          {show ? <EyeOff size={16} /> : <Eye size={16} />}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function OAuthRow({
+  provider,
+  icon,
+  connected,
+  onConnect,
+  onDisconnect,
+  isPending,
+  t,
+}: {
+  provider: string;
+  icon: React.ReactNode;
+  connected: boolean;
+  onConnect: () => void;
+  onDisconnect: () => void;
+  isPending: boolean;
+  t: ReturnType<typeof import('react-i18next').useTranslation>['t'];
+}) {
+  const label = provider.charAt(0).toUpperCase() + provider.slice(1);
+  return (
+    <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-glass-bg border border-cream-3/60">
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-lg bg-glass-bg border border-cream-3 flex items-center justify-center">
+          {icon}
+        </div>
+        <div>
+          <p className="text-[13.5px] font-medium text-text-primary">{label}</p>
+          <p className="text-[11px] text-text-tertiary mt-0.5">
+            {connected ? t('profile.connected', 'Connected') : t('profile.notConnected', 'Not connected')}
+          </p>
+        </div>
+      </div>
+      <div className="flex items-center gap-2.5">
+        {connected && <StatusBadge label={t('profile.connected', 'Connected')} variant="green" />}
+        {connected ? (
+          <button
+            type="button"
+            onClick={onDisconnect}
+            disabled={isPending}
+            className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-red/10 text-red transition-colors hover:bg-red/18 disabled:opacity-50"
+          >
+            {t('profile.disconnect', 'Disconnect')}
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={onConnect}
+            className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-coffee/10 text-coffee transition-colors hover:bg-coffee/18"
+          >
+            {t('profile.connect', 'Connect')}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function GoogleIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
-        fill="#4285F4"
-      />
-      <path
-        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-        fill="#34A853"
-      />
-      <path
-        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z"
-        fill="#FBBC05"
-      />
-      <path
-        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-        fill="#EA4335"
-      />
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
     </svg>
   );
 }

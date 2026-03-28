@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\Employee;
 use App\Entity\LeaveRequest;
-use App\Enum\LeaveRequestStatus;
+use App\Entity\User;
+use App\Entity\Workspace;
+use App\Enum\LeaveRequestStatusEnum;
 use Doctrine\ORM\EntityManagerInterface;
 
 class LeaveRequestService
@@ -13,11 +17,20 @@ class LeaveRequestService
         private EntityManagerInterface $em,
     ) {}
 
-    public function create(Employee $employee, \DateTimeInterface $date, ?string $reason = null): LeaveRequest
-    {
+    public function create(
+        Employee $employee,
+        Workspace $workspace,
+        User $requestedBy,
+        \DateTimeInterface $startDate,
+        \DateTimeInterface $endDate,
+        ?string $reason = null,
+    ): LeaveRequest {
         $leaveRequest = new LeaveRequest();
         $leaveRequest->setEmployee($employee);
-        $leaveRequest->setDate($date);
+        $leaveRequest->setWorkspace($workspace);
+        $leaveRequest->setRequestedBy($requestedBy);
+        $leaveRequest->setStartDate(\DateTimeImmutable::createFromInterface($startDate));
+        $leaveRequest->setEndDate(\DateTimeImmutable::createFromInterface($endDate));
         $leaveRequest->setReason($reason);
 
         $this->em->persist($leaveRequest);
@@ -26,19 +39,24 @@ class LeaveRequestService
         return $leaveRequest;
     }
 
-    public function approve(LeaveRequest $leaveRequest): LeaveRequest
+    public function approve(LeaveRequest $leaveRequest, ?User $reviewedBy = null): LeaveRequest
     {
-        $leaveRequest->setStatus(LeaveRequestStatus::Approved);
+        $leaveRequest->setStatus(LeaveRequestStatusEnum::APPROVED);
         $leaveRequest->setReviewedAt(new \DateTimeImmutable());
+        $leaveRequest->setReviewedBy($reviewedBy);
         $this->em->flush();
 
         return $leaveRequest;
     }
 
-    public function reject(LeaveRequest $leaveRequest): LeaveRequest
+    public function reject(LeaveRequest $leaveRequest, ?User $reviewedBy = null, ?string $reviewNote = null): LeaveRequest
     {
-        $leaveRequest->setStatus(LeaveRequestStatus::Rejected);
+        $leaveRequest->setStatus(LeaveRequestStatusEnum::REJECTED);
         $leaveRequest->setReviewedAt(new \DateTimeImmutable());
+        $leaveRequest->setReviewedBy($reviewedBy);
+        if ($reviewNote !== null) {
+            $leaveRequest->setReviewNote($reviewNote);
+        }
         $this->em->flush();
 
         return $leaveRequest;

@@ -1,12 +1,14 @@
+import type { ReactNode } from 'react';
+
 interface StatCardProps {
   label: string;
   value: number;
   subtitle: string;
   accent: string;
-  emoji: string;
+  icon: ReactNode;
 }
 
-export function StatCard({ label, value, subtitle, accent, emoji }: StatCardProps) {
+export function StatCard({ label, value, subtitle, accent, icon }: StatCardProps) {
   return (
     <div className="relative bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-5 shadow-sm cursor-default overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
       <div
@@ -20,7 +22,7 @@ export function StatCard({ label, value, subtitle, accent, emoji }: StatCardProp
         {value}
       </p>
       <p className="text-xs text-text-tertiary">{subtitle}</p>
-      <span className="absolute top-4 right-4 text-xl opacity-[0.18] select-none">{emoji}</span>
+      <span className="absolute top-4 right-4 opacity-[0.18] select-none">{icon}</span>
     </div>
   );
 }

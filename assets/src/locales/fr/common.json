@@ -31,7 +31,15 @@
     "absent": "Absents",
     "todayAttendance": "Pr\u00e9sence du jour",
     "viewAll": "Tout voir",
-    "ofEmployees": "sur {count} employ\u00e9s"
+    "ofEmployees": "sur {count} employ\u00e9s",
+    "emptyWelcome": "Bienvenue dans votre espace !",
+    "emptySubtitle": "Votre restaurant est pr\u00eat. Ajoutez votre \u00e9quipe pour commencer le suivi des pr\u00e9sences.",
+    "emptyAddEmployee": "Ajouter un employ\u00e9",
+    "emptyAddEmployeeDesc": "Cr\u00e9ez un profil et un code QR pour le pointage",
+    "emptyCreateShift": "Cr\u00e9er un horaire",
+    "emptyCreateShiftDesc": "D\u00e9finissez les heures du matin, du soir ou personnalis\u00e9es",
+    "emptyConfigure": "Configurer les param\u00e8tres",
+    "emptyConfigureDesc": "Fuseau horaire, restriction IP et plus"
   },
   "employee": {
     "add": "Ajouter un employ\u00e9",
@@ -43,6 +51,13 @@
     "inactive": "Inactif",
     "qrCode": "Code QR",
     "attendanceHistory": "Historique de pr\u00e9sence"
+  },
+  "workspace": {
+    "label": "Espace de travail",
+    "noWorkspace": "Aucun espace",
+    "create": "Nouvel espace",
+    "newPlaceholder": "Nom du restaurant",
+    "createFailed": "\u00c9chec de la cr\u00e9ation"
   },
   "common": {
     "save": "Enregistrer",

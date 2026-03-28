@@ -58,7 +58,7 @@
     "absent": "Absent",
     "todayAttendance": "Today's attendance",
     "viewAll": "View all",
-    "ofEmployees": "of {count} employees",
+    "ofEmployees": "of {{count}} employees",
     "myShift": "My shift today",
     "myStatus": "My status",
     "notCheckedIn": "Not checked in yet",
@@ -66,7 +66,15 @@
     "myLeaves": "My leave requests",
     "quickActions": "Quick actions",
     "addEmployee": "Add employee",
-    "viewAttendance": "View attendance"
+    "viewAttendance": "View attendance",
+    "emptyWelcome": "Welcome to your workspace!",
+    "emptySubtitle": "Your restaurant is all set up. Let's add your team and get attendance tracking started.",
+    "emptyAddEmployee": "Add your first employee",
+    "emptyAddEmployeeDesc": "Create a profile and QR code for check-in",
+    "emptyCreateShift": "Create a shift",
+    "emptyCreateShiftDesc": "Define morning, evening, or custom hours",
+    "emptyConfigure": "Configure settings",
+    "emptyConfigureDesc": "Set timezone, IP restriction, and more"
   },
   "employee": {
     "add": "Add employee",
@@ -126,7 +134,7 @@
   "checkin": {
     "checkIn": "Check In",
     "checkOut": "Check Out",
-    "checkedInAt": "Checked in at {time}",
+    "checkedInAt": "Checked in at {{time}}",
     "completed": "Attendance completed for today",
     "ipRestricted": "Check-in not allowed from this location",
     "invalidToken": "Invalid check-in link",
@@ -141,6 +149,13 @@
     "leaveRequests": "Leave request management",
     "unlimitedEmployees": "Unlimited employees",
     "prioritySupport": "Priority support"
+  },
+  "workspace": {
+    "label": "Workspace",
+    "noWorkspace": "No workspace",
+    "create": "New workspace",
+    "newPlaceholder": "Restaurant name",
+    "createFailed": "Failed to create workspace"
   },
   "common": {
     "save": "Save",

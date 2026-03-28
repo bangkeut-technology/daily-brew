@@ -1,13 +1,27 @@
 import { Link } from '@tanstack/react-router';
+import { Coffee } from 'lucide-react';
 import { motion } from 'framer-motion';
+
+const productLinks = [
+  { label: 'Features', to: '/features' },
+  { label: 'Pricing', to: '/pricing' },
+  { label: 'FAQ', to: '/faq' },
+  { label: 'Support', to: '/support' },
+];
+
+const legalLinks = [
+  { label: 'Privacy policy', to: '/privacy' },
+  { label: 'Terms of use', to: '/terms' },
+];
 
 export function LandingFooter() {
   return (
     <footer className="relative bg-cream-2/50 backdrop-blur-sm border-t border-cream-3/50 mt-10">
-      <div className="max-w-5xl mx-auto px-6 md:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+      <div className="max-w-5xl mx-auto px-6 md:px-8 py-14">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
           {/* Brand */}
           <motion.div
+            className="col-span-2 md:col-span-1"
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -16,7 +30,7 @@ export function LandingFooter() {
             <h4 className="text-[18px] font-semibold text-coffee font-serif mb-2">
               DailyBrew
             </h4>
-            <p className="text-[12px] text-text-secondary leading-relaxed max-w-[240px]">
+            <p className="text-[12px] text-text-secondary leading-relaxed max-w-[220px]">
               Staff attendance and leave tracking for restaurants. Simple, warm,
               and built for teams that move fast.
             </p>
@@ -33,30 +47,16 @@ export function LandingFooter() {
               Product
             </p>
             <ul className="space-y-2.5">
-              <li>
-                <a
-                  href="#features"
-                  className="text-[13px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
-                >
-                  Features
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#pricing"
-                  className="text-[13px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
-                >
-                  Pricing
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#contact"
-                  className="text-[13px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
-                >
-                  Contact
-                </a>
-              </li>
+              {productLinks.map((link) => (
+                <li key={link.to}>
+                  <Link
+                    to={link.to}
+                    className="text-[13px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </motion.div>
 
@@ -71,20 +71,44 @@ export function LandingFooter() {
               Legal
             </p>
             <ul className="space-y-2.5">
+              {legalLinks.map((link) => (
+                <li key={link.to}>
+                  <Link
+                    to={link.to}
+                    className="text-[13px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Get started */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+          >
+            <p className="text-[11px] uppercase tracking-[1.5px] font-medium text-text-tertiary mb-4">
+              Get started
+            </p>
+            <ul className="space-y-2.5">
               <li>
                 <Link
-                  to="/privacy"
+                  to="/sign-up"
                   className="text-[13px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
                 >
-                  Privacy policy
+                  Create account
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/terms"
+                  to="/sign-in"
                   className="text-[13px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
                 >
-                  Terms of use
+                  Sign in
                 </Link>
               </li>
             </ul>
@@ -93,7 +117,7 @@ export function LandingFooter() {
 
         {/* Bottom bar */}
         <motion.div
-          className="mt-10 pt-6 border-t border-cream-3/50 text-center"
+          className="mt-12 pt-6 border-t border-cream-3/50 flex flex-col sm:flex-row items-center justify-between gap-3"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -101,6 +125,9 @@ export function LandingFooter() {
         >
           <p className="text-[11px] text-text-tertiary">
             DailyBrew &copy; {new Date().getFullYear()}. All rights reserved.
+          </p>
+          <p className="text-[11px] text-text-tertiary">
+            <span className="inline-flex items-center gap-1">Made with <Coffee size={12} className="text-coffee" /> for restaurants everywhere</span>
           </p>
         </motion.div>
       </div>

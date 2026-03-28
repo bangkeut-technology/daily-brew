@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\Subscription;
@@ -26,6 +28,9 @@ class WorkspaceService
 
         $subscription = new Subscription();
         $subscription->setWorkspace($workspace);
+
+        // Set as current workspace for the owner
+        $owner->setCurrentWorkspace($workspace);
 
         $this->em->persist($workspace);
         $this->em->persist($setting);

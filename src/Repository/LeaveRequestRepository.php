@@ -1,13 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\LeaveRequest;
 use App\Entity\Workspace;
-use App\Enum\LeaveRequestStatus;
+use App\Enum\LeaveRequestStatusEnum;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<LeaveRequest>
+ */
 class LeaveRequestRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -21,11 +26,10 @@ class LeaveRequestRepository extends ServiceEntityRepository
     }
 
     /** @return LeaveRequest[] */
-    public function findByWorkspace(Workspace $workspace, ?LeaveRequestStatus $status = null): array
+    public function findByWorkspace(Workspace $workspace, ?LeaveRequestStatusEnum $status = null): array
     {
         $qb = $this->createQueryBuilder('lr')
-            ->join('lr.employee', 'e')
-            ->where('e.workspace = :workspace')
+            ->where('lr.workspace = :workspace')
             ->setParameter('workspace', $workspace)
             ->orderBy('lr.createdAt', 'DESC');
 
@@ -41,26 +45,28 @@ class LeaveRequestRepository extends ServiceEntityRepository
     {
         return (int) $this->createQueryBuilder('lr')
             ->select('COUNT(lr.id)')
-            ->join('lr.employee', 'e')
-            ->where('e.workspace = :workspace')
+            ->where('lr.workspace = :workspace')
             ->andWhere('lr.status = :status')
             ->setParameter('workspace', $workspace)
-            ->setParameter('status', LeaveRequestStatus::Pending)
+            ->setParameter('status', LeaveRequestStatusEnum::PENDING)
             ->getQuery()
             ->getSingleScalarResult();
     }
 
+    /**
+     * Count approved leave requests that overlap a given date.
+     */
     public function countApprovedByWorkspaceAndDate(Workspace $workspace, \DateTimeInterface $date): int
     {
         return (int) $this->createQueryBuilder('lr')
             ->select('COUNT(lr.id)')
-            ->join('lr.employee', 'e')
-            ->where('e.workspace = :workspace')
-            ->andWhere('lr.date = :date')
+            ->where('lr.workspace = :workspace')
+            ->andWhere('lr.startDate <= :date')
+            ->andWhere('lr.endDate >= :date')
             ->andWhere('lr.status = :status')
             ->setParameter('workspace', $workspace)
             ->setParameter('date', $date)
-            ->setParameter('status', LeaveRequestStatus::Approved)
+            ->setParameter('status', LeaveRequestStatusEnum::APPROVED)
             ->getQuery()
             ->getSingleScalarResult();
     }

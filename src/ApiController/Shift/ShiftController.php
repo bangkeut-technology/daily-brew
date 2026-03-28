@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\ApiController\Shift;
 
 use App\ApiController\Trait\ApiResponseTrait;
+use App\DTO\ShiftDTO;
 use App\Repository\ShiftRepository;
 use App\Repository\WorkspaceRepository;
 use App\Security\Voter\WorkspaceVoter;
@@ -35,7 +36,7 @@ class ShiftController extends AbstractController
 
         $shifts = $shiftRepository->findByWorkspace($workspace);
 
-        return $this->jsonSuccess(array_map(fn ($s) => $this->serializeShift($s), $shifts));
+        return $this->jsonSuccess(array_map(fn ($s) => ShiftDTO::fromEntity($s)->toArray(), $shifts));
     }
 
     #[Route('', name: 'shifts_create', methods: ['POST'])]
@@ -65,7 +66,7 @@ class ShiftController extends AbstractController
             \DateTime::createFromFormat('H:i', $data['endTime']),
         );
 
-        return $this->jsonCreated($this->serializeShift($shift));
+        return $this->jsonCreated(ShiftDTO::fromEntity($shift)->toArray());
     }
 
     #[Route('/{publicId}', name: 'shifts_update', methods: ['PUT'])]
@@ -98,7 +99,7 @@ class ShiftController extends AbstractController
             isset($data['endTime']) ? \DateTime::createFromFormat('H:i', $data['endTime']) : $shift->getEndTime(),
         );
 
-        return $this->jsonSuccess($this->serializeShift($shift));
+        return $this->jsonSuccess(ShiftDTO::fromEntity($shift)->toArray());
     }
 
     #[Route('/{publicId}', name: 'shifts_delete', methods: ['DELETE'])]
@@ -126,22 +127,4 @@ class ShiftController extends AbstractController
         return $this->jsonNoContent();
     }
 
-    private function serializeShift(\App\Entity\Shift $shift): array
-    {
-        return [
-            'publicId' => (string) $shift->getPublicId(),
-            'name' => $shift->getName(),
-            'startTime' => $shift->getStartTime()?->format('H:i'),
-            'endTime' => $shift->getEndTime()?->format('H:i'),
-            'graceLateMinutes' => $shift->getGraceLateMinutes(),
-            'graceEarlyMinutes' => $shift->getGraceEarlyMinutes(),
-            'timeRules' => array_map(fn ($r) => [
-                'publicId' => (string) $r->getPublicId(),
-                'dayOfWeek' => $r->getDayOfWeek()->value,
-                'dayOfWeekLabel' => $r->getDayOfWeek()->label(),
-                'startTime' => $r->getStartTime(),
-                'endTime' => $r->getEndTime(),
-            ], $shift->getTimeRules()->toArray()),
-        ];
-    }
 }

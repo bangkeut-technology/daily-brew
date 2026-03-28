@@ -1,13 +1,15 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
+import { useAuthenticationState } from '@/hooks/use-authentication';
 import { toast } from 'sonner';
-import { Eye, EyeOff } from 'lucide-react';
-import { useState } from 'react';
+import { Eye, EyeOff, QrCode, Users, Clock, LayoutDashboard, Shield, MapPin } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LogoBrand } from '@/components/shared/Logo';
+import { motion } from 'framer-motion';
 
 const signUpSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -23,10 +25,20 @@ export const Route = createFileRoute('/sign-up')({
   component: SignUpPage,
 });
 
+const floatingIcons = [
+  { icon: <QrCode size={20} />, x: '8%', y: '18%', delay: 0, color: '#C17F3B' },
+  { icon: <Users size={20} />, x: '85%', y: '22%', delay: 0.8, color: '#4A7C59' },
+  { icon: <Clock size={20} />, x: '12%', y: '72%', delay: 1.6, color: '#3B6FA0' },
+  { icon: <LayoutDashboard size={20} />, x: '88%', y: '65%', delay: 0.4, color: '#9B6B45' },
+  { icon: <Shield size={18} />, x: '6%', y: '45%', delay: 1.2, color: '#C0392B' },
+  { icon: <MapPin size={18} />, x: '92%', y: '45%', delay: 2.0, color: '#7C5C9B' },
+];
+
 function SignUpPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { register: registerUser } = useAuth();
+  const auth = useAuthenticationState();
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -38,10 +50,17 @@ function SignUpPage() {
     defaultValues: { firstName: '', lastName: '', email: '', password: '', agreedToTerms: false as unknown as true },
   });
 
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (auth.status === 'authenticated') {
+      navigate({ to: '/console/dashboard', replace: true });
+    }
+  }, [auth.status, navigate]);
+
   const onSubmit = async (data: SignUpForm) => {
     try {
       await registerUser(data.email, data.password, data.firstName, data.lastName);
-      navigate({ to: '/onboarding' });
+      window.location.href = '/onboarding';
     } catch (err: unknown) {
       const message =
         err && typeof err === 'object' && 'response' in err
@@ -51,9 +70,52 @@ function SignUpPage() {
     }
   };
 
+  if (auth.status === 'authenticated') return null;
+
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 py-12">
-      <div className="w-full max-w-sm page-enter">
+    <div className="min-h-screen flex items-center justify-center px-6 py-12 relative overflow-hidden">
+      {/* Background gradient orbs */}
+      <div className="absolute inset-0 pointer-events-none">
+        <motion.div
+          className="absolute -top-32 -left-32 w-[400px] h-[400px] rounded-full bg-amber/[0.06] blur-[100px]"
+          animate={{ y: [0, 25, 0], x: [0, 12, 0] }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className="absolute -bottom-32 -right-32 w-[500px] h-[500px] rounded-full bg-coffee/[0.05] blur-[100px]"
+          animate={{ y: [0, -18, 0], x: [0, -12, 0] }}
+          transition={{ duration: 13, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      </div>
+
+      {/* Floating feature icons */}
+      {floatingIcons.map((item, i) => (
+        <motion.div
+          key={i}
+          className="absolute hidden md:flex w-10 h-10 rounded-xl items-center justify-center pointer-events-none"
+          style={{
+            left: item.x,
+            top: item.y,
+            background: `${item.color}10`,
+            color: item.color,
+          }}
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{
+            opacity: [0.3, 0.6, 0.3],
+            y: [0, -12, 0],
+            scale: 1,
+          }}
+          transition={{
+            opacity: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay: item.delay },
+            y: { duration: 5, repeat: Infinity, ease: 'easeInOut', delay: item.delay },
+            scale: { duration: 0.6, delay: item.delay },
+          }}
+        >
+          {item.icon}
+        </motion.div>
+      ))}
+
+      <div className="w-full max-w-sm page-enter relative z-10">
         <div className="text-center mb-8">
           <Link to="/" className="no-underline inline-block">
             <LogoBrand size={36} className="justify-center" />

@@ -17,7 +17,8 @@
                 maxFreeEmployees: {{ maxFreeEmployees }},
                 contactEmail: '{{ contactEmail|e('js') }}',
                 googleClientId: '{{ googleClientId|e('js') }}',
-                appleClientId: '{{ appleClientId|e('js') }}'
+                appleClientId: '{{ appleClientId|e('js') }}',
+                user: {{ user is not null ? user|json_encode|raw : 'null' }}
             };
         </script>
     {% endblock %}

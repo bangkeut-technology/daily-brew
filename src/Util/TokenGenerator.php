@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Util;
 
-use App\Enum\EncodingModeEnum;
 use Exception;
 use InvalidArgumentException;
 use Random\RandomException;
@@ -65,7 +64,6 @@ readonly class TokenGenerator implements TokenGeneratorInterface
      * @param bool $minuscule The token will contain minuscule characters.
      * @param bool $symbols   The token will contain symbols characters.
      * @param int  $length    The length of the token.
-     *
      * @return string The generated token.
      * @throws RandomException
      */
@@ -87,7 +85,6 @@ readonly class TokenGenerator implements TokenGeneratorInterface
      * @param bool $majuscule The string will contain majuscule characters.
      * @param bool $minuscule The string will contain minuscule characters.
      * @param bool $symbols   The string will contain symbols characters.
-     *
      * @return string
      */
     public static function getString(
@@ -98,10 +95,10 @@ readonly class TokenGenerator implements TokenGeneratorInterface
     ): string
     {
         $characters = [
-            'numeric'   => '1234567890',
+            'numeric' => '1234567890',
             'majuscule' => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
             'minuscule' => 'abcdefghijklmnopqrstuvwxyz',
-            'symbols'   => '!@#$%^&*()+',
+            'symbols' => '!@#$%^&*()+',
         ];
 
         $data = '';
@@ -147,31 +144,16 @@ readonly class TokenGenerator implements TokenGeneratorInterface
     }
 
     /**
-     *
-     */
-    public static function getAlphabet(EncodingModeEnum $mode = EncodingModeEnum::BASE64): string
-    {
-        return match ($mode) {
-            EncodingModeEnum::BASE32 => 'abcdefghjkmnpqrstuvwxyz23456789',
-            EncodingModeEnum::BASE36 => 'abcdefghijklmnopqrstuvwxyz0123456789',
-            EncodingModeEnum::BASE64 => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
-            default => throw new InvalidArgumentException('Invalid alphabet mode.'),
-        };
-    }
-
-    /**
      * Generate a random public id.
      *
-     * @param EncodingModeEnum $mode   The encoding mode to use. Default is BASE64.
-     * @param int              $length The length of the public id. Default is 8.
+     * @param int $length The length of the public id.
      *
      * @return string The generated public id.
+     *
      * @throws RandomException
      */
-    public static function generatePublicId(EncodingModeEnum $mode = EncodingModeEnum::BASE64, int $length = 8): string
+    public static function generatePublicId(int $length = 12): string
     {
-        $alphabet = TokenGenerator::getAlphabet($mode);
-
-        return TokenGenerator::generateFromString($alphabet, $length);
+        return TokenGenerator::generateFromString('abcdefghjkmnpqrstuvwxyz23456789', $length);
     }
 }

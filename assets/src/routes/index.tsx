@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { HeroSection } from '@/components/landing/HeroSection';
+import { HowItWorksSection } from '@/components/landing/HowItWorksSection';
 import { FeaturesSection } from '@/components/landing/FeaturesSection';
 import { PricingSection } from '@/components/landing/PricingSection';
 import { ContactSection } from '@/components/landing/ContactSection';
@@ -15,6 +16,7 @@ function LandingPage() {
     <div className="min-h-screen flex flex-col">
       <LandingNav />
       <HeroSection />
+      <HowItWorksSection />
       <FeaturesSection />
       <PricingSection />
       <ContactSection />

@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'daily_brew_closure_periods')]
 class ClosurePeriod extends AbstractBaseEntity
 {
-    #[ORM\ManyToOne(targetEntity: Workspace::class)]
+    #[ORM\ManyToOne(targetEntity: Workspace::class, inversedBy: 'closurePeriods')]
     #[ORM\JoinColumn(nullable: false)]
     private Workspace $workspace;
 

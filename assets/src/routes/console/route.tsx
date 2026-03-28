@@ -2,6 +2,7 @@ import React from 'react';
 import { createFileRoute, Outlet, redirect, useRouter } from '@tanstack/react-router';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { useAuthenticationState } from '@/hooks/use-authentication';
+import { getWorkspacePublicId } from '@/lib/auth';
 
 export const Route = createFileRoute('/console')({
   beforeLoad: ({ context, location }) => {
@@ -26,6 +27,19 @@ function ConsoleLayout() {
       });
     }
   }, [auth.status, router]);
+
+  // Redirect to dashboard if no workspace and not already on dashboard/profile
+  React.useEffect(() => {
+    const path = router.state.location.pathname;
+    const hasWorkspace = !!getWorkspacePublicId();
+    const allowedWithoutWorkspace = ['/console/dashboard', '/console/profile'];
+    const isAllowed = allowedWithoutWorkspace.some(
+      (p) => path === p || path.startsWith(p + '/'),
+    );
+    if (!hasWorkspace && !isAllowed) {
+      router.navigate({ to: '/console/dashboard', replace: true });
+    }
+  }, [router.state.location.pathname, router]);
 
   if (auth.status === 'loading') return null;
 

@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
+use App\Util\TokenGenerator;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Types\UuidType;
-use Symfony\Component\Uid\Uuid;
 
 #[ORM\MappedSuperclass]
 #[ORM\HasLifecycleCallbacks]
@@ -15,8 +16,8 @@ abstract class AbstractBaseEntity
     #[ORM\Column]
     protected ?int $id = null;
 
-    #[ORM\Column(type: UuidType::NAME, unique: true)]
-    protected Uuid $publicId;
+    #[ORM\Column(length: 36, unique: true)]
+    protected string $publicId;
 
     #[ORM\Column]
     protected \DateTimeImmutable $createdAt;
@@ -26,7 +27,7 @@ abstract class AbstractBaseEntity
 
     public function __construct()
     {
-        $this->publicId = Uuid::v4();
+        $this->publicId = TokenGenerator::generatePublicId();
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
     }
@@ -36,7 +37,7 @@ abstract class AbstractBaseEntity
         return $this->id;
     }
 
-    public function getPublicId(): Uuid
+    public function getPublicId(): string
     {
         return $this->publicId;
     }

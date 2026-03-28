@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
+use App\DTO\AttendanceDTO;
 use App\Entity\Workspace;
 use App\Repository\AttendanceRepository;
 use App\Repository\EmployeeRepository;
@@ -34,15 +37,10 @@ final readonly class DashboardService
             'onLeave' => $onLeaveCount,
             'absent' => $absentCount,
             'pendingLeaves' => $pendingLeaves,
-            'recentAttendance' => array_map(fn ($a) => [
-                'publicId' => (string) $a->getPublicId(),
-                'employeeName' => $a->getEmployee()->getName(),
-                'shiftName' => $a->getEmployee()->getShift()?->getName(),
-                'checkInAt' => $a->getCheckInAt()?->format('H:i'),
-                'checkOutAt' => $a->getCheckOutAt()?->format('H:i'),
-                'isLate' => $a->isLate(),
-                'leftEarly' => $a->hasLeftEarly(),
-            ], array_slice($recentAttendance, 0, 10)),
+            'recentAttendance' => array_map(
+                fn ($a) => AttendanceDTO::fromEntity($a, includeEmployee: true)->toArray(),
+                array_slice($recentAttendance, 0, 10),
+            ),
         ];
     }
 }
