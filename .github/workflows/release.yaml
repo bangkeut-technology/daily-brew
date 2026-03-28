@@ -26,7 +26,7 @@ jobs:
                                      composer install --no-dev --optimize-autoloader
                                      composer dump-env prod
                                      composer dump-autoload --no-dev --classmap-authoritative
-                                     sudo npm ci
+                                     sudo npm ci --legacy-peer-deps
                                      sudo npm run router:generate
                                      sudo npm run build
                                      sudo chown -R www-data:www-data ${{ secrets.PROJECT_FOLDER}}
