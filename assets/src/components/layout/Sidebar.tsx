@@ -148,15 +148,16 @@ function Divider() {
 export function Sidebar() {
     const { t } = useTranslation();
     const dispatch = useAuthenticationDispatch();
-    const signOut = () => {
+    const signOut = async () => {
+        const locale = sessionStorage.getItem('locale') || 'en';
         sessionStorage.removeItem('workspace_public_id');
-        // Use fetch to avoid axios interceptors retrying on 401
-        fetch(`/api/v1/${sessionStorage.getItem('locale') || 'en'}/auth/logout`, {
-            method: 'POST',
-            credentials: 'include',
-        }).finally(() => {
-            window.location.href = '/sign-in';
-        });
+        try {
+            await fetch(`/api/v1/${locale}/auth/logout`, {
+                method: 'POST',
+                credentials: 'include',
+            });
+        } catch { /* ignore network errors */ }
+        window.location.href = '/sign-in';
     };
     const workspacePublicId = getWorkspacePublicId() ?? '';
     const { data: plan } = usePlan(workspacePublicId);
