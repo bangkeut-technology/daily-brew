@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.3.1...v1.4.0) (2026-03-29)
+
+
+### Features
+
+* **maintenance:** add maintenance mode page and automate activation during deployment ([6e4ee8e](https://github.com/bangkeut-technology/daily-brew/commit/6e4ee8edb2ce06706e10ad6a6d7b62e2784b9962))
+
 ## [1.3.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.2.0...v1.3.0) (2026-03-29)
 
 
