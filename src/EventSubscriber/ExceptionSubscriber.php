@@ -2,6 +2,7 @@
 
 namespace App\EventSubscriber;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -10,6 +11,11 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ExceptionSubscriber implements EventSubscriberInterface
 {
+    public function __construct(
+        private readonly LoggerInterface $logger,
+    ) {
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
@@ -28,6 +34,13 @@ class ExceptionSubscriber implements EventSubscriberInterface
         $statusCode = $exception instanceof HttpExceptionInterface
             ? $exception->getStatusCode()
             : 500;
+
+        if ($statusCode >= 500) {
+            $this->logger->error('Uncaught exception: {message}', [
+                'message' => $exception->getMessage(),
+                'exception' => $exception,
+            ]);
+        }
 
         $message = $exception->getMessage();
         $debug = $_SERVER['APP_DEBUG'] ?? false;
