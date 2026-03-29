@@ -98,7 +98,7 @@ jobs:
                 with:
                     node-version: ${{ matrix.node-versions }}
             -
-                run: npm ci
+                run: npm ci --legacy-peer-deps
 
             -
                 name: Generate tanstack routes
