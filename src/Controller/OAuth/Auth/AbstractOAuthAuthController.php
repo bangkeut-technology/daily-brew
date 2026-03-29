@@ -45,7 +45,7 @@ abstract class AbstractOAuthAuthController extends AbstractController
 
             $response = $this->getRedirectResponse();
 
-            $user = $this->authenticationService->authenticate(
+            $this->authenticationService->authenticate(
                 new OAuthUserData(
                     provider: $this->provider,
                     providerId: $oauthUser->getId(),
@@ -55,11 +55,6 @@ abstract class AbstractOAuthAuthController extends AbstractController
                 ),
                 $response,
             );
-
-            // Redirect to onboarding if not completed
-            if (!$user->isOnboardingCompleted()) {
-                return $this->redirect('/onboarding');
-            }
 
             return $response;
         } catch (\Exception $e) {
