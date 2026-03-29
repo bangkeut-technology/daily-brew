@@ -30,4 +30,4 @@ jobs:
                                      sudo npm run router:generate
                                      sudo npm run build
                                      sudo chown -R www-data:www-data ${{ secrets.PROJECT_FOLDER}}
-                                     sudo systemctl restart php8.5-fpm
+                                     sudo systemctl restart php8.4-fpm
