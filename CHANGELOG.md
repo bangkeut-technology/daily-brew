@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.4.0...v1.5.0) (2026-03-29)
+
+
+### Features
+
+* add CI/CD pipeline with automated versioning and deployment ([b5267d0](https://github.com/bangkeut-technology/daily-brew/commit/b5267d0c37fca0183b692ac754b4f71cb89c8a3f))
+
 ## [1.4.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.3.1...v1.4.0) (2026-03-29)
 
 
