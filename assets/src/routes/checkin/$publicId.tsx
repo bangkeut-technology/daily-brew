@@ -44,11 +44,17 @@ function CheckinPage() {
       }
       refetch();
     } catch (err: unknown) {
-      const message =
-        err && typeof err === 'object' && 'response' in err
-          ? (err as { response: { data: { message: string } } }).response?.data?.message
-          : 'Check-in failed';
-      setActionError(message);
+      const axiosErr = err as { response?: { status?: number; data?: { message?: string } } };
+      const status = axiosErr?.response?.status;
+      const message = axiosErr?.response?.data?.message;
+
+      if (status === 403 && message?.includes('same device')) {
+        setActionError(t('checkin.deviceMismatch'));
+      } else if (status === 403 && message?.includes('already been used')) {
+        setActionError(t('checkin.deviceAlreadyUsed'));
+      } else {
+        setActionError(message || 'Check-in failed');
+      }
     }
   };
 

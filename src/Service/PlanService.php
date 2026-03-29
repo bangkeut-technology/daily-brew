@@ -63,6 +63,11 @@ class PlanService
         return $this->isEspresso($workspace);
     }
 
+    public function canUseDeviceVerification(Workspace $workspace): bool
+    {
+        return $this->isEspresso($workspace);
+    }
+
     public function getRemainingEmployeeSlots(Workspace $workspace): ?int
     {
         if ($this->isEspresso($workspace)) {
@@ -88,6 +93,7 @@ class PlanService
             'canUseGeofencing' => $this->canUseGeofencing($workspace),
             'canUseLeaveRequests' => $this->canUseLeaveRequests($workspace),
             'canUseShiftTimeRules' => $this->canUseShiftTimeRules($workspace),
+            'canUseDeviceVerification' => $this->canUseDeviceVerification($workspace),
             'currentPeriodEnd' => $subscription?->getCurrentPeriodEnd()?->format('c'),
             'status' => $subscription?->getStatus()->value ?? 'active',
             'paddleSubscriptionId' => $subscription?->getPaddleSubscriptionId(),

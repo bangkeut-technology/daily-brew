@@ -61,12 +61,16 @@ class CheckinController extends AbstractController
         $data = json_decode($request->getContent(), true) ?? [];
         $latitude = isset($data['latitude']) ? (float) $data['latitude'] : null;
         $longitude = isset($data['longitude']) ? (float) $data['longitude'] : null;
+        $deviceId = isset($data['deviceId']) ? (string) $data['deviceId'] : null;
+        $deviceName = isset($data['deviceName']) ? (string) $data['deviceName'] : null;
 
         $attendance = $checkinService->checkin(
             $employee,
             $request->getClientIp() ?? '',
             $latitude,
             $longitude,
+            $deviceId,
+            $deviceName,
         );
 
         return $this->jsonSuccess([

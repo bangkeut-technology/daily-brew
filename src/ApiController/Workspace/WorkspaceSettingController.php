@@ -78,6 +78,16 @@ class WorkspaceSettingController extends AbstractController
             $setting->setAllowedIps($data['allowedIps']);
         }
 
+        // Device verification (Espresso gated)
+        if (isset($data['deviceVerificationEnabled']) && $data['deviceVerificationEnabled']) {
+            if (!$planService->canUseDeviceVerification($workspace)) {
+                return $this->jsonError('Device verification requires the Espresso plan', 402);
+            }
+            $setting->setDeviceVerificationEnabled(true);
+        } elseif (isset($data['deviceVerificationEnabled'])) {
+            $setting->setDeviceVerificationEnabled(false);
+        }
+
         // Geofencing (Espresso gated)
         if (isset($data['geofencingEnabled']) && $data['geofencingEnabled']) {
             if (!$planService->canUseGeofencing($workspace)) {
@@ -118,6 +128,7 @@ class WorkspaceSettingController extends AbstractController
             'allowedIps' => $setting?->getAllowedIps(),
             'timezone' => $setting?->getTimezone() ?? 'Asia/Phnom_Penh',
             'locale' => $setting?->getLocale() ?? 'en',
+            'deviceVerificationEnabled' => $setting?->isDeviceVerificationEnabled() ?? false,
             'geofencingEnabled' => $setting?->isGeofencingEnabled() ?? false,
             'geofencingLatitude' => $setting?->getGeofencingLatitude(),
             'geofencingLongitude' => $setting?->getGeofencingLongitude(),

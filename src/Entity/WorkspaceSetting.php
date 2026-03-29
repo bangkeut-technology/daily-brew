@@ -36,6 +36,9 @@ class WorkspaceSetting extends AbstractBaseEntity
     private string $locale = 'en';
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $deviceVerificationEnabled = false;
+
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $geofencingEnabled = false;
 
     #[ORM\Column(type: 'float', nullable: true)]
@@ -105,6 +108,19 @@ class WorkspaceSetting extends AbstractBaseEntity
     public function setLocale(string $locale): static
     {
         $this->locale = $locale;
+        return $this;
+    }
+
+    // ── Device verification ──────────────────────────────────────
+
+    public function isDeviceVerificationEnabled(): bool
+    {
+        return $this->deviceVerificationEnabled;
+    }
+
+    public function setDeviceVerificationEnabled(bool $deviceVerificationEnabled): static
+    {
+        $this->deviceVerificationEnabled = $deviceVerificationEnabled;
         return $this;
     }
 

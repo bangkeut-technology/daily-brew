@@ -129,7 +129,11 @@
     "longitude": "Longitude",
     "radius": "Radius (meters)",
     "useCurrentLocation": "Use current location",
-    "geofencingEspresso": "Geofencing requires Espresso"
+    "geofencingEspresso": "Geofencing requires Espresso",
+    "deviceVerification": "Device verification",
+    "enableDeviceVerification": "Enable device verification",
+    "deviceVerificationDesc": "Require the same device for check-in and check-out, and prevent one device from checking in multiple employees",
+    "deviceVerificationEspresso": "Device verification requires Espresso"
   },
   "checkin": {
     "checkIn": "Check In",
@@ -140,12 +144,15 @@
     "invalidToken": "Invalid check-in link",
     "locationDenied": "Location access denied. Check-in may fail if geofencing is enabled.",
     "locationRequired": "Location is required for check-in",
-    "outsideGeofence": "You are outside the allowed check-in area"
+    "outsideGeofence": "You are outside the allowed check-in area",
+    "deviceMismatch": "Check-out must be from the same device used for check-in",
+    "deviceAlreadyUsed": "This device has already been used to check in another employee today"
   },
   "plan": {
     "geofencing": "Geofencing for check-in",
     "shiftTimeRules": "Per-day shift schedules",
     "ipRestriction": "IP restriction for check-in",
+    "deviceVerification": "Device verification for check-in",
     "leaveRequests": "Leave request management",
     "unlimitedEmployees": "Unlimited employees",
     "prioritySupport": "Priority support"

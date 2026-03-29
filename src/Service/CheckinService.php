@@ -27,6 +27,8 @@ class CheckinService
         string $clientIp,
         ?float $latitude = null,
         ?float $longitude = null,
+        ?string $deviceId = null,
+        ?string $deviceName = null,
     ): Attendance {
         $workspace = $employee->getWorkspace();
         $setting = $workspace?->getSetting();
@@ -68,6 +70,23 @@ class CheckinService
         $attendance = $this->attendanceRepository->findByEmployeeAndDate($employee, $today);
 
         if ($attendance === null) {
+            // Device double check-in prevention (Espresso feature)
+            if (
+                $setting !== null
+                && $setting->isDeviceVerificationEnabled()
+                && $deviceId !== null
+            ) {
+                $existing = $this->attendanceRepository->findByDeviceIdAndDateExcludingEmployee(
+                    $workspace,
+                    $deviceId,
+                    $today,
+                    $employee,
+                );
+                if ($existing !== null) {
+                    throw new AccessDeniedHttpException('This device has already been used to check in another employee today');
+                }
+            }
+
             // Check in
             $attendance = new Attendance();
             $attendance->setEmployee($employee);
@@ -77,6 +96,8 @@ class CheckinService
             $attendance->setCheckInLat($latitude);
             $attendance->setCheckInLng($longitude);
             $attendance->setIpAddress($clientIp);
+            $attendance->setCheckInDeviceId($deviceId);
+            $attendance->setCheckInDeviceName($deviceName);
 
             // Late detection (ShiftTimeRule-aware)
             $shift = $employee->getShift();
@@ -95,11 +116,24 @@ class CheckinService
 
             $this->em->persist($attendance);
         } elseif ($attendance->getCheckOutAt() === null) {
+            // Device verification check (Espresso feature)
+            if (
+                $setting !== null
+                && $setting->isDeviceVerificationEnabled()
+                && $attendance->getCheckInDeviceId() !== null
+                && $deviceId !== null
+                && $deviceId !== $attendance->getCheckInDeviceId()
+            ) {
+                throw new AccessDeniedHttpException('Check-out must be from the same device used for check-in');
+            }
+
             // Check out
             $attendance->setCheckOutAt($now);
             $attendance->setCheckOutLat($latitude);
             $attendance->setCheckOutLng($longitude);
             $attendance->setIpAddress($clientIp);
+            $attendance->setCheckOutDeviceId($deviceId);
+            $attendance->setCheckOutDeviceName($deviceName);
 
             // Left early detection (ShiftTimeRule-aware)
             $shift = $employee->getShift();

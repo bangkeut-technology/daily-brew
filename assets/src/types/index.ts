@@ -22,6 +22,7 @@ export interface Workspace {
 export interface WorkspaceSetting {
   ipRestrictionEnabled: boolean;
   allowedIps: string[] | null;
+  deviceVerificationEnabled: boolean;
   timezone: string;
   locale: string;
   geofencingEnabled: boolean;
@@ -144,6 +145,7 @@ export interface PlanDetails {
   canUseGeofencing: boolean;
   canUseLeaveRequests: boolean;
   canUseShiftTimeRules: boolean;
+  canUseDeviceVerification: boolean;
   currentPeriodEnd: string | null;
   status: string;
   paddleSubscriptionId: string | null;

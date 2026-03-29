@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import type { CheckinStatus, CheckinResponse } from '@/types';
+import { getDeviceId, getDeviceName } from '@/lib/device';
 
 const checkinApi = axios.create({ baseURL: '/api/v1' });
 
@@ -21,7 +22,11 @@ export function useCheckinAction(publicId: string) {
     mutationFn: async (coords?: { latitude: number; longitude: number }) => {
       const { data } = await checkinApi.post<CheckinResponse>(
         `/checkin/${publicId}`,
-        coords ?? {},
+        {
+          ...coords,
+          deviceId: getDeviceId(),
+          deviceName: getDeviceName(),
+        },
       );
       return data;
     },

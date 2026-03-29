@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { Crown, Check, MapPin, Navigation } from 'lucide-react';
+import { Crown, Check, MapPin, Navigation, Smartphone } from 'lucide-react';
 import {
   useWorkspaces,
   useCreateWorkspace,
@@ -34,6 +34,9 @@ function SettingsPage() {
   const [locale, setLocale] = useState('en');
   const [newWsName, setNewWsName] = useState('');
 
+  // Device verification state
+  const [deviceVerificationEnabled, setDeviceVerificationEnabled] = useState(false);
+
   // Geofencing state
   const [geofencingEnabled, setGeofencingEnabled] = useState(false);
   const [geofencingLat, setGeofencingLat] = useState<number | null>(null);
@@ -47,6 +50,7 @@ function SettingsPage() {
       setAllowedIps(settings.allowedIps?.join('\n') || '');
       setTimezone(settings.timezone);
       setLocale(settings.locale);
+      setDeviceVerificationEnabled(settings.deviceVerificationEnabled);
       setGeofencingEnabled(settings.geofencingEnabled);
       setGeofencingLat(settings.geofencingLatitude);
       setGeofencingLng(settings.geofencingLongitude);
@@ -62,6 +66,7 @@ function SettingsPage() {
           .split('\n')
           .map((ip) => ip.trim())
           .filter(Boolean),
+        deviceVerificationEnabled,
         timezone,
         locale,
         geofencingEnabled,
@@ -190,6 +195,7 @@ function SettingsPage() {
                     {[
                       'Unlimited employees',
                       'IP restriction for check-in',
+                      'Device verification for check-in',
                       'Geofencing for check-in',
                       'Per-day shift schedules',
                       'Leave request management',
@@ -325,6 +331,55 @@ function SettingsPage() {
               >
                 {updateSettings.isPending ? t('common.loading') : t('common.save')}
               </button>
+            </div>
+          </GlassCard>
+        )}
+
+        {/* Device verification settings */}
+        {currentWsId && (
+          <GlassCard hover={false} className="lg:col-span-2">
+            <GlassCardHeader
+              title={t('settings.deviceVerification')}
+              action={
+                <div className="flex items-center gap-2">
+                  <Smartphone size={14} className="text-amber" />
+                  {deviceVerificationEnabled && plan?.canUseDeviceVerification && (
+                    <StatusBadge label="Active" variant="green" />
+                  )}
+                </div>
+              }
+            />
+            <div className="p-5 space-y-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={deviceVerificationEnabled}
+                  onChange={(e) => setDeviceVerificationEnabled(e.target.checked)}
+                  disabled={!plan?.canUseDeviceVerification}
+                  className="accent-[#6B4226]"
+                />
+                <span className="text-[13px] text-text-primary">
+                  {t('settings.enableDeviceVerification')}
+                  {!plan?.canUseDeviceVerification && (
+                    <span className="ml-1.5 text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
+                      Espresso
+                    </span>
+                  )}
+                </span>
+              </label>
+              <p className="text-[12px] text-text-tertiary leading-relaxed">
+                {t('settings.deviceVerificationDesc')}
+              </p>
+
+              {deviceVerificationEnabled && plan?.canUseDeviceVerification && (
+                <button
+                  onClick={handleSaveSettings}
+                  disabled={updateSettings.isPending}
+                  className="px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50"
+                >
+                  {updateSettings.isPending ? t('common.loading') : t('common.save')}
+                </button>
+              )}
             </div>
           </GlassCard>
         )}

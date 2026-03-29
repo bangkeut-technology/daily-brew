@@ -59,6 +59,19 @@
     "newPlaceholder": "Nom du restaurant",
     "createFailed": "\u00c9chec de la cr\u00e9ation"
   },
+  "settings": {
+    "deviceVerification": "V\u00e9rification de l'appareil",
+    "enableDeviceVerification": "Activer la v\u00e9rification de l'appareil",
+    "deviceVerificationDesc": "Exiger le m\u00eame appareil pour le pointage d'entr\u00e9e et de sortie, et emp\u00eacher un appareil de pointer pour plusieurs employ\u00e9s",
+    "deviceVerificationEspresso": "La v\u00e9rification de l'appareil n\u00e9cessite Espresso"
+  },
+  "checkin": {
+    "deviceMismatch": "Le pointage de sortie doit \u00eatre effectu\u00e9 depuis le m\u00eame appareil que le pointage d'entr\u00e9e",
+    "deviceAlreadyUsed": "Cet appareil a d\u00e9j\u00e0 \u00e9t\u00e9 utilis\u00e9 pour pointer un autre employ\u00e9 aujourd'hui"
+  },
+  "plan": {
+    "deviceVerification": "V\u00e9rification de l'appareil pour le pointage"
+  },
   "common": {
     "save": "Enregistrer",
     "cancel": "Annuler",

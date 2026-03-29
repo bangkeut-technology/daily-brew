@@ -9,15 +9,17 @@ DailyBrew helps restaurant owners manage their team's daily attendance through Q
 **Key features:**
 - QR code check-in/check-out for staff (no account needed)
 - Late arrival and early departure detection
+- Device verification — same device must check in and check out, prevents one phone checking in multiple employees
 - Shift and closure management
 - Leave request workflow (approve/reject)
 - Dashboard with today's attendance stats
 - IP restriction for check-in locations
+- Geofencing for check-in (GPS radius)
 - Multi-language support (English, French, Khmer)
 
 ## Plans
 
-| Feature | Free | Brew+ |
+| Feature | Free | Espresso |
 |---|---|---|
 | Employees | Up to 5 | Unlimited |
 | QR check-in | Yes | Yes |
@@ -25,6 +27,9 @@ DailyBrew helps restaurant owners manage their team's daily attendance through Q
 | Dashboard & attendance log | Yes | Yes |
 | Leave requests | - | Yes |
 | IP restriction | - | Yes |
+| Device verification | - | Yes |
+| Geofencing | - | Yes |
+| Per-day shift schedules | - | Yes |
 
 Payments are handled via **Paddle**.
 

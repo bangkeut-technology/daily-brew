@@ -57,6 +57,18 @@ class Attendance extends AbstractBaseEntity
     #[ORM\Column(length: 45, nullable: true)]
     private ?string $ipAddress = null;
 
+    #[ORM\Column(length: 36, nullable: true)]
+    private ?string $checkInDeviceId = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $checkInDeviceName = null;
+
+    #[ORM\Column(length: 36, nullable: true)]
+    private ?string $checkOutDeviceId = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $checkOutDeviceName = null;
+
     #[ORM\ManyToOne(targetEntity: Employee::class, inversedBy: 'attendances')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     #[Groups(['attendance:read'])]
@@ -154,6 +166,20 @@ class Attendance extends AbstractBaseEntity
         $this->ipAddress = $ipAddress;
         return $this;
     }
+
+    // ── Device ─────────────────────────────────────────────────
+
+    public function getCheckInDeviceId(): ?string { return $this->checkInDeviceId; }
+    public function setCheckInDeviceId(?string $v): static { $this->checkInDeviceId = $v; return $this; }
+
+    public function getCheckInDeviceName(): ?string { return $this->checkInDeviceName; }
+    public function setCheckInDeviceName(?string $v): static { $this->checkInDeviceName = $v; return $this; }
+
+    public function getCheckOutDeviceId(): ?string { return $this->checkOutDeviceId; }
+    public function setCheckOutDeviceId(?string $v): static { $this->checkOutDeviceId = $v; return $this; }
+
+    public function getCheckOutDeviceName(): ?string { return $this->checkOutDeviceName; }
+    public function setCheckOutDeviceName(?string $v): static { $this->checkOutDeviceName = $v; return $this; }
 
     // ── Relations ──────────────────────────────────────────────
 

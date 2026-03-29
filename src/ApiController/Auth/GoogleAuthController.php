@@ -25,6 +25,8 @@ class GoogleAuthController extends AbstractController
         AuthenticationSuccessHandler $authenticationSuccessHandler,
         HttpClientInterface $httpClient,
         string $googleClientId,
+        string $googleIosClientId,
+        string $googleAndroidClientId,
     ): Response {
         $data = json_decode($request->getContent(), true);
         $idToken = $data['idToken'] ?? '';
@@ -50,7 +52,8 @@ class GoogleAuthController extends AbstractController
             return $this->jsonError('Invalid Google token payload', 401);
         }
 
-        if ($aud !== $googleClientId) {
+        $allowedAudiences = array_filter([$googleClientId, $googleIosClientId, $googleAndroidClientId]);
+        if (!in_array($aud, $allowedAudiences, true)) {
             return $this->jsonError('Google token audience mismatch', 401);
         }
 

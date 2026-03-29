@@ -11,6 +11,8 @@ parameters:
     paddle_api_key:            '%env(PADDLE_API_KEY)%'
     paddle_price_id_brew_plus: '%env(PADDLE_PRICE_ID_BREW_PLUS)%'
     google_client_id:          '%env(GOOGLE_CLIENT_ID)%'
+    google_ios_client_id:      '%env(GOOGLE_IOS_CLIENT_ID)%'
+    google_android_client_id:  '%env(GOOGLE_ANDROID_CLIENT_ID)%'
     apple_client_id:           '%env(APPLE_CLIENT_ID)%'
     max_free_employees:        5
     contact_email:             'support@dailybrew.work'
@@ -24,6 +26,8 @@ services:
             $maxFreeEmployees: '%max_free_employees%'
             $contactEmail:     '%contact_email%'
             $googleClientId:   '%google_client_id%'
+            $googleIosClientId: '%google_ios_client_id%'
+            $googleAndroidClientId: '%google_android_client_id%'
             $appleClientId:    '%apple_client_id%'
 
     # makes classes in src/ available to be used as services

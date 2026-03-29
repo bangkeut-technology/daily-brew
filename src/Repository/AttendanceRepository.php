@@ -83,6 +83,30 @@ class AttendanceRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    /**
+     * Find an attendance record for a different employee on the same day
+     * using the same device ID (within the same workspace).
+     */
+    public function findByDeviceIdAndDateExcludingEmployee(
+        Workspace $workspace,
+        string $deviceId,
+        \DateTimeInterface $date,
+        Employee $excludeEmployee,
+    ): ?Attendance {
+        return $this->createQueryBuilder('a')
+            ->where('a.workspace = :workspace')
+            ->andWhere('a.date = :date')
+            ->andWhere('a.checkInDeviceId = :deviceId')
+            ->andWhere('a.employee != :employee')
+            ->setParameter('workspace', $workspace)
+            ->setParameter('date', $date)
+            ->setParameter('deviceId', $deviceId)
+            ->setParameter('employee', $excludeEmployee)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     /** @return Attendance[] */
     public function findByEmployee(Employee $employee, int $limit = 30): array
     {
