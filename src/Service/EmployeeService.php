@@ -69,7 +69,8 @@ class EmployeeService
 
     public function delete(Employee $employee): void
     {
-        $this->em->remove($employee);
+        $employee->setDeletedAt(new \DateTimeImmutable());
+        $employee->setLinkedUser(null);
         $this->em->flush();
     }
 }

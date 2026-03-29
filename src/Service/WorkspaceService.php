@@ -50,7 +50,15 @@ class WorkspaceService
 
     public function delete(Workspace $workspace): void
     {
-        $this->em->remove($workspace);
+        $now = new \DateTimeImmutable();
+
+        // Soft-delete all employees in this workspace
+        foreach ($workspace->getEmployees() as $employee) {
+            $employee->setDeletedAt($now);
+            $employee->setLinkedUser(null);
+        }
+
+        $workspace->setDeletedAt($now);
         $this->em->flush();
     }
 }

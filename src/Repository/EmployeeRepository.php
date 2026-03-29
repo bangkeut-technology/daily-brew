@@ -50,4 +50,18 @@ class EmployeeRepository extends ServiceEntityRepository
     {
         return $this->count(['workspace' => $workspace, 'status' => EmployeeStatusEnum::ACTIVE]);
     }
+
+    /** Soft-delete all employees created by the given user. */
+    public function softDeleteByCreator(User $user, \DateTimeImmutable $deletedAt): void
+    {
+        $this->createQueryBuilder('e')
+            ->update()
+            ->set('e.deletedAt', ':now')
+            ->where('e.user = :user')
+            ->andWhere('e.deletedAt IS NULL')
+            ->setParameter('now', $deletedAt)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->execute();
+    }
 }

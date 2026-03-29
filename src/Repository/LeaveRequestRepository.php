@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\LeaveRequest;
+use App\Entity\User;
 use App\Entity\Workspace;
 use App\Enum\LeaveRequestStatusEnum;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -69,5 +70,19 @@ class LeaveRequestRepository extends ServiceEntityRepository
             ->setParameter('status', LeaveRequestStatusEnum::APPROVED)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /** Soft-delete all leave requests made by the given user. */
+    public function softDeleteByRequestedBy(User $user, \DateTimeImmutable $deletedAt): void
+    {
+        $this->createQueryBuilder('lr')
+            ->update()
+            ->set('lr.deletedAt', ':now')
+            ->where('lr.requestedBy = :user')
+            ->andWhere('lr.deletedAt IS NULL')
+            ->setParameter('now', $deletedAt)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->execute();
     }
 }

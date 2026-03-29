@@ -10,6 +10,7 @@ use App\Entity\User;
 use App\Enum\OAuthProviderEnum;
 use App\Repository\EmployeeRepository;
 use App\Repository\WorkspaceRepository;
+use App\Service\AccountDeletionService;
 use App\Service\AuthService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -271,28 +272,10 @@ class UserController extends AbstractController
     #[Route('/me', name: 'users_me_delete', methods: ['DELETE'])]
     public function deleteAccount(
         #[CurrentUser] User $user,
-        EntityManagerInterface $em,
+        AccountDeletionService $accountDeletionService,
     ): JsonResponse {
-        // Revoke all refresh tokens before clearing the email
-        $em->getConnection()->executeStatement(
-            'DELETE FROM daily_brew_refresh_tokens WHERE username = :email',
-            ['email' => $user->getUserIdentifier()],
-        );
+        $accountDeletionService->softDelete($user);
 
-        $deletedSuffix = '_deleted_' . $user->getId() . '_' . time();
-
-        $user->setEnabled(false);
-        $user->setDeletedAt(new \DateTimeImmutable());
-
-        // Free up email + OAuth IDs so they can be reused on a new account
-        $user->setEmail($user->getEmail() . $deletedSuffix);
-        $user->setEmailCanonical($user->getEmailCanonical() . $deletedSuffix);
-        $user->setGoogleId(null);
-        $user->setAppleId(null);
-
-        $em->flush();
-
-        // Clear auth cookies
         $response = $this->jsonSuccess(['deleted' => true]);
         $response->headers->clearCookie('BEARER', '/');
         $response->headers->clearCookie('refresh_token', '/');
