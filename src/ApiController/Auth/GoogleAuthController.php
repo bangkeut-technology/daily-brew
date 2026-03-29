@@ -63,6 +63,8 @@ class GoogleAuthController extends AbstractController
             return $this->jsonError($e->getMessage(), 409);
         }
 
-        return $authenticationSuccessHandler->handleAuthenticationSuccess($user);
+        return $this->withRefreshTokenInBody(
+            $authenticationSuccessHandler->handleAuthenticationSuccess($user),
+        );
     }
 }

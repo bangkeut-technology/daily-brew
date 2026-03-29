@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,6 +18,12 @@ import { useAuthentication } from '@/hooks/use-authentication';
 import { setWorkspacePublicId } from '@/lib/auth';
 
 export const Route = createFileRoute('/onboarding')({
+  beforeLoad: ({ context }) => {
+    const auth = (context as { authentication?: { status: string } }).authentication;
+    if (auth?.status === 'unauthenticated') {
+      throw redirect({ to: '/sign-in' });
+    }
+  },
   component: OnboardingPage,
 });
 

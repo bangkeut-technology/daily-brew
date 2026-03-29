@@ -7,6 +7,7 @@ import {
   useChangePassword,
   useOAuthConnections,
   useDisconnectOAuth,
+  useDeleteAccount,
 } from '@/hooks/queries/useProfile';
 import { useRoleContext, useLinkEmployee } from '@/hooks/queries/useRoleContext';
 import { useTheme } from 'next-themes';
@@ -27,6 +28,8 @@ import {
   UserCheck,
   Mail,
   Globe,
+  Trash2,
+  AlertTriangle,
 } from 'lucide-react';
 
 export const Route = createFileRoute('/console/profile/')({
@@ -57,11 +60,16 @@ function ProfilePage() {
   const [employeeId, setEmployeeId] = useState('');
   const [idCopied, setIdCopied] = useState(false);
 
+  // Delete account state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+
   // Mutations
   const updateProfile = useUpdateProfile();
   const changePassword = useChangePassword();
   const disconnectOAuth = useDisconnectOAuth();
   const linkEmployee = useLinkEmployee();
+  const deleteAccount = useDeleteAccount();
 
   // OAuth connections query
   const { data: oauthData, isLoading: oauthLoading } = useOAuthConnections();
@@ -163,6 +171,17 @@ function ProfilePage() {
       },
       onError: () => {
         toast.error(t('profile.employeeLinkError', 'Failed to link employee. Check the ID.'));
+      },
+    });
+  };
+
+  const handleDeleteAccount = () => {
+    deleteAccount.mutate(undefined, {
+      onSuccess: () => {
+        window.location.href = '/sign-in';
+      },
+      onError: () => {
+        toast.error(t('profile.deleteError', 'Failed to delete account'));
       },
     });
   };
@@ -489,6 +508,85 @@ function ProfilePage() {
                 );
               })}
             </div>
+          </div>
+        </GlassCard>
+
+        {/* Delete account */}
+        <GlassCard hover={false}>
+          <GlassCardHeader
+            title={t('profile.deleteAccount', 'Delete account')}
+            action={
+              <div className="flex items-center gap-1.5">
+                <AlertTriangle size={13} className="text-red" />
+                <span className="text-[11px] text-red font-medium">
+                  {t('profile.danger', 'Danger')}
+                </span>
+              </div>
+            }
+          />
+          <div className="p-6">
+            {!showDeleteConfirm ? (
+              <>
+                <p className="text-[12.5px] text-text-secondary leading-relaxed mb-4">
+                  {t(
+                    'profile.deleteAccountDesc',
+                    'Permanently delete your account and all associated data. This action cannot be undone.',
+                  )}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-red/10 text-red border border-red/20 cursor-pointer transition-all hover:bg-red/18"
+                >
+                  <Trash2 size={14} />
+                  {t('profile.deleteMyAccount', 'Delete my account')}
+                </button>
+              </>
+            ) : (
+              <div className="rounded-xl bg-red/5 border border-red/15 p-5 space-y-4">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle size={18} className="text-red mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-[13px] font-medium text-red">
+                      {t('profile.deleteConfirmTitle', 'Are you sure?')}
+                    </p>
+                    <p className="text-[12px] text-text-secondary mt-1 leading-relaxed">
+                      {t(
+                        'profile.deleteConfirmDesc',
+                        'Type "DELETE" below to confirm. Your account will be permanently deactivated.',
+                      )}
+                    </p>
+                  </div>
+                </div>
+                <input
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder="DELETE"
+                  className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-white/80 border border-red/20 text-text-primary outline-none focus:border-red focus:ring-1 focus:ring-red/20 transition-all font-mono"
+                />
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleDeleteAccount}
+                    disabled={deleteConfirmText !== 'DELETE' || deleteAccount.isPending}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-red text-white border-none cursor-pointer transition-all hover:bg-red/90 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <Trash2 size={14} />
+                    {deleteAccount.isPending
+                      ? t('common.loading')
+                      : t('profile.confirmDelete', 'Delete permanently')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText(''); }}
+                    className="px-4 py-2 rounded-lg text-[13px] font-medium bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer transition-all hover:bg-cream-3/50"
+                  >
+                    {t('common.cancel', 'Cancel')}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </GlassCard>
       </div>

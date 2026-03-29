@@ -82,3 +82,12 @@ export function useResetPassword() {
     },
   });
 }
+
+export function useDeleteAccount() {
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await apiAxios.delete('/users/me');
+      return data;
+    },
+  });
+}

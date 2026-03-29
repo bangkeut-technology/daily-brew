@@ -36,6 +36,8 @@ class LoginController extends AbstractController
             return $this->jsonError('Invalid credentials', 401);
         }
 
-        return $authenticationSuccessHandler->handleAuthenticationSuccess($user);
+        return $this->withRefreshTokenInBody(
+            $authenticationSuccessHandler->handleAuthenticationSuccess($user),
+        );
     }
 }

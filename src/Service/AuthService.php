@@ -53,6 +53,7 @@ class AuthService
 
         $user = new User();
         $user->setEmail($email);
+        $user->setEmailCanonical(mb_strtolower($email));
         $user->setGoogleId($googleId);
         $this->em->persist($user);
         $this->em->flush();
@@ -78,6 +79,7 @@ class AuthService
 
         $user = new User();
         $user->setEmail($email);
+        $user->setEmailCanonical(mb_strtolower($email));
         $user->setAppleId($appleId);
         $this->em->persist($user);
         $this->em->flush();

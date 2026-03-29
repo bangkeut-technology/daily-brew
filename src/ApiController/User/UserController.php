@@ -265,4 +265,38 @@ class UserController extends AbstractController
 
         return $this->jsonSuccess(['disconnected' => true]);
     }
+
+    // ── Account deletion ──────────────────────────────────────
+
+    #[Route('/me', name: 'users_me_delete', methods: ['DELETE'])]
+    public function deleteAccount(
+        #[CurrentUser] User $user,
+        EntityManagerInterface $em,
+    ): JsonResponse {
+        // Revoke all refresh tokens before clearing the email
+        $em->getConnection()->executeStatement(
+            'DELETE FROM daily_brew_refresh_tokens WHERE username = :email',
+            ['email' => $user->getUserIdentifier()],
+        );
+
+        $deletedSuffix = '_deleted_' . $user->getId() . '_' . time();
+
+        $user->setEnabled(false);
+        $user->setDeletedAt(new \DateTimeImmutable());
+
+        // Free up email + OAuth IDs so they can be reused on a new account
+        $user->setEmail($user->getEmail() . $deletedSuffix);
+        $user->setEmailCanonical($user->getEmailCanonical() . $deletedSuffix);
+        $user->setGoogleId(null);
+        $user->setAppleId(null);
+
+        $em->flush();
+
+        // Clear auth cookies
+        $response = $this->jsonSuccess(['deleted' => true]);
+        $response->headers->clearCookie('BEARER', '/');
+        $response->headers->clearCookie('refresh_token', '/');
+
+        return $response;
+    }
 }
