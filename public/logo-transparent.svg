@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Cup body - no background -->
+  <rect x="108" y="190" width="248" height="200" rx="24" fill="#6B4226"/>
+
+  <!-- Cup opening (darker coffee) -->
+  <rect x="118" y="190" width="228" height="42" rx="12" fill="#3E2212"/>
+  <!-- Rim top -->
+  <rect x="108" y="184" width="248" height="30" rx="15" fill="#9B6B45"/>
+  <!-- Rim highlight -->
+  <rect x="108" y="180" width="248" height="26" rx="13" fill="#C17F3B"/>
+
+  <!-- Handle -->
+  <path d="M356 230 C420 230, 420 350, 356 350" stroke="#6B4226" stroke-width="32" fill="none" stroke-linecap="round"/>
+
+  <!-- Steam line left -->
+  <path d="M196 155 C186 125, 210 110, 200 80" stroke="#C17F3B" stroke-width="12" fill="none" stroke-linecap="round" opacity="0.45"/>
+  <!-- Steam line center -->
+  <path d="M232 145 C222 115, 246 100, 236 70" stroke="#C17F3B" stroke-width="12" fill="none" stroke-linecap="round" opacity="0.6"/>
+  <!-- Steam line right -->
+  <path d="M268 155 C258 125, 282 110, 272 80" stroke="#C17F3B" stroke-width="12" fill="none" stroke-linecap="round" opacity="0.45"/>
+
+  <!-- Clock circle -->
+  <circle cx="232" cy="315" r="56" fill="none" stroke="white" stroke-width="4" opacity="0.3"/>
+
+  <!-- Clock hour marks -->
+  <line x1="232" y1="265" x2="232" y2="275" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+  <line x1="232" y1="355" x2="232" y2="365" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+  <line x1="182" y1="315" x2="192" y2="315" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+  <line x1="272" y1="315" x2="282" y2="315" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+
+  <!-- Hour hand -->
+  <line x1="232" y1="315" x2="215" y2="280" stroke="white" stroke-width="5" stroke-linecap="round" opacity="0.6"/>
+  <!-- Minute hand -->
+  <line x1="232" y1="315" x2="262" y2="295" stroke="white" stroke-width="3.5" stroke-linecap="round" opacity="0.6"/>
+  <!-- Center dot -->
+  <circle cx="232" cy="315" r="4" fill="white" opacity="0.6"/>
+
+  <!-- Saucer -->
+  <ellipse cx="232" cy="400" rx="160" ry="22" fill="#9B6B45" opacity="0.35"/>
+  <ellipse cx="232" cy="395" rx="150" ry="16" fill="#C17F3B" opacity="0.2"/>
+</svg>
