@@ -25,11 +25,6 @@ class ExceptionSubscriber implements EventSubscriberInterface
 
     public function onKernelException(ExceptionEvent $event): void
     {
-        $request = $event->getRequest();
-        if (!str_starts_with($request->getPathInfo(), '/api/')) {
-            return;
-        }
-
         $exception = $event->getThrowable();
         $statusCode = $exception instanceof HttpExceptionInterface
             ? $exception->getStatusCode()
@@ -40,6 +35,11 @@ class ExceptionSubscriber implements EventSubscriberInterface
                 'message' => $exception->getMessage(),
                 'exception' => $exception,
             ]);
+        }
+
+        $request = $event->getRequest();
+        if (!str_starts_with($request->getPathInfo(), '/api/')) {
+            return;
         }
 
         $message = $exception->getMessage();

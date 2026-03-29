@@ -20,6 +20,7 @@ jobs:
                     command_timeout: ${{ secrets.TIMEOUT }}
                     script:          |
                                      cd ${{ secrets.PROJECT_FOLDER }}
+                                     sudo touch public/.maintenance
                                      sudo git fetch --tags https://${{ secrets.ACCOUNT_GITHUB_USERNAME }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ secrets.ACCOUNT_GITHUB_USERNAME }}/daily-brew.git
                                      sudo git checkout ${{ github.event.release.tag_name }}
                                      sudo chown -R $(whoami) ${{ secrets.PROJECT_FOLDER }}
@@ -30,4 +31,5 @@ jobs:
                                      sudo npm run router:generate
                                      sudo npm run build
                                      sudo chown -R www-data:www-data ${{ secrets.PROJECT_FOLDER }}
+                                     sudo rm -f public/.maintenance
                                      sudo systemctl restart php8.4-fpm

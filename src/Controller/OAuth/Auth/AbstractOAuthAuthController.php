@@ -40,11 +40,11 @@ abstract class AbstractOAuthAuthController extends AbstractController
 
     public function callback(): Response
     {
-        $oauthUser = $this->getClient()->fetchUser();
-
-        $response = $this->getRedirectResponse();
-
         try {
+            $oauthUser = $this->getClient()->fetchUser();
+
+            $response = $this->getRedirectResponse();
+
             $user = $this->authenticationService->authenticate(
                 new OAuthUserData(
                     provider: $this->provider,
@@ -60,10 +60,10 @@ abstract class AbstractOAuthAuthController extends AbstractController
             if (!$user->isOnboardingCompleted()) {
                 return $this->redirect('/onboarding');
             }
+
+            return $response;
         } catch (\Exception $e) {
             return $this->redirect('/sign-in?error=' . urlencode($e->getMessage()));
         }
-
-        return $response;
     }
 }
