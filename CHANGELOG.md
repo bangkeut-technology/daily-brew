@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.2.0...v1.3.0) (2026-03-29)
+
+
+### Features
+
+* **logging:** add error logging for uncaught exceptions in ExceptionSubscriber ([7d9d47e](https://github.com/bangkeut-technology/daily-brew/commit/7d9d47e13f3bcb6f4d8fc0b890097fb9cc7d27ef))
+
 ## [1.2.0](https://github.com/bangkeut-technology/daily-brew/compare/1.1.1...v1.2.0) (2026-03-29)
 
 
