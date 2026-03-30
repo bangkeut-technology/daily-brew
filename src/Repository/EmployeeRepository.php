@@ -34,21 +34,55 @@ class EmployeeRepository extends ServiceEntityRepository
     /** @return Employee[] */
     public function findByWorkspace(Workspace $workspace): array
     {
-        return $this->findBy(['workspace' => $workspace], ['firstName' => 'ASC']);
+        return $this->createQueryBuilder('e')
+            ->where('e.workspace = :ws')
+            ->andWhere('e.deletedAt IS NULL')
+            ->setParameter('ws', $workspace)
+            ->orderBy('e.firstName', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /** @return Employee[] */
     public function findActiveByWorkspace(Workspace $workspace): array
     {
-        return $this->findBy(
-            ['workspace' => $workspace, 'status' => EmployeeStatusEnum::ACTIVE],
-            ['firstName' => 'ASC']
-        );
+        return $this->createQueryBuilder('e')
+            ->where('e.workspace = :ws')
+            ->andWhere('e.status = :status')
+            ->andWhere('e.deletedAt IS NULL')
+            ->setParameter('ws', $workspace)
+            ->setParameter('status', EmployeeStatusEnum::ACTIVE)
+            ->orderBy('e.firstName', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     public function countActiveByWorkspace(Workspace $workspace): int
     {
-        return $this->count(['workspace' => $workspace, 'status' => EmployeeStatusEnum::ACTIVE]);
+        return (int) $this->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->where('e.workspace = :ws')
+            ->andWhere('e.status = :status')
+            ->andWhere('e.deletedAt IS NULL')
+            ->setParameter('ws', $workspace)
+            ->setParameter('status', EmployeeStatusEnum::ACTIVE)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function findDuplicate(Workspace $workspace, string $firstName, string $lastName): ?Employee
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.workspace = :ws')
+            ->andWhere('e.firstName = :fn')
+            ->andWhere('e.lastName = :ln')
+            ->andWhere('e.deletedAt IS NULL')
+            ->setParameter('ws', $workspace)
+            ->setParameter('fn', $firstName)
+            ->setParameter('ln', $lastName)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     /** Soft-delete all employees created by the given user. */

@@ -10,12 +10,18 @@ import {
   useUpdateShiftTimeRule,
   useDeleteShiftTimeRule,
 } from '@/hooks/queries/useShifts';
+import { useEmployees, useUpdateEmployee } from '@/hooks/queries/useEmployees';
 import { usePlan } from '@/hooks/queries/usePlan';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
-import { ChevronDown, ChevronUp, Crown, Clock, Trash2, Plus } from 'lucide-react';
-import type { Shift, ShiftTimeRule } from '@/types';
+import { Avatar } from '@/components/shared/Avatar';
+import { CustomSelect } from '@/components/shared/CustomSelect';
+import { CustomTimePicker } from '@/components/shared/CustomTimePicker';
+import { UpgradeModal } from '@/components/shared/UpgradeModal';
+import { useUpgradeModal } from '@/hooks/useUpgradeModal';
+import { ChevronDown, ChevronUp, Crown, Clock, Trash2, Plus, Users, X } from 'lucide-react';
+import type { Shift, Employee, ShiftTimeRule } from '@/types';
 
 export const Route = createFileRoute('/console/shifts/')({
   component: ShiftsPage,
@@ -27,9 +33,11 @@ function ShiftsPage() {
   const { t } = useTranslation();
   const workspaceId = getWorkspacePublicId() || '';
   const { data: shifts, isLoading } = useShifts(workspaceId);
+  const { data: employees } = useEmployees(workspaceId);
   const createShift = useCreateShift(workspaceId);
   const deleteShift = useDeleteShift(workspaceId);
   const { data: plan } = usePlan(workspaceId);
+  const upgradeModal = useUpgradeModal();
 
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
@@ -82,9 +90,11 @@ function ShiftsPage() {
       />
 
       {showForm && (
-        <GlassCard hover={false} className="mb-4 max-w-lg">
+        <GlassCard hover={false} className="mb-4">
           <form onSubmit={handleCreate} className="p-5 space-y-3">
             <input
+              id="shift-name"
+              name="shiftName"
               type="text"
               placeholder="Shift name (e.g. Morning)"
               value={name}
@@ -94,26 +104,16 @@ function ShiftsPage() {
             />
             <div className="flex gap-3">
               <div className="flex-1">
-                <label className="block text-[11px] font-medium text-text-secondary mb-1">
+                <label id="shift-start-label" className="block text-[11px] font-medium text-text-secondary mb-1">
                   Start time
                 </label>
-                <input
-                  type="time"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee"
-                />
+                <CustomTimePicker value={startTime} onChange={setStartTime} />
               </div>
               <div className="flex-1">
-                <label className="block text-[11px] font-medium text-text-secondary mb-1">
+                <label id="shift-end-label" className="block text-[11px] font-medium text-text-secondary mb-1">
                   End time
                 </label>
-                <input
-                  type="time"
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee"
-                />
+                <CustomTimePicker value={endTime} onChange={setEndTime} />
               </div>
             </div>
             <button
@@ -153,18 +153,33 @@ function ShiftsPage() {
         <p className="text-text-tertiary">{t('common.loading')}</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {shifts?.map((shift) => (
-            <ShiftCard
-              key={shift.publicId}
-              shift={shift}
-              workspaceId={workspaceId}
-              canUseTimeRules={plan?.canUseShiftTimeRules ?? false}
-              isExpanded={selectedShift === shift.publicId}
-              onToggleExpand={() => toggleShiftSchedule(shift.publicId)}
-              onDelete={() => handleDelete(shift.publicId)}
-            />
-          ))}
+          {shifts?.map((shift) => {
+            const assignedEmployees = employees?.filter((e) => e.shiftPublicId === shift.publicId) ?? [];
+            const unassignedEmployees = employees?.filter((e) => !e.shiftPublicId && e.active) ?? [];
+            return (
+              <ShiftCard
+                key={shift.publicId}
+                shift={shift}
+                workspaceId={workspaceId}
+                assignedEmployees={assignedEmployees}
+                unassignedEmployees={unassignedEmployees}
+                canUseTimeRules={plan?.canUseShiftTimeRules ?? false}
+                isExpanded={selectedShift === shift.publicId}
+                onToggleExpand={() => toggleShiftSchedule(shift.publicId)}
+                onDelete={() => handleDelete(shift.publicId)}
+                onUpgradeClick={() => upgradeModal.openFor('shiftTimeRules')}
+              />
+            );
+          })}
         </div>
+      )}
+
+      {upgradeModal.feature && (
+        <UpgradeModal
+          open={upgradeModal.isOpen}
+          onOpenChange={(open) => { if (!open) upgradeModal.close(); }}
+          feature={upgradeModal.feature}
+        />
       )}
     </div>
   );
@@ -175,22 +190,57 @@ function ShiftsPage() {
 interface ShiftCardProps {
   shift: Shift;
   workspaceId: string;
+  assignedEmployees: Employee[];
+  unassignedEmployees: Employee[];
   canUseTimeRules: boolean;
   isExpanded: boolean;
   onToggleExpand: () => void;
   onDelete: () => void;
+  onUpgradeClick: () => void;
 }
 
 function ShiftCard({
   shift,
   workspaceId,
+  assignedEmployees,
+  unassignedEmployees,
   canUseTimeRules,
   isExpanded,
   onToggleExpand,
   onDelete,
+  onUpgradeClick,
 }: ShiftCardProps) {
+  const { t } = useTranslation();
+  const updateEmployee = useUpdateEmployee(workspaceId);
+  const [showAssign, setShowAssign] = useState(false);
+
+  const handleAssign = async (employeePublicId: string) => {
+    try {
+      await updateEmployee.mutateAsync({
+        publicId: employeePublicId,
+        shiftPublicId: shift.publicId,
+      });
+      toast.success(t('shift.employeeAssigned', 'Employee assigned'));
+      setShowAssign(false);
+    } catch {
+      toast.error(t('shift.assignError', 'Failed to assign employee'));
+    }
+  };
+
+  const handleUnassign = async (employeePublicId: string) => {
+    try {
+      await updateEmployee.mutateAsync({
+        publicId: employeePublicId,
+        shiftPublicId: null,
+      });
+      toast.success(t('shift.employeeUnassigned', 'Employee unassigned'));
+    } catch {
+      toast.error(t('shift.unassignError', 'Failed to unassign employee'));
+    }
+  };
+
   return (
-    <GlassCard hover={!isExpanded}>
+    <GlassCard hover={!isExpanded && !showAssign}>
       <GlassCardHeader
         title={shift.name}
         action={
@@ -207,15 +257,76 @@ function ShiftCard({
         {shift.startTime} &mdash; {shift.endTime}
       </div>
 
+      {/* Employees section */}
+      <div className="border-t border-cream-3/80 px-5 py-3">
+        <div className="flex items-center justify-between mb-2">
+          <span className="flex items-center gap-1.5 text-[12px] font-medium text-text-secondary">
+            <Users size={13} />
+            {t('shift.employees', 'Employees')}
+            {assignedEmployees.length > 0 && (
+              <span className="text-[10px] font-medium px-1.5 py-px rounded-full bg-coffee/10 text-coffee">
+                {assignedEmployees.length}
+              </span>
+            )}
+          </span>
+          <button
+            onClick={() => setShowAssign(!showAssign)}
+            className="text-[11px] font-medium text-coffee hover:text-coffee-light bg-transparent border-none cursor-pointer transition-colors flex items-center gap-0.5"
+          >
+            <Plus size={11} />
+            {t('shift.assign', 'Assign')}
+          </button>
+        </div>
+
+        {showAssign && (
+          <div className="mb-2">
+            <CustomSelect
+              value=""
+              onChange={(v) => { if (v) handleAssign(v); }}
+              options={unassignedEmployees.map((e) => ({
+                value: e.publicId,
+                label: e.name,
+              }))}
+              placeholder={t('shift.selectEmployee', 'Select employee…')}
+            />
+          </div>
+        )}
+
+        {assignedEmployees.length === 0 ? (
+          <p className="text-[11.5px] text-text-tertiary">
+            {t('shift.noEmployees', 'No employees assigned')}
+          </p>
+        ) : (
+          <div className="space-y-1">
+            {assignedEmployees.map((emp, i) => (
+              <div
+                key={emp.publicId}
+                className="flex items-center gap-2 py-1 group"
+              >
+                <Avatar name={emp.name} index={i} size={22} />
+                <span className="text-[12px] text-text-primary flex-1 truncate">
+                  {emp.name}
+                </span>
+                <button
+                  onClick={() => handleUnassign(emp.publicId)}
+                  className="opacity-0 group-hover:opacity-100 text-text-tertiary hover:text-red bg-transparent border-none cursor-pointer p-0.5 transition-all"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Day schedule toggle */}
       <div className="border-t border-cream-3/80">
         <button
-          onClick={onToggleExpand}
-          disabled={!canUseTimeRules}
+          onClick={canUseTimeRules ? onToggleExpand : onUpgradeClick}
           className={`w-full flex items-center justify-between px-5 py-3 text-[12px] font-medium transition-colors border-none cursor-pointer ${
             canUseTimeRules
               ? 'text-text-secondary hover:bg-cream-3/40 bg-transparent'
-              : 'text-text-tertiary bg-transparent cursor-not-allowed'
+              : 'text-text-tertiary bg-transparent hover:bg-amber/5'
           }`}
         >
           <span className="flex items-center gap-1.5">
@@ -353,23 +464,13 @@ function DayRow({
   // Editing mode
   if (editing) {
     return (
-      <div className="flex items-center gap-2 py-2 px-3 rounded-lg bg-white/40">
+      <div className="flex items-center gap-2 py-2 px-3 rounded-lg bg-cream-3/30">
         <span className="text-[11.5px] font-medium text-text-primary w-16 flex-shrink-0">
           {dayLabel.slice(0, 3)}
         </span>
-        <input
-          type="time"
-          value={ruleStart}
-          onChange={(e) => setRuleStart(e.target.value)}
-          className="px-2 py-1 rounded-md text-[12px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee w-[90px]"
-        />
+        <CustomTimePicker value={ruleStart} onChange={setRuleStart} className="w-[100px]" />
         <span className="text-[11px] text-text-tertiary">&ndash;</span>
-        <input
-          type="time"
-          value={ruleEnd}
-          onChange={(e) => setRuleEnd(e.target.value)}
-          className="px-2 py-1 rounded-md text-[12px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee w-[90px]"
-        />
+        <CustomTimePicker value={ruleEnd} onChange={setRuleEnd} className="w-[100px]" />
         <div className="flex items-center gap-1 ml-auto">
           <button
             onClick={handleSave}
@@ -392,7 +493,7 @@ function DayRow({
   // Display mode — existing rule
   if (existingRule) {
     return (
-      <div className="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-white/30 transition-colors group">
+      <div className="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-cream-3/30 transition-colors group">
         <span className="text-[11.5px] font-medium text-text-primary w-16 flex-shrink-0">
           {dayLabel.slice(0, 3)}
         </span>
@@ -423,7 +524,7 @@ function DayRow({
 
   // Display mode — no rule, show shift defaults muted
   return (
-    <div className="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-white/30 transition-colors group">
+    <div className="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-cream-3/30 transition-colors group">
       <span className="text-[11.5px] font-medium text-text-tertiary w-16 flex-shrink-0">
         {dayLabel.slice(0, 3)}
       </span>

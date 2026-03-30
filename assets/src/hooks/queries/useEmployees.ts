@@ -36,6 +36,7 @@ export function useCreateEmployee(workspacePublicId: string) {
       lastName: string;
       phoneNumber?: string;
       shiftPublicId?: string;
+      linkedUserPublicId?: string;
     }) => {
       const { data } = await apiAxios.post<Employee>(
         `/workspaces/${workspacePublicId}/employees`,

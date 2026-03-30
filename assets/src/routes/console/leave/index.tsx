@@ -2,13 +2,15 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { Inbox } from 'lucide-react';
+import { Crown, Inbox } from 'lucide-react';
 import { useLeaveRequests, useUpdateLeaveRequest } from '@/hooks/queries/useLeaveRequests';
+import { usePlan } from '@/hooks/queries/usePlan';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { Avatar } from '@/components/shared/Avatar';
 import { StatusBadge } from '@/components/shared/StatusBadge';
+import { UpgradeModal } from '@/components/shared/UpgradeModal';
 
 export const Route = createFileRoute('/console/leave/')({
   component: LeaveRequestsPage,
@@ -26,9 +28,39 @@ const FILTER_TABS: { value: StatusFilter; labelKey: string; fallback: string }[]
 function LeaveRequestsPage() {
   const { t } = useTranslation();
   const workspaceId = getWorkspacePublicId() || '';
+  const { data: plan } = usePlan(workspaceId);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('');
+  const [showUpgrade, setShowUpgrade] = useState(true);
   const { data: requests, isLoading } = useLeaveRequests(workspaceId, statusFilter || undefined);
   const updateLeave = useUpdateLeaveRequest(workspaceId);
+
+  if (plan && !plan.canUseLeaveRequests) {
+    return (
+      <div className="page-enter">
+        <PageHeader title={t('nav.leaveRequests')} />
+        <GlassCard hover={false}>
+          <div className="p-8 text-center space-y-4">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber/10 mb-2">
+              <Crown size={28} className="text-amber" />
+            </div>
+            <h2 className="text-[18px] font-semibold text-text-primary font-serif">
+              {t('upgrade.leaveRequests.title')}
+            </h2>
+            <p className="text-[13px] text-text-secondary leading-relaxed">
+              {t('upgrade.leaveRequests.description')}
+            </p>
+            <button
+              onClick={() => setShowUpgrade(true)}
+              className="px-6 py-2.5 rounded-xl text-[14px] font-medium text-white border-none cursor-pointer btn-shimmer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,66,38,0.30)]"
+            >
+              {t('upgrade.upgradeButton')}
+            </button>
+          </div>
+        </GlassCard>
+        <UpgradeModal open={showUpgrade} onOpenChange={setShowUpgrade} feature="leaveRequests" />
+      </div>
+    );
+  }
 
   const handleAction = async (publicId: string, status: 'approved' | 'rejected') => {
     try {
@@ -77,7 +109,7 @@ function LeaveRequestsPage() {
           <p className="text-[13px] text-text-tertiary">{t('common.loading')}</p>
         </div>
       ) : requests?.length === 0 ? (
-        <div className="border-[1.5px] border-dashed border-cream-3 rounded-2xl bg-white/30 flex flex-col items-center justify-center min-h-[200px]">
+        <div className="border-[1.5px] border-dashed border-cream-3 rounded-2xl bg-glass-bg backdrop-blur-md flex flex-col items-center justify-center min-h-[200px]">
           <Inbox size={28} className="text-text-tertiary mb-2" />
           <span className="text-[13px] text-text-tertiary">
             {t('leave.noRequests', 'No leave requests found')}

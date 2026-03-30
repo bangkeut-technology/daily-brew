@@ -81,5 +81,31 @@
     "search": "Rechercher",
     "loading": "Chargement...",
     "noResults": "Aucun r\u00e9sultat"
+  },
+  "upgrade": {
+    "espressoFeature": "Fonctionnalit\u00e9 Espresso",
+    "espressoIncludes": "Espresso inclut",
+    "upgradeButton": "Passer \u00e0 Espresso",
+    "maybeLater": "Peut-\u00eatre plus tard",
+    "ipRestriction": {
+      "title": "D\u00e9bloquer la restriction IP",
+      "description": "Limitez les pointages QR \u00e0 des adresses IP sp\u00e9cifiques. Assurez-vous que le personnel ne peut pointer que depuis le r\u00e9seau de votre restaurant."
+    },
+    "geofencing": {
+      "title": "D\u00e9bloquer le g\u00e9ofencing",
+      "description": "D\u00e9finissez une zone g\u00e9ographique autour de votre restaurant. Le personnel ne peut pointer que lorsqu'il est physiquement \u00e0 proximit\u00e9."
+    },
+    "deviceVerification": {
+      "title": "D\u00e9bloquer la v\u00e9rification d'appareil",
+      "description": "Emp\u00eachez la fraude en exigeant le m\u00eame appareil pour le pointage d'entr\u00e9e et de sortie."
+    },
+    "leaveRequests": {
+      "title": "D\u00e9bloquer les demandes de cong\u00e9",
+      "description": "Permettez \u00e0 votre personnel de soumettre des demandes de cong\u00e9. Examinez, approuvez ou rejetez depuis votre tableau de bord."
+    },
+    "shiftTimeRules": {
+      "title": "D\u00e9bloquer les horaires par jour",
+      "description": "Modifiez les heures de travail pour des jours sp\u00e9cifiques. Id\u00e9al pour les restaurants avec des horaires diff\u00e9rents le week-end."
+    }
   }
 }

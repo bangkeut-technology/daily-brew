@@ -13,6 +13,7 @@ import { getWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { Avatar } from '@/components/shared/Avatar';
+import { CustomSelect } from '@/components/shared/CustomSelect';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 
 const editEmployeeSchema = z.object({
@@ -42,6 +43,8 @@ function EmployeeDetailPage() {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<EditEmployeeForm>({
     resolver: zodResolver(editEmployeeSchema),
@@ -129,44 +132,48 @@ function EmployeeDetailPage() {
           {isEditing ? (
             <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
               <div>
-                <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+                <label htmlFor="edit-firstName" className="block text-[12px] font-medium text-text-secondary mb-1.5">
                   {t('employee.firstName', 'First name')} *
                 </label>
-                <input type="text" {...register('firstName')} className={inputClassName} />
+                <input id="edit-firstName" type="text" {...register('firstName')} className={inputClassName} />
                 {errors.firstName && (
                   <p className="text-[11px] text-status-red mt-1">{errors.firstName.message}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+                <label htmlFor="edit-lastName" className="block text-[12px] font-medium text-text-secondary mb-1.5">
                   {t('employee.lastName', 'Last name')} *
                 </label>
-                <input type="text" {...register('lastName')} className={inputClassName} />
+                <input id="edit-lastName" type="text" {...register('lastName')} className={inputClassName} />
                 {errors.lastName && (
                   <p className="text-[11px] text-status-red mt-1">{errors.lastName.message}</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+                <label htmlFor="edit-phone" className="block text-[12px] font-medium text-text-secondary mb-1.5">
                   {t('employee.phoneNumber', 'Phone number')}
                 </label>
-                <input type="text" {...register('phoneNumber')} className={inputClassName} />
+                <input id="edit-phone" type="text" {...register('phoneNumber')} className={inputClassName} />
               </div>
 
               <div>
-                <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+                <label id="edit-shift-label" className="block text-[12px] font-medium text-text-secondary mb-1.5">
                   {t('employee.shift', 'Shift')}
                 </label>
-                <select {...register('shiftPublicId')} className={inputClassName}>
-                  <option value="">{t('employee.noShift', 'No shift')}</option>
-                  {shifts?.map((s) => (
-                    <option key={s.publicId} value={s.publicId}>
-                      {s.name} ({s.startTime} - {s.endTime})
-                    </option>
-                  ))}
-                </select>
+                <CustomSelect
+                  value={watch('shiftPublicId') || ''}
+                  onChange={(v) => setValue('shiftPublicId', v)}
+                  options={[
+                    { value: '', label: t('employee.noShift', 'No shift') },
+                    ...(shifts?.map((s) => ({
+                      value: s.publicId,
+                      label: `${s.name} (${s.startTime} - ${s.endTime})`,
+                    })) ?? []),
+                  ]}
+                  placeholder={t('employee.noShift', 'No shift')}
+                />
               </div>
 
               <div className="flex items-center gap-2">

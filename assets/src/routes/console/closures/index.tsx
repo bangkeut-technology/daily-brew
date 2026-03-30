@@ -10,6 +10,7 @@ import { getWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { CalendarX2, Trash2, CalendarOff } from 'lucide-react';
+import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
 
 const createClosureSchema = z
   .object({
@@ -40,6 +41,8 @@ function ClosuresPage() {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<CreateClosureForm>({
     resolver: zodResolver(createClosureSchema),
@@ -99,7 +102,7 @@ function ClosuresPage() {
       />
 
       {showForm && (
-        <GlassCard hover={false} className="mb-6 max-w-lg">
+        <GlassCard hover={false} className="mb-6">
           <GlassCardHeader title={t('closure.new', 'New closure')} />
           <form onSubmit={handleSubmit(onSubmit)} className="p-5 space-y-3">
             <div>
@@ -118,10 +121,9 @@ function ClosuresPage() {
                 <label className="block text-[11px] font-medium text-text-secondary mb-1">
                   {t('closure.startDate', 'Start date')}
                 </label>
-                <input
-                  type="date"
-                  {...register('startDate')}
-                  className={inputClassName}
+                <CustomDatePicker
+                  value={watch('startDate') || ''}
+                  onChange={(v) => setValue('startDate', v, { shouldValidate: true })}
                 />
                 {errors.startDate && (
                   <p className="text-[11px] text-red mt-1">{errors.startDate.message}</p>
@@ -131,10 +133,9 @@ function ClosuresPage() {
                 <label className="block text-[11px] font-medium text-text-secondary mb-1">
                   {t('closure.endDate', 'End date')}
                 </label>
-                <input
-                  type="date"
-                  {...register('endDate')}
-                  className={inputClassName}
+                <CustomDatePicker
+                  value={watch('endDate') || ''}
+                  onChange={(v) => setValue('endDate', v, { shouldValidate: true })}
                 />
                 {errors.endDate && (
                   <p className="text-[11px] text-red mt-1">{errors.endDate.message}</p>
@@ -168,7 +169,7 @@ function ClosuresPage() {
       ) : closures?.length === 0 ? (
         <div
           onClick={() => setShowForm(true)}
-          className="border-[1.5px] border-dashed border-cream-3 rounded-2xl bg-white/30 flex flex-col items-center justify-center min-h-[200px] cursor-pointer transition-colors hover:bg-cream-3/30"
+          className="border-[1.5px] border-dashed border-cream-3 rounded-2xl bg-glass-bg backdrop-blur-md flex flex-col items-center justify-center min-h-[200px] cursor-pointer transition-colors hover:bg-cream-3/30"
         >
           <CalendarOff size={28} className="text-text-tertiary mb-2" />
           <span className="text-[13px] text-text-tertiary">

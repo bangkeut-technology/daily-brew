@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getWorkspacePublicId, setWorkspacePublicId } from '@/lib/auth';
@@ -80,7 +80,7 @@ function NoWorkspaceView() {
     <div className="page-enter">
       <PageHeader title={t('nav.dashboard')} />
 
-      <div className="max-w-xl mx-auto">
+      <div>
         {/* Header */}
         <div className="text-center mb-8">
           <Coffee size={40} className="text-coffee/60 mx-auto mb-4" strokeWidth={1.5} />

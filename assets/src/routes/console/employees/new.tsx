@@ -1,20 +1,25 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { Plus, Link2 } from 'lucide-react';
 import { useCreateEmployee } from '@/hooks/queries/useEmployees';
-import { useShifts } from '@/hooks/queries/useShifts';
+import { useShifts, useCreateShift } from '@/hooks/queries/useShifts';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard } from '@/components/shared/GlassCard';
+import { CustomSelect } from '@/components/shared/CustomSelect';
+import { CustomTimePicker } from '@/components/shared/CustomTimePicker';
 
 const createEmployeeSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
   phoneNumber: z.string().optional(),
   shiftPublicId: z.string().optional(),
+  linkedUserPublicId: z.string().optional(),
 });
 
 type CreateEmployeeForm = z.infer<typeof createEmployeeSchema>;
@@ -28,11 +33,19 @@ function NewEmployeePage() {
   const navigate = useNavigate();
   const workspaceId = getWorkspacePublicId() || '';
   const createEmployee = useCreateEmployee(workspaceId);
+  const createShift = useCreateShift(workspaceId);
   const { data: shifts } = useShifts(workspaceId);
+
+  const [showShiftForm, setShowShiftForm] = useState(false);
+  const [newShiftName, setNewShiftName] = useState('');
+  const [newStartTime, setNewStartTime] = useState('08:00');
+  const [newEndTime, setNewEndTime] = useState('17:00');
 
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<CreateEmployeeForm>({
     resolver: zodResolver(createEmployeeSchema),
@@ -41,6 +54,7 @@ function NewEmployeePage() {
       lastName: '',
       phoneNumber: '',
       shiftPublicId: '',
+      linkedUserPublicId: '',
     },
   });
 
@@ -51,6 +65,7 @@ function NewEmployeePage() {
         lastName: values.lastName,
         phoneNumber: values.phoneNumber || undefined,
         shiftPublicId: values.shiftPublicId || undefined,
+        linkedUserPublicId: values.linkedUserPublicId || undefined,
       });
       toast.success(t('employee.createSuccess', 'Employee created'));
       navigate({ to: '/console/employees' });
@@ -66,13 +81,14 @@ function NewEmployeePage() {
     <div className="page-enter">
       <PageHeader title={t('employee.add')} />
 
-      <GlassCard hover={false} className="max-w-lg">
+      <GlassCard hover={false}>
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
           <div>
-            <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+            <label htmlFor="emp-firstName" className="block text-[12px] font-medium text-text-secondary mb-1.5">
               {t('employee.firstName', 'First name')} *
             </label>
             <input
+              id="emp-firstName"
               type="text"
               {...register('firstName')}
               className={inputClassName}
@@ -83,10 +99,11 @@ function NewEmployeePage() {
           </div>
 
           <div>
-            <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+            <label htmlFor="emp-lastName" className="block text-[12px] font-medium text-text-secondary mb-1.5">
               {t('employee.lastName', 'Last name')} *
             </label>
             <input
+              id="emp-lastName"
               type="text"
               {...register('lastName')}
               className={inputClassName}
@@ -97,10 +114,11 @@ function NewEmployeePage() {
           </div>
 
           <div>
-            <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+            <label htmlFor="emp-phone" className="block text-[12px] font-medium text-text-secondary mb-1.5">
               {t('employee.phoneNumber', 'Phone number')}
             </label>
             <input
+              id="emp-phone"
               type="text"
               {...register('phoneNumber')}
               className={inputClassName}
@@ -108,20 +126,108 @@ function NewEmployeePage() {
           </div>
 
           <div>
-            <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+            <label htmlFor="emp-linkedUser" className="flex items-center gap-1.5 text-[12px] font-medium text-text-secondary mb-1.5">
+              <Link2 size={12} />
+              {t('employee.userPublicId', 'User public ID')}
+            </label>
+            <input
+              id="emp-linkedUser"
+              type="text"
+              {...register('linkedUserPublicId')}
+              placeholder={t('employee.userPublicIdPlaceholder', 'Optional — link to a user account')}
+              className={`${inputClassName} font-mono`}
+            />
+            <p className="text-[10.5px] text-text-tertiary mt-1">
+              {t('employee.userPublicIdHint', 'The employee can find their public ID on their profile page.')}
+            </p>
+          </div>
+
+          <div>
+            <label id="emp-shift-label" className="block text-[12px] font-medium text-text-secondary mb-1.5">
               {t('employee.shift', 'Shift')}
             </label>
-            <select
-              {...register('shiftPublicId')}
-              className={inputClassName}
-            >
-              <option value="">{t('employee.noShift', 'No shift')}</option>
-              {shifts?.map((s) => (
-                <option key={s.publicId} value={s.publicId}>
-                  {s.name} ({s.startTime} - {s.endTime})
-                </option>
-              ))}
-            </select>
+            <CustomSelect
+              value={watch('shiftPublicId') || ''}
+              onChange={(v) => setValue('shiftPublicId', v)}
+              options={[
+                { value: '', label: t('employee.noShift', 'No shift') },
+                ...(shifts?.map((s) => ({
+                  value: s.publicId,
+                  label: `${s.name} (${s.startTime} - ${s.endTime})`,
+                })) ?? []),
+              ]}
+              placeholder={t('employee.noShift', 'No shift')}
+            />
+
+            {!showShiftForm ? (
+              <button
+                type="button"
+                onClick={() => setShowShiftForm(true)}
+                className={`mt-2 flex items-center gap-1 text-[12px] font-medium bg-transparent border-none cursor-pointer transition-colors p-0 ${
+                  !shifts?.length ? 'text-amber' : 'text-coffee hover:text-coffee-light'
+                }`}
+              >
+                <Plus size={13} />
+                {t('employee.createShift', 'Create a shift')}
+              </button>
+            ) : (
+              <div className="mt-2.5 rounded-lg border border-cream-3 bg-cream-3/20 p-3 space-y-2.5">
+                <input
+                  id="inline-shift-name"
+                  name="inlineShiftName"
+                  type="text"
+                  value={newShiftName}
+                  onChange={(e) => setNewShiftName(e.target.value)}
+                  placeholder={t('shift.name', 'Shift name (e.g. Morning)')}
+                  className={inputClassName}
+                />
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label id="inline-shift-start-label" className="block text-[11px] text-text-tertiary mb-1">
+                      {t('shift.startTime', 'Start')}
+                    </label>
+                    <CustomTimePicker value={newStartTime} onChange={setNewStartTime} />
+                  </div>
+                  <div>
+                    <label id="inline-shift-end-label" className="block text-[11px] text-text-tertiary mb-1">
+                      {t('shift.endTime', 'End')}
+                    </label>
+                    <CustomTimePicker value={newEndTime} onChange={setNewEndTime} />
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    disabled={createShift.isPending || !newShiftName.trim()}
+                    onClick={async () => {
+                      try {
+                        const shift = await createShift.mutateAsync({
+                          name: newShiftName.trim(),
+                          startTime: newStartTime,
+                          endTime: newEndTime,
+                        });
+                        setValue('shiftPublicId', shift.publicId);
+                        toast.success(t('shift.createSuccess', 'Shift created'));
+                        setShowShiftForm(false);
+                        setNewShiftName('');
+                      } catch {
+                        toast.error(t('shift.createError', 'Failed to create shift'));
+                      }
+                    }}
+                    className="px-3 py-1.5 rounded-md text-[12px] font-medium bg-coffee text-white border-none cursor-pointer transition-all hover:bg-coffee-light disabled:opacity-50"
+                  >
+                    {createShift.isPending ? t('common.loading') : t('common.create')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowShiftForm(false)}
+                    className="text-[12px] text-text-tertiary hover:text-text-secondary bg-transparent border-none cursor-pointer transition-colors"
+                  >
+                    {t('common.cancel')}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex gap-3 pt-2">

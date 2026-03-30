@@ -53,5 +53,31 @@
     "delete": "\u179b\u17bb\u1794",
     "loading": "\u1780\u17c6\u1796\u17bb\u1784\u1791\u17b6\u178e\u17b7\u1789...",
     "noResults": "\u1782\u17d2\u1798\u17b6\u1793\u179b\u1791\u17d2\u1792\u1795\u179b"
+  },
+  "upgrade": {
+    "espressoFeature": "\u1798\u17bb\u1781\u1784\u17b6\u179a Espresso",
+    "espressoIncludes": "Espresso \u179a\u17bd\u1798\u1798\u17b6\u1793",
+    "upgradeButton": "\u178a\u17c6\u17a1\u17be\u1784\u1780\u17b6\u179a\u1791\u17c5 Espresso",
+    "maybeLater": "\u1796\u17c1\u179b\u1780\u17d2\u179a\u17c4\u1799",
+    "ipRestriction": {
+      "title": "\u1794\u17be\u1780\u178a\u17c6\u178e\u17be\u179a\u1780\u17b6\u179a\u1780\u17c6\u178e\u178f\u17cb IP",
+      "description": "Restrict QR check-ins to specific IP addresses."
+    },
+    "geofencing": {
+      "title": "\u1794\u17be\u1780\u178a\u17c6\u178e\u17be\u179a\u1780\u17b6\u179a geofencing",
+      "description": "Set a geographic boundary around your restaurant."
+    },
+    "deviceVerification": {
+      "title": "\u1794\u17be\u1780\u178a\u17c6\u178e\u17be\u179a\u1780\u17b6\u179a\u1795\u17d2\u1791\u17c0\u1784\u1795\u17d2\u1791\u17b6\u178f\u17cb\u17a7\u1794\u1780\u179a\u178e\u17cd",
+      "description": "Prevent buddy punching by requiring the same device."
+    },
+    "leaveRequests": {
+      "title": "\u1794\u17be\u1780\u178a\u17c6\u178e\u17be\u179a\u1780\u17b6\u179a\u179f\u17c6\u178e\u17be\u179f\u17c6\u179a\u17b6\u1780\u17cb\u1788\u1794\u17cb",
+      "description": "Let your staff submit leave requests directly."
+    },
+    "shiftTimeRules": {
+      "title": "\u1794\u17be\u1780\u178a\u17c6\u178e\u17be\u179a\u1780\u17b6\u179a\u1780\u17c6\u178e\u178f\u17cb\u1798\u17c9\u17c4\u1784\u178f\u17b6\u1798\u1790\u17d2\u1784\u17c3",
+      "description": "Override shift hours for specific days of the week."
+    }
   }
 }

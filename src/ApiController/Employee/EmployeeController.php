@@ -10,6 +10,7 @@ use App\DTO\EmployeeDTO;
 use App\Repository\AttendanceRepository;
 use App\Repository\EmployeeRepository;
 use App\Repository\ShiftRepository;
+use App\Repository\UserRepository;
 use App\Repository\WorkspaceRepository;
 use App\Security\Voter\WorkspaceVoter;
 use App\Service\EmployeeService;
@@ -48,7 +49,9 @@ class EmployeeController extends AbstractController
         string $workspacePublicId,
         Request $request,
         WorkspaceRepository $workspaceRepository,
+        EmployeeRepository $employeeRepository,
         ShiftRepository $shiftRepository,
+        UserRepository $userRepository,
         EmployeeService $employeeService,
         PlanService $planService,
     ): JsonResponse {
@@ -64,11 +67,16 @@ class EmployeeController extends AbstractController
         }
 
         $data = json_decode($request->getContent(), true);
-        $firstName = $data['firstName'] ?? '';
-        $lastName = $data['lastName'] ?? '';
+        $firstName = trim($data['firstName'] ?? '');
+        $lastName = trim($data['lastName'] ?? '');
 
         if (empty($firstName) || empty($lastName)) {
             return $this->jsonError('First name and last name are required');
+        }
+
+        $existing = $employeeRepository->findDuplicate($workspace, $firstName, $lastName);
+        if ($existing !== null) {
+            return $this->jsonError('An employee with this name already exists', 409);
         }
 
         $shift = null;
@@ -84,7 +92,14 @@ class EmployeeController extends AbstractController
             $shift,
         );
 
-        return $this->jsonCreated($this->serializeEmployee($employee));
+        if (!empty($data['linkedUserPublicId'])) {
+            $linkedUser = $userRepository->findByPublicId($data['linkedUserPublicId']);
+            if ($linkedUser !== null) {
+                $employeeService->linkUser($employee, $linkedUser);
+            }
+        }
+
+        return $this->jsonCreated(EmployeeDTO::fromEntity($employee)->toArray());
     }
 
     #[Route('/{publicId}', name: 'employees_show', methods: ['GET'])]
@@ -156,7 +171,7 @@ class EmployeeController extends AbstractController
             isset($data['active']) ? (bool) $data['active'] : null,
         );
 
-        return $this->jsonSuccess($this->serializeEmployee($employee));
+        return $this->jsonSuccess(EmployeeDTO::fromEntity($employee)->toArray());
     }
 
     #[Route('/{publicId}', name: 'employees_delete', methods: ['DELETE'])]

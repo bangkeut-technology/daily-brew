@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { Search } from 'lucide-react';
-import { useEmployees } from '@/hooks/queries/useEmployees';
+import { toast } from 'sonner';
+import { Search, Trash2 } from 'lucide-react';
+import { useEmployees, useDeleteEmployee } from '@/hooks/queries/useEmployees';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard } from '@/components/shared/GlassCard';
@@ -17,7 +18,20 @@ function EmployeeListPage() {
   const { t } = useTranslation();
   const workspaceId = getWorkspacePublicId() || '';
   const { data: employees, isLoading } = useEmployees(workspaceId);
+  const deleteEmployee = useDeleteEmployee(workspaceId);
   const [search, setSearch] = useState('');
+
+  const handleDelete = async (e: React.MouseEvent, publicId: string, name: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!confirm(t('employee.deleteConfirm', 'Delete {{name}}? This cannot be undone.', { name }))) return;
+    try {
+      await deleteEmployee.mutateAsync(publicId);
+      toast.success(t('employee.deleteSuccess', 'Employee deleted'));
+    } catch {
+      toast.error(t('employee.deleteError', 'Failed to delete employee'));
+    }
+  };
 
   const filtered = employees?.filter((e) => {
     const fullName = `${e.firstName} ${e.lastName}`.toLowerCase();
@@ -65,27 +79,37 @@ function EmployeeListPage() {
               filtered?.map((employee, i) => {
                 const fullName = `${employee.firstName} ${employee.lastName}`;
                 return (
-                  <Link
+                  <div
                     key={employee.publicId}
-                    to="/console/employees/$publicId"
-                    params={{ publicId: employee.publicId }}
-                    className="flex items-center gap-3 px-5 py-3 transition-colors duration-[120ms] hover:bg-cream-3/35 cursor-pointer no-underline"
+                    className="flex items-center gap-3 px-5 py-3 transition-colors duration-[120ms] hover:bg-cream-3/35 group"
                   >
-                    <Avatar name={fullName} index={i} size={42} radius="12px" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[13.5px] font-medium text-text-primary truncate">
-                        {fullName}
+                    <Link
+                      to="/console/employees/$publicId"
+                      params={{ publicId: employee.publicId }}
+                      className="flex items-center gap-3 flex-1 min-w-0 no-underline"
+                    >
+                      <Avatar name={fullName} index={i} size={42} radius="12px" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[13.5px] font-medium text-text-primary truncate">
+                          {fullName}
+                        </div>
+                        <div className="text-[11px] text-text-tertiary">
+                          {employee.shiftName || t('employee.noShift')}
+                          {employee.phoneNumber ? ` \u00b7 ${employee.phoneNumber}` : ''}
+                        </div>
                       </div>
-                      <div className="text-[11px] text-text-tertiary">
-                        {employee.shiftName || t('employee.noShift')}
-                        {employee.phoneNumber ? ` \u00b7 ${employee.phoneNumber}` : ''}
-                      </div>
-                    </div>
+                    </Link>
                     <StatusBadge
                       label={employee.active ? t('employee.active') : t('employee.inactive')}
                       variant={employee.active ? 'green' : 'gray'}
                     />
-                  </Link>
+                    <button
+                      onClick={(e) => handleDelete(e, employee.publicId, fullName)}
+                      className="opacity-0 group-hover:opacity-100 text-text-tertiary hover:text-red bg-transparent border-none cursor-pointer p-1.5 rounded-lg transition-all hover:bg-red/8"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 );
               })
             )}

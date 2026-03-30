@@ -174,5 +174,31 @@
     "loading": "Loading...",
     "noResults": "No results found",
     "back": "Back"
+  },
+  "upgrade": {
+    "espressoFeature": "Espresso feature",
+    "espressoIncludes": "Espresso includes",
+    "upgradeButton": "Upgrade to Espresso",
+    "maybeLater": "Maybe later",
+    "ipRestriction": {
+      "title": "Unlock IP restriction",
+      "description": "Restrict QR check-ins to specific IP addresses. Keep attendance accurate by ensuring staff can only check in from your restaurant's network."
+    },
+    "geofencing": {
+      "title": "Unlock geofencing",
+      "description": "Set a geographic boundary around your restaurant. Staff can only check in when they are physically nearby."
+    },
+    "deviceVerification": {
+      "title": "Unlock device verification",
+      "description": "Prevent buddy punching by requiring the same device for check-in and check-out."
+    },
+    "leaveRequests": {
+      "title": "Unlock leave requests",
+      "description": "Let your staff submit leave requests directly. Review, approve, or reject them from your dashboard."
+    },
+    "shiftTimeRules": {
+      "title": "Unlock per-day schedules",
+      "description": "Override shift hours for specific days of the week. Perfect for restaurants with different hours on weekends."
+    }
   }
 }

@@ -2,7 +2,10 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { Crown, Check, MapPin, Navigation, Smartphone } from 'lucide-react';
+import * as Dialog from '@radix-ui/react-dialog';
+import { Crown, Check, MapPin, Navigation, Smartphone, Building2, Users, Calendar, Plus, X } from 'lucide-react';
+import { UpgradeModal } from '@/components/shared/UpgradeModal';
+import { useUpgradeModal } from '@/hooks/useUpgradeModal';
 import {
   useWorkspaces,
   useCreateWorkspace,
@@ -10,10 +13,13 @@ import {
   useUpdateWorkspaceSettings,
 } from '@/hooks/queries/useWorkspaces';
 import { usePlan } from '@/hooks/queries/usePlan';
+import { useEmployees } from '@/hooks/queries/useEmployees';
+import { useShifts } from '@/hooks/queries/useShifts';
 import { getWorkspacePublicId, setWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { StatusBadge } from '@/components/shared/StatusBadge';
+import { CustomSelect } from '@/components/shared/CustomSelect';
 
 export const Route = createFileRoute('/console/settings')({
   component: SettingsPage,
@@ -27,6 +33,10 @@ function SettingsPage() {
   const { data: settings } = useWorkspaceSettings(currentWsId);
   const updateSettings = useUpdateWorkspaceSettings(currentWsId);
   const { data: plan } = usePlan(currentWsId);
+  const { data: employees } = useEmployees(currentWsId);
+  const { data: shifts } = useShifts(currentWsId);
+  const upgradeModal = useUpgradeModal();
+  const [wsModalOpen, setWsModalOpen] = useState(false);
 
   const [ipEnabled, setIpEnabled] = useState(false);
   const [allowedIps, setAllowedIps] = useState('');
@@ -150,7 +160,7 @@ function SettingsPage() {
                   className={`rounded-xl border-2 p-5 transition-colors ${
                     !plan.isEspresso
                       ? 'border-coffee bg-coffee/5'
-                      : 'border-cream-3 bg-white/30'
+                      : 'border-cream-3 bg-glass-bg'
                   }`}
                 >
                   <h3 className="text-[15px] font-semibold text-text-primary mb-1">Free</h3>
@@ -182,7 +192,7 @@ function SettingsPage() {
                   className={`rounded-xl border-2 p-5 relative overflow-hidden transition-colors ${
                     plan.isEspresso
                       ? 'border-amber bg-amber/5'
-                      : 'border-cream-3 bg-white/30'
+                      : 'border-cream-3 bg-glass-bg'
                   }`}
                 >
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber to-amber-light" />
@@ -225,42 +235,147 @@ function SettingsPage() {
 
         {/* Workspace selector */}
         <GlassCard hover={false}>
-          <GlassCardHeader title="Workspace" />
+          <GlassCardHeader
+            title={t('workspace.label')}
+            action={
+              <button
+                onClick={() => setWsModalOpen(true)}
+                className="flex items-center gap-1 text-[11.5px] font-medium text-coffee hover:text-coffee-light bg-transparent border-none cursor-pointer transition-colors"
+              >
+                <Plus size={12} />
+                {t('workspace.create')}
+              </button>
+            }
+          />
           <div className="p-5 space-y-3">
-            {workspaces?.map((ws) => (
-              <button
-                key={ws.publicId}
-                onClick={() => {
-                  setWorkspacePublicId(ws.publicId);
-                  window.location.reload();
-                }}
-                className={`block w-full text-left px-3 py-2 rounded-lg text-[13.5px] border cursor-pointer transition-colors ${
-                  ws.publicId === currentWsId
-                    ? 'bg-coffee/10 border-coffee text-coffee font-medium'
-                    : 'bg-glass-bg border-cream-3 text-text-primary hover:bg-cream-3'
-                }`}
-              >
-                {ws.name}
-              </button>
-            ))}
-            <form onSubmit={handleCreateWorkspace} className="flex gap-2 mt-2">
-              <input
-                type="text"
-                placeholder="New workspace name"
-                value={newWsName}
-                onChange={(e) => setNewWsName(e.target.value)}
-                required
-                className="flex-1 px-3 py-2 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee"
-              />
-              <button
-                type="submit"
-                className="px-3 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light"
-              >
-                Create
-              </button>
-            </form>
+            {workspaces?.map((ws) => {
+              const isCurrent = ws.publicId === currentWsId;
+              const wsEmployeeCount = isCurrent ? (employees?.length ?? 0) : 0;
+              const wsShiftCount = isCurrent ? (shifts?.length ?? 0) : 0;
+              return (
+                <button
+                  key={ws.publicId}
+                  onClick={() => {
+                    if (!isCurrent) {
+                      setWorkspacePublicId(ws.publicId);
+                      window.location.reload();
+                    }
+                  }}
+                  className={`w-full text-left rounded-xl border-2 p-4 transition-all ${
+                    isCurrent
+                      ? 'border-coffee bg-coffee/5 cursor-default'
+                      : 'border-cream-3 bg-glass-bg cursor-pointer hover:border-coffee/40 hover:-translate-y-px'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-coffee/10 flex items-center justify-center flex-shrink-0">
+                      <span className="text-[13px] font-semibold text-coffee">
+                        {ws.name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[13.5px] font-medium text-text-primary truncate">
+                          {ws.name}
+                        </span>
+                        {isCurrent && (
+                          <span className="text-[10px] font-medium px-1.5 py-px rounded-full bg-coffee/10 text-coffee flex-shrink-0">
+                            {t('common.current', 'Current')}
+                          </span>
+                        )}
+                      </div>
+                      {ws.createdAt && (
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <Calendar size={10} className="text-text-tertiary" />
+                          <span className="text-[10.5px] text-text-tertiary">
+                            {new Date(ws.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    {isCurrent && plan && (
+                      <StatusBadge
+                        label={plan.planLabel}
+                        variant={plan.isEspresso ? 'green' : 'gray'}
+                      />
+                    )}
+                  </div>
+
+                  {isCurrent && (
+                    <div className="flex items-center gap-4 mt-3 pt-3 border-t border-cream-3/60">
+                      <div className="flex items-center gap-1.5">
+                        <Users size={12} className="text-text-tertiary" />
+                        <span className="text-[11.5px] text-text-secondary">
+                          {wsEmployeeCount} {t('nav.employees').toLowerCase()}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Building2 size={12} className="text-text-tertiary" />
+                        <span className="text-[11.5px] text-text-secondary">
+                          {wsShiftCount} {t('nav.shifts').toLowerCase()}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </GlassCard>
+
+        {/* Create workspace modal */}
+        <Dialog.Root open={wsModalOpen} onOpenChange={(v) => { setWsModalOpen(v); if (!v) setNewWsName(''); }}>
+          <Dialog.Portal>
+            <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
+            <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100%-2rem)] max-w-[400px] bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl shadow-[0_16px_50px_rgba(107,66,38,0.15)] outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95">
+              <div className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-coffee/10 flex items-center justify-center">
+                    <Building2 size={20} className="text-coffee" />
+                  </div>
+                  <div>
+                    <Dialog.Title className="text-[16px] font-semibold text-text-primary font-serif">
+                      {t('workspace.create')}
+                    </Dialog.Title>
+                    <Dialog.Description className="text-[12px] text-text-secondary">
+                      {t('workspace.newPlaceholder')}
+                    </Dialog.Description>
+                  </div>
+                </div>
+                <form onSubmit={handleCreateWorkspace}>
+                  <input
+                    type="text"
+                    value={newWsName}
+                    onChange={(e) => setNewWsName(e.target.value)}
+                    placeholder={t('workspace.newPlaceholder')}
+                    autoFocus
+                    required
+                    className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all mb-4"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => { setWsModalOpen(false); setNewWsName(''); }}
+                      className="px-4 py-2 rounded-lg text-[13px] font-medium bg-transparent text-text-secondary border border-cream-3 cursor-pointer hover:bg-cream-3 transition-colors"
+                    >
+                      {t('common.cancel')}
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={createWs.isPending || !newWsName.trim()}
+                      className="px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50 transition-colors"
+                    >
+                      {createWs.isPending ? t('common.loading') : t('common.create')}
+                    </button>
+                  </div>
+                </form>
+              </div>
+              <Dialog.Close className="absolute top-3 right-3 w-7 h-7 rounded-lg flex items-center justify-center bg-transparent border-none text-text-tertiary hover:text-text-secondary hover:bg-cream-3/40 cursor-pointer transition-all">
+                <X size={15} />
+              </Dialog.Close>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
 
         {/* IP restriction + general settings */}
         {currentWsId && (
@@ -269,10 +384,14 @@ function SettingsPage() {
             <div className="p-5 space-y-3">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
+                  id="ip-restriction"
+                  name="ipRestriction"
                   type="checkbox"
                   checked={ipEnabled}
-                  onChange={(e) => setIpEnabled(e.target.checked)}
-                  disabled={!plan?.canUseIpRestriction}
+                  onChange={(e) => {
+                    if (!plan?.canUseIpRestriction) { e.preventDefault(); upgradeModal.openFor('ipRestriction'); return; }
+                    setIpEnabled(e.target.checked);
+                  }}
                   className="accent-[#6B4226]"
                 />
                 <span className="text-[13px] text-text-primary">
@@ -286,10 +405,12 @@ function SettingsPage() {
               </label>
               {ipEnabled && plan?.canUseIpRestriction && (
                 <div>
-                  <label className="block text-[11px] font-medium text-text-secondary mb-1">
+                  <label htmlFor="allowed-ips" className="block text-[11px] font-medium text-text-secondary mb-1">
                     Allowed IPs (one per line)
                   </label>
                   <textarea
+                    id="allowed-ips"
+                    name="allowedIps"
                     value={allowedIps}
                     onChange={(e) => setAllowedIps(e.target.value)}
                     rows={4}
@@ -299,10 +420,12 @@ function SettingsPage() {
               )}
               <div className="flex gap-3">
                 <div className="flex-1">
-                  <label className="block text-[11px] font-medium text-text-secondary mb-1">
+                  <label htmlFor="ws-timezone" className="block text-[11px] font-medium text-text-secondary mb-1">
                     Timezone
                   </label>
                   <input
+                    id="ws-timezone"
+                    name="timezone"
                     type="text"
                     value={timezone}
                     onChange={(e) => setTimezone(e.target.value)}
@@ -310,18 +433,18 @@ function SettingsPage() {
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-[11px] font-medium text-text-secondary mb-1">
+                  <label id="ws-locale-label" className="block text-[11px] font-medium text-text-secondary mb-1">
                     Locale
                   </label>
-                  <select
+                  <CustomSelect
                     value={locale}
-                    onChange={(e) => setLocale(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee"
-                  >
-                    <option value="en">English</option>
-                    <option value="fr">Fran&#231;ais</option>
-                    <option value="km">&#x1781;&#x17D2;&#x1798;&#x17C2;&#x179A;</option>
-                  </select>
+                    onChange={setLocale}
+                    options={[
+                      { value: 'en', label: 'English' },
+                      { value: 'fr', label: 'Français' },
+                      { value: 'km', label: 'ខ្មែរ' },
+                    ]}
+                  />
                 </div>
               </div>
               <button
@@ -354,8 +477,10 @@ function SettingsPage() {
                 <input
                   type="checkbox"
                   checked={deviceVerificationEnabled}
-                  onChange={(e) => setDeviceVerificationEnabled(e.target.checked)}
-                  disabled={!plan?.canUseDeviceVerification}
+                  onChange={(e) => {
+                    if (!plan?.canUseDeviceVerification) { e.preventDefault(); upgradeModal.openFor('deviceVerification'); return; }
+                    setDeviceVerificationEnabled(e.target.checked);
+                  }}
                   className="accent-[#6B4226]"
                 />
                 <span className="text-[13px] text-text-primary">
@@ -403,8 +528,10 @@ function SettingsPage() {
                 <input
                   type="checkbox"
                   checked={geofencingEnabled}
-                  onChange={(e) => setGeofencingEnabled(e.target.checked)}
-                  disabled={!plan?.canUseGeofencing}
+                  onChange={(e) => {
+                    if (!plan?.canUseGeofencing) { e.preventDefault(); upgradeModal.openFor('geofencing'); return; }
+                    setGeofencingEnabled(e.target.checked);
+                  }}
                   className="accent-[#6B4226]"
                 />
                 <span className="text-[13px] text-text-primary">
@@ -507,6 +634,14 @@ function SettingsPage() {
           </GlassCard>
         )}
       </div>
+
+      {upgradeModal.feature && (
+        <UpgradeModal
+          open={upgradeModal.isOpen}
+          onOpenChange={(open) => { if (!open) upgradeModal.close(); }}
+          feature={upgradeModal.feature}
+        />
+      )}
     </div>
   );
 }

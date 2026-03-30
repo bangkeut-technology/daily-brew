@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Popover from '@radix-ui/react-popover';
-import { ChevronsUpDown, Check, Plus } from 'lucide-react';
+import * as Dialog from '@radix-ui/react-dialog';
+import { ChevronsUpDown, Check, Plus, X, Building2 } from 'lucide-react';
 import { getWorkspacePublicId, setWorkspacePublicId } from '@/lib/auth';
 import { useCreateWorkspace } from '@/hooks/queries/useWorkspaces';
 import { toast } from 'sonner';
@@ -13,7 +14,7 @@ interface WorkspaceSwitcherProps {
 export function WorkspaceSwitcher({ workspaces }: WorkspaceSwitcherProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
-  const [creating, setCreating] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const [newName, setNewName] = useState('');
   const createWs = useCreateWorkspace();
 
@@ -45,111 +46,80 @@ export function WorkspaceSwitcher({ workspaces }: WorkspaceSwitcherProps) {
   if (workspaces.length === 0) return null;
 
   return (
-    <Popover.Root open={open} onOpenChange={setOpen}>
-      <Popover.Trigger asChild>
-        <button
-          className="
-            w-full flex items-center gap-2 px-2.5 py-2 rounded-lg
-            text-left cursor-pointer
-            bg-transparent border border-transparent
-            hover:bg-cream-3 transition-all duration-[180ms]
-          "
-        >
-          <div className="w-7 h-7 rounded-lg bg-coffee/10 flex items-center justify-center flex-shrink-0">
-            <span className="text-[11px] font-semibold text-coffee">
-              {(current?.name ?? '?').charAt(0).toUpperCase()}
-            </span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[12.5px] font-medium text-text-primary truncate leading-tight">
-              {current?.name ?? t('workspace.noWorkspace')}
-            </p>
-            <p className="text-[10px] text-text-tertiary leading-tight">
-              {t('workspace.label')}
-            </p>
-          </div>
-          <ChevronsUpDown size={14} className="text-text-tertiary flex-shrink-0" />
-        </button>
-      </Popover.Trigger>
+    <>
+      <Popover.Root open={open} onOpenChange={setOpen}>
+        <Popover.Trigger asChild>
+          <button
+            className="
+              w-full flex items-center gap-2 px-2.5 py-2 rounded-lg
+              text-left cursor-pointer
+              bg-transparent border border-transparent
+              hover:bg-cream-3 transition-all duration-[180ms]
+            "
+          >
+            <div className="w-7 h-7 rounded-lg bg-coffee/10 flex items-center justify-center flex-shrink-0">
+              <span className="text-[11px] font-semibold text-coffee">
+                {(current?.name ?? '?').charAt(0).toUpperCase()}
+              </span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[12.5px] font-medium text-text-primary truncate leading-tight">
+                {current?.name ?? t('workspace.noWorkspace')}
+              </p>
+              <p className="text-[10px] text-text-tertiary leading-tight">
+                {t('workspace.label')}
+              </p>
+            </div>
+            <ChevronsUpDown size={14} className="text-text-tertiary flex-shrink-0" />
+          </button>
+        </Popover.Trigger>
 
-      <Popover.Portal>
-        <Popover.Content
-          side="bottom"
-          align="start"
-          sideOffset={4}
-          className="
-            w-[200px] max-h-[280px] overflow-y-auto
-            bg-cream-2 border border-cream-3 rounded-xl
-            shadow-[0_8px_30px_rgba(107,66,38,0.12)]
-            p-1.5 z-50
-          "
-        >
-          {workspaces.map((ws) => (
+        <Popover.Portal>
+          <Popover.Content
+            side="bottom"
+            align="start"
+            sideOffset={4}
+            className="
+              w-[200px] max-h-[280px] overflow-y-auto
+              bg-cream-2 border border-cream-3 rounded-xl
+              shadow-[0_8px_30px_rgba(107,66,38,0.12)]
+              p-1.5 z-50
+            "
+          >
+            {workspaces.map((ws) => (
+              <button
+                key={ws.publicId}
+                onClick={() => handleSwitch(ws.publicId)}
+                className={`
+                  w-full flex items-center gap-2 px-2.5 py-2 rounded-lg
+                  text-left cursor-pointer border-none
+                  text-[12.5px] font-sans transition-colors duration-[120ms]
+                  ${
+                    ws.publicId === currentId
+                      ? 'bg-glass-bg text-coffee font-medium'
+                      : 'bg-transparent text-text-primary hover:bg-cream-3'
+                  }
+                `}
+              >
+                <div className="w-6 h-6 rounded-md bg-coffee/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-[10px] font-semibold text-coffee">
+                    {ws.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <span className="flex-1 truncate">{ws.name}</span>
+                {ws.publicId === currentId && (
+                  <Check size={14} className="text-coffee flex-shrink-0" />
+                )}
+              </button>
+            ))}
+
+            <div className="my-1.5 border-t border-cream-3" />
+
             <button
-              key={ws.publicId}
-              onClick={() => handleSwitch(ws.publicId)}
-              className={`
-                w-full flex items-center gap-2 px-2.5 py-2 rounded-lg
-                text-left cursor-pointer border-none
-                text-[12.5px] font-sans transition-colors duration-[120ms]
-                ${
-                  ws.publicId === currentId
-                    ? 'bg-glass-bg text-coffee font-medium'
-                    : 'bg-transparent text-text-primary hover:bg-cream-3'
-                }
-              `}
-            >
-              <div className="w-6 h-6 rounded-md bg-coffee/10 flex items-center justify-center flex-shrink-0">
-                <span className="text-[10px] font-semibold text-coffee">
-                  {ws.name.charAt(0).toUpperCase()}
-                </span>
-              </div>
-              <span className="flex-1 truncate">{ws.name}</span>
-              {ws.publicId === currentId && (
-                <Check size={14} className="text-coffee flex-shrink-0" />
-              )}
-            </button>
-          ))}
-
-          <div className="my-1.5 border-t border-cream-3" />
-
-          {creating ? (
-            <form onSubmit={handleCreate} className="px-1">
-              <input
-                type="text"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                placeholder={t('workspace.newPlaceholder')}
-                autoFocus
-                className="
-                  w-full px-2.5 py-1.5 rounded-lg text-[12px]
-                  bg-glass-bg border border-cream-3 text-text-primary
-                  outline-none focus:border-coffee font-sans mb-1
-                "
-              />
-              <div className="flex gap-1.5">
-                <button
-                  type="submit"
-                  disabled={createWs.isPending}
-                  className="flex-1 px-2 py-1 rounded-md text-[11px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50"
-                >
-                  {t('common.create')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCreating(false);
-                    setNewName('');
-                  }}
-                  className="px-2 py-1 rounded-md text-[11px] text-text-secondary bg-transparent border border-cream-3 cursor-pointer hover:bg-cream-3"
-                >
-                  {t('common.cancel')}
-                </button>
-              </div>
-            </form>
-          ) : (
-            <button
-              onClick={() => setCreating(true)}
+              onClick={() => {
+                setOpen(false);
+                setModalOpen(true);
+              }}
               className="
                 w-full flex items-center gap-2 px-2.5 py-2 rounded-lg
                 text-left cursor-pointer border-none bg-transparent
@@ -160,9 +130,63 @@ export function WorkspaceSwitcher({ workspaces }: WorkspaceSwitcherProps) {
               <Plus size={14} />
               {t('workspace.create')}
             </button>
-          )}
-        </Popover.Content>
-      </Popover.Portal>
-    </Popover.Root>
+          </Popover.Content>
+        </Popover.Portal>
+      </Popover.Root>
+
+      <Dialog.Root open={modalOpen} onOpenChange={(v) => { setModalOpen(v); if (!v) setNewName(''); }}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100%-2rem)] max-w-[400px] bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl shadow-[0_16px_50px_rgba(107,66,38,0.15)] outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-coffee/10 flex items-center justify-center">
+                  <Building2 size={20} className="text-coffee" />
+                </div>
+                <div>
+                  <Dialog.Title className="text-[16px] font-semibold text-text-primary font-serif">
+                    {t('workspace.create')}
+                  </Dialog.Title>
+                  <Dialog.Description className="text-[12px] text-text-secondary">
+                    {t('workspace.newPlaceholder')}
+                  </Dialog.Description>
+                </div>
+              </div>
+
+              <form onSubmit={handleCreate}>
+                <input
+                  type="text"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder={t('workspace.newPlaceholder')}
+                  autoFocus
+                  className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all mb-4"
+                />
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => { setModalOpen(false); setNewName(''); }}
+                    className="px-4 py-2 rounded-lg text-[13px] font-medium bg-transparent text-text-secondary border border-cream-3 cursor-pointer hover:bg-cream-3 transition-colors"
+                  >
+                    {t('common.cancel')}
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={createWs.isPending || !newName.trim()}
+                    className="px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50 transition-colors"
+                  >
+                    {createWs.isPending ? t('common.loading') : t('common.create')}
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <Dialog.Close className="absolute top-3 right-3 w-7 h-7 rounded-lg flex items-center justify-center bg-transparent border-none text-text-tertiary hover:text-text-secondary hover:bg-cream-3/40 cursor-pointer transition-all">
+              <X size={15} />
+            </Dialog.Close>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    </>
   );
 }

@@ -51,7 +51,7 @@ export function OwnerDashboard() {
         <PageHeader title={t('nav.dashboard')} />
         <GuidedTour />
 
-        <div className="border-[1.5px] border-dashed border-cream-3 rounded-2xl bg-white/30 flex flex-col items-center justify-center min-h-[400px] py-12 px-6">
+        <div className="border-[1.5px] border-dashed border-cream-3 rounded-2xl bg-glass-bg backdrop-blur-md flex flex-col items-center justify-center min-h-[400px] py-12 px-6">
           <Coffee size={48} className="text-coffee/80 mb-4" strokeWidth={1.5} />
 
           <h2

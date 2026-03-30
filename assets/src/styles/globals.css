@@ -104,39 +104,39 @@
 
 /* ===================== DARK THEME ===================== */
 .dark {
-    --background: 18 19% 8%;
+    --background: 20 22% 10%;
     --foreground: 36 20% 90%;
-    --card: 18 19% 10%;
+    --card: 20 22% 12%;
     --card-foreground: 36 20% 90%;
-    --popover: 18 19% 10%;
+    --popover: 20 22% 12%;
     --popover-foreground: 36 20% 90%;
     --primary: 28 54% 49%;
-    --primary-foreground: 18 19% 8%;
-    --secondary: 18 15% 16%;
+    --primary-foreground: 20 22% 10%;
+    --secondary: 20 18% 16%;
     --secondary-foreground: 36 20% 90%;
-    --muted: 18 15% 20%;
+    --muted: 20 18% 20%;
     --muted-foreground: 30 12% 60%;
     --accent: 22 32% 38%;
     --accent-foreground: 36 20% 90%;
     --destructive: 6 63% 46%;
     --destructive-foreground: 0 0% 100%;
-    --border: 18 15% 20%;
-    --input: 18 15% 20%;
+    --border: 20 18% 20%;
+    --input: 20 18% 20%;
     --ring: 28 54% 49%;
 
-    --sidebar-background: 18 19% 6%;
+    --sidebar-background: 20 22% 8%;
     --sidebar-foreground: 30 12% 60%;
     --sidebar-primary: 28 54% 49%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 18 15% 16%;
+    --sidebar-accent: 20 18% 16%;
     --sidebar-accent-foreground: 36 20% 90%;
-    --sidebar-border: 18 15% 20%;
+    --sidebar-border: 20 18% 20%;
     --sidebar-ring: 28 54% 49%;
 
     /* DailyBrew dark — warm dark coffee tones */
-    --db-cream: #1A1614;
-    --db-cream-2: #221E1A;
-    --db-cream-3: #2E2822;
+    --db-cream: #1E1916;
+    --db-cream-2: #262019;
+    --db-cream-3: #332B24;
     --db-coffee: #E8A85A;
     --db-coffee-light: #D49A4E;
     --db-amber: #E8A85A;
@@ -147,8 +147,8 @@
     --db-green: #6BB87A;
     --db-red: #E05A4E;
     --db-blue: #5A9AD6;
-    --db-glass-bg: rgba(30, 26, 22, 0.72);
-    --db-glass-border: rgba(60, 52, 44, 0.6);
+    --db-glass-bg: rgba(50, 42, 34, 0.72);
+    --db-glass-border: rgba(90, 78, 62, 0.45);
 }
 
 /* ---- Base ---- */
@@ -186,11 +186,11 @@ body::before {
 html.dark body::before {
     background:
         radial-gradient(ellipse 600px 600px at var(--grad-x1, 0%) var(--grad-y1, 0%),
-            rgba(193, 127, 59, 0.06) 0%, transparent 70%),
+            rgba(193, 127, 59, 0.16) 0%, transparent 70%),
         radial-gradient(ellipse 500px 500px at var(--grad-x2, 100%) var(--grad-y2, 100%),
-            rgba(107, 66, 38, 0.04) 0%, transparent 70%),
+            rgba(107, 66, 38, 0.12) 0%, transparent 70%),
         radial-gradient(ellipse 400px 400px at var(--grad-x3, 80%) var(--grad-y3, 10%),
-            rgba(232, 168, 90, 0.03) 0%, transparent 60%);
+            rgba(232, 168, 90, 0.10) 0%, transparent 60%);
 }
 
 @keyframes gradientDrift {
@@ -227,7 +227,7 @@ html.dark body::before {
 }
 
 html.dark .glass-card {
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(80, 70, 58, 0.12);
 }
 
 .glass-card:hover {
@@ -236,7 +236,7 @@ html.dark .glass-card {
 }
 
 html.dark .glass-card:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 /* ---- Page transition ---- */
