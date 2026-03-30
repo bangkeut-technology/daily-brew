@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.8.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.7.0...v1.8.0) (2026-03-30)
+
+
+### Features
+
+* add abstract repository, workspace QR check-in, and reusable formatting utilities ([4a8d581](https://github.com/bangkeut-technology/daily-brew/commit/4a8d581a045e37daa2bfc184f8aa2055b886d538))
+* add dev-exclusive toggle plan endpoint and dashboard updates ([71ff7ce](https://github.com/bangkeut-technology/daily-brew/commit/71ff7ce8ebb4a68e52cabcd808e4cc6a7eb7e87e))
+* add employee-user linking enhancements and improve workspace settings ([5d71e2e](https://github.com/bangkeut-technology/daily-brew/commit/5d71e2e173500f821e976177d5c4dd35fd1dd277))
+* add leave overlap validation, partial leave support, and UI enhancements ([8b5185c](https://github.com/bangkeut-technology/daily-brew/commit/8b5185c335c64d448469632418c7890e5997970e))
+* add leave requests functionality and `cn` utility integration ([98025be](https://github.com/bangkeut-technology/daily-brew/commit/98025be1f5adf114f92be0800f9aa66c2153381d))
+* add overlapping validations for leave requests and closures ([44f2d68](https://github.com/bangkeut-technology/daily-brew/commit/44f2d68561d10e8a94ab0c92982d7f1fee2b074f))
+* add support for cancelling leave requests and enhance UI/UX ([7b09447](https://github.com/bangkeut-technology/daily-brew/commit/7b09447961cedb716ac80024bba7e75051a125d1))
+* add timezone handling and improve check-in/check-out accuracy ([01d70d4](https://github.com/bangkeut-technology/daily-brew/commit/01d70d4e879706ab73801a8f678a7ded79c56460))
+* enhance leave request management and UI with partial-day support and status updates ([016bc90](https://github.com/bangkeut-technology/daily-brew/commit/016bc904cfb4746882e3b742cf4de855b0400777))
+* enhance leave request management and UI with partial-day support and status updates ([2233919](https://github.com/bangkeut-technology/daily-brew/commit/2233919aa3509c6180bef2f17222edac70f492e3))
+* extract and reuse `LeaveRequestModal` in shared components ([2e4afa0](https://github.com/bangkeut-technology/daily-brew/commit/2e4afa0c58832621878f8bd4116ff83e19a1c176))
+* introduce shared UI components for date, time, and select inputs ([1c60bf0](https://github.com/bangkeut-technology/daily-brew/commit/1c60bf002070feee093ed679f22c39b25346ae7e))
+* revamp subscription plans and enhance QR check-in system ([bcd0e98](https://github.com/bangkeut-technology/daily-brew/commit/bcd0e98651e18f76aa8b7d7f56d6b97df880621b))
+* update `daily_brew_subscriptions` schema and enhance UI components ([3f12a06](https://github.com/bangkeut-technology/daily-brew/commit/3f12a06c1414b17533323e7c341eb34e6f2e5b60))
+
+
+### Bug Fixes
+
+* refine leave request validations and UI enhancements ([570a455](https://github.com/bangkeut-technology/daily-brew/commit/570a455ef9bbc3291fae2d9101ec4d35251122bb))
+* update OAuth callback navigation to use `/console/dashboard` route ([b21d15a](https://github.com/bangkeut-technology/daily-brew/commit/b21d15aab75f7f1627e48ae12ec39912b496ffed))
+
 ## [1.7.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.6.0...v1.7.0) (2026-03-30)
 
 
