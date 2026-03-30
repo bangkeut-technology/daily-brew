@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.7.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.6.0...v1.7.0) (2026-03-30)
+
+
+### Features
+
+* capture and store Apple user's first and last name during authentication ([49fd969](https://github.com/bangkeut-technology/daily-brew/commit/49fd96933fe95a7d95eca76ade4d6c64e611511f))
+* support Apple iOS client ID for token verification ([da10542](https://github.com/bangkeut-technology/daily-brew/commit/da105424cea8de908ad43d71a2a3f0eab9dcbc4e))
+
 ## [1.6.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.5.0...v1.6.0) (2026-03-29)
 
 
