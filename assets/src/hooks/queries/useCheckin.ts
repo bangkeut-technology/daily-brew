@@ -5,23 +5,23 @@ import { getDeviceId, getDeviceName } from '@/lib/device';
 
 const checkinApi = axios.create({ baseURL: '/api/v1' });
 
-export function useCheckinStatus(publicId: string) {
+export function useCheckinStatus(qrToken: string) {
   return useQuery({
-    queryKey: ['checkin', publicId],
+    queryKey: ['checkin', qrToken],
     queryFn: async () => {
-      const { data } = await checkinApi.get<CheckinStatus>(`/checkin/${publicId}`);
+      const { data } = await checkinApi.get<CheckinStatus>(`/checkin/${qrToken}`);
       return data;
     },
-    enabled: !!publicId,
+    enabled: !!qrToken,
   });
 }
 
-export function useCheckinAction(publicId: string) {
+export function useCheckinAction(qrToken: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (coords?: { latitude: number; longitude: number }) => {
       const { data } = await checkinApi.post<CheckinResponse>(
-        `/checkin/${publicId}`,
+        `/checkin/${qrToken}`,
         {
           ...coords,
           deviceId: getDeviceId(),
@@ -31,7 +31,7 @@ export function useCheckinAction(publicId: string) {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['checkin', publicId] });
+      queryClient.invalidateQueries({ queryKey: ['checkin', qrToken] });
     },
   });
 }

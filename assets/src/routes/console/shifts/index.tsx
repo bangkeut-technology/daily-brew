@@ -14,7 +14,7 @@ import { useEmployees, useUpdateEmployee } from '@/hooks/queries/useEmployees';
 import { usePlan } from '@/hooks/queries/usePlan';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
+import { GlassCard } from '@/components/shared/GlassCard';
 import { Avatar } from '@/components/shared/Avatar';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { CustomTimePicker } from '@/components/shared/CustomTimePicker';
@@ -239,35 +239,50 @@ function ShiftCard({
     }
   };
 
+  // Calculate shift duration for display
+  const [startH, startM] = shift.startTime.split(':').map(Number);
+  const [endH, endM] = shift.endTime.split(':').map(Number);
+  const startMinutes = startH * 60 + startM;
+  const endMinutes = endH * 60 + endM;
+  const durationMinutes = endMinutes > startMinutes ? endMinutes - startMinutes : (1440 - startMinutes) + endMinutes;
+  const durationHours = Math.floor(durationMinutes / 60);
+  const durationMins = durationMinutes % 60;
+
   return (
     <GlassCard hover={!isExpanded && !showAssign}>
-      <GlassCardHeader
-        title={shift.name}
-        action={
-          <button
-            onClick={onDelete}
-            className="text-text-tertiary hover:text-red transition-colors bg-transparent border-none cursor-pointer p-1"
-          >
-            <Trash2 size={14} />
-          </button>
-        }
-      />
-      <div className="px-5 py-4 flex items-center gap-2 text-[13px] text-text-secondary">
-        <Clock size={14} className="text-amber" />
-        {shift.startTime} &mdash; {shift.endTime}
+      {/* Header with time accent bar */}
+      <div className="relative">
+        <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r from-amber to-coffee" />
+        <div className="px-5 pt-5 pb-3">
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="text-[15px] font-semibold text-text-primary">{shift.name}</h3>
+              <div className="flex items-center gap-3 mt-1.5">
+                <div className="flex items-center gap-1.5 text-[13px] font-mono tabular-nums text-text-secondary">
+                  <Clock size={13} className="text-amber" />
+                  {shift.startTime} &ndash; {shift.endTime}
+                </div>
+                <span className="text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
+                  {durationHours}h{durationMins > 0 ? ` ${durationMins}m` : ''}
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={onDelete}
+              className="text-text-tertiary hover:text-red transition-colors bg-transparent border-none cursor-pointer p-1.5 rounded-lg hover:bg-red/8"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Employees section */}
       <div className="border-t border-cream-3/80 px-5 py-3">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-2.5">
           <span className="flex items-center gap-1.5 text-[12px] font-medium text-text-secondary">
             <Users size={13} />
-            {t('shift.employees', 'Employees')}
-            {assignedEmployees.length > 0 && (
-              <span className="text-[10px] font-medium px-1.5 py-px rounded-full bg-coffee/10 text-coffee">
-                {assignedEmployees.length}
-              </span>
-            )}
+            {assignedEmployees.length} {assignedEmployees.length === 1 ? 'employee' : 'employees'}
           </span>
           <button
             onClick={() => setShowAssign(!showAssign)}
@@ -279,7 +294,7 @@ function ShiftCard({
         </div>
 
         {showAssign && (
-          <div className="mb-2">
+          <div className="mb-3">
             <CustomSelect
               value=""
               onChange={(v) => { if (v) handleAssign(v); }}
@@ -293,23 +308,23 @@ function ShiftCard({
         )}
 
         {assignedEmployees.length === 0 ? (
-          <p className="text-[11.5px] text-text-tertiary">
-            {t('shift.noEmployees', 'No employees assigned')}
+          <p className="text-[11.5px] text-text-tertiary italic">
+            No employees assigned yet
           </p>
         ) : (
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             {assignedEmployees.map((emp, i) => (
               <div
                 key={emp.publicId}
-                className="flex items-center gap-2 py-1 group"
+                className="flex items-center gap-2.5 py-1.5 px-2 rounded-lg hover:bg-cream-3/30 transition-colors group"
               >
-                <Avatar name={emp.name} index={i} size={22} />
-                <span className="text-[12px] text-text-primary flex-1 truncate">
+                <Avatar name={emp.name} index={i} size={24} />
+                <span className="text-[12.5px] text-text-primary flex-1 truncate">
                   {emp.name}
                 </span>
                 <button
                   onClick={() => handleUnassign(emp.publicId)}
-                  className="opacity-0 group-hover:opacity-100 text-text-tertiary hover:text-red bg-transparent border-none cursor-pointer p-0.5 transition-all"
+                  className="text-text-tertiary hover:text-red bg-transparent border-none cursor-pointer p-1 rounded-md hover:bg-red/8 transition-all"
                 >
                   <X size={12} />
                 </button>
@@ -503,7 +518,7 @@ function DayRow({
         <span className="text-[9.5px] font-medium px-1.5 py-px rounded-full bg-coffee/8 text-coffee ml-1">
           override
         </span>
-        <div className="flex items-center gap-1 ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1 ml-auto">
           <button
             onClick={handleStartEdit}
             className="text-[11px] font-medium px-2 py-0.5 rounded-md border-none cursor-pointer bg-transparent text-text-secondary transition-colors hover:text-coffee"
@@ -534,7 +549,7 @@ function DayRow({
       <span className="text-[9.5px] text-text-tertiary ml-1">default</span>
       <button
         onClick={handleStartEdit}
-        className="flex items-center gap-1 ml-auto text-[11px] font-medium px-2 py-0.5 rounded-md border-none cursor-pointer bg-transparent text-text-tertiary transition-colors hover:text-coffee opacity-0 group-hover:opacity-100"
+        className="flex items-center gap-1 ml-auto text-[11px] font-medium px-2 py-0.5 rounded-md border-none cursor-pointer bg-transparent text-text-tertiary transition-colors hover:text-coffee"
       >
         <Plus size={10} />
         Override

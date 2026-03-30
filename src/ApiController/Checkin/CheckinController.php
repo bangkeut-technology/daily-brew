@@ -17,13 +17,13 @@ class CheckinController extends AbstractController
 {
     use ApiResponseTrait;
 
-    #[Route('/checkin/{publicId}', name: 'checkin_status', methods: ['GET'])]
+    #[Route('/checkin/{qrToken}', name: 'checkin_status', methods: ['GET'])]
     public function status(
-        string $publicId,
+        string $qrToken,
         EmployeeRepository $employeeRepository,
         CheckinService $checkinService,
     ): JsonResponse {
-        $employee = $employeeRepository->findByPublicId($publicId);
+        $employee = $employeeRepository->findByQrToken($qrToken);
         if ($employee === null || !$employee->isActive()) {
             throw new NotFoundHttpException('Invalid check-in link');
         }
@@ -36,6 +36,7 @@ class CheckinController extends AbstractController
             'shiftName' => $shift?->getName(),
             'shiftStart' => $shift?->getStartTime()?->format('H:i'),
             'shiftEnd' => $shift?->getEndTime()?->format('H:i'),
+            'linkedUserPublicId' => $employee->getLinkedUser()?->getPublicId(),
             'today' => [
                 'checkedIn' => $attendance?->getCheckInAt() !== null,
                 'checkedOut' => $attendance?->getCheckOutAt() !== null,
@@ -46,14 +47,14 @@ class CheckinController extends AbstractController
         ]);
     }
 
-    #[Route('/checkin/{publicId}', name: 'checkin_action', methods: ['POST'])]
+    #[Route('/checkin/{qrToken}', name: 'checkin_action', methods: ['POST'])]
     public function checkin(
-        string $publicId,
+        string $qrToken,
         Request $request,
         EmployeeRepository $employeeRepository,
         CheckinService $checkinService,
     ): JsonResponse {
-        $employee = $employeeRepository->findByPublicId($publicId);
+        $employee = $employeeRepository->findByQrToken($qrToken);
         if ($employee === null || !$employee->isActive()) {
             throw new NotFoundHttpException('Invalid check-in link');
         }

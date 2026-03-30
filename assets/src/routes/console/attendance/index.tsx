@@ -27,13 +27,13 @@ function AttendancePage() {
 
       <div className="flex items-end gap-3 mb-6">
         <div>
-          <label className="block text-[11px] font-medium text-text-secondary mb-1">
+          <label id="attendance-from-label" className="block text-[11px] font-medium text-text-secondary mb-1">
             {t('attendance.from', 'From')}
           </label>
           <CustomDatePicker value={from} onChange={setFrom} />
         </div>
         <div>
-          <label className="block text-[11px] font-medium text-text-secondary mb-1">
+          <label id="attendance-to-label" className="block text-[11px] font-medium text-text-secondary mb-1">
             {t('attendance.to', 'To')}
           </label>
           <CustomDatePicker value={to} onChange={setTo} />

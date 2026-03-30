@@ -141,6 +141,7 @@ class EmployeeController extends AbstractController
         WorkspaceRepository $workspaceRepository,
         EmployeeRepository $employeeRepository,
         ShiftRepository $shiftRepository,
+        UserRepository $userRepository,
         EmployeeService $employeeService,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
@@ -170,6 +171,21 @@ class EmployeeController extends AbstractController
             $shift,
             isset($data['active']) ? (bool) $data['active'] : null,
         );
+
+        // Handle linking/unlinking user account
+        if (array_key_exists('linkedUserPublicId', $data)) {
+            if ($data['linkedUserPublicId'] === null || $data['linkedUserPublicId'] === '') {
+                $employee->setLinkedUser(null);
+                $employeeService->linkUser($employee, null);
+            } else {
+                $linkedUser = $userRepository->findByPublicId($data['linkedUserPublicId']);
+                if ($linkedUser !== null) {
+                    $employeeService->linkUser($employee, $linkedUser);
+                } else {
+                    return $this->jsonError('User not found with that public ID', 404);
+                }
+            }
+        }
 
         return $this->jsonSuccess(EmployeeDTO::fromEntity($employee)->toArray());
     }

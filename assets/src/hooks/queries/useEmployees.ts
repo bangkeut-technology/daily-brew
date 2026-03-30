@@ -63,6 +63,7 @@ export function useUpdateEmployee(workspacePublicId: string) {
       phoneNumber?: string;
       shiftPublicId?: string | null;
       active?: boolean;
+      linkedUserPublicId?: string | null;
     }) => {
       const { data } = await apiAxios.put<Employee>(
         `/workspaces/${workspacePublicId}/employees/${publicId}`,

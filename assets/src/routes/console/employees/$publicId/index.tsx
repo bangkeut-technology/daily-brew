@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Copy, Pencil, X, Check, Link2 } from 'lucide-react';
+import { Copy, Pencil, X, Check, Link2, Mail, ExternalLink, Unlink, Info } from 'lucide-react';
 import { useState } from 'react';
 import { useEmployee, useUpdateEmployee } from '@/hooks/queries/useEmployees';
 import { useShifts } from '@/hooks/queries/useShifts';
@@ -14,7 +14,9 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { Avatar } from '@/components/shared/Avatar';
 import { CustomSelect } from '@/components/shared/CustomSelect';
+import { Toggle } from '@/components/shared/Toggle';
 import { StatusBadge } from '@/components/shared/StatusBadge';
+import { ConfirmModal } from '@/components/shared/ConfirmModal';
 
 const editEmployeeSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -38,6 +40,8 @@ function EmployeeDetailPage() {
   const { data: shifts } = useShifts(workspaceId);
   const updateEmployee = useUpdateEmployee(workspaceId);
   const [isEditing, setIsEditing] = useState(false);
+  const [linkUserId, setLinkUserId] = useState('');
+  const [showUnlinkConfirm, setShowUnlinkConfirm] = useState(false);
 
   const {
     register,
@@ -68,7 +72,7 @@ function EmployeeDetailPage() {
   }
 
   const fullName = `${employee.firstName} ${employee.lastName}`;
-  const checkinUrl = `${window.location.origin}/checkin/${employee.publicId}`;
+  const checkinUrl = `${window.location.origin}/checkin/${employee.qrToken}`;
 
   const handleCopyLink = async () => {
     try {
@@ -86,6 +90,27 @@ function EmployeeDetailPage() {
   const handleCancelEdit = () => {
     reset();
     setIsEditing(false);
+  };
+
+  const handleLinkUser = async () => {
+    const id = linkUserId.trim();
+    if (!id) return;
+    try {
+      await updateEmployee.mutateAsync({ publicId, linkedUserPublicId: id });
+      toast.success(t('employee.userLinked', 'User account linked'));
+      setLinkUserId('');
+    } catch {
+      toast.error(t('employee.userLinkError', 'Failed to link user. Check the ID and try again.'));
+    }
+  };
+
+  const handleUnlinkUser = async () => {
+    try {
+      await updateEmployee.mutateAsync({ publicId, linkedUserPublicId: null });
+      toast.success(t('employee.userUnlinked', 'User account unlinked'));
+    } catch {
+      toast.error(t('employee.userUnlinkError', 'Failed to unlink user'));
+    }
   };
 
   const onSubmit = async (values: EditEmployeeForm) => {
@@ -177,13 +202,12 @@ function EmployeeDetailPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
+                <Toggle
                   id="active-toggle"
-                  {...register('active')}
-                  className="accent-coffee w-4 h-4"
+                  checked={watch('active')}
+                  onChange={(v) => setValue('active', v)}
                 />
-                <label htmlFor="active-toggle" className="text-[13px] text-text-secondary">
+                <label htmlFor="active-toggle" className="text-[13px] text-text-secondary cursor-pointer">
                   {t('employee.active', 'Active')}
                 </label>
               </div>
@@ -208,29 +232,57 @@ function EmployeeDetailPage() {
               </div>
             </form>
           ) : (
-            <div className="p-6 flex flex-col items-center text-center">
-              <Avatar name={fullName} index={0} size={64} radius="20px" />
-              <h2 className="text-[16px] font-semibold text-text-primary mt-3">{fullName}</h2>
-              <p className="text-[12px] text-text-tertiary mt-1">
-                {employee.shiftName || t('employee.noShift', 'No shift assigned')}
-              </p>
-              {employee.phoneNumber && (
-                <p className="text-[12px] text-text-secondary mt-1">{employee.phoneNumber}</p>
-              )}
-              <div className="mt-3">
-                <StatusBadge
-                  label={employee.active ? t('employee.active') : t('employee.inactive')}
-                  variant={employee.active ? 'green' : 'gray'}
-                />
+            <div className="p-6">
+              <div className="flex flex-col items-center text-center">
+                <Avatar name={fullName} index={0} size={64} radius="20px" />
+                <h2 className="text-[16px] font-semibold text-text-primary mt-3">{fullName}</h2>
+                <div className="mt-3">
+                  <StatusBadge
+                    label={employee.active ? t('employee.active') : t('employee.inactive')}
+                    variant={employee.active ? 'green' : 'gray'}
+                  />
+                </div>
               </div>
 
-              {/* Linked user info */}
-              {employee.linkedUserEmail && (
-                <div className="mt-4 flex items-center gap-1.5 text-[12px] text-text-secondary">
-                  <Link2 size={12} className="text-text-tertiary" />
-                  {employee.linkedUserEmail}
+              <div className="mt-5 space-y-3">
+                <div className="flex items-center justify-between py-2 border-b border-cream-3/50">
+                  <span className="text-[11.5px] text-text-tertiary">{t('employee.shift', 'Shift')}</span>
+                  <span className="text-[12.5px] font-medium text-text-primary">
+                    {employee.shiftName || t('employee.noShift', 'No shift')}
+                  </span>
                 </div>
-              )}
+                {employee.phoneNumber && (
+                  <div className="flex items-center justify-between py-2 border-b border-cream-3/50">
+                    <span className="text-[11.5px] text-text-tertiary">{t('employee.phone', 'Phone')}</span>
+                    <span className="text-[12.5px] font-medium text-text-primary font-mono">{employee.phoneNumber}</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between py-2 border-b border-cream-3/50">
+                  <span className="text-[11.5px] text-text-tertiary">Created</span>
+                  <span className="text-[12.5px] text-text-secondary">
+                    {new Date(employee.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+
+                {/* Linked user info */}
+                {employee.linkedUserEmail ? (
+                  <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-green/8 border border-green/15">
+                    <Mail size={13} className="text-green flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[12px] text-green font-medium truncate block">{employee.linkedUserEmail}</span>
+                      <span className="text-[10.5px] text-green/70">Can view their own dashboard</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-amber/8 border border-amber/15">
+                    <Info size={13} className="text-amber flex-shrink-0" />
+                    <div>
+                      <span className="text-[11.5px] text-amber font-medium block">No user account linked</span>
+                      <span className="text-[10.5px] text-amber/70">This employee can only check in via QR code</span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </GlassCard>
@@ -238,16 +290,41 @@ function EmployeeDetailPage() {
         {/* QR Code + Link User */}
         <div className="flex flex-col gap-6">
           <GlassCard hover={false}>
-            <GlassCardHeader title={t('employee.qrCode', 'QR Code')} />
-            <div className="p-6 flex flex-col items-center">
-              <QRCodeSVG value={checkinUrl} size={180} />
-              <p className="text-[11px] text-text-tertiary mt-3 break-all text-center max-w-[200px]">
-                {checkinUrl}
+            <GlassCardHeader title={t('employee.qrCode', 'QR code')} />
+            <div className="px-5 py-2">
+              <p className="text-[11.5px] text-text-tertiary leading-relaxed">
+                Print or display this QR code at your restaurant. Staff scan it with their phone to check in and out.
               </p>
+            </div>
+            <div className="p-6 pt-2 flex flex-col items-center">
+              <div className="p-4 bg-white rounded-2xl shadow-[0_2px_12px_rgba(107,66,38,0.08)]">
+                <QRCodeSVG
+                  value={checkinUrl}
+                  size={160}
+                  fgColor="#6B4226"
+                  bgColor="#FFFFFF"
+                  level="M"
+                  imageSettings={{
+                    src: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%236B4226" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>'),
+                    height: 24,
+                    width: 24,
+                    excavate: true,
+                  }}
+                />
+              </div>
+              <a
+                href={checkinUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 flex items-center gap-1 text-[11px] text-coffee hover:text-coffee-light transition-colors no-underline"
+              >
+                <ExternalLink size={10} />
+                <span className="break-all text-center max-w-[200px]">{checkinUrl}</span>
+              </a>
               <button
                 type="button"
                 onClick={handleCopyLink}
-                className="mt-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3"
+                className="mt-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3"
               >
                 <Copy size={12} />
                 {t('common.copyLink', 'Copy link')}
@@ -256,48 +333,137 @@ function EmployeeDetailPage() {
           </GlassCard>
 
           {/* Link user section */}
-          {!employee.linkedUserPublicId && (
-            <GlassCard hover={false}>
-              <GlassCardHeader title={t('employee.linkUser', 'Link user account')} />
-              <div className="p-5">
-                <p className="text-[12px] text-text-secondary mb-3">
-                  {t(
-                    'employee.linkUserDescription',
-                    'Share this employee ID with the staff member. They can use it during onboarding to link their account.',
-                  )}
-                </p>
-                <div className="flex items-center gap-2">
-                  <code className="flex-1 px-3 py-2 rounded-lg text-[13px] bg-cream-2 border border-cream-3 text-text-primary font-mono select-all">
-                    {employee.publicId}
-                  </code>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      try {
-                        await navigator.clipboard.writeText(employee.publicId);
-                        toast.success(t('common.copied', 'Copied to clipboard'));
-                      } catch {
-                        toast.error(t('common.copyFailed', 'Failed to copy'));
-                      }
-                    }}
-                    className="flex items-center gap-1 px-2.5 py-2 rounded-lg text-[12px] bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer transition-colors hover:bg-cream-3"
-                  >
-                    <Copy size={12} />
-                  </button>
-                </div>
-              </div>
-            </GlassCard>
-          )}
+          <GlassCard hover={false}>
+            <GlassCardHeader
+              title={t('employee.linkUser', 'Link user account')}
+              action={
+                employee.linkedUserEmail ? (
+                  <StatusBadge label="Linked" variant="green" />
+                ) : undefined
+              }
+            />
+            <div className="p-5 space-y-4">
+              {employee.linkedUserEmail ? (
+                <>
+                  <p className="text-[11.5px] text-text-tertiary leading-relaxed">
+                    This employee is linked to a user account. They can sign in to DailyBrew and view their own attendance, shifts, and leave requests.
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-green/10 flex items-center justify-center flex-shrink-0">
+                      <Mail size={16} className="text-green" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-medium text-text-primary truncate">{employee.linkedUserEmail}</p>
+                      <p className="text-[11px] text-text-tertiary">User account linked</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowUnlinkConfirm(true)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium text-red bg-red/8 border-none cursor-pointer transition-colors hover:bg-red/15"
+                    >
+                      <Unlink size={12} />
+                      Unlink
+                    </button>
+                  </div>
+
+                  <ConfirmModal
+                    open={showUnlinkConfirm}
+                    onOpenChange={setShowUnlinkConfirm}
+                    title={t('employee.unlinkTitle', 'Unlink user account')}
+                    description={t('employee.unlinkConfirm', 'Remove the link between this employee and their user account? They will no longer be able to see their own dashboard.')}
+                    confirmLabel={t('employee.unlink', 'Unlink')}
+                    cancelLabel={t('common.cancel')}
+                    variant="danger"
+                    loading={updateEmployee.isPending}
+                    onConfirm={handleUnlinkUser}
+                  />
+                </>
+              ) : (
+                <>
+                  <p className="text-[11.5px] text-text-tertiary leading-relaxed">
+                    Linking a user account lets this employee sign in and view their own attendance and shifts. Without a linked account, they can only check in via QR code.
+                  </p>
+                  <div>
+                    <p className="text-[12px] font-medium text-text-secondary mb-1.5">
+                      {t('employee.linkByPublicId', 'Link by user public ID')}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        id="link-user-id"
+                        name="linkUserId"
+                        type="text"
+                        value={linkUserId}
+                        onChange={(e) => setLinkUserId(e.target.value)}
+                        placeholder={t('employee.userPublicIdPlaceholder', 'Enter user public ID')}
+                        className="flex-1 px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono transition-colors"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleLinkUser}
+                        disabled={!linkUserId.trim() || updateEmployee.isPending}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-medium bg-coffee text-white border-none cursor-pointer transition-colors hover:bg-coffee-light disabled:opacity-50"
+                      >
+                        <Link2 size={12} />
+                        Link
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-cream-3/60 pt-4">
+                    <p className="text-[12px] text-text-secondary mb-2">
+                      {t(
+                        'employee.linkUserDescription',
+                        'Or share this employee ID with the staff member. They can use it during onboarding to link their account.',
+                      )}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <code className="flex-1 px-3 py-2 rounded-lg text-[13px] bg-cream-2 border border-cream-3 text-text-primary font-mono select-all">
+                        {employee.publicId}
+                      </code>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            await navigator.clipboard.writeText(employee.publicId);
+                            toast.success(t('common.copied', 'Copied to clipboard'));
+                          } catch {
+                            toast.error(t('common.copyFailed', 'Failed to copy'));
+                          }
+                        }}
+                        className="flex items-center gap-1 px-2.5 py-2 rounded-lg text-[12px] bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer transition-colors hover:bg-cream-3"
+                      >
+                        <Copy size={12} />
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </GlassCard>
         </div>
 
         {/* Attendance history */}
         <GlassCard hover={false} className="lg:col-span-1">
-          <GlassCardHeader title={t('employee.attendanceHistory', 'Attendance history')} />
+          <GlassCardHeader
+            title={t('employee.attendanceHistory', 'Attendance history')}
+            action={
+              employee.attendance && employee.attendance.length > 0 ? (
+                <span className="text-[11px] text-text-tertiary">
+                  Last {Math.min(employee.attendance.length, 30)} days
+                </span>
+              ) : undefined
+            }
+          />
           <div className="max-h-[400px] overflow-y-auto">
             {!employee.attendance || employee.attendance.length === 0 ? (
-              <p className="px-5 py-8 text-center text-[13px] text-text-tertiary">
-                {t('employee.noAttendance', 'No attendance records')}
-              </p>
+              <div className="px-5 py-8 text-center">
+                <p className="text-[13px] text-text-tertiary">
+                  {t('employee.noAttendance', 'No attendance records')}
+                </p>
+                <p className="text-[11px] text-text-tertiary mt-1">
+                  Records will appear here after the first check-in via QR code.
+                </p>
+              </div>
             ) : (
               employee.attendance.slice(0, 30).map((a) => (
                 <div

@@ -16,6 +16,7 @@ final readonly class UserDTO
         public string  $fullName,
         public ?string $locale,
         public bool    $onboardingCompleted,
+        public ?string $currentWorkspacePublicId,
     ) {}
 
     public static function fromEntity(User $u): self
@@ -28,6 +29,7 @@ final readonly class UserDTO
             fullName: $u->getFullName(),
             locale: $u->getLocale(),
             onboardingCompleted: $u->isOnboardingCompleted(),
+            currentWorkspacePublicId: $u->getCurrentWorkspace() ? (string) $u->getCurrentWorkspace()->getPublicId() : null,
         );
     }
 
@@ -41,6 +43,7 @@ final readonly class UserDTO
             'fullName' => $this->fullName,
             'locale' => $this->locale,
             'onboardingCompleted' => $this->onboardingCompleted,
+            'currentWorkspacePublicId' => $this->currentWorkspacePublicId,
         ];
     }
 }

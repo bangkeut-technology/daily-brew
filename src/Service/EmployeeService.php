@@ -59,7 +59,7 @@ class EmployeeService
         return $employee;
     }
 
-    public function linkUser(Employee $employee, User $user): Employee
+    public function linkUser(Employee $employee, ?User $user): Employee
     {
         $employee->setLinkedUser($user);
         $this->em->flush();

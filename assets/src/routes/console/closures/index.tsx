@@ -107,6 +107,7 @@ function ClosuresPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="p-5 space-y-3">
             <div>
               <input
+                id="closure-name"
                 type="text"
                 placeholder={t('closure.namePlaceholder', 'Closure name (e.g. Khmer New Year)')}
                 {...register('name')}
@@ -118,7 +119,7 @@ function ClosuresPage() {
             </div>
             <div className="flex gap-3">
               <div className="flex-1">
-                <label className="block text-[11px] font-medium text-text-secondary mb-1">
+                <label id="closure-start-label" className="block text-[11px] font-medium text-text-secondary mb-1">
                   {t('closure.startDate', 'Start date')}
                 </label>
                 <CustomDatePicker
@@ -130,7 +131,7 @@ function ClosuresPage() {
                 )}
               </div>
               <div className="flex-1">
-                <label className="block text-[11px] font-medium text-text-secondary mb-1">
+                <label id="closure-end-label" className="block text-[11px] font-medium text-text-secondary mb-1">
                   {t('closure.endDate', 'End date')}
                 </label>
                 <CustomDatePicker

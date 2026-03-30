@@ -6,6 +6,7 @@ export interface User {
   fullName?: string;
   locale?: string;
   onboardingCompleted?: boolean;
+  currentWorkspacePublicId?: string | null;
 }
 
 export interface Workspace {

@@ -1,24 +1,25 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useCheckinStatus, useCheckinAction } from '@/hooks/queries/useCheckin';
+import { useAuthentication } from '@/hooks/use-authentication';
 import { useState, useEffect } from 'react';
-import { MapPin } from 'lucide-react';
+import { MapPin, ShieldAlert, LogIn } from 'lucide-react';
 
-export const Route = createFileRoute('/checkin/$publicId')({
+export const Route = createFileRoute('/checkin/$qrToken')({
   component: CheckinPage,
 });
 
 function CheckinPage() {
   const { t } = useTranslation();
-  const { publicId } = Route.useParams();
-  const { data, isLoading, error, refetch } = useCheckinStatus(publicId);
-  const checkinAction = useCheckinAction(publicId);
+  const { qrToken } = Route.useParams();
+  const { status: authStatus, user } = useAuthentication();
+  const { data, isLoading, error, refetch } = useCheckinStatus(qrToken);
+  const checkinAction = useCheckinAction(qrToken);
   const [actionResult, setActionResult] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [geoError, setGeoError] = useState<string | null>(null);
 
-  // Request geolocation on mount
   useEffect(() => {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -58,7 +59,7 @@ function CheckinPage() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || authStatus === 'loading') {
     return (
       <div className="min-h-screen bg-cream flex items-center justify-center">
         <p className="text-text-tertiary">{t('common.loading')}</p>
@@ -83,6 +84,11 @@ function CheckinPage() {
   }
 
   if (!data) return null;
+
+  // Auth check: if employee has a linked user, require that user to be logged in
+  const requiresAuth = !!data.linkedUserPublicId;
+  const isCorrectUser = user && data.linkedUserPublicId === user.publicId;
+  const authBlocked = requiresAuth && !isCorrectUser;
 
   const { today } = data;
   const completed = today.checkedIn && today.checkedOut;
@@ -113,9 +119,7 @@ function CheckinPage() {
       </p>
 
       {/* Avatar */}
-      <div
-        className="w-16 h-16 rounded-[20px] flex items-center justify-center text-2xl font-bold text-white mb-4 bg-gradient-to-br from-amber-light to-coffee shadow-[0_4px_14px_rgba(107,66,38,0.25)]"
-      >
+      <div className="w-16 h-16 rounded-[20px] flex items-center justify-center text-2xl font-bold text-white mb-4 bg-gradient-to-br from-amber-light to-coffee shadow-[0_4px_14px_rgba(107,66,38,0.25)]">
         {initials}
       </div>
 
@@ -127,23 +131,50 @@ function CheckinPage() {
           : 'No shift assigned'}
       </p>
 
+      {/* Auth required but not logged in or wrong user */}
+      {authBlocked && (
+        <div className="w-full max-w-xs space-y-3 mb-4">
+          <div className="flex items-start gap-3 bg-amber/10 border border-amber/20 rounded-2xl px-5 py-4">
+            <ShieldAlert size={18} className="text-amber flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-[13px] font-medium text-text-primary mb-1">
+                Sign in required
+              </p>
+              <p className="text-[11.5px] text-text-secondary leading-relaxed">
+                This employee is linked to a user account. Please sign in with your account to check in.
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/sign-in"
+            search={{ redirect: `/checkin/${qrToken}` }}
+            className="w-full flex items-center justify-center gap-2 bg-coffee text-white text-[14px] font-semibold rounded-2xl py-3.5 no-underline shadow-[0_4px_14px_rgba(107,66,38,0.30)] transition-all hover:-translate-y-px"
+          >
+            <LogIn size={16} />
+            Sign in to check in
+          </Link>
+        </div>
+      )}
+
       {/* Geolocation warning */}
-      {geoError && (
+      {!authBlocked && geoError && (
         <div className="flex items-center gap-1.5 bg-amber/10 border border-amber/20 rounded-xl px-4 py-2 text-[11px] text-amber font-medium mb-4 max-w-xs text-center">
           <MapPin size={14} className="shrink-0" />
           {t('checkin.locationDenied')}
         </div>
       )}
 
+      {/* Verified badge for linked user */}
+      {isCorrectUser && !completed && (
+        <div className="flex items-center gap-1.5 bg-green/10 border border-green/20 rounded-full px-4 py-1.5 text-[11.5px] text-green font-medium mb-4">
+          <ShieldAlert size={13} />
+          Verified account
+        </div>
+      )}
+
       {/* Status pill */}
-      {today.checkedIn && (
-        <div
-          className={`border rounded-full px-4 py-1.5 text-[12px] font-medium mb-8 font-sans ${
-            completed
-              ? 'bg-green/10 border-green/20 text-green'
-              : 'bg-green/10 border-green/20 text-green'
-          }`}
-        >
+      {!authBlocked && today.checkedIn && (
+        <div className="border rounded-full px-4 py-1.5 text-[12px] font-medium mb-8 font-sans bg-green/10 border-green/20 text-green">
           {completed
             ? `\u2713 Checked out at ${today.checkOutAt}`
             : `\u2713 Checked in at ${today.checkInAt}`}
@@ -165,7 +196,7 @@ function CheckinPage() {
       )}
 
       {/* CTA button */}
-      {!completed && (
+      {!authBlocked && !completed && (
         <button
           onClick={handleCheckin}
           disabled={checkinAction.isPending}
@@ -179,7 +210,7 @@ function CheckinPage() {
         </button>
       )}
 
-      {completed && (
+      {!authBlocked && completed && (
         <div className="bg-green/10 border border-green/20 rounded-2xl px-6 py-4 text-center max-w-xs">
           <p className="text-[14px] font-medium text-green">{t('checkin.completed')}</p>
         </div>

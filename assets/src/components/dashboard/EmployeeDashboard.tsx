@@ -38,10 +38,10 @@ export function EmployeeDashboard() {
   const { data: ctx, isLoading: ctxLoading } = useRoleContext();
 
   const employee = ctx?.employee ?? null;
-  const publicId = employee?.publicId ?? '';
+  const qrToken = employee?.qrToken ?? '';
 
-  const { data: checkinData, isLoading: checkinLoading, refetch } = useCheckinStatus(publicId);
-  const checkinAction = useCheckinAction(publicId);
+  const { data: checkinData, isLoading: checkinLoading, refetch } = useCheckinStatus(qrToken);
+  const checkinAction = useCheckinAction(qrToken);
 
   const [actionError, setActionError] = useState<string | null>(null);
   const [locationDenied, setLocationDenied] = useState(false);

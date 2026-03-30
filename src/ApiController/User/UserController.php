@@ -48,6 +48,31 @@ class UserController extends AbstractController
         ]);
     }
 
+    #[Route('/me/current-workspace', name: 'users_me_set_current_workspace', methods: ['PUT'])]
+    public function setCurrentWorkspace(
+        #[CurrentUser] User $user,
+        Request $request,
+        WorkspaceRepository $workspaceRepository,
+        EntityManagerInterface $em,
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+        $workspacePublicId = $data['workspacePublicId'] ?? null;
+
+        if ($workspacePublicId) {
+            $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
+            if ($workspace === null) {
+                return $this->jsonError('Workspace not found', 404);
+            }
+            $user->setCurrentWorkspace($workspace);
+        } else {
+            $user->setCurrentWorkspace(null);
+        }
+
+        $em->flush();
+
+        return $this->jsonSuccess(null);
+    }
+
     /**
      * Returns role context — whether the user is an owner, employee, or both.
      */
@@ -81,6 +106,7 @@ class UserController extends AbstractController
             ], $ownedWorkspaces),
             'employee' => $employee ? [
                 'publicId' => (string) $employee->getPublicId(),
+                'qrToken' => $employee->getQrToken(),
                 'name' => $employee->getName(),
                 'workspacePublicId' => $employee->getWorkspace() ? (string) $employee->getWorkspace()->getPublicId() : null,
                 'workspaceName' => $employee->getWorkspace()?->getName(),

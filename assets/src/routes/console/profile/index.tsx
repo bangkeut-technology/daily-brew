@@ -330,10 +330,12 @@ function ProfilePage() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+                  <label htmlFor="profile-firstName" className="block text-[12px] font-medium text-text-secondary mb-1.5">
                     {t('profile.firstName', 'First name')}
                   </label>
                   <input
+                    id="profile-firstName"
+                    name="firstName"
                     type="text"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
@@ -341,10 +343,12 @@ function ProfilePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+                  <label htmlFor="profile-lastName" className="block text-[12px] font-medium text-text-secondary mb-1.5">
                     {t('profile.lastName', 'Last name')}
                   </label>
                   <input
+                    id="profile-lastName"
+                    name="lastName"
                     type="text"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
@@ -354,7 +358,7 @@ function ProfilePage() {
               </div>
 
               <div>
-                <label className="flex items-center gap-1.5 text-[12px] font-medium text-text-secondary mb-1.5">
+                <label id="profile-locale-label" className="flex items-center gap-1.5 text-[12px] font-medium text-text-secondary mb-1.5">
                   <Globe size={12} />
                   {t('profile.locale', 'Language')}
                 </label>
@@ -549,6 +553,8 @@ function ProfilePage() {
                   </div>
                 </div>
                 <input
+                  id="delete-confirm"
+                  name="deleteConfirm"
                   type="text"
                   value={deleteConfirmText}
                   onChange={(e) => setDeleteConfirmText(e.target.value)}

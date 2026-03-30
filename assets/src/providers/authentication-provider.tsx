@@ -3,6 +3,7 @@ import { AuthenticationContextDispatch, AuthenticationContextState } from '@/con
 import { authenticationReducer } from '@/reducers/authentication-reducer';
 import { useQuery } from '@tanstack/react-query';
 import { apiAxios } from '@/lib/apiAxios';
+import { getWorkspacePublicId } from '@/lib/auth';
 import type { AuthenticationState } from '@/contexts/authentication-context';
 
 function getInitialState(): AuthenticationState {
@@ -64,8 +65,21 @@ export const AuthenticationProvider = ({ children }: { children: React.ReactNode
     }, [isSuccess, data]);
 
     React.useEffect(() => {
-        if (workspace) dispatch({ type: 'SET_WORKSPACE', workspace });
+        if (workspace) {
+            dispatch({ type: 'SET_WORKSPACE', workspace });
+            // Sync server workspace to localStorage if not already set
+            if (!getWorkspacePublicId() && workspace.publicId) {
+                localStorage.setItem('workspace_public_id', workspace.publicId);
+            }
+        }
     }, [workspace]);
+
+    // On sign-in, if user has a currentWorkspacePublicId and localStorage is empty, restore it
+    React.useEffect(() => {
+        if (state.status === 'authenticated' && state.user?.currentWorkspacePublicId && !getWorkspacePublicId()) {
+            localStorage.setItem('workspace_public_id', state.user.currentWorkspacePublicId);
+        }
+    }, [state.status, state.user]);
 
     return (
         <AuthenticationContextState.Provider value={state}>

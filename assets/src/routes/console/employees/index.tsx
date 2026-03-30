@@ -21,10 +21,9 @@ function EmployeeListPage() {
   const deleteEmployee = useDeleteEmployee(workspaceId);
   const [search, setSearch] = useState('');
 
-  const handleDelete = async (e: React.MouseEvent, publicId: string, name: string) => {
+  const handleDelete = async (e: React.MouseEvent, publicId: string) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!confirm(t('employee.deleteConfirm', 'Delete {{name}}? This cannot be undone.', { name }))) return;
     try {
       await deleteEmployee.mutateAsync(publicId);
       toast.success(t('employee.deleteSuccess', 'Employee deleted'));
@@ -33,8 +32,8 @@ function EmployeeListPage() {
     }
   };
 
-  const filtered = employees?.filter((e) => {
-    const fullName = `${e.firstName} ${e.lastName}`.toLowerCase();
+  const filtered = employees?.filter((emp) => {
+    const fullName = `${emp.firstName} ${emp.lastName}`.toLowerCase();
     return fullName.includes(search.toLowerCase());
   });
 
@@ -58,6 +57,8 @@ function EmployeeListPage() {
           className="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none"
         />
         <input
+          id="employee-search"
+          name="search"
           type="text"
           placeholder={t('common.search')}
           value={search}
@@ -104,8 +105,8 @@ function EmployeeListPage() {
                       variant={employee.active ? 'green' : 'gray'}
                     />
                     <button
-                      onClick={(e) => handleDelete(e, employee.publicId, fullName)}
-                      className="opacity-0 group-hover:opacity-100 text-text-tertiary hover:text-red bg-transparent border-none cursor-pointer p-1.5 rounded-lg transition-all hover:bg-red/8"
+                      onClick={(e) => handleDelete(e, employee.publicId)}
+                      className="text-text-tertiary hover:text-red bg-transparent border-none cursor-pointer p-1.5 rounded-lg transition-all hover:bg-red/8"
                     >
                       <Trash2 size={14} />
                     </button>

@@ -20,6 +20,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { CustomSelect } from '@/components/shared/CustomSelect';
+import { Toggle } from '@/components/shared/Toggle';
 
 export const Route = createFileRoute('/console/settings')({
   component: SettingsPage,
@@ -382,27 +383,24 @@ function SettingsPage() {
           <GlassCard hover={false}>
             <GlassCardHeader title="Workspace settings" />
             <div className="p-5 space-y-3">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
+              <div className="flex items-center gap-2">
+                <Toggle
                   id="ip-restriction"
-                  name="ipRestriction"
-                  type="checkbox"
                   checked={ipEnabled}
-                  onChange={(e) => {
-                    if (!plan?.canUseIpRestriction) { e.preventDefault(); upgradeModal.openFor('ipRestriction'); return; }
-                    setIpEnabled(e.target.checked);
+                  onChange={(v) => {
+                    if (!plan?.canUseIpRestriction) { upgradeModal.openFor('ipRestriction'); return; }
+                    setIpEnabled(v);
                   }}
-                  className="accent-[#6B4226]"
                 />
-                <span className="text-[13px] text-text-primary">
+                <label htmlFor="ip-restriction" className="text-[13px] text-text-primary cursor-pointer">
                   Enable IP restriction
                   {!plan?.canUseIpRestriction && (
                     <span className="ml-1.5 text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
                       Espresso
                     </span>
                   )}
-                </span>
-              </label>
+                </label>
+              </div>
               {ipEnabled && plan?.canUseIpRestriction && (
                 <div>
                   <label htmlFor="allowed-ips" className="block text-[11px] font-medium text-text-secondary mb-1">
@@ -473,25 +471,24 @@ function SettingsPage() {
               }
             />
             <div className="p-5 space-y-4">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
+              <div className="flex items-center gap-2">
+                <Toggle
+                  id="device-verification"
                   checked={deviceVerificationEnabled}
-                  onChange={(e) => {
-                    if (!plan?.canUseDeviceVerification) { e.preventDefault(); upgradeModal.openFor('deviceVerification'); return; }
-                    setDeviceVerificationEnabled(e.target.checked);
+                  onChange={(v) => {
+                    if (!plan?.canUseDeviceVerification) { upgradeModal.openFor('deviceVerification'); return; }
+                    setDeviceVerificationEnabled(v);
                   }}
-                  className="accent-[#6B4226]"
                 />
-                <span className="text-[13px] text-text-primary">
+                <label htmlFor="device-verification" className="text-[13px] text-text-primary cursor-pointer">
                   {t('settings.enableDeviceVerification')}
                   {!plan?.canUseDeviceVerification && (
                     <span className="ml-1.5 text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
                       Espresso
                     </span>
                   )}
-                </span>
-              </label>
+                </label>
+              </div>
               <p className="text-[12px] text-text-tertiary leading-relaxed">
                 {t('settings.deviceVerificationDesc')}
               </p>
@@ -524,25 +521,24 @@ function SettingsPage() {
               }
             />
             <div className="p-5 space-y-4">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
+              <div className="flex items-center gap-2">
+                <Toggle
+                  id="geofencing"
                   checked={geofencingEnabled}
-                  onChange={(e) => {
-                    if (!plan?.canUseGeofencing) { e.preventDefault(); upgradeModal.openFor('geofencing'); return; }
-                    setGeofencingEnabled(e.target.checked);
+                  onChange={(v) => {
+                    if (!plan?.canUseGeofencing) { upgradeModal.openFor('geofencing'); return; }
+                    setGeofencingEnabled(v);
                   }}
-                  className="accent-[#6B4226]"
                 />
-                <span className="text-[13px] text-text-primary">
+                <label htmlFor="geofencing" className="text-[13px] text-text-primary cursor-pointer">
                   Enable geofencing for check-in
                   {!plan?.canUseGeofencing && (
                     <span className="ml-1.5 text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
                       Espresso
                     </span>
                   )}
-                </span>
-              </label>
+                </label>
+              </div>
               <p className="text-[12px] text-text-tertiary leading-relaxed">
                 When enabled, staff can only check in when they are within a specified radius of your restaurant location.
               </p>
@@ -562,10 +558,12 @@ function SettingsPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-[11px] font-medium text-text-secondary mb-1">
+                      <label htmlFor="geo-lat" className="block text-[11px] font-medium text-text-secondary mb-1">
                         Latitude
                       </label>
                       <input
+                        id="geo-lat"
+                        name="latitude"
                         type="number"
                         step="any"
                         value={geofencingLat ?? ''}
@@ -577,10 +575,12 @@ function SettingsPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-medium text-text-secondary mb-1">
+                      <label htmlFor="geo-lng" className="block text-[11px] font-medium text-text-secondary mb-1">
                         Longitude
                       </label>
                       <input
+                        id="geo-lng"
+                        name="longitude"
                         type="number"
                         step="any"
                         value={geofencingLng ?? ''}
@@ -592,10 +592,12 @@ function SettingsPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-medium text-text-secondary mb-1">
+                      <label htmlFor="geo-radius" className="block text-[11px] font-medium text-text-secondary mb-1">
                         Radius (meters)
                       </label>
                       <input
+                        id="geo-radius"
+                        name="radius"
                         type="number"
                         min={10}
                         max={5000}
