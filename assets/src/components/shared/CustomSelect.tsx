@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useLayoutEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { ChevronDown, Check, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -30,7 +29,7 @@ export function CustomSelect({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
-  const [pos, setPos] = useState<{ top: number; left: number; width: number; dropUp: boolean }>({ top: 0, left: 0, width: 0, dropUp: false });
+  const [dropUp, setDropUp] = useState(false);
 
   const showSearch = searchable ?? options.length > 8;
 
@@ -49,18 +48,11 @@ export function CustomSelect({
     return () => document.removeEventListener('mousedown', handleClick);
   }, [open]);
 
-  // Position the dropdown
+  // Determine drop direction
   useLayoutEffect(() => {
     if (!open || !triggerRef.current) return;
     const rect = triggerRef.current.getBoundingClientRect();
-    const spaceBelow = window.innerHeight - rect.bottom;
-    const dropUp = spaceBelow < 260;
-    setPos({
-      top: dropUp ? rect.top + window.scrollY : rect.bottom + window.scrollY + 4,
-      left: rect.left + window.scrollX,
-      width: rect.width,
-      dropUp,
-    });
+    setDropUp(window.innerHeight - rect.bottom < 260);
   }, [open]);
 
   useEffect(() => {
@@ -92,18 +84,11 @@ export function CustomSelect({
         />
       </button>
 
-      {open && createPortal(
+      {open && (
         <div
           ref={dropdownRef}
-          style={{
-            position: 'absolute',
-            top: pos.dropUp ? undefined : pos.top,
-            bottom: pos.dropUp ? window.innerHeight - pos.top + 4 : undefined,
-            left: pos.left,
-            width: pos.width,
-            zIndex: 9999,
-          }}
-          className="rounded-xl bg-glass-bg backdrop-blur-xl border border-glass-border shadow-lg overflow-hidden"
+          className="absolute left-0 w-full rounded-xl bg-glass-bg backdrop-blur-xl border border-glass-border shadow-lg overflow-hidden z-[9999]"
+          style={dropUp ? { bottom: '100%', marginBottom: 4 } : { top: '100%', marginTop: 4 }}
         >
           {showSearch && (
             <div className="px-2 pt-2 pb-1">
@@ -146,8 +131,7 @@ export function CustomSelect({
               ))
             )}
           </div>
-        </div>,
-        document.body,
+        </div>
       )}
     </div>
   );

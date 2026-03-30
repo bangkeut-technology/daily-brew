@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useLayoutEffect, useMemo } from 'react';
-import { createPortal } from 'react-dom';
 import { CalendarDays, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -40,7 +39,7 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
   const [pickerView, setPickerView] = useState<PickerView>('days');
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [pos, setPos] = useState<{ top: number; left: number; width: number; dropUp: boolean }>({ top: 0, left: 0, width: 0, dropUp: false });
+  const [dropUp, setDropUp] = useState(false);
 
   const parsed = value ? new Date(value) : new Date();
   const [viewYear, setViewYear] = useState(parsed.getFullYear());
@@ -72,18 +71,11 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
     return () => document.removeEventListener('mousedown', handleClick);
   }, [open]);
 
-  // Position
+  // Determine drop direction
   useLayoutEffect(() => {
     if (!open || !triggerRef.current) return;
     const rect = triggerRef.current.getBoundingClientRect();
-    const spaceBelow = window.innerHeight - rect.bottom;
-    const dropUp = spaceBelow < 340;
-    setPos({
-      top: dropUp ? rect.top + window.scrollY : rect.bottom + window.scrollY + 4,
-      left: rect.left + window.scrollX,
-      width: Math.max(rect.width, 280),
-      dropUp,
-    });
+    setDropUp(window.innerHeight - rect.bottom < 340);
   }, [open]);
 
   const prevMonth = () => {
@@ -143,18 +135,11 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
         </span>
       </button>
 
-      {open && createPortal(
+      {open && (
         <div
           ref={dropdownRef}
-          style={{
-            position: 'absolute',
-            top: pos.dropUp ? undefined : pos.top,
-            bottom: pos.dropUp ? window.innerHeight - pos.top + 4 : undefined,
-            left: pos.left,
-            width: 280,
-            zIndex: 9999,
-          }}
-          className="rounded-xl bg-glass-bg backdrop-blur-xl border border-glass-border shadow-lg overflow-hidden"
+          className="absolute left-0 w-[280px] rounded-xl bg-glass-bg backdrop-blur-xl border border-glass-border shadow-lg overflow-hidden z-[9999]"
+          style={dropUp ? { bottom: '100%', marginBottom: 4 } : { top: '100%', marginTop: 4 }}
         >
           {/* Header */}
           <div className="flex items-center justify-between px-3 py-2.5 border-b border-cream-3/60">
@@ -305,8 +290,7 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
               </div>
             </>
           )}
-        </div>,
-        document.body,
+        </div>
       )}
     </div>
   );

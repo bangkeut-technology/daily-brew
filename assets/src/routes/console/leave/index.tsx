@@ -58,7 +58,7 @@ function LeaveRequestsPage() {
         employeePublicId: employee.publicId,
         startDate,
         endDate,
-        reason: reason.trim() || undefined,
+        reason: reason.trim(),
       });
       toast.success(t('leave.submitSuccess', 'Leave request submitted'));
       setShowSubmitModal(false);
@@ -132,7 +132,7 @@ function LeaveRequestsPage() {
   const submitModal = (
     <Dialog.Root open={showSubmitModal} onOpenChange={setShowSubmitModal}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50 pointer-events-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
+        <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
         <Dialog.Content
           onInteractOutside={(e) => e.preventDefault()}
           className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100%-2rem)] max-w-[400px] bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl shadow-[0_16px_50px_rgba(107,66,38,0.15)] outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
@@ -168,7 +168,7 @@ function LeaveRequestsPage() {
             </div>
             <div>
               <label htmlFor="leave-reason-page" className="block text-[11px] font-medium text-text-secondary mb-1">
-                {t('leave.reason', 'Reason')} <span className="text-text-tertiary">({t('common.optional', 'optional')})</span>
+                {t('leave.reason', 'Reason')}
               </label>
               <textarea
                 id="leave-reason-page"
@@ -192,7 +192,7 @@ function LeaveRequestsPage() {
               <button
                 type="button"
                 onClick={handleSubmitLeave}
-                disabled={!startDate || !endDate || createLeave.isPending}
+                disabled={!startDate || !endDate || !reason.trim() || createLeave.isPending}
                 className="px-4 py-2 rounded-lg text-[13px] font-medium text-white bg-coffee border-none cursor-pointer hover:bg-coffee-light transition-colors disabled:opacity-50"
               >
                 {createLeave.isPending ? t('common.loading', 'Loading...') : t('common.submit', 'Submit')}

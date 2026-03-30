@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useLayoutEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { Clock, ChevronUp, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -23,7 +22,7 @@ export function CustomTimePicker({ value, onChange, className = '' }: CustomTime
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [hour, minute] = parseTime(value);
-  const [pos, setPos] = useState<{ top: number; left: number; dropUp: boolean }>({ top: 0, left: 0, dropUp: false });
+  const [dropUp, setDropUp] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -41,13 +40,7 @@ export function CustomTimePicker({ value, onChange, className = '' }: CustomTime
   useLayoutEffect(() => {
     if (!open || !triggerRef.current) return;
     const rect = triggerRef.current.getBoundingClientRect();
-    const spaceBelow = window.innerHeight - rect.bottom;
-    const dropUp = spaceBelow < 180;
-    setPos({
-      top: dropUp ? rect.top + window.scrollY : rect.bottom + window.scrollY + 4,
-      left: rect.left + window.scrollX,
-      dropUp,
-    });
+    setDropUp(window.innerHeight - rect.bottom < 180);
   }, [open]);
 
   const setHour = (h: number) => {
@@ -72,17 +65,11 @@ export function CustomTimePicker({ value, onChange, className = '' }: CustomTime
         <span className="font-mono tabular-nums">{value || '00:00'}</span>
       </button>
 
-      {open && createPortal(
+      {open && (
         <div
           ref={dropdownRef}
-          style={{
-            position: 'absolute',
-            top: pos.dropUp ? undefined : pos.top,
-            bottom: pos.dropUp ? window.innerHeight - pos.top + 4 : undefined,
-            left: pos.left,
-            zIndex: 9999,
-          }}
-          className="rounded-xl bg-glass-bg backdrop-blur-xl border border-glass-border shadow-lg overflow-hidden"
+          className="absolute left-0 rounded-xl bg-glass-bg backdrop-blur-xl border border-glass-border shadow-lg overflow-hidden z-[9999]"
+          style={dropUp ? { bottom: '100%', marginBottom: 4 } : { top: '100%', marginTop: 4 }}
         >
           <div className="flex items-center gap-1 p-3">
             {/* Hour */}
@@ -129,8 +116,7 @@ export function CustomTimePicker({ value, onChange, className = '' }: CustomTime
               </button>
             </div>
           </div>
-        </div>,
-        document.body,
+        </div>
       )}
     </div>
   );
