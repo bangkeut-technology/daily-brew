@@ -641,10 +641,12 @@ export function EmployeeDashboard() {
 function EmployeeLeaveList({
   workspacePublicId,
   employeePublicId,
+  employeeName,
   closures,
 }: {
   workspacePublicId: string;
   employeePublicId: string;
+  employeeName: string;
   closures?: import('@/types').ClosurePeriod[];
 }) {
   const { t } = useTranslation();
