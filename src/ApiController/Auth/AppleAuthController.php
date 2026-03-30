@@ -29,6 +29,10 @@ class AppleAuthController extends AbstractController
         $identityToken = $data['identityToken'] ?? '';
         $fallbackEmail = $data['email'] ?? null;
 
+        // Apple only sends the user's name on the very first authorization
+        $firstName = $data['firstName'] ?? null;
+        $lastName = $data['lastName'] ?? null;
+
         if (empty($identityToken)) {
             return $this->jsonError('identityToken is required');
         }
@@ -47,7 +51,7 @@ class AppleAuthController extends AbstractController
         }
 
         try {
-            $user = $authService->findOrCreateAppleUser($appleId, $email);
+            $user = $authService->findOrCreateAppleUser($appleId, $email, $firstName, $lastName);
         } catch (\InvalidArgumentException $e) {
             return $this->jsonError($e->getMessage(), 409);
         }

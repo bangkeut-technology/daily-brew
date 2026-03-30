@@ -61,7 +61,7 @@ class AuthService
         return $user;
     }
 
-    public function findOrCreateAppleUser(string $appleId, string $email): User
+    public function findOrCreateAppleUser(string $appleId, string $email, ?string $firstName = null, ?string $lastName = null): User
     {
         // Match by Apple ID — already linked
         $user = $this->userRepository->findByAppleId($appleId);
@@ -81,6 +81,8 @@ class AuthService
         $user->setEmail($email);
         $user->setEmailCanonical(mb_strtolower($email));
         $user->setAppleId($appleId);
+        $user->setFirstName($firstName);
+        $user->setLastName($lastName);
         $this->em->persist($user);
         $this->em->flush();
 
