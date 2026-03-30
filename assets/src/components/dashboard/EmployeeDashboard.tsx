@@ -15,6 +15,8 @@ import { useCheckinStatus, useCheckinAction } from '@/hooks/queries/useCheckin';
 import { useWorkspace } from '@/hooks/queries/useWorkspaces';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { useLeaveRequests } from '@/hooks/queries/useLeaveRequests';
+import { useClosures } from '@/hooks/queries/useClosures';
+import { useDateFormat } from '@/hooks/useDateFormat';
 import { Avatar } from '@/components/shared/Avatar';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { StatusBadge } from '@/components/shared/StatusBadge';
@@ -44,6 +46,8 @@ export function EmployeeDashboard() {
   const { data: workspace } = useWorkspace(workspaceId);
   const workspaceQrToken = workspace?.qrToken ?? '';
 
+  const { data: closures } = useClosures(workspaceId);
+  const fmtDate = useDateFormat();
   const { data: checkinData, isLoading: checkinLoading, refetch } = useCheckinStatus(workspaceQrToken);
   const checkinAction = useCheckinAction(workspaceQrToken);
 
@@ -136,7 +140,7 @@ export function EmployeeDashboard() {
   return (
     <div className="page-enter">
       {/* Header with avatar and name */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-2">
         <Avatar name={employee.name} index={0} size={48} radius="14px" />
         <div>
           <h1 className="text-[24px] font-semibold text-text-primary leading-tight font-serif">
@@ -145,6 +149,56 @@ export function EmployeeDashboard() {
           <p className="text-[13px] text-text-tertiary font-sans mt-0.5">{todayStr}</p>
         </div>
       </div>
+      <p className="text-[13px] text-text-secondary mb-6 leading-relaxed">
+        {completed
+          ? 'You\'re all done for today. Your attendance has been recorded.'
+          : checkedIn
+            ? 'You\'re checked in. Don\'t forget to check out when your shift ends.'
+            : checkinData?.shiftName
+              ? `Your shift (${checkinData.shiftName}) is ${checkinData.shiftStart}–${checkinData.shiftEnd}. Scan the workspace QR code to check in.`
+              : 'Scan the workspace QR code from the DailyBrew app to check in.'
+        }
+      </p>
+
+      {/* Closure notice */}
+      {(() => {
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        const activeClosure = (closures ?? []).find((c) => {
+          const s = new Date(c.startDate);
+          const e = new Date(c.endDate);
+          return now >= s && now <= e;
+        });
+        const nextClosure = (closures ?? []).find((c) => {
+          const s = new Date(c.startDate);
+          const in7 = new Date();
+          in7.setDate(in7.getDate() + 7);
+          return s > now && s <= in7;
+        });
+
+        return (
+          <>
+            {activeClosure && (
+              <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-red/8 border border-red/15 mb-4">
+                <CalendarOff size={16} className="text-red flex-shrink-0" />
+                <div>
+                  <p className="text-[13px] font-medium text-red">Restaurant is closed — {activeClosure.name}</p>
+                  <p className="text-[11px] text-red/70">No check-in required today.</p>
+                </div>
+              </div>
+            )}
+            {!activeClosure && nextClosure && (
+              <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-amber/8 border border-amber/15 mb-4">
+                <CalendarOff size={16} className="text-amber flex-shrink-0" />
+                <div>
+                  <p className="text-[13px] font-medium text-amber">Upcoming closure — {nextClosure.name}</p>
+                  <p className="text-[11px] text-amber/70">{fmtDate(nextClosure.startDate)}{nextClosure.startDate !== nextClosure.endDate ? ` – ${fmtDate(nextClosure.endDate)}` : ''}</p>
+                </div>
+              </div>
+            )}
+          </>
+        );
+      })()}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
         {/* My shift today */}
@@ -301,35 +355,42 @@ export function EmployeeDashboard() {
         </GlassCard>
       </div>
 
-      {/* Attendance KPI — this month */}
-      {checkinData && (
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <GlassCard hover={false}>
-            <div className="p-4 text-center">
-              <p className="text-[24px] font-bold text-green tabular-nums">
-                {today?.checkedIn ? 1 : 0}
-              </p>
-              <p className="text-[11px] text-text-tertiary mt-1">Days present</p>
-            </div>
-          </GlassCard>
-          <GlassCard hover={false}>
-            <div className="p-4 text-center">
-              <p className="text-[24px] font-bold text-amber tabular-nums">
-                {today?.isLate ? 1 : 0}
-              </p>
-              <p className="text-[11px] text-text-tertiary mt-1">Late arrivals</p>
-            </div>
-          </GlassCard>
-          <GlassCard hover={false}>
-            <div className="p-4 text-center">
-              <p className="text-[24px] font-bold text-coffee tabular-nums">
-                {today?.checkedIn && !today?.isLate ? '100%' : today?.checkedIn ? '0%' : '—'}
-              </p>
-              <p className="text-[11px] text-text-tertiary mt-1">On-time rate</p>
-            </div>
-          </GlassCard>
-        </div>
-      )}
+      {/* Attendance KPI — today */}
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <GlassCard hover={false}>
+          <div className="p-4">
+            <p className="text-[11px] text-text-tertiary uppercase tracking-[1px] mb-1">Today</p>
+            <p className={`text-[24px] font-bold tabular-nums ${completed ? 'text-green' : checkedIn ? 'text-blue' : 'text-text-tertiary'}`}>
+              {completed ? 'Done' : checkedIn ? 'In' : '—'}
+            </p>
+            <p className="text-[11px] text-text-tertiary mt-1">
+              {completed ? 'Checked in and out' : checkedIn ? 'Checked in, awaiting checkout' : 'Not checked in yet'}
+            </p>
+          </div>
+        </GlassCard>
+        <GlassCard hover={false}>
+          <div className="p-4">
+            <p className="text-[11px] text-text-tertiary uppercase tracking-[1px] mb-1">Check-in</p>
+            <p className="text-[24px] font-bold text-text-primary tabular-nums font-mono">
+              {today?.checkInAt || '—'}
+            </p>
+            <p className="text-[11px] text-text-tertiary mt-1">
+              {today?.isLate ? 'Late arrival' : today?.checkInAt ? 'On time' : 'Awaiting'}
+            </p>
+          </div>
+        </GlassCard>
+        <GlassCard hover={false}>
+          <div className="p-4">
+            <p className="text-[11px] text-text-tertiary uppercase tracking-[1px] mb-1">Check-out</p>
+            <p className="text-[24px] font-bold text-text-primary tabular-nums font-mono">
+              {today?.checkOutAt || '—'}
+            </p>
+            <p className="text-[11px] text-text-tertiary mt-1">
+              {today?.checkOutAt ? 'Recorded' : checkedIn ? 'Pending' : 'Awaiting'}
+            </p>
+          </div>
+        </GlassCard>
+      </div>
 
       {/* Recent attendance - last 7 days */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">

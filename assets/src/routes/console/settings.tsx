@@ -6,6 +6,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { Crown, Check, MapPin, Navigation, Smartphone, Building2, Users, Calendar, Plus, X, Copy, Pencil } from 'lucide-react';
 import { useDateFormat } from '@/hooks/useDateFormat';
 import { usePaddle } from '@/hooks/usePaddle';
+import { useDevTogglePlan } from '@/hooks/useDevTogglePlan';
 import { QRCodeSVG } from 'qrcode.react';
 import { UpgradeModal } from '@/components/shared/UpgradeModal';
 import { useUpgradeModal } from '@/hooks/useUpgradeModal';
@@ -73,6 +74,8 @@ function SettingsPage() {
   const upgradeModal = useUpgradeModal();
   const fmtDate = useDateFormat();
   const { openCheckout } = usePaddle();
+  const devToggle = useDevTogglePlan();
+  const isDev = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
   const [wsModalOpen, setWsModalOpen] = useState(false);
   const [editingWsId, setEditingWsId] = useState<string | null>(null);
   const [editWsName, setEditWsName] = useState('');
@@ -193,6 +196,32 @@ function SettingsPage() {
               }
             />
             <div className="p-5">
+              {/* Dev mode toggle */}
+              {isDev && (
+                <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-lg bg-amber/8 border border-amber/15">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-amber mr-2">Dev</span>
+                  {(['free', 'espresso', 'double_espresso'] as const).map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => {
+                        devToggle.mutate(p, {
+                          onSuccess: () => toast.success(`Switched to ${p === 'double_espresso' ? 'Double Espresso' : p.charAt(0).toUpperCase() + p.slice(1)}`),
+                          onError: () => toast.error('Failed to toggle plan'),
+                        });
+                      }}
+                      disabled={devToggle.isPending}
+                      className={`px-3 py-1 rounded-md text-[11px] font-medium border-none cursor-pointer transition-colors ${
+                        plan.plan === p
+                          ? 'bg-coffee text-white'
+                          : 'bg-glass-bg text-text-secondary hover:bg-cream-3'
+                      }`}
+                    >
+                      {p === 'double_espresso' ? 'Double Espresso' : p === 'free' ? 'Free' : 'Espresso'}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Trial banner */}
                 {plan.isTrialing && (
@@ -248,7 +277,7 @@ function SettingsPage() {
                   <p className="text-[12px] text-text-tertiary mb-1">$12.99/month</p>
                   <p className="text-[12px] text-text-tertiary mb-4">For growing teams</p>
                   <ul className="space-y-2">
-                    {['Up to 20 employees', 'IP restriction', 'Device verification', 'Geofencing', 'Per-day schedules', 'Leave requests', 'BasilBook linking'].map((f) => (
+                    {['Up to 20 employees', 'IP restriction for check-in & out', 'Device verification for check-in & out', 'Geofencing for check-in & out', 'Per-day schedules', 'Leave requests', 'BasilBook linking'].map((f) => (
                       <li key={f} className="flex items-center gap-2 text-[12.5px] text-text-secondary">
                         <Check size={14} className="text-amber shrink-0" />
                         {f}
@@ -293,6 +322,8 @@ function SettingsPage() {
                       { text: 'Everything in Espresso' },
                       { text: 'Priority support' },
                       { text: 'Multiple QR stations', roadmap: true },
+                      { text: 'Per-QR geofence & settings', roadmap: true },
+                      { text: 'Employee assignment per QR', roadmap: true },
                       { text: 'Manager role', roadmap: true },
                       { text: 'White-label branding', roadmap: true },
                     ].map((f) => (

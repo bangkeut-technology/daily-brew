@@ -3,12 +3,41 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CalendarDays, ClipboardList } from 'lucide-react';
 import { useAttendance } from '@/hooks/queries/useAttendance';
+import { useEmployees } from '@/hooks/queries/useEmployees';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { AttendanceRow } from '@/components/shared/AttendanceRow';
 import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
+import { CustomSelect } from '@/components/shared/CustomSelect';
 import { useDateFormat } from '@/hooks/useDateFormat';
+
+function getStartOfMonth(): string {
+  const now = new Date();
+  return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-01`;
+}
+
+function getToday(): string {
+  return new Date().toISOString().split('T')[0];
+}
+
+function getSearchParams() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    from: params.get('from') || getStartOfMonth(),
+    to: params.get('to') || getToday(),
+    employee: params.get('employee') || '',
+  };
+}
+
+function updateSearchParams(from: string, to: string, employee: string) {
+  const url = new URL(window.location.href);
+  url.searchParams.set('from', from);
+  url.searchParams.set('to', to);
+  if (employee) url.searchParams.set('employee', employee);
+  else url.searchParams.delete('employee');
+  window.history.replaceState({}, '', url.toString());
+}
 
 export const Route = createFileRoute('/console/attendance/')({
   component: AttendancePage,
@@ -16,22 +45,49 @@ export const Route = createFileRoute('/console/attendance/')({
 
 function AttendancePage() {
   const { t } = useTranslation();
+  const initial = getSearchParams();
+  const [from, setFromState] = useState(initial.from);
+  const [to, setToState] = useState(initial.to);
+  const [employeeFilter, setEmployeeFilterState] = useState(initial.employee);
   const workspaceId = getWorkspacePublicId() || '';
-  const today = new Date().toISOString().split('T')[0];
-  const [from, setFrom] = useState(today);
-  const [to, setTo] = useState(today);
   const { data: attendance, isLoading } = useAttendance(workspaceId, from, to);
+  const { data: employees } = useEmployees(workspaceId);
   const fmtDate = useDateFormat();
+
+  const setFrom = (value: string) => {
+    setFromState(value);
+    updateSearchParams(value, to, employeeFilter);
+  };
+
+  const setTo = (value: string) => {
+    setToState(value);
+    updateSearchParams(from, value, employeeFilter);
+  };
+
+  const setEmployeeFilter = (value: string) => {
+    setEmployeeFilterState(value);
+    updateSearchParams(from, to, value);
+  };
+
+  // Filter by employee
+  const filtered = employeeFilter
+    ? attendance?.filter((a) => a.employeePublicId === employeeFilter)
+    : attendance;
+
+  const employeeOptions = [
+    { value: '', label: t('attendance.allEmployees', 'All employees') },
+    ...(employees?.map((e) => ({ value: e.publicId, label: e.name })) ?? []),
+  ];
 
   return (
     <div className="page-enter">
       <PageHeader title={t('nav.attendance')} />
 
       <p className="text-[13px] text-text-secondary mb-5 -mt-2 leading-relaxed">
-        View check-in and check-out records for all employees. Filter by date range to see attendance for specific periods.
+        View check-in and check-out records for all employees. Filter by date range or employee.
       </p>
 
-      <div className="flex items-end gap-3 mb-6">
+      <div className="flex flex-wrap items-end gap-3 mb-6">
         <div>
           <label id="attendance-from-label" className="block text-[11px] font-medium text-text-secondary mb-1">
             {t('attendance.from', 'From')}
@@ -44,13 +100,24 @@ function AttendancePage() {
           </label>
           <CustomDatePicker value={to} onChange={setTo} />
         </div>
+        <div className="w-48">
+          <label id="attendance-employee-label" className="block text-[11px] font-medium text-text-secondary mb-1">
+            {t('attendance.employee', 'Employee')}
+          </label>
+          <CustomSelect
+            value={employeeFilter}
+            onChange={setEmployeeFilter}
+            options={employeeOptions}
+            placeholder={t('attendance.allEmployees', 'All employees')}
+          />
+        </div>
       </div>
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
           <p className="text-[13px] text-text-tertiary">{t('common.loading')}</p>
         </div>
-      ) : attendance?.length === 0 ? (
+      ) : filtered?.length === 0 ? (
         <div className="border-[1.5px] border-dashed border-cream-3 rounded-2xl bg-glass-bg backdrop-blur-md flex flex-col items-center justify-center min-h-[200px]">
           <ClipboardList size={28} className="text-text-tertiary mb-2" />
           <span className="text-[13px] text-text-tertiary">
@@ -64,12 +131,13 @@ function AttendancePage() {
             action={
               <span className="flex items-center gap-1.5 text-[12px] text-text-tertiary">
                 <CalendarDays size={13} />
-                {from === to ? fmtDate(from) : `${fmtDate(from)} - ${fmtDate(to)}`}
+                {from === to ? fmtDate(from) : `${fmtDate(from)} – ${fmtDate(to)}`}
+                <span className="ml-1">({filtered?.length} records)</span>
               </span>
             }
           />
           <div>
-            {attendance?.map((a, i) => (
+            {filtered?.map((a, i) => (
               <AttendanceRow
                 key={a.publicId}
                 employee={a.employeeName || ''}

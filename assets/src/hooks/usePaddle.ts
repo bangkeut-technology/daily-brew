@@ -12,10 +12,12 @@ export function usePaddle() {
     if (!token || !window.Paddle) return;
 
     const environment = window.__DAILYBREW__?.paddleEnvironment;
+    if (environment === 'sandbox' && window.Paddle.Environment) {
+      window.Paddle.Environment.set('sandbox');
+    }
 
     window.Paddle.Initialize({
       token,
-      ...(environment === 'sandbox' ? { environment: 'sandbox' } : {}),
       eventCallback: (event) => {
         if (event.name === 'checkout.completed') {
           setTimeout(() => window.location.reload(), 2000);

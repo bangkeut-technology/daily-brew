@@ -15,6 +15,9 @@ declare global {
             paddlePriceIdAnnual?: string;
         };
         Paddle?: {
+            Environment?: {
+                set: (env: 'sandbox' | 'production') => void;
+            };
             Initialize: (opts: { token: string; eventCallback?: (event: { name: string; data?: Record<string, unknown> }) => void }) => void;
             Checkout: {
                 open: (opts: Record<string, unknown>) => void;

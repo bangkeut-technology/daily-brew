@@ -24,9 +24,9 @@ const comparisonRows: { section?: string; feature: string; free: boolean | strin
 
   // Espresso+
   { section: 'Espresso features', feature: 'Leave request management', free: false, espresso: true, double: true },
-  { feature: 'IP restriction for check-in', free: false, espresso: true, double: true },
-  { feature: 'Device verification', free: false, espresso: true, double: true },
-  { feature: 'Geofencing for check-in', free: false, espresso: true, double: true },
+  { feature: 'IP restriction for check-in & out', free: false, espresso: true, double: true },
+  { feature: 'Device verification for check-in & out', free: false, espresso: true, double: true },
+  { feature: 'Geofencing for check-in & out', free: false, espresso: true, double: true },
   { feature: 'Per-day shift schedules', free: false, espresso: true, double: true },
   { feature: 'BasilBook staff linking', free: false, espresso: true, double: true },
   { feature: '14-day free trial', free: false, espresso: true, double: true },
@@ -35,6 +35,8 @@ const comparisonRows: { section?: string; feature: string; free: boolean | strin
   { section: 'Double Espresso features', feature: 'Unlimited employees', free: false, espresso: false, double: true },
   { feature: 'Priority support', free: false, espresso: false, double: true },
   { feature: 'Multiple QR stations (roadmap)', free: false, espresso: false, double: true },
+  { feature: 'Per-QR geofence & settings (roadmap)', free: false, espresso: false, double: true },
+  { feature: 'Employee assignment per QR (roadmap)', free: false, espresso: false, double: true },
   { feature: 'Manager role (roadmap)', free: false, espresso: false, double: true },
   { feature: 'White-label branding (roadmap)', free: false, espresso: false, double: true },
 ];

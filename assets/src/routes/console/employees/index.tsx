@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { Search, Trash2 } from 'lucide-react';
+import { Search, Trash2, Link2, Unlink } from 'lucide-react';
 import { useEmployees, useDeleteEmployee } from '@/hooks/queries/useEmployees';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -15,12 +15,17 @@ export const Route = createFileRoute('/console/employees/')({
   component: EmployeeListPage,
 });
 
+type LinkFilter = '' | 'linked' | 'unlinked';
+type StatusFilter = '' | 'active' | 'inactive';
+
 function EmployeeListPage() {
   const { t } = useTranslation();
   const workspaceId = getWorkspacePublicId() || '';
   const { data: employees, isLoading } = useEmployees(workspaceId);
   const deleteEmployee = useDeleteEmployee(workspaceId);
   const [search, setSearch] = useState('');
+  const [linkFilter, setLinkFilter] = useState<LinkFilter>('');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('');
   const [deleteTarget, setDeleteTarget] = useState<{ publicId: string; name: string } | null>(null);
 
   const confirmDelete = async () => {
@@ -36,8 +41,18 @@ function EmployeeListPage() {
 
   const filtered = employees?.filter((emp) => {
     const fullName = `${emp.firstName} ${emp.lastName}`.toLowerCase();
-    return fullName.includes(search.toLowerCase());
+    if (!fullName.includes(search.toLowerCase())) return false;
+    if (linkFilter === 'linked' && !emp.linkedUserEmail) return false;
+    if (linkFilter === 'unlinked' && emp.linkedUserEmail) return false;
+    if (statusFilter === 'active' && !emp.active) return false;
+    return !(statusFilter === 'inactive' && emp.active);
+
   });
+
+  const linkedCount = employees?.filter((e) => e.linkedUserEmail).length ?? 0;
+  const unlinkedCount = employees?.filter((e) => !e.linkedUserEmail).length ?? 0;
+  const activeCount = employees?.filter((e) => e.active).length ?? 0;
+  const inactiveCount = employees?.filter((e) => !e.active).length ?? 0;
 
   return (
     <div className="page-enter">
@@ -53,20 +68,73 @@ function EmployeeListPage() {
         }
       />
 
-      <div className="mb-4 relative">
-        <Search
-          size={16}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none"
-        />
-        <input
-          id="employee-search"
-          name="search"
-          type="text"
-          placeholder={t('common.search')}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-9 pr-3 py-2 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee transition-colors w-64"
-        />
+      {/* Filters */}
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <div className="relative">
+          <Search
+            size={16}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none"
+          />
+          <input
+            id="employee-search"
+            name="search"
+            type="text"
+            placeholder={t('common.search')}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 pr-3 py-2 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee transition-colors w-56"
+          />
+        </div>
+
+        {/* Link status filter */}
+        <div className="flex gap-1">
+          <button
+            onClick={() => setLinkFilter(linkFilter === '' ? '' : '')}
+            className={`px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors ${
+              linkFilter === '' ? 'bg-coffee text-white' : 'bg-glass-bg text-text-secondary hover:bg-cream-3'
+            }`}
+          >
+            All ({employees?.length ?? 0})
+          </button>
+          <button
+            onClick={() => setLinkFilter(linkFilter === 'linked' ? '' : 'linked')}
+            className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors ${
+              linkFilter === 'linked' ? 'bg-green/15 text-green' : 'bg-glass-bg text-text-secondary hover:bg-cream-3'
+            }`}
+          >
+            <Link2 size={11} />
+            Linked ({linkedCount})
+          </button>
+          <button
+            onClick={() => setLinkFilter(linkFilter === 'unlinked' ? '' : 'unlinked')}
+            className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors ${
+              linkFilter === 'unlinked' ? 'bg-red/15 text-red' : 'bg-glass-bg text-text-secondary hover:bg-cream-3'
+            }`}
+          >
+            <Unlink size={11} />
+            Unlinked ({unlinkedCount})
+          </button>
+        </div>
+
+        {/* Status filter */}
+        <div className="flex gap-1">
+          <button
+            onClick={() => setStatusFilter(statusFilter === 'active' ? '' : 'active')}
+            className={`px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors ${
+              statusFilter === 'active' ? 'bg-green/15 text-green' : 'bg-glass-bg text-text-secondary hover:bg-cream-3'
+            }`}
+          >
+            Active ({activeCount})
+          </button>
+          <button
+            onClick={() => setStatusFilter(statusFilter === 'inactive' ? '' : 'inactive')}
+            className={`px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors ${
+              statusFilter === 'inactive' ? 'bg-amber/15 text-amber' : 'bg-glass-bg text-text-secondary hover:bg-cream-3'
+            }`}
+          >
+            Inactive ({inactiveCount})
+          </button>
+        </div>
       </div>
 
       {isLoading ? (
@@ -84,7 +152,7 @@ function EmployeeListPage() {
                 return (
                   <div
                     key={employee.publicId}
-                    className="flex items-center gap-3 px-5 py-3 transition-colors duration-[120ms] hover:bg-cream-3/35 group"
+                    className="flex items-center gap-3 px-5 py-3 transition-colors duration-120 hover:bg-cream-3/35 group"
                   >
                     <Link
                       to="/console/employees/$publicId"
@@ -102,10 +170,32 @@ function EmployeeListPage() {
                         </div>
                       </div>
                     </Link>
-                    <StatusBadge
-                      label={employee.active ? t('employee.active') : t('employee.inactive')}
-                      variant={employee.active ? 'green' : 'gray'}
-                    />
+                    <div className="flex items-center gap-1.5">
+                      {employee.linkedUserEmail ? (
+                        <button
+                          onClick={() => setLinkFilter(linkFilter === 'linked' ? '' : 'linked')}
+                          className="bg-transparent border-none cursor-pointer p-0"
+                        >
+                          <StatusBadge label="Linked" variant="green" />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => setLinkFilter(linkFilter === 'unlinked' ? '' : 'unlinked')}
+                          className="bg-transparent border-none cursor-pointer p-0"
+                        >
+                          <StatusBadge label="Unlinked" variant="red" />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => setStatusFilter(employee.active ? (statusFilter === 'active' ? '' : 'active') : (statusFilter === 'inactive' ? '' : 'inactive'))}
+                        className="bg-transparent border-none cursor-pointer p-0"
+                      >
+                        <StatusBadge
+                          label={employee.active ? t('employee.active') : t('employee.inactive')}
+                          variant={employee.active ? 'green' : 'gray'}
+                        />
+                      </button>
+                    </div>
                     <button
                       onClick={(e) => {
                         e.preventDefault();
