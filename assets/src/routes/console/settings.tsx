@@ -78,6 +78,7 @@ function SettingsPage() {
   const { openCheckout } = usePaddle();
   const devToggle = useDevTogglePlan();
   const isDev = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
+  const [billing, setBilling] = useState<'monthly' | 'annual'>('annual');
   const [wsModalOpen, setWsModalOpen] = useState(false);
   const [editingWsId, setEditingWsId] = useState<string | null>(null);
   const [editWsName, setEditWsName] = useState('');
@@ -279,7 +280,6 @@ function SettingsPage() {
                     <Crown size={16} className="text-amber" />
                     <h3 className="text-[15px] font-semibold text-text-primary">Espresso</h3>
                   </div>
-                  <p className="text-[12px] text-text-tertiary mb-1">$12.99/month</p>
                   <p className="text-[12px] text-text-tertiary mb-4">For growing teams</p>
                   <ul className="space-y-2">
                     {['Up to 20 employees', 'IP restriction for check-in & out', 'Device verification for check-in & out', 'Geofencing for check-in & out', 'Per-day schedules', 'Leave requests', 'BasilBook linking'].map((f) => (
@@ -290,12 +290,42 @@ function SettingsPage() {
                     ))}
                   </ul>
                   {plan.plan === 'free' && (
-                    <button
-                      onClick={() => openCheckout('annual')}
-                      className="mt-4 w-full px-4 py-2.5 rounded-lg text-[13px] font-semibold bg-linear-to-r from-amber to-coffee text-white border-none cursor-pointer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(193,127,59,0.3)]"
-                    >
-                      Start 14-day free trial
-                    </button>
+                    <div className="mt-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="inline-flex items-center rounded-lg bg-cream-3/40 p-0.5">
+                          <button
+                            onClick={() => setBilling('monthly')}
+                            className={cn(
+                              'px-3 py-1 rounded-md text-[11px] font-medium border-none cursor-pointer transition-colors',
+                              billing === 'monthly' ? 'bg-coffee text-white' : 'bg-transparent text-text-secondary',
+                            )}
+                          >
+                            Monthly
+                          </button>
+                          <button
+                            onClick={() => setBilling('annual')}
+                            className={cn(
+                              'px-3 py-1 rounded-md text-[11px] font-medium border-none cursor-pointer transition-colors',
+                              billing === 'annual' ? 'bg-coffee text-white' : 'bg-transparent text-text-secondary',
+                            )}
+                          >
+                            Annual
+                          </button>
+                        </div>
+                        <span className="text-[13px] font-semibold text-text-primary">
+                          {billing === 'annual' ? '$129/year' : '$12.99/month'}
+                        </span>
+                      </div>
+                      {billing === 'annual' && (
+                        <p className="text-[10.5px] text-green font-medium">Save 17% vs monthly</p>
+                      )}
+                      <button
+                        onClick={() => openCheckout(billing)}
+                        className="w-full px-4 py-2.5 rounded-lg text-[13px] font-semibold bg-linear-to-r from-amber to-coffee text-white border-none cursor-pointer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(193,127,59,0.3)]"
+                      >
+                        Start 14-day free trial
+                      </button>
+                    </div>
                   )}
                   {plan.plan === 'espresso' && plan.currentPeriodEnd && (
                     <div className="mt-4 text-[11px] text-text-tertiary">

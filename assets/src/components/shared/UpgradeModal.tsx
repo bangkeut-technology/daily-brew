@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
 import { usePaddle } from '@/hooks/usePaddle';
 import {
   Crown,
@@ -40,6 +42,7 @@ const espressoBenefits = [
 export function UpgradeModal({ open, onOpenChange, feature }: UpgradeModalProps) {
   const { t } = useTranslation();
   const { openCheckout } = usePaddle();
+  const [billing, setBilling] = useState<'monthly' | 'annual'>('annual');
   const config = featureConfig[feature];
   const FeatureIcon = config.icon;
 
@@ -88,15 +91,44 @@ export function UpgradeModal({ open, onOpenChange, feature }: UpgradeModalProps)
               </div>
             </div>
 
+            {/* Billing toggle */}
+            <div className="inline-flex items-center rounded-lg bg-cream-3/40 p-0.5 mb-4">
+              <button
+                onClick={() => setBilling('monthly')}
+                className={cn(
+                  'px-4 py-1.5 rounded-md text-[12px] font-medium border-none cursor-pointer transition-colors',
+                  billing === 'monthly' ? 'bg-coffee text-white' : 'bg-transparent text-text-secondary hover:text-text-primary',
+                )}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setBilling('annual')}
+                className={cn(
+                  'px-4 py-1.5 rounded-md text-[12px] font-medium border-none cursor-pointer transition-colors',
+                  billing === 'annual' ? 'bg-coffee text-white' : 'bg-transparent text-text-secondary hover:text-text-primary',
+                )}
+              >
+                Annual
+              </button>
+            </div>
+
+            <p className="text-[13px] font-semibold text-text-primary mb-1">
+              {billing === 'annual' ? '$129/year' : '$12.99/month'}
+            </p>
+            {billing === 'annual' && (
+              <p className="text-[11px] text-green font-medium mb-3">Save 17% vs monthly</p>
+            )}
+
             {/* CTA */}
             <button
               onClick={() => {
                 onOpenChange(false);
-                openCheckout('annual');
+                openCheckout(billing);
               }}
               className="w-full py-2.5 rounded-xl text-[14px] font-medium text-white border-none cursor-pointer btn-shimmer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,66,38,0.30)]"
             >
-              Start 14-day free trial
+              {t('upgrade.startTrial', 'Start 14-day free trial')}
             </button>
 
             {/* Secondary */}

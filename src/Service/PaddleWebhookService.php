@@ -27,7 +27,10 @@ class PaddleWebhookService
 
         match ($eventType) {
             'subscription.created' => $this->handleSubscriptionCreated($data),
+            'subscription.activated' => $this->handleSubscriptionUpdated($data),
+            'subscription.trialing' => $this->handleSubscriptionUpdated($data),
             'subscription.updated' => $this->handleSubscriptionUpdated($data),
+            'subscription.imported' => $this->handleSubscriptionCreated($data),
             'subscription.canceled' => $this->handleSubscriptionCanceled($data),
             'subscription.paused' => $this->handleSubscriptionPaused($data),
             'subscription.resumed' => $this->handleSubscriptionResumed($data),
@@ -159,6 +162,7 @@ class PaddleWebhookService
             'canceled' => SubscriptionStatusEnum::Canceled,
             'paused' => SubscriptionStatusEnum::Paused,
             'trialing' => SubscriptionStatusEnum::Trialing,
+            default => SubscriptionStatusEnum::Active,
         };
     }
 }
