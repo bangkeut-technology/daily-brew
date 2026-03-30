@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Entity\Employee;
 use App\Entity\LeaveRequest;
 use App\Entity\User;
 use App\Entity\Workspace;
@@ -70,6 +71,39 @@ class LeaveRequestRepository extends ServiceEntityRepository
             ->setParameter('status', LeaveRequestStatusEnum::APPROVED)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    public function findApprovedForEmployeeOnDate(Employee $employee, \DateTimeInterface $date): ?LeaveRequest
+    {
+        return $this->createQueryBuilder('lr')
+            ->where('lr.employee = :employee')
+            ->andWhere('lr.startDate <= :date')
+            ->andWhere('lr.endDate >= :date')
+            ->andWhere('lr.status = :status')
+            ->andWhere('lr.deletedAt IS NULL')
+            ->setParameter('employee', $employee)
+            ->setParameter('date', $date)
+            ->setParameter('status', LeaveRequestStatusEnum::APPROVED)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findOverlappingForEmployee(Employee $employee, \DateTimeInterface $startDate, \DateTimeInterface $endDate): ?LeaveRequest
+    {
+        return $this->createQueryBuilder('lr')
+            ->where('lr.employee = :employee')
+            ->andWhere('lr.startDate <= :endDate')
+            ->andWhere('lr.endDate >= :startDate')
+            ->andWhere('lr.status != :rejected')
+            ->andWhere('lr.deletedAt IS NULL')
+            ->setParameter('employee', $employee)
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->setParameter('rejected', LeaveRequestStatusEnum::REJECTED)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     /** Soft-delete all leave requests made by the given user. */

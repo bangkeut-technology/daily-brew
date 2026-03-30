@@ -9,12 +9,17 @@ use App\Entity\LeaveRequest;
 use App\Entity\User;
 use App\Entity\Workspace;
 use App\Enum\LeaveRequestStatusEnum;
+use App\Repository\ClosurePeriodRepository;
+use App\Repository\LeaveRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class LeaveRequestService
 {
     public function __construct(
         private EntityManagerInterface $em,
+        private ClosurePeriodRepository $closurePeriodRepository,
+        private LeaveRequestRepository $leaveRequestRepository,
     ) {}
 
     public function create(
@@ -24,7 +29,23 @@ class LeaveRequestService
         \DateTimeInterface $startDate,
         \DateTimeInterface $endDate,
         ?string $reason = null,
+        ?\DateTimeInterface $startTime = null,
+        ?\DateTimeInterface $endTime = null,
     ): LeaveRequest {
+        if ($startDate > $endDate) {
+            throw new BadRequestHttpException('Start date must be before or equal to end date');
+        }
+
+        $closure = $this->closurePeriodRepository->findOverlappingClosure($workspace, $startDate, $endDate);
+        if ($closure !== null) {
+            throw new BadRequestHttpException('Leave dates overlap with closure: ' . $closure->getName());
+        }
+
+        $existing = $this->leaveRequestRepository->findOverlappingForEmployee($employee, $startDate, $endDate);
+        if ($existing !== null) {
+            throw new BadRequestHttpException('You already have a pending or approved leave request for these dates');
+        }
+
         $leaveRequest = new LeaveRequest();
         $leaveRequest->setEmployee($employee);
         $leaveRequest->setWorkspace($workspace);
@@ -32,6 +53,13 @@ class LeaveRequestService
         $leaveRequest->setStartDate(\DateTimeImmutable::createFromInterface($startDate));
         $leaveRequest->setEndDate(\DateTimeImmutable::createFromInterface($endDate));
         $leaveRequest->setReason($reason);
+
+        if ($startTime !== null) {
+            $leaveRequest->setStartTime(\DateTimeImmutable::createFromInterface($startTime));
+        }
+        if ($endTime !== null) {
+            $leaveRequest->setEndTime(\DateTimeImmutable::createFromInterface($endTime));
+        }
 
         $this->em->persist($leaveRequest);
         $this->em->flush();

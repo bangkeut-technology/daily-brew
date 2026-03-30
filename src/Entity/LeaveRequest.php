@@ -48,6 +48,14 @@ class LeaveRequest extends AbstractBaseEntity
     #[Groups(['leave_request:read'])]
     private ?DateTimeImmutable $endDate = null;
 
+    #[ORM\Column(type: Types::TIME_IMMUTABLE, nullable: true)]
+    #[Groups(['leave_request:read'])]
+    private ?DateTimeImmutable $startTime = null;
+
+    #[ORM\Column(type: Types::TIME_IMMUTABLE, nullable: true)]
+    #[Groups(['leave_request:read'])]
+    private ?DateTimeImmutable $endTime = null;
+
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['leave_request:read'])]
     private ?string $reason = null;
@@ -191,6 +199,33 @@ class LeaveRequest extends AbstractBaseEntity
     {
         $this->reviewNote = $reviewNote;
         return $this;
+    }
+
+    public function getStartTime(): ?DateTimeImmutable
+    {
+        return $this->startTime;
+    }
+
+    public function setStartTime(?DateTimeImmutable $startTime): LeaveRequest
+    {
+        $this->startTime = $startTime;
+        return $this;
+    }
+
+    public function getEndTime(): ?DateTimeImmutable
+    {
+        return $this->endTime;
+    }
+
+    public function setEndTime(?DateTimeImmutable $endTime): LeaveRequest
+    {
+        $this->endTime = $endTime;
+        return $this;
+    }
+
+    public function isFullDay(): bool
+    {
+        return $this->startTime === null && $this->endTime === null;
     }
 
     public function getDeletedAt(): ?DateTimeImmutable

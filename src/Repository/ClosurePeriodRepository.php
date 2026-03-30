@@ -25,6 +25,20 @@ class ClosurePeriodRepository extends ServiceEntityRepository
         return $this->findBy(['workspace' => $workspace], ['startDate' => 'DESC']);
     }
 
+    public function findOverlappingClosure(Workspace $workspace, \DateTimeInterface $startDate, \DateTimeInterface $endDate): ?ClosurePeriod
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.workspace = :workspace')
+            ->andWhere('c.startDate <= :endDate')
+            ->andWhere('c.endDate >= :startDate')
+            ->setParameter('workspace', $workspace)
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     public function findActiveOnDate(Workspace $workspace, \DateTimeInterface $date): ?ClosurePeriod
     {
         return $this->createQueryBuilder('c')
