@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.9.0...v1.10.0) (2026-03-30)
+
+
+### Features
+
+* add logging to Paddle webhook handling and subscription processing ([2930f28](https://github.com/bangkeut-technology/daily-brew/commit/2930f28d54df397637f576216c5ab0c8b549fc56))
+
 ## [1.9.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.8.0...v1.9.0) (2026-03-30)
 
 
