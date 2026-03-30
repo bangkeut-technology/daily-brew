@@ -128,7 +128,7 @@ export function CustomDatePicker({ value, onChange, className = '', isDateDisabl
         ref={triggerRef}
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none transition-colors cursor-pointer focus:border-coffee focus:ring-1 focus:ring-coffee/20"
+        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none transition-colors cursor-pointer focus:border-coffee focus:ring-1 focus:ring-coffee/20"
       >
         <CalendarDays size={14} className="text-text-tertiary flex-shrink-0" />
         <span className={cn(!displayValue && 'text-text-tertiary')}>
@@ -157,7 +157,7 @@ export function CustomDatePicker({ value, onChange, className = '', isDateDisabl
                 type="button"
                 onClick={() => setPickerView(pickerView === 'months' ? 'days' : 'months')}
                 className={cn(
-                  'flex items-center gap-0.5 px-2 py-1 rounded-md text-[13px] font-semibold border-none cursor-pointer transition-colors',
+                  'flex items-center gap-0.5 px-2 py-1 rounded-md text-[15px] font-semibold border-none cursor-pointer transition-colors',
                   pickerView === 'months'
                     ? 'bg-coffee/10 text-coffee'
                     : 'bg-transparent text-text-primary hover:bg-cream-3/40'
@@ -171,7 +171,7 @@ export function CustomDatePicker({ value, onChange, className = '', isDateDisabl
                 type="button"
                 onClick={() => setPickerView(pickerView === 'years' ? 'days' : 'years')}
                 className={cn(
-                  'flex items-center gap-0.5 px-2 py-1 rounded-md text-[13px] font-semibold border-none cursor-pointer transition-colors',
+                  'flex items-center gap-0.5 px-2 py-1 rounded-md text-[15px] font-semibold border-none cursor-pointer transition-colors',
                   pickerView === 'years'
                     ? 'bg-coffee/10 text-coffee'
                     : 'bg-transparent text-text-primary hover:bg-cream-3/40'
@@ -200,7 +200,7 @@ export function CustomDatePicker({ value, onChange, className = '', isDateDisabl
                   type="button"
                   onClick={() => { setViewMonth(i); setPickerView('days'); }}
                   className={cn(
-                    'py-2 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors',
+                    'py-2 rounded-lg text-[14px] font-medium border-none cursor-pointer transition-colors',
                     i === viewMonth
                       ? 'bg-coffee text-white'
                       : i === today.getMonth() && viewYear === today.getFullYear()
@@ -223,7 +223,7 @@ export function CustomDatePicker({ value, onChange, className = '', isDateDisabl
                   type="button"
                   onClick={() => { setViewYear(y); setPickerView('months'); }}
                   className={cn(
-                    'py-2 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors',
+                    'py-2 rounded-lg text-[14px] font-medium border-none cursor-pointer transition-colors',
                     y === viewYear
                       ? 'bg-coffee text-white'
                       : y === today.getFullYear()
@@ -242,7 +242,7 @@ export function CustomDatePicker({ value, onChange, className = '', isDateDisabl
             <>
               <div className="grid grid-cols-7 px-2 pt-2">
                 {WEEKDAYS.map((d) => (
-                  <span key={d} className="text-[10px] font-medium text-text-tertiary text-center py-1">
+                  <span key={d} className="text-[12px] font-medium text-text-tertiary text-center py-1">
                     {d}
                   </span>
                 ))}
@@ -253,7 +253,7 @@ export function CustomDatePicker({ value, onChange, className = '', isDateDisabl
                     return (
                       <span
                         key={i}
-                        className="w-8 h-8 flex items-center justify-center text-[12px] text-text-tertiary/40 mx-auto"
+                        className="w-8 h-8 flex items-center justify-center text-[14px] text-text-tertiary/40 mx-auto"
                       >
                         {cell.day}
                       </span>
@@ -279,7 +279,7 @@ export function CustomDatePicker({ value, onChange, className = '', isDateDisabl
                         setOpen(false);
                       }}
                       className={cn(
-                        'w-8 h-8 mx-auto flex items-center justify-center rounded-lg text-[12px] border-none transition-colors',
+                        'w-8 h-8 mx-auto flex items-center justify-center rounded-lg text-[14px] border-none transition-colors',
                         isDisabled
                           ? 'opacity-30 cursor-not-allowed line-through'
                           : 'cursor-pointer',

@@ -73,7 +73,7 @@ export function CustomSelect({
         ref={triggerRef}
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none transition-colors cursor-pointer focus:border-coffee focus:ring-1 focus:ring-coffee/20"
+        className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none transition-colors cursor-pointer focus:border-coffee focus:ring-1 focus:ring-coffee/20"
       >
         <span className={cn(!selected && 'text-text-tertiary')}>
           {selected ? selected.label : placeholder}
@@ -100,14 +100,14 @@ export function CustomSelect({
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search\u2026"
-                  className="w-full pl-7 pr-3 py-1.5 rounded-lg text-[12.5px] bg-cream-3/30 border border-cream-3/60 text-text-primary outline-none focus:border-coffee transition-colors"
+                  className="w-full pl-7 pr-3 py-1.5 rounded-lg text-[14.5px] bg-cream-3/30 border border-cream-3/60 text-text-primary outline-none focus:border-coffee transition-colors"
                 />
               </div>
             </div>
           )}
           <div className="max-h-[220px] overflow-y-auto py-1">
             {filtered.length === 0 ? (
-              <p className="px-3 py-2 text-[12px] text-text-tertiary text-center">No results</p>
+              <p className="px-3 py-2 text-[14px] text-text-tertiary text-center">No results</p>
             ) : (
               filtered.map((option) => (
                 <button
@@ -119,7 +119,7 @@ export function CustomSelect({
                     setSearch('');
                   }}
                   className={cn(
-                    'w-full flex items-center gap-2 px-3 py-2 text-[13px] text-left border-none cursor-pointer transition-colors',
+                    'w-full flex items-center gap-2 px-3 py-2 text-[15px] text-left border-none cursor-pointer transition-colors',
                     option.value === value
                       ? 'bg-coffee/10 text-coffee font-medium'
                       : 'bg-transparent text-text-primary hover:bg-cream-3/40'

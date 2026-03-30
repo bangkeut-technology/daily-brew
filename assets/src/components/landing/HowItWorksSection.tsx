@@ -35,13 +35,13 @@ export function HowItWorksSection() {
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
       >
-        <p className="text-[11px] uppercase tracking-[2px] font-medium text-amber mb-3">
+        <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
           How it works
         </p>
-        <h3 className="text-[28px] md:text-[34px] font-semibold text-text-primary font-serif leading-tight">
+        <h3 className="text-[30px] md:text-[36px] font-semibold text-text-primary font-serif leading-tight">
           Up and running in minutes
         </h3>
-        <p className="text-[14px] text-text-secondary mt-3 max-w-md mx-auto">
+        <p className="text-[16px] text-text-secondary mt-3 max-w-md mx-auto">
           Three steps to effortless attendance tracking.
         </p>
       </motion.div>
@@ -68,17 +68,17 @@ export function HowItWorksSection() {
                 {step.icon}
               </div>
               <span
-                className="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
+                className="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center text-[12px] font-bold text-white"
                 style={{ background: step.accent }}
               >
                 {step.number}
               </span>
             </div>
 
-            <h4 className="text-[15px] font-semibold text-text-primary mb-2">
+            <h4 className="text-[17px] font-semibold text-text-primary mb-2">
               {step.title}
             </h4>
-            <p className="text-[13px] text-text-secondary leading-relaxed max-w-[260px]">
+            <p className="text-[15px] text-text-secondary leading-relaxed max-w-[260px]">
               {step.desc}
             </p>
           </motion.div>

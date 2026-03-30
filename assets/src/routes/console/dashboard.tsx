@@ -85,12 +85,12 @@ function NoWorkspaceView() {
         <div className="text-center mb-8">
           <Coffee size={40} className="text-coffee/60 mx-auto mb-4" strokeWidth={1.5} />
           <h2
-            className="text-[20px] font-semibold text-text-primary mb-2"
+            className="text-[22px] font-semibold text-text-primary mb-2"
             style={{ fontFamily: "'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif" }}
           >
             {t('dashboard.getStarted', 'Get started with DailyBrew')}
           </h2>
-          <p className="text-[13.5px] text-text-secondary">
+          <p className="text-[15.5px] text-text-secondary">
             {t('dashboard.chooseRole', 'Choose how you want to use DailyBrew.')}
           </p>
         </div>
@@ -106,10 +106,10 @@ function NoWorkspaceView() {
               <div className="w-12 h-12 rounded-xl bg-amber/10 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
                 <Building2 size={22} className="text-amber" />
               </div>
-              <p className="text-[14px] font-semibold text-text-primary mb-1">
+              <p className="text-[16px] font-semibold text-text-primary mb-1">
                 {t('dashboard.becomeOwner', 'I own a restaurant')}
               </p>
-              <p className="text-[12px] text-text-secondary leading-relaxed">
+              <p className="text-[14px] text-text-secondary leading-relaxed">
                 {t('dashboard.becomeOwnerDesc', 'Create a workspace to manage your staff, shifts, and attendance.')}
               </p>
             </button>
@@ -123,10 +123,10 @@ function NoWorkspaceView() {
               <div className="w-12 h-12 rounded-xl bg-blue/10 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
                 <UserCheck size={22} className="text-blue" />
               </div>
-              <p className="text-[14px] font-semibold text-text-primary mb-1">
+              <p className="text-[16px] font-semibold text-text-primary mb-1">
                 {t('dashboard.linkEmployee', "I'm a staff member")}
               </p>
-              <p className="text-[12px] text-text-secondary leading-relaxed">
+              <p className="text-[14px] text-text-secondary leading-relaxed">
                 {t('dashboard.linkEmployeeDesc', 'Enter the employee ID your employer gave you to link your account.')}
               </p>
             </button>
@@ -137,10 +137,10 @@ function NoWorkspaceView() {
         {mode === 'owner' && (
           <GlassCard hover={false}>
             <form onSubmit={handleCreateWorkspace} className="p-6">
-              <p className="text-[14px] font-semibold text-text-primary mb-1">
+              <p className="text-[16px] font-semibold text-text-primary mb-1">
                 {t('dashboard.createWorkspace', 'Create your workspace')}
               </p>
-              <p className="text-[12.5px] text-text-secondary mb-5">
+              <p className="text-[14.5px] text-text-secondary mb-5">
                 {t('dashboard.createWorkspaceDesc', 'Enter your restaurant name to get started.')}
               </p>
               <div className="flex gap-3">
@@ -150,12 +150,12 @@ function NoWorkspaceView() {
                   onChange={(e) => setWorkspaceName(e.target.value)}
                   placeholder={t('workspace.newPlaceholder', 'Restaurant name')}
                   autoFocus
-                  className="flex-1 px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
+                  className="flex-1 px-3 py-2.5 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
                 />
                 <button
                   type="submit"
                   disabled={createWorkspace.isPending || !workspaceName.trim()}
-                  className="px-5 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all hover:bg-coffee-light disabled:opacity-50"
+                  className="px-5 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all hover:bg-coffee-light disabled:opacity-50"
                 >
                   {t('common.create')}
                 </button>
@@ -163,7 +163,7 @@ function NoWorkspaceView() {
               <button
                 type="button"
                 onClick={() => setMode(null)}
-                className="mt-4 text-[12px] text-text-tertiary bg-transparent border-none cursor-pointer hover:text-text-secondary transition-colors"
+                className="mt-4 text-[14px] text-text-tertiary bg-transparent border-none cursor-pointer hover:text-text-secondary transition-colors"
               >
                 &larr; {t('common.back')}
               </button>
@@ -175,10 +175,10 @@ function NoWorkspaceView() {
         {mode === 'employee' && (
           <GlassCard hover={false}>
             <form onSubmit={handleLinkEmployee} className="p-6">
-              <p className="text-[14px] font-semibold text-text-primary mb-1">
+              <p className="text-[16px] font-semibold text-text-primary mb-1">
                 {t('dashboard.linkToEmployee', 'Link to your employee profile')}
               </p>
-              <p className="text-[12.5px] text-text-secondary mb-5">
+              <p className="text-[14.5px] text-text-secondary mb-5">
                 {t('dashboard.linkToEmployeeDesc', 'Ask your employer for your employee public ID and enter it below.')}
               </p>
               <div className="flex gap-3">
@@ -188,12 +188,12 @@ function NoWorkspaceView() {
                   onChange={(e) => setEmployeeId(e.target.value)}
                   placeholder={t('onboarding.employeePublicId', 'Employee public ID')}
                   autoFocus
-                  className="flex-1 px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all font-mono"
+                  className="flex-1 px-3 py-2.5 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all font-mono"
                 />
                 <button
                   type="submit"
                   disabled={linkEmployee.isPending || !employeeId.trim()}
-                  className="flex items-center gap-1.5 px-5 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all hover:bg-coffee-light disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-5 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all hover:bg-coffee-light disabled:opacity-50"
                 >
                   <UserCheck size={14} />
                   {t('profile.link', 'Link')}
@@ -202,7 +202,7 @@ function NoWorkspaceView() {
               <button
                 type="button"
                 onClick={() => setMode(null)}
-                className="mt-4 text-[12px] text-text-tertiary bg-transparent border-none cursor-pointer hover:text-text-secondary transition-colors"
+                className="mt-4 text-[14px] text-text-tertiary bg-transparent border-none cursor-pointer hover:text-text-secondary transition-colors"
               >
                 &larr; {t('common.back')}
               </button>

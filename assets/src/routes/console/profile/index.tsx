@@ -217,14 +217,14 @@ function ProfilePage() {
               <Avatar name={displayName} index={0} size={64} radius="20px" />
               <div className="flex-1 min-w-0">
                 <h2
-                  className="text-[20px] font-semibold text-text-primary leading-tight"
+                  className="text-[22px] font-semibold text-text-primary leading-tight"
                   style={{ fontFamily: "'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif" }}
                 >
                   {displayName}
                 </h2>
                 <div className="flex items-center gap-1.5 mt-1.5">
                   <Mail size={12} className="text-text-tertiary" />
-                  <span className="text-[12.5px] text-text-secondary">{user?.email}</span>
+                  <span className="text-[14.5px] text-text-secondary">{user?.email}</span>
                 </div>
                 {roleContext && (
                   <div className="flex items-center gap-2 mt-2.5">
@@ -237,7 +237,7 @@ function ProfilePage() {
 
             {/* Public ID with QR */}
             <div className="mt-5 pt-5 border-t border-cream-3/60">
-              <p className="text-[11px] uppercase tracking-[1px] font-medium text-text-tertiary mb-3">
+              <p className="text-[13px] uppercase tracking-[1px] font-medium text-text-tertiary mb-3">
                 {t('profile.yourPublicId', 'Your public ID')}
               </p>
               <div className="flex items-center gap-4">
@@ -252,18 +252,18 @@ function ProfilePage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <code className="flex-1 px-3 py-2 rounded-lg text-[12px] bg-cream-2 border border-cream-3 text-text-primary font-mono select-all truncate">
+                    <code className="flex-1 px-3 py-2 rounded-lg text-[14px] bg-cream-2 border border-cream-3 text-text-primary font-mono select-all truncate">
                       {user?.publicId}
                     </code>
                     <button
                       type="button"
                       onClick={handleCopyPublicId}
-                      className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-[11.5px] font-medium bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer transition-all hover:bg-cream-3 flex-shrink-0"
+                      className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-[13.5px] font-medium bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer transition-all hover:bg-cream-3 flex-shrink-0"
                     >
                       {idCopied ? <Check size={13} className="text-green" /> : <Copy size={13} />}
                     </button>
                   </div>
-                  <p className="text-[10.5px] text-text-tertiary mt-1.5">
+                  <p className="text-[12.5px] text-text-tertiary mt-1.5">
                     {t('profile.publicIdHint', 'Share this with your employer so they can link you as an employee.')}
                   </p>
                 </div>
@@ -280,14 +280,14 @@ function ProfilePage() {
               action={
                 <div className="flex items-center gap-1.5">
                   <Link2 size={13} className="text-amber" />
-                  <span className="text-[11px] text-amber font-medium">
+                  <span className="text-[13px] text-amber font-medium">
                     {t('profile.optional', 'Optional')}
                   </span>
                 </div>
               }
             />
             <form onSubmit={handleLinkEmployee} className="p-6">
-              <p className="text-[12.5px] text-text-secondary mb-4 leading-relaxed">
+              <p className="text-[14.5px] text-text-secondary mb-4 leading-relaxed">
                 {t(
                   'profile.linkEmployeeDesc',
                   'Enter an employee public ID to link your account to a workspace. You can link to multiple workspaces if you work at different restaurants.',
@@ -299,12 +299,12 @@ function ProfilePage() {
                   value={employeeId}
                   onChange={(e) => setEmployeeId(e.target.value)}
                   placeholder={t('onboarding.employeePublicId', 'Employee public ID')}
-                  className="flex-1 px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all font-mono"
+                  className="flex-1 px-3 py-2.5 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all font-mono"
                 />
                 <button
                   type="submit"
                   disabled={linkEmployee.isPending || !employeeId.trim()}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light disabled:opacity-50"
                 >
                   <UserCheck size={14} />
                   {t('profile.link', 'Link')}
@@ -320,13 +320,13 @@ function ProfilePage() {
             <GlassCardHeader
               title={t('profile.linkedWorkspaces', 'Linked workspaces')}
               action={
-                <span className="text-[11px] text-text-tertiary">
+                <span className="text-[13px] text-text-tertiary">
                   {roleContext.linkedWorkspaces.length} workspace{roleContext.linkedWorkspaces.length !== 1 ? 's' : ''}
                 </span>
               }
             />
             <div className="p-5 space-y-3">
-              <p className="text-[11.5px] text-text-tertiary leading-relaxed">
+              <p className="text-[13.5px] text-text-tertiary leading-relaxed">
                 You are linked as an employee in these workspaces. You can check in, view your attendance, and submit leave requests.
               </p>
               {roleContext.linkedWorkspaces.map((lw) => (
@@ -338,10 +338,10 @@ function ProfilePage() {
                     <UserCheck size={16} className="text-green" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-medium text-text-primary truncate">
+                    <p className="text-[15px] font-medium text-text-primary truncate">
                       {lw.employeeName}
                     </p>
-                    <p className="text-[11px] text-text-tertiary">
+                    <p className="text-[13px] text-text-tertiary">
                       {lw.workspaceName}
                     </p>
                   </div>
@@ -352,7 +352,7 @@ function ProfilePage() {
                       name: lw.employeeName,
                       workspace: lw.workspaceName ?? '',
                     })}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium text-red bg-red/8 border-none cursor-pointer transition-colors hover:bg-red/15"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium text-red bg-red/8 border-none cursor-pointer transition-colors hover:bg-red/15"
                   >
                     <Unlink size={11} />
                     Unlink
@@ -395,7 +395,7 @@ function ProfilePage() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="profile-firstName" className="block text-[12px] font-medium text-text-secondary mb-1.5">
+                  <label htmlFor="profile-firstName" className="block text-[14px] font-medium text-text-secondary mb-1.5">
                     {t('profile.firstName', 'First name')}
                   </label>
                   <input
@@ -404,11 +404,11 @@ function ProfilePage() {
                     type="text"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
+                    className="w-full px-3 py-2.5 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
                   />
                 </div>
                 <div>
-                  <label htmlFor="profile-lastName" className="block text-[12px] font-medium text-text-secondary mb-1.5">
+                  <label htmlFor="profile-lastName" className="block text-[14px] font-medium text-text-secondary mb-1.5">
                     {t('profile.lastName', 'Last name')}
                   </label>
                   <input
@@ -417,13 +417,13 @@ function ProfilePage() {
                     type="text"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
+                    className="w-full px-3 py-2.5 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
                   />
                 </div>
               </div>
 
               <div>
-                <label id="profile-locale-label" className="flex items-center gap-1.5 text-[12px] font-medium text-text-secondary mb-1.5">
+                <label id="profile-locale-label" className="flex items-center gap-1.5 text-[14px] font-medium text-text-secondary mb-1.5">
                   <Globe size={12} />
                   {t('profile.locale', 'Language')}
                 </label>
@@ -439,7 +439,7 @@ function ProfilePage() {
               <button
                 type="submit"
                 disabled={updateProfile.isPending}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50"
               >
                 {updateProfile.isPending ? t('common.loading') : t('common.save')}
               </button>
@@ -480,7 +480,7 @@ function ProfilePage() {
               {passwordErrors.length > 0 && (
                 <div className="rounded-lg bg-red/8 border border-red/15 px-3 py-2.5">
                   {passwordErrors.map((err, i) => (
-                    <p key={i} className="text-[12px] text-red leading-relaxed">{err}</p>
+                    <p key={i} className="text-[14px] text-red leading-relaxed">{err}</p>
                   ))}
                 </div>
               )}
@@ -489,7 +489,7 @@ function ProfilePage() {
               <button
                 type="submit"
                 disabled={changePassword.isPending || (!newPassword && !confirmPassword)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50"
               >
                 {changePassword.isPending ? t('common.loading') : t('profile.updatePassword', 'Update password')}
               </button>
@@ -502,7 +502,7 @@ function ProfilePage() {
           <GlassCardHeader title={t('profile.oauthConnections', 'Connected accounts')} />
           <div className="p-6 space-y-3">
             {oauthLoading ? (
-              <p className="text-[13px] text-text-tertiary text-center py-4">{t('common.loading')}</p>
+              <p className="text-[15px] text-text-tertiary text-center py-4">{t('common.loading')}</p>
             ) : (
               <>
                 <OAuthRow
@@ -525,7 +525,7 @@ function ProfilePage() {
                 />
                 {oauthData && !oauthData.hasPassword && [oauthData.google, oauthData.apple].filter(Boolean).length <= 1 && (
                   <div className="rounded-lg bg-amber/8 border border-amber/15 px-4 py-3 mt-2">
-                    <p className="text-[12px] text-amber leading-relaxed">
+                    <p className="text-[14px] text-amber leading-relaxed">
                       {t('profile.singleMethodWarning', 'You have only one login method. Set a password or connect another provider before disconnecting.')}
                     </p>
                   </div>
@@ -556,7 +556,7 @@ function ProfilePage() {
                     )}
                   >
                     <Icon size={20} className={isActive ? 'text-coffee' : 'text-text-secondary'} />
-                    <span className={cn('text-[12px] font-medium', isActive ? 'text-coffee' : 'text-text-secondary')}>
+                    <span className={cn('text-[14px] font-medium', isActive ? 'text-coffee' : 'text-text-secondary')}>
                       {opt.label}
                     </span>
                     {isActive && (
@@ -578,7 +578,7 @@ function ProfilePage() {
             action={
               <div className="flex items-center gap-1.5">
                 <AlertTriangle size={13} className="text-red" />
-                <span className="text-[11px] text-red font-medium">
+                <span className="text-[13px] text-red font-medium">
                   {t('profile.danger', 'Danger')}
                 </span>
               </div>
@@ -587,7 +587,7 @@ function ProfilePage() {
           <div className="p-6">
             {!showDeleteConfirm ? (
               <>
-                <p className="text-[12.5px] text-text-secondary leading-relaxed mb-4">
+                <p className="text-[14.5px] text-text-secondary leading-relaxed mb-4">
                   {t(
                     'profile.deleteAccountDesc',
                     'Permanently delete your account and all associated data. This action cannot be undone.',
@@ -596,7 +596,7 @@ function ProfilePage() {
                 <button
                   type="button"
                   onClick={() => setShowDeleteConfirm(true)}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-red/10 text-red border border-red/20 cursor-pointer transition-all hover:bg-red/18"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-red/10 text-red border border-red/20 cursor-pointer transition-all hover:bg-red/18"
                 >
                   <Trash2 size={14} />
                   {t('profile.deleteMyAccount', 'Delete my account')}
@@ -607,10 +607,10 @@ function ProfilePage() {
                 <div className="flex items-start gap-3">
                   <AlertTriangle size={18} className="text-red mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="text-[13px] font-medium text-red">
+                    <p className="text-[15px] font-medium text-red">
                       {t('profile.deleteConfirmTitle', 'Are you sure?')}
                     </p>
-                    <p className="text-[12px] text-text-secondary mt-1 leading-relaxed">
+                    <p className="text-[14px] text-text-secondary mt-1 leading-relaxed">
                       {t(
                         'profile.deleteConfirmDesc',
                         'Type "DELETE" below to confirm. Your account will be permanently deactivated.',
@@ -625,14 +625,14 @@ function ProfilePage() {
                   value={deleteConfirmText}
                   onChange={(e) => setDeleteConfirmText(e.target.value)}
                   placeholder="DELETE"
-                  className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-red/20 text-text-primary outline-none focus:border-red focus:ring-1 focus:ring-red/20 transition-all font-mono"
+                  className="w-full px-3 py-2.5 rounded-lg text-[15.5px] bg-glass-bg border border-red/20 text-text-primary outline-none focus:border-red focus:ring-1 focus:ring-red/20 transition-all font-mono"
                 />
                 <div className="flex items-center gap-3">
                   <button
                     type="button"
                     onClick={handleDeleteAccount}
                     disabled={deleteConfirmText !== 'DELETE' || deleteAccount.isPending}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-red text-white border-none cursor-pointer transition-all hover:bg-red/90 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-red text-white border-none cursor-pointer transition-all hover:bg-red/90 disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <Trash2 size={14} />
                     {deleteAccount.isPending
@@ -642,7 +642,7 @@ function ProfilePage() {
                   <button
                     type="button"
                     onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText(''); }}
-                    className="px-4 py-2 rounded-lg text-[13px] font-medium bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer transition-all hover:bg-cream-3/50"
+                    className="px-4 py-2 rounded-lg text-[15px] font-medium bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer transition-all hover:bg-cream-3/50"
                   >
                     {t('common.cancel', 'Cancel')}
                   </button>
@@ -673,14 +673,14 @@ function PasswordField({
 }) {
   return (
     <div>
-      <label className="block text-[12px] font-medium text-text-secondary mb-1.5">{label}</label>
+      <label className="block text-[14px] font-medium text-text-secondary mb-1.5">{label}</label>
       <div className="relative">
         <input
           type={show ? 'text' : 'password'}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
+          className="w-full px-3 py-2.5 pr-10 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
         />
         <button
           type="button"
@@ -719,8 +719,8 @@ function OAuthRow({
           {icon}
         </div>
         <div>
-          <p className="text-[13.5px] font-medium text-text-primary">{label}</p>
-          <p className="text-[11px] text-text-tertiary mt-0.5">
+          <p className="text-[15.5px] font-medium text-text-primary">{label}</p>
+          <p className="text-[13px] text-text-tertiary mt-0.5">
             {connected ? t('profile.connected', 'Connected') : t('profile.notConnected', 'Not connected')}
           </p>
         </div>
@@ -732,7 +732,7 @@ function OAuthRow({
             type="button"
             onClick={onDisconnect}
             disabled={isPending}
-            className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-red/10 text-red transition-colors hover:bg-red/18 disabled:opacity-50"
+            className="text-[13.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-red/10 text-red transition-colors hover:bg-red/18 disabled:opacity-50"
           >
             {t('profile.disconnect', 'Disconnect')}
           </button>
@@ -740,7 +740,7 @@ function OAuthRow({
           <button
             type="button"
             onClick={onConnect}
-            className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-coffee/10 text-coffee transition-colors hover:bg-coffee/18"
+            className="text-[13.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-coffee/10 text-coffee transition-colors hover:bg-coffee/18"
           >
             {t('profile.connect', 'Connect')}
           </button>

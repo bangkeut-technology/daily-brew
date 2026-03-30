@@ -233,16 +233,16 @@ function WelcomeStep({ onContinue }: { onContinue: () => void }) {
         </motion.div>
       </motion.div>
 
-      <h1 className="text-[28px] font-semibold text-text-primary font-serif mb-2">
+      <h1 className="text-[30px] font-semibold text-text-primary font-serif mb-2">
         {t('onboarding.welcomeTitle', 'Welcome to DailyBrew')}
       </h1>
-      <p className="text-[14px] text-text-secondary font-sans mb-10">
+      <p className="text-[16px] text-text-secondary font-sans mb-10">
         {t('onboarding.welcomeSubtitle', 'Staff attendance, brewed simply')}
       </p>
 
       <button
         onClick={onContinue}
-        className="flex items-center gap-2 px-8 py-3 rounded-xl text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,66,38,0.30)]"
+        className="flex items-center gap-2 px-8 py-3 rounded-xl text-[17px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,66,38,0.30)]"
       >
         {t('onboarding.getStarted', 'Get started')}
         <ArrowRight size={18} />
@@ -256,10 +256,10 @@ function RoleSelectionStep({ onSelect }: { onSelect: (role: 'owner' | 'employee'
 
   return (
     <div className="text-center">
-      <h2 className="text-[22px] font-semibold text-text-primary font-serif mb-2">
+      <h2 className="text-[24px] font-semibold text-text-primary font-serif mb-2">
         {t('onboarding.roleTitle', 'How will you use DailyBrew?')}
       </h2>
-      <p className="text-[13px] text-text-secondary font-sans mb-8">
+      <p className="text-[15px] text-text-secondary font-sans mb-8">
         {t('onboarding.roleSubtitle', 'Are you a restaurant owner or a staff member?')}
       </p>
 
@@ -272,10 +272,10 @@ function RoleSelectionStep({ onSelect }: { onSelect: (role: 'owner' | 'employee'
           <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-gradient-to-br from-amber to-coffee shadow-[0_3px_10px_rgba(107,66,38,0.20)]">
             <Building2 size={22} color="white" strokeWidth={1.8} />
           </div>
-          <p className="text-[14px] font-semibold text-text-primary font-sans mb-1">
+          <p className="text-[16px] font-semibold text-text-primary font-sans mb-1">
             {t('onboarding.ownerTitle', 'I own a restaurant')}
           </p>
-          <p className="text-[12px] text-text-secondary font-sans leading-relaxed">
+          <p className="text-[14px] text-text-secondary font-sans leading-relaxed">
             {t('onboarding.ownerDescription', 'Create your workspace and manage staff')}
           </p>
           <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -291,10 +291,10 @@ function RoleSelectionStep({ onSelect }: { onSelect: (role: 'owner' | 'employee'
           <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-gradient-to-br from-blue to-[#1a3a5c] shadow-[0_3px_10px_rgba(59,111,160,0.20)]">
             <UserCircle size={22} color="white" strokeWidth={1.8} />
           </div>
-          <p className="text-[14px] font-semibold text-text-primary font-sans mb-1">
+          <p className="text-[16px] font-semibold text-text-primary font-sans mb-1">
             {t('onboarding.employeeTitle', "I'm a staff member")}
           </p>
-          <p className="text-[12px] text-text-secondary font-sans leading-relaxed">
+          <p className="text-[14px] text-text-secondary font-sans leading-relaxed">
             {t('onboarding.employeeDescription', 'Get linked to your workplace')}
           </p>
           <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -327,10 +327,10 @@ function OwnerFormStep({
         <Building2 size={24} color="white" strokeWidth={1.8} />
       </div>
 
-      <h2 className="text-[22px] font-semibold text-text-primary font-serif mb-2">
+      <h2 className="text-[24px] font-semibold text-text-primary font-serif mb-2">
         {t('onboarding.createWorkspaceTitle', 'Name your restaurant')}
       </h2>
-      <p className="text-[13px] text-text-secondary font-sans mb-8">
+      <p className="text-[15px] text-text-secondary font-sans mb-8">
         {t(
           'onboarding.createWorkspaceSubtitle',
           'This is the workspace where you will manage your staff.',
@@ -340,7 +340,7 @@ function OwnerFormStep({
       <div className="glass-card p-6">
         <form onSubmit={onSubmit} className="space-y-5">
           <div className="text-left">
-            <label className="block text-[12px] font-medium text-text-secondary mb-1.5 font-sans">
+            <label className="block text-[14px] font-medium text-text-secondary mb-1.5 font-sans">
               {t('onboarding.restaurantName', 'Restaurant name')}
             </label>
             <input
@@ -349,14 +349,14 @@ function OwnerFormStep({
               onChange={(e) => onWorkspaceNameChange(e.target.value)}
               placeholder={t('onboarding.restaurantPlaceholder', 'e.g. Caf\u00e9 Mekong')}
               autoFocus
-              className="w-full px-3.5 py-3 rounded-xl text-[14px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-2 focus:ring-coffee/15 transition-all font-sans placeholder:text-text-tertiary"
+              className="w-full px-3.5 py-3 rounded-xl text-[16px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-2 focus:ring-coffee/15 transition-all font-sans placeholder:text-text-tertiary"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-[14px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,66,38,0.30)] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-[16px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,66,38,0.30)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading
               ? t('common.loading', 'Creating...')
@@ -368,7 +368,7 @@ function OwnerFormStep({
 
       <button
         onClick={onBack}
-        className="mt-5 text-[12.5px] text-text-tertiary hover:text-text-secondary font-sans bg-transparent border-none cursor-pointer transition-colors"
+        className="mt-5 text-[14.5px] text-text-tertiary hover:text-text-secondary font-sans bg-transparent border-none cursor-pointer transition-colors"
       >
         {t('onboarding.back', 'Back')}
       </button>
@@ -405,10 +405,10 @@ function EmployeeLinkStep({
         <UserCircle size={24} color="white" strokeWidth={1.8} />
       </div>
 
-      <h2 className="text-[22px] font-semibold text-text-primary font-serif mb-2">
+      <h2 className="text-[24px] font-semibold text-text-primary font-serif mb-2">
         {t('onboarding.employeeLinkTitle', 'Link to your workplace')}
       </h2>
-      <p className="text-[13px] text-text-secondary font-sans mb-8">
+      <p className="text-[15px] text-text-secondary font-sans mb-8">
         {t(
           'onboarding.employeeLinkSubtitle',
           'Ask your employer for your Employee ID, then enter it below to link your account.',
@@ -418,11 +418,11 @@ function EmployeeLinkStep({
       <div className="glass-card p-6 space-y-6">
         {/* Your public ID section */}
         <div className="text-left">
-          <label className="block text-[11px] font-medium uppercase tracking-wider text-text-tertiary mb-2 font-sans">
+          <label className="block text-[13px] font-medium uppercase tracking-wider text-text-tertiary mb-2 font-sans">
             {t('onboarding.yourId', 'Your user ID')}
           </label>
           <div className="flex items-center gap-2">
-            <div className="flex-1 px-3.5 py-2.5 rounded-lg bg-cream-2 border border-cream-3 text-[13px] text-text-primary font-mono tabular-nums truncate select-all">
+            <div className="flex-1 px-3.5 py-2.5 rounded-lg bg-cream-2 border border-cream-3 text-[15px] text-text-primary font-mono tabular-nums truncate select-all">
               {userPublicId}
             </div>
             <button
@@ -438,7 +438,7 @@ function EmployeeLinkStep({
               )}
             </button>
           </div>
-          <p className="text-[11px] text-text-tertiary mt-2 font-sans leading-relaxed">
+          <p className="text-[13px] text-text-tertiary mt-2 font-sans leading-relaxed">
             {t(
               'onboarding.shareIdHint',
               'Share this with your restaurant owner so they can add you as an employee.',
@@ -449,7 +449,7 @@ function EmployeeLinkStep({
         {/* Divider */}
         <div className="flex items-center gap-3">
           <div className="flex-1 h-px bg-cream-3/80" />
-          <span className="text-[11px] text-text-tertiary uppercase tracking-wider font-sans">
+          <span className="text-[13px] text-text-tertiary uppercase tracking-wider font-sans">
             {t('onboarding.or', 'or')}
           </span>
           <div className="flex-1 h-px bg-cream-3/80" />
@@ -458,7 +458,7 @@ function EmployeeLinkStep({
         {/* Self-link form */}
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="text-left">
-            <label className="block text-[12px] font-medium text-text-secondary mb-1.5 font-sans">
+            <label className="block text-[14px] font-medium text-text-secondary mb-1.5 font-sans">
               {t('onboarding.enterEmployeeId', 'Enter your employee ID')}
             </label>
             <input
@@ -466,9 +466,9 @@ function EmployeeLinkStep({
               value={employeePublicId}
               onChange={(e) => onEmployeePublicIdChange(e.target.value)}
               placeholder={t('onboarding.employeeIdPlaceholder', 'Ask your employer for your Employee ID')}
-              className="w-full px-3.5 py-3 rounded-xl text-[14px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-2 focus:ring-coffee/15 transition-all font-sans placeholder:text-text-tertiary"
+              className="w-full px-3.5 py-3 rounded-xl text-[16px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-2 focus:ring-coffee/15 transition-all font-sans placeholder:text-text-tertiary"
             />
-            <p className="text-[11px] text-text-tertiary mt-1.5 font-sans leading-relaxed">
+            <p className="text-[13px] text-text-tertiary mt-1.5 font-sans leading-relaxed">
               {t(
                 'onboarding.employeeIdHint',
                 'Your employer creates your employee profile and gives you this ID to link your account.',
@@ -479,7 +479,7 @@ function EmployeeLinkStep({
           <button
             type="submit"
             disabled={loading || !employeePublicId.trim()}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-[14px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,66,38,0.30)] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-[16px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,66,38,0.30)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading
               ? t('common.loading', 'Linking...')
@@ -493,15 +493,15 @@ function EmployeeLinkStep({
       <div className="mt-5 flex items-center justify-center gap-4">
         <button
           onClick={onBack}
-          className="text-[12.5px] text-text-tertiary hover:text-text-secondary font-sans bg-transparent border-none cursor-pointer transition-colors"
+          className="text-[14.5px] text-text-tertiary hover:text-text-secondary font-sans bg-transparent border-none cursor-pointer transition-colors"
         >
           {t('onboarding.back', 'Back')}
         </button>
-        <span className="text-text-tertiary text-[10px]">&middot;</span>
+        <span className="text-text-tertiary text-[12px]">&middot;</span>
         <button
           onClick={onSkip}
           disabled={loading}
-          className="text-[12.5px] text-text-tertiary hover:text-text-secondary font-sans bg-transparent border-none cursor-pointer transition-colors disabled:opacity-50"
+          className="text-[14.5px] text-text-tertiary hover:text-text-secondary font-sans bg-transparent border-none cursor-pointer transition-colors disabled:opacity-50"
         >
           {t('onboarding.skipForNow', 'Skip for now')}
         </button>

@@ -98,7 +98,7 @@ function AttendancePage() {
     <div className="page-enter">
       <PageHeader title={isEmployee ? t('nav.myAttendance', 'My Attendance') : t('nav.attendance')} />
 
-      <p className="text-[13px] text-text-secondary mb-5 -mt-2 leading-relaxed">
+      <p className="text-[15px] text-text-secondary mb-5 -mt-2 leading-relaxed">
         {isEmployee
           ? t('attendance.employeeDescription', 'Your check-in and check-out history. Filter by date range.')
           : t('attendance.ownerDescription', 'View check-in and check-out records for all employees. Filter by date range or employee.')}
@@ -106,20 +106,20 @@ function AttendancePage() {
 
       <div className="flex flex-wrap items-end gap-3 mb-6">
         <div>
-          <label id="attendance-from-label" className="block text-[11px] font-medium text-text-secondary mb-1">
+          <label id="attendance-from-label" className="block text-[13px] font-medium text-text-secondary mb-1">
             {t('attendance.from', 'From')}
           </label>
           <CustomDatePicker value={from} onChange={setFrom} />
         </div>
         <div>
-          <label id="attendance-to-label" className="block text-[11px] font-medium text-text-secondary mb-1">
+          <label id="attendance-to-label" className="block text-[13px] font-medium text-text-secondary mb-1">
             {t('attendance.to', 'To')}
           </label>
           <CustomDatePicker value={to} onChange={setTo} />
         </div>
         {!isEmployee && (
           <div className="w-48">
-            <label id="attendance-employee-label" className="block text-[11px] font-medium text-text-secondary mb-1">
+            <label id="attendance-employee-label" className="block text-[13px] font-medium text-text-secondary mb-1">
               {t('attendance.employee', 'Employee')}
             </label>
             <CustomSelect
@@ -134,12 +134,12 @@ function AttendancePage() {
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <p className="text-[13px] text-text-tertiary">{t('common.loading')}</p>
+          <p className="text-[15px] text-text-tertiary">{t('common.loading')}</p>
         </div>
       ) : filtered?.length === 0 ? (
         <div className="border-[1.5px] border-dashed border-cream-3 rounded-2xl bg-glass-bg backdrop-blur-md flex flex-col items-center justify-center min-h-[200px]">
           <ClipboardList size={28} className="text-text-tertiary mb-2" />
-          <span className="text-[13px] text-text-tertiary">
+          <span className="text-[15px] text-text-tertiary">
             {t('attendance.noRecords', 'No attendance records for this period')}
           </span>
         </div>
@@ -148,7 +148,7 @@ function AttendancePage() {
           <GlassCardHeader
             title={t('attendance.log', 'Attendance log')}
             action={
-              <span className="flex items-center gap-1.5 text-[12px] text-text-tertiary">
+              <span className="flex items-center gap-1.5 text-[14px] text-text-tertiary">
                 <CalendarDays size={13} />
                 {from === to ? fmtDate(from) : `${fmtDate(from)} – ${fmtDate(to)}`}
                 <span className="ml-1">({filtered?.length} records)</span>

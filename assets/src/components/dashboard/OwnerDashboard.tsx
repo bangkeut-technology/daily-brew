@@ -68,12 +68,12 @@ export function OwnerDashboard() {
         <PageHeader title={t('nav.dashboard')} />
         <GlassCard hover={false}>
           <div className="p-8 text-center">
-            <p className="text-[13.5px] text-text-secondary mb-4 font-sans">
+            <p className="text-[15.5px] text-text-secondary mb-4 font-sans">
               {t('dashboard.noWorkspace', 'No workspace selected. Create one to get started.')}
             </p>
             <Link
               to="/console/settings"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white no-underline transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white no-underline transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
             >
               {t('dashboard.goToSettings', 'Go to settings')}
             </Link>
@@ -87,7 +87,7 @@ export function OwnerDashboard() {
     return (
       <div className="page-enter">
         <PageHeader title={t('nav.dashboard')} />
-        <p className="text-text-tertiary text-[13px] font-sans">{t('common.loading', 'Loading...')}</p>
+        <p className="text-text-tertiary text-[15px] font-sans">{t('common.loading', 'Loading...')}</p>
       </div>
     );
   }
@@ -102,13 +102,13 @@ export function OwnerDashboard() {
           <Coffee size={48} className="text-coffee/80 mb-4" strokeWidth={1.5} />
 
           <h2
-            className="text-[20px] font-semibold text-text-primary mb-2 text-center"
+            className="text-[22px] font-semibold text-text-primary mb-2 text-center"
             style={{ fontFamily: "'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif" }}
           >
             {t('dashboard.emptyWelcome')}
           </h2>
 
-          <p className="text-[13.5px] text-text-secondary font-sans text-center max-w-md mb-8">
+          <p className="text-[15.5px] text-text-secondary font-sans text-center max-w-md mb-8">
             {t('dashboard.emptySubtitle')}
           </p>
 
@@ -120,10 +120,10 @@ export function OwnerDashboard() {
             >
               <div className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-5 text-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer">
                 <UserPlus size={28} className="text-text-tertiary mx-auto mb-3 group-hover:text-coffee transition-colors" />
-                <p className="text-[13.5px] font-medium text-text-primary font-sans mb-1">
+                <p className="text-[15.5px] font-medium text-text-primary font-sans mb-1">
                   {t('dashboard.emptyAddEmployee')}
                 </p>
-                <p className="text-[11px] text-text-tertiary font-sans">
+                <p className="text-[13px] text-text-tertiary font-sans">
                   {t('dashboard.emptyAddEmployeeDesc')}
                 </p>
               </div>
@@ -132,10 +132,10 @@ export function OwnerDashboard() {
             <Link to="/console/shifts" className="group no-underline">
               <div className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-5 text-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer">
                 <Clock size={28} className="text-text-tertiary mx-auto mb-3 group-hover:text-coffee transition-colors" />
-                <p className="text-[13.5px] font-medium text-text-primary font-sans mb-1">
+                <p className="text-[15.5px] font-medium text-text-primary font-sans mb-1">
                   {t('dashboard.emptyCreateShift')}
                 </p>
-                <p className="text-[11px] text-text-tertiary font-sans">
+                <p className="text-[13px] text-text-tertiary font-sans">
                   {t('dashboard.emptyCreateShiftDesc')}
                 </p>
               </div>
@@ -144,10 +144,10 @@ export function OwnerDashboard() {
             <Link to="/console/settings" className="group no-underline">
               <div className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-5 text-center transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer">
                 <Settings size={28} className="text-text-tertiary mx-auto mb-3 group-hover:text-coffee transition-colors" />
-                <p className="text-[13.5px] font-medium text-text-primary font-sans mb-1">
+                <p className="text-[15.5px] font-medium text-text-primary font-sans mb-1">
                   {t('dashboard.emptyConfigure')}
                 </p>
-                <p className="text-[11px] text-text-tertiary font-sans">
+                <p className="text-[13px] text-text-tertiary font-sans">
                   {t('dashboard.emptyConfigureDesc')}
                 </p>
               </div>
@@ -165,7 +165,7 @@ export function OwnerDashboard() {
         badge={plan ? (
           <Link to="/console/settings" className="no-underline">
             <span className={cn(
-              'text-[10px] font-semibold px-2 py-0.5 rounded-full',
+              'text-[12px] font-semibold px-2 py-0.5 rounded-full',
               plan.isEspresso ? 'bg-green/10 text-green' : 'bg-cream-3 text-text-tertiary',
             )}>
               {plan.planLabel}
@@ -179,7 +179,7 @@ export function OwnerDashboard() {
                 to="/console/leave"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber/10 no-underline hover:bg-amber/15 transition-colors"
               >
-                <span className="text-[12px] font-medium text-amber">
+                <span className="text-[14px] font-medium text-amber">
                   {data.pendingLeaves} {data.pendingLeaves === 1 ? t('leave.pendingRequest', 'leave request pending') : t('leave.pendingRequests', 'leave requests pending')}
                 </span>
               </Link>
@@ -187,14 +187,14 @@ export function OwnerDashboard() {
             <Link
               to="/console/employees/new"
               data-tour="add-employee"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-coffee text-white no-underline border-none cursor-pointer transition-all hover:bg-coffee-light"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[14px] font-medium bg-coffee text-white no-underline border-none cursor-pointer transition-all hover:bg-coffee-light"
             >
               <UserPlus size={13} />
               {t('dashboard.addEmployee', 'Add employee')}
             </Link>
             <Link
               to="/console/attendance"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-glass-bg text-text-primary border border-cream-3 no-underline cursor-pointer transition-all hover:bg-cream-3"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[14px] font-medium bg-glass-bg text-text-primary border border-cream-3 no-underline cursor-pointer transition-all hover:bg-cream-3"
             >
               <ClipboardList size={13} />
               {t('dashboard.viewAttendance', 'View attendance')}
@@ -207,7 +207,7 @@ export function OwnerDashboard() {
 
       {/* Welcome + summary text */}
       <div className="mb-6">
-        <p className="text-[13.5px] text-text-secondary leading-relaxed">
+        <p className="text-[15.5px] text-text-secondary leading-relaxed">
           {data.totalEmployees === 0
             ? 'Get started by adding your first employee and creating a shift.'
             : data.present === data.totalEmployees
@@ -235,13 +235,13 @@ export function OwnerDashboard() {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <QrCode size={15} className="text-coffee" />
-                <h3 className="text-[14px] font-semibold text-text-primary">Check-in QR code</h3>
+                <h3 className="text-[16px] font-semibold text-text-primary">Check-in QR code</h3>
               </div>
-              <p className="text-[12px] text-text-secondary leading-relaxed mb-3">
+              <p className="text-[14px] text-text-secondary leading-relaxed mb-3">
                 Print and display this at your restaurant. Employees scan it with the DailyBrew app to check in and out.
               </p>
               <div className="flex items-center gap-2">
-                <code className="text-[11px] font-mono text-text-tertiary bg-cream-3/30 px-2 py-1 rounded">
+                <code className="text-[13px] font-mono text-text-tertiary bg-cream-3/30 px-2 py-1 rounded">
                   dailybrew:ws:{currentWs.qrToken}
                 </code>
                 <button
@@ -301,33 +301,33 @@ export function OwnerDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <GlassCard hover={false}>
             <div className="p-4">
-              <p className="text-[11px] text-text-tertiary uppercase tracking-[1px] mb-1">Attendance rate</p>
-              <p className="text-[28px] font-bold text-coffee tabular-nums">
+              <p className="text-[13px] text-text-tertiary uppercase tracking-[1px] mb-1">Attendance rate</p>
+              <p className="text-[30px] font-bold text-coffee tabular-nums">
                 {data.totalEmployees > 0 ? Math.round((data.present / data.totalEmployees) * 100) : 0}%
               </p>
-              <p className="text-[11px] text-text-tertiary mt-1">
+              <p className="text-[13px] text-text-tertiary mt-1">
                 {data.present} present out of {data.totalEmployees} employees
               </p>
             </div>
           </GlassCard>
           <GlassCard hover={false}>
             <div className="p-4">
-              <p className="text-[11px] text-text-tertiary uppercase tracking-[1px] mb-1">On-time rate</p>
-              <p className="text-[28px] font-bold text-green tabular-nums">
+              <p className="text-[13px] text-text-tertiary uppercase tracking-[1px] mb-1">On-time rate</p>
+              <p className="text-[30px] font-bold text-green tabular-nums">
                 {data.present > 0 ? Math.round(((data.present - data.late) / data.present) * 100) : 0}%
               </p>
-              <p className="text-[11px] text-text-tertiary mt-1">
+              <p className="text-[13px] text-text-tertiary mt-1">
                 {data.present - data.late} on time, {data.late} late today
               </p>
             </div>
           </GlassCard>
           <GlassCard hover={false}>
             <div className="p-4">
-              <p className="text-[11px] text-text-tertiary uppercase tracking-[1px] mb-1">Leave & absent</p>
-              <p className="text-[28px] font-bold text-amber tabular-nums">
+              <p className="text-[13px] text-text-tertiary uppercase tracking-[1px] mb-1">Leave & absent</p>
+              <p className="text-[30px] font-bold text-amber tabular-nums">
                 {data.onLeave + data.absent}
               </p>
-              <p className="text-[11px] text-text-tertiary mt-1">
+              <p className="text-[13px] text-text-tertiary mt-1">
                 {data.onLeave} on leave, {data.absent} absent{data.pendingLeaves > 0 ? `, ${data.pendingLeaves} pending` : ''}
               </p>
             </div>
@@ -342,10 +342,10 @@ export function OwnerDashboard() {
             <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-red/8 border border-red/15 mb-3">
               <CalendarOff size={16} className="text-red shrink-0" />
               <div className="flex-1">
-                <p className="text-[13px] font-medium text-red">
+                <p className="text-[15px] font-medium text-red">
                   Restaurant is closed today — {activeClosures.map((c) => c.name).join(', ')}
                 </p>
-                <p className="text-[11px] text-red/70">
+                <p className="text-[13px] text-red/70">
                   No attendance is expected during this period.
                 </p>
               </div>
@@ -369,12 +369,12 @@ export function OwnerDashboard() {
                     <div key={c.publicId} className="flex items-center gap-3 px-5 py-3 border-b border-cream-3/50 last:border-0">
                       <CalendarOff size={14} className="text-amber shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-medium text-text-primary truncate">{c.name}</p>
-                        <p className="text-[11px] text-text-tertiary">
+                        <p className="text-[15px] font-medium text-text-primary truncate">{c.name}</p>
+                        <p className="text-[13px] text-text-tertiary">
                           {fmtDate(c.startDate)}{c.startDate !== c.endDate ? ` – ${fmtDate(c.endDate)}` : ''}
                         </p>
                       </div>
-                      <span className="text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
+                      <span className="text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
                         in {daysUntil} day{daysUntil !== 1 ? 's' : ''}
                       </span>
                     </div>
@@ -401,7 +401,7 @@ export function OwnerDashboard() {
         />
         <div>
           {data.recentAttendance.length === 0 ? (
-            <p className="px-5 py-8 text-center text-[13px] text-text-tertiary font-sans">
+            <p className="px-5 py-8 text-center text-[15px] text-text-tertiary font-sans">
               {t('dashboard.noAttendance', 'No attendance records yet today')}
             </p>
           ) : (
@@ -426,13 +426,13 @@ export function OwnerDashboard() {
         {!canUseLeave && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-cream/80 dark:bg-cream/60 backdrop-blur-sm">
             <Crown size={24} className="text-amber mb-2" />
-            <p className="text-[14px] font-semibold text-text-primary mb-1">Upcoming leaves</p>
-            <p className="text-[12px] text-text-secondary mb-3 text-center max-w-xs">
+            <p className="text-[16px] font-semibold text-text-primary mb-1">Upcoming leaves</p>
+            <p className="text-[14px] text-text-secondary mb-3 text-center max-w-xs">
               See who's taking time off in the next 2 weeks. Upgrade to Espresso to manage leave requests.
             </p>
             <button
               onClick={() => openCheckout('annual')}
-              className="px-5 py-2 rounded-xl text-[13px] font-medium text-white border-none cursor-pointer btn-shimmer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,66,38,0.30)]"
+              className="px-5 py-2 rounded-xl text-[15px] font-medium text-white border-none cursor-pointer btn-shimmer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,66,38,0.30)]"
             >
               Start 14-day free trial
             </button>
@@ -453,7 +453,7 @@ export function OwnerDashboard() {
           />
           <div className={!canUseLeave ? 'blur-[2px] select-none pointer-events-none' : ''}>
             {canUseLeave && upcomingLeaves.length === 0 ? (
-              <p className="px-5 py-6 text-center text-[13px] text-text-tertiary">
+              <p className="px-5 py-6 text-center text-[15px] text-text-tertiary">
                 No upcoming leaves in the next 2 weeks
               </p>
             ) : (
@@ -469,10 +469,10 @@ export function OwnerDashboard() {
                   >
                     <CalendarDays size={14} className={lr.status === 'pending' ? 'text-amber shrink-0' : 'text-blue shrink-0'} />
                     <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-medium text-text-primary truncate">
+                      <p className="text-[15px] font-medium text-text-primary truncate">
                         {lr.employeeName}
                       </p>
-                      <p className="text-[11px] text-text-tertiary">
+                      <p className="text-[13px] text-text-tertiary">
                         {fmtDate(lr.startDate)}{lr.startDate !== lr.endDate ? ` – ${fmtDate(lr.endDate)}` : ''}
                       </p>
                     </div>
@@ -490,7 +490,7 @@ export function OwnerDashboard() {
                             } catch { toast.error(t('leave.updateError', 'Failed to update leave request')); }
                           }}
                           disabled={updateLeave.isPending}
-                          className="text-[11px] font-medium px-2.5 py-1 rounded-md border-none cursor-pointer bg-green/12 text-green transition-colors hover:bg-green/20 disabled:opacity-50"
+                          className="text-[13px] font-medium px-2.5 py-1 rounded-md border-none cursor-pointer bg-green/12 text-green transition-colors hover:bg-green/20 disabled:opacity-50"
                         >
                           &#10003;
                         </button>
@@ -502,7 +502,7 @@ export function OwnerDashboard() {
                             } catch { toast.error(t('leave.updateError', 'Failed to update leave request')); }
                           }}
                           disabled={updateLeave.isPending}
-                          className="text-[11px] font-medium px-2.5 py-1 rounded-md border-none cursor-pointer bg-red/10 text-red transition-colors hover:bg-red/18 disabled:opacity-50"
+                          className="text-[13px] font-medium px-2.5 py-1 rounded-md border-none cursor-pointer bg-red/10 text-red transition-colors hover:bg-red/18 disabled:opacity-50"
                         >
                           &#10005;
                         </button>

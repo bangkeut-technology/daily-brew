@@ -202,7 +202,7 @@ function SettingsPage() {
               {/* Dev mode toggle */}
               {isDev && (
                 <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-lg bg-amber/8 border border-amber/15">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-amber mr-2">Dev</span>
+                  <span className="text-[12px] font-semibold uppercase tracking-wider text-amber mr-2">Dev</span>
                   {(['free', 'espresso', 'double_espresso'] as const).map((p) => (
                     <button
                       key={p}
@@ -214,7 +214,7 @@ function SettingsPage() {
                       }}
                       disabled={devToggle.isPending}
                       className={cn(
-                        'px-3 py-1 rounded-md text-[11px] font-medium border-none cursor-pointer transition-colors',
+                        'px-3 py-1 rounded-md text-[13px] font-medium border-none cursor-pointer transition-colors',
                         plan.plan === p
                           ? 'bg-coffee text-white'
                           : 'bg-glass-bg text-text-secondary hover:bg-cream-3',
@@ -234,61 +234,44 @@ function SettingsPage() {
                       <Crown size={20} className="text-amber" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-[14px] font-semibold text-text-primary">
+                      <p className="text-[16px] font-semibold text-text-primary">
                         Espresso trial — {plan.trialDaysRemaining} day{plan.trialDaysRemaining !== 1 ? 's' : ''} remaining
                       </p>
-                      <p className="text-[12px] text-text-secondary">
+                      <p className="text-[14px] text-text-secondary">
                         You have full access to all Espresso features. Your first payment will be charged after the trial ends.
                       </p>
                     </div>
                   </div>
                 )}
 
-                {/* Free plan */}
-                <div
-                  className={cn(
-                    'rounded-xl border-2 p-5 transition-colors',
-                    plan.plan === 'free' ? 'border-coffee bg-coffee/5' : 'border-cream-3 bg-glass-bg',
-                  )}
-                >
-                  <h3 className="text-[15px] font-semibold text-text-primary mb-1">Free</h3>
-                  <p className="text-[12px] text-text-tertiary mb-4">Get started</p>
-                  <ul className="space-y-2">
-                    {['Up to 10 employees', 'QR code check-in', 'Shift management', 'Closure management', 'Dashboard & attendance log'].map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-[12.5px] text-text-secondary">
-                        <Check size={14} className="text-green shrink-0" />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  {plan.plan === 'free' && plan.remainingEmployeeSlots !== null && (
-                    <div className="mt-4 text-[11px] text-text-tertiary">
-                      {plan.remainingEmployeeSlots} employee slot{plan.remainingEmployeeSlots !== 1 ? 's' : ''} remaining
-                    </div>
-                  )}
-                </div>
-
                 {/* Espresso plan */}
                 <div
                   className={cn(
                     'rounded-xl border-2 p-5 relative overflow-hidden transition-colors',
-                    plan.plan === 'espresso' ? 'border-amber bg-amber/5' : 'border-cream-3 bg-glass-bg',
+                    plan.isEspresso ? 'border-amber bg-amber/5' : 'border-cream-3 bg-glass-bg',
                   )}
                 >
                   <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-amber to-amber-light" />
                   <div className="flex items-center gap-2 mb-1">
-                    <Crown size={16} className="text-amber" />
-                    <h3 className="text-[15px] font-semibold text-text-primary">Espresso</h3>
+                    <Crown size={18} className="text-amber" />
+                    <h3 className="text-[20px] font-semibold text-text-primary">Espresso</h3>
+                    {plan.isEspresso && (
+                      <span className="text-[13px] font-semibold px-2 py-0.5 rounded-full bg-green/10 text-green">
+                        {plan.isTrialing ? 'Trial' : 'Current'}
+                      </span>
+                    )}
                   </div>
-                  <p className="text-[12px] text-text-tertiary mb-4">For growing teams</p>
-                  <ul className="space-y-2">
+                  <p className="text-[16px] text-text-tertiary mb-4">For growing teams</p>
+                  <ul className="space-y-2.5">
                     {['Up to 20 employees', 'IP restriction for check-in & out', 'Device verification for check-in & out', 'Geofencing for check-in & out', 'Per-day schedules', 'Leave requests', 'BasilBook linking'].map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-[12.5px] text-text-secondary">
-                        <Check size={14} className="text-amber shrink-0" />
+                      <li key={f} className="flex items-center gap-2 text-[16px] text-text-secondary">
+                        <Check size={16} className="text-amber shrink-0" />
                         {f}
                       </li>
                     ))}
                   </ul>
+
+                  {/* Subscribe button (free plan) */}
                   {plan.plan === 'free' && (
                     <div className="mt-4 space-y-3">
                       <div className="flex items-center justify-between">
@@ -296,7 +279,7 @@ function SettingsPage() {
                           <button
                             onClick={() => setBilling('monthly')}
                             className={cn(
-                              'px-3 py-1 rounded-md text-[11px] font-medium border-none cursor-pointer transition-colors',
+                              'px-3 py-1 rounded-md text-[13px] font-medium border-none cursor-pointer transition-colors',
                               billing === 'monthly' ? 'bg-coffee text-white' : 'bg-transparent text-text-secondary',
                             )}
                           >
@@ -305,32 +288,89 @@ function SettingsPage() {
                           <button
                             onClick={() => setBilling('annual')}
                             className={cn(
-                              'px-3 py-1 rounded-md text-[11px] font-medium border-none cursor-pointer transition-colors',
+                              'px-3 py-1 rounded-md text-[13px] font-medium border-none cursor-pointer transition-colors',
                               billing === 'annual' ? 'bg-coffee text-white' : 'bg-transparent text-text-secondary',
                             )}
                           >
                             Annual
                           </button>
                         </div>
-                        <span className="text-[13px] font-semibold text-text-primary">
+                        <span className="text-[15px] font-semibold text-text-primary">
                           {billing === 'annual' ? '$129/year' : '$12.99/month'}
                         </span>
                       </div>
                       {billing === 'annual' && (
-                        <p className="text-[10.5px] text-green font-medium">Save 17% vs monthly</p>
+                        <p className="text-[12.5px] text-green font-medium">Save 17% vs monthly</p>
                       )}
                       <button
                         onClick={() => openCheckout(billing)}
-                        className="w-full px-4 py-2.5 rounded-lg text-[13px] font-semibold bg-linear-to-r from-amber to-coffee text-white border-none cursor-pointer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(193,127,59,0.3)]"
+                        className="w-full px-4 py-2.5 rounded-lg text-[15px] font-semibold bg-linear-to-r from-amber to-coffee text-white border-none cursor-pointer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(193,127,59,0.3)]"
                       >
                         Start 14-day free trial
                       </button>
                     </div>
                   )}
-                  {plan.plan === 'espresso' && plan.currentPeriodEnd && (
-                    <div className="mt-4 text-[11px] text-text-tertiary">
-                      {plan.remainingEmployeeSlots !== null && `${plan.remainingEmployeeSlots} slots remaining · `}
-                      Renews {fmtDate(plan.currentPeriodEnd)}
+
+                  {/* Billing info + manage (subscribed) */}
+                  {plan.isEspresso && (
+                    <div className="mt-4 space-y-3">
+                      <div className="text-[13px] text-text-tertiary space-y-1">
+                        {plan.remainingEmployeeSlots !== null && (
+                          <p>{plan.remainingEmployeeSlots} employee slot{plan.remainingEmployeeSlots !== 1 ? 's' : ''} remaining</p>
+                        )}
+                        {plan.currentPeriodEnd && (
+                          <p>{plan.isTrialing ? 'Trial ends' : 'Renews'} {fmtDate(plan.currentPeriodEnd)}</p>
+                        )}
+                      </div>
+                      {plan.paddleSubscriptionId && (
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              window.Paddle?.Checkout?.open({
+                                transactionId: undefined,
+                                settings: { displayMode: 'overlay', theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light' },
+                              });
+                              // Use Paddle.js update subscription
+                              window.open(`https://customer.paddle.com/subscriptions/${plan.paddleSubscriptionId}/update`, '_blank');
+                            }}
+                            className="flex-1 px-3 py-2 rounded-lg text-[14px] font-medium bg-glass-bg text-text-primary border border-cream-3 cursor-pointer hover:bg-cream-3 transition-colors"
+                          >
+                            Manage billing
+                          </button>
+                          <button
+                            onClick={() => {
+                              window.open(`https://customer.paddle.com/subscriptions/${plan.paddleSubscriptionId}/cancel`, '_blank');
+                            }}
+                            className="px-3 py-2 rounded-lg text-[14px] font-medium bg-transparent text-red border border-red/20 cursor-pointer hover:bg-red/5 transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Free plan */}
+                <div
+                  className={cn(
+                    'rounded-xl border-2 p-5 transition-colors',
+                    plan.plan === 'free' ? 'border-coffee bg-coffee/5' : 'border-cream-3 bg-glass-bg',
+                  )}
+                >
+                  <h3 className="text-[17px] font-semibold text-text-primary mb-1">Free</h3>
+                  <p className="text-[14px] text-text-tertiary mb-4">Get started</p>
+                  <ul className="space-y-2">
+                    {['Up to 10 employees', 'QR code check-in', 'Shift management', 'Closure management', 'Dashboard & attendance log'].map((f) => (
+                      <li key={f} className="flex items-center gap-2 text-[14.5px] text-text-secondary">
+                        <Check size={14} className="text-green shrink-0" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  {plan.plan === 'free' && plan.remainingEmployeeSlots !== null && (
+                    <div className="mt-4 text-[13px] text-text-tertiary">
+                      {plan.remainingEmployeeSlots} employee slot{plan.remainingEmployeeSlots !== 1 ? 's' : ''} remaining
                     </div>
                   )}
                 </div>
@@ -345,13 +385,13 @@ function SettingsPage() {
                   <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-coffee to-amber" />
                   <div className="flex items-center gap-2 mb-1">
                     <Crown size={16} className="text-coffee" />
-                    <h3 className="text-[15px] font-semibold text-text-primary">Double Espresso</h3>
-                    <span className="text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-coffee/10 text-coffee">
+                    <h3 className="text-[17px] font-semibold text-text-primary">Double Espresso</h3>
+                    <span className="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-coffee/10 text-coffee">
                       Coming soon
                     </span>
                   </div>
-                  <p className="text-[12px] text-text-tertiary mb-1">$39.99/month</p>
-                  <p className="text-[12px] text-text-tertiary mb-4">For large teams</p>
+                  <p className="text-[14px] text-text-tertiary mb-1">$39.99/month</p>
+                  <p className="text-[14px] text-text-tertiary mb-4">For large teams</p>
                   <ul className="space-y-2">
                     {[
                       { text: 'Unlimited employees' },
@@ -363,11 +403,11 @@ function SettingsPage() {
                       { text: 'Manager role', roadmap: true },
                       { text: 'White-label branding', roadmap: true },
                     ].map((f) => (
-                      <li key={f.text} className={cn('flex items-center gap-2 text-[12.5px]', f.roadmap ? 'text-text-tertiary' : 'text-text-secondary')}>
+                      <li key={f.text} className={cn('flex items-center gap-2 text-[14.5px]', f.roadmap ? 'text-text-tertiary' : 'text-text-secondary')}>
                         <Check size={14} className={cn('shrink-0', f.roadmap ? 'text-text-tertiary' : 'text-coffee')} />
                         {f.text}
                         {f.roadmap && (
-                          <span className="text-[9px] font-medium px-1.5 py-px rounded-full bg-cream-3/60 text-text-tertiary">
+                          <span className="text-[11px] font-medium px-1.5 py-px rounded-full bg-cream-3/60 text-text-tertiary">
                             Roadmap
                           </span>
                         )}
@@ -377,13 +417,13 @@ function SettingsPage() {
                   {(plan.plan === 'free' || plan.plan === 'espresso') && (
                     <button
                       disabled
-                      className="mt-4 w-full px-4 py-2.5 rounded-lg text-[13px] font-semibold bg-glass-bg text-text-secondary border border-cream-3 cursor-not-allowed opacity-70"
+                      className="mt-4 w-full px-4 py-2.5 rounded-lg text-[15px] font-semibold bg-glass-bg text-text-secondary border border-cream-3 cursor-not-allowed opacity-70"
                     >
                       Coming soon
                     </button>
                   )}
                   {plan.plan === 'double_espresso' && plan.currentPeriodEnd && (
-                    <div className="mt-4 text-[11px] text-text-tertiary">
+                    <div className="mt-4 text-[13px] text-text-tertiary">
                       Renews {fmtDate(plan.currentPeriodEnd)}
                     </div>
                   )}
@@ -402,7 +442,7 @@ function SettingsPage() {
             <GlassCard hover={false}>
               <GlassCardHeader title="Check-in QR code" />
               <div className="px-5 py-2">
-                <p className="text-[11.5px] text-text-tertiary leading-relaxed">
+                <p className="text-[13.5px] text-text-tertiary leading-relaxed">
                   Display this QR code at your restaurant. Employees open the DailyBrew app, scan this code, and check in instantly.
                 </p>
               </div>
@@ -422,7 +462,7 @@ function SettingsPage() {
                     }}
                   />
                 </div>
-                <p className="mt-3 text-[11px] text-text-tertiary font-mono text-center">
+                <p className="mt-3 text-[13px] text-text-tertiary font-mono text-center">
                   {qrData}
                 </p>
                 <button
@@ -435,7 +475,7 @@ function SettingsPage() {
                       toast.error('Failed to copy');
                     }
                   }}
-                  className="mt-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3"
+                  className="mt-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[14px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3"
                 >
                   <Copy size={12} />
                   Copy token
@@ -452,7 +492,7 @@ function SettingsPage() {
             action={
               <button
                 onClick={() => setWsModalOpen(true)}
-                className="flex items-center gap-1 text-[11.5px] font-medium text-coffee hover:text-coffee-light bg-transparent border-none cursor-pointer transition-colors"
+                className="flex items-center gap-1 text-[13.5px] font-medium text-coffee hover:text-coffee-light bg-transparent border-none cursor-pointer transition-colors"
               >
                 <Plus size={12} />
                 {t('workspace.create')}
@@ -484,7 +524,7 @@ function SettingsPage() {
                         type="text"
                         value={editWsName}
                         onChange={(e) => setEditWsName(e.target.value)}
-                        className="w-full px-3 py-2 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee transition-colors"
+                        className="w-full px-3 py-2 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee transition-colors"
                         autoFocus
                       />
                       <div className="flex items-center gap-2">
@@ -500,13 +540,13 @@ function SettingsPage() {
                             }
                           }}
                           disabled={updateWs.isPending || !editWsName.trim()}
-                          className="px-3 py-1.5 rounded-lg text-[12px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50 transition-colors"
+                          className="px-3 py-1.5 rounded-lg text-[14px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50 transition-colors"
                         >
                           {t('common.save')}
                         </button>
                         <button
                           onClick={() => setEditingWsId(null)}
-                          className="px-3 py-1.5 rounded-lg text-[12px] font-medium bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer hover:bg-cream-3 transition-colors"
+                          className="px-3 py-1.5 rounded-lg text-[14px] font-medium bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer hover:bg-cream-3 transition-colors"
                         >
                           {t('common.cancel')}
                         </button>
@@ -524,7 +564,7 @@ function SettingsPage() {
                           }}
                           className={cn('w-9 h-9 rounded-lg bg-coffee/10 flex items-center justify-center shrink-0', !isCurrent && 'cursor-pointer')}
                         >
-                          <span className="text-[13px] font-semibold text-coffee">
+                          <span className="text-[15px] font-semibold text-coffee">
                             {ws.name.charAt(0).toUpperCase()}
                           </span>
                         </div>
@@ -538,11 +578,11 @@ function SettingsPage() {
                           }}
                         >
                           <div className="flex items-center gap-2">
-                            <span className="text-[13.5px] font-medium text-text-primary truncate">
+                            <span className="text-[15.5px] font-medium text-text-primary truncate">
                               {ws.name}
                             </span>
                             {isCurrent && (
-                              <span className="text-[10px] font-medium px-1.5 py-px rounded-full bg-coffee/10 text-coffee shrink-0">
+                              <span className="text-[12px] font-medium px-1.5 py-px rounded-full bg-coffee/10 text-coffee shrink-0">
                                 Current
                               </span>
                             )}
@@ -550,7 +590,7 @@ function SettingsPage() {
                           {ws.createdAt && (
                             <div className="flex items-center gap-1 mt-0.5">
                               <Calendar size={10} className="text-text-tertiary" />
-                              <span className="text-[10.5px] text-text-tertiary">
+                              <span className="text-[12.5px] text-text-tertiary">
                                 {fmtDate(ws.createdAt)}
                               </span>
                             </div>
@@ -574,13 +614,13 @@ function SettingsPage() {
                         <div className="flex items-center gap-4 mt-3 pt-3 border-t border-cream-3/60">
                           <div className="flex items-center gap-1.5">
                             <Users size={12} className="text-text-tertiary" />
-                            <span className="text-[11.5px] text-text-secondary">
+                            <span className="text-[13.5px] text-text-secondary">
                               {wsEmployeeCount} {t('nav.employees').toLowerCase()}
                             </span>
                           </div>
                           <div className="flex items-center gap-1.5">
                             <Building2 size={12} className="text-text-tertiary" />
-                            <span className="text-[11.5px] text-text-secondary">
+                            <span className="text-[13.5px] text-text-secondary">
                               {wsShiftCount} {t('nav.shifts').toLowerCase()}
                             </span>
                           </div>
@@ -605,10 +645,10 @@ function SettingsPage() {
                     <Building2 size={20} className="text-coffee" />
                   </div>
                   <div>
-                    <Dialog.Title className="text-[16px] font-semibold text-text-primary font-serif">
+                    <Dialog.Title className="text-[18px] font-semibold text-text-primary font-serif">
                       {t('workspace.create')}
                     </Dialog.Title>
-                    <Dialog.Description className="text-[12px] text-text-secondary">
+                    <Dialog.Description className="text-[14px] text-text-secondary">
                       {t('workspace.newPlaceholder')}
                     </Dialog.Description>
                   </div>
@@ -621,20 +661,20 @@ function SettingsPage() {
                     placeholder={t('workspace.newPlaceholder')}
                     autoFocus
                     required
-                    className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all mb-4"
+                    className="w-full px-3 py-2.5 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all mb-4"
                   />
                   <div className="flex justify-end gap-2">
                     <button
                       type="button"
                       onClick={() => { setWsModalOpen(false); setNewWsName(''); }}
-                      className="px-4 py-2 rounded-lg text-[13px] font-medium bg-transparent text-text-secondary border border-cream-3 cursor-pointer hover:bg-cream-3 transition-colors"
+                      className="px-4 py-2 rounded-lg text-[15px] font-medium bg-transparent text-text-secondary border border-cream-3 cursor-pointer hover:bg-cream-3 transition-colors"
                     >
                       {t('common.cancel')}
                     </button>
                     <button
                       type="submit"
                       disabled={createWs.isPending || !newWsName.trim()}
-                      className="px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50 transition-colors"
+                      className="px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50 transition-colors"
                     >
                       {createWs.isPending ? t('common.loading') : t('common.create')}
                     </button>
@@ -662,10 +702,10 @@ function SettingsPage() {
                     setIpEnabled(v);
                   }}
                 />
-                <label htmlFor="ip-restriction" className="text-[13px] text-text-primary cursor-pointer">
+                <label htmlFor="ip-restriction" className="text-[15px] text-text-primary cursor-pointer">
                   Enable IP restriction
                   {!plan?.canUseIpRestriction && (
-                    <span className="ml-1.5 text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
+                    <span className="ml-1.5 text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
                       Espresso
                     </span>
                   )}
@@ -674,7 +714,7 @@ function SettingsPage() {
               {ipEnabled && plan?.canUseIpRestriction && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label htmlFor="allowed-ips" className="text-[11px] font-medium text-text-secondary">
+                    <label htmlFor="allowed-ips" className="text-[13px] font-medium text-text-secondary">
                       Allowed IPs (one per line)
                     </label>
                     <button
@@ -692,7 +732,7 @@ function SettingsPage() {
                           // silently fail
                         }
                       }}
-                      className="text-[10.5px] font-medium text-amber cursor-pointer bg-transparent border-none hover:text-coffee transition-colors"
+                      className="text-[12.5px] font-medium text-amber cursor-pointer bg-transparent border-none hover:text-coffee transition-colors"
                     >
                       + Use my current IP
                     </button>
@@ -703,12 +743,12 @@ function SettingsPage() {
                     value={allowedIps}
                     onChange={(e) => setAllowedIps(e.target.value)}
                     rows={4}
-                    className="w-full px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono"
+                    className="w-full px-3 py-2 rounded-lg text-[15px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono"
                   />
                 </div>
               )}
               <div>
-                <label id="ws-timezone-label" className="block text-[11px] font-medium text-text-secondary mb-1">
+                <label id="ws-timezone-label" className="block text-[13px] font-medium text-text-secondary mb-1">
                   Timezone
                 </label>
                 <CustomSelect
@@ -717,12 +757,12 @@ function SettingsPage() {
                   options={TIMEZONE_OPTIONS}
                   placeholder="Select timezone…"
                 />
-                <p className="text-[10.5px] text-text-tertiary mt-1">
+                <p className="text-[12.5px] text-text-tertiary mt-1">
                   Used to calculate late arrivals and early departures relative to shift times.
                 </p>
               </div>
               <div>
-                <label id="ws-dateformat-label" className="block text-[11px] font-medium text-text-secondary mb-1">
+                <label id="ws-dateformat-label" className="block text-[13px] font-medium text-text-secondary mb-1">
                   Date format
                 </label>
                 <CustomSelect
@@ -738,7 +778,7 @@ function SettingsPage() {
               <button
                 onClick={handleSaveSettings}
                 disabled={updateSettings.isPending}
-                className="px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50"
+                className="px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50"
               >
                 {updateSettings.isPending ? t('common.loading') : t('common.save')}
               </button>
@@ -770,16 +810,16 @@ function SettingsPage() {
                     setDeviceVerificationEnabled(v);
                   }}
                 />
-                <label htmlFor="device-verification" className="text-[13px] text-text-primary cursor-pointer">
+                <label htmlFor="device-verification" className="text-[15px] text-text-primary cursor-pointer">
                   {t('settings.enableDeviceVerification')}
                   {!plan?.canUseDeviceVerification && (
-                    <span className="ml-1.5 text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
+                    <span className="ml-1.5 text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
                       Espresso
                     </span>
                   )}
                 </label>
               </div>
-              <p className="text-[12px] text-text-tertiary leading-relaxed">
+              <p className="text-[14px] text-text-tertiary leading-relaxed">
                 {t('settings.deviceVerificationDesc')}
               </p>
 
@@ -787,7 +827,7 @@ function SettingsPage() {
                 <button
                   onClick={handleSaveSettings}
                   disabled={updateSettings.isPending}
-                  className="px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50"
+                  className="px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50"
                 >
                   {updateSettings.isPending ? t('common.loading') : t('common.save')}
                 </button>
@@ -820,16 +860,16 @@ function SettingsPage() {
                     setGeofencingEnabled(v);
                   }}
                 />
-                <label htmlFor="geofencing" className="text-[13px] text-text-primary cursor-pointer">
+                <label htmlFor="geofencing" className="text-[15px] text-text-primary cursor-pointer">
                   Enable geofencing for check-in
                   {!plan?.canUseGeofencing && (
-                    <span className="ml-1.5 text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
+                    <span className="ml-1.5 text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
                       Espresso
                     </span>
                   )}
                 </label>
               </div>
-              <p className="text-[12px] text-text-tertiary leading-relaxed">
+              <p className="text-[14px] text-text-tertiary leading-relaxed">
                 When enabled, staff can only check in when they are within a specified radius of your restaurant location.
               </p>
 
@@ -840,7 +880,7 @@ function SettingsPage() {
                     type="button"
                     onClick={handleUseCurrentLocation}
                     disabled={locatingPosition}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3 disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-[15px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3 disabled:opacity-50"
                   >
                     <Navigation size={14} className={locatingPosition ? 'animate-pulse text-amber' : 'text-coffee'} />
                     {locatingPosition ? 'Detecting location...' : 'Use current location'}
@@ -848,7 +888,7 @@ function SettingsPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <label htmlFor="geo-lat" className="block text-[11px] font-medium text-text-secondary mb-1">
+                      <label htmlFor="geo-lat" className="block text-[13px] font-medium text-text-secondary mb-1">
                         Latitude
                       </label>
                       <input
@@ -861,11 +901,11 @@ function SettingsPage() {
                           setGeofencingLat(e.target.value === '' ? null : parseFloat(e.target.value))
                         }
                         placeholder="11.5564"
-                        className="w-full px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono"
+                        className="w-full px-3 py-2 rounded-lg text-[15px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono"
                       />
                     </div>
                     <div>
-                      <label htmlFor="geo-lng" className="block text-[11px] font-medium text-text-secondary mb-1">
+                      <label htmlFor="geo-lng" className="block text-[13px] font-medium text-text-secondary mb-1">
                         Longitude
                       </label>
                       <input
@@ -878,11 +918,11 @@ function SettingsPage() {
                           setGeofencingLng(e.target.value === '' ? null : parseFloat(e.target.value))
                         }
                         placeholder="104.9282"
-                        className="w-full px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono"
+                        className="w-full px-3 py-2 rounded-lg text-[15px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono"
                       />
                     </div>
                     <div>
-                      <label htmlFor="geo-radius" className="block text-[11px] font-medium text-text-secondary mb-1">
+                      <label htmlFor="geo-radius" className="block text-[13px] font-medium text-text-secondary mb-1">
                         Radius (meters)
                       </label>
                       <input
@@ -893,12 +933,12 @@ function SettingsPage() {
                         max={5000}
                         value={geofencingRadius}
                         onChange={(e) => setGeofencingRadius(parseInt(e.target.value, 10) || 100)}
-                        className="w-full px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono"
+                        className="w-full px-3 py-2 rounded-lg text-[15px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono"
                       />
                     </div>
                   </div>
 
-                  <p className="text-[12px] text-text-tertiary">
+                  <p className="text-[14px] text-text-tertiary">
                     Staff must be within{' '}
                     <span className="font-medium text-text-secondary">{geofencingRadius}m</span> of
                     this location to check in.
@@ -907,7 +947,7 @@ function SettingsPage() {
                   {geofencingLat !== null && geofencingLng !== null && (
                     <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-green/5 border border-green/15">
                       <MapPin size={14} className="text-green shrink-0" />
-                      <span className="text-[12px] text-green font-mono">
+                      <span className="text-[14px] text-green font-mono">
                         {geofencingLat.toFixed(6)}, {geofencingLng.toFixed(6)}
                       </span>
                     </div>
@@ -916,7 +956,7 @@ function SettingsPage() {
                   <button
                     onClick={handleSaveSettings}
                     disabled={updateSettings.isPending}
-                    className="px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50"
+                    className="px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50"
                   >
                     {updateSettings.isPending ? t('common.loading') : t('common.save')}
                   </button>

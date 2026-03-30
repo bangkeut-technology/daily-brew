@@ -46,13 +46,13 @@ export function HeroSection() {
               transition={{ duration: 0.5 }}
             >
               <span className="w-1.5 h-1.5 rounded-full bg-amber animate-pulse" />
-              <span className="text-[11px] font-medium text-amber tracking-wide">
+              <span className="text-[13px] font-medium text-amber tracking-wide">
                 Free for up to 10 employees
               </span>
             </motion.div>
 
             <motion.h1
-              className="text-[38px] md:text-[52px] font-semibold text-text-primary leading-[1.08] mb-6 font-serif"
+              className="text-[40px] md:text-[54px] font-semibold text-text-primary leading-[1.08] mb-6 font-serif"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
@@ -63,7 +63,7 @@ export function HeroSection() {
             </motion.h1>
 
             <motion.p
-              className="text-[16px] md:text-[17px] text-text-secondary mb-8 max-w-lg leading-relaxed"
+              className="text-[18px] md:text-[19px] text-text-secondary mb-8 max-w-lg leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -80,21 +80,21 @@ export function HeroSection() {
             >
               <Link
                 to="/sign-up"
-                className="btn-shimmer inline-flex items-center gap-2 px-7 py-3.5 rounded-xl text-[15px] font-semibold text-white border-none cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(107,66,38,0.30)] no-underline"
+                className="btn-shimmer inline-flex items-center gap-2 px-7 py-3.5 rounded-xl text-[17px] font-semibold text-white border-none cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(107,66,38,0.30)] no-underline"
               >
                 Get started free
                 <ChevronRight size={16} />
               </Link>
               <Link
                 to="/pricing"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-[14px] font-medium text-text-primary bg-glass-bg backdrop-blur-sm border border-glass-border hover:bg-cream-3 transition-all duration-200 no-underline cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-[16px] font-medium text-text-primary bg-glass-bg backdrop-blur-sm border border-glass-border hover:bg-cream-3 transition-all duration-200 no-underline cursor-pointer"
               >
                 View pricing
               </Link>
             </motion.div>
 
             <motion.p
-              className="text-[12px] text-text-tertiary mt-5"
+              className="text-[14px] text-text-tertiary mt-5"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.6 }}
@@ -116,16 +116,16 @@ export function HeroSection() {
               {/* Dashboard header */}
               <div className="flex items-center justify-between mb-5">
                 <div>
-                  <p className="text-[10px] uppercase tracking-[1px] font-medium text-text-tertiary mb-0.5">
+                  <p className="text-[12px] uppercase tracking-[1px] font-medium text-text-tertiary mb-0.5">
                     Today's overview
                   </p>
-                  <p className="text-[15px] font-semibold text-text-primary font-serif">
+                  <p className="text-[17px] font-semibold text-text-primary font-serif">
                     Dashboard
                   </p>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-green animate-pulse" />
-                  <span className="text-[10px] text-green font-medium">Live</span>
+                  <span className="text-[12px] text-green font-medium">Live</span>
                 </div>
               </div>
 
@@ -139,12 +139,12 @@ export function HeroSection() {
                 ].map((s) => (
                   <div key={s.label} className="bg-cream/60 rounded-xl p-2.5 text-center">
                     <p
-                      className="text-[18px] font-semibold leading-none mb-0.5"
+                      className="text-[20px] font-semibold leading-none mb-0.5"
                       style={{ color: s.color }}
                     >
                       {s.value}
                     </p>
-                    <p className="text-[9px] text-text-tertiary uppercase tracking-wider">
+                    <p className="text-[11px] text-text-tertiary uppercase tracking-wider">
                       {s.label}
                     </p>
                   </div>
@@ -163,7 +163,7 @@ export function HeroSection() {
                     className={cn('flex items-center gap-2.5 px-3 py-2.5 rounded-lg', i === 0 && 'bg-cream/40')}
                   >
                     <div
-                      className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shrink-0"
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-semibold text-white shrink-0"
                       style={{
                         background: [
                           'linear-gradient(135deg, #C17F3B, #6B4226)',
@@ -175,16 +175,16 @@ export function HeroSection() {
                       {r.initials}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[11.5px] font-medium text-text-primary truncate">
+                      <p className="text-[13.5px] font-medium text-text-primary truncate">
                         {r.name}
                       </p>
-                      <p className="text-[9.5px] text-text-tertiary">{r.shift}</p>
+                      <p className="text-[11.5px] text-text-tertiary">{r.shift}</p>
                     </div>
-                    <span className="text-[10.5px] text-text-secondary font-mono tabular-nums mr-2">
+                    <span className="text-[12.5px] text-text-secondary font-mono tabular-nums mr-2">
                       {r.time}
                     </span>
                     <span
-                      className="text-[9px] font-medium px-1.5 py-0.5 rounded-full"
+                      className="text-[11px] font-medium px-1.5 py-0.5 rounded-full"
                       style={{
                         background: `${r.statusColor}15`,
                         color: r.statusColor,
@@ -210,7 +210,7 @@ export function HeroSection() {
                 <div className="w-6 h-6 rounded-lg bg-coffee/10 flex items-center justify-center">
                   <QrCode size={13} className="text-coffee" />
                 </div>
-                <p className="text-[10px] font-medium text-text-primary">QR Check-in</p>
+                <p className="text-[12px] font-medium text-text-primary">QR Check-in</p>
               </div>
               {/* Mini QR code */}
               <div className="w-full aspect-square rounded-xl bg-cream-3/40 flex items-center justify-center p-3">
@@ -258,10 +258,10 @@ export function HeroSection() {
                   <CheckCircle size={14} className="text-green" />
                 </div>
                 <div>
-                  <p className="text-[10.5px] font-medium text-text-primary">
+                  <p className="text-[12.5px] font-medium text-text-primary">
                     Check-in recorded
                   </p>
-                  <p className="text-[9px] text-text-tertiary">Just now</p>
+                  <p className="text-[11px] text-text-tertiary">Just now</p>
                 </div>
               </div>
             </motion.div>

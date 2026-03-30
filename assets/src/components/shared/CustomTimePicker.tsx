@@ -59,7 +59,7 @@ export function CustomTimePicker({ value, onChange, className = '' }: CustomTime
         ref={triggerRef}
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none transition-colors cursor-pointer focus:border-coffee focus:ring-1 focus:ring-coffee/20"
+        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none transition-colors cursor-pointer focus:border-coffee focus:ring-1 focus:ring-coffee/20"
       >
         <Clock size={14} className="text-text-tertiary flex-shrink-0" />
         <span className="font-mono tabular-nums">{value || '00:00'}</span>
@@ -81,7 +81,7 @@ export function CustomTimePicker({ value, onChange, className = '' }: CustomTime
               >
                 <ChevronUp size={14} />
               </button>
-              <span className="w-9 h-9 flex items-center justify-center rounded-lg bg-coffee/10 text-[15px] font-mono font-semibold text-coffee tabular-nums">
+              <span className="w-9 h-9 flex items-center justify-center rounded-lg bg-coffee/10 text-[17px] font-mono font-semibold text-coffee tabular-nums">
                 {pad(hour)}
               </span>
               <button
@@ -93,7 +93,7 @@ export function CustomTimePicker({ value, onChange, className = '' }: CustomTime
               </button>
             </div>
 
-            <span className="text-[16px] font-semibold text-text-tertiary px-0.5">:</span>
+            <span className="text-[18px] font-semibold text-text-tertiary px-0.5">:</span>
 
             {/* Minute */}
             <div className="flex flex-col items-center gap-0.5">
@@ -104,7 +104,7 @@ export function CustomTimePicker({ value, onChange, className = '' }: CustomTime
               >
                 <ChevronUp size={14} />
               </button>
-              <span className="w-9 h-9 flex items-center justify-center rounded-lg bg-coffee/10 text-[15px] font-mono font-semibold text-coffee tabular-nums">
+              <span className="w-9 h-9 flex items-center justify-center rounded-lg bg-coffee/10 text-[17px] font-mono font-semibold text-coffee tabular-nums">
                 {pad(minute)}
               </span>
               <button

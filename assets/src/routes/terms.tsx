@@ -11,10 +11,10 @@ function TermsPage() {
     <div className="min-h-screen flex flex-col">
       <LandingNav />
       <main className="flex-1 pt-28 pb-16 px-6 md:px-8 max-w-3xl mx-auto w-full page-enter">
-        <h1 className="text-[28px] font-semibold text-text-primary font-serif mb-2">
+        <h1 className="text-[30px] font-semibold text-text-primary font-serif mb-2">
           Terms of Use
         </h1>
-        <p className="text-[12px] text-text-tertiary mb-8">
+        <p className="text-[14px] text-text-tertiary mb-8">
           Last updated: March 2026
         </p>
 
@@ -102,7 +102,7 @@ function TermsPage() {
         <div className="mt-6 text-center">
           <Link
             to="/"
-            className="text-[13px] text-text-secondary hover:text-coffee no-underline transition-colors"
+            className="text-[15px] text-text-secondary hover:text-coffee no-underline transition-colors"
           >
             &larr; Back to home
           </Link>
@@ -116,10 +116,10 @@ function TermsPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h3 className="text-[14px] font-semibold text-text-primary mb-2">
+      <h3 className="text-[16px] font-semibold text-text-primary mb-2">
         {title}
       </h3>
-      <div className="text-[13px] text-text-secondary leading-relaxed">
+      <div className="text-[15px] text-text-secondary leading-relaxed">
         {children}
       </div>
     </div>

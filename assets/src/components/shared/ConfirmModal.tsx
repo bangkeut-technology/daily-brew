@@ -38,10 +38,10 @@ export function ConfirmModal({
                 <AlertTriangle size={20} className={cn(isDanger ? 'text-red' : 'text-amber')} />
               </div>
               <div>
-                <Dialog.Title className="text-[15px] font-semibold text-text-primary">
+                <Dialog.Title className="text-[17px] font-semibold text-text-primary">
                   {title}
                 </Dialog.Title>
-                <Dialog.Description className="text-[12.5px] text-text-secondary mt-1 leading-relaxed">
+                <Dialog.Description className="text-[14.5px] text-text-secondary mt-1 leading-relaxed">
                   {description}
                 </Dialog.Description>
               </div>
@@ -51,7 +51,7 @@ export function ConfirmModal({
               <button
                 type="button"
                 onClick={() => onOpenChange(false)}
-                className="px-4 py-2 rounded-lg text-[13px] font-medium bg-transparent text-text-secondary border border-cream-3 cursor-pointer hover:bg-cream-3 transition-colors"
+                className="px-4 py-2 rounded-lg text-[15px] font-medium bg-transparent text-text-secondary border border-cream-3 cursor-pointer hover:bg-cream-3 transition-colors"
               >
                 {cancelLabel}
               </button>
@@ -63,7 +63,7 @@ export function ConfirmModal({
                 }}
                 disabled={loading}
                 className={cn(
-                  'px-4 py-2 rounded-lg text-[13px] font-medium text-white border-none cursor-pointer transition-colors disabled:opacity-50',
+                  'px-4 py-2 rounded-lg text-[15px] font-medium text-white border-none cursor-pointer transition-colors disabled:opacity-50',
                   isDanger
                     ? 'bg-red hover:bg-red/90'
                     : 'bg-coffee hover:bg-coffee-light'

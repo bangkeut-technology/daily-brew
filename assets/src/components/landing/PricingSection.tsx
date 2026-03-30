@@ -73,13 +73,13 @@ export function PricingSection() {
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
       >
-        <p className="text-[11px] uppercase tracking-[2px] font-medium text-amber mb-3">
+        <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
           Pricing
         </p>
-        <h3 className="text-[28px] md:text-[34px] font-semibold text-text-primary font-serif leading-tight">
+        <h3 className="text-[30px] md:text-[36px] font-semibold text-text-primary font-serif leading-tight">
           Simple, transparent pricing
         </h3>
-        <p className="text-[14px] text-text-secondary mt-3 max-w-md mx-auto">
+        <p className="text-[16px] text-text-secondary mt-3 max-w-md mx-auto">
           Start free. Upgrade when you need more.
         </p>
       </motion.div>
@@ -100,7 +100,7 @@ export function PricingSection() {
           <button
             onClick={() => setYearly(false)}
             className={cn(
-              'relative z-10 px-5 py-1.5 rounded-full text-[13px] font-medium border-none cursor-pointer bg-transparent transition-colors duration-300',
+              'relative z-10 px-5 py-1.5 rounded-full text-[15px] font-medium border-none cursor-pointer bg-transparent transition-colors duration-300',
               !yearly ? 'text-white' : 'text-text-secondary'
             )}
           >
@@ -109,7 +109,7 @@ export function PricingSection() {
           <button
             onClick={() => setYearly(true)}
             className={cn(
-              'relative z-10 px-5 py-1.5 rounded-full text-[13px] font-medium border-none cursor-pointer bg-transparent transition-colors duration-300',
+              'relative z-10 px-5 py-1.5 rounded-full text-[15px] font-medium border-none cursor-pointer bg-transparent transition-colors duration-300',
               yearly ? 'text-white' : 'text-text-secondary'
             )}
           >
@@ -118,7 +118,7 @@ export function PricingSection() {
         </div>
         {yearly ? (
           <motion.span
-            className="text-[10.5px] font-semibold px-2.5 py-0.5 rounded-full bg-green/10 text-green"
+            className="text-[12.5px] font-semibold px-2.5 py-0.5 rounded-full bg-green/10 text-green"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
           >
@@ -127,7 +127,7 @@ export function PricingSection() {
         ) : (
           <motion.button
             onClick={() => setYearly(true)}
-            className="text-[11px] font-medium text-amber cursor-pointer bg-transparent border-none hover:underline"
+            className="text-[13px] font-medium text-amber cursor-pointer bg-transparent border-none hover:underline"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
@@ -145,18 +145,18 @@ export function PricingSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <p className="text-[14px] font-semibold text-text-primary mb-1">
+          <p className="text-[16px] font-semibold text-text-primary mb-1">
             {freePlan.name}
           </p>
           <div className="flex items-baseline gap-1 mb-1">
-            <span className="text-[40px] font-bold text-text-primary tracking-tight">
+            <span className="text-[42px] font-bold text-text-primary tracking-tight">
               {freePlan.price}
             </span>
-            <span className="text-[13px] text-text-tertiary">
+            <span className="text-[15px] text-text-tertiary">
               {freePlan.period}
             </span>
           </div>
-          <p className="text-[12.5px] text-text-secondary mb-7">
+          <p className="text-[14.5px] text-text-secondary mb-7">
             {freePlan.subtitle}
           </p>
 
@@ -169,7 +169,7 @@ export function PricingSection() {
                   <X size={15} className="text-text-tertiary/50 shrink-0" strokeWidth={2} />
                 )}
                 <span
-                  className={cn('text-[13px]', f.included ? 'text-text-secondary' : 'text-text-tertiary')}
+                  className={cn('text-[15px]', f.included ? 'text-text-secondary' : 'text-text-tertiary')}
                 >
                   {f.text}
                 </span>
@@ -179,7 +179,7 @@ export function PricingSection() {
 
           <Link
             to="/sign-up"
-            className="flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-[13px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3 no-underline"
+            className="flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-[15px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3 no-underline"
           >
             Get started
           </Link>
@@ -195,7 +195,7 @@ export function PricingSection() {
         >
           {/* Popular badge */}
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-            <span className="text-[10px] font-semibold uppercase tracking-wider px-3.5 py-1 rounded-full bg-amber text-white shadow-[0_2px_8px_rgba(193,127,59,0.3)]">
+            <span className="text-[12px] font-semibold uppercase tracking-wider px-3.5 py-1 rounded-full bg-amber text-white shadow-[0_2px_8px_rgba(193,127,59,0.3)]">
               Most popular
             </span>
           </div>
@@ -204,25 +204,25 @@ export function PricingSection() {
           <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-amber-light via-amber to-coffee opacity-80 rounded-t-2xl" />
 
           <div className="relative flex items-center gap-2 mb-1">
-            <p className="text-[14px] font-semibold text-text-primary">
+            <p className="text-[16px] font-semibold text-text-primary">
               {espressoPlan.name}
             </p>
             <Crown size={14} className="text-amber" />
           </div>
           <div className="relative flex items-baseline gap-1 mb-1">
-            <span className="text-[40px] font-bold text-text-primary tracking-tight">
+            <span className="text-[42px] font-bold text-text-primary tracking-tight">
               {espressoPricing.price}
             </span>
-            <span className="text-[13px] text-text-tertiary">
+            <span className="text-[15px] text-text-tertiary">
               {espressoPricing.period}
             </span>
           </div>
           {yearly && (
-            <p className="relative text-[11.5px] text-green font-medium mb-3">
+            <p className="relative text-[13.5px] text-green font-medium mb-3">
               That's just ${espressoPlan.yearly.monthly}/month
             </p>
           )}
-          <p className="relative text-[12.5px] text-text-secondary mb-7">
+          <p className="relative text-[14.5px] text-text-secondary mb-7">
             {espressoPlan.subtitle}
           </p>
 
@@ -230,14 +230,14 @@ export function PricingSection() {
             {espressoPlan.features.map((f) => (
               <li key={f.text} className="flex items-center gap-2.5">
                 <Check size={15} className="text-green shrink-0" strokeWidth={2.5} />
-                <span className="text-[13px] text-text-secondary">{f.text}</span>
+                <span className="text-[15px] text-text-secondary">{f.text}</span>
               </li>
             ))}
           </ul>
 
           <Link
             to="/sign-up"
-            className="relative btn-shimmer flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-[13px] font-semibold text-white border-none cursor-pointer transition-all duration-150 hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] no-underline"
+            className="relative btn-shimmer flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-[15px] font-semibold text-white border-none cursor-pointer transition-all duration-150 hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] no-underline"
           >
             Start with Espresso
             <ChevronRight size={14} />
@@ -254,7 +254,7 @@ export function PricingSection() {
         >
           {/* Coming soon badge */}
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-            <span className="text-[10px] font-semibold uppercase tracking-wider px-3.5 py-1 rounded-full bg-text-tertiary text-white shadow-[0_2px_8px_rgba(174,157,149,0.3)]">
+            <span className="text-[12px] font-semibold uppercase tracking-wider px-3.5 py-1 rounded-full bg-text-tertiary text-white shadow-[0_2px_8px_rgba(174,157,149,0.3)]">
               Coming soon
             </span>
           </div>
@@ -263,25 +263,25 @@ export function PricingSection() {
           <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-coffee via-coffee-light to-amber opacity-60 rounded-t-2xl" />
 
           <div className="relative flex items-center gap-2 mb-1">
-            <p className="text-[14px] font-semibold text-text-primary">
+            <p className="text-[16px] font-semibold text-text-primary">
               {doubleEspressoPlan.name}
             </p>
             <Crown size={14} className="text-coffee" />
           </div>
           <div className="relative flex items-baseline gap-1 mb-1">
-            <span className="text-[40px] font-bold text-text-primary tracking-tight">
+            <span className="text-[42px] font-bold text-text-primary tracking-tight">
               {doublePricing.price}
             </span>
-            <span className="text-[13px] text-text-tertiary">
+            <span className="text-[15px] text-text-tertiary">
               {doublePricing.period}
             </span>
           </div>
           {yearly && (
-            <p className="relative text-[11.5px] text-green font-medium mb-3">
+            <p className="relative text-[13.5px] text-green font-medium mb-3">
               That's just ${doubleEspressoPlan.yearly.monthly}/month
             </p>
           )}
-          <p className="relative text-[12.5px] text-text-secondary mb-7">
+          <p className="relative text-[14.5px] text-text-secondary mb-7">
             {doubleEspressoPlan.subtitle}
           </p>
 
@@ -289,10 +289,10 @@ export function PricingSection() {
             {doubleEspressoPlan.features.map((f) => (
               <li key={f.text} className="flex items-center gap-2.5">
                 <Check size={15} className={cn('shrink-0', f.roadmap ? 'text-text-tertiary' : 'text-green')} strokeWidth={2.5} />
-                <span className={cn('text-[13px]', f.roadmap ? 'text-text-tertiary' : 'text-text-secondary')}>
+                <span className={cn('text-[15px]', f.roadmap ? 'text-text-tertiary' : 'text-text-secondary')}>
                   {f.text}
                   {f.roadmap && (
-                    <span className="ml-1.5 text-[9px] font-medium px-1.5 py-px rounded-full bg-cream-3/60 text-text-tertiary">
+                    <span className="ml-1.5 text-[11px] font-medium px-1.5 py-px rounded-full bg-cream-3/60 text-text-tertiary">
                       Roadmap
                     </span>
                   )}
@@ -303,7 +303,7 @@ export function PricingSection() {
 
           <button
             disabled
-            className="relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-[13px] font-medium bg-cream-3/60 text-text-tertiary border border-cream-3 cursor-not-allowed no-underline"
+            className="relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-[15px] font-medium bg-cream-3/60 text-text-tertiary border border-cream-3 cursor-not-allowed no-underline"
           >
             Coming soon
           </button>
@@ -311,7 +311,7 @@ export function PricingSection() {
       </div>
 
       <motion.p
-        className="text-center text-[12px] text-text-tertiary mt-8"
+        className="text-center text-[14px] text-text-tertiary mt-8"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}

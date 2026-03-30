@@ -84,13 +84,13 @@ function FeaturesPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <p className="text-[11px] uppercase tracking-[2px] font-medium text-amber mb-3">
+          <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
             Features
           </p>
-          <h1 className="text-[32px] md:text-[42px] font-semibold text-text-primary font-serif leading-tight">
+          <h1 className="text-[34px] md:text-[44px] font-semibold text-text-primary font-serif leading-tight">
             Everything you need to track attendance
           </h1>
-          <p className="text-[15px] text-text-secondary mt-4 max-w-xl mx-auto">
+          <p className="text-[17px] text-text-secondary mt-4 max-w-xl mx-auto">
             From QR check-in to geofencing — simple tools that work for restaurants of any size.
           </p>
         </motion.div>
@@ -98,7 +98,7 @@ function FeaturesPage() {
         {/* Core features */}
         <div className="mb-20">
           <motion.h2
-            className="text-[11px] uppercase tracking-[2px] font-medium text-text-tertiary mb-8 text-center"
+            className="text-[13px] uppercase tracking-[2px] font-medium text-text-tertiary mb-8 text-center"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -121,7 +121,7 @@ function FeaturesPage() {
             viewport={{ once: true }}
           >
             <Crown size={16} className="text-amber" />
-            <h2 className="text-[11px] uppercase tracking-[2px] font-medium text-amber">
+            <h2 className="text-[13px] uppercase tracking-[2px] font-medium text-amber">
               Espresso features
             </h2>
           </motion.div>
@@ -139,23 +139,23 @@ function FeaturesPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <h3 className="text-[22px] font-semibold text-text-primary font-serif mb-3">
+          <h3 className="text-[24px] font-semibold text-text-primary font-serif mb-3">
             Ready to get started?
           </h3>
-          <p className="text-[14px] text-text-secondary mb-6">
+          <p className="text-[16px] text-text-secondary mb-6">
             Free for up to 10 employees. No credit card required.
           </p>
           <div className="flex items-center justify-center gap-3">
             <Link
               to="/sign-up"
-              className="btn-shimmer flex items-center gap-1.5 px-6 py-2.5 rounded-lg text-[13px] font-semibold text-white no-underline transition-all hover:-translate-y-px"
+              className="btn-shimmer flex items-center gap-1.5 px-6 py-2.5 rounded-lg text-[15px] font-semibold text-white no-underline transition-all hover:-translate-y-px"
             >
               Start free
               <ChevronRight size={14} />
             </Link>
             <Link
               to="/pricing"
-              className="px-6 py-2.5 rounded-lg text-[13px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 no-underline transition-all hover:bg-cream-3"
+              className="px-6 py-2.5 rounded-lg text-[15px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 no-underline transition-all hover:bg-cream-3"
             >
               View pricing
             </Link>
@@ -204,16 +204,16 @@ function FeatureCard({
           {feature.icon}
         </div>
         <div className="flex items-center gap-2 mb-2">
-          <h3 className="text-[14px] font-semibold text-text-primary">
+          <h3 className="text-[16px] font-semibold text-text-primary">
             {feature.title}
           </h3>
           {espresso && (
-            <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-amber/10 text-amber uppercase tracking-wider">
+            <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded-full bg-amber/10 text-amber uppercase tracking-wider">
               Espresso
             </span>
           )}
         </div>
-        <p className="text-[12.5px] text-text-secondary leading-relaxed">
+        <p className="text-[14.5px] text-text-secondary leading-relaxed">
           {feature.desc}
         </p>
       </div>

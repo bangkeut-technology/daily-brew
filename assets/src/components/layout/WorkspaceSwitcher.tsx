@@ -65,27 +65,27 @@ export function WorkspaceSwitcher({ workspaces, planLabel, isEspresso }: Workspa
             "
           >
             <div className="w-7 h-7 rounded-lg bg-coffee/10 flex items-center justify-center flex-shrink-0">
-              <span className="text-[11px] font-semibold text-coffee">
+              <span className="text-[13px] font-semibold text-coffee">
                 {(current?.name ?? '?').charAt(0).toUpperCase()}
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5">
-                <p className="text-[12.5px] font-medium text-text-primary truncate leading-tight">
-                  {current?.name ?? t('workspace.noWorkspace')}
+              <p className="text-[14.5px] font-semibold text-text-primary leading-tight break-words">
+                {current?.name ?? t('workspace.noWorkspace')}
+              </p>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <p className="text-[12px] text-text-tertiary leading-tight shrink-0">
+                  {current?.role === 'employee' ? 'Employee' : t('workspace.label')}
                 </p>
                 {planLabel && (
                   <span className={cn(
-                    'text-[8px] font-semibold px-1.5 py-px rounded-full shrink-0',
+                    'text-[10px] font-semibold px-1.5 py-px rounded-full truncate max-w-[90px]',
                     isEspresso ? 'bg-green/10 text-green' : 'bg-cream-3 text-text-tertiary'
                   )}>
                     {planLabel}
                   </span>
                 )}
               </div>
-              <p className="text-[10px] text-text-tertiary leading-tight">
-                {current?.role === 'employee' ? 'Employee' : t('workspace.label')}
-              </p>
             </div>
             <ChevronsUpDown size={14} className="text-text-tertiary flex-shrink-0" />
           </button>
@@ -108,20 +108,20 @@ export function WorkspaceSwitcher({ workspaces, planLabel, isEspresso }: Workspa
                 key={ws.publicId}
                 onClick={() => handleSwitch(ws.publicId)}
                 className={cn(
-                  'w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left cursor-pointer border-none text-[12.5px] font-sans transition-colors duration-[120ms]',
+                  'w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left cursor-pointer border-none text-[14.5px] font-sans transition-colors duration-[120ms]',
                   ws.publicId === currentId
                     ? 'bg-glass-bg text-coffee font-medium'
                     : 'bg-transparent text-text-primary hover:bg-cream-3'
                 )}
               >
                 <div className="w-6 h-6 rounded-md bg-coffee/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-[10px] font-semibold text-coffee">
+                  <span className="text-[12px] font-semibold text-coffee">
                     {ws.name.charAt(0).toUpperCase()}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <span className="block truncate">{ws.name}</span>
-                  <span className="text-[9px] text-text-tertiary">{ws.role === 'employee' ? 'Employee' : 'Owner'}</span>
+                  <span className="text-[11px] text-text-tertiary">{ws.role === 'employee' ? 'Employee' : 'Owner'}</span>
                 </div>
                 {ws.publicId === currentId && (
                   <Check size={14} className="text-coffee flex-shrink-0" />
@@ -139,7 +139,7 @@ export function WorkspaceSwitcher({ workspaces, planLabel, isEspresso }: Workspa
               className="
                 w-full flex items-center gap-2 px-2.5 py-2 rounded-lg
                 text-left cursor-pointer border-none bg-transparent
-                text-[12.5px] text-text-secondary font-sans
+                text-[14.5px] text-text-secondary font-sans
                 hover:bg-cream-3 hover:text-text-primary transition-colors duration-[120ms]
               "
             >
@@ -160,10 +160,10 @@ export function WorkspaceSwitcher({ workspaces, planLabel, isEspresso }: Workspa
                   <Building2 size={20} className="text-coffee" />
                 </div>
                 <div>
-                  <Dialog.Title className="text-[16px] font-semibold text-text-primary font-serif">
+                  <Dialog.Title className="text-[18px] font-semibold text-text-primary font-serif">
                     {t('workspace.create')}
                   </Dialog.Title>
-                  <Dialog.Description className="text-[12px] text-text-secondary">
+                  <Dialog.Description className="text-[14px] text-text-secondary">
                     {t('workspace.newPlaceholder')}
                   </Dialog.Description>
                 </div>
@@ -176,20 +176,20 @@ export function WorkspaceSwitcher({ workspaces, planLabel, isEspresso }: Workspa
                   onChange={(e) => setNewName(e.target.value)}
                   placeholder={t('workspace.newPlaceholder')}
                   autoFocus
-                  className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all mb-4"
+                  className="w-full px-3 py-2.5 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all mb-4"
                 />
                 <div className="flex justify-end gap-2">
                   <button
                     type="button"
                     onClick={() => { setModalOpen(false); setNewName(''); }}
-                    className="px-4 py-2 rounded-lg text-[13px] font-medium bg-transparent text-text-secondary border border-cream-3 cursor-pointer hover:bg-cream-3 transition-colors"
+                    className="px-4 py-2 rounded-lg text-[15px] font-medium bg-transparent text-text-secondary border border-cream-3 cursor-pointer hover:bg-cream-3 transition-colors"
                   >
                     {t('common.cancel')}
                   </button>
                   <button
                     type="submit"
                     disabled={createWs.isPending || !newName.trim()}
-                    className="px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50 transition-colors"
+                    className="px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50 transition-colors"
                   >
                     {createWs.isPending ? t('common.loading') : t('common.create')}
                   </button>

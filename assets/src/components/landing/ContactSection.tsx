@@ -14,13 +14,13 @@ export function ContactSection() {
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
       >
-        <p className="text-[11px] uppercase tracking-[2px] font-medium text-amber mb-3">
+        <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
           Contact
         </p>
-        <h3 className="text-[28px] md:text-[34px] font-semibold text-text-primary font-serif leading-tight">
+        <h3 className="text-[30px] md:text-[36px] font-semibold text-text-primary font-serif leading-tight">
           Get in touch
         </h3>
-        <p className="text-[14px] text-text-secondary mt-3">
+        <p className="text-[16px] text-text-secondary mt-3">
           Have questions? We'd love to hear from you.
         </p>
       </motion.div>
@@ -40,12 +40,12 @@ export function ContactSection() {
           <div className="w-11 h-11 rounded-xl bg-coffee/10 flex items-center justify-center text-coffee mb-4">
             <Mail size={20} strokeWidth={1.8} />
           </div>
-          <h4 className="text-[14px] font-semibold text-text-primary mb-1">Email us</h4>
-          <p className="text-[12.5px] text-coffee font-medium mb-2">
+          <h4 className="text-[16px] font-semibold text-text-primary mb-1">Email us</h4>
+          <p className="text-[14.5px] text-coffee font-medium mb-2">
             {contactEmail}
           </p>
           <div className="flex items-center gap-1.5">
-            <p className="text-[11px] text-text-tertiary">
+            <p className="text-[13px] text-text-tertiary">
               We typically respond within 24 hours
             </p>
             <ArrowRight size={12} className="text-text-tertiary group-hover:text-coffee group-hover:translate-x-0.5 transition-all" />
@@ -65,8 +65,8 @@ export function ContactSection() {
           <div className="w-11 h-11 rounded-xl bg-amber/10 flex items-center justify-center text-amber mb-4">
             <MessageCircle size={20} strokeWidth={1.8} />
           </div>
-          <h4 className="text-[14px] font-semibold text-text-primary mb-1">Feedback</h4>
-          <p className="text-[12.5px] text-text-secondary leading-relaxed">
+          <h4 className="text-[16px] font-semibold text-text-primary mb-1">Feedback</h4>
+          <p className="text-[14.5px] text-text-secondary leading-relaxed">
             Use the feedback widget in the bottom-right corner to report bugs or
             suggest features. We read every message.
           </p>

@@ -60,7 +60,7 @@ export function LandingNav() {
             <Link
               key={link.href}
               to={link.href}
-              className="text-[13px] font-medium text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
+              className="text-[15px] font-medium text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
             >
               {link.label}
             </Link>
@@ -68,13 +68,13 @@ export function LandingNav() {
           <div className="w-px h-4 bg-cream-3" />
           <Link
             to="/sign-in"
-            className="text-[13px] font-medium text-text-secondary hover:text-text-primary no-underline transition-colors duration-200"
+            className="text-[15px] font-medium text-text-secondary hover:text-text-primary no-underline transition-colors duration-200"
           >
             Sign in
           </Link>
           <Link
             to="/sign-up"
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] no-underline"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] no-underline"
           >
             Get started
           </Link>
@@ -104,7 +104,7 @@ export function LandingNav() {
                 key={link.href}
                 to={link.href}
                 onClick={() => setMobileOpen(false)}
-                className="block text-[14px] font-medium text-text-secondary hover:text-coffee no-underline py-1 transition-colors"
+                className="block text-[16px] font-medium text-text-secondary hover:text-coffee no-underline py-1 transition-colors"
               >
                 {link.label}
               </Link>
@@ -113,14 +113,14 @@ export function LandingNav() {
             <Link
               to="/sign-in"
               onClick={() => setMobileOpen(false)}
-              className="block text-[14px] font-medium text-text-secondary no-underline py-1"
+              className="block text-[16px] font-medium text-text-secondary no-underline py-1"
             >
               Sign in
             </Link>
             <Link
               to="/sign-up"
               onClick={() => setMobileOpen(false)}
-              className="inline-flex items-center px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white no-underline"
+              className="inline-flex items-center px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white no-underline"
             >
               Get started
             </Link>

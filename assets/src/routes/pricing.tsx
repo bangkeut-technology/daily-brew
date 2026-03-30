@@ -68,7 +68,7 @@ const faqItems = [
 function CellValue({ value }: { value: boolean | string }) {
   if (typeof value === 'string') {
     return (
-      <span className="text-[13px] font-medium text-text-primary">{value}</span>
+      <span className="text-[15px] font-medium text-text-primary">{value}</span>
     );
   }
   return value ? (
@@ -101,7 +101,7 @@ function FaqItem({
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-6 py-4 text-left bg-transparent border-none cursor-pointer"
       >
-        <span className="text-[14px] font-medium text-text-primary pr-4">
+        <span className="text-[16px] font-medium text-text-primary pr-4">
           {question}
         </span>
         <motion.span
@@ -122,7 +122,7 @@ function FaqItem({
             className="overflow-hidden"
           >
             <div className="px-6 pb-4">
-              <p className="text-[13px] text-text-secondary leading-relaxed">
+              <p className="text-[15px] text-text-secondary leading-relaxed">
                 {answer}
               </p>
             </div>
@@ -150,13 +150,13 @@ function PricingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <p className="text-[11px] uppercase tracking-[2px] font-medium text-amber mb-3">
+            <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
               Compare
             </p>
-            <h3 className="text-[28px] md:text-[34px] font-semibold text-text-primary font-serif leading-tight">
+            <h3 className="text-[30px] md:text-[36px] font-semibold text-text-primary font-serif leading-tight">
               Feature comparison
             </h3>
-            <p className="text-[14px] text-text-secondary mt-3 max-w-md mx-auto">
+            <p className="text-[16px] text-text-secondary mt-3 max-w-md mx-auto">
               See exactly what you get with each plan.
             </p>
           </motion.div>
@@ -170,16 +170,16 @@ function PricingPage() {
           >
             {/* Header */}
             <div className="grid grid-cols-4 px-6 py-4 border-b border-cream-3/60">
-              <span className="text-[11px] uppercase tracking-[1.5px] font-medium text-text-tertiary">
+              <span className="text-[13px] uppercase tracking-[1.5px] font-medium text-text-tertiary">
                 Feature
               </span>
-              <span className="text-[11px] uppercase tracking-[1.5px] font-medium text-text-tertiary text-center">
+              <span className="text-[13px] uppercase tracking-[1.5px] font-medium text-text-tertiary text-center">
                 Free
               </span>
-              <span className="text-[11px] uppercase tracking-[1.5px] font-medium text-amber text-center">
+              <span className="text-[13px] uppercase tracking-[1.5px] font-medium text-amber text-center">
                 Espresso
               </span>
-              <span className="text-[11px] uppercase tracking-[1.5px] font-medium text-coffee text-center">
+              <span className="text-[13px] uppercase tracking-[1.5px] font-medium text-coffee text-center">
                 Double Espresso
               </span>
             </div>
@@ -189,7 +189,7 @@ function PricingPage() {
               <div key={row.feature}>
                 {row.section && (
                   <div className="px-6 pt-4 pb-2 border-b border-cream-3/40">
-                    <span className="text-[10px] uppercase tracking-[1.5px] font-semibold text-text-tertiary">
+                    <span className="text-[12px] uppercase tracking-[1.5px] font-semibold text-text-tertiary">
                       {row.section}
                     </span>
                   </div>
@@ -204,7 +204,7 @@ function PricingPage() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.3, delay: 0.15 + i * 0.03 }}
               >
-                <span className="text-[13px] text-text-secondary">
+                <span className="text-[15px] text-text-secondary">
                   {row.feature}
                 </span>
                 <span className="flex justify-center">
@@ -231,10 +231,10 @@ function PricingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <p className="text-[11px] uppercase tracking-[2px] font-medium text-amber mb-3">
+            <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
               FAQ
             </p>
-            <h3 className="text-[28px] md:text-[34px] font-semibold text-text-primary font-serif leading-tight">
+            <h3 className="text-[30px] md:text-[36px] font-semibold text-text-primary font-serif leading-tight">
               Billing questions
             </h3>
           </motion.div>
@@ -251,7 +251,7 @@ function PricingPage() {
           </div>
 
           <motion.p
-            className="text-center text-[12px] text-text-tertiary mt-8"
+            className="text-center text-[14px] text-text-tertiary mt-8"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}

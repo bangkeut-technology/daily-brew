@@ -88,14 +88,14 @@ function ShiftsPage() {
         action={
           <button
             onClick={() => setShowForm(!showForm)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light"
           >
             + {t('common.create')}
           </button>
         }
       />
 
-      <p className="text-[13px] text-text-secondary mb-5 -mt-2 leading-relaxed">
+      <p className="text-[15px] text-text-secondary mb-5 -mt-2 leading-relaxed">
         Define your restaurant's working hours. Assign employees to shifts so DailyBrew can track late arrivals and early departures automatically.
       </p>
 
@@ -110,17 +110,17 @@ function ShiftsPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full px-3 py-2 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee"
+              className="w-full px-3 py-2 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee"
             />
             <div className="flex gap-3">
               <div className="flex-1">
-                <label id="shift-start-label" className="block text-[11px] font-medium text-text-secondary mb-1">
+                <label id="shift-start-label" className="block text-[13px] font-medium text-text-secondary mb-1">
                   Start time
                 </label>
                 <CustomTimePicker value={startTime} onChange={setStartTime} />
               </div>
               <div className="flex-1">
-                <label id="shift-end-label" className="block text-[11px] font-medium text-text-secondary mb-1">
+                <label id="shift-end-label" className="block text-[13px] font-medium text-text-secondary mb-1">
                   End time
                 </label>
                 <CustomTimePicker value={endTime} onChange={setEndTime} />
@@ -130,14 +130,14 @@ function ShiftsPage() {
               <button
                 type="submit"
                 disabled={createShift.isPending}
-                className="px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50"
+                className="px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50"
               >
                 {createShift.isPending ? t('common.loading') : t('common.create')}
               </button>
               <button
                 type="button"
                 onClick={() => { setShowForm(false); setName(''); }}
-                className="px-4 py-2 rounded-lg text-[13px] font-medium bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer hover:bg-cream-3/40 transition-colors"
+                className="px-4 py-2 rounded-lg text-[15px] font-medium bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer hover:bg-cream-3/40 transition-colors"
               >
                 {t('common.cancel')}
               </button>
@@ -155,12 +155,12 @@ function ShiftsPage() {
                 <Crown size={16} className="text-amber" />
               </div>
               <div className="flex-1">
-                <p className="text-[13px] font-medium text-text-primary">Per-day shift schedules</p>
-                <p className="text-[11.5px] text-text-tertiary mt-0.5">
+                <p className="text-[15px] font-medium text-text-primary">Per-day shift schedules</p>
+                <p className="text-[13.5px] text-text-tertiary mt-0.5">
                   Override shift hours for specific days of the week. Available with Espresso.
                 </p>
               </div>
-              <span className="text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber shrink-0">
+              <span className="text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber shrink-0">
                 Espresso
               </span>
             </div>
@@ -173,8 +173,8 @@ function ShiftsPage() {
       ) : shifts?.length === 0 ? (
         <div className="border-[1.5px] border-dashed border-cream-3 rounded-2xl bg-glass-bg backdrop-blur-md flex flex-col items-center justify-center min-h-50 cursor-pointer transition-colors hover:bg-cream-3/30" onClick={() => setShowForm(true)}>
           <Clock size={28} className="text-text-tertiary mb-2" />
-          <span className="text-[13px] text-text-tertiary">No shifts created yet</span>
-          <span className="text-[11px] text-text-tertiary mt-1">Click to create your first shift</span>
+          <span className="text-[15px] text-text-tertiary">No shifts created yet</span>
+          <span className="text-[13px] text-text-tertiary mt-1">Click to create your first shift</span>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -333,17 +333,17 @@ function ShiftCard({
                 onChange={(e) => setEditName(e.target.value)}
                 placeholder="Shift name"
                 required
-                className="w-full px-3 py-2 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee"
+                className="w-full px-3 py-2 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee"
               />
               <div className="flex gap-3">
                 <div className="flex-1">
-                  <label className="block text-[11px] font-medium text-text-secondary mb-1">
+                  <label className="block text-[13px] font-medium text-text-secondary mb-1">
                     Start time
                   </label>
                   <CustomTimePicker value={editStartTime} onChange={setEditStartTime} />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-[11px] font-medium text-text-secondary mb-1">
+                  <label className="block text-[13px] font-medium text-text-secondary mb-1">
                     End time
                   </label>
                   <CustomTimePicker value={editEndTime} onChange={setEditEndTime} />
@@ -353,13 +353,13 @@ function ShiftCard({
                 <button
                   onClick={handleSaveEdit}
                   disabled={updateShift.isPending || !editName.trim()}
-                  className="px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50 transition-colors"
+                  className="px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50 transition-colors"
                 >
                   {updateShift.isPending ? t('common.loading') : t('common.save', 'Save')}
                 </button>
                 <button
                   onClick={handleCancelEdit}
-                  className="px-4 py-2 rounded-lg text-[13px] font-medium bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer hover:bg-cream-3/40 transition-colors"
+                  className="px-4 py-2 rounded-lg text-[15px] font-medium bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer hover:bg-cream-3/40 transition-colors"
                 >
                   {t('common.cancel', 'Cancel')}
                 </button>
@@ -368,13 +368,13 @@ function ShiftCard({
           ) : (
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-[15px] font-semibold text-text-primary">{shift.name}</h3>
+                <h3 className="text-[17px] font-semibold text-text-primary">{shift.name}</h3>
                 <div className="flex items-center gap-3 mt-1.5">
-                  <div className="flex items-center gap-1.5 text-[13px] font-mono tabular-nums text-text-secondary">
+                  <div className="flex items-center gap-1.5 text-[15px] font-mono tabular-nums text-text-secondary">
                     <Clock size={13} className="text-amber" />
                     {shift.startTime} &ndash; {shift.endTime}
                   </div>
-                  <span className="text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
+                  <span className="text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
                     {durationHours}h{durationMins > 0 ? ` ${durationMins}m` : ''}
                   </span>
                 </div>
@@ -401,13 +401,13 @@ function ShiftCard({
       {/* Employees section */}
       <div className="border-t border-cream-3/80 px-5 py-3">
         <div className="flex items-center justify-between mb-2.5">
-          <span className="flex items-center gap-1.5 text-[12px] font-medium text-text-secondary">
+          <span className="flex items-center gap-1.5 text-[14px] font-medium text-text-secondary">
             <Users size={13} />
             {assignedEmployees.length} {assignedEmployees.length === 1 ? 'employee' : 'employees'}
           </span>
           <button
             onClick={() => setShowAssign(!showAssign)}
-            className="text-[11px] font-medium text-coffee hover:text-coffee-light bg-transparent border-none cursor-pointer transition-colors flex items-center gap-0.5"
+            className="text-[13px] font-medium text-coffee hover:text-coffee-light bg-transparent border-none cursor-pointer transition-colors flex items-center gap-0.5"
           >
             <Plus size={11} />
             {t('shift.assign', 'Assign')}
@@ -429,7 +429,7 @@ function ShiftCard({
         )}
 
         {assignedEmployees.length === 0 ? (
-          <p className="text-[11.5px] text-text-tertiary italic">
+          <p className="text-[13.5px] text-text-tertiary italic">
             No employees assigned. Assign staff to track their attendance against this shift's hours.
           </p>
         ) : (
@@ -440,7 +440,7 @@ function ShiftCard({
                 className="flex items-center gap-2.5 py-1.5 px-2 rounded-lg hover:bg-cream-3/30 transition-colors group"
               >
                 <Avatar name={emp.name} index={i} size={24} />
-                <span className="text-[12.5px] text-text-primary flex-1 truncate">
+                <span className="text-[14.5px] text-text-primary flex-1 truncate">
                   {emp.name}
                 </span>
                 <button
@@ -460,7 +460,7 @@ function ShiftCard({
         <button
           onClick={canUseTimeRules ? onToggleExpand : onUpgradeClick}
           className={cn(
-            'w-full flex items-center justify-between px-5 py-3 text-[12px] font-medium transition-colors border-none cursor-pointer',
+            'w-full flex items-center justify-between px-5 py-3 text-[14px] font-medium transition-colors border-none cursor-pointer',
             canUseTimeRules
               ? 'text-text-secondary hover:bg-cream-3/40 bg-transparent'
               : 'text-text-tertiary bg-transparent hover:bg-amber/5',
@@ -469,12 +469,12 @@ function ShiftCard({
           <span className="flex items-center gap-1.5">
             Day schedule
             {!canUseTimeRules && (
-              <span className="text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
+              <span className="text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
                 Espresso
               </span>
             )}
             {canUseTimeRules && shift.timeRules.length > 0 && (
-              <span className="text-[10px] font-medium px-1.5 py-px rounded-full bg-coffee/10 text-coffee">
+              <span className="text-[12px] font-medium px-1.5 py-px rounded-full bg-coffee/10 text-coffee">
                 {shift.timeRules.length}
               </span>
             )}
@@ -614,23 +614,23 @@ function DayRow({
   if (editing) {
     return (
       <div className="flex items-center gap-2 py-2 px-3 rounded-lg bg-cream-3/30">
-        <span className="text-[11.5px] font-medium text-text-primary w-16 shrink-0">
+        <span className="text-[13.5px] font-medium text-text-primary w-16 shrink-0">
           {dayLabel.slice(0, 3)}
         </span>
         <CustomTimePicker value={ruleStart} onChange={setRuleStart} className="w-25" />
-        <span className="text-[11px] text-text-tertiary">&ndash;</span>
+        <span className="text-[13px] text-text-tertiary">&ndash;</span>
         <CustomTimePicker value={ruleEnd} onChange={setRuleEnd} className="w-25" />
         <div className="flex items-center gap-1 ml-auto">
           <button
             onClick={handleSave}
             disabled={isPending}
-            className="text-[11px] font-medium px-2.5 py-1 rounded-md border-none cursor-pointer bg-coffee/10 text-coffee transition-colors hover:bg-coffee/20 disabled:opacity-50"
+            className="text-[13px] font-medium px-2.5 py-1 rounded-md border-none cursor-pointer bg-coffee/10 text-coffee transition-colors hover:bg-coffee/20 disabled:opacity-50"
           >
             Save
           </button>
           <button
             onClick={() => setEditing(false)}
-            className="text-[11px] font-medium px-2.5 py-1 rounded-md border-none cursor-pointer bg-transparent text-text-tertiary transition-colors hover:text-text-secondary"
+            className="text-[13px] font-medium px-2.5 py-1 rounded-md border-none cursor-pointer bg-transparent text-text-tertiary transition-colors hover:text-text-secondary"
           >
             Cancel
           </button>
@@ -643,19 +643,19 @@ function DayRow({
   if (existingRule) {
     return (
       <div className="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-cream-3/30 transition-colors group">
-        <span className="text-[11.5px] font-medium text-text-primary w-16 shrink-0">
+        <span className="text-[13.5px] font-medium text-text-primary w-16 shrink-0">
           {dayLabel.slice(0, 3)}
         </span>
-        <span className="text-[12px] font-mono text-text-secondary tabular-nums">
+        <span className="text-[14px] font-mono text-text-secondary tabular-nums">
           {existingRule.startTime} &ndash; {existingRule.endTime}
         </span>
-        <span className="text-[9.5px] font-medium px-1.5 py-px rounded-full bg-coffee/8 text-coffee ml-1">
+        <span className="text-[11.5px] font-medium px-1.5 py-px rounded-full bg-coffee/8 text-coffee ml-1">
           override
         </span>
         <div className="flex items-center gap-1 ml-auto">
           <button
             onClick={handleStartEdit}
-            className="text-[11px] font-medium px-2 py-0.5 rounded-md border-none cursor-pointer bg-transparent text-text-secondary transition-colors hover:text-coffee"
+            className="text-[13px] font-medium px-2 py-0.5 rounded-md border-none cursor-pointer bg-transparent text-text-secondary transition-colors hover:text-coffee"
           >
             Edit
           </button>
@@ -674,16 +674,16 @@ function DayRow({
   // Display mode — no rule, show shift defaults muted
   return (
     <div className="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-cream-3/30 transition-colors group">
-      <span className="text-[11.5px] font-medium text-text-tertiary w-16 shrink-0">
+      <span className="text-[13.5px] font-medium text-text-tertiary w-16 shrink-0">
         {dayLabel.slice(0, 3)}
       </span>
-      <span className="text-[12px] font-mono text-text-tertiary tabular-nums">
+      <span className="text-[14px] font-mono text-text-tertiary tabular-nums">
         {shiftDefault.startTime} &ndash; {shiftDefault.endTime}
       </span>
-      <span className="text-[9.5px] text-text-tertiary ml-1">default</span>
+      <span className="text-[11.5px] text-text-tertiary ml-1">default</span>
       <button
         onClick={handleStartEdit}
-        className="flex items-center gap-1 ml-auto text-[11px] font-medium px-2 py-0.5 rounded-md border-none cursor-pointer bg-transparent text-text-tertiary transition-colors hover:text-coffee"
+        className="flex items-center gap-1 ml-auto text-[13px] font-medium px-2 py-0.5 rounded-md border-none cursor-pointer bg-transparent text-text-tertiary transition-colors hover:text-coffee"
       >
         <Plus size={10} />
         Override

@@ -15,10 +15,10 @@ export function StatCard({ label, value, subtitle, accent, icon }: StatCardProps
         className="absolute top-0 left-0 right-0 h-0.5 opacity-60"
         style={{ backgroundColor: accent }}
       />
-      <p className="text-[10.5px] uppercase tracking-[0.8px] font-medium text-text-secondary mb-2.5">
+      <p className="text-[12.5px] uppercase tracking-[0.8px] font-medium text-text-secondary mb-2.5">
         {label}
       </p>
-      <p className="text-[32px] font-semibold text-text-primary leading-none tracking-[-1px] mb-1.5">
+      <p className="text-[34px] font-semibold text-text-primary leading-none tracking-[-1px] mb-1.5">
         {value}
       </p>
       <p className="text-xs text-text-tertiary">{subtitle}</p>

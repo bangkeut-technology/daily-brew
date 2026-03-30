@@ -78,7 +78,7 @@ function NavItem({
         return (
             <div
                 {...(tourId ? { 'data-tour': tourId } : {})}
-                className="relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg mb-px font-sans text-[13.5px] text-text-tertiary/50 border border-transparent cursor-not-allowed select-none"
+                className="relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg mb-px font-sans text-[15.5px] text-text-tertiary/50 border border-transparent cursor-not-allowed select-none"
             >
                 <Icon size={16} />
                 <span className="flex-1">{t(label)}</span>
@@ -91,7 +91,7 @@ function NavItem({
             to={to}
             {...(tourId ? { 'data-tour': tourId } : {})}
             className={cn(
-                'relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer mb-px font-sans text-[13.5px] transition-all duration-180 no-underline',
+                'relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer mb-px font-sans text-[15.5px] transition-all duration-180 no-underline',
                 active
                     ? 'bg-glass-bg backdrop-blur-sm text-coffee font-medium border border-glass-border shadow-sm'
                     : 'text-text-secondary hover:bg-cream-3 hover:text-text-primary border border-transparent',
@@ -103,13 +103,13 @@ function NavItem({
                 {planBadge}
             </span>
             {espresso && !canUseLeaveRequests && (
-                <span className="ml-auto flex items-center gap-1 text-[10px] font-semibold text-amber">
+                <span className="ml-auto flex items-center gap-1 text-[12px] font-semibold text-amber">
                     <Crown size={12} className="opacity-60" />
                     <span>Espresso</span>
                 </span>
             )}
             {badge != null && badge > 0 && (
-                <span className="ml-auto bg-amber text-white text-[10px] font-semibold px-1.5 py-px rounded-full leading-normal">
+                <span className="ml-auto bg-amber text-white text-[12px] font-semibold px-1.5 py-px rounded-full leading-normal">
                     {badge}
                 </span>
             )}
@@ -249,7 +249,7 @@ export function Sidebar() {
                     <ThemeToggle />
                     <button
                         onClick={signOut}
-                        className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer w-full font-sans text-[13.5px] text-text-secondary hover:bg-cream-3 hover:text-text-primary transition-all duration-180 border-none bg-transparent"
+                        className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer w-full font-sans text-[15.5px] text-text-secondary hover:bg-cream-3 hover:text-text-primary transition-all duration-180 border-none bg-transparent"
                     >
                         <LogOut size={16} />
                         {t('nav.signOut')}
@@ -267,7 +267,7 @@ function ThemeToggle() {
     return (
         <button
             onClick={() => setTheme(isDark ? 'light' : 'dark')}
-            className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer w-full font-sans text-[13.5px] text-text-secondary hover:bg-cream-3 hover:text-text-primary transition-all duration-180 border-none bg-transparent"
+            className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer w-full font-sans text-[15.5px] text-text-secondary hover:bg-cream-3 hover:text-text-primary transition-all duration-180 border-none bg-transparent"
         >
             {isDark ? <Sun size={16} /> : <Moon size={16} />}
             {isDark ? 'Light mode' : 'Dark mode'}

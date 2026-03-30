@@ -135,7 +135,7 @@ function AccordionItem({
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-6 py-4 text-left bg-transparent border-none cursor-pointer group"
       >
-        <span className="text-[14px] font-medium text-text-primary pr-4 group-hover:text-coffee transition-colors duration-200">
+        <span className="text-[16px] font-medium text-text-primary pr-4 group-hover:text-coffee transition-colors duration-200">
           {question}
         </span>
         <motion.span
@@ -156,7 +156,7 @@ function AccordionItem({
             className="overflow-hidden"
           >
             <div className="px-6 pb-5">
-              <p className="text-[13px] text-text-secondary leading-relaxed">
+              <p className="text-[15px] text-text-secondary leading-relaxed">
                 {answer}
               </p>
             </div>
@@ -180,13 +180,13 @@ function FaqPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <p className="text-[11px] uppercase tracking-[2px] font-medium text-amber mb-3">
+            <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
               FAQ
             </p>
-            <h1 className="text-[32px] md:text-[40px] font-semibold text-text-primary font-serif leading-tight mb-4">
+            <h1 className="text-[34px] md:text-[42px] font-semibold text-text-primary font-serif leading-tight mb-4">
               Frequently asked questions
             </h1>
-            <p className="text-[14px] text-text-secondary max-w-md mx-auto">
+            <p className="text-[16px] text-text-secondary max-w-md mx-auto">
               Everything you need to know about DailyBrew. Can't find what you're
               looking for?{' '}
               <a
@@ -209,7 +209,7 @@ function FaqPage() {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: sectionIndex * 0.08 }}
             >
-              <h2 className="text-[11px] uppercase tracking-[2px] font-medium text-text-tertiary mb-4 px-6">
+              <h2 className="text-[13px] uppercase tracking-[2px] font-medium text-text-tertiary mb-4 px-6">
                 {section.title}
               </h2>
               <div className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(107,66,38,0.05)]">
@@ -233,12 +233,12 @@ function FaqPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <p className="text-[13px] text-text-secondary mb-4">
+            <p className="text-[15px] text-text-secondary mb-4">
               Still have questions? We are happy to help.
             </p>
             <a
               href="mailto:support@dailybrew.work"
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-[13px] font-medium bg-coffee text-white no-underline transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-[15px] font-medium bg-coffee text-white no-underline transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
             >
               Contact support
             </a>

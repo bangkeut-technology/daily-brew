@@ -60,32 +60,32 @@ export function UpgradeModal({ open, onOpenChange, feature }: UpgradeModalProps)
               <Crown size={28} className="text-amber" />
             </div>
 
-            <Dialog.Title className="text-[18px] font-semibold text-text-primary font-serif mb-2">
+            <Dialog.Title className="text-[20px] font-semibold text-text-primary font-serif mb-2">
               {t(config.titleKey)}
             </Dialog.Title>
 
-            <Dialog.Description className="text-[13px] text-text-secondary leading-relaxed mb-5">
+            <Dialog.Description className="text-[15px] text-text-secondary leading-relaxed mb-5">
               {t(config.descKey)}
             </Dialog.Description>
 
             {/* Feature badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber/8 border border-amber/15 mb-5">
               <FeatureIcon size={14} className="text-amber" />
-              <span className="text-[11.5px] font-medium text-amber">
+              <span className="text-[13.5px] font-medium text-amber">
                 {t('upgrade.espressoFeature', 'Espresso feature')}
               </span>
             </div>
 
             {/* Benefits list */}
             <div className="text-left rounded-xl bg-cream-3/20 border border-cream-3/40 p-4 mb-5">
-              <p className="text-[11px] uppercase tracking-[1px] font-medium text-text-tertiary mb-2.5">
+              <p className="text-[13px] uppercase tracking-[1px] font-medium text-text-tertiary mb-2.5">
                 {t('upgrade.espressoIncludes', 'Espresso includes')}
               </p>
               <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
                 {espressoBenefits.map((b) => (
                   <div key={b} className="flex items-center gap-1.5">
                     <Check size={12} className="text-amber flex-shrink-0" />
-                    <span className="text-[12px] text-text-secondary">{b}</span>
+                    <span className="text-[14px] text-text-secondary">{b}</span>
                   </div>
                 ))}
               </div>
@@ -96,7 +96,7 @@ export function UpgradeModal({ open, onOpenChange, feature }: UpgradeModalProps)
               <button
                 onClick={() => setBilling('monthly')}
                 className={cn(
-                  'px-4 py-1.5 rounded-md text-[12px] font-medium border-none cursor-pointer transition-colors',
+                  'px-4 py-1.5 rounded-md text-[14px] font-medium border-none cursor-pointer transition-colors',
                   billing === 'monthly' ? 'bg-coffee text-white' : 'bg-transparent text-text-secondary hover:text-text-primary',
                 )}
               >
@@ -105,7 +105,7 @@ export function UpgradeModal({ open, onOpenChange, feature }: UpgradeModalProps)
               <button
                 onClick={() => setBilling('annual')}
                 className={cn(
-                  'px-4 py-1.5 rounded-md text-[12px] font-medium border-none cursor-pointer transition-colors',
+                  'px-4 py-1.5 rounded-md text-[14px] font-medium border-none cursor-pointer transition-colors',
                   billing === 'annual' ? 'bg-coffee text-white' : 'bg-transparent text-text-secondary hover:text-text-primary',
                 )}
               >
@@ -113,11 +113,11 @@ export function UpgradeModal({ open, onOpenChange, feature }: UpgradeModalProps)
               </button>
             </div>
 
-            <p className="text-[13px] font-semibold text-text-primary mb-1">
+            <p className="text-[15px] font-semibold text-text-primary mb-1">
               {billing === 'annual' ? '$129/year' : '$12.99/month'}
             </p>
             {billing === 'annual' && (
-              <p className="text-[11px] text-green font-medium mb-3">Save 17% vs monthly</p>
+              <p className="text-[13px] text-green font-medium mb-3">Save 17% vs monthly</p>
             )}
 
             {/* CTA */}
@@ -126,7 +126,7 @@ export function UpgradeModal({ open, onOpenChange, feature }: UpgradeModalProps)
                 onOpenChange(false);
                 openCheckout(billing);
               }}
-              className="w-full py-2.5 rounded-xl text-[14px] font-medium text-white border-none cursor-pointer btn-shimmer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,66,38,0.30)]"
+              className="w-full py-2.5 rounded-xl text-[16px] font-medium text-white border-none cursor-pointer btn-shimmer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,66,38,0.30)]"
             >
               {t('upgrade.startTrial', 'Start 14-day free trial')}
             </button>
@@ -134,7 +134,7 @@ export function UpgradeModal({ open, onOpenChange, feature }: UpgradeModalProps)
             {/* Secondary */}
             <button
               onClick={() => onOpenChange(false)}
-              className="mt-3 text-[12.5px] text-text-tertiary hover:text-text-secondary bg-transparent border-none cursor-pointer transition-colors"
+              className="mt-3 text-[14.5px] text-text-tertiary hover:text-text-secondary bg-transparent border-none cursor-pointer transition-colors"
             >
               {t('upgrade.maybeLater', 'Maybe later')}
             </button>

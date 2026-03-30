@@ -76,13 +76,13 @@ export function FeaturesSection() {
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
       >
-        <p className="text-[11px] uppercase tracking-[2px] font-medium text-amber mb-3">
+        <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
           Features
         </p>
-        <h3 className="text-[28px] md:text-[34px] font-semibold text-text-primary font-serif leading-tight">
+        <h3 className="text-[30px] md:text-[36px] font-semibold text-text-primary font-serif leading-tight">
           Everything your restaurant needs
         </h3>
-        <p className="text-[14px] text-text-secondary mt-3 max-w-md mx-auto">
+        <p className="text-[16px] text-text-secondary mt-3 max-w-md mx-auto">
           Built for restaurant owners who want clarity without complexity.
         </p>
       </motion.div>
@@ -105,7 +105,7 @@ export function FeaturesSection() {
         <div className="flex-1 h-px bg-cream-3" />
         <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber/8 border border-amber/15">
           <Crown size={13} className="text-amber" />
-          <span className="text-[11px] font-semibold text-amber uppercase tracking-wider">
+          <span className="text-[13px] font-semibold text-amber uppercase tracking-wider">
             Espresso plan
           </span>
         </div>
@@ -152,16 +152,16 @@ function FeatureCard({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1.5">
-            <h4 className="text-[14px] font-semibold text-text-primary">
+            <h4 className="text-[16px] font-semibold text-text-primary">
               {f.title}
             </h4>
             {f.espresso && (
-              <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
+              <span className="text-[11px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
                 Espresso
               </span>
             )}
           </div>
-          <p className="text-[12.5px] text-text-secondary leading-relaxed">
+          <p className="text-[14.5px] text-text-secondary leading-relaxed">
             {f.desc}
           </p>
         </div>

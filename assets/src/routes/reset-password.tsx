@@ -59,11 +59,11 @@ function ResetPasswordPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="no-underline">
-            <h1 className="text-[24px] font-semibold text-coffee font-serif mb-1">
+            <h1 className="text-[26px] font-semibold text-coffee font-serif mb-1">
               DailyBrew
             </h1>
           </Link>
-          <p className="text-[13px] text-text-secondary">
+          <p className="text-[15px] text-text-secondary">
             {t('auth.setNewPassword', 'Set a new password')}
           </p>
         </div>
@@ -71,7 +71,7 @@ function ResetPasswordPage() {
         <div className="glass-card !rounded-2xl p-6 hover:!transform-none">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+              <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
                 {t('auth.newPassword', 'New password')}
               </label>
               <div className="relative">
@@ -82,7 +82,7 @@ function ResetPasswordPage() {
                   required
                   minLength={8}
                   placeholder="8+ characters"
-                  className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
+                  className="w-full px-3 py-2.5 pr-10 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
                 />
                 <button
                   type="button"
@@ -94,7 +94,7 @@ function ResetPasswordPage() {
               </div>
             </div>
             <div>
-              <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+              <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
                 {t('auth.confirmPassword', 'Confirm password')}
               </label>
               <div className="relative">
@@ -105,7 +105,7 @@ function ResetPasswordPage() {
                   required
                   minLength={8}
                   placeholder="8+ characters"
-                  className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
+                  className="w-full px-3 py-2.5 pr-10 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
                 />
                 <button
                   type="button"
@@ -119,7 +119,7 @@ function ResetPasswordPage() {
             <button
               type="submit"
               disabled={resetPassword.isPending}
-              className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50"
             >
               {resetPassword.isPending
                 ? t('common.loading', 'Loading...')
@@ -130,7 +130,7 @@ function ResetPasswordPage() {
           <div className="mt-5 text-center">
             <Link
               to="/sign-in"
-              className="text-[12px] text-coffee font-medium no-underline hover:text-coffee-light transition-colors"
+              className="text-[14px] text-coffee font-medium no-underline hover:text-coffee-light transition-colors"
             >
               {t('auth.backToSignIn', 'Back to sign in')}
             </Link>

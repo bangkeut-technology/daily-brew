@@ -94,7 +94,7 @@ function ClosuresPage() {
   };
 
   const inputClassName =
-    'w-full px-3 py-2 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee transition-colors';
+    'w-full px-3 py-2 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee transition-colors';
 
   return (
     <div className="page-enter">
@@ -103,14 +103,14 @@ function ClosuresPage() {
         action={
           <button
             onClick={handleToggleForm}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light"
           >
             + {t('common.create')}
           </button>
         }
       />
 
-      <p className="text-[13px] text-text-secondary mb-5 -mt-2 leading-relaxed">
+      <p className="text-[15px] text-text-secondary mb-5 -mt-2 leading-relaxed">
         Define dates when your restaurant is closed (holidays, renovations, etc.). No attendance is expected during closures — employees won't be marked absent.
       </p>
 
@@ -127,12 +127,12 @@ function ClosuresPage() {
                 className={inputClassName}
               />
               {errors.name && (
-                <p className="text-[11px] text-red mt-1">{errors.name.message}</p>
+                <p className="text-[13px] text-red mt-1">{errors.name.message}</p>
               )}
             </div>
             <div className="flex gap-3">
               <div className="flex-1">
-                <label id="closure-start-label" className="block text-[11px] font-medium text-text-secondary mb-1">
+                <label id="closure-start-label" className="block text-[13px] font-medium text-text-secondary mb-1">
                   {t('closure.startDate', 'Start date')}
                 </label>
                 <CustomDatePicker
@@ -140,11 +140,11 @@ function ClosuresPage() {
                   onChange={(v) => setValue('startDate', v, { shouldValidate: true })}
                 />
                 {errors.startDate && (
-                  <p className="text-[11px] text-red mt-1">{errors.startDate.message}</p>
+                  <p className="text-[13px] text-red mt-1">{errors.startDate.message}</p>
                 )}
               </div>
               <div className="flex-1">
-                <label id="closure-end-label" className="block text-[11px] font-medium text-text-secondary mb-1">
+                <label id="closure-end-label" className="block text-[13px] font-medium text-text-secondary mb-1">
                   {t('closure.endDate', 'End date')}
                 </label>
                 <CustomDatePicker
@@ -152,7 +152,7 @@ function ClosuresPage() {
                   onChange={(v) => setValue('endDate', v, { shouldValidate: true })}
                 />
                 {errors.endDate && (
-                  <p className="text-[11px] text-red mt-1">{errors.endDate.message}</p>
+                  <p className="text-[13px] text-red mt-1">{errors.endDate.message}</p>
                 )}
               </div>
             </div>
@@ -160,14 +160,14 @@ function ClosuresPage() {
               <button
                 type="submit"
                 disabled={createClosure.isPending}
-                className="px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50 transition-colors"
+                className="px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50 transition-colors"
               >
                 {createClosure.isPending ? t('common.loading') : t('common.create')}
               </button>
               <button
                 type="button"
                 onClick={handleToggleForm}
-                className="px-4 py-2 rounded-lg text-[13px] font-medium bg-glass-bg text-text-primary border border-cream-3 cursor-pointer hover:bg-cream-3 transition-colors"
+                className="px-4 py-2 rounded-lg text-[15px] font-medium bg-glass-bg text-text-primary border border-cream-3 cursor-pointer hover:bg-cream-3 transition-colors"
               >
                 {t('common.cancel', 'Cancel')}
               </button>
@@ -178,7 +178,7 @@ function ClosuresPage() {
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <p className="text-[13px] text-text-tertiary">{t('common.loading')}</p>
+          <p className="text-[15px] text-text-tertiary">{t('common.loading')}</p>
         </div>
       ) : closures?.length === 0 ? (
         <div
@@ -186,10 +186,10 @@ function ClosuresPage() {
           className="border-[1.5px] border-dashed border-cream-3 rounded-2xl bg-glass-bg backdrop-blur-md flex flex-col items-center justify-center min-h-[200px] cursor-pointer transition-colors hover:bg-cream-3/30"
         >
           <CalendarOff size={28} className="text-text-tertiary mb-2" />
-          <span className="text-[13px] text-text-tertiary">
+          <span className="text-[15px] text-text-tertiary">
             {t('closure.empty', 'No closure periods defined')}
           </span>
-          <span className="text-[11px] text-text-tertiary mt-1">
+          <span className="text-[13px] text-text-tertiary mt-1">
             {t('closure.emptyHint', 'Click to add one')}
           </span>
         </div>
@@ -275,7 +275,7 @@ function ClosureCard({ closure, fmtDate, onDelete, onUpdate, deleting, updating 
     setIsEditing(true);
   };
 
-  const inputClassName = 'w-full px-3 py-2 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee transition-colors';
+  const inputClassName = 'w-full px-3 py-2 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee transition-colors';
 
   return (
     <GlassCard hover={!isPast && !isEditing}>
@@ -294,13 +294,13 @@ function ClosureCard({ closure, fmtDate, onDelete, onUpdate, deleting, updating 
               />
               <div className="flex gap-3">
                 <div className="flex-1">
-                  <label className="block text-[11px] font-medium text-text-secondary mb-1">
+                  <label className="block text-[13px] font-medium text-text-secondary mb-1">
                     Start date
                   </label>
                   <CustomDatePicker value={editStart} onChange={setEditStart} />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-[11px] font-medium text-text-secondary mb-1">
+                  <label className="block text-[13px] font-medium text-text-secondary mb-1">
                     End date
                   </label>
                   <CustomDatePicker value={editEnd} onChange={setEditEnd} />
@@ -310,13 +310,13 @@ function ClosureCard({ closure, fmtDate, onDelete, onUpdate, deleting, updating 
                 <button
                   onClick={handleSave}
                   disabled={updating || !editName.trim() || !editStart || !editEnd}
-                  className="px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50 transition-colors"
+                  className="px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50 transition-colors"
                 >
                   {updating ? t('common.loading') : t('common.save')}
                 </button>
                 <button
                   onClick={() => setIsEditing(false)}
-                  className="px-4 py-2 rounded-lg text-[13px] font-medium bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer hover:bg-cream-3/40 transition-colors"
+                  className="px-4 py-2 rounded-lg text-[15px] font-medium bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer hover:bg-cream-3/40 transition-colors"
                 >
                   {t('common.cancel')}
                 </button>
@@ -325,12 +325,12 @@ function ClosureCard({ closure, fmtDate, onDelete, onUpdate, deleting, updating 
           ) : (
             <div className="flex items-start justify-between">
               <div className="flex-1 min-w-0">
-                <h3 className={cn('text-[15px] font-semibold truncate', isPast ? 'text-text-tertiary' : 'text-text-primary')}>
+                <h3 className={cn('text-[17px] font-semibold truncate', isPast ? 'text-text-tertiary' : 'text-text-primary')}>
                   {closure.name}
                 </h3>
                 <div className="flex items-center gap-2 mt-1.5">
                   <StatusBadge label={statusLabel} variant={statusVariant as 'red' | 'gray' | 'amber'} />
-                  <span className="text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-cream-3/40 text-text-secondary">
+                  <span className="text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-cream-3/40 text-text-secondary">
                     {days} day{days !== 1 ? 's' : ''}
                   </span>
                 </div>
@@ -359,7 +359,7 @@ function ClosureCard({ closure, fmtDate, onDelete, onUpdate, deleting, updating 
         <div className="border-t border-cream-3/80 px-5 py-3 space-y-2">
           <div className="flex items-center gap-2">
             <CalendarX2 size={13} className={isActive ? 'text-red' : 'text-text-tertiary'} />
-            <span className="text-[13px] font-mono tabular-nums text-text-secondary">
+            <span className="text-[15px] font-mono tabular-nums text-text-secondary">
               {fmtDate(closure.startDate)} &ndash; {fmtDate(closure.endDate)}
             </span>
           </div>
@@ -368,7 +368,7 @@ function ClosureCard({ closure, fmtDate, onDelete, onUpdate, deleting, updating 
             return (
               <div className="flex items-center gap-2">
                 <Clock size={13} className="text-amber" />
-                <span className="text-[11.5px] text-text-tertiary">
+                <span className="text-[13.5px] text-text-tertiary">
                   Starts in {daysUntil} day{daysUntil !== 1 ? 's' : ''}
                 </span>
               </div>
@@ -379,7 +379,7 @@ function ClosureCard({ closure, fmtDate, onDelete, onUpdate, deleting, updating 
             return (
               <div className="flex items-center gap-2">
                 <Clock size={13} className="text-red" />
-                <span className="text-[11.5px] text-red">
+                <span className="text-[13.5px] text-red">
                   {daysLeft} day{daysLeft !== 1 ? 's' : ''} remaining
                 </span>
               </div>

@@ -120,7 +120,7 @@ function SignUpPage() {
           <Link to="/" className="no-underline inline-block">
             <LogoBrand size={36} className="justify-center" />
           </Link>
-          <p className="text-[13px] text-text-secondary mt-2">Get started for free</p>
+          <p className="text-[15px] text-text-secondary mt-2">Get started for free</p>
         </div>
 
         <div className="glass-card !rounded-2xl p-6 hover:!transform-none">
@@ -128,14 +128,14 @@ function SignUpPage() {
           <div className="space-y-2.5 mb-5">
             <a
               href="/oauth/auth/google"
-              className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg text-[13px] font-medium bg-glass-bg border border-cream-3 text-text-primary no-underline transition-all hover:bg-cream-3/50"
+              className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg text-[15px] font-medium bg-glass-bg border border-cream-3 text-text-primary no-underline transition-all hover:bg-cream-3/50"
             >
               <GoogleIcon />
               Sign up with Google
             </a>
             <a
               href="/oauth/auth/apple"
-              className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg text-[13px] font-medium bg-glass-bg border border-cream-3 text-text-primary no-underline transition-all hover:bg-cream-3/50"
+              className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg text-[15px] font-medium bg-glass-bg border border-cream-3 text-text-primary no-underline transition-all hover:bg-cream-3/50"
             >
               <AppleIcon />
               Sign up with Apple
@@ -144,57 +144,57 @@ function SignUpPage() {
 
           <div className="flex items-center gap-3 mb-5">
             <div className="flex-1 h-px bg-cream-3/80" />
-            <span className="text-[11px] text-text-tertiary uppercase tracking-wider">or</span>
+            <span className="text-[13px] text-text-tertiary uppercase tracking-wider">or</span>
             <div className="flex-1 h-px bg-cream-3/80" />
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+                <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
                   {t('employee.firstName')}
                 </label>
                 <input
                   type="text"
                   {...register('firstName')}
                   placeholder="John"
-                  className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
+                  className="w-full px-3 py-2.5 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
                 />
                 {errors.firstName && (
-                  <p className="text-[11px] text-red mt-1">{errors.firstName.message}</p>
+                  <p className="text-[13px] text-red mt-1">{errors.firstName.message}</p>
                 )}
               </div>
               <div>
-                <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+                <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
                   {t('employee.lastName')}
                 </label>
                 <input
                   type="text"
                   {...register('lastName')}
                   placeholder="Doe"
-                  className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
+                  className="w-full px-3 py-2.5 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
                 />
                 {errors.lastName && (
-                  <p className="text-[11px] text-red mt-1">{errors.lastName.message}</p>
+                  <p className="text-[13px] text-red mt-1">{errors.lastName.message}</p>
                 )}
               </div>
             </div>
             <div>
-              <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+              <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
                 {t('auth.email')}
               </label>
               <input
                 type="email"
                 {...register('email')}
                 placeholder="you@restaurant.com"
-                className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
+                className="w-full px-3 py-2.5 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
               />
               {errors.email && (
-                <p className="text-[11px] text-red mt-1">{errors.email.message}</p>
+                <p className="text-[13px] text-red mt-1">{errors.email.message}</p>
               )}
             </div>
             <div>
-              <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+              <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
                 {t('auth.password')}
               </label>
               <div className="relative">
@@ -202,7 +202,7 @@ function SignUpPage() {
                   type={showPassword ? 'text' : 'password'}
                   {...register('password')}
                   placeholder="8+ characters"
-                  className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
+                  className="w-full px-3 py-2.5 pr-10 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
                 />
                 <button
                   type="button"
@@ -213,7 +213,7 @@ function SignUpPage() {
                 </button>
               </div>
               {errors.password && (
-                <p className="text-[11px] text-red mt-1">{errors.password.message}</p>
+                <p className="text-[13px] text-red mt-1">{errors.password.message}</p>
               )}
             </div>
 
@@ -223,7 +223,7 @@ function SignUpPage() {
                 {...register('agreedToTerms')}
                 className="mt-0.5 w-4 h-4 rounded border-cream-3 accent-coffee"
               />
-              <span className="text-[11.5px] text-text-secondary leading-snug">
+              <span className="text-[13.5px] text-text-secondary leading-snug">
                 I agree to the{' '}
                 <Link to="/terms" className="text-coffee no-underline hover:text-coffee-light font-medium">
                   Terms of Use
@@ -235,20 +235,20 @@ function SignUpPage() {
               </span>
             </label>
             {errors.agreedToTerms && (
-              <p className="text-[11px] text-red">{errors.agreedToTerms.message}</p>
+              <p className="text-[13px] text-red">{errors.agreedToTerms.message}</p>
             )}
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full px-4 py-2.5 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50"
+              className="w-full px-4 py-2.5 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50"
             >
               {isSubmitting ? t('common.loading') : t('auth.signUp')}
             </button>
           </form>
 
           <div className="mt-5 text-center">
-            <p className="text-[12px] text-text-tertiary">
+            <p className="text-[14px] text-text-tertiary">
               {t('auth.hasAccount')}{' '}
               <Link to="/sign-in" className="text-coffee font-medium no-underline hover:text-coffee-light">
                 {t('auth.signIn')}
@@ -258,9 +258,9 @@ function SignUpPage() {
         </div>
 
         <div className="mt-6 text-center space-x-3">
-          <Link to="/privacy" className="text-[11px] text-text-tertiary hover:text-text-secondary no-underline transition-colors">Privacy</Link>
-          <span className="text-[11px] text-text-tertiary">&middot;</span>
-          <Link to="/terms" className="text-[11px] text-text-tertiary hover:text-text-secondary no-underline transition-colors">Terms</Link>
+          <Link to="/privacy" className="text-[13px] text-text-tertiary hover:text-text-secondary no-underline transition-colors">Privacy</Link>
+          <span className="text-[13px] text-text-tertiary">&middot;</span>
+          <Link to="/terms" className="text-[13px] text-text-tertiary hover:text-text-secondary no-underline transition-colors">Terms</Link>
         </div>
       </div>
     </div>

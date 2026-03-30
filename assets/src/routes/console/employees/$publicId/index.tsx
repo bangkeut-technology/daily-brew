@@ -131,7 +131,7 @@ function EmployeeDetailPage() {
   };
 
   const inputClassName =
-    'w-full px-3 py-2 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee transition-colors';
+    'w-full px-3 py-2 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee transition-colors';
 
   return (
     <div className="page-enter">
@@ -142,7 +142,7 @@ function EmployeeDetailPage() {
             <button
               type="button"
               onClick={handleStartEdit}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
             >
               <Pencil size={14} />
               {t('common.edit', 'Edit')}
@@ -157,34 +157,34 @@ function EmployeeDetailPage() {
           {isEditing ? (
             <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
               <div>
-                <label htmlFor="edit-firstName" className="block text-[12px] font-medium text-text-secondary mb-1.5">
+                <label htmlFor="edit-firstName" className="block text-[14px] font-medium text-text-secondary mb-1.5">
                   {t('employee.firstName', 'First name')} *
                 </label>
                 <input id="edit-firstName" type="text" {...register('firstName')} className={inputClassName} />
                 {errors.firstName && (
-                  <p className="text-[11px] text-status-red mt-1">{errors.firstName.message}</p>
+                  <p className="text-[13px] text-status-red mt-1">{errors.firstName.message}</p>
                 )}
               </div>
 
               <div>
-                <label htmlFor="edit-lastName" className="block text-[12px] font-medium text-text-secondary mb-1.5">
+                <label htmlFor="edit-lastName" className="block text-[14px] font-medium text-text-secondary mb-1.5">
                   {t('employee.lastName', 'Last name')} *
                 </label>
                 <input id="edit-lastName" type="text" {...register('lastName')} className={inputClassName} />
                 {errors.lastName && (
-                  <p className="text-[11px] text-status-red mt-1">{errors.lastName.message}</p>
+                  <p className="text-[13px] text-status-red mt-1">{errors.lastName.message}</p>
                 )}
               </div>
 
               <div>
-                <label htmlFor="edit-phone" className="block text-[12px] font-medium text-text-secondary mb-1.5">
+                <label htmlFor="edit-phone" className="block text-[14px] font-medium text-text-secondary mb-1.5">
                   {t('employee.phoneNumber', 'Phone number')}
                 </label>
                 <input id="edit-phone" type="text" {...register('phoneNumber')} className={inputClassName} />
               </div>
 
               <div>
-                <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+                <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
                   {t('employee.dob', 'Date of birth')}
                 </label>
                 <CustomDatePicker
@@ -194,7 +194,7 @@ function EmployeeDetailPage() {
               </div>
 
               <div>
-                <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+                <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
                   {t('employee.joinedAt', 'Join date')}
                 </label>
                 <CustomDatePicker
@@ -204,7 +204,7 @@ function EmployeeDetailPage() {
               </div>
 
               <div>
-                <label id="edit-shift-label" className="block text-[12px] font-medium text-text-secondary mb-1.5">
+                <label id="edit-shift-label" className="block text-[14px] font-medium text-text-secondary mb-1.5">
                   {t('employee.shift', 'Shift')}
                 </label>
                 <CustomSelect
@@ -227,7 +227,7 @@ function EmployeeDetailPage() {
                   checked={watch('active')}
                   onChange={(v) => setValue('active', v)}
                 />
-                <label htmlFor="active-toggle" className="text-[13px] text-text-secondary cursor-pointer">
+                <label htmlFor="active-toggle" className="text-[15px] text-text-secondary cursor-pointer">
                   {t('employee.active', 'Active')}
                 </label>
               </div>
@@ -236,7 +236,7 @@ function EmployeeDetailPage() {
                 <button
                   type="submit"
                   disabled={updateEmployee.isPending}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light disabled:opacity-50"
                 >
                   <Check size={14} />
                   {updateEmployee.isPending ? t('common.loading') : t('common.save', 'Save')}
@@ -244,7 +244,7 @@ function EmployeeDetailPage() {
                 <button
                   type="button"
                   onClick={handleCancelEdit}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3"
                 >
                   <X size={14} />
                   {t('common.cancel')}
@@ -258,9 +258,9 @@ function EmployeeDetailPage() {
                 <div className="flex items-center gap-4 flex-shrink-0">
                   <Avatar name={fullName} index={0} size={64} radius="20px" />
                   <div>
-                    <h2 className="text-[16px] font-semibold text-text-primary">{fullName}</h2>
+                    <h2 className="text-[18px] font-semibold text-text-primary">{fullName}</h2>
                     {employee.username && (
-                      <p className="text-[12px] text-text-tertiary font-mono mt-0.5">@{employee.username}</p>
+                      <p className="text-[14px] text-text-tertiary font-mono mt-0.5">@{employee.username}</p>
                     )}
                     <div className="mt-1.5">
                       <StatusBadge
@@ -274,7 +274,7 @@ function EmployeeDetailPage() {
                 {/* Right: details grid */}
                 <div className="flex-1 grid grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3">
                   <div>
-                    <span className="text-[11px] text-text-tertiary block">{t('employee.shift', 'Shift')}</span>
+                    <span className="text-[13px] text-text-tertiary block">{t('employee.shift', 'Shift')}</span>
                     {employee.shiftName && employee.shiftPublicId ? (
                       <ShiftPopover
                         shiftName={employee.shiftName}
@@ -282,30 +282,30 @@ function EmployeeDetailPage() {
                         shifts={shifts}
                       />
                     ) : (
-                      <span className="text-[13px] text-text-tertiary">{t('employee.noShift', 'No shift')}</span>
+                      <span className="text-[15px] text-text-tertiary">{t('employee.noShift', 'No shift')}</span>
                     )}
                   </div>
                   {employee.phoneNumber && (
                     <div>
-                      <span className="text-[11px] text-text-tertiary block">{t('employee.phone', 'Phone')}</span>
-                      <span className="text-[13px] font-medium text-text-primary font-mono">{employee.phoneNumber}</span>
+                      <span className="text-[13px] text-text-tertiary block">{t('employee.phone', 'Phone')}</span>
+                      <span className="text-[15px] font-medium text-text-primary font-mono">{employee.phoneNumber}</span>
                     </div>
                   )}
                   {employee.dob && (
                     <div>
-                      <span className="text-[11px] text-text-tertiary block">{t('employee.dob', 'Date of birth')}</span>
-                      <span className="text-[13px] text-text-secondary">{fmtDate(employee.dob)}</span>
+                      <span className="text-[13px] text-text-tertiary block">{t('employee.dob', 'Date of birth')}</span>
+                      <span className="text-[15px] text-text-secondary">{fmtDate(employee.dob)}</span>
                     </div>
                   )}
                   {employee.joinedAt && (
                     <div>
-                      <span className="text-[11px] text-text-tertiary block">{t('employee.joinedAt', 'Join date')}</span>
-                      <span className="text-[13px] text-text-secondary">{fmtDate(employee.joinedAt)}</span>
+                      <span className="text-[13px] text-text-tertiary block">{t('employee.joinedAt', 'Join date')}</span>
+                      <span className="text-[15px] text-text-secondary">{fmtDate(employee.joinedAt)}</span>
                     </div>
                   )}
                   <div>
-                    <span className="text-[11px] text-text-tertiary block">Created</span>
-                    <span className="text-[13px] text-text-secondary">{fmtDate(employee.createdAt)}</span>
+                    <span className="text-[13px] text-text-tertiary block">Created</span>
+                    <span className="text-[15px] text-text-secondary">{fmtDate(employee.createdAt)}</span>
                   </div>
                 </div>
               </div>
@@ -316,16 +316,16 @@ function EmployeeDetailPage() {
                   <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-green/8 border border-green/15">
                     <Mail size={13} className="text-green flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <span className="text-[12px] text-green font-medium truncate block">{employee.linkedUserEmail}</span>
-                      <span className="text-[10.5px] text-green/70">Can check in and view own dashboard</span>
+                      <span className="text-[14px] text-green font-medium truncate block">{employee.linkedUserEmail}</span>
+                      <span className="text-[12.5px] text-green/70">Can check in and view own dashboard</span>
                     </div>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-red/8 border border-red/15">
                     <Info size={13} className="text-red flex-shrink-0" />
                     <div>
-                      <span className="text-[11.5px] text-red font-medium block">No user account linked</span>
-                      <span className="text-[10.5px] text-red/70">This employee cannot check in until linked</span>
+                      <span className="text-[13.5px] text-red font-medium block">No user account linked</span>
+                      <span className="text-[12.5px] text-red/70">This employee cannot check in until linked</span>
                     </div>
                   </div>
                 )}
@@ -347,7 +347,7 @@ function EmployeeDetailPage() {
             <div className="p-5 space-y-4">
               {employee.linkedUserEmail ? (
                 <>
-                  <p className="text-[11.5px] text-text-tertiary leading-relaxed">
+                  <p className="text-[13.5px] text-text-tertiary leading-relaxed">
                     This employee can check in by scanning the workspace QR code while signed in. They can also view their own attendance and shifts.
                   </p>
                   <div className="flex items-center gap-3">
@@ -355,13 +355,13 @@ function EmployeeDetailPage() {
                       <Mail size={16} className="text-green" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-medium text-text-primary truncate">{employee.linkedUserEmail}</p>
-                      <p className="text-[11px] text-text-tertiary">User account linked</p>
+                      <p className="text-[15px] font-medium text-text-primary truncate">{employee.linkedUserEmail}</p>
+                      <p className="text-[13px] text-text-tertiary">User account linked</p>
                     </div>
                     <button
                       type="button"
                       onClick={() => setShowUnlinkConfirm(true)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium text-red bg-red/8 border-none cursor-pointer transition-colors hover:bg-red/15"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[14px] font-medium text-red bg-red/8 border-none cursor-pointer transition-colors hover:bg-red/15"
                     >
                       <Unlink size={12} />
                       Unlink
@@ -382,11 +382,11 @@ function EmployeeDetailPage() {
                 </>
               ) : (
                 <>
-                  <p className="text-[11.5px] text-text-tertiary leading-relaxed">
+                  <p className="text-[13.5px] text-text-tertiary leading-relaxed">
                     A linked user account is required for check-in. The employee signs in on their phone and scans the workspace QR code to check in and out.
                   </p>
                   <div>
-                    <p className="text-[12px] font-medium text-text-secondary mb-1.5">
+                    <p className="text-[14px] font-medium text-text-secondary mb-1.5">
                       {t('employee.linkByPublicId', 'Link by user public ID')}
                     </p>
                     <div className="flex items-center gap-2">
@@ -397,13 +397,13 @@ function EmployeeDetailPage() {
                         value={linkUserId}
                         onChange={(e) => setLinkUserId(e.target.value)}
                         placeholder={t('employee.userPublicIdPlaceholder', 'Enter user public ID')}
-                        className="flex-1 px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono transition-colors"
+                        className="flex-1 px-3 py-2 rounded-lg text-[15px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono transition-colors"
                       />
                       <button
                         type="button"
                         onClick={handleLinkUser}
                         disabled={!linkUserId.trim() || updateEmployee.isPending}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-medium bg-coffee text-white border-none cursor-pointer transition-colors hover:bg-coffee-light disabled:opacity-50"
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[14px] font-medium bg-coffee text-white border-none cursor-pointer transition-colors hover:bg-coffee-light disabled:opacity-50"
                       >
                         <Link2 size={12} />
                         Link
@@ -412,7 +412,7 @@ function EmployeeDetailPage() {
                   </div>
 
                   <div className="border-t border-cream-3/60 pt-4">
-                    <p className="text-[12px] text-text-secondary mb-3">
+                    <p className="text-[14px] text-text-secondary mb-3">
                       {t(
                         'employee.linkUserDescription',
                         'Or share this QR code or employee ID with the staff member. They can scan it or enter it during onboarding to link their account.',
@@ -429,9 +429,9 @@ function EmployeeDetailPage() {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[10px] text-text-tertiary mb-1">Employee ID</p>
+                        <p className="text-[12px] text-text-tertiary mb-1">Employee ID</p>
                         <div className="flex items-center gap-2">
-                          <code className="flex-1 px-3 py-2 rounded-lg text-[12px] bg-cream-2 border border-cream-3 text-text-primary font-mono select-all truncate">
+                          <code className="flex-1 px-3 py-2 rounded-lg text-[14px] bg-cream-2 border border-cream-3 text-text-primary font-mono select-all truncate">
                             {employee.publicId}
                           </code>
                           <button
@@ -444,7 +444,7 @@ function EmployeeDetailPage() {
                                 toast.error(t('common.copyFailed', 'Failed to copy'));
                               }
                             }}
-                            className="flex items-center gap-1 px-2.5 py-2 rounded-lg text-[12px] bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer transition-colors hover:bg-cream-3 flex-shrink-0"
+                            className="flex items-center gap-1 px-2.5 py-2 rounded-lg text-[14px] bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer transition-colors hover:bg-cream-3 flex-shrink-0"
                           >
                             <Copy size={12} />
                           </button>
@@ -463,7 +463,7 @@ function EmployeeDetailPage() {
             title={t('employee.attendanceHistory', 'Attendance history')}
             action={
               employee.attendance && employee.attendance.length > 0 ? (
-                <span className="text-[11px] text-text-tertiary">
+                <span className="text-[13px] text-text-tertiary">
                   Last {Math.min(employee.attendance.length, 30)} days
                 </span>
               ) : undefined
@@ -472,10 +472,10 @@ function EmployeeDetailPage() {
           <div className="max-h-[400px] overflow-y-auto">
             {!employee.attendance || employee.attendance.length === 0 ? (
               <div className="px-5 py-8 text-center">
-                <p className="text-[13px] text-text-tertiary">
+                <p className="text-[15px] text-text-tertiary">
                   {t('employee.noAttendance', 'No attendance records')}
                 </p>
-                <p className="text-[11px] text-text-tertiary mt-1">
+                <p className="text-[13px] text-text-tertiary mt-1">
                   Records will appear here after the employee's first check-in.
                 </p>
               </div>
@@ -486,10 +486,10 @@ function EmployeeDetailPage() {
                   className="flex items-center justify-between px-5 py-2.5 border-b border-cream-3/50 last:border-0"
                 >
                   <div>
-                    <div className="text-[12.5px] font-mono tabular-nums text-text-primary">
+                    <div className="text-[14.5px] font-mono tabular-nums text-text-primary">
                       {fmtDate(a.date)}
                     </div>
-                    <div className="text-[11px] text-text-tertiary">
+                    <div className="text-[13px] text-text-tertiary">
                       {a.checkInAt || '--:--'} &rarr; {a.checkOutAt || '--:--'}
                     </div>
                   </div>
@@ -534,7 +534,7 @@ function ShiftPopover({
   );
 
   if (!shift) {
-    return <span className="text-[13px] font-medium text-text-primary">{shiftName}</span>;
+    return <span className="text-[15px] font-medium text-text-primary">{shiftName}</span>;
   }
 
   const [startH, startM] = shift.startTime.split(':').map(Number);
@@ -550,7 +550,7 @@ function ShiftPopover({
       <Popover.Trigger asChild>
         <button
           type="button"
-          className="text-[13px] font-medium text-coffee hover:text-coffee-light bg-transparent border-none cursor-pointer p-0 transition-colors underline decoration-dotted underline-offset-2"
+          className="text-[15px] font-medium text-coffee hover:text-coffee-light bg-transparent border-none cursor-pointer p-0 transition-colors underline decoration-dotted underline-offset-2"
         >
           {shiftName}
         </button>
@@ -563,28 +563,28 @@ function ShiftPopover({
           className="z-50 w-[220px] bg-glass-bg backdrop-blur-xl border border-glass-border rounded-xl shadow-lg p-4 space-y-3"
         >
           <div>
-            <p className="text-[14px] font-semibold text-text-primary">{shift.name}</p>
+            <p className="text-[16px] font-semibold text-text-primary">{shift.name}</p>
             <div className="flex items-center gap-2 mt-1.5">
               <Clock size={13} className="text-amber" />
-              <span className="text-[13px] font-mono tabular-nums text-text-secondary">
+              <span className="text-[15px] font-mono tabular-nums text-text-secondary">
                 {shift.startTime} – {shift.endTime}
               </span>
             </div>
-            <span className="text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber mt-2 inline-block">
+            <span className="text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber mt-2 inline-block">
               {durH}h{durM > 0 ? ` ${durM}m` : ''}
             </span>
           </div>
 
           {shift.timeRules.length > 0 && (
             <div className="border-t border-cream-3/60 pt-2">
-              <p className="text-[10px] uppercase tracking-[1px] font-medium text-text-tertiary mb-1.5">
+              <p className="text-[12px] uppercase tracking-[1px] font-medium text-text-tertiary mb-1.5">
                 Day overrides
               </p>
               <div className="space-y-1">
                 {shift.timeRules.map((rule) => (
                   <div key={rule.publicId} className="flex items-center justify-between">
-                    <span className="text-[11px] text-text-secondary">{rule.dayOfWeekLabel}</span>
-                    <span className="text-[11px] font-mono tabular-nums text-text-tertiary">
+                    <span className="text-[13px] text-text-secondary">{rule.dayOfWeekLabel}</span>
+                    <span className="text-[13px] font-mono tabular-nums text-text-tertiary">
                       {rule.startTime} – {rule.endTime}
                     </span>
                   </div>

@@ -30,11 +30,11 @@ function ForgotPasswordPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="no-underline">
-            <h1 className="text-[24px] font-semibold text-coffee font-serif mb-1">
+            <h1 className="text-[26px] font-semibold text-coffee font-serif mb-1">
               DailyBrew
             </h1>
           </Link>
-          <p className="text-[13px] text-text-secondary">
+          <p className="text-[15px] text-text-secondary">
             {t('auth.resetYourPassword', 'Reset your password')}
           </p>
         </div>
@@ -47,10 +47,10 @@ function ForgotPasswordPage() {
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               </div>
-              <p className="text-[13.5px] text-text-primary font-medium mb-2">
+              <p className="text-[15.5px] text-text-primary font-medium mb-2">
                 {t('auth.checkYourEmail', 'Check your email')}
               </p>
-              <p className="text-[12.5px] text-text-secondary leading-relaxed mb-6">
+              <p className="text-[14.5px] text-text-secondary leading-relaxed mb-6">
                 {t(
                   'auth.resetLinkSent',
                   'If an account exists, a reset link has been sent to your email.',
@@ -58,14 +58,14 @@ function ForgotPasswordPage() {
               </p>
               <Link
                 to="/sign-in"
-                className="text-[13px] text-coffee font-medium no-underline hover:text-coffee-light transition-colors"
+                className="text-[15px] text-coffee font-medium no-underline hover:text-coffee-light transition-colors"
               >
                 {t('auth.backToSignIn', 'Back to sign in')}
               </Link>
             </div>
           ) : (
             <>
-              <p className="text-[13px] text-text-secondary mb-5 leading-relaxed">
+              <p className="text-[15px] text-text-secondary mb-5 leading-relaxed">
                 {t(
                   'auth.forgotPasswordDescription',
                   'Enter the email address associated with your account and we\'ll send you a link to reset your password.',
@@ -74,7 +74,7 @@ function ForgotPasswordPage() {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+                  <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
                     {t('auth.email', 'Email')}
                   </label>
                   <input
@@ -82,14 +82,14 @@ function ForgotPasswordPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
+                    className="w-full px-3 py-2.5 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
                     placeholder="you@restaurant.com"
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={forgotPassword.isPending}
-                  className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50"
                 >
                   {forgotPassword.isPending
                     ? t('common.loading', 'Loading...')
@@ -100,7 +100,7 @@ function ForgotPasswordPage() {
               <div className="mt-5 text-center">
                 <Link
                   to="/sign-in"
-                  className="text-[12px] text-coffee font-medium no-underline hover:text-coffee-light transition-colors"
+                  className="text-[14px] text-coffee font-medium no-underline hover:text-coffee-light transition-colors"
                 >
                   {t('auth.backToSignIn', 'Back to sign in')}
                 </Link>

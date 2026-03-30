@@ -62,7 +62,7 @@ function EmployeeListPage() {
         action={
           <Link
             to="/console/employees/new"
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] no-underline"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] no-underline"
           >
             + {t('employee.add')}
           </Link>
@@ -83,7 +83,7 @@ function EmployeeListPage() {
             placeholder={t('common.search')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 pr-3 py-2 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee transition-colors w-56"
+            className="pl-9 pr-3 py-2 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee transition-colors w-56"
           />
         </div>
 
@@ -92,7 +92,7 @@ function EmployeeListPage() {
           <button
             onClick={() => setLinkFilter(linkFilter === '' ? '' : '')}
             className={cn(
-              'px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors',
+              'px-3 py-1.5 rounded-lg text-[14px] font-medium border-none cursor-pointer transition-colors',
               linkFilter === '' ? 'bg-coffee text-white' : 'bg-glass-bg text-text-secondary hover:bg-cream-3',
             )}
           >
@@ -101,7 +101,7 @@ function EmployeeListPage() {
           <button
             onClick={() => setLinkFilter(linkFilter === 'linked' ? '' : 'linked')}
             className={cn(
-              'flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors',
+              'flex items-center gap-1 px-3 py-1.5 rounded-lg text-[14px] font-medium border-none cursor-pointer transition-colors',
               linkFilter === 'linked' ? 'bg-green/15 text-green' : 'bg-glass-bg text-text-secondary hover:bg-cream-3',
             )}
           >
@@ -111,7 +111,7 @@ function EmployeeListPage() {
           <button
             onClick={() => setLinkFilter(linkFilter === 'unlinked' ? '' : 'unlinked')}
             className={cn(
-              'flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors',
+              'flex items-center gap-1 px-3 py-1.5 rounded-lg text-[14px] font-medium border-none cursor-pointer transition-colors',
               linkFilter === 'unlinked' ? 'bg-red/15 text-red' : 'bg-glass-bg text-text-secondary hover:bg-cream-3',
             )}
           >
@@ -125,7 +125,7 @@ function EmployeeListPage() {
           <button
             onClick={() => setStatusFilter(statusFilter === 'active' ? '' : 'active')}
             className={cn(
-              'px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors',
+              'px-3 py-1.5 rounded-lg text-[14px] font-medium border-none cursor-pointer transition-colors',
               statusFilter === 'active' ? 'bg-green/15 text-green' : 'bg-glass-bg text-text-secondary hover:bg-cream-3',
             )}
           >
@@ -134,7 +134,7 @@ function EmployeeListPage() {
           <button
             onClick={() => setStatusFilter(statusFilter === 'inactive' ? '' : 'inactive')}
             className={cn(
-              'px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors',
+              'px-3 py-1.5 rounded-lg text-[14px] font-medium border-none cursor-pointer transition-colors',
               statusFilter === 'inactive' ? 'bg-amber/15 text-amber' : 'bg-glass-bg text-text-secondary hover:bg-cream-3',
             )}
           >
@@ -149,7 +149,7 @@ function EmployeeListPage() {
         <GlassCard hover={false}>
           <div>
             {filtered?.length === 0 ? (
-              <p className="px-5 py-8 text-center text-[13px] text-text-tertiary">
+              <p className="px-5 py-8 text-center text-[15px] text-text-tertiary">
                 {t('common.noResults')}
               </p>
             ) : (
@@ -167,10 +167,10 @@ function EmployeeListPage() {
                     >
                       <Avatar name={fullName} index={i} size={42} radius="12px" />
                       <div className="flex-1 min-w-0">
-                        <div className="text-[13.5px] font-medium text-text-primary truncate">
+                        <div className="text-[15.5px] font-medium text-text-primary truncate">
                           {fullName}
                         </div>
-                        <div className="text-[11px] text-text-tertiary">
+                        <div className="text-[13px] text-text-tertiary">
                           {employee.shiftName || t('employee.noShift')}
                           {employee.phoneNumber ? ` \u00b7 ${employee.phoneNumber}` : ''}
                         </div>

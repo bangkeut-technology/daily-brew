@@ -66,15 +66,15 @@ function LeaveRequestsPage() {
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber/10 mb-2">
               <Crown size={28} className="text-amber" />
             </div>
-            <h2 className="text-[18px] font-semibold text-text-primary font-serif">
+            <h2 className="text-[20px] font-semibold text-text-primary font-serif">
               {t('upgrade.leaveRequests.title')}
             </h2>
-            <p className="text-[13px] text-text-secondary leading-relaxed">
+            <p className="text-[15px] text-text-secondary leading-relaxed">
               {t('upgrade.leaveRequests.description')}
             </p>
             <button
               onClick={() => setShowUpgrade(true)}
-              className="px-6 py-2.5 rounded-xl text-[14px] font-medium text-white border-none cursor-pointer btn-shimmer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,66,38,0.30)]"
+              className="px-6 py-2.5 rounded-xl text-[16px] font-medium text-white border-none cursor-pointer btn-shimmer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,66,38,0.30)]"
             >
               {t('upgrade.upgradeButton')}
             </button>
@@ -136,7 +136,7 @@ function LeaveRequestsPage() {
         {isEmployee && employee && (
           <button
             onClick={() => setShowSubmitModal(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-[15px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light transition-colors"
           >
             <Plus size={14} />
             {t('leave.submitRequest', 'Submit leave request')}
@@ -150,7 +150,7 @@ function LeaveRequestsPage() {
             key={tab.value}
             onClick={() => setStatusFilter(tab.value)}
             className={cn(
-              'px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors',
+              'px-3 py-1.5 rounded-lg text-[14px] font-medium border-none cursor-pointer transition-colors',
               statusFilter === tab.value
                 ? 'bg-coffee text-white'
                 : 'bg-glass-bg text-text-secondary hover:bg-cream-3',
@@ -163,12 +163,12 @@ function LeaveRequestsPage() {
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <p className="text-[13px] text-text-tertiary">{t('common.loading')}</p>
+          <p className="text-[15px] text-text-tertiary">{t('common.loading')}</p>
         </div>
       ) : filteredRequests?.length === 0 ? (
         <div className="border-[1.5px] border-dashed border-cream-3 rounded-2xl bg-glass-bg backdrop-blur-md flex flex-col items-center justify-center min-h-[200px]">
           <Inbox size={28} className="text-text-tertiary mb-2" />
-          <span className="text-[13px] text-text-tertiary">
+          <span className="text-[15px] text-text-tertiary">
             {t('leave.noRequests', 'No leave requests found')}
           </span>
         </div>
@@ -177,7 +177,7 @@ function LeaveRequestsPage() {
           <GlassCardHeader
             title={isEmployee ? t('leave.myRequests', 'My requests') : t('leave.requests', 'Leave requests')}
             action={
-              <span className="text-[12px] text-text-tertiary">
+              <span className="text-[14px] text-text-tertiary">
                 {filteredRequests?.length} {t('leave.total', 'total')}
               </span>
             }
@@ -191,16 +191,16 @@ function LeaveRequestsPage() {
                 {!isEmployee && <Avatar name={lr.employeeName} index={i} size={32} />}
                 <div className="flex-1 min-w-0">
                   {!isEmployee && (
-                    <div className="text-[13.5px] font-medium text-text-primary truncate">
+                    <div className="text-[15.5px] font-medium text-text-primary truncate">
                       {lr.employeeName}
                     </div>
                   )}
-                  <div className={isEmployee ? 'text-[13.5px] font-medium text-text-primary' : 'text-[11px] text-text-tertiary'}>
+                  <div className={isEmployee ? 'text-[15.5px] font-medium text-text-primary' : 'text-[13px] text-text-tertiary'}>
                     {formatDateRange(lr.startDate, lr.endDate)}
                     {!lr.isFullDay && lr.startTime && lr.endTime && ` ${lr.startTime}–${lr.endTime}`}
                   </div>
                   {lr.reason && (
-                    <div className="text-[11.5px] text-text-secondary mt-0.5 truncate">
+                    <div className="text-[13.5px] text-text-secondary mt-0.5 truncate">
                       {lr.reason}
                     </div>
                   )}
@@ -220,14 +220,14 @@ function LeaveRequestsPage() {
                     <button
                       onClick={() => handleAction(lr.publicId, 'approved')}
                       disabled={updateLeave.isPending}
-                      className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-green/12 text-green transition-colors hover:bg-green/20 disabled:opacity-50"
+                      className="text-[13.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-green/12 text-green transition-colors hover:bg-green/20 disabled:opacity-50"
                     >
                       &#10003; {t('leave.approve', 'Approve')}
                     </button>
                     <button
                       onClick={() => handleAction(lr.publicId, 'rejected')}
                       disabled={updateLeave.isPending}
-                      className="text-[11.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-red/10 text-red transition-colors hover:bg-red/18 disabled:opacity-50"
+                      className="text-[13.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-red/10 text-red transition-colors hover:bg-red/18 disabled:opacity-50"
                     >
                       &#10005; {t('leave.reject', 'Reject')}
                     </button>

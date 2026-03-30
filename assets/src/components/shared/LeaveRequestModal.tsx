@@ -91,15 +91,15 @@ export function LeaveRequestModal({
           className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100%-2rem)] max-w-[420px] overflow-visible bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl shadow-[0_16px_50px_rgba(107,66,38,0.15)] outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
         >
           <div className="p-6 space-y-4">
-            <Dialog.Title className="text-[16px] font-semibold text-text-primary font-serif">
+            <Dialog.Title className="text-[18px] font-semibold text-text-primary font-serif">
               {t('leave.submitRequest', 'Submit leave request')}
             </Dialog.Title>
-            <Dialog.Description className="text-[12.5px] text-text-secondary leading-relaxed -mt-2">
+            <Dialog.Description className="text-[14.5px] text-text-secondary leading-relaxed -mt-2">
               {t('leave.submitDescription', 'Select the dates you need off and provide a reason.')}
             </Dialog.Description>
 
             <div>
-              <label htmlFor="leave-start" className="block text-[11px] font-medium text-text-secondary mb-1">
+              <label htmlFor="leave-start" className="block text-[13px] font-medium text-text-secondary mb-1">
                 {t('leave.startDate', 'Start date')}
               </label>
               <CustomDatePicker
@@ -112,7 +112,7 @@ export function LeaveRequestModal({
               />
             </div>
             <div>
-              <label htmlFor="leave-end" className="block text-[11px] font-medium text-text-secondary mb-1">
+              <label htmlFor="leave-end" className="block text-[13px] font-medium text-text-secondary mb-1">
                 {t('leave.endDate', 'End date')}
               </label>
               <CustomDatePicker
@@ -129,7 +129,7 @@ export function LeaveRequestModal({
                 checked={isPartial}
                 onChange={setIsPartial}
               />
-              <label htmlFor="partial-day" className="text-[13px] text-text-primary cursor-pointer">
+              <label htmlFor="partial-day" className="text-[15px] text-text-primary cursor-pointer">
                 {t('leave.partialDay', 'Partial day')}
               </label>
             </div>
@@ -137,13 +137,13 @@ export function LeaveRequestModal({
             {isPartial && (
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label htmlFor="leave-start-time" className="block text-[11px] font-medium text-text-secondary mb-1">
+                  <label htmlFor="leave-start-time" className="block text-[13px] font-medium text-text-secondary mb-1">
                     {t('leave.fromTime', 'From')}
                   </label>
                   <CustomTimePicker value={startTime} onChange={setStartTime} />
                 </div>
                 <div>
-                  <label htmlFor="leave-end-time" className="block text-[11px] font-medium text-text-secondary mb-1">
+                  <label htmlFor="leave-end-time" className="block text-[13px] font-medium text-text-secondary mb-1">
                     {t('leave.toTime', 'To')}
                   </label>
                   <CustomTimePicker value={endTime} onChange={setEndTime} />
@@ -152,7 +152,7 @@ export function LeaveRequestModal({
             )}
 
             <div>
-              <label htmlFor="leave-reason" className="block text-[11px] font-medium text-text-secondary mb-1">
+              <label htmlFor="leave-reason" className="block text-[13px] font-medium text-text-secondary mb-1">
                 {t('leave.reason', 'Reason')}
               </label>
               <textarea
@@ -162,7 +162,7 @@ export function LeaveRequestModal({
                 onChange={(e) => setReason(e.target.value)}
                 rows={3}
                 placeholder={t('leave.reasonPlaceholder', 'e.g. Family event, medical appointment...')}
-                className="w-full px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-sans resize-none"
+                className="w-full px-3 py-2 rounded-lg text-[15px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-sans resize-none"
               />
             </div>
 
@@ -170,7 +170,7 @@ export function LeaveRequestModal({
               <button
                 type="button"
                 onClick={() => onOpenChange(false)}
-                className="px-4 py-2 rounded-lg text-[13px] font-medium bg-transparent text-text-secondary border border-cream-3 cursor-pointer hover:bg-cream-3 transition-colors"
+                className="px-4 py-2 rounded-lg text-[15px] font-medium bg-transparent text-text-secondary border border-cream-3 cursor-pointer hover:bg-cream-3 transition-colors"
               >
                 {t('common.cancel', 'Cancel')}
               </button>
@@ -178,7 +178,7 @@ export function LeaveRequestModal({
                 type="button"
                 onClick={handleSubmit}
                 disabled={!startDate || !endDate || !reason.trim() || createLeave.isPending}
-                className="px-4 py-2 rounded-lg text-[13px] font-medium text-white bg-coffee border-none cursor-pointer hover:bg-coffee-light transition-colors disabled:opacity-50"
+                className="px-4 py-2 rounded-lg text-[15px] font-medium text-white bg-coffee border-none cursor-pointer hover:bg-coffee-light transition-colors disabled:opacity-50"
               >
                 {createLeave.isPending ? t('common.loading', 'Loading...') : t('common.submit', 'Submit')}
               </button>

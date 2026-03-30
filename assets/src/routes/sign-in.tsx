@@ -127,7 +127,7 @@ function SignInPage() {
           <Link to="/" className="no-underline inline-block">
             <LogoBrand size={36} className="justify-center" />
           </Link>
-          <p className="text-[13px] text-text-secondary mt-2">Welcome back</p>
+          <p className="text-[15px] text-text-secondary mt-2">Welcome back</p>
         </div>
 
         <div className="glass-card !rounded-2xl p-6 hover:!transform-none">
@@ -135,14 +135,14 @@ function SignInPage() {
           <div className="space-y-2.5 mb-5">
             <a
               href="/oauth/auth/google"
-              className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg text-[13px] font-medium bg-glass-bg border border-cream-3 text-text-primary no-underline transition-all hover:bg-cream-3/50"
+              className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg text-[15px] font-medium bg-glass-bg border border-cream-3 text-text-primary no-underline transition-all hover:bg-cream-3/50"
             >
               <GoogleIcon />
               {t('auth.signIn')} with {t('auth.google')}
             </a>
             <a
               href="/oauth/auth/apple"
-              className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg text-[13px] font-medium bg-glass-bg border border-cream-3 text-text-primary no-underline transition-all hover:bg-cream-3/50"
+              className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg text-[15px] font-medium bg-glass-bg border border-cream-3 text-text-primary no-underline transition-all hover:bg-cream-3/50"
             >
               <AppleIcon />
               {t('auth.signIn')} with {t('auth.apple')}
@@ -151,33 +151,33 @@ function SignInPage() {
 
           <div className="flex items-center gap-3 mb-5">
             <div className="flex-1 h-px bg-cream-3/80" />
-            <span className="text-[11px] text-text-tertiary uppercase tracking-wider">or</span>
+            <span className="text-[13px] text-text-tertiary uppercase tracking-wider">or</span>
             <div className="flex-1 h-px bg-cream-3/80" />
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-              <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+              <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
                 {t('auth.email')}
               </label>
               <input
                 type="email"
                 {...register('email')}
                 placeholder="you@restaurant.com"
-                className="w-full px-3 py-2.5 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
+                className="w-full px-3 py-2.5 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
               />
               {errors.email && (
-                <p className="text-[11px] text-red mt-1">{errors.email.message}</p>
+                <p className="text-[13px] text-red mt-1">{errors.email.message}</p>
               )}
             </div>
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-[12px] font-medium text-text-secondary">
+                <label className="text-[14px] font-medium text-text-secondary">
                   {t('auth.password')}
                 </label>
                 <Link
                   to="/forgot-password"
-                  className="text-[11px] text-amber no-underline hover:text-coffee transition-colors"
+                  className="text-[13px] text-amber no-underline hover:text-coffee transition-colors"
                 >
                   {t('auth.forgotPassword')}
                 </Link>
@@ -186,7 +186,7 @@ function SignInPage() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   {...register('password')}
-                  className="w-full px-3 py-2.5 pr-10 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
+                  className="w-full px-3 py-2.5 pr-10 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
                 />
                 <button
                   type="button"
@@ -197,20 +197,20 @@ function SignInPage() {
                 </button>
               </div>
               {errors.password && (
-                <p className="text-[11px] text-red mt-1">{errors.password.message}</p>
+                <p className="text-[13px] text-red mt-1">{errors.password.message}</p>
               )}
             </div>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full px-4 py-2.5 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer transition-all hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50"
+              className="w-full px-4 py-2.5 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50"
             >
               {isSubmitting ? t('common.loading') : t('auth.signIn')}
             </button>
           </form>
 
           <div className="mt-5 text-center">
-            <p className="text-[12px] text-text-tertiary">
+            <p className="text-[14px] text-text-tertiary">
               {t('auth.noAccount')}{' '}
               <Link to="/sign-up" className="text-coffee font-medium no-underline hover:text-coffee-light">
                 {t('auth.signUp')}
@@ -220,9 +220,9 @@ function SignInPage() {
         </div>
 
         <div className="mt-6 text-center space-x-3">
-          <Link to="/privacy" className="text-[11px] text-text-tertiary hover:text-text-secondary no-underline transition-colors">Privacy</Link>
-          <span className="text-[11px] text-text-tertiary">&middot;</span>
-          <Link to="/terms" className="text-[11px] text-text-tertiary hover:text-text-secondary no-underline transition-colors">Terms</Link>
+          <Link to="/privacy" className="text-[13px] text-text-tertiary hover:text-text-secondary no-underline transition-colors">Privacy</Link>
+          <span className="text-[13px] text-text-tertiary">&middot;</span>
+          <Link to="/terms" className="text-[13px] text-text-tertiary hover:text-text-secondary no-underline transition-colors">Terms</Link>
         </div>
       </div>
     </div>

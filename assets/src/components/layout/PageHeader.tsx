@@ -11,7 +11,7 @@ export function PageHeader({ title, badge, action }: PageHeaderProps) {
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center gap-3">
         <h1
-          className="text-[24px] font-semibold text-text-primary"
+          className="text-[26px] font-semibold text-text-primary"
           style={{ fontFamily: "'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif" }}
         >
           {title}

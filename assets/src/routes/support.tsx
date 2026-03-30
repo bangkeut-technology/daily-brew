@@ -103,13 +103,13 @@ function SupportPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <p className="text-[11px] uppercase tracking-[2px] font-medium text-amber mb-3">
+            <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
               Support
             </p>
-            <h1 className="text-[32px] md:text-[40px] font-semibold text-text-primary font-serif leading-tight mb-4">
+            <h1 className="text-[34px] md:text-[42px] font-semibold text-text-primary font-serif leading-tight mb-4">
               How can we help?
             </h1>
-            <p className="text-[14px] text-text-secondary mb-8 max-w-md mx-auto">
+            <p className="text-[16px] text-text-secondary mb-8 max-w-md mx-auto">
               Find answers, browse guides, or get in touch with our team.
             </p>
           </motion.div>
@@ -129,7 +129,7 @@ function SupportPage() {
               <input
                 type="text"
                 placeholder="Search for help articles..."
-                className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-glass-bg backdrop-blur-md border border-glass-border text-[14px] text-text-primary placeholder:text-text-tertiary shadow-[0_2px_12px_rgba(107,66,38,0.05)] outline-none focus:border-amber/40 focus:shadow-[0_4px_16px_rgba(193,127,59,0.10)] transition-all duration-200"
+                className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-glass-bg backdrop-blur-md border border-glass-border text-[16px] text-text-primary placeholder:text-text-tertiary shadow-[0_2px_12px_rgba(107,66,38,0.05)] outline-none focus:border-amber/40 focus:shadow-[0_4px_16px_rgba(193,127,59,0.10)] transition-all duration-200"
                 readOnly
               />
             </div>
@@ -157,13 +157,13 @@ function SupportPage() {
                   >
                     <channel.icon size={20} strokeWidth={1.8} />
                   </div>
-                  <h3 className="text-[14px] font-semibold text-text-primary mb-1.5">
+                  <h3 className="text-[16px] font-semibold text-text-primary mb-1.5">
                     {channel.title}
                   </h3>
-                  <p className="text-[12px] text-text-secondary leading-relaxed mb-4">
+                  <p className="text-[14px] text-text-secondary leading-relaxed mb-4">
                     {channel.description}
                   </p>
-                  <span className="inline-flex items-center gap-1 text-[12px] font-medium text-coffee group-hover:text-coffee-light transition-colors">
+                  <span className="inline-flex items-center gap-1 text-[14px] font-medium text-coffee group-hover:text-coffee-light transition-colors">
                     {channel.linkLabel}
                     <ArrowRight
                       size={13}
@@ -185,13 +185,13 @@ function SupportPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <p className="text-[11px] uppercase tracking-[2px] font-medium text-amber mb-3">
+            <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
               Help center
             </p>
-            <h2 className="text-[28px] md:text-[34px] font-semibold text-text-primary font-serif leading-tight">
+            <h2 className="text-[30px] md:text-[36px] font-semibold text-text-primary font-serif leading-tight">
               Common topics
             </h2>
-            <p className="text-[14px] text-text-secondary mt-3 max-w-md mx-auto">
+            <p className="text-[16px] text-text-secondary mt-3 max-w-md mx-auto">
               Quick answers to the most common questions.
             </p>
           </motion.div>
@@ -211,13 +211,13 @@ function SupportPage() {
                   <div className="w-10 h-10 rounded-xl bg-amber/10 flex items-center justify-center text-amber mb-4">
                     <topic.icon size={18} strokeWidth={1.8} />
                   </div>
-                  <h3 className="text-[14px] font-semibold text-text-primary mb-1.5">
+                  <h3 className="text-[16px] font-semibold text-text-primary mb-1.5">
                     {topic.title}
                   </h3>
-                  <p className="text-[12px] text-text-secondary leading-relaxed mb-3">
+                  <p className="text-[14px] text-text-secondary leading-relaxed mb-3">
                     {topic.description}
                   </p>
-                  <span className="inline-flex items-center gap-1 text-[12px] font-medium text-coffee group-hover:text-coffee-light transition-colors">
+                  <span className="inline-flex items-center gap-1 text-[14px] font-medium text-coffee group-hover:text-coffee-light transition-colors">
                     Learn more
                     <ArrowRight
                       size={13}
@@ -242,16 +242,16 @@ function SupportPage() {
             <div className="w-12 h-12 rounded-xl bg-coffee/10 flex items-center justify-center text-coffee mx-auto mb-4">
               <Mail size={22} strokeWidth={1.8} />
             </div>
-            <h3 className="text-[18px] font-semibold text-text-primary font-serif mb-2">
+            <h3 className="text-[20px] font-semibold text-text-primary font-serif mb-2">
               Still need help?
             </h3>
-            <p className="text-[13px] text-text-secondary leading-relaxed mb-5 max-w-sm mx-auto">
+            <p className="text-[15px] text-text-secondary leading-relaxed mb-5 max-w-sm mx-auto">
               Our team is here for you. Send us an email and we will get back to
               you within 24 hours.
             </p>
             <a
               href="mailto:support@dailybrew.work"
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-[13px] font-medium bg-coffee text-white no-underline transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-[15px] font-medium bg-coffee text-white no-underline transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
             >
               <Mail size={14} />
               support@dailybrew.work

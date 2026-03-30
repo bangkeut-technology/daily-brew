@@ -18,7 +18,7 @@ interface StatusBadgeProps {
 export function StatusBadge({ label, variant }: StatusBadgeProps) {
   return (
     <span
-      className={cn('text-[10.5px] font-medium px-2 py-0.5 rounded-full', badgeStyles[variant])}
+      className={cn('text-[12.5px] font-medium px-2 py-0.5 rounded-full', badgeStyles[variant])}
     >
       {label}
     </span>

@@ -102,7 +102,7 @@ export function EmployeeDashboard() {
     return (
       <div className="page-enter">
         <PageHeader title={t('nav.dashboard')} />
-        <p className="text-text-tertiary text-[13px] font-sans">{t('common.loading', 'Loading...')}</p>
+        <p className="text-text-tertiary text-[15px] font-sans">{t('common.loading', 'Loading...')}</p>
       </div>
     );
   }
@@ -113,15 +113,15 @@ export function EmployeeDashboard() {
         <PageHeader title={t('nav.dashboard')} />
         <GlassCard hover={false}>
           <div className="p-8 text-center space-y-3">
-            <p className="text-[13.5px] text-text-secondary font-sans">
+            <p className="text-[15.5px] text-text-secondary font-sans">
               {t('dashboard.noEmployee', 'Your account is not linked to an employee profile yet.')}
             </p>
-            <p className="text-[12px] text-text-tertiary font-sans">
+            <p className="text-[14px] text-text-tertiary font-sans">
               Ask your employer to link your account, or enter your employee ID on your profile page.
             </p>
             <Link
               to="/console/profile"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white no-underline transition-all hover:bg-coffee-light"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white no-underline transition-all hover:bg-coffee-light"
             >
               Go to profile
             </Link>
@@ -152,13 +152,13 @@ export function EmployeeDashboard() {
       <div className="flex items-center gap-4 mb-2">
         <Avatar name={employee.name} index={0} size={48} radius="14px" />
         <div>
-          <h1 className="text-[24px] font-semibold text-text-primary leading-tight font-serif">
+          <h1 className="text-[26px] font-semibold text-text-primary leading-tight font-serif">
             {t('dashboard.welcomeBack', 'Welcome back')}, {employee.name.split(' ')[0]}
           </h1>
-          <p className="text-[13px] text-text-tertiary font-sans mt-0.5">{todayStr}</p>
+          <p className="text-[15px] text-text-tertiary font-sans mt-0.5">{todayStr}</p>
         </div>
       </div>
-      <p className="text-[13px] text-text-secondary mb-6 leading-relaxed">
+      <p className="text-[15px] text-text-secondary mb-6 leading-relaxed">
         {completed
           ? 'You\'re all done for today. Your attendance has been recorded.'
           : checkedIn
@@ -191,8 +191,8 @@ export function EmployeeDashboard() {
               <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-red/8 border border-red/15 mb-4">
                 <CalendarOff size={16} className="text-red shrink-0" />
                 <div>
-                  <p className="text-[13px] font-medium text-red">Restaurant is closed — {activeClosure.name}</p>
-                  <p className="text-[11px] text-red/70">No check-in required today.</p>
+                  <p className="text-[15px] font-medium text-red">Restaurant is closed — {activeClosure.name}</p>
+                  <p className="text-[13px] text-red/70">No check-in required today.</p>
                 </div>
               </div>
             )}
@@ -200,8 +200,8 @@ export function EmployeeDashboard() {
               <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-amber/8 border border-amber/15 mb-4">
                 <CalendarOff size={16} className="text-amber shrink-0" />
                 <div>
-                  <p className="text-[13px] font-medium text-amber">Upcoming closure — {nextClosure.name}</p>
-                  <p className="text-[11px] text-amber/70">{fmtDate(nextClosure.startDate)}{nextClosure.startDate !== nextClosure.endDate ? ` – ${fmtDate(nextClosure.endDate)}` : ''}</p>
+                  <p className="text-[15px] font-medium text-amber">Upcoming closure — {nextClosure.name}</p>
+                  <p className="text-[13px] text-amber/70">{fmtDate(nextClosure.startDate)}{nextClosure.startDate !== nextClosure.endDate ? ` – ${fmtDate(nextClosure.endDate)}` : ''}</p>
                 </div>
               </div>
             )}
@@ -223,16 +223,16 @@ export function EmployeeDashboard() {
                   <Clock size={18} className="text-white" />
                 </div>
                 <div>
-                  <p className="text-[14px] font-semibold text-text-primary font-sans">
+                  <p className="text-[16px] font-semibold text-text-primary font-sans">
                     {checkinData.shiftName}
                   </p>
-                  <p className="text-[12.5px] text-text-secondary font-mono tabular-nums">
+                  <p className="text-[14.5px] text-text-secondary font-mono tabular-nums">
                     {checkinData.shiftStart} &ndash; {checkinData.shiftEnd}
                   </p>
                 </div>
               </div>
             ) : (
-              <p className="text-[13px] text-text-tertiary font-sans">
+              <p className="text-[15px] text-text-tertiary font-sans">
                 {t('dashboard.noShiftAssigned', 'No shift assigned')}
               </p>
             )}
@@ -258,7 +258,7 @@ export function EmployeeDashboard() {
           />
           <div className="px-5 py-4">
             {checkinLoading ? (
-              <div className="flex items-center gap-2 text-[13px] text-text-tertiary font-sans">
+              <div className="flex items-center gap-2 text-[15px] text-text-tertiary font-sans">
                 <Loader2 size={14} className="animate-spin" />
                 {t('common.loading', 'Loading...')}
               </div>
@@ -266,10 +266,10 @@ export function EmployeeDashboard() {
               <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue/8 border border-blue/15">
                 <CalendarOff size={16} className="text-blue shrink-0" />
                 <div>
-                  <p className="text-[13px] font-medium text-blue">
+                  <p className="text-[15px] font-medium text-blue">
                     {t('dashboard.onApprovedLeave', 'You are on approved leave today')}
                   </p>
-                  <p className="text-[11px] text-blue/70">
+                  <p className="text-[13px] text-blue/70">
                     {t('dashboard.noCheckinRequired', 'No check-in required.')}
                   </p>
                 </div>
@@ -278,10 +278,10 @@ export function EmployeeDashboard() {
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <LogIn size={14} className="text-green" />
-                  <span className="text-[13px] text-text-primary font-sans">
+                  <span className="text-[15px] text-text-primary font-sans">
                     {t('dashboard.checkInTime', 'Check-in')}:
                   </span>
-                  <span className="text-[12.5px] text-text-secondary font-mono tabular-nums">
+                  <span className="text-[14.5px] text-text-secondary font-mono tabular-nums">
                     {formatTime(today?.checkInAt ?? null)}
                   </span>
                   {today?.isLate && (
@@ -291,10 +291,10 @@ export function EmployeeDashboard() {
                 {checkedOut && (
                   <div className="flex items-center gap-2">
                     <LogOut size={14} className="text-blue" />
-                    <span className="text-[13px] text-text-primary font-sans">
+                    <span className="text-[15px] text-text-primary font-sans">
                       {t('dashboard.checkOutTime', 'Check-out')}:
                     </span>
-                    <span className="text-[12.5px] text-text-secondary font-mono tabular-nums">
+                    <span className="text-[14.5px] text-text-secondary font-mono tabular-nums">
                       {formatTime(today?.checkOutAt ?? null)}
                     </span>
                   </div>
@@ -302,18 +302,18 @@ export function EmployeeDashboard() {
               </div>
             ) : (
               <div className="space-y-3">
-                <p className="text-[13px] text-text-secondary font-sans">
+                <p className="text-[15px] text-text-secondary font-sans">
                   {t('dashboard.readyToCheckIn', 'You have not checked in yet today.')}
                 </p>
 
                 {actionError && (
-                  <div className="bg-red/10 border border-red/20 rounded-xl px-4 py-2.5 text-[12px] text-red font-medium font-sans">
+                  <div className="bg-red/10 border border-red/20 rounded-xl px-4 py-2.5 text-[14px] text-red font-medium font-sans">
                     {actionError}
                   </div>
                 )}
 
                 {locationDenied && (
-                  <div className="flex items-center gap-1.5 text-[11px] text-amber font-sans">
+                  <div className="flex items-center gap-1.5 text-[13px] text-amber font-sans">
                     <MapPinOff size={12} />
                     {t('dashboard.locationDenied', 'Location access denied. Check-in sent without location.')}
                   </div>
@@ -322,7 +322,7 @@ export function EmployeeDashboard() {
                 <button
                   onClick={handleCheckin}
                   disabled={checkinAction.isPending}
-                  className="w-full bg-coffee text-white text-[15px] font-semibold rounded-xl py-3.5 border-none cursor-pointer shadow-[0_4px_14px_rgba(107,66,38,0.30)] active:scale-[0.97] transition-transform disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full bg-coffee text-white text-[17px] font-semibold rounded-xl py-3.5 border-none cursor-pointer shadow-[0_4px_14px_rgba(107,66,38,0.30)] active:scale-[0.97] transition-transform disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {checkinAction.isPending ? (
                     <>
@@ -343,13 +343,13 @@ export function EmployeeDashboard() {
             {checkedIn && !checkedOut && (
               <div className="mt-3">
                 {actionError && (
-                  <div className="bg-red/10 border border-red/20 rounded-xl px-4 py-2.5 text-[12px] text-red font-medium font-sans mb-3">
+                  <div className="bg-red/10 border border-red/20 rounded-xl px-4 py-2.5 text-[14px] text-red font-medium font-sans mb-3">
                     {actionError}
                   </div>
                 )}
 
                 {locationDenied && (
-                  <div className="flex items-center gap-1.5 text-[11px] text-amber font-sans mb-3">
+                  <div className="flex items-center gap-1.5 text-[13px] text-amber font-sans mb-3">
                     <MapPinOff size={12} />
                     {t('dashboard.locationDenied', 'Location access denied. Check-in sent without location.')}
                   </div>
@@ -358,7 +358,7 @@ export function EmployeeDashboard() {
                 <button
                   onClick={handleCheckin}
                   disabled={checkinAction.isPending}
-                  className="w-full bg-glass-bg backdrop-blur-sm text-text-primary text-[14px] font-medium rounded-xl py-3 border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3 disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full bg-glass-bg backdrop-blur-sm text-text-primary text-[16px] font-medium rounded-xl py-3 border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {checkinAction.isPending ? (
                     <>
@@ -382,33 +382,33 @@ export function EmployeeDashboard() {
       <div className="grid grid-cols-3 gap-4 mb-6">
         <GlassCard hover={false}>
           <div className="p-4">
-            <p className="text-[11px] text-text-tertiary uppercase tracking-[1px] mb-1">Today</p>
-            <p className={cn('text-[24px] font-bold tabular-nums', completed ? 'text-green' : checkedIn ? 'text-blue' : 'text-text-tertiary')}>
+            <p className="text-[13px] text-text-tertiary uppercase tracking-[1px] mb-1">Today</p>
+            <p className={cn('text-[26px] font-bold tabular-nums', completed ? 'text-green' : checkedIn ? 'text-blue' : 'text-text-tertiary')}>
               {completed ? 'Done' : checkedIn ? 'In' : '—'}
             </p>
-            <p className="text-[11px] text-text-tertiary mt-1">
+            <p className="text-[13px] text-text-tertiary mt-1">
               {completed ? 'Checked in and out' : checkedIn ? 'Checked in, awaiting checkout' : 'Not checked in yet'}
             </p>
           </div>
         </GlassCard>
         <GlassCard hover={false}>
           <div className="p-4">
-            <p className="text-[11px] text-text-tertiary uppercase tracking-[1px] mb-1">Check-in</p>
-            <p className="text-[24px] font-bold text-text-primary tabular-nums font-mono">
+            <p className="text-[13px] text-text-tertiary uppercase tracking-[1px] mb-1">Check-in</p>
+            <p className="text-[26px] font-bold text-text-primary tabular-nums font-mono">
               {today?.checkInAt || '—'}
             </p>
-            <p className="text-[11px] text-text-tertiary mt-1">
+            <p className="text-[13px] text-text-tertiary mt-1">
               {today?.isLate ? 'Late arrival' : today?.checkInAt ? 'On time' : 'Awaiting'}
             </p>
           </div>
         </GlassCard>
         <GlassCard hover={false}>
           <div className="p-4">
-            <p className="text-[11px] text-text-tertiary uppercase tracking-[1px] mb-1">Check-out</p>
-            <p className="text-[24px] font-bold text-text-primary tabular-nums font-mono">
+            <p className="text-[13px] text-text-tertiary uppercase tracking-[1px] mb-1">Check-out</p>
+            <p className="text-[26px] font-bold text-text-primary tabular-nums font-mono">
               {today?.checkOutAt || '—'}
             </p>
-            <p className="text-[11px] text-text-tertiary mt-1">
+            <p className="text-[13px] text-text-tertiary mt-1">
               {today?.checkOutAt ? 'Recorded' : checkedIn ? 'Pending' : 'Awaiting'}
             </p>
           </div>
@@ -429,7 +429,7 @@ export function EmployeeDashboard() {
 
             if (!closures) {
               return (
-                <p className="text-[13px] text-text-tertiary font-sans">
+                <p className="text-[15px] text-text-tertiary font-sans">
                   {t('common.loading', 'Loading...')}
                 </p>
               );
@@ -437,7 +437,7 @@ export function EmployeeDashboard() {
 
             if (upcoming.length === 0) {
               return (
-                <p className="text-[13px] text-text-tertiary font-sans text-center py-2">
+                <p className="text-[15px] text-text-tertiary font-sans text-center py-2">
                   {t('dashboard.noUpcomingClosures', 'No upcoming closures')}
                 </p>
               );
@@ -453,8 +453,8 @@ export function EmployeeDashboard() {
                     <div key={c.publicId} className="flex items-center gap-3 py-2">
                       <CalendarOff size={14} className={isActive ? 'text-red shrink-0' : 'text-amber shrink-0'} />
                       <div className="flex-1">
-                        <p className="text-[13px] text-text-primary font-sans">{c.name}</p>
-                        <p className="text-[11px] text-text-tertiary font-sans">
+                        <p className="text-[15px] text-text-primary font-sans">{c.name}</p>
+                        <p className="text-[13px] text-text-tertiary font-sans">
                           {fmtDate(c.startDate)}{c.startDate !== c.endDate ? ` – ${fmtDate(c.endDate)}` : ''}
                         </p>
                       </div>
@@ -488,14 +488,14 @@ export function EmployeeDashboard() {
                 <div key={leave.publicId} className="flex items-center gap-3 py-2">
                   <CalendarOff size={14} className={leave.status === 'pending' ? 'text-amber shrink-0' : 'text-green shrink-0'} />
                   <div className="flex-1">
-                    <p className="text-[13px] text-text-primary font-sans">
+                    <p className="text-[15px] text-text-primary font-sans">
                       {fmtDate(leave.startDate)}{leave.startDate !== leave.endDate ? ` – ${fmtDate(leave.endDate)}` : ''}
                       {!leave.isFullDay && leave.startTime && leave.endTime && (
-                        <span className="text-[11px] text-text-tertiary ml-1">{leave.startTime}–{leave.endTime}</span>
+                        <span className="text-[13px] text-text-tertiary ml-1">{leave.startTime}–{leave.endTime}</span>
                       )}
                     </p>
                     {leave.reason && (
-                      <p className="text-[11px] text-text-tertiary font-sans truncate max-w-62.5">{leave.reason}</p>
+                      <p className="text-[13px] text-text-tertiary font-sans truncate max-w-62.5">{leave.reason}</p>
                     )}
                   </div>
                   <StatusBadge
@@ -570,12 +570,12 @@ export function EmployeeDashboard() {
                     className="flex items-center gap-3 px-5 py-2.5 transition-colors duration-120 hover:bg-cream-3/35 cursor-default"
                   >
                     <CalendarDays size={14} className="text-text-tertiary shrink-0" />
-                    <span className="text-[13px] text-text-primary font-sans flex-1">
+                    <span className="text-[15px] text-text-primary font-sans flex-1">
                       {day.label}
                     </span>
                     {day.checkedIn ? (
                       <>
-                        <span className="text-[12.5px] text-text-secondary font-mono tabular-nums">
+                        <span className="text-[14.5px] text-text-secondary font-mono tabular-nums">
                           {formatTime(day.checkInAt)}
                           {day.checkOutAt ? ` \u2192 ${formatTime(day.checkOutAt)}` : ''}
                         </span>
@@ -596,7 +596,7 @@ export function EmployeeDashboard() {
                 ));
               })()
             ) : (
-              <p className="px-5 py-8 text-center text-[13px] text-text-tertiary font-sans">
+              <p className="px-5 py-8 text-center text-[15px] text-text-tertiary font-sans">
                 {t('dashboard.noRecentAttendance', 'No recent attendance data')}
               </p>
             )}
@@ -627,7 +627,7 @@ export function EmployeeDashboard() {
                 closures={closures}
               />
             ) : (
-              <p className="text-[13px] text-text-tertiary font-sans text-center py-4">
+              <p className="text-[15px] text-text-tertiary font-sans text-center py-4">
                 {t('dashboard.noWorkspace', 'No workspace linked')}
               </p>
             )}
@@ -696,18 +696,18 @@ function EmployeeLeaveList({
     <>
       <button
         onClick={() => setShowModal(true)}
-        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light transition-colors mb-4"
+        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[15px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light transition-colors mb-4"
       >
         <Plus size={14} />
         {t('leave.submitRequest', 'Submit leave request')}
       </button>
 
       {isLoading ? (
-        <p className="text-[13px] text-text-tertiary font-sans">
+        <p className="text-[15px] text-text-tertiary font-sans">
           {t('common.loading', 'Loading...')}
         </p>
       ) : myLeaves.length === 0 ? (
-        <p className="text-[13px] text-text-tertiary font-sans text-center py-2">
+        <p className="text-[15px] text-text-tertiary font-sans text-center py-2">
           {t('dashboard.noLeaveRequests', 'No leave requests')}
         </p>
       ) : (
@@ -719,17 +719,17 @@ function EmployeeLeaveList({
             >
               <CalendarOff size={14} className="text-text-tertiary shrink-0" />
               <div className="flex-1">
-                <p className="text-[13px] text-text-primary font-sans">
+                <p className="text-[15px] text-text-primary font-sans">
                   {formatDate(leave.startDate)}
                   {leave.startDate !== leave.endDate && ` \u2013 ${formatDate(leave.endDate)}`}
                   {!leave.isFullDay && leave.startTime && leave.endTime && (
-                    <span className="text-[11px] text-text-tertiary ml-1">
+                    <span className="text-[13px] text-text-tertiary ml-1">
                       {leave.startTime}–{leave.endTime}
                     </span>
                   )}
                 </p>
                 {leave.reason && (
-                  <p className="text-[11px] text-text-tertiary font-sans truncate max-w-50">
+                  <p className="text-[13px] text-text-tertiary font-sans truncate max-w-50">
                     {leave.reason}
                   </p>
                 )}

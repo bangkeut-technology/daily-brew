@@ -27,10 +27,10 @@ export function LandingFooter() {
             viewport={{ once: true }}
             transition={{ duration: 0.4 }}
           >
-            <h4 className="text-[18px] font-semibold text-coffee font-serif mb-2">
+            <h4 className="text-[20px] font-semibold text-coffee font-serif mb-2">
               DailyBrew
             </h4>
-            <p className="text-[12px] text-text-secondary leading-relaxed max-w-[220px]">
+            <p className="text-[14px] text-text-secondary leading-relaxed max-w-[220px]">
               Staff attendance and leave tracking for restaurants. Simple, warm,
               and built for teams that move fast.
             </p>
@@ -43,7 +43,7 @@ export function LandingFooter() {
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: 0.1 }}
           >
-            <p className="text-[11px] uppercase tracking-[1.5px] font-medium text-text-tertiary mb-4">
+            <p className="text-[13px] uppercase tracking-[1.5px] font-medium text-text-tertiary mb-4">
               Product
             </p>
             <ul className="space-y-2.5">
@@ -51,7 +51,7 @@ export function LandingFooter() {
                 <li key={link.to}>
                   <Link
                     to={link.to}
-                    className="text-[13px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
+                    className="text-[15px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
                   >
                     {link.label}
                   </Link>
@@ -67,7 +67,7 @@ export function LandingFooter() {
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: 0.2 }}
           >
-            <p className="text-[11px] uppercase tracking-[1.5px] font-medium text-text-tertiary mb-4">
+            <p className="text-[13px] uppercase tracking-[1.5px] font-medium text-text-tertiary mb-4">
               Legal
             </p>
             <ul className="space-y-2.5">
@@ -75,7 +75,7 @@ export function LandingFooter() {
                 <li key={link.to}>
                   <Link
                     to={link.to}
-                    className="text-[13px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
+                    className="text-[15px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
                   >
                     {link.label}
                   </Link>
@@ -91,14 +91,14 @@ export function LandingFooter() {
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: 0.3 }}
           >
-            <p className="text-[11px] uppercase tracking-[1.5px] font-medium text-text-tertiary mb-4">
+            <p className="text-[13px] uppercase tracking-[1.5px] font-medium text-text-tertiary mb-4">
               Get started
             </p>
             <ul className="space-y-2.5">
               <li>
                 <Link
                   to="/sign-up"
-                  className="text-[13px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
+                  className="text-[15px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
                 >
                   Create account
                 </Link>
@@ -106,7 +106,7 @@ export function LandingFooter() {
               <li>
                 <Link
                   to="/sign-in"
-                  className="text-[13px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
+                  className="text-[15px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
                 >
                   Sign in
                 </Link>
@@ -123,10 +123,10 @@ export function LandingFooter() {
           viewport={{ once: true }}
           transition={{ duration: 0.4, delay: 0.3 }}
         >
-          <p className="text-[11px] text-text-tertiary">
+          <p className="text-[13px] text-text-tertiary">
             DailyBrew &copy; {new Date().getFullYear()}. All rights reserved.
           </p>
-          <p className="text-[11px] text-text-tertiary">
+          <p className="text-[13px] text-text-tertiary">
             <span className="inline-flex items-center gap-1">Made with <Coffee size={12} className="text-coffee" /> for restaurants everywhere</span>
           </p>
         </motion.div>
