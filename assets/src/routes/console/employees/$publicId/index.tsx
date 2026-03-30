@@ -17,6 +17,7 @@ import { Toggle } from '@/components/shared/Toggle';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
+import { useDateFormat } from '@/hooks/useDateFormat';
 
 const editEmployeeSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -39,6 +40,7 @@ function EmployeeDetailPage() {
   const { publicId } = Route.useParams();
   const workspaceId = getWorkspacePublicId() || '';
   const { data: employee, isLoading } = useEmployee(workspaceId, publicId);
+  const fmtDate = useDateFormat();
   const { data: shifts } = useShifts(workspaceId);
   const updateEmployee = useUpdateEmployee(workspaceId);
   const [isEditing, setIsEditing] = useState(false);
@@ -147,9 +149,9 @@ function EmployeeDetailPage() {
         }
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Info card */}
-        <GlassCard hover={false}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Info card — full width */}
+        <GlassCard hover={false} className="lg:col-span-2">
           {isEditing ? (
             <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
               <div>
@@ -249,68 +251,71 @@ function EmployeeDetailPage() {
             </form>
           ) : (
             <div className="p-6">
-              <div className="flex flex-col items-center text-center">
-                <Avatar name={fullName} index={0} size={64} radius="20px" />
-                <h2 className="text-[16px] font-semibold text-text-primary mt-3">{fullName}</h2>
-                <div className="mt-3">
-                  <StatusBadge
-                    label={employee.active ? t('employee.active') : t('employee.inactive')}
-                    variant={employee.active ? 'green' : 'gray'}
-                  />
+              <div className="flex items-start gap-6">
+                {/* Left: avatar + name */}
+                <div className="flex items-center gap-4 flex-shrink-0">
+                  <Avatar name={fullName} index={0} size={64} radius="20px" />
+                  <div>
+                    <h2 className="text-[16px] font-semibold text-text-primary">{fullName}</h2>
+                    {employee.username && (
+                      <p className="text-[12px] text-text-tertiary font-mono mt-0.5">@{employee.username}</p>
+                    )}
+                    <div className="mt-1.5">
+                      <StatusBadge
+                        label={employee.active ? t('employee.active') : t('employee.inactive')}
+                        variant={employee.active ? 'green' : 'gray'}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: details grid */}
+                <div className="flex-1 grid grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3">
+                  <div>
+                    <span className="text-[11px] text-text-tertiary block">{t('employee.shift', 'Shift')}</span>
+                    <span className="text-[13px] font-medium text-text-primary">{employee.shiftName || t('employee.noShift', 'No shift')}</span>
+                  </div>
+                  {employee.phoneNumber && (
+                    <div>
+                      <span className="text-[11px] text-text-tertiary block">{t('employee.phone', 'Phone')}</span>
+                      <span className="text-[13px] font-medium text-text-primary font-mono">{employee.phoneNumber}</span>
+                    </div>
+                  )}
+                  {employee.dob && (
+                    <div>
+                      <span className="text-[11px] text-text-tertiary block">{t('employee.dob', 'Date of birth')}</span>
+                      <span className="text-[13px] text-text-secondary">{fmtDate(employee.dob)}</span>
+                    </div>
+                  )}
+                  {employee.joinedAt && (
+                    <div>
+                      <span className="text-[11px] text-text-tertiary block">{t('employee.joinedAt', 'Join date')}</span>
+                      <span className="text-[13px] text-text-secondary">{fmtDate(employee.joinedAt)}</span>
+                    </div>
+                  )}
+                  <div>
+                    <span className="text-[11px] text-text-tertiary block">Created</span>
+                    <span className="text-[13px] text-text-secondary">{fmtDate(employee.createdAt)}</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="mt-5 space-y-3">
-                <div className="flex items-center justify-between py-2 border-b border-cream-3/50">
-                  <span className="text-[11.5px] text-text-tertiary">{t('employee.shift', 'Shift')}</span>
-                  <span className="text-[12.5px] font-medium text-text-primary">
-                    {employee.shiftName || t('employee.noShift', 'No shift')}
-                  </span>
-                </div>
-                {employee.phoneNumber && (
-                  <div className="flex items-center justify-between py-2 border-b border-cream-3/50">
-                    <span className="text-[11.5px] text-text-tertiary">{t('employee.phone', 'Phone')}</span>
-                    <span className="text-[12.5px] font-medium text-text-primary font-mono">{employee.phoneNumber}</span>
-                  </div>
-                )}
-                {employee.dob && (
-                  <div className="flex items-center justify-between py-2 border-b border-cream-3/50">
-                    <span className="text-[11.5px] text-text-tertiary">{t('employee.dob', 'Date of birth')}</span>
-                    <span className="text-[12.5px] text-text-secondary">
-                      {new Date(employee.dob).toLocaleDateString()}
-                    </span>
-                  </div>
-                )}
-                {employee.joinedAt && (
-                  <div className="flex items-center justify-between py-2 border-b border-cream-3/50">
-                    <span className="text-[11.5px] text-text-tertiary">{t('employee.joinedAt', 'Join date')}</span>
-                    <span className="text-[12.5px] text-text-secondary">
-                      {new Date(employee.joinedAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                )}
-                <div className="flex items-center justify-between py-2 border-b border-cream-3/50">
-                  <span className="text-[11.5px] text-text-tertiary">Created</span>
-                  <span className="text-[12.5px] text-text-secondary">
-                    {new Date(employee.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-
-                {/* Linked user info */}
+              {/* Linked user status */}
+              <div className="mt-5">
                 {employee.linkedUserEmail ? (
                   <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-green/8 border border-green/15">
                     <Mail size={13} className="text-green flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <span className="text-[12px] text-green font-medium truncate block">{employee.linkedUserEmail}</span>
-                      <span className="text-[10.5px] text-green/70">Can view their own dashboard</span>
+                      <span className="text-[10.5px] text-green/70">Can check in and view own dashboard</span>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-amber/8 border border-amber/15">
-                    <Info size={13} className="text-amber flex-shrink-0" />
+                  <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-red/8 border border-red/15">
+                    <Info size={13} className="text-red flex-shrink-0" />
                     <div>
-                      <span className="text-[11.5px] text-amber font-medium block">No user account linked</span>
-                      <span className="text-[10.5px] text-amber/70">This employee can only check in via QR code</span>
+                      <span className="text-[11.5px] text-red font-medium block">No user account linked</span>
+                      <span className="text-[10.5px] text-red/70">This employee cannot check in until linked</span>
                     </div>
                   </div>
                 )}
@@ -319,12 +324,7 @@ function EmployeeDetailPage() {
           )}
         </GlassCard>
 
-        {/* Link User */}
-        <div className="flex flex-col gap-6">
-            </div>
-          </GlassCard>
-
-          {/* Link user section */}
+        {/* Link user section */}
           <GlassCard hover={false}>
             <GlassCardHeader
               title={t('employee.linkUser', 'Link user account')}
@@ -338,7 +338,7 @@ function EmployeeDetailPage() {
               {employee.linkedUserEmail ? (
                 <>
                   <p className="text-[11.5px] text-text-tertiary leading-relaxed">
-                    This employee is linked to a user account. They can sign in to DailyBrew and view their own attendance, shifts, and leave requests.
+                    This employee can check in by scanning the workspace QR code while signed in. They can also view their own attendance and shifts.
                   </p>
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-lg bg-green/10 flex items-center justify-center flex-shrink-0">
@@ -373,7 +373,7 @@ function EmployeeDetailPage() {
               ) : (
                 <>
                   <p className="text-[11.5px] text-text-tertiary leading-relaxed">
-                    Linking a user account lets this employee sign in and view their own attendance and shifts. Without a linked account, they can only check in via QR code.
+                    A linked user account is required for check-in. The employee signs in on their phone and scans the workspace QR code to check in and out.
                   </p>
                   <div>
                     <p className="text-[12px] font-medium text-text-secondary mb-1.5">
@@ -432,10 +432,9 @@ function EmployeeDetailPage() {
               )}
             </div>
           </GlassCard>
-        </div>
 
         {/* Attendance history */}
-        <GlassCard hover={false} className="lg:col-span-1">
+        <GlassCard hover={false}>
           <GlassCardHeader
             title={t('employee.attendanceHistory', 'Attendance history')}
             action={
@@ -453,7 +452,7 @@ function EmployeeDetailPage() {
                   {t('employee.noAttendance', 'No attendance records')}
                 </p>
                 <p className="text-[11px] text-text-tertiary mt-1">
-                  Records will appear here after the first check-in via QR code.
+                  Records will appear here after the employee's first check-in.
                 </p>
               </div>
             ) : (
@@ -464,7 +463,7 @@ function EmployeeDetailPage() {
                 >
                   <div>
                     <div className="text-[12.5px] font-mono tabular-nums text-text-primary">
-                      {a.date}
+                      {fmtDate(a.date)}
                     </div>
                     <div className="text-[11px] text-text-tertiary">
                       {a.checkInAt || '--:--'} &rarr; {a.checkOutAt || '--:--'}

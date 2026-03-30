@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { CalendarDays, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 
 interface CustomDatePickerProps {
@@ -36,8 +37,9 @@ type PickerView = 'days' | 'months' | 'years';
 export function CustomDatePicker({ value, onChange, className = '' }: CustomDatePickerProps) {
   const [open, setOpen] = useState(false);
   const [pickerView, setPickerView] = useState<PickerView>('days');
-  const ref = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState<{ top: number; left: number; width: number; dropUp: boolean }>({ top: 0, left: 0, width: 0, dropUp: false });
 
   const parsed = value ? new Date(value) : new Date();
   const [viewYear, setViewYear] = useState(parsed.getFullYear());
@@ -55,24 +57,32 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
     if (!open) setPickerView('days');
   }, [open]);
 
+  // Close on outside click
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+    if (!open) return;
+    const handleClick = (e: MouseEvent) => {
+      if (
+        triggerRef.current?.contains(e.target as Node) ||
+        dropdownRef.current?.contains(e.target as Node)
+      ) return;
+      setOpen(false);
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [open]);
 
-  // Position dropdown above if it would overflow below
-  const [dropUp, setDropUp] = useState(false);
-  useEffect(() => {
-    if (open && ref.current) {
-      const rect = ref.current.getBoundingClientRect();
-      const spaceBelow = window.innerHeight - rect.bottom;
-      setDropUp(spaceBelow < 340);
-    }
+  // Position
+  useLayoutEffect(() => {
+    if (!open || !triggerRef.current) return;
+    const rect = triggerRef.current.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const dropUp = spaceBelow < 340;
+    setPos({
+      top: dropUp ? rect.top + window.scrollY : rect.bottom + window.scrollY + 4,
+      left: rect.left + window.scrollX,
+      width: Math.max(rect.width, 280),
+      dropUp,
+    });
   }, [open]);
 
   const prevMonth = () => {
@@ -119,8 +129,9 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
     : '';
 
   return (
-    <div ref={ref} className={`relative ${className}`}>
+    <div className={`relative ${className}`}>
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen(!open)}
         className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none transition-colors cursor-pointer focus:border-coffee focus:ring-1 focus:ring-coffee/20"
@@ -131,12 +142,18 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
         </span>
       </button>
 
-      {open && (
+      {open && createPortal(
         <div
           ref={dropdownRef}
-          className={`absolute z-50 w-[280px] rounded-xl bg-glass-bg backdrop-blur-xl border border-glass-border shadow-lg overflow-hidden ${
-            dropUp ? 'bottom-full mb-1' : 'top-full mt-1'
-          }`}
+          style={{
+            position: 'absolute',
+            top: pos.dropUp ? undefined : pos.top,
+            bottom: pos.dropUp ? window.innerHeight - pos.top + 4 : undefined,
+            left: pos.left,
+            width: 280,
+            zIndex: 9999,
+          }}
+          className="rounded-xl bg-glass-bg backdrop-blur-xl border border-glass-border shadow-lg overflow-hidden"
         >
           {/* Header */}
           <div className="flex items-center justify-between px-3 py-2.5 border-b border-cream-3/60">
@@ -149,7 +166,6 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
             </button>
 
             <div className="flex items-center gap-1">
-              {/* Month selector */}
               <button
                 type="button"
                 onClick={() => setPickerView(pickerView === 'months' ? 'days' : 'months')}
@@ -163,7 +179,6 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
                 <ChevronDown size={11} className="text-text-tertiary" />
               </button>
 
-              {/* Year selector */}
               <button
                 type="button"
                 onClick={() => setPickerView(pickerView === 'years' ? 'days' : 'years')}
@@ -187,7 +202,7 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
             </button>
           </div>
 
-          {/* Month picker grid */}
+          {/* Month picker */}
           {pickerView === 'months' && (
             <div className="grid grid-cols-3 gap-1 p-2">
               {MONTHS.map((m, i) => (
@@ -209,7 +224,7 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
             </div>
           )}
 
-          {/* Year picker grid */}
+          {/* Year picker */}
           {pickerView === 'years' && (
             <div className="grid grid-cols-4 gap-1 p-2 max-h-[220px] overflow-y-auto">
               {yearRange.map((y) => (
@@ -284,7 +299,8 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
               </div>
             </>
           )}
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

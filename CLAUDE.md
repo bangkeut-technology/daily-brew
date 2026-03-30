@@ -9,8 +9,8 @@ Symfony backend + React frontend (Symfony Webpack Encore).
 
 - Restaurant owners sign up, create a Workspace (their restaurant)
 - Owner creates Employees and assigns them a Shift
-- Each Employee gets a unique QR code (separate `qrToken`, not the `publicId`)
-- Staff scan the QR code on their phone → mobile web page opens → tap Check In
+- Each Workspace has a single QR code displayed at the restaurant
+- Employees sign in on their phone and scan the workspace QR → check in/out recorded
 - Attendance is recorded and compared against their Shift to detect late arrivals and early departures
 - Staff submit Leave Requests via mobile web page; owner approves or rejects from dashboard
 - Owner defines Closures (date ranges when restaurant is closed) — no attendance expected during these periods
@@ -68,6 +68,7 @@ Users can be owners (create workspaces) or employees (linked to an employee reco
 **Workspace**
 - id, publicId
 - name (restaurant name)
+- qrToken (string 24, unique) — used in check-in QR code URL (one QR per workspace)
 - ownerId → User (ManyToOne)
 - createdAt, updatedAt
 
@@ -112,7 +113,6 @@ Users can be owners (create workspaces) or employees (linked to an employee reco
 - phoneNumber (nullable)
 - dob (date, nullable) — date of birth
 - joinedAt (date, nullable) — join date
-- qrToken (string 24, unique) — used exclusively in QR code check-in URL (NOT publicId)
 - status (enum: active/inactive, default active)
 - deletedAt (datetime, nullable) — soft delete
 - createdAt, updatedAt
@@ -152,11 +152,12 @@ Before creating any attendance record, check if the date falls within any Closur
 ### Late / left early detection
 Computed at check-in/out time relative to the Employee's assigned Shift + grace minutes. If no Shift, always false.
 
-### QR check-in — separate token from publicId
-- `qrToken` is a 20-char random string generated on employee creation
-- QR encodes `https://dailybrew.work/checkin/{qrToken}`
-- `publicId` is used only for account linking and API references — NEVER in QR URLs
-- This prevents someone who receives a publicId for linking from using it to check in
+### QR check-in — workspace-level QR code
+- Each workspace has a `qrToken` (20-char random string) generated on creation
+- QR encodes `https://dailybrew.work/checkin/{workspaceQrToken}`
+- ONE QR code per workspace — displayed at the restaurant entrance
+- Employee must be signed in to check in — system resolves employee from auth session + workspace
+- All employees need a linked user account to check in
 
 ### QR check-in IP restriction
 On check-in via QR:
@@ -164,12 +165,12 @@ On check-in via QR:
 2. If enabled and `allowedIps` is empty → allow (misconfiguration fallback)
 3. If enabled → check request IP against `allowedIps` → reject with 403 if not matched
 
-### QR check-in auth for linked users
-If an employee has a `linkedUser`:
-1. The check-in page requires the linked user to be signed in
-2. Shows "Sign in required" with a sign-in button if not authenticated
-3. Shows "Verified account" badge when the correct user is signed in
-4. Unlinked employees (QR-only staff) keep the fully public check-in flow
+### QR check-in auth (always required)
+1. Employee scans workspace QR → opens check-in page
+2. If not signed in → shows "Sign in required" with sign-in button
+3. If signed in → backend resolves employee from user + workspace
+4. If no employee record found → 403 "You are not registered as an employee in this workspace"
+5. If found → shows check-in/out button with "Verified" badge
 
 ### Device verification (Espresso)
 Prevents fraud by binding check-in/out to a single device per employee per day.

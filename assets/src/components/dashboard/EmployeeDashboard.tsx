@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { useRoleContext } from '@/hooks/queries/useRoleContext';
 import { useCheckinStatus, useCheckinAction } from '@/hooks/queries/useCheckin';
+import { useWorkspace } from '@/hooks/queries/useWorkspaces';
+import { getWorkspacePublicId } from '@/lib/auth';
 import { useLeaveRequests } from '@/hooks/queries/useLeaveRequests';
 import { Avatar } from '@/components/shared/Avatar';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
@@ -38,10 +40,12 @@ export function EmployeeDashboard() {
   const { data: ctx, isLoading: ctxLoading } = useRoleContext();
 
   const employee = ctx?.employee ?? null;
-  const qrToken = employee?.qrToken ?? '';
+  const workspaceId = getWorkspacePublicId() || '';
+  const { data: workspace } = useWorkspace(workspaceId);
+  const workspaceQrToken = workspace?.qrToken ?? '';
 
-  const { data: checkinData, isLoading: checkinLoading, refetch } = useCheckinStatus(qrToken);
-  const checkinAction = useCheckinAction(qrToken);
+  const { data: checkinData, isLoading: checkinLoading, refetch } = useCheckinStatus(workspaceQrToken);
+  const checkinAction = useCheckinAction(workspaceQrToken);
 
   const [actionError, setActionError] = useState<string | null>(null);
   const [locationDenied, setLocationDenied] = useState(false);

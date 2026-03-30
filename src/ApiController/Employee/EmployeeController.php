@@ -15,7 +15,7 @@ use App\Repository\WorkspaceRepository;
 use App\Security\Voter\WorkspaceVoter;
 use App\Service\EmployeeService;
 use App\Service\PlanService;
-use Doctrine\ORM\EntityManagerInterface;
+
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -55,7 +55,6 @@ class EmployeeController extends AbstractController
         UserRepository $userRepository,
         EmployeeService $employeeService,
         PlanService $planService,
-        EntityManagerInterface $em,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
         if ($workspace === null) {
@@ -113,7 +112,7 @@ class EmployeeController extends AbstractController
             }
         }
 
-        $em->flush();
+        $employeeRepository->flush();
 
         return $this->jsonCreated(EmployeeDTO::fromEntity($employee)->toArray());
     }
@@ -214,6 +213,8 @@ class EmployeeController extends AbstractController
                 }
             }
         }
+
+        $employeeRepository->flush();
 
         return $this->jsonSuccess(EmployeeDTO::fromEntity($employee)->toArray());
     }

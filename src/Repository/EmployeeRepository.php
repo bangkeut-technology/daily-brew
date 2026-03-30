@@ -8,22 +8,16 @@ use App\Entity\Employee;
 use App\Entity\User;
 use App\Entity\Workspace;
 use App\Enum\EmployeeStatusEnum;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Employee>
+ * @extends AbstractRepository<Employee>
  */
-class EmployeeRepository extends ServiceEntityRepository
+class EmployeeRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Employee::class);
-    }
-
-    public function findByPublicId(string $publicId): ?Employee
-    {
-        return $this->findOneBy(['publicId' => $publicId]);
+        parent::__construct($registry, Employee::class, 12);
     }
 
     /** @return Employee[] */

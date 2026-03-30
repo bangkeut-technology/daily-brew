@@ -16,6 +16,7 @@ export interface AuthResponse {
 export interface Workspace {
   publicId: string;
   name: string;
+  qrToken: string;
   createdAt?: string;
 }
 
@@ -59,7 +60,6 @@ export interface ClosurePeriod {
 
 export interface Employee {
   publicId: string;
-  qrToken: string;
   firstName: string;
   lastName: string;
   name: string;
@@ -123,7 +123,6 @@ export interface CheckinStatus {
   shiftName: string | null;
   shiftStart: string | null;
   shiftEnd: string | null;
-  linkedUserPublicId: string | null;
   today: {
     checkedIn: boolean;
     checkedOut: boolean;
@@ -163,7 +162,6 @@ export interface RoleContext {
   ownedWorkspaces: { publicId: string; name: string }[];
   employee: {
     publicId: string;
-    qrToken: string;
     name: string;
     workspacePublicId: string | null;
     workspaceName: string | null;

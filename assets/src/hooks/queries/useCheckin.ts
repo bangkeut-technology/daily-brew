@@ -1,27 +1,25 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import { axios } from '@/lib/apiAxios';
 import type { CheckinStatus, CheckinResponse } from '@/types';
 import { getDeviceId, getDeviceName } from '@/lib/device';
 
-const checkinApi = axios.create({ baseURL: '/api/v1' });
-
-export function useCheckinStatus(qrToken: string) {
+export function useCheckinStatus(workspaceQrToken: string) {
   return useQuery({
-    queryKey: ['checkin', qrToken],
+    queryKey: ['checkin', workspaceQrToken],
     queryFn: async () => {
-      const { data } = await checkinApi.get<CheckinStatus>(`/checkin/${qrToken}`);
+      const { data } = await axios.get<CheckinStatus>(`/checkin/${workspaceQrToken}`);
       return data;
     },
-    enabled: !!qrToken,
+    enabled: !!workspaceQrToken,
   });
 }
 
-export function useCheckinAction(qrToken: string) {
+export function useCheckinAction(workspaceQrToken: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (coords?: { latitude: number; longitude: number }) => {
-      const { data } = await checkinApi.post<CheckinResponse>(
-        `/checkin/${qrToken}`,
+      const { data } = await axios.post<CheckinResponse>(
+        `/checkin/${workspaceQrToken}`,
         {
           ...coords,
           deviceId: getDeviceId(),
@@ -31,7 +29,7 @@ export function useCheckinAction(qrToken: string) {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['checkin', qrToken] });
+      queryClient.invalidateQueries({ queryKey: ['checkin', workspaceQrToken] });
     },
   });
 }

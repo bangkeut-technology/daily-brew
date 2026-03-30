@@ -3,12 +3,15 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import * as Dialog from '@radix-ui/react-dialog';
-import { Crown, Check, MapPin, Navigation, Smartphone, Building2, Users, Calendar, Plus, X } from 'lucide-react';
+import { Crown, Check, MapPin, Navigation, Smartphone, Building2, Users, Calendar, Plus, X, Copy, ExternalLink, Pencil } from 'lucide-react';
+import { useDateFormat } from '@/hooks/useDateFormat';
+import { QRCodeSVG } from 'qrcode.react';
 import { UpgradeModal } from '@/components/shared/UpgradeModal';
 import { useUpgradeModal } from '@/hooks/useUpgradeModal';
 import {
   useWorkspaces,
   useCreateWorkspace,
+  useUpdateWorkspace,
   useWorkspaceSettings,
   useUpdateWorkspaceSettings,
 } from '@/hooks/queries/useWorkspaces';
@@ -60,13 +63,17 @@ function SettingsPage() {
   const currentWsId = getWorkspacePublicId() || '';
   const { data: workspaces } = useWorkspaces();
   const createWs = useCreateWorkspace();
+  const updateWs = useUpdateWorkspace();
   const { data: settings } = useWorkspaceSettings(currentWsId);
   const updateSettings = useUpdateWorkspaceSettings(currentWsId);
   const { data: plan } = usePlan(currentWsId);
   const { data: employees } = useEmployees(currentWsId);
   const { data: shifts } = useShifts(currentWsId);
   const upgradeModal = useUpgradeModal();
+  const fmtDate = useDateFormat();
   const [wsModalOpen, setWsModalOpen] = useState(false);
+  const [editingWsId, setEditingWsId] = useState<string | null>(null);
+  const [editWsName, setEditWsName] = useState('');
 
   const [ipEnabled, setIpEnabled] = useState(false);
   const [allowedIps, setAllowedIps] = useState('');
@@ -254,7 +261,7 @@ function SettingsPage() {
                   )}
                   {plan.isEspresso && plan.currentPeriodEnd && (
                     <div className="mt-4 text-[11px] text-text-tertiary">
-                      Renews {new Date(plan.currentPeriodEnd).toLocaleDateString()}
+                      Renews {fmtDate(plan.currentPeriodEnd)}
                     </div>
                   )}
                 </div>
@@ -262,6 +269,64 @@ function SettingsPage() {
             </div>
           </GlassCard>
         )}
+
+        {/* Workspace QR code for check-in */}
+        {currentWsId && (() => {
+          const currentWs = workspaces?.find((ws) => ws.publicId === currentWsId);
+          if (!currentWs?.qrToken) return null;
+          const checkinUrl = `${window.location.origin}/checkin/${currentWs.qrToken}`;
+          return (
+            <GlassCard hover={false}>
+              <GlassCardHeader title="Check-in QR code" />
+              <div className="px-5 py-2">
+                <p className="text-[11.5px] text-text-tertiary leading-relaxed">
+                  Display this QR code at your restaurant. Employees scan it with their phone while signed in to check in and out.
+                </p>
+              </div>
+              <div className="p-6 pt-2 flex flex-col items-center">
+                <div className="p-4 bg-white rounded-2xl shadow-[0_2px_12px_rgba(107,66,38,0.08)]">
+                  <QRCodeSVG
+                    value={checkinUrl}
+                    size={180}
+                    fgColor="#6B4226"
+                    bgColor="#FFFFFF"
+                    level="M"
+                    imageSettings={{
+                      src: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%236B4226" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>'),
+                      height: 24,
+                      width: 24,
+                      excavate: true,
+                    }}
+                  />
+                </div>
+                <a
+                  href={checkinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 flex items-center gap-1 text-[11px] text-coffee hover:text-coffee-light transition-colors no-underline"
+                >
+                  <ExternalLink size={10} />
+                  <span className="break-all text-center max-w-[240px]">{checkinUrl}</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(checkinUrl);
+                      toast.success('Link copied');
+                    } catch {
+                      toast.error('Failed to copy');
+                    }
+                  }}
+                  className="mt-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3"
+                >
+                  <Copy size={12} />
+                  Copy link
+                </button>
+              </div>
+            </GlassCard>
+          );
+        })()}
 
         {/* Workspace selector */}
         <GlassCard hover={false}>
@@ -282,72 +347,130 @@ function SettingsPage() {
               const isCurrent = ws.publicId === currentWsId;
               const wsEmployeeCount = isCurrent ? (employees?.length ?? 0) : 0;
               const wsShiftCount = isCurrent ? (shifts?.length ?? 0) : 0;
+              const isEditing = editingWsId === ws.publicId;
+
               return (
-                <button
+                <div
                   key={ws.publicId}
-                  onClick={() => {
-                    if (!isCurrent) {
-                      setWorkspacePublicId(ws.publicId);
-                      window.location.reload();
-                    }
-                  }}
                   className={`w-full text-left rounded-xl border-2 p-4 transition-all ${
                     isCurrent
-                      ? 'border-coffee bg-coffee/5 cursor-default'
-                      : 'border-cream-3 bg-glass-bg cursor-pointer hover:border-coffee/40 hover:-translate-y-px'
+                      ? 'border-coffee bg-coffee/5'
+                      : 'border-cream-3 bg-glass-bg'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-coffee/10 flex items-center justify-center flex-shrink-0">
-                      <span className="text-[13px] font-semibold text-coffee">
-                        {ws.name.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
+                  {isEditing ? (
+                    <div className="space-y-3">
+                      <input
+                        id={`ws-name-${ws.publicId}`}
+                        name="workspaceName"
+                        type="text"
+                        value={editWsName}
+                        onChange={(e) => setEditWsName(e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee transition-colors"
+                        autoFocus
+                      />
                       <div className="flex items-center gap-2">
-                        <span className="text-[13.5px] font-medium text-text-primary truncate">
-                          {ws.name}
-                        </span>
-                        {isCurrent && (
-                          <span className="text-[10px] font-medium px-1.5 py-px rounded-full bg-coffee/10 text-coffee flex-shrink-0">
-                            {t('common.current', 'Current')}
-                          </span>
-                        )}
+                        <button
+                          onClick={async () => {
+                            if (!editWsName.trim()) return;
+                            try {
+                              await updateWs.mutateAsync({ publicId: ws.publicId, name: editWsName.trim() });
+                              toast.success('Workspace updated');
+                              setEditingWsId(null);
+                            } catch {
+                              toast.error('Failed to update workspace');
+                            }
+                          }}
+                          disabled={updateWs.isPending || !editWsName.trim()}
+                          className="px-3 py-1.5 rounded-lg text-[12px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50 transition-colors"
+                        >
+                          {t('common.save')}
+                        </button>
+                        <button
+                          onClick={() => setEditingWsId(null)}
+                          className="px-3 py-1.5 rounded-lg text-[12px] font-medium bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer hover:bg-cream-3 transition-colors"
+                        >
+                          {t('common.cancel')}
+                        </button>
                       </div>
-                      {ws.createdAt && (
-                        <div className="flex items-center gap-1 mt-0.5">
-                          <Calendar size={10} className="text-text-tertiary" />
-                          <span className="text-[10.5px] text-text-tertiary">
-                            {new Date(ws.createdAt).toLocaleDateString()}
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-3">
+                        <div
+                          onClick={() => {
+                            if (!isCurrent) {
+                              setWorkspacePublicId(ws.publicId);
+                              window.location.reload();
+                            }
+                          }}
+                          className={`w-9 h-9 rounded-lg bg-coffee/10 flex items-center justify-center flex-shrink-0 ${!isCurrent ? 'cursor-pointer' : ''}`}
+                        >
+                          <span className="text-[13px] font-semibold text-coffee">
+                            {ws.name.charAt(0).toUpperCase()}
                           </span>
                         </div>
-                      )}
-                    </div>
-                    {isCurrent && plan && (
-                      <StatusBadge
-                        label={plan.planLabel}
-                        variant={plan.isEspresso ? 'green' : 'gray'}
-                      />
-                    )}
-                  </div>
+                        <div
+                          className={`flex-1 min-w-0 ${!isCurrent ? 'cursor-pointer' : ''}`}
+                          onClick={() => {
+                            if (!isCurrent) {
+                              setWorkspacePublicId(ws.publicId);
+                              window.location.reload();
+                            }
+                          }}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-[13.5px] font-medium text-text-primary truncate">
+                              {ws.name}
+                            </span>
+                            {isCurrent && (
+                              <span className="text-[10px] font-medium px-1.5 py-px rounded-full bg-coffee/10 text-coffee flex-shrink-0">
+                                Current
+                              </span>
+                            )}
+                          </div>
+                          {ws.createdAt && (
+                            <div className="flex items-center gap-1 mt-0.5">
+                              <Calendar size={10} className="text-text-tertiary" />
+                              <span className="text-[10.5px] text-text-tertiary">
+                                {fmtDate(ws.createdAt)}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        {isCurrent && plan && (
+                          <StatusBadge
+                            label={plan.planLabel}
+                            variant={plan.isEspresso ? 'green' : 'gray'}
+                          />
+                        )}
+                        <button
+                          onClick={() => { setEditingWsId(ws.publicId); setEditWsName(ws.name); }}
+                          className="text-text-tertiary hover:text-coffee bg-transparent border-none cursor-pointer p-1.5 rounded-lg hover:bg-coffee/8 transition-all"
+                        >
+                          <Pencil size={13} />
+                        </button>
+                      </div>
 
-                  {isCurrent && (
-                    <div className="flex items-center gap-4 mt-3 pt-3 border-t border-cream-3/60">
-                      <div className="flex items-center gap-1.5">
-                        <Users size={12} className="text-text-tertiary" />
-                        <span className="text-[11.5px] text-text-secondary">
-                          {wsEmployeeCount} {t('nav.employees').toLowerCase()}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Building2 size={12} className="text-text-tertiary" />
-                        <span className="text-[11.5px] text-text-secondary">
-                          {wsShiftCount} {t('nav.shifts').toLowerCase()}
-                        </span>
-                      </div>
-                    </div>
+                      {isCurrent && (
+                        <div className="flex items-center gap-4 mt-3 pt-3 border-t border-cream-3/60">
+                          <div className="flex items-center gap-1.5">
+                            <Users size={12} className="text-text-tertiary" />
+                            <span className="text-[11.5px] text-text-secondary">
+                              {wsEmployeeCount} {t('nav.employees').toLowerCase()}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Building2 size={12} className="text-text-tertiary" />
+                            <span className="text-[11.5px] text-text-secondary">
+                              {wsShiftCount} {t('nav.shifts').toLowerCase()}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </>
                   )}
-                </button>
+                </div>
               );
             })}
           </div>
@@ -409,7 +532,7 @@ function SettingsPage() {
 
         {/* IP restriction + general settings */}
         {currentWsId && (
-          <GlassCard hover={false}>
+          <GlassCard hover={false} className="lg:col-span-2">
             <GlassCardHeader title="Workspace settings" />
             <div className="p-5 space-y-3">
               <div className="flex items-center gap-2">

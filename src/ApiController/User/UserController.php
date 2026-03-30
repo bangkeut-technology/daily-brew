@@ -9,10 +9,10 @@ use App\DTO\UserDTO;
 use App\Entity\User;
 use App\Enum\OAuthProviderEnum;
 use App\Repository\EmployeeRepository;
+use App\Repository\UserRepository;
 use App\Repository\WorkspaceRepository;
 use App\Service\AccountDeletionService;
 use App\Service\AuthService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -53,7 +53,7 @@ class UserController extends AbstractController
         #[CurrentUser] User $user,
         Request $request,
         WorkspaceRepository $workspaceRepository,
-        EntityManagerInterface $em,
+        UserRepository $userRepository,
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
         $workspacePublicId = $data['workspacePublicId'] ?? null;
@@ -68,7 +68,7 @@ class UserController extends AbstractController
             $user->setCurrentWorkspace(null);
         }
 
-        $em->flush();
+        $userRepository->flush();
 
         return $this->jsonSuccess(null);
     }
@@ -128,7 +128,6 @@ class UserController extends AbstractController
         #[CurrentUser] User $user,
         Request $request,
         EmployeeRepository $employeeRepository,
-        EntityManagerInterface $em,
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
         $employeePublicId = $data['employeePublicId'] ?? null;
@@ -156,7 +155,7 @@ class UserController extends AbstractController
         }
 
         $employee->setLinkedUser($user);
-        $em->flush();
+        $employeeRepository->flush();
 
         return $this->jsonSuccess([
             'publicId' => (string) $employee->getPublicId(),
@@ -168,10 +167,10 @@ class UserController extends AbstractController
     #[Route('/me/complete-onboarding', name: 'users_me_complete_onboarding', methods: ['POST'])]
     public function completeOnboarding(
         #[CurrentUser] User $user,
-        EntityManagerInterface $em,
+        UserRepository $userRepository,
     ): JsonResponse {
         $user->setOnboardingCompleted(true);
-        $em->flush();
+        $userRepository->flush();
 
         return $this->jsonSuccess(['onboardingCompleted' => true]);
     }
@@ -182,7 +181,7 @@ class UserController extends AbstractController
     public function updateProfile(
         #[CurrentUser] User $user,
         Request $request,
-        EntityManagerInterface $em,
+        UserRepository $userRepository,
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
@@ -196,7 +195,7 @@ class UserController extends AbstractController
             $user->setLocale($data['locale']);
         }
 
-        $em->flush();
+        $userRepository->flush();
 
         return $this->jsonSuccess(UserDTO::fromEntity($user)->toArray());
     }
@@ -206,7 +205,7 @@ class UserController extends AbstractController
         #[CurrentUser] User $user,
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
-        EntityManagerInterface $em,
+        UserRepository $userRepository,
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
         $currentPassword = $data['currentPassword'] ?? '';
@@ -228,7 +227,7 @@ class UserController extends AbstractController
         }
 
         $user->setPassword($passwordHasher->hashPassword($user, $newPassword));
-        $em->flush();
+        $userRepository->flush();
 
         return $this->jsonSuccess(['message' => 'Password updated']);
     }

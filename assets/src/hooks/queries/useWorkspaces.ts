@@ -36,6 +36,19 @@ export function useCreateWorkspace() {
   });
 }
 
+export function useUpdateWorkspace() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ publicId, name }: { publicId: string; name: string }) => {
+      const { data } = await apiAxios.put<Workspace>(`/workspaces/${publicId}`, { name });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workspaces'] });
+    },
+  });
+}
+
 export function useWorkspaceSettings(workspacePublicId: string) {
   return useQuery({
     queryKey: ['workspaces', workspacePublicId, 'settings'],

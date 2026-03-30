@@ -71,11 +71,9 @@ if (rootElement && !rootElement.innerHTML) {
     );
 }
 
-// Register service worker
-if ('serviceWorker' in navigator) {
+// Register service worker (production only — sw.js doesn't exist in dev)
+if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(() => {
-            // SW not available in dev or unsupported
-        });
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
     });
 }

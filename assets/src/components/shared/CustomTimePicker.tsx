@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Clock, ChevronUp, ChevronDown } from 'lucide-react';
 
 interface CustomTimePickerProps {
@@ -18,18 +19,35 @@ function parseTime(value: string): [number, number] {
 
 export function CustomTimePicker({ value, onChange, className = '' }: CustomTimePickerProps) {
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [hour, minute] = parseTime(value);
+  const [pos, setPos] = useState<{ top: number; left: number; dropUp: boolean }>({ top: 0, left: 0, dropUp: false });
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+    if (!open) return;
+    const handleClick = (e: MouseEvent) => {
+      if (
+        triggerRef.current?.contains(e.target as Node) ||
+        dropdownRef.current?.contains(e.target as Node)
+      ) return;
+      setOpen(false);
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [open]);
+
+  useLayoutEffect(() => {
+    if (!open || !triggerRef.current) return;
+    const rect = triggerRef.current.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const dropUp = spaceBelow < 180;
+    setPos({
+      top: dropUp ? rect.top + window.scrollY : rect.bottom + window.scrollY + 4,
+      left: rect.left + window.scrollX,
+      dropUp,
+    });
+  }, [open]);
 
   const setHour = (h: number) => {
     const clamped = ((h % 24) + 24) % 24;
@@ -42,8 +60,9 @@ export function CustomTimePicker({ value, onChange, className = '' }: CustomTime
   };
 
   return (
-    <div ref={ref} className={`relative ${className}`}>
+    <div className={`relative ${className}`}>
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen(!open)}
         className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none transition-colors cursor-pointer focus:border-coffee focus:ring-1 focus:ring-coffee/20"
@@ -52,8 +71,18 @@ export function CustomTimePicker({ value, onChange, className = '' }: CustomTime
         <span className="font-mono tabular-nums">{value || '00:00'}</span>
       </button>
 
-      {open && (
-        <div className="absolute z-50 mt-1 rounded-xl bg-glass-bg backdrop-blur-xl border border-glass-border shadow-lg overflow-hidden">
+      {open && createPortal(
+        <div
+          ref={dropdownRef}
+          style={{
+            position: 'absolute',
+            top: pos.dropUp ? undefined : pos.top,
+            bottom: pos.dropUp ? window.innerHeight - pos.top + 4 : undefined,
+            left: pos.left,
+            zIndex: 9999,
+          }}
+          className="rounded-xl bg-glass-bg backdrop-blur-xl border border-glass-border shadow-lg overflow-hidden"
+        >
           <div className="flex items-center gap-1 p-3">
             {/* Hour */}
             <div className="flex flex-col items-center gap-0.5">
@@ -99,7 +128,8 @@ export function CustomTimePicker({ value, onChange, className = '' }: CustomTime
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

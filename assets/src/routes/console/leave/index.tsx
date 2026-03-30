@@ -28,11 +28,21 @@ const FILTER_TABS: { value: StatusFilter; labelKey: string; fallback: string }[]
 function LeaveRequestsPage() {
   const { t } = useTranslation();
   const workspaceId = getWorkspacePublicId() || '';
-  const { data: plan } = usePlan(workspaceId);
+  const { data: plan, isLoading: planLoading } = usePlan(workspaceId);
+  const canUse = plan?.canUseLeaveRequests ?? false;
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('');
   const [showUpgrade, setShowUpgrade] = useState(true);
-  const { data: requests, isLoading } = useLeaveRequests(workspaceId, statusFilter || undefined);
+  const { data: requests, isLoading } = useLeaveRequests(canUse ? workspaceId : '', statusFilter || undefined);
   const updateLeave = useUpdateLeaveRequest(workspaceId);
+
+  if (planLoading) {
+    return (
+      <div className="page-enter">
+        <PageHeader title={t('nav.leaveRequests')} />
+        <p className="text-text-tertiary">{t('common.loading')}</p>
+      </div>
+    );
+  }
 
   if (plan && !plan.canUseLeaveRequests) {
     return (
