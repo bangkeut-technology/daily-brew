@@ -22,6 +22,7 @@ final readonly class AppleTokenVerifier
         private HttpClientInterface $httpClient,
         private CacheInterface $cache,
         private string $appleClientId,
+        private string $appleIosClientId,
     ) {}
 
     /**
@@ -45,8 +46,9 @@ final readonly class AppleTokenVerifier
             throw new \InvalidArgumentException('Invalid Apple token issuer');
         }
 
-        // Verify audience matches our app's client ID
-        if (($payload['aud'] ?? '') !== $this->appleClientId) {
+        // Verify audience matches one of our allowed client IDs (web or iOS)
+        $allowedAudiences = array_filter([$this->appleClientId, $this->appleIosClientId]);
+        if (!in_array($payload['aud'] ?? '', $allowedAudiences, true)) {
             throw new \InvalidArgumentException('Invalid Apple token audience');
         }
 

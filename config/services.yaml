@@ -14,6 +14,7 @@ parameters:
     google_ios_client_id:      '%env(GOOGLE_IOS_CLIENT_ID)%'
     google_android_client_id:  '%env(GOOGLE_ANDROID_CLIENT_ID)%'
     apple_client_id:           '%env(APPLE_CLIENT_ID)%'
+    apple_ios_client_id:       '%env(APPLE_IOS_CLIENT_ID)%'
     max_free_employees:        5
     contact_email:             'support@dailybrew.work'
     jwt_token_ttl:             3600
@@ -29,6 +30,7 @@ services:
             $googleIosClientId: '%google_ios_client_id%'
             $googleAndroidClientId: '%google_android_client_id%'
             $appleClientId:    '%apple_client_id%'
+            $appleIosClientId: '%apple_ios_client_id%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
