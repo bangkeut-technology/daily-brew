@@ -2,10 +2,10 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import * as Dialog from '@radix-ui/react-dialog';
-import { Crown, Inbox, Plus, X } from 'lucide-react';
+import { Crown, Inbox, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useLeaveRequests, useUpdateLeaveRequest, useCreateLeaveRequest } from '@/hooks/queries/useLeaveRequests';
+import { useLeaveRequests, useUpdateLeaveRequest } from '@/hooks/queries/useLeaveRequests';
+import { useClosures } from '@/hooks/queries/useClosures';
 import { useRoleContext } from '@/hooks/queries/useRoleContext';
 import { usePlan } from '@/hooks/queries/usePlan';
 import { getWorkspacePublicId } from '@/lib/auth';
@@ -14,7 +14,7 @@ import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { Avatar } from '@/components/shared/Avatar';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { UpgradeModal } from '@/components/shared/UpgradeModal';
-import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
+import { LeaveRequestModal } from '@/components/shared/LeaveRequestModal';
 import { useDateFormat } from '@/hooks/useDateFormat';
 
 export const Route = createFileRoute('/console/leave/')({
@@ -40,35 +40,11 @@ function LeaveRequestsPage() {
   const employee = roleContext?.employee ?? null;
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('');
   const [showUpgrade, setShowUpgrade] = useState(true);
-  const { data: requests, isLoading } = useLeaveRequests(canUse ? workspaceId : '', statusFilter || undefined);
-  const updateLeave = useUpdateLeaveRequest(workspaceId);
-  const createLeave = useCreateLeaveRequest(workspaceId);
-  const fmtDate = useDateFormat();
-
-  // Leave request submission form state
   const [showSubmitModal, setShowSubmitModal] = useState(false);
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [reason, setReason] = useState('');
-
-  const handleSubmitLeave = async () => {
-    if (!startDate || !endDate || !employee?.publicId) return;
-    try {
-      await createLeave.mutateAsync({
-        employeePublicId: employee.publicId,
-        startDate,
-        endDate,
-        reason: reason.trim(),
-      });
-      toast.success(t('leave.submitSuccess', 'Leave request submitted'));
-      setShowSubmitModal(false);
-      setStartDate('');
-      setEndDate('');
-      setReason('');
-    } catch {
-      toast.error(t('leave.submitError', 'Failed to submit leave request'));
-    }
-  };
+  const { data: requests, isLoading } = useLeaveRequests(canUse ? workspaceId : '', statusFilter || undefined);
+  const { data: closures } = useClosures(workspaceId);
+  const updateLeave = useUpdateLeaveRequest(workspaceId);
+  const fmtDate = useDateFormat();
 
   if (planLoading || roleLoading) {
     return (
@@ -129,83 +105,6 @@ function LeaveRequestsPage() {
     return `${fmtDate(startDate)} - ${fmtDate(endDate)}`;
   };
 
-  const submitModal = (
-    <Dialog.Root open={showSubmitModal} onOpenChange={setShowSubmitModal}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
-        <Dialog.Content
-          onInteractOutside={(e) => e.preventDefault()}
-          className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100%-2rem)] max-w-[400px] bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl shadow-[0_16px_50px_rgba(107,66,38,0.15)] outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
-        >
-          <div className="p-6 space-y-4">
-            <Dialog.Title className="text-[16px] font-semibold text-text-primary font-serif">
-              {t('leave.submitRequest', 'Submit leave request')}
-            </Dialog.Title>
-            <Dialog.Description className="text-[12.5px] text-text-secondary leading-relaxed -mt-2">
-              {t('leave.submitDescription', 'Select the dates you need off and optionally add a reason.')}
-            </Dialog.Description>
-
-            <div>
-              <label htmlFor="leave-start" className="block text-[11px] font-medium text-text-secondary mb-1">
-                {t('leave.startDate', 'Start date')}
-              </label>
-              <CustomDatePicker
-                value={startDate}
-                onChange={(v) => {
-                  setStartDate(v);
-                  if (!endDate || v > endDate) setEndDate(v);
-                }}
-              />
-            </div>
-            <div>
-              <label htmlFor="leave-end" className="block text-[11px] font-medium text-text-secondary mb-1">
-                {t('leave.endDate', 'End date')}
-              </label>
-              <CustomDatePicker
-                value={endDate}
-                onChange={setEndDate}
-              />
-            </div>
-            <div>
-              <label htmlFor="leave-reason-page" className="block text-[11px] font-medium text-text-secondary mb-1">
-                {t('leave.reason', 'Reason')}
-              </label>
-              <textarea
-                id="leave-reason-page"
-                name="leaveReason"
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                rows={3}
-                placeholder={t('leave.reasonPlaceholder', 'e.g. Family event, medical appointment...')}
-                className="w-full px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-sans resize-none"
-              />
-            </div>
-
-            <div className="flex justify-end gap-2 pt-1">
-              <button
-                type="button"
-                onClick={() => setShowSubmitModal(false)}
-                className="px-4 py-2 rounded-lg text-[13px] font-medium bg-transparent text-text-secondary border border-cream-3 cursor-pointer hover:bg-cream-3 transition-colors"
-              >
-                {t('common.cancel', 'Cancel')}
-              </button>
-              <button
-                type="button"
-                onClick={handleSubmitLeave}
-                disabled={!startDate || !endDate || !reason.trim() || createLeave.isPending}
-                className="px-4 py-2 rounded-lg text-[13px] font-medium text-white bg-coffee border-none cursor-pointer hover:bg-coffee-light transition-colors disabled:opacity-50"
-              >
-                {createLeave.isPending ? t('common.loading', 'Loading...') : t('common.submit', 'Submit')}
-              </button>
-            </div>
-          </div>
-          <Dialog.Close className="absolute top-3 right-3 w-7 h-7 rounded-lg flex items-center justify-center bg-transparent border-none text-text-tertiary hover:text-text-secondary hover:bg-cream-3/40 cursor-pointer transition-all">
-            <X size={15} />
-          </Dialog.Close>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
-  );
 
   // Filter to only this employee's requests if employee view
   const filteredRequests = isEmployee && employee
@@ -283,6 +182,7 @@ function LeaveRequestsPage() {
                   )}
                   <div className="text-[11px] text-text-tertiary">
                     {formatDateRange(lr.startDate, lr.endDate)}
+                    {!lr.isFullDay && lr.startTime && lr.endTime && ` ${lr.startTime}–${lr.endTime}`}
                     {lr.reason ? ` \u2014 ${lr.reason}` : ''}
                   </div>
                 </div>
@@ -311,7 +211,15 @@ function LeaveRequestsPage() {
         </GlassCard>
       )}
 
-      {submitModal}
+      {isEmployee && employee && (
+        <LeaveRequestModal
+          open={showSubmitModal}
+          onOpenChange={setShowSubmitModal}
+          workspacePublicId={workspaceId}
+          employeePublicId={employee.publicId}
+          closures={closures}
+        />
+      )}
     </div>
   );
 }
