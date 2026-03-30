@@ -30,6 +30,8 @@ final readonly class DashboardService
         $recentAttendance = $this->attendanceRepository->findByWorkspaceAndDate($workspace, $today);
         $pendingLeaves = $this->leaveRequestRepository->countPendingByWorkspace($workspace);
 
+        $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
+
         return [
             'totalEmployees' => $totalActive,
             'present' => $presentCount,
@@ -38,7 +40,7 @@ final readonly class DashboardService
             'absent' => $absentCount,
             'pendingLeaves' => $pendingLeaves,
             'recentAttendance' => array_map(
-                fn ($a) => AttendanceDTO::fromEntity($a, includeEmployee: true)->toArray(),
+                fn ($a) => AttendanceDTO::fromEntity($a, includeEmployee: true, tz: $tz)->toArray(),
                 array_slice($recentAttendance, 0, 10),
             ),
         ];

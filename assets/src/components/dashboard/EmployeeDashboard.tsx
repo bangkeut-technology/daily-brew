@@ -20,10 +20,10 @@ import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { PageHeader } from '@/components/layout/PageHeader';
 
-function formatTime(iso: string | null): string {
-  if (!iso) return '--:--';
-  const d = new Date(iso);
-  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+function formatTime(time: string | null): string {
+  if (!time) return '--:--';
+  // Already in HH:mm format from the API
+  return time;
 }
 
 function formatDate(iso: string): string {
@@ -96,15 +96,24 @@ export function EmployeeDashboard() {
     );
   }
 
-  if (!employee) {
+  if (!employee || !workspaceId) {
     return (
       <div className="page-enter">
         <PageHeader title={t('nav.dashboard')} />
         <GlassCard hover={false}>
-          <div className="p-8 text-center">
+          <div className="p-8 text-center space-y-3">
             <p className="text-[13.5px] text-text-secondary font-sans">
               {t('dashboard.noEmployee', 'Your account is not linked to an employee profile yet.')}
             </p>
+            <p className="text-[12px] text-text-tertiary font-sans">
+              Ask your employer to link your account, or enter your employee ID on your profile page.
+            </p>
+            <Link
+              to="/console/profile"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white no-underline transition-all hover:bg-coffee-light"
+            >
+              Go to profile
+            </Link>
           </div>
         </GlassCard>
       </div>

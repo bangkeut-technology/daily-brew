@@ -5,7 +5,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Copy, Pencil, X, Check, Link2, Mail, Unlink, Info } from 'lucide-react';
-import { useState } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
+import { useState, useMemo } from 'react';
+import * as Popover from '@radix-ui/react-popover';
 import { useEmployee, useUpdateEmployee } from '@/hooks/queries/useEmployees';
 import { useShifts } from '@/hooks/queries/useShifts';
 import { getWorkspacePublicId } from '@/lib/auth';
@@ -273,7 +275,15 @@ function EmployeeDetailPage() {
                 <div className="flex-1 grid grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3">
                   <div>
                     <span className="text-[11px] text-text-tertiary block">{t('employee.shift', 'Shift')}</span>
-                    <span className="text-[13px] font-medium text-text-primary">{employee.shiftName || t('employee.noShift', 'No shift')}</span>
+                    {employee.shiftName && employee.shiftPublicId ? (
+                      <ShiftPopover
+                        shiftName={employee.shiftName}
+                        shiftPublicId={employee.shiftPublicId}
+                        shifts={shifts}
+                      />
+                    ) : (
+                      <span className="text-[13px] text-text-tertiary">{t('employee.noShift', 'No shift')}</span>
+                    )}
                   </div>
                   {employee.phoneNumber && (
                     <div>
@@ -402,30 +412,44 @@ function EmployeeDetailPage() {
                   </div>
 
                   <div className="border-t border-cream-3/60 pt-4">
-                    <p className="text-[12px] text-text-secondary mb-2">
+                    <p className="text-[12px] text-text-secondary mb-3">
                       {t(
                         'employee.linkUserDescription',
-                        'Or share this employee ID with the staff member. They can use it during onboarding to link their account.',
+                        'Or share this QR code or employee ID with the staff member. They can scan it or enter it during onboarding to link their account.',
                       )}
                     </p>
-                    <div className="flex items-center gap-2">
-                      <code className="flex-1 px-3 py-2 rounded-lg text-[13px] bg-cream-2 border border-cream-3 text-text-primary font-mono select-all">
-                        {employee.publicId}
-                      </code>
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          try {
-                            await navigator.clipboard.writeText(employee.publicId);
-                            toast.success(t('common.copied', 'Copied to clipboard'));
-                          } catch {
-                            toast.error(t('common.copyFailed', 'Failed to copy'));
-                          }
-                        }}
-                        className="flex items-center gap-1 px-2.5 py-2 rounded-lg text-[12px] bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer transition-colors hover:bg-cream-3"
-                      >
-                        <Copy size={12} />
-                      </button>
+                    <div className="flex items-center gap-4">
+                      <div className="p-2 bg-white rounded-xl shadow-[0_2px_8px_rgba(107,66,38,0.06)] flex-shrink-0">
+                        <QRCodeSVG
+                          value={`dailybrew:emp:${employee.publicId}`}
+                          size={64}
+                          fgColor="#6B4226"
+                          bgColor="#FFFFFF"
+                          level="M"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] text-text-tertiary mb-1">Employee ID</p>
+                        <div className="flex items-center gap-2">
+                          <code className="flex-1 px-3 py-2 rounded-lg text-[12px] bg-cream-2 border border-cream-3 text-text-primary font-mono select-all truncate">
+                            {employee.publicId}
+                          </code>
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              try {
+                                await navigator.clipboard.writeText(employee.publicId);
+                                toast.success(t('common.copied', 'Copied to clipboard'));
+                              } catch {
+                                toast.error(t('common.copyFailed', 'Failed to copy'));
+                              }
+                            }}
+                            className="flex items-center gap-1 px-2.5 py-2 rounded-lg text-[12px] bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer transition-colors hover:bg-cream-3 flex-shrink-0"
+                          >
+                            <Copy size={12} />
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </>
@@ -473,10 +497,10 @@ function EmployeeDetailPage() {
                     {a.isLate && (
                       <StatusBadge label={t('attendance.late', 'Late')} variant="amber" />
                     )}
-                    {a.leftEarly && (
-                      <StatusBadge label={t('attendance.early', 'Early')} variant="amber" />
+                    {a.leftEarly && !a.isLate && (
+                      <StatusBadge label={t('attendance.leftEarly', 'Left early')} variant="amber" />
                     )}
-                    {!a.isLate && !a.leftEarly && (
+                    {!a.isLate && !a.leftEarly && a.checkInAt && (
                       <StatusBadge label={t('attendance.onTime', 'On time')} variant="green" />
                     )}
                   </div>
@@ -487,5 +511,91 @@ function EmployeeDetailPage() {
         </GlassCard>
       </div>
     </div>
+  );
+}
+
+// ── Shift Popover ─────────────────────────────────────────────
+
+import type { Shift } from '@/types';
+import { Clock } from 'lucide-react';
+
+function ShiftPopover({
+  shiftName,
+  shiftPublicId,
+  shifts,
+}: {
+  shiftName: string;
+  shiftPublicId: string;
+  shifts: Shift[] | undefined;
+}) {
+  const shift = useMemo(
+    () => shifts?.find((s) => s.publicId === shiftPublicId),
+    [shifts, shiftPublicId],
+  );
+
+  if (!shift) {
+    return <span className="text-[13px] font-medium text-text-primary">{shiftName}</span>;
+  }
+
+  const [startH, startM] = shift.startTime.split(':').map(Number);
+  const [endH, endM] = shift.endTime.split(':').map(Number);
+  const startMin = startH * 60 + startM;
+  const endMin = endH * 60 + endM;
+  const durMin = endMin > startMin ? endMin - startMin : 1440 - startMin + endMin;
+  const durH = Math.floor(durMin / 60);
+  const durM = durMin % 60;
+
+  return (
+    <Popover.Root>
+      <Popover.Trigger asChild>
+        <button
+          type="button"
+          className="text-[13px] font-medium text-coffee hover:text-coffee-light bg-transparent border-none cursor-pointer p-0 transition-colors underline decoration-dotted underline-offset-2"
+        >
+          {shiftName}
+        </button>
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content
+          side="bottom"
+          align="start"
+          sideOffset={6}
+          className="z-50 w-[220px] bg-glass-bg backdrop-blur-xl border border-glass-border rounded-xl shadow-lg p-4 space-y-3"
+        >
+          <div>
+            <p className="text-[14px] font-semibold text-text-primary">{shift.name}</p>
+            <div className="flex items-center gap-2 mt-1.5">
+              <Clock size={13} className="text-amber" />
+              <span className="text-[13px] font-mono tabular-nums text-text-secondary">
+                {shift.startTime} – {shift.endTime}
+              </span>
+            </div>
+            <span className="text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber mt-2 inline-block">
+              {durH}h{durM > 0 ? ` ${durM}m` : ''}
+            </span>
+          </div>
+
+          {shift.timeRules.length > 0 && (
+            <div className="border-t border-cream-3/60 pt-2">
+              <p className="text-[10px] uppercase tracking-[1px] font-medium text-text-tertiary mb-1.5">
+                Day overrides
+              </p>
+              <div className="space-y-1">
+                {shift.timeRules.map((rule) => (
+                  <div key={rule.publicId} className="flex items-center justify-between">
+                    <span className="text-[11px] text-text-secondary">{rule.dayOfWeekLabel}</span>
+                    <span className="text-[11px] font-mono tabular-nums text-text-tertiary">
+                      {rule.startTime} – {rule.endTime}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <Popover.Arrow className="fill-glass-border" />
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
   );
 }

@@ -9,7 +9,7 @@ import {
   useDisconnectOAuth,
   useDeleteAccount,
 } from '@/hooks/queries/useProfile';
-import { useRoleContext, useLinkEmployee } from '@/hooks/queries/useRoleContext';
+import { useRoleContext, useLinkEmployee, useUnlinkEmployee } from '@/hooks/queries/useRoleContext';
 import { useTheme } from 'next-themes';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
@@ -30,8 +30,11 @@ import {
   Globe,
   Trash2,
   AlertTriangle,
+  Unlink,
 } from 'lucide-react';
 import { CustomSelect } from '@/components/shared/CustomSelect';
+import { ConfirmModal } from '@/components/shared/ConfirmModal';
+import { QRCodeSVG } from 'qrcode.react';
 
 export const Route = createFileRoute('/console/profile/')({
   component: ProfilePage,
@@ -70,7 +73,9 @@ function ProfilePage() {
   const changePassword = useChangePassword();
   const disconnectOAuth = useDisconnectOAuth();
   const linkEmployee = useLinkEmployee();
+  const unlinkEmployee = useUnlinkEmployee();
   const deleteAccount = useDeleteAccount();
+  const [unlinkTarget, setUnlinkTarget] = useState<{ publicId: string; name: string; workspace: string } | null>(null);
 
   // OAuth connections query
   const { data: oauthData, isLoading: oauthLoading } = useOAuthConnections();
@@ -229,29 +234,39 @@ function ProfilePage() {
               </div>
             </div>
 
-            {/* Public ID */}
+            {/* Public ID with QR */}
             <div className="mt-5 pt-5 border-t border-cream-3/60">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[11px] uppercase tracking-[1px] font-medium text-text-tertiary mb-1">
-                    {t('profile.yourPublicId', 'Your public ID')}
-                  </p>
-                  <p className="text-[13px] font-mono text-text-secondary tabular-nums">
-                    {user?.publicId}
+              <p className="text-[11px] uppercase tracking-[1px] font-medium text-text-tertiary mb-3">
+                {t('profile.yourPublicId', 'Your public ID')}
+              </p>
+              <div className="flex items-center gap-4">
+                <div className="p-2 bg-white rounded-xl shadow-[0_2px_8px_rgba(107,66,38,0.06)] flex-shrink-0">
+                  <QRCodeSVG
+                    value={`dailybrew:user:${user?.publicId ?? ''}`}
+                    size={64}
+                    fgColor="#6B4226"
+                    bgColor="#FFFFFF"
+                    level="M"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 px-3 py-2 rounded-lg text-[12px] bg-cream-2 border border-cream-3 text-text-primary font-mono select-all truncate">
+                      {user?.publicId}
+                    </code>
+                    <button
+                      type="button"
+                      onClick={handleCopyPublicId}
+                      className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-[11.5px] font-medium bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer transition-all hover:bg-cream-3 flex-shrink-0"
+                    >
+                      {idCopied ? <Check size={13} className="text-green" /> : <Copy size={13} />}
+                    </button>
+                  </div>
+                  <p className="text-[10.5px] text-text-tertiary mt-1.5">
+                    {t('profile.publicIdHint', 'Share this with your employer so they can link you as an employee.')}
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleCopyPublicId}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11.5px] font-medium bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer transition-all hover:bg-cream-3"
-                >
-                  {idCopied ? <Check size={13} className="text-green" /> : <Copy size={13} />}
-                  {idCopied ? t('onboarding.idCopied', 'Copied!') : t('onboarding.copyId', 'Copy')}
-                </button>
               </div>
-              <p className="text-[11px] text-text-tertiary mt-1.5">
-                {t('profile.publicIdHint', 'Share this with your employer so they can link you as an employee.')}
-              </p>
             </div>
           </div>
         </GlassCard>
@@ -298,30 +313,79 @@ function ProfilePage() {
           </GlassCard>
         )}
 
-        {/* Linked employee info (if linked) */}
-        {roleContext?.employee && (
+        {/* Linked workspaces */}
+        {roleContext?.linkedWorkspaces && roleContext.linkedWorkspaces.length > 0 && (
           <GlassCard hover={false}>
-            <GlassCardHeader title={t('profile.linkedEmployee', 'Linked employee')} />
-            <div className="p-6">
-              <div className="flex items-center gap-4 py-3 px-4 rounded-xl bg-green/5 border border-green/15">
-                <div className="w-10 h-10 rounded-xl bg-green/10 flex items-center justify-center">
-                  <UserCheck size={18} className="text-green" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[13.5px] font-medium text-text-primary">
-                    {roleContext.employee.name}
-                  </p>
-                  {roleContext.employee.workspaceName && (
-                    <p className="text-[11px] text-text-tertiary mt-0.5">
-                      {roleContext.employee.workspaceName}
+            <GlassCardHeader
+              title={t('profile.linkedWorkspaces', 'Linked workspaces')}
+              action={
+                <span className="text-[11px] text-text-tertiary">
+                  {roleContext.linkedWorkspaces.length} workspace{roleContext.linkedWorkspaces.length !== 1 ? 's' : ''}
+                </span>
+              }
+            />
+            <div className="p-5 space-y-3">
+              <p className="text-[11.5px] text-text-tertiary leading-relaxed">
+                You are linked as an employee in these workspaces. You can check in, view your attendance, and submit leave requests.
+              </p>
+              {roleContext.linkedWorkspaces.map((lw) => (
+                <div
+                  key={lw.employeePublicId}
+                  className="flex items-center gap-3 py-3 px-4 rounded-xl bg-green/5 border border-green/15"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-green/10 flex items-center justify-center flex-shrink-0">
+                    <UserCheck size={16} className="text-green" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-medium text-text-primary truncate">
+                      {lw.employeeName}
                     </p>
-                  )}
+                    <p className="text-[11px] text-text-tertiary">
+                      {lw.workspaceName}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setUnlinkTarget({
+                      publicId: lw.employeePublicId,
+                      name: lw.employeeName,
+                      workspace: lw.workspaceName ?? '',
+                    })}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium text-red bg-red/8 border-none cursor-pointer transition-colors hover:bg-red/15"
+                  >
+                    <Unlink size={11} />
+                    Unlink
+                  </button>
                 </div>
-                <StatusBadge label="Linked" variant="green" />
-              </div>
+              ))}
             </div>
           </GlassCard>
         )}
+
+        <ConfirmModal
+          open={!!unlinkTarget}
+          onOpenChange={(open) => { if (!open) setUnlinkTarget(null); }}
+          title={t('profile.unlinkTitle', 'Unlink from workspace')}
+          description={t(
+            'profile.unlinkConfirm',
+            'Unlink your account from {{name}} at {{workspace}}? You will no longer be able to check in or view your attendance there.',
+            { name: unlinkTarget?.name ?? '', workspace: unlinkTarget?.workspace ?? '' },
+          )}
+          confirmLabel={t('profile.unlink', 'Unlink')}
+          cancelLabel={t('common.cancel')}
+          variant="danger"
+          loading={unlinkEmployee.isPending}
+          onConfirm={async () => {
+            if (!unlinkTarget) return;
+            try {
+              await unlinkEmployee.mutateAsync(unlinkTarget.publicId);
+              toast.success(t('profile.unlinkSuccess', 'Unlinked successfully'));
+            } catch {
+              toast.error(t('profile.unlinkError', 'Failed to unlink'));
+            }
+            setUnlinkTarget(null);
+          }}
+        />
 
         {/* Profile info form */}
         <GlassCard hover={false}>

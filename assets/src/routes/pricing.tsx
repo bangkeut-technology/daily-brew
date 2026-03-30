@@ -10,17 +10,33 @@ export const Route = createFileRoute('/pricing')({
   component: PricingPage,
 });
 
-const comparisonRows = [
-  { feature: 'Employees', free: 'Up to 10', brew: 'Unlimited' },
-  { feature: 'QR check-in', free: true, brew: true },
-  { feature: 'Shift tracking', free: true, brew: true },
-  { feature: 'Closures', free: true, brew: true },
-  { feature: 'Dashboard', free: true, brew: true },
-  { feature: 'Leave requests', free: false, brew: true },
-  { feature: 'IP restriction', free: false, brew: true },
-  { feature: 'Geofencing', free: false, brew: true },
-  { feature: 'Per-day schedules', free: false, brew: true },
-  { feature: 'Priority support', free: false, brew: true },
+const comparisonRows: { section?: string; feature: string; free: boolean | string; espresso: boolean | string; double: boolean | string }[] = [
+  // Core
+  { section: 'Core', feature: 'Employees', free: 'Up to 10', espresso: 'Up to 20', double: 'Unlimited' },
+  { feature: 'Workspace QR code check-in', free: true, espresso: true, double: true },
+  { feature: 'Shift management', free: true, espresso: true, double: true },
+  { feature: 'Closure periods', free: true, espresso: true, double: true },
+  { feature: 'Owner dashboard & stats', free: true, espresso: true, double: true },
+  { feature: 'Employee dashboard', free: true, espresso: true, double: true },
+  { feature: 'Attendance log', free: true, espresso: true, double: true },
+  { feature: 'Dark mode', free: true, espresso: true, double: true },
+  { feature: 'Multi-language (EN/FR/KM)', free: true, espresso: true, double: true },
+
+  // Espresso+
+  { section: 'Espresso features', feature: 'Leave request management', free: false, espresso: true, double: true },
+  { feature: 'IP restriction for check-in', free: false, espresso: true, double: true },
+  { feature: 'Device verification', free: false, espresso: true, double: true },
+  { feature: 'Geofencing for check-in', free: false, espresso: true, double: true },
+  { feature: 'Per-day shift schedules', free: false, espresso: true, double: true },
+  { feature: 'BasilBook staff linking', free: false, espresso: true, double: true },
+  { feature: '14-day free trial', free: false, espresso: true, double: true },
+
+  // Double Espresso
+  { section: 'Double Espresso features', feature: 'Unlimited employees', free: false, espresso: false, double: true },
+  { feature: 'Priority support', free: false, espresso: false, double: true },
+  { feature: 'Multiple QR stations (roadmap)', free: false, espresso: false, double: true },
+  { feature: 'Manager role (roadmap)', free: false, espresso: false, double: true },
+  { feature: 'White-label branding (roadmap)', free: false, espresso: false, double: true },
 ];
 
 const faqItems = [
@@ -37,7 +53,7 @@ const faqItems = [
   {
     question: 'Is there a free trial?',
     answer:
-      'The Free plan is free forever with no time limit. If you want to try Espresso, you get a 14-day free trial with full access to all features.',
+      'The Free plan is free forever with no time limit. If you want to try Espresso, you get a 14-day free trial with full access to all Espresso features.',
   },
   {
     question: 'Can I cancel anytime?',
@@ -123,7 +139,7 @@ function PricingPage() {
         <PricingSection />
 
         {/* Comparison table */}
-        <section className="py-16 px-6 md:px-8 max-w-3xl mx-auto">
+        <section className="py-16 px-6 md:px-8 max-w-4xl mx-auto">
           <motion.div
             className="text-center mb-10"
             initial={{ opacity: 0, y: 20 }}
@@ -150,7 +166,7 @@ function PricingPage() {
             transition={{ duration: 0.5, delay: 0.1 }}
           >
             {/* Header */}
-            <div className="grid grid-cols-3 px-6 py-4 border-b border-cream-3/60">
+            <div className="grid grid-cols-4 px-6 py-4 border-b border-cream-3/60">
               <span className="text-[11px] uppercase tracking-[1.5px] font-medium text-text-tertiary">
                 Feature
               </span>
@@ -160,13 +176,23 @@ function PricingPage() {
               <span className="text-[11px] uppercase tracking-[1.5px] font-medium text-amber text-center">
                 Espresso
               </span>
+              <span className="text-[11px] uppercase tracking-[1.5px] font-medium text-coffee text-center">
+                Double Espresso
+              </span>
             </div>
 
             {/* Rows */}
             {comparisonRows.map((row, i) => (
+              <div key={row.feature}>
+                {row.section && (
+                  <div className="px-6 pt-4 pb-2 border-b border-cream-3/40">
+                    <span className="text-[10px] uppercase tracking-[1.5px] font-semibold text-text-tertiary">
+                      {row.section}
+                    </span>
+                  </div>
+                )}
               <motion.div
-                key={row.feature}
-                className={`grid grid-cols-3 px-6 py-3.5 items-center transition-colors duration-120 hover:bg-cream-3/20 ${
+                className={`grid grid-cols-4 px-6 py-3.5 items-center transition-colors duration-120 hover:bg-cream-3/20 ${
                   i < comparisonRows.length - 1
                     ? 'border-b border-cream-3/40'
                     : ''
@@ -183,9 +209,13 @@ function PricingPage() {
                   <CellValue value={row.free} />
                 </span>
                 <span className="flex justify-center">
-                  <CellValue value={row.brew} />
+                  <CellValue value={row.espresso} />
+                </span>
+                <span className="flex justify-center">
+                  <CellValue value={row.double} />
                 </span>
               </motion.div>
+              </div>
             ))}
           </motion.div>
         </section>

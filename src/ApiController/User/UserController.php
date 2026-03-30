@@ -79,13 +79,19 @@ class UserController extends AbstractController
     #[Route('/me/role-context', name: 'users_me_role_context', methods: ['GET'])]
     public function roleContext(
         #[CurrentUser] User $user,
+        Request $request,
         WorkspaceRepository $workspaceRepository,
         EmployeeRepository $employeeRepository,
     ): JsonResponse {
         $ownedWorkspaces = $workspaceRepository->findByOwner($user);
         $linkedEmployees = $employeeRepository->findByLinkedUser($user);
 
-        $currentWorkspace = $user->getCurrentWorkspace();
+        // Use workspace from query param (frontend's localStorage) or fallback to server-side
+        $wsParam = $request->query->get('workspaceId');
+        $currentWorkspace = $wsParam
+            ? $workspaceRepository->findByPublicId($wsParam)
+            : $user->getCurrentWorkspace();
+
         $isOwnerOfCurrent = false;
         $currentEmployee = null;
 
@@ -162,6 +168,35 @@ class UserController extends AbstractController
             'name' => $employee->getName(),
             'workspaceName' => $employee->getWorkspace()?->getName(),
         ]);
+    }
+
+    #[Route('/me/unlink-employee', name: 'users_me_unlink_employee', methods: ['POST'])]
+    public function unlinkEmployee(
+        #[CurrentUser] User $user,
+        Request $request,
+        EmployeeRepository $employeeRepository,
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+        $employeePublicId = $data['employeePublicId'] ?? null;
+
+        if (!$employeePublicId) {
+            return $this->jsonError('employeePublicId is required');
+        }
+
+        $employee = $employeeRepository->findByPublicId($employeePublicId);
+        if ($employee === null) {
+            return $this->jsonError('Employee not found');
+        }
+
+        // Only allow unlinking if the employee is linked to the current user
+        if ($employee->getLinkedUser()?->getId() !== $user->getId()) {
+            return $this->jsonError('This employee is not linked to your account', 403);
+        }
+
+        $employee->setLinkedUser(null);
+        $employeeRepository->flush();
+
+        return $this->jsonSuccess(null);
     }
 
     #[Route('/me/complete-onboarding', name: 'users_me_complete_onboarding', methods: ['POST'])]

@@ -11,11 +11,13 @@ export function usePaddle() {
     const token = window.__DAILYBREW__?.paddleClientSideToken;
     if (!token || !window.Paddle) return;
 
+    const environment = window.__DAILYBREW__?.paddleEnvironment;
+
     window.Paddle.Initialize({
       token,
+      ...(environment === 'sandbox' ? { environment: 'sandbox' } : {}),
       eventCallback: (event) => {
         if (event.name === 'checkout.completed') {
-          // Reload after successful checkout — webhook will update subscription
           setTimeout(() => window.location.reload(), 2000);
         }
       },

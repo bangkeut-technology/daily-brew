@@ -24,7 +24,7 @@ function DashboardPage() {
     return <NoWorkspaceView />;
   }
 
-  if (roleLoading) {
+  if (roleLoading || !roleContext) {
     return (
       <div className="page-enter">
         <PageHeader title={t('nav.dashboard')} />
@@ -33,11 +33,8 @@ function DashboardPage() {
     );
   }
 
-  const isOwner = roleContext?.isOwner ?? false;
-  const isEmployee = roleContext?.isEmployee ?? false;
-
   // Employee dashboard if user is an employee (not an owner) in this workspace
-  if (isEmployee && !isOwner) {
+  if (roleContext.isEmployee && !roleContext.isOwner) {
     return <EmployeeDashboard />;
   }
 

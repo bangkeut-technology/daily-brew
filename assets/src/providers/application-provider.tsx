@@ -9,6 +9,7 @@ declare global {
             contactEmail?: string;
             googleClientId?: string;
             appleClientId?: string;
+            paddleEnvironment?: string;
             paddleClientSideToken?: string;
             paddlePriceIdMonthly?: string;
             paddlePriceIdAnnual?: string;

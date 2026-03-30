@@ -125,13 +125,22 @@ function ShiftsPage() {
                 <CustomTimePicker value={endTime} onChange={setEndTime} />
               </div>
             </div>
-            <button
-              type="submit"
-              disabled={createShift.isPending}
-              className="px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50"
-            >
-              {createShift.isPending ? t('common.loading') : t('common.create')}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="submit"
+                disabled={createShift.isPending}
+                className="px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50"
+              >
+                {createShift.isPending ? t('common.loading') : t('common.create')}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setShowForm(false); setName(''); }}
+                className="px-4 py-2 rounded-lg text-[13px] font-medium bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer hover:bg-cream-3/40 transition-colors"
+              >
+                {t('common.cancel')}
+              </button>
+            </div>
           </form>
         </GlassCard>
       )}
@@ -141,7 +150,7 @@ function ShiftsPage() {
         <div className="mb-4">
           <GlassCard hover={false}>
             <div className="px-5 py-4 flex items-center gap-3">
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-amber/10 flex-shrink-0">
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-amber/10 shrink-0">
                 <Crown size={16} className="text-amber" />
               </div>
               <div className="flex-1">
@@ -150,7 +159,7 @@ function ShiftsPage() {
                   Override shift hours for specific days of the week. Available with Espresso.
                 </p>
               </div>
-              <span className="text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber flex-shrink-0">
+              <span className="text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber shrink-0">
                 Espresso
               </span>
             </div>
@@ -161,7 +170,7 @@ function ShiftsPage() {
       {isLoading ? (
         <p className="text-text-tertiary">{t('common.loading')}</p>
       ) : shifts?.length === 0 ? (
-        <div className="border-[1.5px] border-dashed border-cream-3 rounded-2xl bg-glass-bg backdrop-blur-md flex flex-col items-center justify-center min-h-[200px] cursor-pointer transition-colors hover:bg-cream-3/30" onClick={() => setShowForm(true)}>
+        <div className="border-[1.5px] border-dashed border-cream-3 rounded-2xl bg-glass-bg backdrop-blur-md flex flex-col items-center justify-center min-h-50 cursor-pointer transition-colors hover:bg-cream-3/30" onClick={() => setShowForm(true)}>
           <Clock size={28} className="text-text-tertiary mb-2" />
           <span className="text-[13px] text-text-tertiary">No shifts created yet</span>
           <span className="text-[11px] text-text-tertiary mt-1">Click to create your first shift</span>
@@ -313,7 +322,7 @@ function ShiftCard({
     <GlassCard hover={!isExpanded && !showAssign && !isEditing}>
       {/* Header with time accent bar */}
       <div className="relative">
-        <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r from-amber to-coffee" />
+        <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-linear-to-r from-amber to-coffee" />
         <div className="px-5 pt-5 pb-3">
           {isEditing ? (
             <div className="space-y-3">
@@ -603,12 +612,12 @@ function DayRow({
   if (editing) {
     return (
       <div className="flex items-center gap-2 py-2 px-3 rounded-lg bg-cream-3/30">
-        <span className="text-[11.5px] font-medium text-text-primary w-16 flex-shrink-0">
+        <span className="text-[11.5px] font-medium text-text-primary w-16 shrink-0">
           {dayLabel.slice(0, 3)}
         </span>
-        <CustomTimePicker value={ruleStart} onChange={setRuleStart} className="w-[100px]" />
+        <CustomTimePicker value={ruleStart} onChange={setRuleStart} className="w-25" />
         <span className="text-[11px] text-text-tertiary">&ndash;</span>
-        <CustomTimePicker value={ruleEnd} onChange={setRuleEnd} className="w-[100px]" />
+        <CustomTimePicker value={ruleEnd} onChange={setRuleEnd} className="w-25" />
         <div className="flex items-center gap-1 ml-auto">
           <button
             onClick={handleSave}
@@ -632,7 +641,7 @@ function DayRow({
   if (existingRule) {
     return (
       <div className="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-cream-3/30 transition-colors group">
-        <span className="text-[11.5px] font-medium text-text-primary w-16 flex-shrink-0">
+        <span className="text-[11.5px] font-medium text-text-primary w-16 shrink-0">
           {dayLabel.slice(0, 3)}
         </span>
         <span className="text-[12px] font-mono text-text-secondary tabular-nums">
@@ -663,7 +672,7 @@ function DayRow({
   // Display mode — no rule, show shift defaults muted
   return (
     <div className="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-cream-3/30 transition-colors group">
-      <span className="text-[11.5px] font-medium text-text-tertiary w-16 flex-shrink-0">
+      <span className="text-[11.5px] font-medium text-text-tertiary w-16 shrink-0">
         {dayLabel.slice(0, 3)}
       </span>
       <span className="text-[12px] font-mono text-text-tertiary tabular-nums">

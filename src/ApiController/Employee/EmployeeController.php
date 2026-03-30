@@ -138,10 +138,11 @@ class EmployeeController extends AbstractController
         }
 
         $recentAttendance = $attendanceRepository->findByEmployee($employee, 30);
+        $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
 
         $data = EmployeeDTO::fromEntity($employee)->toArray();
         $data['attendance'] = array_map(
-            fn ($a) => AttendanceDTO::fromEntity($a)->toArray(),
+            fn ($a) => AttendanceDTO::fromEntity($a, tz: $tz)->toArray(),
             $recentAttendance,
         );
 

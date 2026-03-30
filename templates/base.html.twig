@@ -24,9 +24,10 @@
                 contactEmail: '{{ contactEmail|e('js') }}',
                 googleClientId: '{{ googleClientId|e('js') }}',
                 appleClientId: '{{ appleClientId|e('js') }}',
+                paddleEnvironment: '{{ paddleEnvironment|e('js') }}',
                 paddleClientSideToken: '{{ paddleClientSideToken|e('js') }}',
-                paddlePriceIdMonthly: '{{ paddlePriceIdExpressoMonthly|e('js') }}',
-                paddlePriceIdAnnual: '{{ paddlePriceIdExpressoAnnual|e('js') }}',
+                paddlePriceIdMonthly: '{{ paddlePriceIdEspressoMonthly|e('js') }}',
+                paddlePriceIdAnnual: '{{ paddlePriceIdEspressoAnnual|e('js') }}',
                 user: {{ user is not null ? user|json_encode|raw : 'null' }}
             };
         </script>

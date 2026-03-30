@@ -40,14 +40,20 @@ class AttendanceController extends AbstractController
             new \DateTime($to),
         );
 
+        $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
+        $formatTime = static function (?\DateTimeInterface $dt) use ($tz): ?string {
+            if ($dt === null) return null;
+            return \DateTimeImmutable::createFromInterface($dt)->setTimezone($tz)->format('H:i');
+        };
+
         return $this->jsonSuccess(array_map(fn ($a) => [
             'publicId' => (string) $a->getPublicId(),
             'employeePublicId' => (string) $a->getEmployee()->getPublicId(),
             'employeeName' => $a->getEmployee()->getName(),
             'shiftName' => $a->getEmployee()->getShift()?->getName(),
             'date' => $a->getDate()->format('Y-m-d'),
-            'checkInAt' => $a->getCheckInAt()?->format('H:i'),
-            'checkOutAt' => $a->getCheckOutAt()?->format('H:i'),
+            'checkInAt' => $formatTime($a->getCheckInAt()),
+            'checkOutAt' => $formatTime($a->getCheckOutAt()),
             'isLate' => $a->isLate(),
             'leftEarly' => $a->hasLeftEarly(),
         ], $attendances));

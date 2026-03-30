@@ -32,8 +32,10 @@ class CheckinService
     ): Attendance {
         $workspace = $employee->getWorkspace();
         $setting = $workspace?->getSetting();
-        $now = new DateTimeImmutable();
-        $today = new DateTimeImmutable('today');
+        $wsTz = new \DateTimeZone($setting?->getTimezone() ?? 'UTC');
+        $nowUtc = new DateTimeImmutable();
+        $now = $nowUtc->setTimezone($wsTz); // for time comparisons (late/early)
+        $today = new DateTimeImmutable('today', $wsTz);
 
         // IP restriction check
         if ($setting !== null && $setting->isIpRestrictionEnabled()) {
@@ -92,7 +94,7 @@ class CheckinService
             $attendance->setEmployee($employee);
             $attendance->setWorkspace($workspace);
             $attendance->setDate($today);
-            $attendance->setCheckInAt($now);
+            $attendance->setCheckInAt($nowUtc);
             $attendance->setCheckInLat($latitude);
             $attendance->setCheckInLng($longitude);
             $attendance->setIpAddress($clientIp);
@@ -128,7 +130,7 @@ class CheckinService
             }
 
             // Check out
-            $attendance->setCheckOutAt($now);
+            $attendance->setCheckOutAt($nowUtc);
             $attendance->setCheckOutLat($latitude);
             $attendance->setCheckOutLng($longitude);
             $attendance->setIpAddress($clientIp);
@@ -160,9 +162,10 @@ class CheckinService
 
     public function getStatus(Employee $employee): ?Attendance
     {
+        $tz = new \DateTimeZone($employee->getWorkspace()?->getSetting()?->getTimezone() ?? 'UTC');
         return $this->attendanceRepository->findByEmployeeAndDate(
             $employee,
-            new DateTimeImmutable('today')
+            new DateTimeImmutable('today', $tz)
         );
     }
 

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import * as Dialog from '@radix-ui/react-dialog';
-import { Crown, Check, MapPin, Navigation, Smartphone, Building2, Users, Calendar, Plus, X, Copy, ExternalLink, Pencil } from 'lucide-react';
+import { Crown, Check, MapPin, Navigation, Smartphone, Building2, Users, Calendar, Plus, X, Copy, Pencil } from 'lucide-react';
 import { useDateFormat } from '@/hooks/useDateFormat';
 import { usePaddle } from '@/hooks/usePaddle';
 import { QRCodeSVG } from 'qrcode.react';
@@ -197,7 +197,7 @@ function SettingsPage() {
                 {/* Trial banner */}
                 {plan.isTrialing && (
                   <div className="col-span-2 flex items-center gap-3 rounded-xl border-2 border-amber bg-amber/5 p-4 mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-amber/10 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-amber/10 flex items-center justify-center shrink-0">
                       <Crown size={20} className="text-amber" />
                     </div>
                     <div className="flex-1">
@@ -222,7 +222,7 @@ function SettingsPage() {
                   <ul className="space-y-2">
                     {['Up to 10 employees', 'QR code check-in', 'Shift management', 'Closure management', 'Dashboard & attendance log'].map((f) => (
                       <li key={f} className="flex items-center gap-2 text-[12.5px] text-text-secondary">
-                        <Check size={14} className="text-green flex-shrink-0" />
+                        <Check size={14} className="text-green shrink-0" />
                         {f}
                       </li>
                     ))}
@@ -240,7 +240,7 @@ function SettingsPage() {
                     plan.plan === 'espresso' ? 'border-amber bg-amber/5' : 'border-cream-3 bg-glass-bg'
                   }`}
                 >
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber to-amber-light" />
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-amber to-amber-light" />
                   <div className="flex items-center gap-2 mb-1">
                     <Crown size={16} className="text-amber" />
                     <h3 className="text-[15px] font-semibold text-text-primary">Espresso</h3>
@@ -250,7 +250,7 @@ function SettingsPage() {
                   <ul className="space-y-2">
                     {['Up to 20 employees', 'IP restriction', 'Device verification', 'Geofencing', 'Per-day schedules', 'Leave requests', 'BasilBook linking'].map((f) => (
                       <li key={f} className="flex items-center gap-2 text-[12.5px] text-text-secondary">
-                        <Check size={14} className="text-amber flex-shrink-0" />
+                        <Check size={14} className="text-amber shrink-0" />
                         {f}
                       </li>
                     ))}
@@ -258,7 +258,7 @@ function SettingsPage() {
                   {plan.plan === 'free' && (
                     <button
                       onClick={() => openCheckout('annual')}
-                      className="mt-4 w-full px-4 py-2.5 rounded-lg text-[13px] font-semibold bg-gradient-to-r from-amber to-coffee text-white border-none cursor-pointer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(193,127,59,0.3)]"
+                      className="mt-4 w-full px-4 py-2.5 rounded-lg text-[13px] font-semibold bg-linear-to-r from-amber to-coffee text-white border-none cursor-pointer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(193,127,59,0.3)]"
                     >
                       Start 14-day free trial
                     </button>
@@ -277,7 +277,7 @@ function SettingsPage() {
                     plan.plan === 'double_espresso' ? 'border-coffee bg-coffee/5' : 'border-cream-3 bg-glass-bg'
                   }`}
                 >
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-coffee to-amber" />
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-coffee to-amber" />
                   <div className="flex items-center gap-2 mb-1">
                     <Crown size={16} className="text-coffee" />
                     <h3 className="text-[15px] font-semibold text-text-primary">Double Espresso</h3>
@@ -288,10 +288,22 @@ function SettingsPage() {
                   <p className="text-[12px] text-text-tertiary mb-1">$39.99/month</p>
                   <p className="text-[12px] text-text-tertiary mb-4">For large teams</p>
                   <ul className="space-y-2">
-                    {['Unlimited employees', 'Everything in Espresso', 'Priority support'].map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-[12.5px] text-text-secondary">
-                        <Check size={14} className="text-coffee flex-shrink-0" />
-                        {f}
+                    {[
+                      { text: 'Unlimited employees' },
+                      { text: 'Everything in Espresso' },
+                      { text: 'Priority support' },
+                      { text: 'Multiple QR stations', roadmap: true },
+                      { text: 'Manager role', roadmap: true },
+                      { text: 'White-label branding', roadmap: true },
+                    ].map((f) => (
+                      <li key={f.text} className={`flex items-center gap-2 text-[12.5px] ${f.roadmap ? 'text-text-tertiary' : 'text-text-secondary'}`}>
+                        <Check size={14} className={`shrink-0 ${f.roadmap ? 'text-text-tertiary' : 'text-coffee'}`} />
+                        {f.text}
+                        {f.roadmap && (
+                          <span className="text-[9px] font-medium px-1.5 py-px rounded-full bg-cream-3/60 text-text-tertiary">
+                            Roadmap
+                          </span>
+                        )}
                       </li>
                     ))}
                   </ul>
@@ -442,7 +454,7 @@ function SettingsPage() {
                               window.location.reload();
                             }
                           }}
-                          className={`w-9 h-9 rounded-lg bg-coffee/10 flex items-center justify-center flex-shrink-0 ${!isCurrent ? 'cursor-pointer' : ''}`}
+                          className={`w-9 h-9 rounded-lg bg-coffee/10 flex items-center justify-center shrink-0 ${!isCurrent ? 'cursor-pointer' : ''}`}
                         >
                           <span className="text-[13px] font-semibold text-coffee">
                             {ws.name.charAt(0).toUpperCase()}
@@ -462,7 +474,7 @@ function SettingsPage() {
                               {ws.name}
                             </span>
                             {isCurrent && (
-                              <span className="text-[10px] font-medium px-1.5 py-px rounded-full bg-coffee/10 text-coffee flex-shrink-0">
+                              <span className="text-[10px] font-medium px-1.5 py-px rounded-full bg-coffee/10 text-coffee shrink-0">
                                 Current
                               </span>
                             )}
@@ -518,7 +530,7 @@ function SettingsPage() {
         <Dialog.Root open={wsModalOpen} onOpenChange={(v) => { setWsModalOpen(v); if (!v) setNewWsName(''); }}>
           <Dialog.Portal>
             <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
-            <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100%-2rem)] max-w-[400px] bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl shadow-[0_16px_50px_rgba(107,66,38,0.15)] outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95">
+            <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100%-2rem)] max-w-100 bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl shadow-[0_16px_50px_rgba(107,66,38,0.15)] outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95">
               <div className="p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-xl bg-coffee/10 flex items-center justify-center">
@@ -805,7 +817,7 @@ function SettingsPage() {
 
                   {geofencingLat !== null && geofencingLng !== null && (
                     <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-green/5 border border-green/15">
-                      <MapPin size={14} className="text-green flex-shrink-0" />
+                      <MapPin size={14} className="text-green shrink-0" />
                       <span className="text-[12px] text-green font-mono">
                         {geofencingLat.toFixed(6)}, {geofencingLng.toFixed(6)}
                       </span>

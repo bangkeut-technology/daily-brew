@@ -42,17 +42,18 @@ class CheckinController extends AbstractController
         $attendance = $checkinService->getStatus($employee);
         $shift = $employee->getShift();
 
+        $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
+
         return $this->jsonSuccess([
             'employeeName' => $employee->getName(),
             'shiftName' => $shift?->getName(),
             'shiftStart' => $shift?->getStartTime()?->format('H:i'),
             'shiftEnd' => $shift?->getEndTime()?->format('H:i'),
-            'linkedUserPublicId' => $employee->getLinkedUser()?->getPublicId(),
             'today' => [
                 'checkedIn' => $attendance?->getCheckInAt() !== null,
                 'checkedOut' => $attendance?->getCheckOutAt() !== null,
-                'checkInAt' => $attendance?->getCheckInAt()?->format('H:i'),
-                'checkOutAt' => $attendance?->getCheckOutAt()?->format('H:i'),
+                'checkInAt' => $attendance?->getCheckInAt() ? (clone $attendance->getCheckInAt())->setTimezone($tz)->format('H:i') : null,
+                'checkOutAt' => $attendance?->getCheckOutAt() ? (clone $attendance->getCheckOutAt())->setTimezone($tz)->format('H:i') : null,
                 'isLate' => $attendance?->isLate() ?? false,
             ],
         ]);
@@ -92,9 +93,11 @@ class CheckinController extends AbstractController
             $deviceName,
         );
 
+        $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
+
         return $this->jsonSuccess([
-            'checkInAt' => $attendance->getCheckInAt()?->format('H:i'),
-            'checkOutAt' => $attendance->getCheckOutAt()?->format('H:i'),
+            'checkInAt' => $attendance->getCheckInAt() ? (clone $attendance->getCheckInAt())->setTimezone($tz)->format('H:i') : null,
+            'checkOutAt' => $attendance->getCheckOutAt() ? (clone $attendance->getCheckOutAt())->setTimezone($tz)->format('H:i') : null,
             'isLate' => $attendance->isLate(),
             'leftEarly' => $attendance->hasLeftEarly(),
         ]);
