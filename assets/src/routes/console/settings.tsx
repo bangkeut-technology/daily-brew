@@ -226,23 +226,53 @@ function SettingsPage() {
                 </div>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Trial banner */}
-                {plan.isTrialing && (
-                  <div className="col-span-2 flex items-center gap-3 rounded-xl border-2 border-amber bg-amber/5 p-4 mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-amber/10 flex items-center justify-center shrink-0">
-                      <Crown size={20} className="text-amber" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-[16px] font-semibold text-text-primary">
-                        Espresso trial — {plan.trialDaysRemaining} day{plan.trialDaysRemaining !== 1 ? 's' : ''} remaining
-                      </p>
-                      <p className="text-[14px] text-text-secondary">
-                        You have full access to all Espresso features. Your first payment will be charged after the trial ends.
-                      </p>
-                    </div>
+              {/* Trial alert */}
+              {plan.isTrialing && (
+                <div className="flex items-center gap-4 rounded-xl bg-amber/8 border border-amber/20 px-5 py-4 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-amber/15 flex items-center justify-center shrink-0">
+                    <Crown size={20} className="text-amber" />
                   </div>
-                )}
+                  <div className="flex-1">
+                    <p className="text-[16px] font-semibold text-amber">
+                      Espresso trial — {plan.trialDaysRemaining} day{plan.trialDaysRemaining !== 1 ? 's' : ''} remaining
+                    </p>
+                    <p className="text-[14px] text-text-secondary">
+                      You have full access to all Espresso features. Your first payment will be charged after the trial ends.
+                    </p>
+                  </div>
+                  {plan.currentPeriodEnd && (
+                    <p className="text-[13px] text-amber font-medium shrink-0">
+                      Ends {fmtDate(plan.currentPeriodEnd)}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                {/* Free plan */}
+                <div
+                  className={cn(
+                    'rounded-xl border-2 p-5 transition-colors',
+                    plan.plan === 'free' ? 'border-coffee bg-coffee/5' : 'border-cream-3 bg-glass-bg',
+                  )}
+                >
+                  <h3 className="text-[17px] font-semibold text-text-primary mb-1">Free</h3>
+                  <p className="text-[14px] text-text-tertiary mb-4">Get started</p>
+                  <ul className="space-y-2">
+                    {['Up to 10 employees', 'QR code check-in', 'Shift management', 'Closure management', 'Dashboard & attendance log'].map((f) => (
+                      <li key={f} className="flex items-center gap-2 text-[14.5px] text-text-secondary">
+                        <Check size={14} className="text-green shrink-0" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  {plan.plan === 'free' && plan.remainingEmployeeSlots !== null && (
+                    <div className="mt-4 text-[13px] text-text-tertiary">
+                      {plan.remainingEmployeeSlots} employee slot{plan.remainingEmployeeSlots !== 1 ? 's' : ''} remaining
+                    </div>
+                  )}
+                </div>
 
                 {/* Espresso plan */}
                 <div
@@ -326,11 +356,6 @@ function SettingsPage() {
                         <div className="flex gap-2">
                           <button
                             onClick={() => {
-                              window.Paddle?.Checkout?.open({
-                                transactionId: undefined,
-                                settings: { displayMode: 'overlay', theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light' },
-                              });
-                              // Use Paddle.js update subscription
                               window.open(`https://customer.paddle.com/subscriptions/${plan.paddleSubscriptionId}/update`, '_blank');
                             }}
                             className="flex-1 px-3 py-2 rounded-lg text-[14px] font-medium bg-glass-bg text-text-primary border border-cream-3 cursor-pointer hover:bg-cream-3 transition-colors"
@@ -347,30 +372,6 @@ function SettingsPage() {
                           </button>
                         </div>
                       )}
-                    </div>
-                  )}
-                </div>
-
-                {/* Free plan */}
-                <div
-                  className={cn(
-                    'rounded-xl border-2 p-5 transition-colors',
-                    plan.plan === 'free' ? 'border-coffee bg-coffee/5' : 'border-cream-3 bg-glass-bg',
-                  )}
-                >
-                  <h3 className="text-[17px] font-semibold text-text-primary mb-1">Free</h3>
-                  <p className="text-[14px] text-text-tertiary mb-4">Get started</p>
-                  <ul className="space-y-2">
-                    {['Up to 10 employees', 'QR code check-in', 'Shift management', 'Closure management', 'Dashboard & attendance log'].map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-[14.5px] text-text-secondary">
-                        <Check size={14} className="text-green shrink-0" />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  {plan.plan === 'free' && plan.remainingEmployeeSlots !== null && (
-                    <div className="mt-4 text-[13px] text-text-tertiary">
-                      {plan.remainingEmployeeSlots} employee slot{plan.remainingEmployeeSlots !== 1 ? 's' : ''} remaining
                     </div>
                   )}
                 </div>
