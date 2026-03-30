@@ -15,6 +15,7 @@ use App\Repository\WorkspaceRepository;
 use App\Security\Voter\WorkspaceVoter;
 use App\Service\EmployeeService;
 use App\Service\PlanService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -54,6 +55,7 @@ class EmployeeController extends AbstractController
         UserRepository $userRepository,
         EmployeeService $employeeService,
         PlanService $planService,
+        EntityManagerInterface $em,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
         if ($workspace === null) {
@@ -92,12 +94,26 @@ class EmployeeController extends AbstractController
             $shift,
         );
 
+        if (isset($data['username'])) {
+            $employee->setUsername(trim($data['username']) ?: null);
+        }
+
+        if (!empty($data['dob'])) {
+            $employee->setDob(new \DateTimeImmutable($data['dob']));
+        }
+
+        if (!empty($data['joinedAt'])) {
+            $employee->setJoinedAt(new \DateTimeImmutable($data['joinedAt']));
+        }
+
         if (!empty($data['linkedUserPublicId'])) {
             $linkedUser = $userRepository->findByPublicId($data['linkedUserPublicId']);
             if ($linkedUser !== null) {
                 $employeeService->linkUser($employee, $linkedUser);
             }
         }
+
+        $em->flush();
 
         return $this->jsonCreated(EmployeeDTO::fromEntity($employee)->toArray());
     }
@@ -171,6 +187,18 @@ class EmployeeController extends AbstractController
             $shift,
             isset($data['active']) ? (bool) $data['active'] : null,
         );
+
+        if (array_key_exists('username', $data)) {
+            $employee->setUsername($data['username'] ? trim($data['username']) : null);
+        }
+
+        if (array_key_exists('dob', $data)) {
+            $employee->setDob(!empty($data['dob']) ? new \DateTimeImmutable($data['dob']) : null);
+        }
+
+        if (array_key_exists('joinedAt', $data)) {
+            $employee->setJoinedAt(!empty($data['joinedAt']) ? new \DateTimeImmutable($data['joinedAt']) : null);
+        }
 
         // Handle linking/unlinking user account
         if (array_key_exists('linkedUserPublicId', $data)) {

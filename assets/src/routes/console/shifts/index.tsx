@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import {
   useShifts,
   useCreateShift,
+  useUpdateShift,
   useDeleteShift,
   useCreateShiftTimeRule,
   useUpdateShiftTimeRule,
@@ -20,7 +21,7 @@ import { CustomSelect } from '@/components/shared/CustomSelect';
 import { CustomTimePicker } from '@/components/shared/CustomTimePicker';
 import { UpgradeModal } from '@/components/shared/UpgradeModal';
 import { useUpgradeModal } from '@/hooks/useUpgradeModal';
-import { ChevronDown, ChevronUp, Crown, Clock, Trash2, Plus, Users, X } from 'lucide-react';
+import { ChevronDown, ChevronUp, Crown, Clock, Pencil, Trash2, Plus, Users, X } from 'lucide-react';
 import type { Shift, Employee, ShiftTimeRule } from '@/types';
 
 export const Route = createFileRoute('/console/shifts/')({
@@ -89,6 +90,10 @@ function ShiftsPage() {
         }
       />
 
+      <p className="text-[13px] text-text-secondary mb-5 -mt-2 leading-relaxed">
+        Define your restaurant's working hours. Assign employees to shifts so DailyBrew can track late arrivals and early departures automatically.
+      </p>
+
       {showForm && (
         <GlassCard hover={false} className="mb-4">
           <form onSubmit={handleCreate} className="p-5 space-y-3">
@@ -151,6 +156,12 @@ function ShiftsPage() {
 
       {isLoading ? (
         <p className="text-text-tertiary">{t('common.loading')}</p>
+      ) : shifts?.length === 0 ? (
+        <div className="border-[1.5px] border-dashed border-cream-3 rounded-2xl bg-glass-bg backdrop-blur-md flex flex-col items-center justify-center min-h-[200px] cursor-pointer transition-colors hover:bg-cream-3/30" onClick={() => setShowForm(true)}>
+          <Clock size={28} className="text-text-tertiary mb-2" />
+          <span className="text-[13px] text-text-tertiary">No shifts created yet</span>
+          <span className="text-[11px] text-text-tertiary mt-1">Click to create your first shift</span>
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {shifts?.map((shift) => {
@@ -212,7 +223,38 @@ function ShiftCard({
 }: ShiftCardProps) {
   const { t } = useTranslation();
   const updateEmployee = useUpdateEmployee(workspaceId);
+  const updateShift = useUpdateShift(workspaceId);
   const [showAssign, setShowAssign] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(shift.name);
+  const [editStartTime, setEditStartTime] = useState(shift.startTime);
+  const [editEndTime, setEditEndTime] = useState(shift.endTime);
+
+  const handleStartEdit = () => {
+    setEditName(shift.name);
+    setEditStartTime(shift.startTime);
+    setEditEndTime(shift.endTime);
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      await updateShift.mutateAsync({
+        publicId: shift.publicId,
+        name: editName,
+        startTime: editStartTime,
+        endTime: editEndTime,
+      });
+      toast.success(t('shift.updated', 'Shift updated'));
+      setIsEditing(false);
+    } catch {
+      toast.error(t('shift.updateError', 'Failed to update shift'));
+    }
+  };
 
   const handleAssign = async (employeePublicId: string) => {
     try {
@@ -249,31 +291,81 @@ function ShiftCard({
   const durationMins = durationMinutes % 60;
 
   return (
-    <GlassCard hover={!isExpanded && !showAssign}>
+    <GlassCard hover={!isExpanded && !showAssign && !isEditing}>
       {/* Header with time accent bar */}
       <div className="relative">
         <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r from-amber to-coffee" />
         <div className="px-5 pt-5 pb-3">
-          <div className="flex items-start justify-between">
-            <div>
-              <h3 className="text-[15px] font-semibold text-text-primary">{shift.name}</h3>
-              <div className="flex items-center gap-3 mt-1.5">
-                <div className="flex items-center gap-1.5 text-[13px] font-mono tabular-nums text-text-secondary">
-                  <Clock size={13} className="text-amber" />
-                  {shift.startTime} &ndash; {shift.endTime}
+          {isEditing ? (
+            <div className="space-y-3">
+              <input
+                type="text"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                placeholder="Shift name"
+                required
+                className="w-full px-3 py-2 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee"
+              />
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <label className="block text-[11px] font-medium text-text-secondary mb-1">
+                    Start time
+                  </label>
+                  <CustomTimePicker value={editStartTime} onChange={setEditStartTime} />
                 </div>
-                <span className="text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
-                  {durationHours}h{durationMins > 0 ? ` ${durationMins}m` : ''}
-                </span>
+                <div className="flex-1">
+                  <label className="block text-[11px] font-medium text-text-secondary mb-1">
+                    End time
+                  </label>
+                  <CustomTimePicker value={editEndTime} onChange={setEditEndTime} />
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleSaveEdit}
+                  disabled={updateShift.isPending || !editName.trim()}
+                  className="px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50 transition-colors"
+                >
+                  {updateShift.isPending ? t('common.loading') : t('common.save', 'Save')}
+                </button>
+                <button
+                  onClick={handleCancelEdit}
+                  className="px-4 py-2 rounded-lg text-[13px] font-medium bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer hover:bg-cream-3/40 transition-colors"
+                >
+                  {t('common.cancel', 'Cancel')}
+                </button>
               </div>
             </div>
-            <button
-              onClick={onDelete}
-              className="text-text-tertiary hover:text-red transition-colors bg-transparent border-none cursor-pointer p-1.5 rounded-lg hover:bg-red/8"
-            >
-              <Trash2 size={14} />
-            </button>
-          </div>
+          ) : (
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-[15px] font-semibold text-text-primary">{shift.name}</h3>
+                <div className="flex items-center gap-3 mt-1.5">
+                  <div className="flex items-center gap-1.5 text-[13px] font-mono tabular-nums text-text-secondary">
+                    <Clock size={13} className="text-amber" />
+                    {shift.startTime} &ndash; {shift.endTime}
+                  </div>
+                  <span className="text-[10.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
+                    {durationHours}h{durationMins > 0 ? ` ${durationMins}m` : ''}
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={handleStartEdit}
+                  className="text-text-tertiary hover:text-coffee transition-colors bg-transparent border-none cursor-pointer p-1.5 rounded-lg hover:bg-coffee/8"
+                >
+                  <Pencil size={14} />
+                </button>
+                <button
+                  onClick={onDelete}
+                  className="text-text-tertiary hover:text-red transition-colors bg-transparent border-none cursor-pointer p-1.5 rounded-lg hover:bg-red/8"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -309,7 +401,7 @@ function ShiftCard({
 
         {assignedEmployees.length === 0 ? (
           <p className="text-[11.5px] text-text-tertiary italic">
-            No employees assigned yet
+            No employees assigned. Assign staff to track their attendance against this shift's hours.
           </p>
         ) : (
           <div className="space-y-1.5">

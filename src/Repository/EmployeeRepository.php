@@ -31,9 +31,29 @@ class EmployeeRepository extends ServiceEntityRepository
         return $this->findOneBy(['qrToken' => $qrToken]);
     }
 
-    public function findByLinkedUser(User $user): ?Employee
+    /** @return Employee[] */
+    public function findByLinkedUser(User $user): array
     {
-        return $this->findOneBy(['linkedUser' => $user]);
+        return $this->createQueryBuilder('e')
+            ->where('e.linkedUser = :user')
+            ->andWhere('e.deletedAt IS NULL')
+            ->setParameter('user', $user)
+            ->orderBy('e.firstName', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findOneByLinkedUserAndWorkspace(User $user, Workspace $workspace): ?Employee
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.linkedUser = :user')
+            ->andWhere('e.workspace = :ws')
+            ->andWhere('e.deletedAt IS NULL')
+            ->setParameter('user', $user)
+            ->setParameter('ws', $workspace)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     /** @return Employee[] */

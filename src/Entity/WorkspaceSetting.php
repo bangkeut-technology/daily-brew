@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Class WorkspaceSetting
  *
- * OneToOne typed settings per workspace — IP restriction, geofencing, locale.
+ * OneToOne typed settings per workspace — IP restriction, geofencing, timezone.
  *
  * @package App\Entity
  * @author  Vandeth THO <thovandeth@gmail.com>
@@ -32,8 +32,9 @@ class WorkspaceSetting extends AbstractBaseEntity
     #[ORM\Column(length: 50, options: ['default' => 'Asia/Phnom_Penh'])]
     private string $timezone = 'Asia/Phnom_Penh';
 
-    #[ORM\Column(length: 5, options: ['default' => 'en'])]
-    private string $locale = 'en';
+    /** Date display format: DD/MM/YYYY, MM/DD/YYYY, or YYYY-MM-DD */
+    #[ORM\Column(length: 12, options: ['default' => 'DD/MM/YYYY'])]
+    private string $dateFormat = 'DD/MM/YYYY';
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $deviceVerificationEnabled = false;
@@ -87,7 +88,7 @@ class WorkspaceSetting extends AbstractBaseEntity
         return $this;
     }
 
-    // ── Locale / Timezone ──────────────────────────────────────
+    // ── Timezone ───────────────────────────────────────────────
 
     public function getTimezone(): string
     {
@@ -100,14 +101,14 @@ class WorkspaceSetting extends AbstractBaseEntity
         return $this;
     }
 
-    public function getLocale(): string
+    public function getDateFormat(): string
     {
-        return $this->locale;
+        return $this->dateFormat;
     }
 
-    public function setLocale(string $locale): static
+    public function setDateFormat(string $dateFormat): static
     {
-        $this->locale = $locale;
+        $this->dateFormat = $dateFormat;
         return $this;
     }
 

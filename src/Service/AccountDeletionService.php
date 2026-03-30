@@ -41,9 +41,11 @@ final readonly class AccountDeletionService
         // Soft-delete any remaining employees created by this user
         $this->employeeRepository->softDeleteByCreator($user, $now);
 
-        // Unlink employee record linked to this user
-        $linkedEmployee = $this->employeeRepository->findByLinkedUser($user);
-        $linkedEmployee?->setLinkedUser(null);
+        // Unlink all employee records linked to this user
+        $linkedEmployees = $this->employeeRepository->findByLinkedUser($user);
+        foreach ($linkedEmployees as $linkedEmployee) {
+            $linkedEmployee->setLinkedUser(null);
+        }
 
         // Soft-delete leave requests made by this user
         $this->leaveRequestRepository->softDeleteByRequestedBy($user, $now);

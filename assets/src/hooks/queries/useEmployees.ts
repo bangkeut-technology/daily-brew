@@ -35,8 +35,11 @@ export function useCreateEmployee(workspacePublicId: string) {
       firstName: string;
       lastName: string;
       phoneNumber?: string;
+      username?: string;
       shiftPublicId?: string;
       linkedUserPublicId?: string;
+      dob?: string;
+      joinedAt?: string;
     }) => {
       const { data } = await apiAxios.post<Employee>(
         `/workspaces/${workspacePublicId}/employees`,
@@ -61,9 +64,12 @@ export function useUpdateEmployee(workspacePublicId: string) {
       firstName?: string;
       lastName?: string;
       phoneNumber?: string;
+      username?: string | null;
       shiftPublicId?: string | null;
       active?: boolean;
       linkedUserPublicId?: string | null;
+      dob?: string | null;
+      joinedAt?: string | null;
     }) => {
       const { data } = await apiAxios.put<Employee>(
         `/workspaces/${workspacePublicId}/employees/${publicId}`,

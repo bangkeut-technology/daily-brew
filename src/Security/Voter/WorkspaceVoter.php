@@ -61,8 +61,8 @@ class WorkspaceVoter extends Voter
 
         // Employees can VIEW workspace resources (read-only)
         if ($attribute === self::VIEW) {
-            $employee = $this->employeeRepository->findByLinkedUser($user);
-            if ($employee !== null && $employee->getWorkspace()?->getId() === $workspace->getId()) {
+            $employee = $this->employeeRepository->findOneByLinkedUserAndWorkspace($user, $workspace);
+            if ($employee !== null) {
                 return true;
             }
         }

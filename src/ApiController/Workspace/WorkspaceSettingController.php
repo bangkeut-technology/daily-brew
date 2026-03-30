@@ -112,8 +112,8 @@ class WorkspaceSettingController extends AbstractController
         if (isset($data['timezone'])) {
             $setting->setTimezone($data['timezone']);
         }
-        if (isset($data['locale'])) {
-            $setting->setLocale($data['locale']);
+        if (isset($data['dateFormat'])) {
+            $setting->setDateFormat($data['dateFormat']);
         }
 
         $em->flush();
@@ -127,7 +127,7 @@ class WorkspaceSettingController extends AbstractController
             'ipRestrictionEnabled' => $setting?->isIpRestrictionEnabled() ?? false,
             'allowedIps' => $setting?->getAllowedIps(),
             'timezone' => $setting?->getTimezone() ?? 'Asia/Phnom_Penh',
-            'locale' => $setting?->getLocale() ?? 'en',
+            'dateFormat' => $setting?->getDateFormat() ?? 'DD/MM/YYYY',
             'deviceVerificationEnabled' => $setting?->isDeviceVerificationEnabled() ?? false,
             'geofencingEnabled' => $setting?->isGeofencingEnabled() ?? false,
             'geofencingLatitude' => $setting?->getGeofencingLatitude(),

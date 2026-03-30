@@ -24,7 +24,7 @@ export interface WorkspaceSetting {
   allowedIps: string[] | null;
   deviceVerificationEnabled: boolean;
   timezone: string;
-  locale: string;
+  dateFormat: string;
   geofencingEnabled: boolean;
   geofencingLatitude: number | null;
   geofencingLongitude: number | null;
@@ -63,10 +63,13 @@ export interface Employee {
   firstName: string;
   lastName: string;
   name: string;
+  username: string | null;
   phoneNumber: string | null;
   active: boolean;
   shiftName: string | null;
   shiftPublicId: string | null;
+  dob: string | null;
+  joinedAt: string | null;
   linkedUserPublicId: string | null;
   linkedUserEmail: string | null;
   createdAt: string;
@@ -165,4 +168,10 @@ export interface RoleContext {
     workspacePublicId: string | null;
     workspaceName: string | null;
   } | null;
+  linkedWorkspaces: {
+    workspacePublicId: string | null;
+    workspaceName: string | null;
+    employeePublicId: string;
+    employeeName: string;
+  }[];
 }

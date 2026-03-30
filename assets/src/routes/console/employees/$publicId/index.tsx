@@ -17,11 +17,14 @@ import { CustomSelect } from '@/components/shared/CustomSelect';
 import { Toggle } from '@/components/shared/Toggle';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
+import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
 
 const editEmployeeSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
   phoneNumber: z.string().optional(),
+  dob: z.string().optional(),
+  joinedAt: z.string().optional(),
   shiftPublicId: z.string().optional(),
   active: z.boolean(),
 });
@@ -57,6 +60,8 @@ function EmployeeDetailPage() {
           firstName: employee.firstName,
           lastName: employee.lastName,
           phoneNumber: employee.phoneNumber || '',
+          dob: employee.dob || '',
+          joinedAt: employee.joinedAt || '',
           shiftPublicId: employee.shiftPublicId || '',
           active: employee.active,
         }
@@ -120,6 +125,8 @@ function EmployeeDetailPage() {
         firstName: values.firstName,
         lastName: values.lastName,
         phoneNumber: values.phoneNumber || undefined,
+        dob: values.dob || null,
+        joinedAt: values.joinedAt || null,
         shiftPublicId: values.shiftPublicId || null,
         active: values.active,
       });
@@ -181,6 +188,26 @@ function EmployeeDetailPage() {
                   {t('employee.phoneNumber', 'Phone number')}
                 </label>
                 <input id="edit-phone" type="text" {...register('phoneNumber')} className={inputClassName} />
+              </div>
+
+              <div>
+                <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+                  {t('employee.dob', 'Date of birth')}
+                </label>
+                <CustomDatePicker
+                  value={watch('dob') || ''}
+                  onChange={(v) => setValue('dob', v)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-[12px] font-medium text-text-secondary mb-1.5">
+                  {t('employee.joinedAt', 'Join date')}
+                </label>
+                <CustomDatePicker
+                  value={watch('joinedAt') || ''}
+                  onChange={(v) => setValue('joinedAt', v)}
+                />
               </div>
 
               <div>
@@ -255,6 +282,22 @@ function EmployeeDetailPage() {
                   <div className="flex items-center justify-between py-2 border-b border-cream-3/50">
                     <span className="text-[11.5px] text-text-tertiary">{t('employee.phone', 'Phone')}</span>
                     <span className="text-[12.5px] font-medium text-text-primary font-mono">{employee.phoneNumber}</span>
+                  </div>
+                )}
+                {employee.dob && (
+                  <div className="flex items-center justify-between py-2 border-b border-cream-3/50">
+                    <span className="text-[11.5px] text-text-tertiary">{t('employee.dob', 'Date of birth')}</span>
+                    <span className="text-[12.5px] text-text-secondary">
+                      {new Date(employee.dob).toLocaleDateString()}
+                    </span>
+                  </div>
+                )}
+                {employee.joinedAt && (
+                  <div className="flex items-center justify-between py-2 border-b border-cream-3/50">
+                    <span className="text-[11.5px] text-text-tertiary">{t('employee.joinedAt', 'Join date')}</span>
+                    <span className="text-[12.5px] text-text-secondary">
+                      {new Date(employee.joinedAt).toLocaleDateString()}
+                    </span>
                   </div>
                 )}
                 <div className="flex items-center justify-between py-2 border-b border-cream-3/50">

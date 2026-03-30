@@ -21,6 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author  Vandeth THO <thovandeth@gmail.com>
  */
 #[ORM\Table(name: 'daily_brew_employees')]
+#[ORM\UniqueConstraint(name: 'unique_linked_user_workspace', columns: ['linked_user_id', 'workspace_id'])]
 #[ORM\Entity(repositoryClass: EmployeeRepository::class)]
 class Employee extends AbstractBaseEntity
 {
@@ -40,6 +41,11 @@ class Employee extends AbstractBaseEntity
     #[ORM\Column(length: 20, nullable: true)]
     #[Groups(['employee:read'])]
     private ?string $phoneNumber = null;
+
+    /** Unique username for cross-product staff linking (e.g. BasilBook). */
+    #[ORM\Column(length: 50, nullable: true, unique: true)]
+    #[Groups(['employee:read'])]
+    private ?string $username = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['employee:read'])]
@@ -67,7 +73,7 @@ class Employee extends AbstractBaseEntity
     private ?User $user = null;
 
     /** Linked user account — allows employee to log in and see their own data. */
-    #[ORM\OneToOne(targetEntity: User::class)]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     #[Groups(['employee:read'])]
     private ?User $linkedUser = null;
@@ -145,6 +151,17 @@ class Employee extends AbstractBaseEntity
     }
 
     // ── Contact / Details ──────────────────────────────────────
+
+    public function getUsername(): ?string
+    {
+        return $this->username;
+    }
+
+    public function setUsername(?string $username): static
+    {
+        $this->username = $username;
+        return $this;
+    }
 
     public function getPhoneNumber(): ?string
     {

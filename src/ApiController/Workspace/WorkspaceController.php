@@ -77,7 +77,6 @@ class WorkspaceController extends AbstractController
                 'ipRestrictionEnabled' => $setting->isIpRestrictionEnabled(),
                 'allowedIps' => $setting->getAllowedIps(),
                 'timezone' => $setting->getTimezone(),
-                'locale' => $setting->getLocale(),
             ] : null,
         ]);
     }

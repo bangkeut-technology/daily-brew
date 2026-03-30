@@ -83,34 +83,44 @@ class UserController extends AbstractController
         EmployeeRepository $employeeRepository,
     ): JsonResponse {
         $ownedWorkspaces = $workspaceRepository->findByOwner($user);
-        $employee = $employeeRepository->findByLinkedUser($user);
+        $linkedEmployees = $employeeRepository->findByLinkedUser($user);
 
         $currentWorkspace = $user->getCurrentWorkspace();
         $isOwnerOfCurrent = false;
-        $isEmployeeInCurrent = false;
+        $currentEmployee = null;
 
         if ($currentWorkspace !== null) {
             $isOwnerOfCurrent = $currentWorkspace->getOwner()?->getId() === $user->getId();
-            if ($employee !== null) {
-                $isEmployeeInCurrent = $employee->getWorkspace()?->getId() === $currentWorkspace->getId();
+            // Find the employee record for the current workspace
+            foreach ($linkedEmployees as $emp) {
+                if ($emp->getWorkspace()?->getId() === $currentWorkspace->getId()) {
+                    $currentEmployee = $emp;
+                    break;
+                }
             }
         }
 
         return $this->jsonSuccess([
             'isOwner' => $isOwnerOfCurrent,
-            'isEmployee' => $isEmployeeInCurrent,
+            'isEmployee' => $currentEmployee !== null,
             'onboardingCompleted' => $user->isOnboardingCompleted(),
             'ownedWorkspaces' => array_map(fn ($w) => [
                 'publicId' => (string) $w->getPublicId(),
                 'name' => $w->getName(),
             ], $ownedWorkspaces),
-            'employee' => $employee ? [
-                'publicId' => (string) $employee->getPublicId(),
-                'qrToken' => $employee->getQrToken(),
-                'name' => $employee->getName(),
-                'workspacePublicId' => $employee->getWorkspace() ? (string) $employee->getWorkspace()->getPublicId() : null,
-                'workspaceName' => $employee->getWorkspace()?->getName(),
+            'employee' => $currentEmployee ? [
+                'publicId' => (string) $currentEmployee->getPublicId(),
+                'qrToken' => $currentEmployee->getQrToken(),
+                'name' => $currentEmployee->getName(),
+                'workspacePublicId' => $currentEmployee->getWorkspace() ? (string) $currentEmployee->getWorkspace()->getPublicId() : null,
+                'workspaceName' => $currentEmployee->getWorkspace()?->getName(),
             ] : null,
+            'linkedWorkspaces' => array_map(fn ($emp) => [
+                'workspacePublicId' => $emp->getWorkspace() ? (string) $emp->getWorkspace()->getPublicId() : null,
+                'workspaceName' => $emp->getWorkspace()?->getName(),
+                'employeePublicId' => (string) $emp->getPublicId(),
+                'employeeName' => $emp->getName(),
+            ], $linkedEmployees),
         ]);
     }
 
@@ -128,11 +138,6 @@ class UserController extends AbstractController
             return $this->jsonError('employeePublicId is required');
         }
 
-        $existing = $employeeRepository->findByLinkedUser($user);
-        if ($existing !== null) {
-            return $this->jsonError('You are already linked to an employee record');
-        }
-
         $employee = $employeeRepository->findByPublicId($employeePublicId);
         if ($employee === null) {
             return $this->jsonError('Employee not found');
@@ -140,6 +145,15 @@ class UserController extends AbstractController
 
         if ($employee->getLinkedUser() !== null) {
             return $this->jsonError('This employee is already linked to a user');
+        }
+
+        // Check if user is already linked to another employee in the same workspace
+        $workspace = $employee->getWorkspace();
+        if ($workspace !== null) {
+            $existing = $employeeRepository->findOneByLinkedUserAndWorkspace($user, $workspace);
+            if ($existing !== null) {
+                return $this->jsonError('You are already linked to an employee in this workspace');
+            }
         }
 
         $employee->setLinkedUser($user);

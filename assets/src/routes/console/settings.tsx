@@ -26,6 +26,35 @@ export const Route = createFileRoute('/console/settings')({
   component: SettingsPage,
 });
 
+const TIMEZONE_OPTIONS = [
+  { value: 'Pacific/Honolulu', label: 'Hawaii (UTC-10)' },
+  { value: 'America/Anchorage', label: 'Alaska (UTC-9)' },
+  { value: 'America/Los_Angeles', label: 'Pacific Time (UTC-8)' },
+  { value: 'America/Denver', label: 'Mountain Time (UTC-7)' },
+  { value: 'America/Chicago', label: 'Central Time (UTC-6)' },
+  { value: 'America/New_York', label: 'Eastern Time (UTC-5)' },
+  { value: 'America/Sao_Paulo', label: 'Brasilia (UTC-3)' },
+  { value: 'Atlantic/Reykjavik', label: 'Iceland (UTC+0)' },
+  { value: 'Europe/London', label: 'London (UTC+0)' },
+  { value: 'Europe/Paris', label: 'Paris (UTC+1)' },
+  { value: 'Europe/Berlin', label: 'Berlin (UTC+1)' },
+  { value: 'Europe/Istanbul', label: 'Istanbul (UTC+3)' },
+  { value: 'Asia/Dubai', label: 'Dubai (UTC+4)' },
+  { value: 'Asia/Kolkata', label: 'India (UTC+5:30)' },
+  { value: 'Asia/Dhaka', label: 'Dhaka (UTC+6)' },
+  { value: 'Asia/Bangkok', label: 'Bangkok (UTC+7)' },
+  { value: 'Asia/Phnom_Penh', label: 'Phnom Penh (UTC+7)' },
+  { value: 'Asia/Ho_Chi_Minh', label: 'Ho Chi Minh (UTC+7)' },
+  { value: 'Asia/Singapore', label: 'Singapore (UTC+8)' },
+  { value: 'Asia/Shanghai', label: 'China (UTC+8)' },
+  { value: 'Asia/Hong_Kong', label: 'Hong Kong (UTC+8)' },
+  { value: 'Asia/Taipei', label: 'Taipei (UTC+8)' },
+  { value: 'Asia/Seoul', label: 'Seoul (UTC+9)' },
+  { value: 'Asia/Tokyo', label: 'Tokyo (UTC+9)' },
+  { value: 'Australia/Sydney', label: 'Sydney (UTC+11)' },
+  { value: 'Pacific/Auckland', label: 'Auckland (UTC+12)' },
+];
+
 function SettingsPage() {
   const { t } = useTranslation();
   const currentWsId = getWorkspacePublicId() || '';
@@ -42,7 +71,7 @@ function SettingsPage() {
   const [ipEnabled, setIpEnabled] = useState(false);
   const [allowedIps, setAllowedIps] = useState('');
   const [timezone, setTimezone] = useState('Asia/Phnom_Penh');
-  const [locale, setLocale] = useState('en');
+  const [dateFormat, setDateFormat] = useState('DD/MM/YYYY');
   const [newWsName, setNewWsName] = useState('');
 
   // Device verification state
@@ -60,7 +89,7 @@ function SettingsPage() {
       setIpEnabled(settings.ipRestrictionEnabled);
       setAllowedIps(settings.allowedIps?.join('\n') || '');
       setTimezone(settings.timezone);
-      setLocale(settings.locale);
+      setDateFormat(settings.dateFormat || 'DD/MM/YYYY');
       setDeviceVerificationEnabled(settings.deviceVerificationEnabled);
       setGeofencingEnabled(settings.geofencingEnabled);
       setGeofencingLat(settings.geofencingLatitude);
@@ -79,7 +108,7 @@ function SettingsPage() {
           .filter(Boolean),
         deviceVerificationEnabled,
         timezone,
-        locale,
+        dateFormat,
         geofencingEnabled,
         geofencingLatitude: geofencingEnabled ? geofencingLat : null,
         geofencingLongitude: geofencingEnabled ? geofencingLng : null,
@@ -416,34 +445,33 @@ function SettingsPage() {
                   />
                 </div>
               )}
-              <div className="flex gap-3">
-                <div className="flex-1">
-                  <label htmlFor="ws-timezone" className="block text-[11px] font-medium text-text-secondary mb-1">
-                    Timezone
-                  </label>
-                  <input
-                    id="ws-timezone"
-                    name="timezone"
-                    type="text"
-                    value={timezone}
-                    onChange={(e) => setTimezone(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee"
-                  />
-                </div>
-                <div className="flex-1">
-                  <label id="ws-locale-label" className="block text-[11px] font-medium text-text-secondary mb-1">
-                    Locale
-                  </label>
-                  <CustomSelect
-                    value={locale}
-                    onChange={setLocale}
-                    options={[
-                      { value: 'en', label: 'English' },
-                      { value: 'fr', label: 'Français' },
-                      { value: 'km', label: 'ខ្មែរ' },
-                    ]}
-                  />
-                </div>
+              <div>
+                <label id="ws-timezone-label" className="block text-[11px] font-medium text-text-secondary mb-1">
+                  Timezone
+                </label>
+                <CustomSelect
+                  value={timezone}
+                  onChange={setTimezone}
+                  options={TIMEZONE_OPTIONS}
+                  placeholder="Select timezone…"
+                />
+                <p className="text-[10.5px] text-text-tertiary mt-1">
+                  Used to calculate late arrivals and early departures relative to shift times.
+                </p>
+              </div>
+              <div>
+                <label id="ws-dateformat-label" className="block text-[11px] font-medium text-text-secondary mb-1">
+                  Date format
+                </label>
+                <CustomSelect
+                  value={dateFormat}
+                  onChange={setDateFormat}
+                  options={[
+                    { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY (30/03/2026)' },
+                    { value: 'MM/DD/YYYY', label: 'MM/DD/YYYY (03/30/2026)' },
+                    { value: 'YYYY-MM-DD', label: 'YYYY-MM-DD (2026-03-30)' },
+                  ]}
+                />
               </div>
               <button
                 onClick={handleSaveSettings}
