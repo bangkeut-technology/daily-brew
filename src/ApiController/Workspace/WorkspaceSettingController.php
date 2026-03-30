@@ -7,9 +7,9 @@ namespace App\ApiController\Workspace;
 use App\ApiController\Trait\ApiResponseTrait;
 use App\Entity\WorkspaceSetting;
 use App\Repository\WorkspaceRepository;
+use App\Repository\WorkspaceSettingRepository;
 use App\Security\Voter\WorkspaceVoter;
 use App\Service\PlanService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,7 +44,7 @@ class WorkspaceSettingController extends AbstractController
         Request $request,
         WorkspaceRepository $workspaceRepository,
         PlanService $planService,
-        EntityManagerInterface $em,
+        WorkspaceSettingRepository $settingRepository,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
         if ($workspace === null) {
@@ -61,7 +61,7 @@ class WorkspaceSettingController extends AbstractController
             $setting = new WorkspaceSetting();
             $setting->setWorkspace($workspace);
             $workspace->setSetting($setting);
-            $em->persist($setting);
+            $settingRepository->persist($setting);
         }
 
         // IP restriction (Espresso gated)
@@ -116,7 +116,7 @@ class WorkspaceSettingController extends AbstractController
             $setting->setDateFormat($data['dateFormat']);
         }
 
-        $em->flush();
+        $settingRepository->flush();
 
         return $this->jsonSuccess($this->serializeSetting($setting));
     }

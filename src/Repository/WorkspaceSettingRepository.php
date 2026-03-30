@@ -3,10 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\WorkspaceSetting;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class WorkspaceSettingRepository extends ServiceEntityRepository
+class WorkspaceSettingRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
