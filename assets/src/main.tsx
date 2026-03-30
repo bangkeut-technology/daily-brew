@@ -60,7 +60,7 @@ if (rootElement && !rootElement.innerHTML) {
                             <AuthenticationProvider>
                                 <LanguageProvider>
                                     <Application />
-                                    <Toaster position="top-right" richColors />
+                                    <Toaster position="top-right" richColors theme="system" />
                                 </LanguageProvider>
                             </AuthenticationProvider>
                         </ApplicationProvider>

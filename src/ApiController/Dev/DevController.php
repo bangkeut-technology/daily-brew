@@ -35,7 +35,8 @@ class DevController extends AbstractController
         WorkspaceRepository $workspaceRepository,
         SubscriptionRepository $subscriptionRepository,
     ): JsonResponse {
-        if ($this->getParameter('kernel.environment') !== 'dev') {
+        $env = $this->getParameter('kernel.environment');
+        if ($env !== 'dev') {
             return $this->jsonError('Only available in dev environment', 403);
         }
 

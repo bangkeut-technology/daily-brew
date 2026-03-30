@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import clsx from 'clsx';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -210,11 +211,12 @@ function SettingsPage() {
                         });
                       }}
                       disabled={devToggle.isPending}
-                      className={`px-3 py-1 rounded-md text-[11px] font-medium border-none cursor-pointer transition-colors ${
+                      className={clsx(
+                        'px-3 py-1 rounded-md text-[11px] font-medium border-none cursor-pointer transition-colors',
                         plan.plan === p
                           ? 'bg-coffee text-white'
-                          : 'bg-glass-bg text-text-secondary hover:bg-cream-3'
-                      }`}
+                          : 'bg-glass-bg text-text-secondary hover:bg-cream-3',
+                      )}
                     >
                       {p === 'double_espresso' ? 'Double Espresso' : p === 'free' ? 'Free' : 'Espresso'}
                     </button>
