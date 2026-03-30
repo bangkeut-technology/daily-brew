@@ -45,23 +45,36 @@ class PaddleWebhookService
         $customData = $data['custom_data'] ?? [];
         $workspacePublicId = $customData['workspace_public_id'] ?? null;
 
+        $this->logger->info('handleSubscriptionCreated', [
+            'paddle_sub_id' => $paddleSubId,
+            'workspace_public_id' => $workspacePublicId,
+            'status' => $data['status'] ?? null,
+            'custom_data' => $customData,
+        ]);
+
         if (!$workspacePublicId) {
-            $this->logger->warning('Paddle subscription.created missing workspace_public_id');
+            $this->logger->error('Paddle subscription.created missing workspace_public_id', ['data' => $customData]);
             return;
         }
 
         $workspace = $this->workspaceRepository->findByPublicId($workspacePublicId);
         if ($workspace === null) {
-            $this->logger->warning('Workspace not found: ' . $workspacePublicId);
+            $this->logger->error('Workspace not found for subscription', ['workspace_public_id' => $workspacePublicId]);
             return;
         }
 
         $subscription = $this->subscriptionRepository->findByWorkspace($workspace);
+        $isNew = $subscription === null;
         if ($subscription === null) {
             $subscription = new Subscription();
             $subscription->setWorkspace($workspace);
             $this->em->persist($subscription);
         }
+
+        $this->logger->info('Subscription record ' . ($isNew ? 'created' : 'updated'), [
+            'workspace' => $workspace->getName(),
+            'paddle_sub_id' => $paddleSubId,
+        ]);
 
         $subscription->setPlan(PlanEnum::Espresso);
         $subscription->setSource(SubscriptionSourceEnum::Paddle);
@@ -86,6 +99,11 @@ class PaddleWebhookService
 
     private function handleSubscriptionUpdated(array $data): void
     {
+        $this->logger->info('handleSubscriptionUpdated', [
+            'paddle_sub_id' => $data['id'] ?? '',
+            'status' => $data['status'] ?? null,
+        ]);
+
         $subscription = $this->findByPaddleId($data['id'] ?? '');
         if ($subscription === null) return;
 
@@ -149,7 +167,10 @@ class PaddleWebhookService
     {
         $subscription = $this->subscriptionRepository->findByPaddleSubscriptionId($paddleSubId);
         if ($subscription === null) {
-            $this->logger->warning('Paddle subscription not found: ' . $paddleSubId);
+            $this->logger->error('Paddle subscription not found in database', [
+                'paddle_subscription_id' => $paddleSubId,
+                'hint' => 'subscription.created may not have been processed — check webhook delivery in Paddle dashboard',
+            ]);
         }
         return $subscription;
     }
