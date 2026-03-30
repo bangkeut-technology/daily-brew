@@ -32,6 +32,7 @@ class LeaveRequestRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('lr')
             ->where('lr.workspace = :workspace')
+            ->andWhere('lr.deletedAt IS NULL')
             ->setParameter('workspace', $workspace)
             ->orderBy('lr.createdAt', 'DESC');
 
@@ -49,6 +50,7 @@ class LeaveRequestRepository extends ServiceEntityRepository
             ->select('COUNT(lr.id)')
             ->where('lr.workspace = :workspace')
             ->andWhere('lr.status = :status')
+            ->andWhere('lr.deletedAt IS NULL')
             ->setParameter('workspace', $workspace)
             ->setParameter('status', LeaveRequestStatusEnum::PENDING)
             ->getQuery()
@@ -66,6 +68,7 @@ class LeaveRequestRepository extends ServiceEntityRepository
             ->andWhere('lr.startDate <= :date')
             ->andWhere('lr.endDate >= :date')
             ->andWhere('lr.status = :status')
+            ->andWhere('lr.deletedAt IS NULL')
             ->setParameter('workspace', $workspace)
             ->setParameter('date', $date)
             ->setParameter('status', LeaveRequestStatusEnum::APPROVED)

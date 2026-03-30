@@ -11,12 +11,14 @@ import {
   Loader2,
   MapPinOff,
   Plus,
+  X,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { useRoleContext } from '@/hooks/queries/useRoleContext';
 import { useCheckinStatus, useCheckinAction } from '@/hooks/queries/useCheckin';
 import { useWorkspace } from '@/hooks/queries/useWorkspaces';
 import { getWorkspacePublicId } from '@/lib/auth';
-import { useLeaveRequests } from '@/hooks/queries/useLeaveRequests';
+import { useLeaveRequests, useDeleteLeaveRequest } from '@/hooks/queries/useLeaveRequests';
 import { useClosures } from '@/hooks/queries/useClosures';
 import { useDateFormat } from '@/hooks/useDateFormat';
 import { Avatar } from '@/components/shared/Avatar';
@@ -24,6 +26,7 @@ import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { LeaveRequestModal } from '@/components/shared/LeaveRequestModal';
+import { ConfirmModal } from '@/components/shared/ConfirmModal';
 
 function formatTime(time: string | null): string {
   if (!time) return '--:--';
@@ -185,7 +188,7 @@ export function EmployeeDashboard() {
           <>
             {activeClosure && (
               <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-red/8 border border-red/15 mb-4">
-                <CalendarOff size={16} className="text-red flex-shrink-0" />
+                <CalendarOff size={16} className="text-red shrink-0" />
                 <div>
                   <p className="text-[13px] font-medium text-red">Restaurant is closed — {activeClosure.name}</p>
                   <p className="text-[11px] text-red/70">No check-in required today.</p>
@@ -194,7 +197,7 @@ export function EmployeeDashboard() {
             )}
             {!activeClosure && nextClosure && (
               <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-amber/8 border border-amber/15 mb-4">
-                <CalendarOff size={16} className="text-amber flex-shrink-0" />
+                <CalendarOff size={16} className="text-amber shrink-0" />
                 <div>
                   <p className="text-[13px] font-medium text-amber">Upcoming closure — {nextClosure.name}</p>
                   <p className="text-[11px] text-amber/70">{fmtDate(nextClosure.startDate)}{nextClosure.startDate !== nextClosure.endDate ? ` – ${fmtDate(nextClosure.endDate)}` : ''}</p>
@@ -215,7 +218,7 @@ export function EmployeeDashboard() {
           <div className="px-5 py-4">
             {checkinData?.shiftName ? (
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-amber-light to-coffee">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-linear-to-br from-amber-light to-coffee">
                   <Clock size={18} className="text-white" />
                 </div>
                 <div>
@@ -260,7 +263,7 @@ export function EmployeeDashboard() {
               </div>
             ) : onLeave && leaveIsFullDay ? (
               <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue/8 border border-blue/15">
-                <CalendarOff size={16} className="text-blue flex-shrink-0" />
+                <CalendarOff size={16} className="text-blue shrink-0" />
                 <div>
                   <p className="text-[13px] font-medium text-blue">
                     {t('dashboard.onApprovedLeave', 'You are on approved leave today')}
@@ -447,7 +450,7 @@ export function EmployeeDashboard() {
                   const isActive = nowDate >= start && nowDate <= end;
                   return (
                     <div key={c.publicId} className="flex items-center gap-3 py-2">
-                      <CalendarOff size={14} className={isActive ? 'text-red flex-shrink-0' : 'text-amber flex-shrink-0'} />
+                      <CalendarOff size={14} className={isActive ? 'text-red shrink-0' : 'text-amber shrink-0'} />
                       <div className="flex-1">
                         <p className="text-[13px] text-text-primary font-sans">{c.name}</p>
                         <p className="text-[11px] text-text-tertiary font-sans">
@@ -525,9 +528,9 @@ export function EmployeeDashboard() {
                 return days.map((day) => (
                   <div
                     key={day.date}
-                    className="flex items-center gap-3 px-5 py-2.5 transition-colors duration-[120ms] hover:bg-cream-3/35 cursor-default"
+                    className="flex items-center gap-3 px-5 py-2.5 transition-colors duration-120 hover:bg-cream-3/35 cursor-default"
                   >
-                    <CalendarDays size={14} className="text-text-tertiary flex-shrink-0" />
+                    <CalendarDays size={14} className="text-text-tertiary shrink-0" />
                     <span className="text-[13px] text-text-primary font-sans flex-1">
                       {day.label}
                     </span>
@@ -609,7 +612,20 @@ function EmployeeLeaveList({
 }) {
   const { t } = useTranslation();
   const { data: leaves, isLoading } = useLeaveRequests(workspacePublicId);
+  const deleteLeave = useDeleteLeaveRequest(workspacePublicId);
   const [showModal, setShowModal] = useState(false);
+  const [confirmCancelId, setConfirmCancelId] = useState<string | null>(null);
+
+  const handleCancel = async () => {
+    if (!confirmCancelId) return;
+    try {
+      await deleteLeave.mutateAsync(confirmCancelId);
+      toast.success(t('leave.cancelSuccess', 'Leave request cancelled'));
+    } catch {
+      toast.error(t('leave.cancelError', 'Failed to cancel leave request'));
+    }
+    setConfirmCancelId(null);
+  };
 
   const statusVariant = (status: string) => {
     switch (status) {
@@ -660,9 +676,9 @@ function EmployeeLeaveList({
           {myLeaves.map((leave) => (
             <div
               key={leave.publicId}
-              className="flex items-center gap-3 py-2 transition-colors duration-[120ms]"
+              className="flex items-center gap-3 py-2 transition-colors duration-120"
             >
-              <CalendarOff size={14} className="text-text-tertiary flex-shrink-0" />
+              <CalendarOff size={14} className="text-text-tertiary shrink-0" />
               <div className="flex-1">
                 <p className="text-[13px] text-text-primary font-sans">
                   {formatDate(leave.startDate)}
@@ -674,12 +690,21 @@ function EmployeeLeaveList({
                   )}
                 </p>
                 {leave.reason && (
-                  <p className="text-[11px] text-text-tertiary font-sans truncate max-w-[200px]">
+                  <p className="text-[11px] text-text-tertiary font-sans truncate max-w-50">
                     {leave.reason}
                   </p>
                 )}
               </div>
               <StatusBadge label={statusLabel(leave.status)} variant={statusVariant(leave.status)} />
+              {leave.status === 'pending' && (
+                <button
+                  onClick={() => setConfirmCancelId(leave.publicId)}
+                  className="w-6 h-6 flex items-center justify-center rounded-md bg-transparent border-none cursor-pointer text-text-tertiary hover:bg-red/10 hover:text-red transition-colors"
+                  title={t('leave.cancel', 'Cancel')}
+                >
+                  <X size={13} />
+                </button>
+              )}
             </div>
           ))}
         </div>
@@ -691,6 +716,17 @@ function EmployeeLeaveList({
         workspacePublicId={workspacePublicId}
         employeePublicId={employeePublicId}
         closures={closures}
+      />
+
+      <ConfirmModal
+        open={confirmCancelId !== null}
+        onOpenChange={(open) => { if (!open) setConfirmCancelId(null); }}
+        title={t('leave.cancelTitle', 'Cancel leave request')}
+        description={t('leave.cancelDescription', 'Are you sure you want to cancel this leave request? This action cannot be undone.')}
+        confirmLabel={t('leave.cancelConfirm', 'Yes, cancel')}
+        variant="danger"
+        loading={deleteLeave.isPending}
+        onConfirm={handleCancel}
       />
     </>
   );

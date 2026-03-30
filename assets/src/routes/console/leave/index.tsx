@@ -2,9 +2,9 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { Crown, Inbox, Plus } from 'lucide-react';
+import { Crown, Inbox, Plus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useLeaveRequests, useUpdateLeaveRequest } from '@/hooks/queries/useLeaveRequests';
+import { useLeaveRequests, useUpdateLeaveRequest, useDeleteLeaveRequest } from '@/hooks/queries/useLeaveRequests';
 import { useClosures } from '@/hooks/queries/useClosures';
 import { useRoleContext } from '@/hooks/queries/useRoleContext';
 import { usePlan } from '@/hooks/queries/usePlan';
@@ -15,6 +15,7 @@ import { Avatar } from '@/components/shared/Avatar';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { UpgradeModal } from '@/components/shared/UpgradeModal';
 import { LeaveRequestModal } from '@/components/shared/LeaveRequestModal';
+import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { useDateFormat } from '@/hooks/useDateFormat';
 
 export const Route = createFileRoute('/console/leave/')({
@@ -44,6 +45,7 @@ function LeaveRequestsPage() {
   const { data: requests, isLoading } = useLeaveRequests(canUse ? workspaceId : '', statusFilter || undefined);
   const { data: closures } = useClosures(workspaceId);
   const updateLeave = useUpdateLeaveRequest(workspaceId);
+  const deleteLeave = useDeleteLeaveRequest(workspaceId);
   const fmtDate = useDateFormat();
 
   if (planLoading || roleLoading) {
@@ -92,6 +94,19 @@ function LeaveRequestsPage() {
     } catch {
       toast.error(t('leave.updateError', 'Failed to update leave request'));
     }
+  };
+
+  const [confirmCancelId, setConfirmCancelId] = useState<string | null>(null);
+
+  const handleCancelLeave = async () => {
+    if (!confirmCancelId) return;
+    try {
+      await deleteLeave.mutateAsync(confirmCancelId);
+      toast.success(t('leave.cancelSuccess', 'Leave request cancelled'));
+    } catch {
+      toast.error(t('leave.cancelError', 'Failed to cancel leave request'));
+    }
+    setConfirmCancelId(null);
   };
 
   const statusVariant = (s: string): 'green' | 'amber' | 'red' => {
@@ -180,13 +195,26 @@ function LeaveRequestsPage() {
                       {lr.employeeName}
                     </div>
                   )}
-                  <div className="text-[11px] text-text-tertiary">
+                  <div className={isEmployee ? 'text-[13.5px] font-medium text-text-primary' : 'text-[11px] text-text-tertiary'}>
                     {formatDateRange(lr.startDate, lr.endDate)}
                     {!lr.isFullDay && lr.startTime && lr.endTime && ` ${lr.startTime}–${lr.endTime}`}
-                    {lr.reason ? ` \u2014 ${lr.reason}` : ''}
                   </div>
+                  {lr.reason && (
+                    <div className="text-[11.5px] text-text-secondary mt-0.5 truncate">
+                      {lr.reason}
+                    </div>
+                  )}
                 </div>
                 <StatusBadge label={t(`leave.${lr.status}`, lr.status)} variant={statusVariant(lr.status)} />
+                {isEmployee && lr.status === 'pending' && (
+                  <button
+                    onClick={() => setConfirmCancelId(lr.publicId)}
+                    className="w-7 h-7 flex items-center justify-center rounded-md bg-transparent border-none cursor-pointer text-text-tertiary hover:bg-red/10 hover:text-red transition-colors"
+                    title={t('leave.cancel', 'Cancel')}
+                  >
+                    <X size={14} />
+                  </button>
+                )}
                 {!isEmployee && lr.status === 'pending' && (
                   <div className="flex gap-1.5 ml-2">
                     <button
@@ -220,6 +248,17 @@ function LeaveRequestsPage() {
           closures={closures}
         />
       )}
+
+      <ConfirmModal
+        open={confirmCancelId !== null}
+        onOpenChange={(open) => { if (!open) setConfirmCancelId(null); }}
+        title={t('leave.cancelTitle', 'Cancel leave request')}
+        description={t('leave.cancelDescription', 'Are you sure you want to cancel this leave request? This action cannot be undone.')}
+        confirmLabel={t('leave.cancelConfirm', 'Yes, cancel')}
+        variant="danger"
+        loading={deleteLeave.isPending}
+        onConfirm={handleCancelLeave}
+      />
     </div>
   );
 }

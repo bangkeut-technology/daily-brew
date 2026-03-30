@@ -39,6 +39,18 @@ export function useCreateLeaveRequest(workspacePublicId: string) {
   });
 }
 
+export function useDeleteLeaveRequest(workspacePublicId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (publicId: string) => {
+      await apiAxios.delete(`/workspaces/${workspacePublicId}/leave-requests/${publicId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leaveRequests', workspacePublicId] });
+    },
+  });
+}
+
 export function useUpdateLeaveRequest(workspacePublicId: string) {
   const queryClient = useQueryClient();
   return useMutation({

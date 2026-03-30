@@ -140,4 +140,42 @@ class LeaveRequestController extends AbstractController
 
         return $this->jsonSuccess(LeaveRequestDTO::fromEntity($leaveRequest)->toArray());
     }
+
+    #[Route('/{publicId}', name: 'leave_requests_delete', methods: ['DELETE'])]
+    public function delete(
+        string $workspacePublicId,
+        string $publicId,
+        #[CurrentUser] User $user,
+        WorkspaceRepository $workspaceRepository,
+        LeaveRequestRepository $leaveRequestRepository,
+        \Doctrine\ORM\EntityManagerInterface $em,
+    ): JsonResponse {
+        $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
+        if ($workspace === null) {
+            throw new NotFoundHttpException('Workspace not found');
+        }
+
+        $this->denyAccessUnlessGranted(WorkspaceVoter::VIEW, $workspace);
+
+        $leaveRequest = $leaveRequestRepository->findByPublicId($publicId);
+        if ($leaveRequest === null || $leaveRequest->getEmployee()?->getWorkspace()?->getId() !== $workspace->getId()) {
+            throw new NotFoundHttpException('Leave request not found');
+        }
+
+        // Employees can only delete their own pending requests
+        $isOwner = $workspace->getOwner()?->getId() === $user->getId();
+        if (!$isOwner) {
+            if ($leaveRequest->getRequestedBy()?->getId() !== $user->getId()) {
+                return $this->jsonError('You can only cancel your own leave requests', 403);
+            }
+            if ($leaveRequest->getStatus() !== \App\Enum\LeaveRequestStatusEnum::PENDING) {
+                return $this->jsonError('Only pending leave requests can be cancelled', 400);
+            }
+        }
+
+        $leaveRequest->setDeletedAt(new \DateTimeImmutable());
+        $em->flush();
+
+        return $this->jsonSuccess(null, 204);
+    }
 }
