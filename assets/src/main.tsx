@@ -4,6 +4,7 @@ import { createRouter, RouterProvider } from '@tanstack/react-router';
 import { HelmetProvider } from 'react-helmet-async';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
+import { useTheme } from 'next-themes';
 
 import { routeTree } from './routeTree.gen';
 import { useAuthenticationState } from '@/hooks/use-authentication';
@@ -60,7 +61,7 @@ if (rootElement && !rootElement.innerHTML) {
                             <AuthenticationProvider>
                                 <LanguageProvider>
                                     <Application />
-                                    <Toaster position="top-right" richColors theme="system" />
+                                    <ThemedToaster />
                                 </LanguageProvider>
                             </AuthenticationProvider>
                         </ApplicationProvider>
@@ -69,6 +70,11 @@ if (rootElement && !rootElement.innerHTML) {
             </HelmetProvider>
         </StrictMode>,
     );
+}
+
+function ThemedToaster() {
+    const { resolvedTheme } = useTheme();
+    return <Toaster position="top-right" richColors theme={resolvedTheme === 'dark' ? 'dark' : 'light'} />;
 }
 
 // Register service worker (production only — sw.js doesn't exist in dev)

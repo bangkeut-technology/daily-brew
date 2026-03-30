@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import clsx from 'clsx';
+import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -21,6 +21,7 @@ import {
 import { usePlan } from '@/hooks/queries/usePlan';
 import { useEmployees } from '@/hooks/queries/useEmployees';
 import { useShifts } from '@/hooks/queries/useShifts';
+import { apiAxios } from '@/lib/apiAxios';
 import { getWorkspacePublicId, setWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
@@ -211,7 +212,7 @@ function SettingsPage() {
                         });
                       }}
                       disabled={devToggle.isPending}
-                      className={clsx(
+                      className={cn(
                         'px-3 py-1 rounded-md text-[11px] font-medium border-none cursor-pointer transition-colors',
                         plan.plan === p
                           ? 'bg-coffee text-white'
@@ -244,9 +245,10 @@ function SettingsPage() {
 
                 {/* Free plan */}
                 <div
-                  className={`rounded-xl border-2 p-5 transition-colors ${
-                    plan.plan === 'free' ? 'border-coffee bg-coffee/5' : 'border-cream-3 bg-glass-bg'
-                  }`}
+                  className={cn(
+                    'rounded-xl border-2 p-5 transition-colors',
+                    plan.plan === 'free' ? 'border-coffee bg-coffee/5' : 'border-cream-3 bg-glass-bg',
+                  )}
                 >
                   <h3 className="text-[15px] font-semibold text-text-primary mb-1">Free</h3>
                   <p className="text-[12px] text-text-tertiary mb-4">Get started</p>
@@ -267,9 +269,10 @@ function SettingsPage() {
 
                 {/* Espresso plan */}
                 <div
-                  className={`rounded-xl border-2 p-5 relative overflow-hidden transition-colors ${
-                    plan.plan === 'espresso' ? 'border-amber bg-amber/5' : 'border-cream-3 bg-glass-bg'
-                  }`}
+                  className={cn(
+                    'rounded-xl border-2 p-5 relative overflow-hidden transition-colors',
+                    plan.plan === 'espresso' ? 'border-amber bg-amber/5' : 'border-cream-3 bg-glass-bg',
+                  )}
                 >
                   <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-amber to-amber-light" />
                   <div className="flex items-center gap-2 mb-1">
@@ -304,9 +307,10 @@ function SettingsPage() {
 
                 {/* Double Espresso plan */}
                 <div
-                  className={`rounded-xl border-2 p-5 relative overflow-hidden transition-colors ${
-                    plan.plan === 'double_espresso' ? 'border-coffee bg-coffee/5' : 'border-cream-3 bg-glass-bg'
-                  }`}
+                  className={cn(
+                    'rounded-xl border-2 p-5 relative overflow-hidden transition-colors',
+                    plan.plan === 'double_espresso' ? 'border-coffee bg-coffee/5' : 'border-cream-3 bg-glass-bg',
+                  )}
                 >
                   <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-coffee to-amber" />
                   <div className="flex items-center gap-2 mb-1">
@@ -329,8 +333,8 @@ function SettingsPage() {
                       { text: 'Manager role', roadmap: true },
                       { text: 'White-label branding', roadmap: true },
                     ].map((f) => (
-                      <li key={f.text} className={`flex items-center gap-2 text-[12.5px] ${f.roadmap ? 'text-text-tertiary' : 'text-text-secondary'}`}>
-                        <Check size={14} className={`shrink-0 ${f.roadmap ? 'text-text-tertiary' : 'text-coffee'}`} />
+                      <li key={f.text} className={cn('flex items-center gap-2 text-[12.5px]', f.roadmap ? 'text-text-tertiary' : 'text-text-secondary')}>
+                        <Check size={14} className={cn('shrink-0', f.roadmap ? 'text-text-tertiary' : 'text-coffee')} />
                         {f.text}
                         {f.roadmap && (
                           <span className="text-[9px] font-medium px-1.5 py-px rounded-full bg-cream-3/60 text-text-tertiary">
@@ -435,11 +439,12 @@ function SettingsPage() {
               return (
                 <div
                   key={ws.publicId}
-                  className={`w-full text-left rounded-xl border-2 p-4 transition-all ${
+                  className={cn(
+                    'w-full text-left rounded-xl border-2 p-4 transition-all',
                     isCurrent
                       ? 'border-coffee bg-coffee/5'
-                      : 'border-cream-3 bg-glass-bg'
-                  }`}
+                      : 'border-cream-3 bg-glass-bg',
+                  )}
                 >
                   {isEditing ? (
                     <div className="space-y-3">
@@ -487,14 +492,14 @@ function SettingsPage() {
                               window.location.reload();
                             }
                           }}
-                          className={`w-9 h-9 rounded-lg bg-coffee/10 flex items-center justify-center shrink-0 ${!isCurrent ? 'cursor-pointer' : ''}`}
+                          className={cn('w-9 h-9 rounded-lg bg-coffee/10 flex items-center justify-center shrink-0', !isCurrent && 'cursor-pointer')}
                         >
                           <span className="text-[13px] font-semibold text-coffee">
                             {ws.name.charAt(0).toUpperCase()}
                           </span>
                         </div>
                         <div
-                          className={`flex-1 min-w-0 ${!isCurrent ? 'cursor-pointer' : ''}`}
+                          className={cn('flex-1 min-w-0', !isCurrent && 'cursor-pointer')}
                           onClick={() => {
                             if (!isCurrent) {
                               setWorkspacePublicId(ws.publicId);
@@ -638,9 +643,30 @@ function SettingsPage() {
               </div>
               {ipEnabled && plan?.canUseIpRestriction && (
                 <div>
-                  <label htmlFor="allowed-ips" className="block text-[11px] font-medium text-text-secondary mb-1">
-                    Allowed IPs (one per line)
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label htmlFor="allowed-ips" className="text-[11px] font-medium text-text-secondary">
+                      Allowed IPs (one per line)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          const { data } = await apiAxios.get(`/workspaces/${currentWsId}/settings/my-ip`);
+                          const ip = data?.data?.ip;
+                          if (!ip) return;
+                          const existing = allowedIps.split('\n').map((s: string) => s.trim()).filter(Boolean);
+                          if (!existing.includes(ip)) {
+                            setAllowedIps(existing.length ? `${allowedIps.trimEnd()}\n${ip}` : ip);
+                          }
+                        } catch {
+                          // silently fail
+                        }
+                      }}
+                      className="text-[10.5px] font-medium text-amber cursor-pointer bg-transparent border-none hover:text-coffee transition-colors"
+                    >
+                      + Use my current IP
+                    </button>
+                  </div>
                   <textarea
                     id="allowed-ips"
                     name="allowedIps"

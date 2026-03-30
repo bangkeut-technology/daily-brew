@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Search, Trash2, Link2, Unlink } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useEmployees, useDeleteEmployee } from '@/hooks/queries/useEmployees';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -90,26 +91,29 @@ function EmployeeListPage() {
         <div className="flex gap-1">
           <button
             onClick={() => setLinkFilter(linkFilter === '' ? '' : '')}
-            className={`px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors ${
-              linkFilter === '' ? 'bg-coffee text-white' : 'bg-glass-bg text-text-secondary hover:bg-cream-3'
-            }`}
+            className={cn(
+              'px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors',
+              linkFilter === '' ? 'bg-coffee text-white' : 'bg-glass-bg text-text-secondary hover:bg-cream-3',
+            )}
           >
             All ({employees?.length ?? 0})
           </button>
           <button
             onClick={() => setLinkFilter(linkFilter === 'linked' ? '' : 'linked')}
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors ${
-              linkFilter === 'linked' ? 'bg-green/15 text-green' : 'bg-glass-bg text-text-secondary hover:bg-cream-3'
-            }`}
+            className={cn(
+              'flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors',
+              linkFilter === 'linked' ? 'bg-green/15 text-green' : 'bg-glass-bg text-text-secondary hover:bg-cream-3',
+            )}
           >
             <Link2 size={11} />
             Linked ({linkedCount})
           </button>
           <button
             onClick={() => setLinkFilter(linkFilter === 'unlinked' ? '' : 'unlinked')}
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors ${
-              linkFilter === 'unlinked' ? 'bg-red/15 text-red' : 'bg-glass-bg text-text-secondary hover:bg-cream-3'
-            }`}
+            className={cn(
+              'flex items-center gap-1 px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors',
+              linkFilter === 'unlinked' ? 'bg-red/15 text-red' : 'bg-glass-bg text-text-secondary hover:bg-cream-3',
+            )}
           >
             <Unlink size={11} />
             Unlinked ({unlinkedCount})
@@ -120,17 +124,19 @@ function EmployeeListPage() {
         <div className="flex gap-1">
           <button
             onClick={() => setStatusFilter(statusFilter === 'active' ? '' : 'active')}
-            className={`px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors ${
-              statusFilter === 'active' ? 'bg-green/15 text-green' : 'bg-glass-bg text-text-secondary hover:bg-cream-3'
-            }`}
+            className={cn(
+              'px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors',
+              statusFilter === 'active' ? 'bg-green/15 text-green' : 'bg-glass-bg text-text-secondary hover:bg-cream-3',
+            )}
           >
             Active ({activeCount})
           </button>
           <button
             onClick={() => setStatusFilter(statusFilter === 'inactive' ? '' : 'inactive')}
-            className={`px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors ${
-              statusFilter === 'inactive' ? 'bg-amber/15 text-amber' : 'bg-glass-bg text-text-secondary hover:bg-cream-3'
-            }`}
+            className={cn(
+              'px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors',
+              statusFilter === 'inactive' ? 'bg-amber/15 text-amber' : 'bg-glass-bg text-text-secondary hover:bg-cream-3',
+            )}
           >
             Inactive ({inactiveCount})
           </button>

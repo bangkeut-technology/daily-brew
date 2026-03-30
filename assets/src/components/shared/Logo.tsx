@@ -1,4 +1,5 @@
 import { Coffee } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface LogoProps {
   size?: number;
@@ -10,7 +11,7 @@ interface LogoProps {
  * Used in navbar, sidebar, auth pages, and loading screens.
  */
 export function Logo({ size = 32, className = '' }: LogoProps) {
-  return <Coffee size={size} className={`text-coffee ${className}`} strokeWidth={2} />;
+  return <Coffee size={size} className={cn('text-coffee', className)} strokeWidth={2} />;
 }
 
 /**
@@ -18,7 +19,7 @@ export function Logo({ size = 32, className = '' }: LogoProps) {
  */
 export function LogoBrand({ size = 32, className = '' }: LogoProps) {
   return (
-    <div className={`flex items-center gap-2.5 ${className}`}>
+    <div className={cn('flex items-center gap-2.5', className)}>
       <Logo size={size} />
       <span
         className="font-semibold text-coffee"

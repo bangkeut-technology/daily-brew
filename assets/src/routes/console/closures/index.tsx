@@ -10,6 +10,7 @@ import { getWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { CalendarX2, Trash2, CalendarOff, Clock, Pencil } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
@@ -279,7 +280,7 @@ function ClosureCard({ closure, fmtDate, onDelete, onUpdate, deleting, updating 
   return (
     <GlassCard hover={!isPast && !isEditing}>
       <div className="relative">
-        <div className={`absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r ${accentColor}`} />
+        <div className={cn('absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r', accentColor)} />
         <div className="px-5 pt-5 pb-3">
           {isEditing ? (
             <div className="space-y-3">
@@ -324,7 +325,7 @@ function ClosureCard({ closure, fmtDate, onDelete, onUpdate, deleting, updating 
           ) : (
             <div className="flex items-start justify-between">
               <div className="flex-1 min-w-0">
-                <h3 className={`text-[15px] font-semibold truncate ${isPast ? 'text-text-tertiary' : 'text-text-primary'}`}>
+                <h3 className={cn('text-[15px] font-semibold truncate', isPast ? 'text-text-tertiary' : 'text-text-primary')}>
                   {closure.name}
                 </h3>
                 <div className="flex items-center gap-2 mt-1.5">

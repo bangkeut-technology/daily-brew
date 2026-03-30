@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { useState, useEffect, useCallback } from 'react';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
 import { LogoBrand } from '@/components/shared/Logo';
 
 const navLinks = [
@@ -26,20 +27,22 @@ export function LandingNav() {
 
   return (
     <motion.nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={cn(
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
         scrolled
           ? 'bg-cream/75 backdrop-blur-2xl shadow-[0_1px_8px_rgba(107,66,38,0.06)]'
-          : 'bg-transparent backdrop-blur-none'
-      }`}
+          : 'bg-transparent backdrop-blur-none',
+      )}
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
       {/* Bottom glow line on scroll */}
       <div
-        className={`absolute bottom-0 left-0 right-0 h-px transition-opacity duration-500 ${
-          scrolled ? 'opacity-100' : 'opacity-0'
-        }`}
+        className={cn(
+          'absolute bottom-0 left-0 right-0 h-px transition-opacity duration-500',
+          scrolled ? 'opacity-100' : 'opacity-0',
+        )}
         style={{
           background:
             'linear-gradient(90deg, transparent, rgba(193,127,59,0.25), rgba(232,168,90,0.2), rgba(193,127,59,0.25), transparent)',

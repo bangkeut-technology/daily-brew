@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, Check, Search } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export interface SelectOption {
   value: string;
@@ -75,19 +76,19 @@ export function CustomSelect({
     : options;
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={cn('relative', className)}>
       <button
         ref={triggerRef}
         type="button"
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none transition-colors cursor-pointer focus:border-coffee focus:ring-1 focus:ring-coffee/20"
       >
-        <span className={selected ? '' : 'text-text-tertiary'}>
+        <span className={cn(!selected && 'text-text-tertiary')}>
           {selected ? selected.label : placeholder}
         </span>
         <ChevronDown
           size={14}
-          className={`text-text-tertiary transition-transform ${open ? 'rotate-180' : ''}`}
+          className={cn('text-text-tertiary transition-transform', open && 'rotate-180')}
         />
       </button>
 
@@ -132,11 +133,12 @@ export function CustomSelect({
                     setOpen(false);
                     setSearch('');
                   }}
-                  className={`w-full flex items-center gap-2 px-3 py-2 text-[13px] text-left border-none cursor-pointer transition-colors ${
+                  className={cn(
+                    'w-full flex items-center gap-2 px-3 py-2 text-[13px] text-left border-none cursor-pointer transition-colors',
                     option.value === value
                       ? 'bg-coffee/10 text-coffee font-medium'
                       : 'bg-transparent text-text-primary hover:bg-cream-3/40'
-                  }`}
+                  )}
                 >
                   <span className="flex-1">{option.label}</span>
                   {option.value === value && <Check size={13} className="text-coffee flex-shrink-0" />}

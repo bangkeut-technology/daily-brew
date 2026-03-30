@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { ChevronRight, QrCode, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 const floatingCardVariants = {
   hidden: { opacity: 0, scale: 0.92, y: 30 },
@@ -159,7 +160,7 @@ export function HeroSection() {
                 ].map((r, i) => (
                   <div
                     key={r.name}
-                    className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg ${i === 0 ? 'bg-cream/40' : ''}`}
+                    className={cn('flex items-center gap-2.5 px-3 py-2.5 rounded-lg', i === 0 && 'bg-cream/40')}
                   >
                     <div
                       className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shrink-0"

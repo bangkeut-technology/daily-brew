@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Clock, ChevronUp, ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface CustomTimePickerProps {
   value: string; // "HH:mm"
@@ -60,7 +61,7 @@ export function CustomTimePicker({ value, onChange, className = '' }: CustomTime
   };
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={cn('relative', className)}>
       <button
         ref={triggerRef}
         type="button"

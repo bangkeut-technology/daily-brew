@@ -35,6 +35,7 @@ services:
             $googleAndroidClientId:        '%google_android_client_id%'
             $appleClientId:                '%apple_client_id%'
             $appleIosClientId:             '%apple_ios_client_id%'
+            $kernelEnvironment:            '%kernel.environment%'
             $paddleEnvironment:            '%paddle_environment%'
             $paddleClientSideToken:        '%paddle_client_side_token%'
             $paddlePriceIdEspressoMonthly: '%paddle_price_id_espresso_monthly%'

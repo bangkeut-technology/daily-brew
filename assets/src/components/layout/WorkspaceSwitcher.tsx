@@ -6,6 +6,7 @@ import { ChevronsUpDown, Check, Plus, X, Building2 } from 'lucide-react';
 import { getWorkspacePublicId, setWorkspacePublicId } from '@/lib/auth';
 import { useCreateWorkspace } from '@/hooks/queries/useWorkspaces';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface WorkspaceItem {
   publicId: string;
@@ -15,9 +16,11 @@ interface WorkspaceItem {
 
 interface WorkspaceSwitcherProps {
   workspaces: WorkspaceItem[];
+  planLabel?: string;
+  isEspresso?: boolean;
 }
 
-export function WorkspaceSwitcher({ workspaces }: WorkspaceSwitcherProps) {
+export function WorkspaceSwitcher({ workspaces, planLabel, isEspresso }: WorkspaceSwitcherProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -67,9 +70,19 @@ export function WorkspaceSwitcher({ workspaces }: WorkspaceSwitcherProps) {
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[12.5px] font-medium text-text-primary truncate leading-tight">
-                {current?.name ?? t('workspace.noWorkspace')}
-              </p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-[12.5px] font-medium text-text-primary truncate leading-tight">
+                  {current?.name ?? t('workspace.noWorkspace')}
+                </p>
+                {planLabel && (
+                  <span className={cn(
+                    'text-[8px] font-semibold px-1.5 py-px rounded-full shrink-0',
+                    isEspresso ? 'bg-green/10 text-green' : 'bg-cream-3 text-text-tertiary'
+                  )}>
+                    {planLabel}
+                  </span>
+                )}
+              </div>
               <p className="text-[10px] text-text-tertiary leading-tight">
                 {current?.role === 'employee' ? 'Employee' : t('workspace.label')}
               </p>
@@ -94,16 +107,12 @@ export function WorkspaceSwitcher({ workspaces }: WorkspaceSwitcherProps) {
               <button
                 key={ws.publicId}
                 onClick={() => handleSwitch(ws.publicId)}
-                className={`
-                  w-full flex items-center gap-2 px-2.5 py-2 rounded-lg
-                  text-left cursor-pointer border-none
-                  text-[12.5px] font-sans transition-colors duration-[120ms]
-                  ${
-                    ws.publicId === currentId
-                      ? 'bg-glass-bg text-coffee font-medium'
-                      : 'bg-transparent text-text-primary hover:bg-cream-3'
-                  }
-                `}
+                className={cn(
+                  'w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left cursor-pointer border-none text-[12.5px] font-sans transition-colors duration-[120ms]',
+                  ws.publicId === currentId
+                    ? 'bg-glass-bg text-coffee font-medium'
+                    : 'bg-transparent text-text-primary hover:bg-cream-3'
+                )}
               >
                 <div className="w-6 h-6 rounded-md bg-coffee/10 flex items-center justify-center flex-shrink-0">
                   <span className="text-[10px] font-semibold text-coffee">

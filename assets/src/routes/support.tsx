@@ -15,6 +15,7 @@ import {
 import { motion } from 'framer-motion';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
+import { cn } from '@/lib/utils';
 
 export const Route = createFileRoute('/support')({
   component: SupportPage,
@@ -152,7 +153,7 @@ function SupportPage() {
 
                 <div className="relative">
                   <div
-                    className={`w-11 h-11 rounded-xl ${channel.iconBg} flex items-center justify-center ${channel.iconColor} mb-4`}
+                    className={cn('w-11 h-11 rounded-xl flex items-center justify-center mb-4', channel.iconBg, channel.iconColor)}
                   >
                     <channel.icon size={20} strokeWidth={1.8} />
                   </div>

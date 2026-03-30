@@ -121,6 +121,22 @@ class WorkspaceSettingController extends AbstractController
         return $this->jsonSuccess($this->serializeSetting($setting));
     }
 
+    #[Route('/my-ip', name: 'workspace_settings_my_ip', methods: ['GET'])]
+    public function myIp(
+        string $workspacePublicId,
+        Request $request,
+        WorkspaceRepository $workspaceRepository,
+    ): JsonResponse {
+        $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
+        if ($workspace === null) {
+            throw new NotFoundHttpException('Workspace not found');
+        }
+
+        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
+
+        return $this->jsonSuccess(['ip' => $request->getClientIp()]);
+    }
+
     private function serializeSetting(?WorkspaceSetting $setting): array
     {
         return [

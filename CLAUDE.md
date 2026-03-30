@@ -132,7 +132,8 @@ Users can be owners (create workspaces) or employees (linked to an employee reco
 **LeaveRequest**
 - id, publicId
 - employeeId → Employee (ManyToOne)
-- date (date)
+- startDate (date)
+- endDate (date)
 - reason (text, nullable)
 - status (enum: pending, approved, rejected, default pending)
 - reviewedAt (datetime, nullable)
@@ -162,6 +163,8 @@ On check-in via QR:
 1. If `WorkspaceSetting.ipRestrictionEnabled` is false → allow
 2. If enabled and `allowedIps` is empty → allow (misconfiguration fallback)
 3. If enabled → check request IP against `allowedIps` → reject with 403 if not matched
+
+Settings page has a "Use my current IP" button that calls `GET /workspaces/{publicId}/settings/my-ip` to fetch the client IP as seen by the server, then appends it to the allowed IPs list.
 
 ### QR check-in auth (always required)
 1. Employee scans workspace QR → opens check-in page
@@ -237,7 +240,7 @@ Symfony 7 + Doctrine ORM + LexikJWTAuthenticationBundle + KnpPaginatorBundle.
 
 ## Frontend Architecture
 
-React 19 + TypeScript, TanStack Router (file-based) + TanStack Query, shadcn/ui + Radix, Tailwind CSS v4, Zod + React Hook Form, Axios, i18next (en/fr/km), Lucide React icons, Sonner toasts.
+React 19 + TypeScript, TanStack Router (file-based) + TanStack Query, shadcn/ui + Radix, Tailwind CSS v4, Zod + React Hook Form, Axios, i18next (en/fr/km), Lucide React icons, Sonner toasts, clsx + tailwind-merge via `cn()` utility (`@/lib/utils`).
 
 Routes: `/sign-in`, `/sign-up`, `/auth/callback`, `/checkin/:qrToken` (public/auth), `/console/*` (auth guard) with dashboard, employees, attendance, leave, shifts, closures, settings, profile.
 
@@ -252,6 +255,23 @@ Routes: `/sign-in`, `/sign-up`, `/auth/callback`, `/checkin/:qrToken` (public/au
 - **StatusBadge** — colored pill badge (green/amber/red/gray/blue)
 - **StatCard** — glass card with colored accent bar
 - **EmptyState** — dashed border card with "+" prompt
+
+### Employee dashboard
+Route `/console/dashboard` (when `isEmployee && !isOwner`):
+- Welcome header with avatar, name, and today's date
+- Active closure alert (red) and upcoming closure alert (amber, within 7 days)
+- My shift today card (shift name + times, or "No shift assigned")
+- Check-in/out status with action button (uses geolocation if available)
+- Attendance KPI cards (today status, check-in time, check-out time)
+- Recent attendance list (last 7 days)
+- My leave requests card with "Submit leave request" button + modal (CustomDatePicker for dates, optional reason)
+
+### Leave requests (employee view)
+Route `/console/leave` (when `isEmployee && !isOwner`):
+- Filtered to only the current employee's requests
+- "Submit leave request" button at top + same modal as dashboard
+- Status filter tabs (All, Pending, Approved, Rejected)
+- No approve/reject buttons (owner-only)
 
 ### Check-in mobile page
 Route `/checkin/:qrToken`:
@@ -340,6 +360,7 @@ Warm cafe aesthetic with glassmorphism. Dark mode supported with warm coffee ton
 | Cream backgrounds (#FAF7F2) | Pure white backgrounds |
 | Glass cards with `backdrop-blur` | Flat opaque cards |
 | `bg-glass-bg` for translucent backgrounds | Hardcoded `bg-white/30` or `bg-white/40` |
+| `cn()` from `@/lib/utils` for conditional classNames | Template literal className concatenation |
 | CustomSelect, CustomDatePicker, CustomTimePicker | Native `<select>`, `<input type="date">`, `<input type="time">` |
 | Toggle component with check/X indicator | Native checkboxes |
 | ConfirmModal for destructive actions | Native `confirm()` dialogs |

@@ -159,21 +159,27 @@ export function OwnerDashboard() {
       <PageHeader
         title={t('nav.dashboard')}
         action={
-          data.pendingLeaves > 0 ? (
-            <Link
-              to="/console/leave"
-              className="inline-flex items-center gap-2 no-underline"
-            >
-              <CalendarOff size={14} className="text-amber" />
-              <span className="text-[13px] text-text-secondary font-sans">
-                {t('dashboard.pendingLeaves', 'Pending leaves')}
-              </span>
-              <StatusBadge
-                label={String(data.pendingLeaves)}
-                variant="amber"
-              />
-            </Link>
-          ) : undefined
+          <div className="flex items-center gap-3">
+            {data.pendingLeaves > 0 && canUseLeave && (
+              <Link
+                to="/console/leave"
+                className="inline-flex items-center gap-2 no-underline"
+              >
+                <CalendarOff size={14} className="text-amber" />
+                <span className="text-[13px] text-text-secondary font-sans">
+                  {data.pendingLeaves} pending
+                </span>
+              </Link>
+            )}
+            {!plan?.isEspresso && (
+              <button
+                onClick={() => openCheckout('annual')}
+                className="text-[11px] font-medium text-amber bg-transparent border-none cursor-pointer hover:underline"
+              >
+                Upgrade
+              </button>
+            )}
+          </div>
         }
       />
 

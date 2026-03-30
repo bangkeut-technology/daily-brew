@@ -23,6 +23,7 @@ import { UpgradeModal } from '@/components/shared/UpgradeModal';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { useUpgradeModal } from '@/hooks/useUpgradeModal';
 import { ChevronDown, ChevronUp, Crown, Clock, Pencil, Trash2, Plus, Users, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import type { Shift, Employee, ShiftTimeRule } from '@/types';
 
 export const Route = createFileRoute('/console/shifts/')({
@@ -458,11 +459,12 @@ function ShiftCard({
       <div className="border-t border-cream-3/80">
         <button
           onClick={canUseTimeRules ? onToggleExpand : onUpgradeClick}
-          className={`w-full flex items-center justify-between px-5 py-3 text-[12px] font-medium transition-colors border-none cursor-pointer ${
+          className={cn(
+            'w-full flex items-center justify-between px-5 py-3 text-[12px] font-medium transition-colors border-none cursor-pointer',
             canUseTimeRules
               ? 'text-text-secondary hover:bg-cream-3/40 bg-transparent'
-              : 'text-text-tertiary bg-transparent hover:bg-amber/5'
-          }`}
+              : 'text-text-tertiary bg-transparent hover:bg-amber/5',
+          )}
         >
           <span className="flex items-center gap-1.5">
             Day schedule

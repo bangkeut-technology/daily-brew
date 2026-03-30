@@ -1,6 +1,9 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
 import { Link } from '@tanstack/react-router';
+import * as Dialog from '@radix-ui/react-dialog';
+import { toast } from 'sonner';
 import {
   Clock,
   LogIn,
@@ -9,18 +12,21 @@ import {
   CalendarOff,
   Loader2,
   MapPinOff,
+  Plus,
+  X,
 } from 'lucide-react';
 import { useRoleContext } from '@/hooks/queries/useRoleContext';
 import { useCheckinStatus, useCheckinAction } from '@/hooks/queries/useCheckin';
 import { useWorkspace } from '@/hooks/queries/useWorkspaces';
 import { getWorkspacePublicId } from '@/lib/auth';
-import { useLeaveRequests } from '@/hooks/queries/useLeaveRequests';
+import { useLeaveRequests, useCreateLeaveRequest } from '@/hooks/queries/useLeaveRequests';
 import { useClosures } from '@/hooks/queries/useClosures';
 import { useDateFormat } from '@/hooks/useDateFormat';
 import { Avatar } from '@/components/shared/Avatar';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
 
 function formatTime(time: string | null): string {
   if (!time) return '--:--';
@@ -360,7 +366,7 @@ export function EmployeeDashboard() {
         <GlassCard hover={false}>
           <div className="p-4">
             <p className="text-[11px] text-text-tertiary uppercase tracking-[1px] mb-1">Today</p>
-            <p className={`text-[24px] font-bold tabular-nums ${completed ? 'text-green' : checkedIn ? 'text-blue' : 'text-text-tertiary'}`}>
+            <p className={cn('text-[24px] font-bold tabular-nums', completed ? 'text-green' : checkedIn ? 'text-blue' : 'text-text-tertiary')}>
               {completed ? 'Done' : checkedIn ? 'In' : '—'}
             </p>
             <p className="text-[11px] text-text-tertiary mt-1">
@@ -391,6 +397,62 @@ export function EmployeeDashboard() {
           </div>
         </GlassCard>
       </div>
+
+      {/* Upcoming closures */}
+      <GlassCard hover={false} className="mb-6">
+        <GlassCardHeader title={t('dashboard.upcomingClosures', 'Upcoming closures')} />
+        <div className="px-5 py-4">
+          {(() => {
+            const nowDate = new Date();
+            nowDate.setHours(0, 0, 0, 0);
+            const upcoming = (closures ?? [])
+              .filter((c) => new Date(c.endDate) >= nowDate)
+              .sort((a, b) => a.startDate.localeCompare(b.startDate))
+              .slice(0, 5);
+
+            if (!closures) {
+              return (
+                <p className="text-[13px] text-text-tertiary font-sans">
+                  {t('common.loading', 'Loading...')}
+                </p>
+              );
+            }
+
+            if (upcoming.length === 0) {
+              return (
+                <p className="text-[13px] text-text-tertiary font-sans text-center py-2">
+                  {t('dashboard.noUpcomingClosures', 'No upcoming closures')}
+                </p>
+              );
+            }
+
+            return (
+              <div className="space-y-2">
+                {upcoming.map((c) => {
+                  const start = new Date(c.startDate);
+                  const end = new Date(c.endDate);
+                  const isActive = nowDate >= start && nowDate <= end;
+                  return (
+                    <div key={c.publicId} className="flex items-center gap-3 py-2">
+                      <CalendarOff size={14} className={isActive ? 'text-red flex-shrink-0' : 'text-amber flex-shrink-0'} />
+                      <div className="flex-1">
+                        <p className="text-[13px] text-text-primary font-sans">{c.name}</p>
+                        <p className="text-[11px] text-text-tertiary font-sans">
+                          {fmtDate(c.startDate)}{c.startDate !== c.endDate ? ` – ${fmtDate(c.endDate)}` : ''}
+                        </p>
+                      </div>
+                      <StatusBadge
+                        label={isActive ? t('dashboard.closedNow', 'Closed now') : t('dashboard.upcoming', 'Upcoming')}
+                        variant={isActive ? 'red' : 'amber'}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
+        </div>
+      </GlassCard>
 
       {/* Recent attendance - last 7 days */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -491,18 +553,21 @@ export function EmployeeDashboard() {
           <GlassCardHeader
             title={t('dashboard.myLeaveRequests', 'My leave requests')}
             action={
-              <Link
-                to="/console/leave"
-                className="text-xs text-amber font-medium cursor-pointer no-underline"
-              >
-                {t('dashboard.viewAll', 'View all')} &rarr;
-              </Link>
+              <div className="flex items-center gap-3">
+                <Link
+                  to="/console/leave"
+                  className="text-xs text-amber font-medium cursor-pointer no-underline"
+                >
+                  {t('dashboard.viewAll', 'View all')} &rarr;
+                </Link>
+              </div>
             }
           />
           <div className="px-5 py-4">
             {employee.workspacePublicId ? (
               <EmployeeLeaveList
                 workspacePublicId={employee.workspacePublicId}
+                employeePublicId={employee.publicId}
                 employeeName={employee.name}
               />
             ) : (
@@ -519,34 +584,39 @@ export function EmployeeDashboard() {
 
 function EmployeeLeaveList({
   workspacePublicId,
+  employeePublicId,
   employeeName,
 }: {
   workspacePublicId: string;
+  employeePublicId: string;
   employeeName: string;
 }) {
   const { t } = useTranslation();
   const { data: leaves, isLoading } = useLeaveRequests(workspacePublicId);
+  const createLeave = useCreateLeaveRequest(workspacePublicId);
+  const [showModal, setShowModal] = useState(false);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [reason, setReason] = useState('');
 
-  if (isLoading) {
-    return (
-      <p className="text-[13px] text-text-tertiary font-sans">
-        {t('common.loading', 'Loading...')}
-      </p>
-    );
-  }
-
-  // Filter to only this employee's leaves and take the 5 most recent
-  const myLeaves = (leaves ?? [])
-    .filter((l) => l.employeeName === employeeName)
-    .slice(0, 5);
-
-  if (myLeaves.length === 0) {
-    return (
-      <p className="text-[13px] text-text-tertiary font-sans text-center py-2">
-        {t('dashboard.noLeaveRequests', 'No leave requests')}
-      </p>
-    );
-  }
+  const handleSubmit = async () => {
+    if (!startDate || !endDate) return;
+    try {
+      await createLeave.mutateAsync({
+        employeePublicId,
+        startDate,
+        endDate,
+        reason: reason.trim() || undefined,
+      });
+      toast.success(t('leave.submitSuccess', 'Leave request submitted'));
+      setShowModal(false);
+      setStartDate('');
+      setEndDate('');
+      setReason('');
+    } catch {
+      toast.error(t('leave.submitError', 'Failed to submit leave request'));
+    }
+  };
 
   const statusVariant = (status: string) => {
     switch (status) {
@@ -570,28 +640,130 @@ function EmployeeLeaveList({
     }
   };
 
+  // Filter to only this employee's leaves and take the 5 most recent
+  const myLeaves = (leaves ?? [])
+    .filter((l) => l.employeeName === employeeName)
+    .slice(0, 5);
+
   return (
-    <div className="space-y-2">
-      {myLeaves.map((leave) => (
-        <div
-          key={leave.publicId}
-          className="flex items-center gap-3 py-2 transition-colors duration-[120ms]"
-        >
-          <CalendarOff size={14} className="text-text-tertiary flex-shrink-0" />
-          <div className="flex-1">
-            <p className="text-[13px] text-text-primary font-sans">
-              {formatDate(leave.startDate)}
-              {leave.startDate !== leave.endDate && ` \u2013 ${formatDate(leave.endDate)}`}
-            </p>
-            {leave.reason && (
-              <p className="text-[11px] text-text-tertiary font-sans truncate max-w-[200px]">
-                {leave.reason}
-              </p>
-            )}
-          </div>
-          <StatusBadge label={statusLabel(leave.status)} variant={statusVariant(leave.status)} />
+    <>
+      <button
+        onClick={() => setShowModal(true)}
+        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light transition-colors mb-4"
+      >
+        <Plus size={14} />
+        {t('leave.submitRequest', 'Submit leave request')}
+      </button>
+
+      {isLoading ? (
+        <p className="text-[13px] text-text-tertiary font-sans">
+          {t('common.loading', 'Loading...')}
+        </p>
+      ) : myLeaves.length === 0 ? (
+        <p className="text-[13px] text-text-tertiary font-sans text-center py-2">
+          {t('dashboard.noLeaveRequests', 'No leave requests')}
+        </p>
+      ) : (
+        <div className="space-y-2">
+          {myLeaves.map((leave) => (
+            <div
+              key={leave.publicId}
+              className="flex items-center gap-3 py-2 transition-colors duration-[120ms]"
+            >
+              <CalendarOff size={14} className="text-text-tertiary flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-[13px] text-text-primary font-sans">
+                  {formatDate(leave.startDate)}
+                  {leave.startDate !== leave.endDate && ` \u2013 ${formatDate(leave.endDate)}`}
+                </p>
+                {leave.reason && (
+                  <p className="text-[11px] text-text-tertiary font-sans truncate max-w-[200px]">
+                    {leave.reason}
+                  </p>
+                )}
+              </div>
+              <StatusBadge label={statusLabel(leave.status)} variant={statusVariant(leave.status)} />
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
+      )}
+
+      {/* Submit leave request modal */}
+      <Dialog.Root open={showModal} onOpenChange={setShowModal}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
+          <Dialog.Content
+            onInteractOutside={(e) => e.preventDefault()}
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100%-2rem)] max-w-[400px] bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl shadow-[0_16px_50px_rgba(107,66,38,0.15)] outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+          >
+            <div className="p-6 space-y-4">
+              <Dialog.Title className="text-[16px] font-semibold text-text-primary font-serif">
+                {t('leave.submitRequest', 'Submit leave request')}
+              </Dialog.Title>
+              <Dialog.Description className="text-[12.5px] text-text-secondary leading-relaxed -mt-2">
+                {t('leave.submitDescription', 'Select the dates you need off and optionally add a reason.')}
+              </Dialog.Description>
+
+              <div>
+                <label htmlFor="leave-start" className="block text-[11px] font-medium text-text-secondary mb-1">
+                  {t('leave.startDate', 'Start date')}
+                </label>
+                <CustomDatePicker
+                  value={startDate}
+                  onChange={(v) => {
+                    setStartDate(v);
+                    if (!endDate || v > endDate) setEndDate(v);
+                  }}
+                />
+              </div>
+              <div>
+                <label htmlFor="leave-end" className="block text-[11px] font-medium text-text-secondary mb-1">
+                  {t('leave.endDate', 'End date')}
+                </label>
+                <CustomDatePicker
+                  value={endDate}
+                  onChange={setEndDate}
+                />
+              </div>
+              <div>
+                <label htmlFor="leave-reason" className="block text-[11px] font-medium text-text-secondary mb-1">
+                  {t('leave.reason', 'Reason')} <span className="text-text-tertiary">({t('common.optional', 'optional')})</span>
+                </label>
+                <textarea
+                  id="leave-reason"
+                  name="leaveReason"
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  rows={3}
+                  placeholder={t('leave.reasonPlaceholder', 'e.g. Family event, medical appointment...')}
+                  className="w-full px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-sans resize-none"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 rounded-lg text-[13px] font-medium bg-transparent text-text-secondary border border-cream-3 cursor-pointer hover:bg-cream-3 transition-colors"
+                >
+                  {t('common.cancel', 'Cancel')}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={!startDate || !endDate || createLeave.isPending}
+                  className="px-4 py-2 rounded-lg text-[13px] font-medium text-white bg-coffee border-none cursor-pointer hover:bg-coffee-light transition-colors disabled:opacity-50"
+                >
+                  {createLeave.isPending ? t('common.loading', 'Loading...') : t('common.submit', 'Submit')}
+                </button>
+              </div>
+            </div>
+            <Dialog.Close className="absolute top-3 right-3 w-7 h-7 rounded-lg flex items-center justify-center bg-transparent border-none text-text-tertiary hover:text-text-secondary hover:bg-cream-3/40 cursor-pointer transition-all">
+              <X size={15} />
+            </Dialog.Close>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    </>
   );
 }

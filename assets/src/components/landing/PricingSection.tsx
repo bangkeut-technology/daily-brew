@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { Check, X, Crown, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { cn } from '@/lib/utils';
 
 const freePlan = {
   name: 'Free',
@@ -98,17 +99,19 @@ export function PricingSection() {
           />
           <button
             onClick={() => setYearly(false)}
-            className={`relative z-10 px-5 py-1.5 rounded-full text-[13px] font-medium border-none cursor-pointer bg-transparent transition-colors duration-300 ${
+            className={cn(
+              'relative z-10 px-5 py-1.5 rounded-full text-[13px] font-medium border-none cursor-pointer bg-transparent transition-colors duration-300',
               !yearly ? 'text-white' : 'text-text-secondary'
-            }`}
+            )}
           >
             Monthly
           </button>
           <button
             onClick={() => setYearly(true)}
-            className={`relative z-10 px-5 py-1.5 rounded-full text-[13px] font-medium border-none cursor-pointer bg-transparent transition-colors duration-300 ${
+            className={cn(
+              'relative z-10 px-5 py-1.5 rounded-full text-[13px] font-medium border-none cursor-pointer bg-transparent transition-colors duration-300',
               yearly ? 'text-white' : 'text-text-secondary'
-            }`}
+            )}
           >
             Yearly
           </button>
@@ -166,7 +169,7 @@ export function PricingSection() {
                   <X size={15} className="text-text-tertiary/50 shrink-0" strokeWidth={2} />
                 )}
                 <span
-                  className={`text-[13px] ${f.included ? 'text-text-secondary' : 'text-text-tertiary'}`}
+                  className={cn('text-[13px]', f.included ? 'text-text-secondary' : 'text-text-tertiary')}
                 >
                   {f.text}
                 </span>
@@ -285,8 +288,8 @@ export function PricingSection() {
           <ul className="relative space-y-3 mb-8 flex-1">
             {doubleEspressoPlan.features.map((f) => (
               <li key={f.text} className="flex items-center gap-2.5">
-                <Check size={15} className={`shrink-0 ${f.roadmap ? 'text-text-tertiary' : 'text-green'}`} strokeWidth={2.5} />
-                <span className={`text-[13px] ${f.roadmap ? 'text-text-tertiary' : 'text-text-secondary'}`}>
+                <Check size={15} className={cn('shrink-0', f.roadmap ? 'text-text-tertiary' : 'text-green')} strokeWidth={2.5} />
+                <span className={cn('text-[13px]', f.roadmap ? 'text-text-tertiary' : 'text-text-secondary')}>
                   {f.text}
                   {f.roadmap && (
                     <span className="ml-1.5 text-[9px] font-medium px-1.5 py-px rounded-full bg-cream-3/60 text-text-tertiary">

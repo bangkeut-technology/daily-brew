@@ -76,7 +76,7 @@ class DevController extends AbstractController
         $subscription->setPlan($plan);
         $subscription->setSource(SubscriptionSourceEnum::Paddle);
         $subscription->setStatus(SubscriptionStatusEnum::Active);
-        $subscription->setCurrentPeriodEnd(new \DateTimeImmutable('+30 days'));
+        $subscription->setCurrentPeriodEnd(new \DateTime('+30 days'));
         $subscription->setTrialEndsAt(null);
         $subscription->setCanceledAt(null);
 

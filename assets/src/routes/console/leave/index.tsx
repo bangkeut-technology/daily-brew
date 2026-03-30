@@ -2,8 +2,11 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { Crown, Inbox } from 'lucide-react';
-import { useLeaveRequests, useUpdateLeaveRequest } from '@/hooks/queries/useLeaveRequests';
+import * as Dialog from '@radix-ui/react-dialog';
+import { Crown, Inbox, Plus, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useLeaveRequests, useUpdateLeaveRequest, useCreateLeaveRequest } from '@/hooks/queries/useLeaveRequests';
+import { useRoleContext } from '@/hooks/queries/useRoleContext';
 import { usePlan } from '@/hooks/queries/usePlan';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -11,6 +14,7 @@ import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { Avatar } from '@/components/shared/Avatar';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { UpgradeModal } from '@/components/shared/UpgradeModal';
+import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
 import { useDateFormat } from '@/hooks/useDateFormat';
 
 export const Route = createFileRoute('/console/leave/')({
@@ -30,12 +34,41 @@ function LeaveRequestsPage() {
   const { t } = useTranslation();
   const workspaceId = getWorkspacePublicId() || '';
   const { data: plan, isLoading: planLoading } = usePlan(workspaceId);
+  const { data: roleContext } = useRoleContext();
   const canUse = plan?.canUseLeaveRequests ?? false;
+  const isEmployee = roleContext?.isEmployee && !roleContext?.isOwner;
+  const employee = roleContext?.employee ?? null;
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('');
   const [showUpgrade, setShowUpgrade] = useState(true);
   const { data: requests, isLoading } = useLeaveRequests(canUse ? workspaceId : '', statusFilter || undefined);
   const updateLeave = useUpdateLeaveRequest(workspaceId);
+  const createLeave = useCreateLeaveRequest(workspaceId);
   const fmtDate = useDateFormat();
+
+  // Leave request submission form state
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [reason, setReason] = useState('');
+
+  const handleSubmitLeave = async () => {
+    if (!startDate || !endDate || !employee?.publicId) return;
+    try {
+      await createLeave.mutateAsync({
+        employeePublicId: employee.publicId,
+        startDate,
+        endDate,
+        reason: reason.trim() || undefined,
+      });
+      toast.success(t('leave.submitSuccess', 'Leave request submitted'));
+      setShowSubmitModal(false);
+      setStartDate('');
+      setEndDate('');
+      setReason('');
+    } catch {
+      toast.error(t('leave.submitError', 'Failed to submit leave request'));
+    }
+  };
 
   if (planLoading) {
     return (
@@ -96,20 +129,118 @@ function LeaveRequestsPage() {
     return `${fmtDate(startDate)} - ${fmtDate(endDate)}`;
   };
 
+  const submitModal = (
+    <Dialog.Root open={showSubmitModal} onOpenChange={setShowSubmitModal}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
+        <Dialog.Content
+          onInteractOutside={(e) => e.preventDefault()}
+          className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100%-2rem)] max-w-[400px] bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl shadow-[0_16px_50px_rgba(107,66,38,0.15)] outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+        >
+          <div className="p-6 space-y-4">
+            <Dialog.Title className="text-[16px] font-semibold text-text-primary font-serif">
+              {t('leave.submitRequest', 'Submit leave request')}
+            </Dialog.Title>
+            <Dialog.Description className="text-[12.5px] text-text-secondary leading-relaxed -mt-2">
+              {t('leave.submitDescription', 'Select the dates you need off and optionally add a reason.')}
+            </Dialog.Description>
+
+            <div>
+              <label htmlFor="leave-start" className="block text-[11px] font-medium text-text-secondary mb-1">
+                {t('leave.startDate', 'Start date')}
+              </label>
+              <CustomDatePicker
+                value={startDate}
+                onChange={(v) => {
+                  setStartDate(v);
+                  if (!endDate || v > endDate) setEndDate(v);
+                }}
+              />
+            </div>
+            <div>
+              <label htmlFor="leave-end" className="block text-[11px] font-medium text-text-secondary mb-1">
+                {t('leave.endDate', 'End date')}
+              </label>
+              <CustomDatePicker
+                value={endDate}
+                onChange={setEndDate}
+              />
+            </div>
+            <div>
+              <label htmlFor="leave-reason-page" className="block text-[11px] font-medium text-text-secondary mb-1">
+                {t('leave.reason', 'Reason')} <span className="text-text-tertiary">({t('common.optional', 'optional')})</span>
+              </label>
+              <textarea
+                id="leave-reason-page"
+                name="leaveReason"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                rows={3}
+                placeholder={t('leave.reasonPlaceholder', 'e.g. Family event, medical appointment...')}
+                className="w-full px-3 py-2 rounded-lg text-[13px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-sans resize-none"
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setShowSubmitModal(false)}
+                className="px-4 py-2 rounded-lg text-[13px] font-medium bg-transparent text-text-secondary border border-cream-3 cursor-pointer hover:bg-cream-3 transition-colors"
+              >
+                {t('common.cancel', 'Cancel')}
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmitLeave}
+                disabled={!startDate || !endDate || createLeave.isPending}
+                className="px-4 py-2 rounded-lg text-[13px] font-medium text-white bg-coffee border-none cursor-pointer hover:bg-coffee-light transition-colors disabled:opacity-50"
+              >
+                {createLeave.isPending ? t('common.loading', 'Loading...') : t('common.submit', 'Submit')}
+              </button>
+            </div>
+          </div>
+          <Dialog.Close className="absolute top-3 right-3 w-7 h-7 rounded-lg flex items-center justify-center bg-transparent border-none text-text-tertiary hover:text-text-secondary hover:bg-cream-3/40 cursor-pointer transition-all">
+            <X size={15} />
+          </Dialog.Close>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+
+  // Filter to only this employee's requests if employee view
+  const filteredRequests = isEmployee && employee
+    ? (requests ?? []).filter((r) => r.employeeName === employee.name)
+    : requests;
+
   return (
     <div className="page-enter">
-      <PageHeader title={t('nav.leaveRequests')} />
+      <PageHeader
+        title={isEmployee ? t('nav.myLeaveRequests', 'My leave requests') : t('nav.leaveRequests')}
+      />
+
+      <div className="flex items-center gap-3 mb-6">
+        {isEmployee && employee && (
+          <button
+            onClick={() => setShowSubmitModal(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light transition-colors"
+          >
+            <Plus size={14} />
+            {t('leave.submitRequest', 'Submit leave request')}
+          </button>
+        )}
+      </div>
 
       <div className="flex gap-2 mb-6">
         {FILTER_TABS.map((tab) => (
           <button
             key={tab.value}
             onClick={() => setStatusFilter(tab.value)}
-            className={`px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors ${
+            className={cn(
+              'px-3 py-1.5 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors',
               statusFilter === tab.value
                 ? 'bg-coffee text-white'
-                : 'bg-glass-bg text-text-secondary hover:bg-cream-3'
-            }`}
+                : 'bg-glass-bg text-text-secondary hover:bg-cream-3',
+            )}
           >
             {t(tab.labelKey, tab.fallback)}
           </button>
@@ -120,7 +251,7 @@ function LeaveRequestsPage() {
         <div className="flex items-center justify-center py-12">
           <p className="text-[13px] text-text-tertiary">{t('common.loading')}</p>
         </div>
-      ) : requests?.length === 0 ? (
+      ) : filteredRequests?.length === 0 ? (
         <div className="border-[1.5px] border-dashed border-cream-3 rounded-2xl bg-glass-bg backdrop-blur-md flex flex-col items-center justify-center min-h-[200px]">
           <Inbox size={28} className="text-text-tertiary mb-2" />
           <span className="text-[13px] text-text-tertiary">
@@ -130,31 +261,33 @@ function LeaveRequestsPage() {
       ) : (
         <GlassCard hover={false}>
           <GlassCardHeader
-            title={t('leave.requests', 'Leave requests')}
+            title={isEmployee ? t('leave.myRequests', 'My requests') : t('leave.requests', 'Leave requests')}
             action={
               <span className="text-[12px] text-text-tertiary">
-                {requests?.length} {t('leave.total', 'total')}
+                {filteredRequests?.length} {t('leave.total', 'total')}
               </span>
             }
           />
           <div>
-            {requests?.map((lr, i) => (
+            {filteredRequests?.map((lr, i) => (
               <div
                 key={lr.publicId}
                 className="flex items-center gap-3 px-5 py-3 border-b border-cream-3/50 last:border-0 transition-colors hover:bg-cream-3/20"
               >
-                <Avatar name={lr.employeeName} index={i} size={32} />
+                {!isEmployee && <Avatar name={lr.employeeName} index={i} size={32} />}
                 <div className="flex-1 min-w-0">
-                  <div className="text-[13.5px] font-medium text-text-primary truncate">
-                    {lr.employeeName}
-                  </div>
+                  {!isEmployee && (
+                    <div className="text-[13.5px] font-medium text-text-primary truncate">
+                      {lr.employeeName}
+                    </div>
+                  )}
                   <div className="text-[11px] text-text-tertiary">
                     {formatDateRange(lr.startDate, lr.endDate)}
                     {lr.reason ? ` \u2014 ${lr.reason}` : ''}
                   </div>
                 </div>
                 <StatusBadge label={t(`leave.${lr.status}`, lr.status)} variant={statusVariant(lr.status)} />
-                {lr.status === 'pending' && (
+                {!isEmployee && lr.status === 'pending' && (
                   <div className="flex gap-1.5 ml-2">
                     <button
                       onClick={() => handleAction(lr.publicId, 'approved')}
@@ -177,6 +310,8 @@ function LeaveRequestsPage() {
           </div>
         </GlassCard>
       )}
+
+      {submitModal}
     </div>
   );
 }

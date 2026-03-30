@@ -35,6 +35,7 @@ import {
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { QRCodeSVG } from 'qrcode.react';
+import { cn } from '@/lib/utils';
 
 export const Route = createFileRoute('/console/profile/')({
   component: ProfilePage,
@@ -271,8 +272,8 @@ function ProfilePage() {
           </div>
         </GlassCard>
 
-        {/* Employee linking (only if not already linked) */}
-        {roleContext && !roleContext.isEmployee && (
+        {/* Employee linking — always show so users can link to multiple workspaces */}
+        {roleContext && (
           <GlassCard hover={false}>
             <GlassCardHeader
               title={t('profile.linkEmployee', 'Link to employee')}
@@ -289,7 +290,7 @@ function ProfilePage() {
               <p className="text-[12.5px] text-text-secondary mb-4 leading-relaxed">
                 {t(
                   'profile.linkEmployeeDesc',
-                  'If your employer gave you an employee public ID, enter it here to link your account. This lets you view your attendance and submit leave requests.',
+                  'Enter an employee public ID to link your account to a workspace. You can link to multiple workspaces if you work at different restaurants.',
                 )}
               </p>
               <div className="flex gap-3">
@@ -547,14 +548,15 @@ function ProfilePage() {
                     key={opt.value}
                     type="button"
                     onClick={() => setTheme(opt.value)}
-                    className={`relative flex flex-col items-center gap-2 py-4 px-3 rounded-xl border cursor-pointer transition-all duration-200 ${
+                    className={cn(
+                      'relative flex flex-col items-center gap-2 py-4 px-3 rounded-xl border cursor-pointer transition-all duration-200',
                       isActive
                         ? 'bg-coffee/8 border-coffee/40 shadow-[0_2px_8px_rgba(107,66,38,0.10)]'
-                        : 'bg-glass-bg border-cream-3 hover:bg-cream-3/40'
-                    }`}
+                        : 'bg-glass-bg border-cream-3 hover:bg-cream-3/40',
+                    )}
                   >
                     <Icon size={20} className={isActive ? 'text-coffee' : 'text-text-secondary'} />
-                    <span className={`text-[12px] font-medium ${isActive ? 'text-coffee' : 'text-text-secondary'}`}>
+                    <span className={cn('text-[12px] font-medium', isActive ? 'text-coffee' : 'text-text-secondary')}>
                       {opt.label}
                     </span>
                     {isActive && (

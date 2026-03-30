@@ -1,3 +1,5 @@
+import { cn } from '@/lib/utils';
+
 type BadgeVariant = 'green' | 'amber' | 'red' | 'blue' | 'gray';
 
 const badgeStyles: Record<BadgeVariant, string> = {
@@ -16,7 +18,7 @@ interface StatusBadgeProps {
 export function StatusBadge({ label, variant }: StatusBadgeProps) {
   return (
     <span
-      className={`text-[10.5px] font-medium px-2 py-0.5 rounded-full ${badgeStyles[variant]}`}
+      className={cn('text-[10.5px] font-medium px-2 py-0.5 rounded-full', badgeStyles[variant])}
     >
       {label}
     </span>

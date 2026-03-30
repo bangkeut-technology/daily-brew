@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Plus, Link2, AtSign } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useCreateEmployee } from '@/hooks/queries/useEmployees';
 import { useShifts, useCreateShift } from '@/hooks/queries/useShifts';
 import { usePlan } from '@/hooks/queries/usePlan';
@@ -175,7 +176,7 @@ function NewEmployeePage() {
                   type="text"
                   {...register('username')}
                   placeholder="e.g. vandeth.tho"
-                  className={`${inputClassName} font-mono`}
+                  className={cn(inputClassName, 'font-mono')}
                 />
                 <p className="text-[10.5px] text-text-tertiary mt-1">
                   Unique identifier to link this employee with BasilBook staff records. Must match the staff name or ID used in your POS system.
@@ -198,7 +199,7 @@ function NewEmployeePage() {
               type="text"
               {...register('linkedUserPublicId')}
               placeholder={t('employee.userPublicIdPlaceholder', 'Optional — link to a user account')}
-              className={`${inputClassName} font-mono`}
+              className={cn(inputClassName, 'font-mono')}
             />
             <p className="text-[10.5px] text-text-tertiary mt-1">
               {t('employee.userPublicIdHint', 'The employee can find their public ID on their profile page.')}
@@ -226,9 +227,10 @@ function NewEmployeePage() {
               <button
                 type="button"
                 onClick={() => setShowShiftForm(true)}
-                className={`mt-2 flex items-center gap-1 text-[12px] font-medium bg-transparent border-none cursor-pointer transition-colors p-0 ${
-                  !shifts?.length ? 'text-amber' : 'text-coffee hover:text-coffee-light'
-                }`}
+                className={cn(
+                  'mt-2 flex items-center gap-1 text-[12px] font-medium bg-transparent border-none cursor-pointer transition-colors p-0',
+                  !shifts?.length ? 'text-amber' : 'text-coffee hover:text-coffee-light',
+                )}
               >
                 <Plus size={13} />
                 {t('employee.createShift', 'Create a shift')}

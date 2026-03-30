@@ -12,11 +12,10 @@ import {
     Crown,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useAuthenticationDispatch } from '@/hooks/use-authentication';
-import { apiAxios } from '@/lib/apiAxios';
 import { usePlan } from '@/hooks/queries/usePlan';
 import { useRoleContext } from '@/hooks/queries/useRoleContext';
 import { getWorkspacePublicId } from '@/lib/auth';
+import { cn } from '@/lib/utils';
 import { LogoBrand } from '@/components/shared/Logo';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
 import { useTheme } from 'next-themes';
@@ -89,15 +88,12 @@ function NavItem({
         <Link
             to={to}
             {...(tourId ? { 'data-tour': tourId } : {})}
-            className={`
-                relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer mb-px
-                font-sans text-[13.5px] transition-all duration-[180ms] no-underline
-                ${
-                    active
-                        ? 'bg-glass-bg backdrop-blur-sm text-coffee font-medium border border-glass-border shadow-sm'
-                        : 'text-text-secondary hover:bg-cream-3 hover:text-text-primary border border-transparent'
-                }
-            `}
+            className={cn(
+                'relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer mb-px font-sans text-[13.5px] transition-all duration-180 no-underline',
+                active
+                    ? 'bg-glass-bg backdrop-blur-sm text-coffee font-medium border border-glass-border shadow-sm'
+                    : 'text-text-secondary hover:bg-cream-3 hover:text-text-primary border border-transparent',
+            )}
         >
             <Icon size={16} />
             <span className="flex-1">{t(label)}</span>
@@ -113,9 +109,10 @@ function NavItem({
                 </span>
             )}
             <span
-                className={`absolute right-2.5 w-1 h-1 rounded-full bg-amber transition-opacity ${
-                    active ? 'opacity-100' : 'opacity-0'
-                }`}
+                className={cn(
+                    'absolute right-2.5 w-1 h-1 rounded-full bg-amber transition-opacity',
+                    active ? 'opacity-100' : 'opacity-0',
+                )}
             />
         </Link>
     );
@@ -147,7 +144,6 @@ function Divider() {
 
 export function Sidebar() {
     const { t } = useTranslation();
-    const dispatch = useAuthenticationDispatch();
     const signOut = () => {
         sessionStorage.removeItem('workspace_public_id');
         // Submit as a real form POST so the browser follows the redirect
@@ -174,7 +170,7 @@ export function Sidebar() {
     const hasWorkspace = !!workspacePublicId;
 
     return (
-        <aside className="fixed left-0 top-0 bottom-0 w-[220px] bg-cream-2 border-r border-cream-3 flex flex-col z-10">
+        <aside className="fixed left-0 top-0 bottom-0 w-55 bg-cream-2 border-r border-cream-3 flex flex-col z-10">
             {/* Logo */}
             <div className="px-5 py-5">
                 <LogoBrand size={28} />
@@ -190,6 +186,8 @@ export function Sidebar() {
                                 .filter((lw) => lw.workspacePublicId && !roleContext.ownedWorkspaces?.some((ow) => ow.publicId === lw.workspacePublicId))
                                 .map((lw) => ({ publicId: lw.workspacePublicId!, name: lw.workspaceName ?? '', role: 'employee' as const })),
                         ]}
+                        planLabel={plan?.planLabel}
+                        isEspresso={plan?.isEspresso}
                     />
                 </div>
             )}
@@ -198,9 +196,21 @@ export function Sidebar() {
             <nav className="flex-1 px-3 flex flex-col overflow-y-auto">
                 {showOwnerView && (
                     <>
-                        {/* Dashboard is always enabled */}
+                        {/* Dashboard with plan badge */}
                         <div className="space-y-0.5">
-                            <NavItem to="/console/dashboard" icon={LayoutDashboard} label="nav.dashboard" />
+                            <NavItem to="/console/dashboard" icon={LayoutDashboard} label="nav.dashboard" badge={undefined} />
+                            {plan && (
+                                <div className="px-2.5 -mt-0.5 mb-1">
+                                    <Link to="/console/settings" className="no-underline">
+                                        <span className={cn(
+                                            'text-[9px] font-semibold px-2 py-0.5 rounded-full',
+                                            plan.isEspresso ? 'bg-green/10 text-green' : 'bg-cream-3 text-text-tertiary',
+                                        )}>
+                                            {plan.planLabel}
+                                        </span>
+                                    </Link>
+                                </div>
+                            )}
                         </div>
                         <NavSection
                             items={ownerMainNav.filter((i) => i.to !== '/console/dashboard')}
@@ -249,7 +259,7 @@ export function Sidebar() {
                     <ThemeToggle />
                     <button
                         onClick={signOut}
-                        className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer w-full font-sans text-[13.5px] text-text-secondary hover:bg-cream-3 hover:text-text-primary transition-all duration-[180ms] border-none bg-transparent"
+                        className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer w-full font-sans text-[13.5px] text-text-secondary hover:bg-cream-3 hover:text-text-primary transition-all duration-180 border-none bg-transparent"
                     >
                         <LogOut size={16} />
                         {t('nav.signOut')}
@@ -267,7 +277,7 @@ function ThemeToggle() {
     return (
         <button
             onClick={() => setTheme(isDark ? 'light' : 'dark')}
-            className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer w-full font-sans text-[13.5px] text-text-secondary hover:bg-cream-3 hover:text-text-primary transition-all duration-[180ms] border-none bg-transparent"
+            className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer w-full font-sans text-[13.5px] text-text-secondary hover:bg-cream-3 hover:text-text-primary transition-all duration-180 border-none bg-transparent"
         >
             {isDark ? <Sun size={16} /> : <Moon size={16} />}
             {isDark ? 'Light mode' : 'Dark mode'}

@@ -2,6 +2,7 @@
 
 namespace App\EventSubscriber;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -10,6 +11,11 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ExceptionSubscriber implements EventSubscriberInterface
 {
+    public function __construct(
+        private LoggerInterface $logger,
+        private string $kernelEnvironment = 'prod',
+    ) {}
+
     public static function getSubscribedEvents(): array
     {
         return [
@@ -26,16 +32,26 @@ class ExceptionSubscriber implements EventSubscriberInterface
 
         $exception = $event->getThrowable();
 
-        if (!$exception instanceof HttpExceptionInterface) {
-            // Unknown exceptions: let Symfony handle logging and error response
-            return;
-        }
+        if ($exception instanceof HttpExceptionInterface) {
+            $statusCode = $exception->getStatusCode();
+            $message = $exception->getMessage();
+        } else {
+            // Log 500 errors for debugging
+            $this->logger->error('API 500 error: ' . $exception->getMessage(), [
+                'exception' => $exception,
+                'url' => $request->getUri(),
+                'method' => $request->getMethod(),
+            ]);
 
-        $statusCode = $exception->getStatusCode();
+            $statusCode = 500;
+            $message = $this->kernelEnvironment === 'dev'
+                ? $exception->getMessage()
+                : 'An internal error occurred';
+        }
 
         $event->setResponse(new JsonResponse([
             'error'   => true,
-            'message' => $exception->getMessage(),
+            'message' => $message,
             'code'    => $statusCode,
         ], $statusCode));
     }

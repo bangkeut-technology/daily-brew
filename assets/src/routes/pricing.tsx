@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { PricingSection } from '@/components/landing/PricingSection';
 import { LandingFooter } from '@/components/landing/LandingFooter';
+import { cn } from '@/lib/utils';
 
 export const Route = createFileRoute('/pricing')({
   component: PricingPage,
@@ -194,11 +195,10 @@ function PricingPage() {
                   </div>
                 )}
               <motion.div
-                className={`grid grid-cols-4 px-6 py-3.5 items-center transition-colors duration-120 hover:bg-cream-3/20 ${
-                  i < comparisonRows.length - 1
-                    ? 'border-b border-cream-3/40'
-                    : ''
-                }`}
+                className={cn(
+                  'grid grid-cols-4 px-6 py-3.5 items-center transition-colors duration-120 hover:bg-cream-3/20',
+                  i < comparisonRows.length - 1 && 'border-b border-cream-3/40'
+                )}
                 initial={{ opacity: 0, x: -10 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}

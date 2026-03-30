@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useLayoutEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { CalendarDays, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface CustomDatePickerProps {
   value: string; // "YYYY-MM-DD"
@@ -129,7 +130,7 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
     : '';
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={cn('relative', className)}>
       <button
         ref={triggerRef}
         type="button"
@@ -137,7 +138,7 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
         className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[13.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none transition-colors cursor-pointer focus:border-coffee focus:ring-1 focus:ring-coffee/20"
       >
         <CalendarDays size={14} className="text-text-tertiary flex-shrink-0" />
-        <span className={displayValue ? '' : 'text-text-tertiary'}>
+        <span className={cn(!displayValue && 'text-text-tertiary')}>
           {displayValue || 'Select date'}
         </span>
       </button>
@@ -169,11 +170,12 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
               <button
                 type="button"
                 onClick={() => setPickerView(pickerView === 'months' ? 'days' : 'months')}
-                className={`flex items-center gap-0.5 px-2 py-1 rounded-md text-[13px] font-semibold border-none cursor-pointer transition-colors ${
+                className={cn(
+                  'flex items-center gap-0.5 px-2 py-1 rounded-md text-[13px] font-semibold border-none cursor-pointer transition-colors',
                   pickerView === 'months'
                     ? 'bg-coffee/10 text-coffee'
                     : 'bg-transparent text-text-primary hover:bg-cream-3/40'
-                }`}
+                )}
               >
                 {MONTHS[viewMonth].slice(0, 3)}
                 <ChevronDown size={11} className="text-text-tertiary" />
@@ -182,11 +184,12 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
               <button
                 type="button"
                 onClick={() => setPickerView(pickerView === 'years' ? 'days' : 'years')}
-                className={`flex items-center gap-0.5 px-2 py-1 rounded-md text-[13px] font-semibold border-none cursor-pointer transition-colors ${
+                className={cn(
+                  'flex items-center gap-0.5 px-2 py-1 rounded-md text-[13px] font-semibold border-none cursor-pointer transition-colors',
                   pickerView === 'years'
                     ? 'bg-coffee/10 text-coffee'
                     : 'bg-transparent text-text-primary hover:bg-cream-3/40'
-                }`}
+                )}
               >
                 {viewYear}
                 <ChevronDown size={11} className="text-text-tertiary" />
@@ -210,13 +213,14 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
                   key={m}
                   type="button"
                   onClick={() => { setViewMonth(i); setPickerView('days'); }}
-                  className={`py-2 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors ${
+                  className={cn(
+                    'py-2 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors',
                     i === viewMonth
                       ? 'bg-coffee text-white'
                       : i === today.getMonth() && viewYear === today.getFullYear()
                         ? 'bg-amber/12 text-amber hover:bg-amber/20'
                         : 'bg-transparent text-text-primary hover:bg-cream-3/40'
-                  }`}
+                  )}
                 >
                   {m.slice(0, 3)}
                 </button>
@@ -232,13 +236,14 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
                   key={y}
                   type="button"
                   onClick={() => { setViewYear(y); setPickerView('months'); }}
-                  className={`py-2 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors ${
+                  className={cn(
+                    'py-2 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors',
                     y === viewYear
                       ? 'bg-coffee text-white'
                       : y === today.getFullYear()
                         ? 'bg-amber/12 text-amber hover:bg-amber/20'
                         : 'bg-transparent text-text-primary hover:bg-cream-3/40'
-                  }`}
+                  )}
                 >
                   {y}
                 </button>
@@ -284,13 +289,14 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
                         onChange(dateStr);
                         setOpen(false);
                       }}
-                      className={`w-8 h-8 mx-auto flex items-center justify-center rounded-lg text-[12px] border-none cursor-pointer transition-colors ${
+                      className={cn(
+                        'w-8 h-8 mx-auto flex items-center justify-center rounded-lg text-[12px] border-none cursor-pointer transition-colors',
                         isSelected
                           ? 'bg-coffee text-white font-semibold'
                           : isToday
                             ? 'bg-amber/12 text-amber font-medium hover:bg-amber/20'
                             : 'bg-transparent text-text-primary hover:bg-cream-3/40'
-                      }`}
+                      )}
                     >
                       {cell.day}
                     </button>
