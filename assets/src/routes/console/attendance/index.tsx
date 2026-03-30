@@ -8,6 +8,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { AttendanceRow } from '@/components/shared/AttendanceRow';
 import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
+import { useDateFormat } from '@/hooks/useDateFormat';
 
 export const Route = createFileRoute('/console/attendance/')({
   component: AttendancePage,
@@ -20,10 +21,15 @@ function AttendancePage() {
   const [from, setFrom] = useState(today);
   const [to, setTo] = useState(today);
   const { data: attendance, isLoading } = useAttendance(workspaceId, from, to);
+  const fmtDate = useDateFormat();
 
   return (
     <div className="page-enter">
       <PageHeader title={t('nav.attendance')} />
+
+      <p className="text-[13px] text-text-secondary mb-5 -mt-2 leading-relaxed">
+        View check-in and check-out records for all employees. Filter by date range to see attendance for specific periods.
+      </p>
 
       <div className="flex items-end gap-3 mb-6">
         <div>
@@ -58,7 +64,7 @@ function AttendancePage() {
             action={
               <span className="flex items-center gap-1.5 text-[12px] text-text-tertiary">
                 <CalendarDays size={13} />
-                {from === to ? from : `${from} - ${to}`}
+                {from === to ? fmtDate(from) : `${fmtDate(from)} - ${fmtDate(to)}`}
               </span>
             }
           />

@@ -162,10 +162,13 @@ export function Sidebar() {
     const { data: plan } = usePlan(workspacePublicId);
     const { data: roleContext } = useRoleContext();
 
-    const isOwner = roleContext?.isOwner ?? true; // default to owner view while loading
+    const isOwner = roleContext?.isOwner ?? false;
     const isEmployee = roleContext?.isEmployee ?? false;
-    const showOwnerView = isOwner || (!isOwner && !isEmployee); // fallback to owner view
-    const showEmployeeView = isEmployee && !isOwner;
+    const roleLoaded = !!roleContext;
+    // Show owner nav if owner of current workspace, or if no role loaded yet (loading state)
+    const showOwnerView = !roleLoaded || isOwner;
+    // Show employee nav only when explicitly employee and NOT owner in this workspace
+    const showEmployeeView = roleLoaded && isEmployee && !isOwner;
 
     const canUseLeaveRequests = plan?.canUseLeaveRequests ?? false;
     const hasWorkspace = !!workspacePublicId;
@@ -177,10 +180,17 @@ export function Sidebar() {
                 <LogoBrand size={28} />
             </div>
 
-            {/* Workspace switcher */}
-            {roleContext?.ownedWorkspaces && roleContext.ownedWorkspaces.length > 0 && (
+            {/* Workspace switcher — always show, combines owned + linked workspaces */}
+            {roleContext && (
                 <div className="px-3 pb-2">
-                    <WorkspaceSwitcher workspaces={roleContext.ownedWorkspaces} />
+                    <WorkspaceSwitcher
+                        workspaces={[
+                            ...(roleContext.ownedWorkspaces ?? []).map((ws) => ({ ...ws, role: 'owner' as const })),
+                            ...(roleContext.linkedWorkspaces ?? [])
+                                .filter((lw) => lw.workspacePublicId && !roleContext.ownedWorkspaces?.some((ow) => ow.publicId === lw.workspacePublicId))
+                                .map((lw) => ({ publicId: lw.workspacePublicId!, name: lw.workspaceName ?? '', role: 'employee' as const })),
+                        ]}
+                    />
                 </div>
             )}
 

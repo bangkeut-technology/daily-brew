@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Crown, Check, MapPin, Navigation, Smartphone, Building2, Users, Calendar, Plus, X, Copy, ExternalLink, Pencil } from 'lucide-react';
 import { useDateFormat } from '@/hooks/useDateFormat';
+import { usePaddle } from '@/hooks/usePaddle';
 import { QRCodeSVG } from 'qrcode.react';
 import { UpgradeModal } from '@/components/shared/UpgradeModal';
 import { useUpgradeModal } from '@/hooks/useUpgradeModal';
@@ -71,6 +72,7 @@ function SettingsPage() {
   const { data: shifts } = useShifts(currentWsId);
   const upgradeModal = useUpgradeModal();
   const fmtDate = useDateFormat();
+  const { openCheckout } = usePaddle();
   const [wsModalOpen, setWsModalOpen] = useState(false);
   const [editingWsId, setEditingWsId] = useState<string | null>(null);
   const [editWsName, setEditWsName] = useState('');
@@ -185,41 +187,49 @@ function SettingsPage() {
               title="Plan"
               action={
                 <StatusBadge
-                  label={plan.planLabel}
-                  variant={plan.isEspresso ? 'green' : 'gray'}
+                  label={plan.isTrialing ? `Trial · ${plan.trialDaysRemaining}d left` : plan.planLabel}
+                  variant={plan.isTrialing ? 'amber' : plan.isEspresso ? 'green' : 'gray'}
                 />
               }
             />
             <div className="p-5">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Trial banner */}
+                {plan.isTrialing && (
+                  <div className="col-span-2 flex items-center gap-3 rounded-xl border-2 border-amber bg-amber/5 p-4 mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-amber/10 flex items-center justify-center flex-shrink-0">
+                      <Crown size={20} className="text-amber" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-[14px] font-semibold text-text-primary">
+                        Espresso trial — {plan.trialDaysRemaining} day{plan.trialDaysRemaining !== 1 ? 's' : ''} remaining
+                      </p>
+                      <p className="text-[12px] text-text-secondary">
+                        You have full access to all Espresso features. Your first payment will be charged after the trial ends.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Free plan */}
                 <div
                   className={`rounded-xl border-2 p-5 transition-colors ${
-                    !plan.isEspresso
-                      ? 'border-coffee bg-coffee/5'
-                      : 'border-cream-3 bg-glass-bg'
+                    plan.plan === 'free' ? 'border-coffee bg-coffee/5' : 'border-cream-3 bg-glass-bg'
                   }`}
                 >
                   <h3 className="text-[15px] font-semibold text-text-primary mb-1">Free</h3>
                   <p className="text-[12px] text-text-tertiary mb-4">Get started</p>
                   <ul className="space-y-2">
-                    {[
-                      'Up to 5 employees',
-                      'QR code check-in',
-                      'Shift management',
-                      'Closure management',
-                      'Dashboard & attendance log',
-                    ].map((f) => (
+                    {['Up to 10 employees', 'QR code check-in', 'Shift management', 'Closure management', 'Dashboard & attendance log'].map((f) => (
                       <li key={f} className="flex items-center gap-2 text-[12.5px] text-text-secondary">
                         <Check size={14} className="text-green flex-shrink-0" />
                         {f}
                       </li>
                     ))}
                   </ul>
-                  {!plan.isEspresso && (
+                  {plan.plan === 'free' && plan.remainingEmployeeSlots !== null && (
                     <div className="mt-4 text-[11px] text-text-tertiary">
-                      {plan.remainingEmployeeSlots !== null &&
-                        `${plan.remainingEmployeeSlots} employee slot${plan.remainingEmployeeSlots !== 1 ? 's' : ''} remaining`}
+                      {plan.remainingEmployeeSlots} employee slot{plan.remainingEmployeeSlots !== 1 ? 's' : ''} remaining
                     </div>
                   )}
                 </div>
@@ -227,9 +237,7 @@ function SettingsPage() {
                 {/* Espresso plan */}
                 <div
                   className={`rounded-xl border-2 p-5 relative overflow-hidden transition-colors ${
-                    plan.isEspresso
-                      ? 'border-amber bg-amber/5'
-                      : 'border-cream-3 bg-glass-bg'
+                    plan.plan === 'espresso' ? 'border-amber bg-amber/5' : 'border-cream-3 bg-glass-bg'
                   }`}
                 >
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber to-amber-light" />
@@ -237,29 +245,65 @@ function SettingsPage() {
                     <Crown size={16} className="text-amber" />
                     <h3 className="text-[15px] font-semibold text-text-primary">Espresso</h3>
                   </div>
-                  <p className="text-[12px] text-text-tertiary mb-4">Everything you need</p>
+                  <p className="text-[12px] text-text-tertiary mb-1">$12.99/month</p>
+                  <p className="text-[12px] text-text-tertiary mb-4">For growing teams</p>
                   <ul className="space-y-2">
-                    {[
-                      'Unlimited employees',
-                      'IP restriction for check-in',
-                      'Device verification for check-in',
-                      'Geofencing for check-in',
-                      'Per-day shift schedules',
-                      'Leave request management',
-                      'Everything in Free',
-                    ].map((f) => (
+                    {['Up to 20 employees', 'IP restriction', 'Device verification', 'Geofencing', 'Per-day schedules', 'Leave requests', 'BasilBook linking'].map((f) => (
                       <li key={f} className="flex items-center gap-2 text-[12.5px] text-text-secondary">
                         <Check size={14} className="text-amber flex-shrink-0" />
                         {f}
                       </li>
                     ))}
                   </ul>
-                  {!plan.isEspresso && (
-                    <button className="mt-4 w-full px-4 py-2.5 rounded-lg text-[13px] font-semibold bg-gradient-to-r from-amber to-coffee text-white border-none cursor-pointer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(193,127,59,0.3)]">
-                      Upgrade to Espresso
+                  {plan.plan === 'free' && (
+                    <button
+                      onClick={() => openCheckout('annual')}
+                      className="mt-4 w-full px-4 py-2.5 rounded-lg text-[13px] font-semibold bg-gradient-to-r from-amber to-coffee text-white border-none cursor-pointer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(193,127,59,0.3)]"
+                    >
+                      Start 14-day free trial
                     </button>
                   )}
-                  {plan.isEspresso && plan.currentPeriodEnd && (
+                  {plan.plan === 'espresso' && plan.currentPeriodEnd && (
+                    <div className="mt-4 text-[11px] text-text-tertiary">
+                      {plan.remainingEmployeeSlots !== null && `${plan.remainingEmployeeSlots} slots remaining · `}
+                      Renews {fmtDate(plan.currentPeriodEnd)}
+                    </div>
+                  )}
+                </div>
+
+                {/* Double Espresso plan */}
+                <div
+                  className={`rounded-xl border-2 p-5 relative overflow-hidden transition-colors ${
+                    plan.plan === 'double_espresso' ? 'border-coffee bg-coffee/5' : 'border-cream-3 bg-glass-bg'
+                  }`}
+                >
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-coffee to-amber" />
+                  <div className="flex items-center gap-2 mb-1">
+                    <Crown size={16} className="text-coffee" />
+                    <h3 className="text-[15px] font-semibold text-text-primary">Double Espresso</h3>
+                    <span className="text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-coffee/10 text-coffee">
+                      Coming soon
+                    </span>
+                  </div>
+                  <p className="text-[12px] text-text-tertiary mb-1">$39.99/month</p>
+                  <p className="text-[12px] text-text-tertiary mb-4">For large teams</p>
+                  <ul className="space-y-2">
+                    {['Unlimited employees', 'Everything in Espresso', 'Priority support'].map((f) => (
+                      <li key={f} className="flex items-center gap-2 text-[12.5px] text-text-secondary">
+                        <Check size={14} className="text-coffee flex-shrink-0" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  {(plan.plan === 'free' || plan.plan === 'espresso') && (
+                    <button
+                      disabled
+                      className="mt-4 w-full px-4 py-2.5 rounded-lg text-[13px] font-semibold bg-glass-bg text-text-secondary border border-cream-3 cursor-not-allowed opacity-70"
+                    >
+                      Coming soon
+                    </button>
+                  )}
+                  {plan.plan === 'double_espresso' && plan.currentPeriodEnd && (
                     <div className="mt-4 text-[11px] text-text-tertiary">
                       Renews {fmtDate(plan.currentPeriodEnd)}
                     </div>
@@ -274,19 +318,19 @@ function SettingsPage() {
         {currentWsId && (() => {
           const currentWs = workspaces?.find((ws) => ws.publicId === currentWsId);
           if (!currentWs?.qrToken) return null;
-          const checkinUrl = `${window.location.origin}/checkin/${currentWs.qrToken}`;
+          const qrData = `dailybrew:ws:${currentWs.qrToken}`;
           return (
             <GlassCard hover={false}>
               <GlassCardHeader title="Check-in QR code" />
               <div className="px-5 py-2">
                 <p className="text-[11.5px] text-text-tertiary leading-relaxed">
-                  Display this QR code at your restaurant. Employees scan it with their phone while signed in to check in and out.
+                  Display this QR code at your restaurant. Employees open the DailyBrew app, scan this code, and check in instantly.
                 </p>
               </div>
               <div className="p-6 pt-2 flex flex-col items-center">
                 <div className="p-4 bg-white rounded-2xl shadow-[0_2px_12px_rgba(107,66,38,0.08)]">
                   <QRCodeSVG
-                    value={checkinUrl}
+                    value={qrData}
                     size={180}
                     fgColor="#6B4226"
                     bgColor="#FFFFFF"
@@ -299,21 +343,15 @@ function SettingsPage() {
                     }}
                   />
                 </div>
-                <a
-                  href={checkinUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 flex items-center gap-1 text-[11px] text-coffee hover:text-coffee-light transition-colors no-underline"
-                >
-                  <ExternalLink size={10} />
-                  <span className="break-all text-center max-w-[240px]">{checkinUrl}</span>
-                </a>
+                <p className="mt-3 text-[11px] text-text-tertiary font-mono text-center">
+                  {qrData}
+                </p>
                 <button
                   type="button"
                   onClick={async () => {
                     try {
-                      await navigator.clipboard.writeText(checkinUrl);
-                      toast.success('Link copied');
+                      await navigator.clipboard.writeText(currentWs.qrToken);
+                      toast.success('Token copied');
                     } catch {
                       toast.error('Failed to copy');
                     }
@@ -321,7 +359,7 @@ function SettingsPage() {
                   className="mt-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3"
                 >
                   <Copy size={12} />
-                  Copy link
+                  Copy token
                 </button>
               </div>
             </GlassCard>

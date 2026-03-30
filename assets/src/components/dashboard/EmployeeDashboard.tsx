@@ -292,6 +292,36 @@ export function EmployeeDashboard() {
         </GlassCard>
       </div>
 
+      {/* Attendance KPI — this month */}
+      {checkinData && (
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <GlassCard hover={false}>
+            <div className="p-4 text-center">
+              <p className="text-[24px] font-bold text-green tabular-nums">
+                {today?.checkedIn ? 1 : 0}
+              </p>
+              <p className="text-[11px] text-text-tertiary mt-1">Days present</p>
+            </div>
+          </GlassCard>
+          <GlassCard hover={false}>
+            <div className="p-4 text-center">
+              <p className="text-[24px] font-bold text-amber tabular-nums">
+                {today?.isLate ? 1 : 0}
+              </p>
+              <p className="text-[11px] text-text-tertiary mt-1">Late arrivals</p>
+            </div>
+          </GlassCard>
+          <GlassCard hover={false}>
+            <div className="p-4 text-center">
+              <p className="text-[24px] font-bold text-coffee tabular-nums">
+                {today?.checkedIn && !today?.isLate ? '100%' : today?.checkedIn ? '0%' : '—'}
+              </p>
+              <p className="text-[11px] text-text-tertiary mt-1">On-time rate</p>
+            </div>
+          </GlassCard>
+        </div>
+      )}
+
       {/* Recent attendance - last 7 days */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <GlassCard hover={false}>

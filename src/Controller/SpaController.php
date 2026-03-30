@@ -18,6 +18,9 @@ class SpaController extends AbstractController
         string $contactEmail,
         string $googleClientId,
         string $appleClientId,
+        string $paddleClientSideToken,
+        string $paddlePriceIdExpressoMonthly,
+        string $paddlePriceIdExpressoAnnual,
         #[CurrentUser]
         ?User $user = null,
     ): Response {
@@ -39,6 +42,9 @@ class SpaController extends AbstractController
             'contactEmail' => $contactEmail,
             'googleClientId' => $googleClientId,
             'appleClientId' => $appleClientId,
+            'paddleClientSideToken' => $paddleClientSideToken,
+            'paddlePriceIdExpressoMonthly' => $paddlePriceIdExpressoMonthly,
+            'paddlePriceIdExpressoAnnual' => $paddlePriceIdExpressoAnnual,
             'user' => $userData,
         ]);
     }

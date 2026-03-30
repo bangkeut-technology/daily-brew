@@ -1,6 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from '@tanstack/react-router';
+import { usePaddle } from '@/hooks/usePaddle';
 import {
   Crown,
   Globe,
@@ -39,7 +39,7 @@ const espressoBenefits = [
 
 export function UpgradeModal({ open, onOpenChange, feature }: UpgradeModalProps) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const { openCheckout } = usePaddle();
   const config = featureConfig[feature];
   const FeatureIcon = config.icon;
 
@@ -92,11 +92,11 @@ export function UpgradeModal({ open, onOpenChange, feature }: UpgradeModalProps)
             <button
               onClick={() => {
                 onOpenChange(false);
-                navigate({ to: '/pricing' });
+                openCheckout('annual');
               }}
               className="w-full py-2.5 rounded-xl text-[14px] font-medium text-white border-none cursor-pointer btn-shimmer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,66,38,0.30)]"
             >
-              {t('upgrade.upgradeButton', 'Upgrade to Espresso')}
+              Start 14-day free trial
             </button>
 
             {/* Secondary */}

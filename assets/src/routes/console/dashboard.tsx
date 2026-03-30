@@ -33,12 +33,15 @@ function DashboardPage() {
     );
   }
 
+  const isOwner = roleContext?.isOwner ?? false;
+  const isEmployee = roleContext?.isEmployee ?? false;
+
   // Employee dashboard if user is an employee (not an owner) in this workspace
-  if (roleContext?.isEmployee && !roleContext?.isOwner) {
+  if (isEmployee && !isOwner) {
     return <EmployeeDashboard />;
   }
 
-  // Owner dashboard (default, also for users who are both)
+  // Owner dashboard
   return <OwnerDashboard />;
 }
 

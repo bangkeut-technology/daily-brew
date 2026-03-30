@@ -9,6 +9,15 @@ declare global {
             contactEmail?: string;
             googleClientId?: string;
             appleClientId?: string;
+            paddleClientSideToken?: string;
+            paddlePriceIdMonthly?: string;
+            paddlePriceIdAnnual?: string;
+        };
+        Paddle?: {
+            Initialize: (opts: { token: string; eventCallback?: (event: { name: string; data?: Record<string, unknown> }) => void }) => void;
+            Checkout: {
+                open: (opts: Record<string, unknown>) => void;
+            };
         };
     }
 }

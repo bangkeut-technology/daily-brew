@@ -46,7 +46,7 @@ const faqSections: FaqSection[] = [
       {
         question: "What's included in the Free plan?",
         answer:
-          'The Free plan includes up to 5 employees, QR check-in, shift tracking, closure periods, and the attendance dashboard. It is free forever with no time limit.',
+          'The Free plan includes up to 10 employees, QR check-in, shift tracking, closure periods, and the attendance dashboard. It is free forever with no time limit.',
       },
       {
         question: "What's included in Espresso?",

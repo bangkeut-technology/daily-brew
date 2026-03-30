@@ -8,6 +8,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard } from '@/components/shared/GlassCard';
 import { Avatar } from '@/components/shared/Avatar';
 import { StatusBadge } from '@/components/shared/StatusBadge';
+import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { useState } from 'react';
 
 export const Route = createFileRoute('/console/employees/')({
@@ -20,16 +21,17 @@ function EmployeeListPage() {
   const { data: employees, isLoading } = useEmployees(workspaceId);
   const deleteEmployee = useDeleteEmployee(workspaceId);
   const [search, setSearch] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<{ publicId: string; name: string } | null>(null);
 
-  const handleDelete = async (e: React.MouseEvent, publicId: string) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      await deleteEmployee.mutateAsync(publicId);
+      await deleteEmployee.mutateAsync(deleteTarget.publicId);
       toast.success(t('employee.deleteSuccess', 'Employee deleted'));
     } catch {
       toast.error(t('employee.deleteError', 'Failed to delete employee'));
     }
+    setDeleteTarget(null);
   };
 
   const filtered = employees?.filter((emp) => {
@@ -105,7 +107,11 @@ function EmployeeListPage() {
                       variant={employee.active ? 'green' : 'gray'}
                     />
                     <button
-                      onClick={(e) => handleDelete(e, employee.publicId)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setDeleteTarget({ publicId: employee.publicId, name: fullName });
+                      }}
                       className="text-text-tertiary hover:text-red bg-transparent border-none cursor-pointer p-1.5 rounded-lg transition-all hover:bg-red/8"
                     >
                       <Trash2 size={14} />
@@ -117,6 +123,18 @@ function EmployeeListPage() {
           </div>
         </GlassCard>
       )}
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        title={t('employee.deleteTitle', 'Delete employee')}
+        description={t('employee.deleteConfirm', 'Delete {{name}}? This cannot be undone.', { name: deleteTarget?.name ?? '' })}
+        confirmLabel={t('common.delete', 'Delete')}
+        cancelLabel={t('common.cancel', 'Cancel')}
+        variant="danger"
+        loading={deleteEmployee.isPending}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

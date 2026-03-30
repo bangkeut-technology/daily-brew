@@ -4,10 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Subscription;
 use App\Entity\Workspace;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class SubscriptionRepository extends ServiceEntityRepository
+class SubscriptionRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -22,5 +21,10 @@ class SubscriptionRepository extends ServiceEntityRepository
     public function findByPaddleSubscriptionId(string $paddleSubscriptionId): ?Subscription
     {
         return $this->findOneBy(['paddleSubscriptionId' => $paddleSubscriptionId]);
+    }
+
+    public function findByRevenuecatSubscriptionId(string $revenuecatSubscriptionId): ?Subscription
+    {
+        return $this->findOneBy(['revenuecatSubscriptionId' => $revenuecatSubscriptionId]);
     }
 }

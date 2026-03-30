@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Enum\PlanEnum;
+use App\Enum\SubscriptionSourceEnum;
 use App\Enum\SubscriptionStatusEnum;
 use App\Repository\SubscriptionRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -22,14 +23,23 @@ class Subscription extends AbstractBaseEntity
     #[ORM\Column(length: 20, enumType: SubscriptionStatusEnum::class)]
     private SubscriptionStatusEnum $status = SubscriptionStatusEnum::Active;
 
+    #[ORM\Column(length: 20, enumType: SubscriptionSourceEnum::class)]
+    private SubscriptionSourceEnum $source = SubscriptionSourceEnum::Paddle;
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $paddleSubscriptionId = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $paddleCustomerId = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $revenuecatSubscriptionId = null;
+
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $currentPeriodEnd = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $trialEndsAt = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $canceledAt = null;
@@ -89,6 +99,28 @@ class Subscription extends AbstractBaseEntity
         return $this;
     }
 
+    public function getSource(): SubscriptionSourceEnum
+    {
+        return $this->source;
+    }
+
+    public function setSource(SubscriptionSourceEnum $source): static
+    {
+        $this->source = $source;
+        return $this;
+    }
+
+    public function getRevenuecatSubscriptionId(): ?string
+    {
+        return $this->revenuecatSubscriptionId;
+    }
+
+    public function setRevenuecatSubscriptionId(?string $revenuecatSubscriptionId): static
+    {
+        $this->revenuecatSubscriptionId = $revenuecatSubscriptionId;
+        return $this;
+    }
+
     public function getCurrentPeriodEnd(): ?\DateTimeInterface
     {
         return $this->currentPeriodEnd;
@@ -98,6 +130,32 @@ class Subscription extends AbstractBaseEntity
     {
         $this->currentPeriodEnd = $currentPeriodEnd;
         return $this;
+    }
+
+    public function getTrialEndsAt(): ?\DateTimeInterface
+    {
+        return $this->trialEndsAt;
+    }
+
+    public function setTrialEndsAt(?\DateTimeInterface $trialEndsAt): static
+    {
+        $this->trialEndsAt = $trialEndsAt;
+        return $this;
+    }
+
+    public function isTrialing(): bool
+    {
+        return $this->status === SubscriptionStatusEnum::Trialing;
+    }
+
+    public function getTrialDaysRemaining(): ?int
+    {
+        if (!$this->isTrialing() || $this->trialEndsAt === null) {
+            return null;
+        }
+        $now = new \DateTimeImmutable();
+        $diff = $now->diff($this->trialEndsAt);
+        return $diff->invert ? 0 : $diff->days + 1;
     }
 
     public function getCanceledAt(): ?\DateTimeInterface
@@ -111,9 +169,19 @@ class Subscription extends AbstractBaseEntity
         return $this;
     }
 
+    public function isActive(): bool
+    {
+        return in_array($this->status, [SubscriptionStatusEnum::Active, SubscriptionStatusEnum::Trialing]);
+    }
+
+    /** Returns the active plan, or Free if subscription is not active. */
+    public function getActivePlan(): PlanEnum
+    {
+        return $this->isActive() ? $this->plan : PlanEnum::Free;
+    }
+
     public function isEspresso(): bool
     {
-        return $this->plan === PlanEnum::Espresso
-            && in_array($this->status, [SubscriptionStatusEnum::Active, SubscriptionStatusEnum::Trialing]);
+        return $this->isActive() && in_array($this->plan, [PlanEnum::Espresso, PlanEnum::DoubleEspresso]);
     }
 }

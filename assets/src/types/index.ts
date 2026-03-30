@@ -140,9 +140,13 @@ export interface CheckinResponse {
 }
 
 export interface PlanDetails {
-  plan: 'free' | 'espresso';
+  plan: 'free' | 'espresso' | 'double_espresso';
   planLabel: string;
   isEspresso: boolean;
+  isDoubleEspresso: boolean;
+  isTrialing: boolean;
+  trialDaysRemaining: number | null;
+  trialEndsAt: string | null;
   employeeLimit: number | null;
   remainingEmployeeSlots: number | null;
   canUseIpRestriction: boolean;

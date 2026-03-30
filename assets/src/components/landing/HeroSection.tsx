@@ -46,7 +46,7 @@ export function HeroSection() {
             >
               <span className="w-1.5 h-1.5 rounded-full bg-amber animate-pulse" />
               <span className="text-[11px] font-medium text-amber tracking-wide">
-                Free for up to 5 employees
+                Free for up to 10 employees
               </span>
             </motion.div>
 

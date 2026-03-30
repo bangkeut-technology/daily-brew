@@ -143,7 +143,7 @@ function FeaturesPage() {
             Ready to get started?
           </h3>
           <p className="text-[14px] text-text-secondary mb-6">
-            Free for up to 5 employees. No credit card required.
+            Free for up to 10 employees. No credit card required.
           </p>
           <div className="flex items-center justify-center gap-3">
             <Link

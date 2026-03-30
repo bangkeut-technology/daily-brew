@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Subscription;
 use App\Enum\PlanEnum;
+use App\Enum\SubscriptionSourceEnum;
 use App\Enum\SubscriptionStatusEnum;
 use App\Repository\SubscriptionRepository;
 use App\Repository\WorkspaceRepository;
@@ -60,12 +61,21 @@ class PaddleWebhookService
         }
 
         $subscription->setPlan(PlanEnum::Espresso);
+        $subscription->setSource(SubscriptionSourceEnum::Paddle);
         $subscription->setStatus($this->mapStatus($data['status'] ?? 'active'));
         $subscription->setPaddleSubscriptionId($paddleSubId);
         $subscription->setPaddleCustomerId($data['customer_id'] ?? null);
 
         if (isset($data['current_billing_period']['ends_at'])) {
             $subscription->setCurrentPeriodEnd(new \DateTimeImmutable($data['current_billing_period']['ends_at']));
+        }
+
+        // Paddle trial period
+        if (isset($data['scheduled_change']['action']) && $data['scheduled_change']['action'] === 'resume') {
+            // Trial with scheduled resume = trial ends at the effective_at date
+            if (isset($data['scheduled_change']['effective_at'])) {
+                $subscription->setTrialEndsAt(new \DateTimeImmutable($data['scheduled_change']['effective_at']));
+            }
         }
 
         $this->em->flush();
@@ -80,6 +90,16 @@ class PaddleWebhookService
 
         if (isset($data['current_billing_period']['ends_at'])) {
             $subscription->setCurrentPeriodEnd(new \DateTimeImmutable($data['current_billing_period']['ends_at']));
+        }
+
+        // Update trial end date if still trialing
+        if (($data['status'] ?? '') === 'trialing' && isset($data['next_billed_at'])) {
+            $subscription->setTrialEndsAt(new \DateTimeImmutable($data['next_billed_at']));
+        }
+
+        // Clear trial when no longer trialing
+        if (($data['status'] ?? '') === 'active') {
+            $subscription->setTrialEndsAt(null);
         }
 
         $this->em->flush();

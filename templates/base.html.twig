@@ -17,12 +17,16 @@
 
     {% block javascripts %}
         {{ encore_entry_script_tags('daily_brew_application') }}
+        <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
         <script type="text/javascript">
             window.__DAILYBREW__ = {
                 maxFreeEmployees: {{ maxFreeEmployees }},
                 contactEmail: '{{ contactEmail|e('js') }}',
                 googleClientId: '{{ googleClientId|e('js') }}',
                 appleClientId: '{{ appleClientId|e('js') }}',
+                paddleClientSideToken: '{{ paddleClientSideToken|e('js') }}',
+                paddlePriceIdMonthly: '{{ paddlePriceIdExpressoMonthly|e('js') }}',
+                paddlePriceIdAnnual: '{{ paddlePriceIdExpressoAnnual|e('js') }}',
                 user: {{ user is not null ? user|json_encode|raw : 'null' }}
             };
         </script>

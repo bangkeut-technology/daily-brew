@@ -1,7 +1,10 @@
 import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { UserPlus, ClipboardList, CalendarOff, Clock, Settings, CheckCircle, AlertTriangle, Palmtree, XCircle, Coffee } from 'lucide-react';
+import { UserPlus, ClipboardList, CalendarOff, Clock, Settings, CheckCircle, AlertTriangle, Palmtree, XCircle, Coffee, Copy, QrCode } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
+import { toast } from 'sonner';
 import { useDashboard } from '@/hooks/queries/useDashboard';
+import { useWorkspaces } from '@/hooks/queries/useWorkspaces';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { StatCard } from '@/components/shared/StatCard';
@@ -14,6 +17,8 @@ export function OwnerDashboard() {
   const { t } = useTranslation();
   const workspaceId = getWorkspacePublicId() || '';
   const { data, isLoading } = useDashboard(workspaceId);
+  const { data: workspaces } = useWorkspaces();
+  const currentWs = workspaces?.find((ws) => ws.publicId === workspaceId);
 
   if (!workspaceId) {
     return (
@@ -135,6 +140,51 @@ export function OwnerDashboard() {
       />
 
       <GuidedTour />
+
+      {/* QR Check-in card */}
+      {currentWs?.qrToken && (
+        <GlassCard hover={false} className="mb-6">
+          <div className="p-5 flex items-center gap-5">
+            <div className="p-3 bg-white rounded-xl shadow-[0_2px_8px_rgba(107,66,38,0.06)] flex-shrink-0">
+              <QRCodeSVG
+                value={`dailybrew:ws:${currentWs.qrToken}`}
+                size={80}
+                fgColor="#6B4226"
+                bgColor="#FFFFFF"
+                level="M"
+              />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <QrCode size={15} className="text-coffee" />
+                <h3 className="text-[14px] font-semibold text-text-primary">Check-in QR code</h3>
+              </div>
+              <p className="text-[12px] text-text-secondary leading-relaxed mb-3">
+                Print and display this at your restaurant. Employees scan it with the DailyBrew app to check in and out.
+              </p>
+              <div className="flex items-center gap-2">
+                <code className="text-[11px] font-mono text-text-tertiary bg-cream-3/30 px-2 py-1 rounded">
+                  dailybrew:ws:{currentWs.qrToken}
+                </code>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(currentWs.qrToken);
+                      toast.success('Token copied');
+                    } catch {
+                      toast.error('Failed to copy');
+                    }
+                  }}
+                  className="text-text-tertiary hover:text-coffee bg-transparent border-none cursor-pointer p-1 rounded transition-colors"
+                >
+                  <Copy size={12} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </GlassCard>
+      )}
 
       {/* Stats grid */}
       <div data-tour="dashboard" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

@@ -11,7 +11,7 @@ export const Route = createFileRoute('/pricing')({
 });
 
 const comparisonRows = [
-  { feature: 'Employees', free: 'Up to 5', brew: 'Unlimited' },
+  { feature: 'Employees', free: 'Up to 10', brew: 'Unlimited' },
   { feature: 'QR check-in', free: true, brew: true },
   { feature: 'Shift tracking', free: true, brew: true },
   { feature: 'Closures', free: true, brew: true },

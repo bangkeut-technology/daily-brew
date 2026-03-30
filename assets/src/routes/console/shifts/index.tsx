@@ -45,6 +45,7 @@ function ShiftsPage() {
   const [name, setName] = useState('');
   const [startTime, setStartTime] = useState('08:00');
   const [endTime, setEndTime] = useState('17:00');
+  const [deleteTarget, setDeleteTarget] = useState<{ publicId: string; name: string } | null>(null);
 
   // Track which shift card has its day schedule expanded
   const [selectedShift, setSelectedShift] = useState<string | null>(null);
@@ -61,16 +62,18 @@ function ShiftsPage() {
     }
   };
 
-  const handleDelete = async (publicId: string) => {
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      await deleteShift.mutateAsync(publicId);
+      await deleteShift.mutateAsync(deleteTarget.publicId);
       toast.success('Shift deleted');
-      if (selectedShift === publicId) {
+      if (selectedShift === deleteTarget.publicId) {
         setSelectedShift(null);
       }
     } catch {
       toast.error('Failed to delete shift');
     }
+    setDeleteTarget(null);
   };
 
   const toggleShiftSchedule = (publicId: string) => {
@@ -178,7 +181,7 @@ function ShiftsPage() {
                 canUseTimeRules={plan?.canUseShiftTimeRules ?? false}
                 isExpanded={selectedShift === shift.publicId}
                 onToggleExpand={() => toggleShiftSchedule(shift.publicId)}
-                onDelete={() => handleDelete(shift.publicId)}
+                onDelete={() => setDeleteTarget({ publicId: shift.publicId, name: shift.name })}
                 onUpgradeClick={() => upgradeModal.openFor('shiftTimeRules')}
               />
             );
@@ -193,6 +196,18 @@ function ShiftsPage() {
           feature={upgradeModal.feature}
         />
       )}
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        title={t('shift.deleteTitle', 'Delete shift')}
+        description={t('shift.deleteConfirm', 'Delete the {{name}} shift? Employees assigned to this shift will be unassigned.', { name: deleteTarget?.name ?? '' })}
+        confirmLabel={t('common.delete', 'Delete')}
+        cancelLabel={t('common.cancel', 'Cancel')}
+        variant="danger"
+        loading={deleteShift.isPending}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

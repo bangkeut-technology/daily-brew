@@ -11,6 +11,7 @@ import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { Avatar } from '@/components/shared/Avatar';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { UpgradeModal } from '@/components/shared/UpgradeModal';
+import { useDateFormat } from '@/hooks/useDateFormat';
 
 export const Route = createFileRoute('/console/leave/')({
   component: LeaveRequestsPage,
@@ -34,6 +35,7 @@ function LeaveRequestsPage() {
   const [showUpgrade, setShowUpgrade] = useState(true);
   const { data: requests, isLoading } = useLeaveRequests(canUse ? workspaceId : '', statusFilter || undefined);
   const updateLeave = useUpdateLeaveRequest(workspaceId);
+  const fmtDate = useDateFormat();
 
   if (planLoading) {
     return (
@@ -90,8 +92,8 @@ function LeaveRequestsPage() {
   };
 
   const formatDateRange = (startDate: string, endDate: string) => {
-    if (startDate === endDate) return startDate;
-    return `${startDate} - ${endDate}`;
+    if (startDate === endDate) return fmtDate(startDate);
+    return `${fmtDate(startDate)} - ${fmtDate(endDate)}`;
   };
 
   return (

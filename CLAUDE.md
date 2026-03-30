@@ -25,24 +25,20 @@ Symfony backend + React frontend (Symfony Webpack Encore).
 
 Any request to add the above should be deferred to a future milestone.
 
-### Espresso Plan ($12.99/month)
-Premium features gated behind Espresso subscription:
-- Unlimited employees (free = 5 max)
+### Espresso Plan ($12.99/month · $129/year)
+- Up to 20 employees (free = 10 max)
 - IP restriction for check-in
 - Device verification for check-in (same device for in/out, prevent double check-in)
 - Geofencing for check-in (lat/lng + radius)
 - Per-day shift schedules (ShiftTimeRule per day-of-week)
 - Leave request management
 - Employee username for BasilBook staff linking
-- Priority support
 
-### Dark Roast Plan (future roadmap — do NOT build)
-- Multiple QR codes per workspace (e.g. front door, kitchen, bar)
-- Per-QR geofence & WiFi rules
-- Employee assignment per QR code
-- Manager role (elevated Employee — can view team attendance & approve leave)
-- Trusted devices per employee (whitelist specific devices that can check in/out)
-- White-label branding (custom logo, colors, app name per workspace)
+### Double Espresso Plan ($39.99/month · $399/year)
+- Unlimited employees
+- Everything in Espresso
+- Priority support
+- Future: Multiple QR codes per workspace, manager role, white-label branding
 
 ### Dual Role System
 Users can be owners (create workspaces) or employees (linked to an employee record).
@@ -154,10 +150,12 @@ Computed at check-in/out time relative to the Employee's assigned Shift + grace 
 
 ### QR check-in — workspace-level QR code
 - Each workspace has a `qrToken` (20-char random string) generated on creation
-- QR encodes `https://dailybrew.work/checkin/{workspaceQrToken}`
+- QR encodes `dailybrew:ws:{qrToken}` — NOT a URL, just data for the mobile app
 - ONE QR code per workspace — displayed at the restaurant entrance
+- Employee opens DailyBrew mobile app → scans QR → app extracts token → calls `POST /api/v1/checkin/{qrToken}`
 - Employee must be signed in to check in — system resolves employee from auth session + workspace
 - All employees need a linked user account to check in
+- Web route `/checkin/{qrToken}` exists as a fallback for testing only
 
 ### QR check-in IP restriction
 On check-in via QR:
@@ -223,7 +221,7 @@ JWT via LexikJWTAuthenticationBundle. Flows: email+password, Google OAuth, Apple
 
 ## QR Check-in Flow
 
-QR encodes `https://dailybrew.work/checkin/{qrToken}`. Staff scans → mobile web page → Check In/Out button. POST `/api/v1/checkin/{qrToken}` validates IP, device, geofence if enabled → creates/updates Attendance record. Public route for unlinked employees; requires auth for linked employees.
+QR encodes `dailybrew:ws:{qrToken}` (data payload, not a URL). Employee opens DailyBrew mobile app → scans QR → app parses token → calls `POST /api/v1/checkin/{qrToken}` with JWT auth. Backend resolves employee from auth user + workspace. Validates IP, device, geofence if enabled → creates/updates Attendance record. Auth always required.
 
 ---
 

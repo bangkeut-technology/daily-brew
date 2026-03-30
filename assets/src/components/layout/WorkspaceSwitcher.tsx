@@ -7,8 +7,14 @@ import { getWorkspacePublicId, setWorkspacePublicId } from '@/lib/auth';
 import { useCreateWorkspace } from '@/hooks/queries/useWorkspaces';
 import { toast } from 'sonner';
 
+interface WorkspaceItem {
+  publicId: string;
+  name: string;
+  role: 'owner' | 'employee';
+}
+
 interface WorkspaceSwitcherProps {
-  workspaces: { publicId: string; name: string }[];
+  workspaces: WorkspaceItem[];
 }
 
 export function WorkspaceSwitcher({ workspaces }: WorkspaceSwitcherProps) {
@@ -43,8 +49,6 @@ export function WorkspaceSwitcher({ workspaces }: WorkspaceSwitcherProps) {
     }
   };
 
-  if (workspaces.length === 0) return null;
-
   return (
     <>
       <Popover.Root open={open} onOpenChange={setOpen}>
@@ -67,7 +71,7 @@ export function WorkspaceSwitcher({ workspaces }: WorkspaceSwitcherProps) {
                 {current?.name ?? t('workspace.noWorkspace')}
               </p>
               <p className="text-[10px] text-text-tertiary leading-tight">
-                {t('workspace.label')}
+                {current?.role === 'employee' ? 'Employee' : t('workspace.label')}
               </p>
             </div>
             <ChevronsUpDown size={14} className="text-text-tertiary flex-shrink-0" />
@@ -106,7 +110,10 @@ export function WorkspaceSwitcher({ workspaces }: WorkspaceSwitcherProps) {
                     {ws.name.charAt(0).toUpperCase()}
                   </span>
                 </div>
-                <span className="flex-1 truncate">{ws.name}</span>
+                <div className="flex-1 min-w-0">
+                  <span className="block truncate">{ws.name}</span>
+                  <span className="text-[9px] text-text-tertiary">{ws.role === 'employee' ? 'Employee' : 'Owner'}</span>
+                </div>
                 {ws.publicId === currentId && (
                   <Check size={14} className="text-coffee flex-shrink-0" />
                 )}
