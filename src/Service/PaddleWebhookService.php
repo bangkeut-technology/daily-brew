@@ -45,36 +45,23 @@ class PaddleWebhookService
         $customData = $data['custom_data'] ?? [];
         $workspacePublicId = $customData['workspace_public_id'] ?? null;
 
-        $this->logger->info('handleSubscriptionCreated', [
-            'paddle_sub_id' => $paddleSubId,
-            'workspace_public_id' => $workspacePublicId,
-            'status' => $data['status'] ?? null,
-            'custom_data' => $customData,
-        ]);
-
         if (!$workspacePublicId) {
-            $this->logger->error('Paddle subscription.created missing workspace_public_id', ['data' => $customData]);
+            $this->logger->warning('Paddle subscription.created missing workspace_public_id');
             return;
         }
 
         $workspace = $this->workspaceRepository->findByPublicId($workspacePublicId);
         if ($workspace === null) {
-            $this->logger->error('Workspace not found for subscription', ['workspace_public_id' => $workspacePublicId]);
+            $this->logger->warning('Workspace not found: ' . $workspacePublicId);
             return;
         }
 
         $subscription = $this->subscriptionRepository->findByWorkspace($workspace);
-        $isNew = $subscription === null;
         if ($subscription === null) {
             $subscription = new Subscription();
             $subscription->setWorkspace($workspace);
             $this->em->persist($subscription);
         }
-
-        $this->logger->info('Subscription record ' . ($isNew ? 'created' : 'updated'), [
-            'workspace' => $workspace->getName(),
-            'paddle_sub_id' => $paddleSubId,
-        ]);
 
         $subscription->setPlan(PlanEnum::Espresso);
         $subscription->setSource(SubscriptionSourceEnum::Paddle);
@@ -83,14 +70,14 @@ class PaddleWebhookService
         $subscription->setPaddleCustomerId($data['customer_id'] ?? null);
 
         if (isset($data['current_billing_period']['ends_at'])) {
-            $subscription->setCurrentPeriodEnd(new \DateTimeImmutable($data['current_billing_period']['ends_at']));
+            $subscription->setCurrentPeriodEnd(new \DateTime($data['current_billing_period']['ends_at']));
         }
 
         // Paddle trial period
         if (isset($data['scheduled_change']['action']) && $data['scheduled_change']['action'] === 'resume') {
             // Trial with scheduled resume = trial ends at the effective_at date
             if (isset($data['scheduled_change']['effective_at'])) {
-                $subscription->setTrialEndsAt(new \DateTimeImmutable($data['scheduled_change']['effective_at']));
+                $subscription->setTrialEndsAt(new \DateTime($data['scheduled_change']['effective_at']));
             }
         }
 
@@ -99,23 +86,18 @@ class PaddleWebhookService
 
     private function handleSubscriptionUpdated(array $data): void
     {
-        $this->logger->info('handleSubscriptionUpdated', [
-            'paddle_sub_id' => $data['id'] ?? '',
-            'status' => $data['status'] ?? null,
-        ]);
-
         $subscription = $this->findByPaddleId($data['id'] ?? '');
         if ($subscription === null) return;
 
         $subscription->setStatus($this->mapStatus($data['status'] ?? 'active'));
 
         if (isset($data['current_billing_period']['ends_at'])) {
-            $subscription->setCurrentPeriodEnd(new \DateTimeImmutable($data['current_billing_period']['ends_at']));
+            $subscription->setCurrentPeriodEnd(new \DateTime($data['current_billing_period']['ends_at']));
         }
 
         // Update trial end date if still trialing
         if (($data['status'] ?? '') === 'trialing' && isset($data['next_billed_at'])) {
-            $subscription->setTrialEndsAt(new \DateTimeImmutable($data['next_billed_at']));
+            $subscription->setTrialEndsAt(new \DateTime($data['next_billed_at']));
         }
 
         // Clear trial when no longer trialing
@@ -132,7 +114,7 @@ class PaddleWebhookService
         if ($subscription === null) return;
 
         $subscription->setStatus(SubscriptionStatusEnum::Canceled);
-        $subscription->setCanceledAt(new \DateTimeImmutable());
+        $subscription->setCanceledAt(new \DateTime());
         $this->em->flush();
     }
 
@@ -167,10 +149,7 @@ class PaddleWebhookService
     {
         $subscription = $this->subscriptionRepository->findByPaddleSubscriptionId($paddleSubId);
         if ($subscription === null) {
-            $this->logger->error('Paddle subscription not found in database', [
-                'paddle_subscription_id' => $paddleSubId,
-                'hint' => 'subscription.created may not have been processed — check webhook delivery in Paddle dashboard',
-            ]);
+            $this->logger->warning('Paddle subscription not found: ' . $paddleSubId);
         }
         return $subscription;
     }
