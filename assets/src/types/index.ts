@@ -94,6 +94,10 @@ export interface LeaveRequest {
   employeeName: string;
   startDate: string;
   endDate: string;
+  startTime: string | null;
+  endTime: string | null;
+  isFullDay: boolean;
+  type: 'paid' | 'unpaid';
   reason: string | null;
   status: 'pending' | 'approved' | 'rejected';
   reviewedAt: string | null;

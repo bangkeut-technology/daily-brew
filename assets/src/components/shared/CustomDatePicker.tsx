@@ -6,6 +6,7 @@ interface CustomDatePickerProps {
   value: string; // "YYYY-MM-DD"
   onChange: (value: string) => void;
   className?: string;
+  isDateDisabled?: (dateStr: string) => boolean;
 }
 
 const WEEKDAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
@@ -34,7 +35,7 @@ function getFirstDayOfWeek(year: number, month: number) {
 
 type PickerView = 'days' | 'months' | 'years';
 
-export function CustomDatePicker({ value, onChange, className = '' }: CustomDatePickerProps) {
+export function CustomDatePicker({ value, onChange, className = '', isDateDisabled }: CustomDatePickerProps) {
   const [open, setOpen] = useState(false);
   const [pickerView, setPickerView] = useState<PickerView>('days');
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -265,22 +266,28 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
                     viewMonth === selectedMonth &&
                     viewYear === selectedYear;
                   const isToday = dateStr === todayStr;
+                  const isDisabled = isDateDisabled?.(dateStr) ?? false;
 
                   return (
                     <button
                       key={i}
                       type="button"
+                      disabled={isDisabled}
                       onClick={() => {
+                        if (isDisabled) return;
                         onChange(dateStr);
                         setOpen(false);
                       }}
                       className={cn(
-                        'w-8 h-8 mx-auto flex items-center justify-center rounded-lg text-[12px] border-none cursor-pointer transition-colors',
-                        isSelected
+                        'w-8 h-8 mx-auto flex items-center justify-center rounded-lg text-[12px] border-none transition-colors',
+                        isDisabled
+                          ? 'opacity-30 cursor-not-allowed line-through'
+                          : 'cursor-pointer',
+                        !isDisabled && isSelected
                           ? 'bg-coffee text-white font-semibold'
-                          : isToday
+                          : !isDisabled && isToday
                             ? 'bg-amber/12 text-amber font-medium hover:bg-amber/20'
-                            : 'bg-transparent text-text-primary hover:bg-cream-3/40'
+                            : !isDisabled ? 'bg-transparent text-text-primary hover:bg-cream-3/40' : ''
                       )}
                     >
                       {cell.day}

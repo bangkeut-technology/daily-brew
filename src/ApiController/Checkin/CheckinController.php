@@ -7,6 +7,7 @@ namespace App\ApiController\Checkin;
 use App\ApiController\Trait\ApiResponseTrait;
 use App\Entity\User;
 use App\Repository\EmployeeRepository;
+use App\Repository\LeaveRequestRepository;
 use App\Repository\WorkspaceRepository;
 use App\Service\CheckinService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,6 +29,7 @@ class CheckinController extends AbstractController
         WorkspaceRepository $workspaceRepository,
         EmployeeRepository $employeeRepository,
         CheckinService $checkinService,
+        LeaveRequestRepository $leaveRequestRepository,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByQrToken($workspaceQrToken);
         if ($workspace === null) {
@@ -43,12 +45,16 @@ class CheckinController extends AbstractController
         $shift = $employee->getShift();
 
         $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
+        $todayDate = new \DateTimeImmutable('today', $tz);
+        $approvedLeave = $leaveRequestRepository->findApprovedForEmployeeOnDate($employee, $todayDate);
 
         return $this->jsonSuccess([
             'employeeName' => $employee->getName(),
             'shiftName' => $shift?->getName(),
             'shiftStart' => $shift?->getStartTime()?->format('H:i'),
             'shiftEnd' => $shift?->getEndTime()?->format('H:i'),
+            'onLeave' => $approvedLeave !== null,
+            'leaveIsFullDay' => $approvedLeave?->isFullDay() ?? false,
             'today' => [
                 'checkedIn' => $attendance?->getCheckInAt() !== null,
                 'checkedOut' => $attendance?->getCheckOutAt() !== null,

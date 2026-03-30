@@ -88,6 +88,9 @@ class LeaveRequestController extends AbstractController
             return $this->jsonError('You can only submit leave requests for yourself', 403);
         }
 
+        $startTime = !empty($data['startTime']) ? \DateTimeImmutable::createFromFormat('H:i', $data['startTime']) ?: null : null;
+        $endTime = !empty($data['endTime']) ? \DateTimeImmutable::createFromFormat('H:i', $data['endTime']) ?: null : null;
+
         $leaveRequest = $leaveRequestService->create(
             $employee,
             $workspace,
@@ -95,6 +98,8 @@ class LeaveRequestController extends AbstractController
             new \DateTime($data['startDate']),
             new \DateTime($data['endDate']),
             $data['reason'] ?? null,
+            $startTime,
+            $endTime,
         );
 
         return $this->jsonCreated(LeaveRequestDTO::fromEntity($leaveRequest)->toArray());

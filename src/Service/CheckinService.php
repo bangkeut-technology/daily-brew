@@ -9,6 +9,7 @@ use App\Entity\Employee;
 use App\Enum\DayOfWeekEnum;
 use App\Repository\AttendanceRepository;
 use App\Repository\ClosurePeriodRepository;
+use App\Repository\LeaveRequestRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -20,6 +21,7 @@ class CheckinService
         private EntityManagerInterface $em,
         private AttendanceRepository $attendanceRepository,
         private ClosurePeriodRepository $closurePeriodRepository,
+        private LeaveRequestRepository $leaveRequestRepository,
     ) {}
 
     public function checkin(
@@ -66,6 +68,12 @@ class CheckinService
         $closure = $this->closurePeriodRepository->findActiveOnDate($workspace, $today);
         if ($closure !== null) {
             throw new BadRequestHttpException('Restaurant is closed today (' . $closure->getName() . ')');
+        }
+
+        // Approved full-day leave check
+        $approvedLeave = $this->leaveRequestRepository->findApprovedForEmployeeOnDate($employee, $today);
+        if ($approvedLeave !== null && $approvedLeave->isFullDay()) {
+            throw new BadRequestHttpException('You are on approved leave today');
         }
 
         // Find or create attendance

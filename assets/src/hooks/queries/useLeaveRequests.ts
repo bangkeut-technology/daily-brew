@@ -24,6 +24,8 @@ export function useCreateLeaveRequest(workspacePublicId: string) {
       startDate: string;
       endDate: string;
       reason?: string;
+      startTime?: string;
+      endTime?: string;
     }) => {
       const { data } = await apiAxios.post<LeaveRequest>(
         `/workspaces/${workspacePublicId}/leave-requests`,
