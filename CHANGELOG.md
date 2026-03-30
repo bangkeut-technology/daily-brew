@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.6.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.5.0...v1.6.0) (2026-03-29)
+
+
+### Features
+
+* add account deletion functionality and enhance authentication flow ([6889dc0](https://github.com/bangkeut-technology/daily-brew/commit/6889dc04656118d4aae6d886ccaf7d3fbb7ea1bd))
+* implement soft account deletion with comprehensive cleanup ([6e04cf9](https://github.com/bangkeut-technology/daily-brew/commit/6e04cf967250917f6de0f774a0ca89cfff8b2302))
+
 ## [1.5.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.4.0...v1.5.0) (2026-03-29)
 
 
