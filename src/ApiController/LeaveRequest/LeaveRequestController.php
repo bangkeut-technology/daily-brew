@@ -69,7 +69,7 @@ class LeaveRequestController extends AbstractController
             throw new NotFoundHttpException('Workspace not found');
         }
 
-        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
+        $this->denyAccessUnlessGranted(WorkspaceVoter::VIEW, $workspace);
 
         $data = json_decode($request->getContent(), true);
 
@@ -80,6 +80,12 @@ class LeaveRequestController extends AbstractController
         $employee = $employeeRepository->findByPublicId($data['employeePublicId']);
         if ($employee === null || $employee->getWorkspace()?->getId() !== $workspace->getId()) {
             throw $this->createNotFoundException('Employee not found');
+        }
+
+        // Employees can only submit leave requests for themselves
+        $isOwner = $workspace->getOwner()?->getId() === $user->getId();
+        if (!$isOwner && $employee->getLinkedUser()?->getId() !== $user->getId()) {
+            return $this->jsonError('You can only submit leave requests for yourself', 403);
         }
 
         $leaveRequest = $leaveRequestService->create(

@@ -34,9 +34,9 @@ function LeaveRequestsPage() {
   const { t } = useTranslation();
   const workspaceId = getWorkspacePublicId() || '';
   const { data: plan, isLoading: planLoading } = usePlan(workspaceId);
-  const { data: roleContext } = useRoleContext();
+  const { data: roleContext, isLoading: roleLoading } = useRoleContext();
   const canUse = plan?.canUseLeaveRequests ?? false;
-  const isEmployee = roleContext?.isEmployee && !roleContext?.isOwner;
+  const isEmployee = !!roleContext && roleContext.isEmployee && !roleContext.isOwner;
   const employee = roleContext?.employee ?? null;
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('');
   const [showUpgrade, setShowUpgrade] = useState(true);
@@ -70,7 +70,7 @@ function LeaveRequestsPage() {
     }
   };
 
-  if (planLoading) {
+  if (planLoading || roleLoading) {
     return (
       <div className="page-enter">
         <PageHeader title={t('nav.leaveRequests')} />
@@ -132,7 +132,7 @@ function LeaveRequestsPage() {
   const submitModal = (
     <Dialog.Root open={showSubmitModal} onOpenChange={setShowSubmitModal}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
+        <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50 pointer-events-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
         <Dialog.Content
           onInteractOutside={(e) => e.preventDefault()}
           className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100%-2rem)] max-w-[400px] bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl shadow-[0_16px_50px_rgba(107,66,38,0.15)] outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
@@ -209,7 +209,7 @@ function LeaveRequestsPage() {
 
   // Filter to only this employee's requests if employee view
   const filteredRequests = isEmployee && employee
-    ? (requests ?? []).filter((r) => r.employeeName === employee.name)
+    ? (requests ?? []).filter((r) => r.employeePublicId === employee.publicId)
     : requests;
 
   return (

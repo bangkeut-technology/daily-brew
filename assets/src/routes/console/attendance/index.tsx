@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { CalendarDays, ClipboardList } from 'lucide-react';
 import { useAttendance } from '@/hooks/queries/useAttendance';
 import { useEmployees } from '@/hooks/queries/useEmployees';
+import { useRoleContext } from '@/hooks/queries/useRoleContext';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
@@ -52,7 +53,11 @@ function AttendancePage() {
   const workspaceId = getWorkspacePublicId() || '';
   const { data: attendance, isLoading } = useAttendance(workspaceId, from, to);
   const { data: employees } = useEmployees(workspaceId);
+  const { data: roleContext, isLoading: roleLoading } = useRoleContext();
   const fmtDate = useDateFormat();
+
+  const isEmployee = !!roleContext && roleContext.isEmployee && !roleContext.isOwner;
+  const employeePublicId = roleContext?.employee?.publicId;
 
   const setFrom = (value: string) => {
     setFromState(value);
@@ -69,9 +74,10 @@ function AttendancePage() {
     updateSearchParams(from, to, value);
   };
 
-  // Filter by employee
-  const filtered = employeeFilter
-    ? attendance?.filter((a) => a.employeePublicId === employeeFilter)
+  // For employees, always filter to their own records; for owners, use the dropdown filter
+  const activeFilter = isEmployee && employeePublicId ? employeePublicId : employeeFilter;
+  const filtered = activeFilter
+    ? attendance?.filter((a) => a.employeePublicId === activeFilter)
     : attendance;
 
   const employeeOptions = [
@@ -79,12 +85,23 @@ function AttendancePage() {
     ...(employees?.map((e) => ({ value: e.publicId, label: e.name })) ?? []),
   ];
 
+  if (roleLoading) {
+    return (
+      <div className="page-enter">
+        <PageHeader title={t('nav.attendance')} />
+        <p className="text-text-tertiary">{t('common.loading')}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="page-enter">
-      <PageHeader title={t('nav.attendance')} />
+      <PageHeader title={isEmployee ? t('nav.myAttendance', 'My Attendance') : t('nav.attendance')} />
 
       <p className="text-[13px] text-text-secondary mb-5 -mt-2 leading-relaxed">
-        View check-in and check-out records for all employees. Filter by date range or employee.
+        {isEmployee
+          ? t('attendance.employeeDescription', 'Your check-in and check-out history. Filter by date range.')
+          : t('attendance.ownerDescription', 'View check-in and check-out records for all employees. Filter by date range or employee.')}
       </p>
 
       <div className="flex flex-wrap items-end gap-3 mb-6">
@@ -100,17 +117,19 @@ function AttendancePage() {
           </label>
           <CustomDatePicker value={to} onChange={setTo} />
         </div>
-        <div className="w-48">
-          <label id="attendance-employee-label" className="block text-[11px] font-medium text-text-secondary mb-1">
-            {t('attendance.employee', 'Employee')}
-          </label>
-          <CustomSelect
-            value={employeeFilter}
-            onChange={setEmployeeFilter}
-            options={employeeOptions}
-            placeholder={t('attendance.allEmployees', 'All employees')}
-          />
-        </div>
+        {!isEmployee && (
+          <div className="w-48">
+            <label id="attendance-employee-label" className="block text-[11px] font-medium text-text-secondary mb-1">
+              {t('attendance.employee', 'Employee')}
+            </label>
+            <CustomSelect
+              value={employeeFilter}
+              onChange={setEmployeeFilter}
+              options={employeeOptions}
+              placeholder={t('attendance.allEmployees', 'All employees')}
+            />
+          </div>
+        )}
       </div>
 
       {isLoading ? (
