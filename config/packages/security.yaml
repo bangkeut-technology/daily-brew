@@ -18,11 +18,6 @@ security:
             stateless: true
             security: false
 
-        checkin:
-            pattern: '^/api/v1/checkin'
-            stateless: true
-            security: false
-
         auth:
             pattern: '^/api/v1/[a-z]+/auth'
             stateless: true
@@ -57,7 +52,7 @@ security:
         - path: '^/api/v1/webhooks'
           roles: PUBLIC_ACCESS
         - path: '^/api/v1/checkin'
-          roles: PUBLIC_ACCESS
+          roles: IS_AUTHENTICATED_FULLY
         - path: '^/api/v1/[a-z]+/auth'
           roles: PUBLIC_ACCESS
         - path: '^/api/v1/token/refresh'

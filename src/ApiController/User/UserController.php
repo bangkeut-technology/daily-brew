@@ -110,7 +110,6 @@ class UserController extends AbstractController
             ], $ownedWorkspaces),
             'employee' => $currentEmployee ? [
                 'publicId' => (string) $currentEmployee->getPublicId(),
-                'qrToken' => $currentEmployee->getQrToken(),
                 'name' => $currentEmployee->getName(),
                 'workspacePublicId' => $currentEmployee->getWorkspace() ? (string) $currentEmployee->getWorkspace()->getPublicId() : null,
                 'workspaceName' => $currentEmployee->getWorkspace()?->getName(),

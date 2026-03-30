@@ -1,11 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { QRCodeSVG } from 'qrcode.react';
 import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Copy, Pencil, X, Check, Link2, Mail, ExternalLink, Unlink, Info } from 'lucide-react';
+import { Copy, Pencil, X, Check, Link2, Mail, Unlink, Info } from 'lucide-react';
 import { useState } from 'react';
 import { useEmployee, useUpdateEmployee } from '@/hooks/queries/useEmployees';
 import { useShifts } from '@/hooks/queries/useShifts';
@@ -77,16 +76,6 @@ function EmployeeDetailPage() {
   }
 
   const fullName = `${employee.firstName} ${employee.lastName}`;
-  const checkinUrl = `${window.location.origin}/checkin/${employee.qrToken}`;
-
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(checkinUrl);
-      toast.success(t('common.copied', 'Link copied to clipboard'));
-    } catch {
-      toast.error(t('common.copyFailed', 'Failed to copy link'));
-    }
-  };
 
   const handleStartEdit = () => {
     setIsEditing(true);
@@ -330,48 +319,8 @@ function EmployeeDetailPage() {
           )}
         </GlassCard>
 
-        {/* QR Code + Link User */}
+        {/* Link User */}
         <div className="flex flex-col gap-6">
-          <GlassCard hover={false}>
-            <GlassCardHeader title={t('employee.qrCode', 'QR code')} />
-            <div className="px-5 py-2">
-              <p className="text-[11.5px] text-text-tertiary leading-relaxed">
-                Print or display this QR code at your restaurant. Staff scan it with their phone to check in and out.
-              </p>
-            </div>
-            <div className="p-6 pt-2 flex flex-col items-center">
-              <div className="p-4 bg-white rounded-2xl shadow-[0_2px_12px_rgba(107,66,38,0.08)]">
-                <QRCodeSVG
-                  value={checkinUrl}
-                  size={160}
-                  fgColor="#6B4226"
-                  bgColor="#FFFFFF"
-                  level="M"
-                  imageSettings={{
-                    src: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%236B4226" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></svg>'),
-                    height: 24,
-                    width: 24,
-                    excavate: true,
-                  }}
-                />
-              </div>
-              <a
-                href={checkinUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 flex items-center gap-1 text-[11px] text-coffee hover:text-coffee-light transition-colors no-underline"
-              >
-                <ExternalLink size={10} />
-                <span className="break-all text-center max-w-[200px]">{checkinUrl}</span>
-              </a>
-              <button
-                type="button"
-                onClick={handleCopyLink}
-                className="mt-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3"
-              >
-                <Copy size={12} />
-                {t('common.copyLink', 'Copy link')}
-              </button>
             </div>
           </GlassCard>
 

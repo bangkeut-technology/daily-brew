@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\WorkspaceRepository;
+use App\Util\TokenGenerator;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -30,6 +31,10 @@ use Vich\UploaderBundle\Mapping\Attribute as Vich;
 #[Vich\Uploadable]
 class Workspace extends AbstractBaseEntity
 {
+    /** Unique token for the workspace QR code — employees scan this to check in. */
+    #[ORM\Column(length: 24, unique: true)]
+    private string $qrToken;
+
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['user:read', 'attendance:read', 'employee:read'])]
     private ?string $name = null;
@@ -97,6 +102,7 @@ class Workspace extends AbstractBaseEntity
     public function __construct()
     {
         parent::__construct();
+        $this->qrToken = TokenGenerator::generatePublicId(20);
         $this->employees = new ArrayCollection();
         $this->shifts = new ArrayCollection();
         $this->closurePeriods = new ArrayCollection();
@@ -105,6 +111,11 @@ class Workspace extends AbstractBaseEntity
     }
 
     // ── Core ───────────────────────────────────────────────────
+
+    public function getQrToken(): string
+    {
+        return $this->qrToken;
+    }
 
     public function getName(): ?string
     {

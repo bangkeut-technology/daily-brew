@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 
 interface CustomDatePickerProps {
   value: string; // "YYYY-MM-DD"
@@ -8,6 +8,11 @@ interface CustomDatePickerProps {
 }
 
 const WEEKDAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+
+const MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
 
 function pad(n: number) {
   return n.toString().padStart(2, '0');
@@ -23,12 +28,16 @@ function getMonthDays(year: number, month: number) {
 
 function getFirstDayOfWeek(year: number, month: number) {
   const day = new Date(year, month, 1).getDay();
-  return day === 0 ? 6 : day - 1; // Monday = 0
+  return day === 0 ? 6 : day - 1;
 }
+
+type PickerView = 'days' | 'months' | 'years';
 
 export function CustomDatePicker({ value, onChange, className = '' }: CustomDatePickerProps) {
   const [open, setOpen] = useState(false);
+  const [pickerView, setPickerView] = useState<PickerView>('days');
   const ref = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const parsed = value ? new Date(value) : new Date();
   const [viewYear, setViewYear] = useState(parsed.getFullYear());
@@ -43,6 +52,10 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
   }, [value, open]);
 
   useEffect(() => {
+    if (!open) setPickerView('days');
+  }, [open]);
+
+  useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpen(false);
@@ -52,22 +65,24 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const prevMonth = () => {
-    if (viewMonth === 0) {
-      setViewMonth(11);
-      setViewYear(viewYear - 1);
-    } else {
-      setViewMonth(viewMonth - 1);
+  // Position dropdown above if it would overflow below
+  const [dropUp, setDropUp] = useState(false);
+  useEffect(() => {
+    if (open && ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      setDropUp(spaceBelow < 340);
     }
+  }, [open]);
+
+  const prevMonth = () => {
+    if (viewMonth === 0) { setViewMonth(11); setViewYear(viewYear - 1); }
+    else setViewMonth(viewMonth - 1);
   };
 
   const nextMonth = () => {
-    if (viewMonth === 11) {
-      setViewMonth(0);
-      setViewYear(viewYear + 1);
-    } else {
-      setViewMonth(viewMonth + 1);
-    }
+    if (viewMonth === 11) { setViewMonth(0); setViewYear(viewYear + 1); }
+    else setViewMonth(viewMonth + 1);
   };
 
   const cells = useMemo(() => {
@@ -75,23 +90,17 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
     const firstDay = getFirstDayOfWeek(viewYear, viewMonth);
     const items: { day: number; current: boolean }[] = [];
 
-    // Previous month trailing days
     const prevMonthDays = getMonthDays(viewYear, viewMonth - 1);
     for (let i = firstDay - 1; i >= 0; i--) {
       items.push({ day: prevMonthDays - i, current: false });
     }
-
-    // Current month
     for (let d = 1; d <= daysInMonth; d++) {
       items.push({ day: d, current: true });
     }
-
-    // Fill remaining to complete the grid
     const remaining = 42 - items.length;
     for (let d = 1; d <= remaining; d++) {
       items.push({ day: d, current: false });
     }
-
     return items;
   }, [viewYear, viewMonth]);
 
@@ -102,10 +111,8 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
   const today = new Date();
   const todayStr = formatDate(today.getFullYear(), today.getMonth(), today.getDate());
 
-  const monthLabel = new Date(viewYear, viewMonth).toLocaleString('default', {
-    month: 'long',
-    year: 'numeric',
-  });
+  const currentYear = new Date().getFullYear();
+  const yearRange = Array.from({ length: 100 }, (_, i) => currentYear - 80 + i);
 
   const displayValue = value
     ? new Date(value).toLocaleDateString('default', { year: 'numeric', month: 'short', day: 'numeric' })
@@ -125,7 +132,12 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-1 w-[280px] rounded-xl bg-glass-bg backdrop-blur-xl border border-glass-border shadow-lg overflow-hidden">
+        <div
+          ref={dropdownRef}
+          className={`absolute z-50 w-[280px] rounded-xl bg-glass-bg backdrop-blur-xl border border-glass-border shadow-lg overflow-hidden ${
+            dropUp ? 'bottom-full mb-1' : 'top-full mt-1'
+          }`}
+        >
           {/* Header */}
           <div className="flex items-center justify-between px-3 py-2.5 border-b border-cream-3/60">
             <button
@@ -135,7 +147,37 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
             >
               <ChevronLeft size={15} />
             </button>
-            <span className="text-[13px] font-semibold text-text-primary">{monthLabel}</span>
+
+            <div className="flex items-center gap-1">
+              {/* Month selector */}
+              <button
+                type="button"
+                onClick={() => setPickerView(pickerView === 'months' ? 'days' : 'months')}
+                className={`flex items-center gap-0.5 px-2 py-1 rounded-md text-[13px] font-semibold border-none cursor-pointer transition-colors ${
+                  pickerView === 'months'
+                    ? 'bg-coffee/10 text-coffee'
+                    : 'bg-transparent text-text-primary hover:bg-cream-3/40'
+                }`}
+              >
+                {MONTHS[viewMonth].slice(0, 3)}
+                <ChevronDown size={11} className="text-text-tertiary" />
+              </button>
+
+              {/* Year selector */}
+              <button
+                type="button"
+                onClick={() => setPickerView(pickerView === 'years' ? 'days' : 'years')}
+                className={`flex items-center gap-0.5 px-2 py-1 rounded-md text-[13px] font-semibold border-none cursor-pointer transition-colors ${
+                  pickerView === 'years'
+                    ? 'bg-coffee/10 text-coffee'
+                    : 'bg-transparent text-text-primary hover:bg-cream-3/40'
+                }`}
+              >
+                {viewYear}
+                <ChevronDown size={11} className="text-text-tertiary" />
+              </button>
+            </div>
+
             <button
               type="button"
               onClick={nextMonth}
@@ -145,57 +187,103 @@ export function CustomDatePicker({ value, onChange, className = '' }: CustomDate
             </button>
           </div>
 
-          {/* Weekday headers */}
-          <div className="grid grid-cols-7 px-2 pt-2">
-            {WEEKDAYS.map((d) => (
-              <span key={d} className="text-[10px] font-medium text-text-tertiary text-center py-1">
-                {d}
-              </span>
-            ))}
-          </div>
-
-          {/* Days grid */}
-          <div className="grid grid-cols-7 px-2 pb-2">
-            {cells.map((cell, i) => {
-              if (!cell.current) {
-                return (
-                  <span
-                    key={i}
-                    className="w-8 h-8 flex items-center justify-center text-[12px] text-text-tertiary/40 mx-auto"
-                  >
-                    {cell.day}
-                  </span>
-                );
-              }
-
-              const dateStr = formatDate(viewYear, viewMonth, cell.day);
-              const isSelected =
-                cell.day === selectedDay &&
-                viewMonth === selectedMonth &&
-                viewYear === selectedYear;
-              const isToday = dateStr === todayStr;
-
-              return (
+          {/* Month picker grid */}
+          {pickerView === 'months' && (
+            <div className="grid grid-cols-3 gap-1 p-2">
+              {MONTHS.map((m, i) => (
                 <button
-                  key={i}
+                  key={m}
                   type="button"
-                  onClick={() => {
-                    onChange(dateStr);
-                    setOpen(false);
-                  }}
-                  className={`w-8 h-8 mx-auto flex items-center justify-center rounded-lg text-[12px] border-none cursor-pointer transition-colors ${
-                    isSelected
-                      ? 'bg-coffee text-white font-semibold'
-                      : isToday
-                        ? 'bg-amber/12 text-amber font-medium hover:bg-amber/20'
+                  onClick={() => { setViewMonth(i); setPickerView('days'); }}
+                  className={`py-2 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors ${
+                    i === viewMonth
+                      ? 'bg-coffee text-white'
+                      : i === today.getMonth() && viewYear === today.getFullYear()
+                        ? 'bg-amber/12 text-amber hover:bg-amber/20'
                         : 'bg-transparent text-text-primary hover:bg-cream-3/40'
                   }`}
                 >
-                  {cell.day}
+                  {m.slice(0, 3)}
                 </button>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+          )}
+
+          {/* Year picker grid */}
+          {pickerView === 'years' && (
+            <div className="grid grid-cols-4 gap-1 p-2 max-h-[220px] overflow-y-auto">
+              {yearRange.map((y) => (
+                <button
+                  key={y}
+                  type="button"
+                  onClick={() => { setViewYear(y); setPickerView('months'); }}
+                  className={`py-2 rounded-lg text-[12px] font-medium border-none cursor-pointer transition-colors ${
+                    y === viewYear
+                      ? 'bg-coffee text-white'
+                      : y === today.getFullYear()
+                        ? 'bg-amber/12 text-amber hover:bg-amber/20'
+                        : 'bg-transparent text-text-primary hover:bg-cream-3/40'
+                  }`}
+                >
+                  {y}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Days view */}
+          {pickerView === 'days' && (
+            <>
+              <div className="grid grid-cols-7 px-2 pt-2">
+                {WEEKDAYS.map((d) => (
+                  <span key={d} className="text-[10px] font-medium text-text-tertiary text-center py-1">
+                    {d}
+                  </span>
+                ))}
+              </div>
+              <div className="grid grid-cols-7 px-2 pb-2">
+                {cells.map((cell, i) => {
+                  if (!cell.current) {
+                    return (
+                      <span
+                        key={i}
+                        className="w-8 h-8 flex items-center justify-center text-[12px] text-text-tertiary/40 mx-auto"
+                      >
+                        {cell.day}
+                      </span>
+                    );
+                  }
+
+                  const dateStr = formatDate(viewYear, viewMonth, cell.day);
+                  const isSelected =
+                    cell.day === selectedDay &&
+                    viewMonth === selectedMonth &&
+                    viewYear === selectedYear;
+                  const isToday = dateStr === todayStr;
+
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => {
+                        onChange(dateStr);
+                        setOpen(false);
+                      }}
+                      className={`w-8 h-8 mx-auto flex items-center justify-center rounded-lg text-[12px] border-none cursor-pointer transition-colors ${
+                        isSelected
+                          ? 'bg-coffee text-white font-semibold'
+                          : isToday
+                            ? 'bg-amber/12 text-amber font-medium hover:bg-amber/20'
+                            : 'bg-transparent text-text-primary hover:bg-cream-3/40'
+                      }`}
+                    >
+                      {cell.day}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>

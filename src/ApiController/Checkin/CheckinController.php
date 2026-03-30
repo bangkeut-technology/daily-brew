@@ -5,27 +5,38 @@ declare(strict_types=1);
 namespace App\ApiController\Checkin;
 
 use App\ApiController\Trait\ApiResponseTrait;
+use App\Entity\User;
 use App\Repository\EmployeeRepository;
+use App\Repository\WorkspaceRepository;
 use App\Service\CheckinService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class CheckinController extends AbstractController
 {
     use ApiResponseTrait;
 
-    #[Route('/checkin/{qrToken}', name: 'checkin_status', methods: ['GET'])]
+    #[Route('/checkin/{workspaceQrToken}', name: 'checkin_status', methods: ['GET'])]
     public function status(
-        string $qrToken,
+        string $workspaceQrToken,
+        #[CurrentUser] User $user,
+        WorkspaceRepository $workspaceRepository,
         EmployeeRepository $employeeRepository,
         CheckinService $checkinService,
     ): JsonResponse {
-        $employee = $employeeRepository->findByQrToken($qrToken);
-        if ($employee === null || !$employee->isActive()) {
+        $workspace = $workspaceRepository->findByQrToken($workspaceQrToken);
+        if ($workspace === null) {
             throw new NotFoundHttpException('Invalid check-in link');
+        }
+
+        $employee = $employeeRepository->findOneByLinkedUserAndWorkspace($user, $workspace);
+        if ($employee === null || !$employee->isActive()) {
+            throw new AccessDeniedHttpException('You are not registered as an employee in this workspace');
         }
 
         $attendance = $checkinService->getStatus($employee);
@@ -47,16 +58,23 @@ class CheckinController extends AbstractController
         ]);
     }
 
-    #[Route('/checkin/{qrToken}', name: 'checkin_action', methods: ['POST'])]
+    #[Route('/checkin/{workspaceQrToken}', name: 'checkin_action', methods: ['POST'])]
     public function checkin(
-        string $qrToken,
+        string $workspaceQrToken,
         Request $request,
+        #[CurrentUser] User $user,
+        WorkspaceRepository $workspaceRepository,
         EmployeeRepository $employeeRepository,
         CheckinService $checkinService,
     ): JsonResponse {
-        $employee = $employeeRepository->findByQrToken($qrToken);
-        if ($employee === null || !$employee->isActive()) {
+        $workspace = $workspaceRepository->findByQrToken($workspaceQrToken);
+        if ($workspace === null) {
             throw new NotFoundHttpException('Invalid check-in link');
+        }
+
+        $employee = $employeeRepository->findOneByLinkedUserAndWorkspace($user, $workspace);
+        if ($employee === null || !$employee->isActive()) {
+            throw new AccessDeniedHttpException('You are not registered as an employee in this workspace');
         }
 
         $data = json_decode($request->getContent(), true) ?? [];

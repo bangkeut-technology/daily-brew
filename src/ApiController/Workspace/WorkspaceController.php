@@ -29,6 +29,7 @@ class WorkspaceController extends AbstractController
         return $this->jsonSuccess(array_map(fn ($w) => [
             'publicId' => (string) $w->getPublicId(),
             'name' => $w->getName(),
+            'qrToken' => $w->getQrToken(),
             'createdAt' => $w->getCreatedAt()->format('c'),
         ], $workspaces));
     }
@@ -51,6 +52,7 @@ class WorkspaceController extends AbstractController
         return $this->jsonCreated([
             'publicId' => (string) $workspace->getPublicId(),
             'name' => $workspace->getName(),
+            'qrToken' => $workspace->getQrToken(),
             'createdAt' => $workspace->getCreatedAt()->format('c'),
         ]);
     }
@@ -72,6 +74,7 @@ class WorkspaceController extends AbstractController
         return $this->jsonSuccess([
             'publicId' => (string) $workspace->getPublicId(),
             'name' => $workspace->getName(),
+            'qrToken' => $workspace->getQrToken(),
             'createdAt' => $workspace->getCreatedAt()->format('c'),
             'setting' => $setting ? [
                 'ipRestrictionEnabled' => $setting->isIpRestrictionEnabled(),

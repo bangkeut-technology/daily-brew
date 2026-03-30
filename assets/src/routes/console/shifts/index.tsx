@@ -20,6 +20,7 @@ import { Avatar } from '@/components/shared/Avatar';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { CustomTimePicker } from '@/components/shared/CustomTimePicker';
 import { UpgradeModal } from '@/components/shared/UpgradeModal';
+import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { useUpgradeModal } from '@/hooks/useUpgradeModal';
 import { ChevronDown, ChevronUp, Crown, Clock, Pencil, Trash2, Plus, Users, X } from 'lucide-react';
 import type { Shift, Employee, ShiftTimeRule } from '@/types';
@@ -226,6 +227,7 @@ function ShiftCard({
   const updateShift = useUpdateShift(workspaceId);
   const [showAssign, setShowAssign] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [unassignTarget, setUnassignTarget] = useState<{ publicId: string; name: string } | null>(null);
   const [editName, setEditName] = useState(shift.name);
   const [editStartTime, setEditStartTime] = useState(shift.startTime);
   const [editEndTime, setEditEndTime] = useState(shift.endTime);
@@ -269,16 +271,18 @@ function ShiftCard({
     }
   };
 
-  const handleUnassign = async (employeePublicId: string) => {
+  const handleUnassign = async () => {
+    if (!unassignTarget) return;
     try {
       await updateEmployee.mutateAsync({
-        publicId: employeePublicId,
+        publicId: unassignTarget.publicId,
         shiftPublicId: null,
       });
       toast.success(t('shift.employeeUnassigned', 'Employee unassigned'));
     } catch {
       toast.error(t('shift.unassignError', 'Failed to unassign employee'));
     }
+    setUnassignTarget(null);
   };
 
   // Calculate shift duration for display
@@ -415,7 +419,7 @@ function ShiftCard({
                   {emp.name}
                 </span>
                 <button
-                  onClick={() => handleUnassign(emp.publicId)}
+                  onClick={() => setUnassignTarget({ publicId: emp.publicId, name: emp.name })}
                   className="text-text-tertiary hover:text-red bg-transparent border-none cursor-pointer p-1 rounded-md hover:bg-red/8 transition-all"
                 >
                   <X size={12} />
@@ -457,6 +461,18 @@ function ShiftCard({
           <DaySchedulePanel shift={shift} workspaceId={workspaceId} />
         )}
       </div>
+
+      <ConfirmModal
+        open={!!unassignTarget}
+        onOpenChange={(open) => { if (!open) setUnassignTarget(null); }}
+        title={t('shift.unassignTitle', 'Remove from shift')}
+        description={t('shift.unassignConfirm', 'Remove {{name}} from the {{shift}} shift? Their attendance will no longer be tracked against this shift.', { name: unassignTarget?.name ?? '', shift: shift.name })}
+        confirmLabel={t('shift.unassign', 'Remove')}
+        cancelLabel={t('common.cancel')}
+        variant="danger"
+        loading={updateEmployee.isPending}
+        onConfirm={handleUnassign}
+      />
     </GlassCard>
   );
 }

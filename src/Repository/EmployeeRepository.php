@@ -26,11 +26,6 @@ class EmployeeRepository extends ServiceEntityRepository
         return $this->findOneBy(['publicId' => $publicId]);
     }
 
-    public function findByQrToken(string $qrToken): ?Employee
-    {
-        return $this->findOneBy(['qrToken' => $qrToken]);
-    }
-
     /** @return Employee[] */
     public function findByLinkedUser(User $user): array
     {

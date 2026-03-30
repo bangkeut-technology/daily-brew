@@ -23,7 +23,7 @@ function AuthCallbackPage() {
             return;
         }
 
-        navigate({ to: '/console' });
+        navigate({ to: '/console/dashboard' });
     }, [status, user, navigate]);
 
     return null;

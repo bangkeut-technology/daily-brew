@@ -19,6 +19,11 @@ class WorkspaceRepository extends ServiceEntityRepository
         return $this->findOneBy(['publicId' => $publicId]);
     }
 
+    public function findByQrToken(string $qrToken): ?Workspace
+    {
+        return $this->findOneBy(['qrToken' => $qrToken]);
+    }
+
     /** @return Workspace[] */
     public function findByOwner(User $owner): array
     {

@@ -6,7 +6,6 @@ namespace App\Entity;
 
 use App\Enum\EmployeeStatusEnum;
 use App\Repository\EmployeeRepository;
-use App\Util\TokenGenerator;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -62,10 +61,6 @@ class Employee extends AbstractBaseEntity
     #[Groups(['employee:read'])]
     private EmployeeStatusEnum $status = EmployeeStatusEnum::ACTIVE;
 
-    /** Unique token for QR code check-in URL — separate from publicId for security. */
-    #[ORM\Column(length: 24, unique: true)]
-    private string $qrToken;
-
     /** The user who created this employee (workspace owner). */
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
@@ -93,7 +88,6 @@ class Employee extends AbstractBaseEntity
     public function __construct()
     {
         parent::__construct();
-        $this->qrToken = TokenGenerator::generatePublicId(20);
         $this->attendances = new ArrayCollection();
     }
 
@@ -132,11 +126,6 @@ class Employee extends AbstractBaseEntity
     public function getFullName(): string
     {
         return $this->getName();
-    }
-
-    public function getQrToken(): string
-    {
-        return $this->qrToken;
     }
 
     public function getNameCanonical(): ?string

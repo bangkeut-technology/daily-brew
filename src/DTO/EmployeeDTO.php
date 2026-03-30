@@ -10,7 +10,6 @@ final readonly class EmployeeDTO
 {
     public function __construct(
         public string  $publicId,
-        public string  $qrToken,
         public string  $firstName,
         public string  $lastName,
         public string  $name,
@@ -30,7 +29,6 @@ final readonly class EmployeeDTO
     {
         return new self(
             publicId: (string) $e->getPublicId(),
-            qrToken: $e->getQrToken(),
             firstName: $e->getFirstName(),
             lastName: $e->getLastName(),
             name: $e->getName(),
@@ -51,7 +49,6 @@ final readonly class EmployeeDTO
     {
         return [
             'publicId' => $this->publicId,
-            'qrToken' => $this->qrToken,
             'firstName' => $this->firstName,
             'lastName' => $this->lastName,
             'name' => $this->name,
