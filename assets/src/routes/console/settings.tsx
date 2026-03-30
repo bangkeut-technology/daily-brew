@@ -626,7 +626,7 @@ function SettingsPage() {
               <div className="flex items-center gap-2">
                 <Toggle
                   id="ip-restriction"
-                  checked={ipEnabled}
+                  checked={ipEnabled && (plan?.canUseIpRestriction ?? false)}
                   onChange={(v) => {
                     if (!plan?.canUseIpRestriction) { upgradeModal.openFor('ipRestriction'); return; }
                     setIpEnabled(v);
@@ -652,7 +652,7 @@ function SettingsPage() {
                       onClick={async () => {
                         try {
                           const { data } = await apiAxios.get(`/workspaces/${currentWsId}/settings/my-ip`);
-                          const ip = data?.data?.ip;
+                          const ip = data?.ip;
                           if (!ip) return;
                           const existing = allowedIps.split('\n').map((s: string) => s.trim()).filter(Boolean);
                           if (!existing.includes(ip)) {
@@ -734,7 +734,7 @@ function SettingsPage() {
               <div className="flex items-center gap-2">
                 <Toggle
                   id="device-verification"
-                  checked={deviceVerificationEnabled}
+                  checked={deviceVerificationEnabled && (plan?.canUseDeviceVerification ?? false)}
                   onChange={(v) => {
                     if (!plan?.canUseDeviceVerification) { upgradeModal.openFor('deviceVerification'); return; }
                     setDeviceVerificationEnabled(v);
@@ -784,7 +784,7 @@ function SettingsPage() {
               <div className="flex items-center gap-2">
                 <Toggle
                   id="geofencing"
-                  checked={geofencingEnabled}
+                  checked={geofencingEnabled && (plan?.canUseGeofencing ?? false)}
                   onChange={(v) => {
                     if (!plan?.canUseGeofencing) { upgradeModal.openFor('geofencing'); return; }
                     setGeofencingEnabled(v);

@@ -56,6 +56,7 @@ function NavItem({
     espresso,
     canUseLeaveRequests,
     badge,
+    planBadge,
     tourId,
     disabled,
 }: {
@@ -65,6 +66,7 @@ function NavItem({
     espresso?: boolean;
     canUseLeaveRequests?: boolean;
     badge?: number;
+    planBadge?: React.ReactNode;
     tourId?: string;
     disabled?: boolean;
 }) {
@@ -96,7 +98,10 @@ function NavItem({
             )}
         >
             <Icon size={16} />
-            <span className="flex-1">{t(label)}</span>
+            <span className="flex-1 flex items-center gap-1.5">
+                {t(label)}
+                {planBadge}
+            </span>
             {espresso && !canUseLeaveRequests && (
                 <span className="ml-auto flex items-center gap-1 text-[10px] font-semibold text-amber">
                     <Crown size={12} className="opacity-60" />
@@ -196,22 +201,7 @@ export function Sidebar() {
             <nav className="flex-1 px-3 flex flex-col overflow-y-auto">
                 {showOwnerView && (
                     <>
-                        {/* Dashboard with plan badge */}
-                        <div className="space-y-0.5">
-                            <NavItem to="/console/dashboard" icon={LayoutDashboard} label="nav.dashboard" badge={undefined} />
-                            {plan && (
-                                <div className="px-2.5 -mt-0.5 mb-1">
-                                    <Link to="/console/settings" className="no-underline">
-                                        <span className={cn(
-                                            'text-[9px] font-semibold px-2 py-0.5 rounded-full',
-                                            plan.isEspresso ? 'bg-green/10 text-green' : 'bg-cream-3 text-text-tertiary',
-                                        )}>
-                                            {plan.planLabel}
-                                        </span>
-                                    </Link>
-                                </div>
-                            )}
-                        </div>
+                        <NavItem to="/console/dashboard" icon={LayoutDashboard} label="nav.dashboard" />
                         <NavSection
                             items={ownerMainNav.filter((i) => i.to !== '/console/dashboard')}
                             canUseLeaveRequests={canUseLeaveRequests}

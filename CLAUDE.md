@@ -134,10 +134,14 @@ Users can be owners (create workspaces) or employees (linked to an employee reco
 - employeeId → Employee (ManyToOne)
 - startDate (date)
 - endDate (date)
+- startTime (time, nullable) — partial-day leave start; `null` = full day
+- endTime (time, nullable) — partial-day leave end; `null` = full day
 - reason (text, nullable)
+- type (enum: paid, unpaid)
 - status (enum: pending, approved, rejected, default pending)
 - reviewedAt (datetime, nullable)
 - createdAt, updatedAt
+- Helper: `isFullDay()` — returns true when both startTime and endTime are null
 
 ---
 
@@ -145,6 +149,20 @@ Users can be owners (create workspaces) or employees (linked to an employee reco
 
 ### Closure logic
 Before creating any attendance record, check if the date falls within any Closure for the workspace. If yes, skip entirely.
+
+### Leave request validation
+`LeaveRequestService::create()` enforces:
+- `startDate <= endDate`
+- No overlap with closure periods (uses `ClosurePeriodRepository::findOverlappingClosure()`)
+- No duplicate pending/approved leaves for same dates (uses `LeaveRequestRepository::findOverlappingForEmployee()`)
+- Accepts optional `startTime`/`endTime` for partial-day leave (`null` = full day)
+
+### Leave request authorization
+- CREATE uses `WorkspaceVoter::VIEW` (not EDIT) so employees can submit their own requests. Backend enforces employees can only submit for themselves.
+- DELETE `DELETE /workspaces/{publicId}/leave-requests/{publicId}` — employees can cancel own pending requests, owners can cancel any.
+
+### Leave blocks check-in
+CheckinService blocks check-in for employees with an approved full-day leave for the current date. Checkin status API returns `onLeave` (boolean) and `leaveIsFullDay` (boolean) fields.
 
 ### Late / left early detection
 Computed at check-in/out time relative to the Employee's assigned Shift + grace minutes. If no Shift, always false.
@@ -246,9 +264,10 @@ Routes: `/sign-in`, `/sign-up`, `/auth/callback`, `/checkin/:qrToken` (public/au
 
 ### Custom UI Components (assets/src/components/shared/)
 - **GlassCard** / **GlassCardHeader** — glass-morphism card with optional hover lift
-- **CustomSelect** — dropdown with auto-search for 8+ options, check marks, glass design
-- **CustomDatePicker** — calendar grid with month navigation, today highlight
-- **CustomTimePicker** — hour/minute spinners with 5-min step
+- **CustomSelect** — dropdown with auto-search for 8+ options, check marks, glass design. Uses `position: absolute` (no portal).
+- **CustomDatePicker** — calendar grid with month navigation, today highlight. Uses `position: absolute` (no portal). Accepts `isDateDisabled` callback prop to disable specific dates (e.g. closure dates).
+- **CustomTimePicker** — hour/minute spinners with 5-min step. Uses `position: absolute` (no portal).
+- **LeaveRequestModal** — closure-aware date pickers, partial-day toggle with time pickers, required reason field, type selector (paid/unpaid). Used by both employee dashboard and leave page.
 - **Toggle** — pill switch with check/X icon indicator (replaces all checkboxes)
 - **ConfirmModal** — Radix dialog with danger/default variants
 - **Avatar** — deterministic gradient from name, initials
@@ -260,18 +279,39 @@ Routes: `/sign-in`, `/sign-up`, `/auth/callback`, `/checkin/:qrToken` (public/au
 Route `/console/dashboard` (when `isEmployee && !isOwner`):
 - Welcome header with avatar, name, and today's date
 - Active closure alert (red) and upcoming closure alert (amber, within 7 days)
+- "On approved leave" status displayed when employee has approved leave for today
 - My shift today card (shift name + times, or "No shift assigned")
 - Check-in/out status with action button (uses geolocation if available)
 - Attendance KPI cards (today status, check-in time, check-out time)
 - Recent attendance list (last 7 days)
-- My leave requests card with "Submit leave request" button + modal (CustomDatePicker for dates, optional reason)
+- Upcoming leaves card (pending + approved) with "Submit leave request" button using shared LeaveRequestModal
 
 ### Leave requests (employee view)
 Route `/console/leave` (when `isEmployee && !isOwner`):
 - Filtered to only the current employee's requests
-- "Submit leave request" button at top + same modal as dashboard
+- "Submit leave request" button at top using shared LeaveRequestModal
 - Status filter tabs (All, Pending, Approved, Rejected)
+- Cancel button with ConfirmModal for pending requests (calls DELETE endpoint)
 - No approve/reject buttons (owner-only)
+
+### Attendance (employee view)
+Route `/console/attendance` (when `isEmployee && !isOwner`):
+- Filtered to own attendance records only
+- No employee dropdown selector
+
+### Owner dashboard
+Route `/console/dashboard` (when `isOwner`):
+- Plan badge next to page title (via PageHeader `badge` prop)
+- Action buttons in header row (Add employee, View attendance)
+- Pending leave count badge that links to the leave page
+- Upcoming leaves section showing both pending and approved with inline approve/reject buttons
+
+### PageHeader component
+- Added optional `badge` prop for rendering an inline badge next to the page title
+
+### Settings page
+- Espresso-gated toggles (IP restriction, device verification, geofencing) display as OFF when the current plan does not support them, regardless of the persisted server state
+- "Use my current IP" button calls `GET /workspaces/{publicId}/settings/my-ip`
 
 ### Check-in mobile page
 Route `/checkin/:qrToken`:

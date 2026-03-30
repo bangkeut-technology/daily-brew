@@ -53,6 +53,7 @@ export function EmployeeDashboard() {
   const workspaceQrToken = workspace?.qrToken ?? '';
 
   const { data: closures } = useClosures(workspaceId);
+  const { data: allLeaves } = useLeaveRequests(workspaceId);
   const fmtDate = useDateFormat();
   const { data: checkinData, isLoading: checkinLoading, refetch } = useCheckinStatus(workspaceQrToken);
   const checkinAction = useCheckinAction(workspaceQrToken);
@@ -470,6 +471,44 @@ export function EmployeeDashboard() {
         </div>
       </GlassCard>
 
+      {/* Pending & upcoming leave requests */}
+      {(() => {
+        const pendingLeaves = (allLeaves ?? [])
+          .filter((l) => l.employeePublicId === employee.publicId && (l.status === 'pending' || (l.status === 'approved' && l.endDate >= new Date().toISOString().split('T')[0])))
+          .sort((a, b) => a.startDate.localeCompare(b.startDate))
+          .slice(0, 5);
+
+        if (pendingLeaves.length === 0) return null;
+
+        return (
+          <GlassCard hover={false} className="mb-6">
+            <GlassCardHeader title={t('dashboard.upcomingLeaves', 'Upcoming leaves')} />
+            <div className="px-5 py-4 space-y-2">
+              {pendingLeaves.map((leave) => (
+                <div key={leave.publicId} className="flex items-center gap-3 py-2">
+                  <CalendarOff size={14} className={leave.status === 'pending' ? 'text-amber shrink-0' : 'text-green shrink-0'} />
+                  <div className="flex-1">
+                    <p className="text-[13px] text-text-primary font-sans">
+                      {fmtDate(leave.startDate)}{leave.startDate !== leave.endDate ? ` – ${fmtDate(leave.endDate)}` : ''}
+                      {!leave.isFullDay && leave.startTime && leave.endTime && (
+                        <span className="text-[11px] text-text-tertiary ml-1">{leave.startTime}–{leave.endTime}</span>
+                      )}
+                    </p>
+                    {leave.reason && (
+                      <p className="text-[11px] text-text-tertiary font-sans truncate max-w-62.5">{leave.reason}</p>
+                    )}
+                  </div>
+                  <StatusBadge
+                    label={leave.status === 'pending' ? t('leave.pending', 'Pending') : t('leave.approved', 'Approved')}
+                    variant={leave.status === 'pending' ? 'amber' : 'green'}
+                  />
+                </div>
+              ))}
+            </div>
+          </GlassCard>
+        );
+      })()}
+
       {/* Recent attendance - last 7 days */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <GlassCard hover={false}>
@@ -602,12 +641,10 @@ export function EmployeeDashboard() {
 function EmployeeLeaveList({
   workspacePublicId,
   employeePublicId,
-  employeeName,
   closures,
 }: {
   workspacePublicId: string;
   employeePublicId: string;
-  employeeName: string;
   closures?: import('@/types').ClosurePeriod[];
 }) {
   const { t } = useTranslation();
@@ -650,7 +687,7 @@ function EmployeeLeaveList({
   };
 
   const myLeaves = (leaves ?? [])
-    .filter((l) => l.employeeName === employeeName)
+    .filter((l) => l.employeePublicId === employeePublicId)
     .slice(0, 5);
 
   return (

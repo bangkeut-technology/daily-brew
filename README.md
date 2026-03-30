@@ -11,7 +11,7 @@ DailyBrew helps restaurant owners manage their team's daily attendance through Q
 - Late arrival and early departure detection
 - Device verification — same device must check in and check out, prevents one phone checking in multiple employees
 - Shift and closure management
-- Leave request workflow — employees submit, owners approve/reject
+- Leave request workflow — employees submit (full-day or partial-day with time range), owners approve/reject, employees can cancel pending requests
 - Owner dashboard with today's attendance stats
 - Employee dashboard with personal attendance, shift, and leave request submission
 - IP restriction for check-in locations (with "Use my current IP" helper)
@@ -182,6 +182,7 @@ assets/src/
 - `GET/POST /api/v1/{locale}/workspaces/{publicId}/shifts`
 - `GET/POST /api/v1/{locale}/workspaces/{publicId}/closures`
 - `GET/POST /api/v1/{locale}/workspaces/{publicId}/leave-requests`
+- `DELETE /api/v1/{locale}/workspaces/{publicId}/leave-requests/{publicId}` — cancel pending leave request (employee: own only, owner: any)
 - `GET /api/v1/{locale}/workspaces/{publicId}/attendances`
 - `GET /api/v1/{locale}/workspaces/{publicId}/settings/my-ip` — returns client IP as seen by server
 

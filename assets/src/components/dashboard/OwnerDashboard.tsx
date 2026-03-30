@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router';
+import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { UserPlus, ClipboardList, CalendarOff, Clock, Settings, CheckCircle, AlertTriangle, Palmtree, XCircle, Coffee, Copy, QrCode, Crown, CalendarDays } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
@@ -13,7 +14,7 @@ import { AttendanceRow } from '@/components/shared/AttendanceRow';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { GuidedTour } from '@/components/shared/GuidedTour';
 import { usePlan } from '@/hooks/queries/usePlan';
-import { useLeaveRequests } from '@/hooks/queries/useLeaveRequests';
+import { useLeaveRequests, useUpdateLeaveRequest } from '@/hooks/queries/useLeaveRequests';
 import { useClosures } from '@/hooks/queries/useClosures';
 import { usePaddle } from '@/hooks/usePaddle';
 import { useDateFormat } from '@/hooks/useDateFormat';
@@ -26,6 +27,7 @@ export function OwnerDashboard() {
   const { data: plan } = usePlan(workspaceId);
   const canUseLeave = plan?.canUseLeaveRequests ?? false;
   const { data: leaveRequests } = useLeaveRequests(canUseLeave ? workspaceId : '');
+  const updateLeave = useUpdateLeaveRequest(workspaceId);
   const { openCheckout } = usePaddle();
   const fmtDate = useDateFormat();
   const { data: closures } = useClosures(workspaceId);
@@ -46,16 +48,18 @@ export function OwnerDashboard() {
     return start > today && start <= in30Days;
   }).slice(0, 3);
 
-  // Upcoming approved leaves (next 14 days)
+  // Upcoming pending + approved leaves (next 14 days)
   const upcomingLeaves = (leaveRequests ?? [])
     .filter((lr) => {
-      if (lr.status !== 'approved') return false;
-      const start = new Date(lr.startDate);
+      if (lr.status !== 'approved' && lr.status !== 'pending') return false;
+      const end = new Date(lr.endDate);
       const now = new Date();
+      now.setHours(0, 0, 0, 0);
       const in14Days = new Date();
       in14Days.setDate(in14Days.getDate() + 14);
-      return start >= now && start <= in14Days;
+      return end >= now && new Date(lr.startDate) <= in14Days;
     })
+    .sort((a, b) => a.startDate.localeCompare(b.startDate))
     .slice(0, 5);
 
   if (!workspaceId) {
@@ -158,27 +162,43 @@ export function OwnerDashboard() {
     <div className="page-enter">
       <PageHeader
         title={t('nav.dashboard')}
+        badge={plan ? (
+          <Link to="/console/settings" className="no-underline">
+            <span className={cn(
+              'text-[10px] font-semibold px-2 py-0.5 rounded-full',
+              plan.isEspresso ? 'bg-green/10 text-green' : 'bg-cream-3 text-text-tertiary',
+            )}>
+              {plan.planLabel}
+            </span>
+          </Link>
+        ) : undefined}
         action={
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {data.pendingLeaves > 0 && canUseLeave && (
               <Link
                 to="/console/leave"
-                className="inline-flex items-center gap-2 no-underline"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber/10 no-underline hover:bg-amber/15 transition-colors"
               >
-                <CalendarOff size={14} className="text-amber" />
-                <span className="text-[13px] text-text-secondary font-sans">
-                  {data.pendingLeaves} pending
+                <span className="text-[12px] font-medium text-amber">
+                  {data.pendingLeaves} {data.pendingLeaves === 1 ? t('leave.pendingRequest', 'leave request pending') : t('leave.pendingRequests', 'leave requests pending')}
                 </span>
               </Link>
             )}
-            {!plan?.isEspresso && (
-              <button
-                onClick={() => openCheckout('annual')}
-                className="text-[11px] font-medium text-amber bg-transparent border-none cursor-pointer hover:underline"
-              >
-                Upgrade
-              </button>
-            )}
+            <Link
+              to="/console/employees/new"
+              data-tour="add-employee"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-coffee text-white no-underline border-none cursor-pointer transition-all hover:bg-coffee-light"
+            >
+              <UserPlus size={13} />
+              {t('dashboard.addEmployee', 'Add employee')}
+            </Link>
+            <Link
+              to="/console/attendance"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-glass-bg text-text-primary border border-cream-3 no-underline cursor-pointer transition-all hover:bg-cream-3"
+            >
+              <ClipboardList size={13} />
+              {t('dashboard.viewAttendance', 'View attendance')}
+            </Link>
           </div>
         }
       />
@@ -447,7 +467,7 @@ export function OwnerDashboard() {
                     key={lr.publicId}
                     className="flex items-center gap-3 px-5 py-3 border-b border-cream-3/50 last:border-0"
                   >
-                    <CalendarDays size={14} className="text-blue shrink-0" />
+                    <CalendarDays size={14} className={lr.status === 'pending' ? 'text-amber shrink-0' : 'text-blue shrink-0'} />
                     <div className="flex-1 min-w-0">
                       <p className="text-[13px] font-medium text-text-primary truncate">
                         {lr.employeeName}
@@ -456,7 +476,38 @@ export function OwnerDashboard() {
                         {fmtDate(lr.startDate)}{lr.startDate !== lr.endDate ? ` – ${fmtDate(lr.endDate)}` : ''}
                       </p>
                     </div>
-                    <StatusBadge label="Approved" variant="green" />
+                    <StatusBadge
+                      label={lr.status === 'pending' ? 'Pending' : 'Approved'}
+                      variant={lr.status === 'pending' ? 'amber' : 'green'}
+                    />
+                    {lr.status === 'pending' && (
+                      <div className="flex gap-1.5 ml-1">
+                        <button
+                          onClick={async () => {
+                            try {
+                              await updateLeave.mutateAsync({ publicId: lr.publicId, status: 'approved' });
+                              toast.success(t('leave.approvedSuccess', 'Leave request approved'));
+                            } catch { toast.error(t('leave.updateError', 'Failed to update leave request')); }
+                          }}
+                          disabled={updateLeave.isPending}
+                          className="text-[11px] font-medium px-2.5 py-1 rounded-md border-none cursor-pointer bg-green/12 text-green transition-colors hover:bg-green/20 disabled:opacity-50"
+                        >
+                          &#10003;
+                        </button>
+                        <button
+                          onClick={async () => {
+                            try {
+                              await updateLeave.mutateAsync({ publicId: lr.publicId, status: 'rejected' });
+                              toast.success(t('leave.rejectedSuccess', 'Leave request rejected'));
+                            } catch { toast.error(t('leave.updateError', 'Failed to update leave request')); }
+                          }}
+                          disabled={updateLeave.isPending}
+                          className="text-[11px] font-medium px-2.5 py-1 rounded-md border-none cursor-pointer bg-red/10 text-red transition-colors hover:bg-red/18 disabled:opacity-50"
+                        >
+                          &#10005;
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -465,24 +516,6 @@ export function OwnerDashboard() {
         </GlassCard>
       </div>
 
-      {/* Quick actions */}
-      <div className="flex flex-wrap gap-3">
-        <Link
-          to="/console/employees/new"
-          data-tour="add-employee"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-coffee text-white no-underline border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
-        >
-          <UserPlus size={14} />
-          {t('dashboard.addEmployee', 'Add employee')}
-        </Link>
-        <Link
-          to="/console/attendance"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 no-underline cursor-pointer transition-all duration-150 hover:bg-cream-3"
-        >
-          <ClipboardList size={14} />
-          {t('dashboard.viewAttendance', 'View attendance')}
-        </Link>
-      </div>
     </div>
   );
 }
