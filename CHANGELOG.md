@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.8.0...v1.9.0) (2026-03-30)
+
+
+### Features
+
+* add billing toggle (monthly/annual) and dynamic pricing updates ([9bb9135](https://github.com/bangkeut-technology/daily-brew/commit/9bb91351bc79311871e19dd491e1b4092f460e75))
+
 ## [1.8.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.7.0...v1.8.0) (2026-03-30)
 
 
