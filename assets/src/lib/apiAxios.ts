@@ -1,6 +1,7 @@
 import * as defaultAxios from 'axios';
 import { joinPaths } from '@tanstack/react-router';
 import type { AxiosResponse } from 'axios';
+import { clearWorkspacePublicId, emitWorkspaceInvalid } from '@/lib/auth';
 
 const host = '/api';
 const apiVersion = '/v1';
@@ -42,6 +43,12 @@ const ResponseErrorHandler = async (error: any) => {
         } catch {
             return Promise.reject(error);
         }
+    }
+
+    // 403 on workspace-scoped endpoints → workspace may be stale
+    if (status === 403 && config?.url?.includes('/workspaces/')) {
+        clearWorkspacePublicId();
+        emitWorkspaceInvalid();
     }
 
     return Promise.reject(error);

@@ -3,7 +3,7 @@ import { AuthenticationContextDispatch, AuthenticationContextState } from '@/con
 import { authenticationReducer } from '@/reducers/authentication-reducer';
 import { useQuery } from '@tanstack/react-query';
 import { apiAxios } from '@/lib/apiAxios';
-import { getWorkspacePublicId } from '@/lib/auth';
+import { getWorkspacePublicId, clearWorkspacePublicId } from '@/lib/auth';
 import type { AuthenticationState } from '@/contexts/authentication-context';
 
 function getInitialState(): AuthenticationState {
@@ -46,6 +46,7 @@ export const AuthenticationProvider = ({ children }: { children: React.ReactNode
         staleTime: 0,
     });
 
+    // Fetch current workspace from server (source of truth)
     const { data: workspace } = useQuery({
         queryKey: ['my-current-workspace'],
         queryFn: async () => {
@@ -64,13 +65,18 @@ export const AuthenticationProvider = ({ children }: { children: React.ReactNode
         if (isSuccess && data) dispatch({ type: 'SIGN_IN', user: data });
     }, [isSuccess, data]);
 
+    // Sync workspace from server → localStorage (server is authoritative)
     React.useEffect(() => {
-        if (workspace) {
+        if (workspace === undefined) return; // still loading
+
+        if (workspace && workspace.publicId) {
             dispatch({ type: 'SET_WORKSPACE', workspace });
-            // Sync server workspace to localStorage if not already set
-            if (!getWorkspacePublicId() && workspace.publicId) {
-                localStorage.setItem('workspace_public_id', workspace.publicId);
-            }
+            // Sync server workspace to localStorage
+            localStorage.setItem('workspace_public_id', workspace.publicId);
+        } else {
+            // Server says no workspace — clear stale localStorage
+            dispatch({ type: 'SET_WORKSPACE', workspace: undefined as any });
+            clearWorkspacePublicId();
         }
     }, [workspace]);
 

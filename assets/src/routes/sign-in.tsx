@@ -70,6 +70,7 @@ function SignInPage() {
       if (result?.user?.onboardingCompleted === false) {
         navigate({ to: '/onboarding' });
       } else {
+        // Let the console route handle workspace selection
         window.location.href = '/console/dashboard';
       }
     } catch {

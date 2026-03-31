@@ -3,7 +3,7 @@ import { createFileRoute, Outlet, redirect, useRouter } from '@tanstack/react-ro
 import { Sidebar } from '@/components/layout/Sidebar';
 import { useAuthenticationState } from '@/hooks/use-authentication';
 import { useRoleContext } from '@/hooks/queries/useRoleContext';
-import { getWorkspacePublicId } from '@/lib/auth';
+import { getWorkspacePublicId, clearWorkspacePublicId } from '@/lib/auth';
 
 export const Route = createFileRoute('/console')({
   beforeLoad: ({ context, location }) => {
@@ -32,6 +32,25 @@ function ConsoleLayout() {
       });
     }
   }, [auth.status, router]);
+
+  // Redirect to onboarding if not completed and no workspace
+  React.useEffect(() => {
+    if (!roleContext) return;
+    const hasWorkspace = !!getWorkspacePublicId();
+    if (!hasWorkspace && !roleContext.onboardingCompleted) {
+      router.navigate({ to: '/onboarding', replace: true });
+    }
+  }, [roleContext, router]);
+
+  // On 403 workspace-invalid, clear stale workspace and redirect to dashboard
+  React.useEffect(() => {
+    const handler = () => {
+      clearWorkspacePublicId();
+      router.navigate({ to: '/console/dashboard', replace: true });
+    };
+    window.addEventListener('dailybrew:workspace-invalid', handler);
+    return () => window.removeEventListener('dailybrew:workspace-invalid', handler);
+  }, [router]);
 
   // Redirect to dashboard if no workspace and not already on dashboard/profile
   React.useEffect(() => {

@@ -67,7 +67,14 @@ class EmployeeService
 
     public function linkUser(Employee $employee, ?User $user): Employee
     {
+        $previousUser = $employee->getLinkedUser();
         $employee->setLinkedUser($user);
+
+        // If unlinking, clear currentWorkspace if it pointed to this workspace
+        if ($user === null && $previousUser !== null) {
+            $this->clearCurrentWorkspaceIfMatches($previousUser, $employee->getWorkspace());
+        }
+
         $this->em->flush();
 
         return $employee;
@@ -75,8 +82,30 @@ class EmployeeService
 
     public function delete(Employee $employee): void
     {
+        $linkedUser = $employee->getLinkedUser();
         $employee->setDeletedAt(new \DateTimeImmutable());
         $employee->setLinkedUser(null);
+
+        // Clear currentWorkspace if the deleted employee's user was viewing this workspace
+        if ($linkedUser !== null) {
+            $this->clearCurrentWorkspaceIfMatches($linkedUser, $employee->getWorkspace());
+        }
+
         $this->em->flush();
+    }
+
+    private function clearCurrentWorkspaceIfMatches(User $user, ?Workspace $workspace): void
+    {
+        if ($workspace === null) {
+            return;
+        }
+
+        $current = $user->getCurrentWorkspace();
+        if ($current !== null && $current->getId() === $workspace->getId()) {
+            // Only clear if user is not also the owner of this workspace
+            if ($workspace->getOwner()?->getId() !== $user->getId()) {
+                $user->setCurrentWorkspace(null);
+            }
+        }
     }
 }

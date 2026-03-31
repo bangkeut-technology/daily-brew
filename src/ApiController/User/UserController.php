@@ -193,6 +193,15 @@ class UserController extends AbstractController
             return $this->jsonError('This employee is not linked to your account', 403);
         }
 
+        // Clear currentWorkspace if it matches the unlinked workspace
+        $workspace = $employee->getWorkspace();
+        $current = $user->getCurrentWorkspace();
+        if ($workspace !== null && $current !== null && $current->getId() === $workspace->getId()) {
+            if ($workspace->getOwner()?->getId() !== $user->getId()) {
+                $user->setCurrentWorkspace(null);
+            }
+        }
+
         $employee->setLinkedUser(null);
         $employeeRepository->flush();
 
