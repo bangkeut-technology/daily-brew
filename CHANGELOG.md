@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.17.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.16.0...v1.17.0) (2026-03-31)
+
+
+### Features
+
+* enhance geofencing logic and restrict non-owner data visibility ([39d3ff9](https://github.com/bangkeut-technology/daily-brew/commit/39d3ff92465a060fdd0acaea4183cb82d52660cb))
+* **settings:** enforce minimum geofencing radius of 50m and improve validation UX ([32704e1](https://github.com/bangkeut-technology/daily-brew/commit/32704e1f6b6a700432adae093c2b2bdc9dd04bb0))
+
 ## [1.16.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.15.0...v1.16.0) (2026-03-31)
 
 
