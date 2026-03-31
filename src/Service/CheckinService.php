@@ -120,12 +120,10 @@ class CheckinService
                 $shiftStart = $this->resolveEffectiveStartTime($shift, $now);
                 if ($shiftStart !== null) {
                     $grace = $shift->getGraceLateMinutes();
-                    $shiftStartWithGrace = DateTimeImmutable::createFromFormat('H:i', $shiftStart->format('H:i'));
-                    if ($grace > 0) {
-                        $shiftStartWithGrace = $shiftStartWithGrace->modify("+{$grace} minutes");
-                    }
-                    $checkInTime = DateTimeImmutable::createFromFormat('H:i', $now->format('H:i'));
-                    $attendance->setIsLate($checkInTime > $shiftStartWithGrace);
+                    $startMinutes = (int) $shiftStart->format('G') * 60 + (int) $shiftStart->format('i');
+                    $startMinutes += $grace;
+                    $checkInMinutes = (int) $now->format('G') * 60 + (int) $now->format('i');
+                    $attendance->setIsLate($checkInMinutes > $startMinutes);
                 }
             }
 
@@ -156,12 +154,10 @@ class CheckinService
                 $shiftEnd = $this->resolveEffectiveEndTime($shift, $now);
                 if ($shiftEnd !== null) {
                     $grace = $shift->getGraceEarlyMinutes();
-                    $shiftEndWithGrace = DateTimeImmutable::createFromFormat('H:i', $shiftEnd->format('H:i'));
-                    if ($grace > 0) {
-                        $shiftEndWithGrace = $shiftEndWithGrace->modify("-{$grace} minutes");
-                    }
-                    $checkOutTime = DateTimeImmutable::createFromFormat('H:i', $now->format('H:i'));
-                    $attendance->setLeftEarly($checkOutTime < $shiftEndWithGrace);
+                    $endMinutes = (int) $shiftEnd->format('G') * 60 + (int) $shiftEnd->format('i');
+                    $endMinutes -= $grace;
+                    $checkOutMinutes = (int) $now->format('G') * 60 + (int) $now->format('i');
+                    $attendance->setLeftEarly($checkOutMinutes < $endMinutes);
                 }
             }
         } else {
