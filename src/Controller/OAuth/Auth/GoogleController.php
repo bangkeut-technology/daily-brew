@@ -7,7 +7,6 @@ namespace App\Controller\OAuth\Auth;
 use App\Enum\OAuthProviderEnum;
 use App\Security\OAuthAuthenticationService;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -18,14 +17,12 @@ final class GoogleController extends AbstractOAuthAuthController
     public function __construct(
         ClientRegistry             $clientRegistry,
         OAuthAuthenticationService $authenticationService,
-        LoggerInterface            $logger,
     ) {
         parent::__construct(
             'google_auth',
             OAuthProviderEnum::GOOGLE,
             $clientRegistry,
             $authenticationService,
-            $logger,
         );
     }
 

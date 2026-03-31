@@ -12,6 +12,7 @@ use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\OAuth2ClientInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +20,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 abstract class AbstractOAuthConnectController extends AbstractController
 {
+    private const STATE_COOKIE = 'oauth_state';
+
     public function __construct(
         protected readonly string                     $client,
         protected readonly OAuthProviderEnum          $provider,
@@ -44,7 +47,16 @@ abstract class AbstractOAuthConnectController extends AbstractController
      */
     public function connect(): Response
     {
-        return $this->getClient()->redirect();
+        $client = $this->getClient();
+        $client->setAsStateless();
+        $response = $client->redirect();
+
+        $state = $client->getOAuth2Provider()->getState();
+        $response->headers->setCookie(
+            Cookie::create(self::STATE_COOKIE, $state, time() + 300, '/', null, false, true, false, Cookie::SAMESITE_LAX),
+        );
+
+        return $response;
     }
 
     /**
@@ -76,7 +88,16 @@ abstract class AbstractOAuthConnectController extends AbstractController
             return $this->redirect('/sign-in?error=' . urlencode('You must be signed in to connect an account'));
         }
 
-        $oauthUser = $this->getClient()->fetchUser();
+        $expectedState = $request->cookies->get(self::STATE_COOKIE);
+        $actualState = $request->query->get('state') ?? $request->request->get('state');
+
+        if (!$actualState || !$expectedState || !hash_equals($expectedState, $actualState)) {
+            return $this->redirect(sprintf('%s?error=%s', $this->redirectRoute, urlencode('Invalid state')));
+        }
+
+        $client = $this->getClient();
+        $client->setAsStateless();
+        $oauthUser = $client->fetchUser();
 
         try {
             $this->authenticationService->connect(
@@ -88,7 +109,10 @@ abstract class AbstractOAuthConnectController extends AbstractController
             return $this->redirect(sprintf('%s?error=%s', $this->redirectRoute, urlencode($e->getMessage())));
         }
 
-        return $this->getRedirectRoute();
+        $response = $this->getRedirectRoute();
+        $response->headers->clearCookie(self::STATE_COOKIE, '/');
+
+        return $response;
     }
 
     protected function resolveUserFromJwt(Request $request): ?User

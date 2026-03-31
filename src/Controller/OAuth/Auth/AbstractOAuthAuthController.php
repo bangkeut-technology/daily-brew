@@ -9,21 +9,21 @@ use App\Security\OAuthAuthenticationService;
 use App\Security\OAuthUserData;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\OAuth2ClientInterface;
-use KnpU\OAuth2ClientBundle\Exception\InvalidStateException;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 abstract class AbstractOAuthAuthController extends AbstractController
 {
+    private const STATE_COOKIE = 'oauth_state';
+
     public function __construct(
         protected readonly string                     $client,
         protected readonly OAuthProviderEnum          $provider,
         protected readonly ClientRegistry             $clientRegistry,
         protected readonly OAuthAuthenticationService $authenticationService,
-        protected readonly LoggerInterface            $logger,
         protected readonly string                     $redirectRoute = '/auth/callback',
     ) {}
 
@@ -39,15 +39,38 @@ abstract class AbstractOAuthAuthController extends AbstractController
 
     public function connect(): Response
     {
-        return $this->getClient()->redirect();
+        $client = $this->getClient();
+        $client->setAsStateless();
+        $response = $client->redirect();
+
+        // Store state in a cookie instead of the session — the session cookie
+        // is unreliable across OAuth redirects in many browser/server combos.
+        $state = $client->getOAuth2Provider()->getState();
+        $response->headers->setCookie(
+            Cookie::create(self::STATE_COOKIE, $state, time() + 300, '/', null, false, true, false, Cookie::SAMESITE_LAX),
+        );
+
+        return $response;
     }
 
     public function callback(Request $request): Response
     {
         try {
-            $oauthUser = $this->getClient()->fetchUser();
+            $expectedState = $request->cookies->get(self::STATE_COOKIE);
+            $actualState = $request->query->get('state') ?? $request->request->get('state');
+
+            if (!$actualState || !$expectedState || !hash_equals($expectedState, $actualState)) {
+                return $this->redirect('/sign-in?error=' . urlencode('Invalid state'));
+            }
+
+            $client = $this->getClient();
+            $client->setAsStateless();
+            $oauthUser = $client->fetchUser();
 
             $response = $this->getRedirectResponse();
+
+            // Clear the state cookie
+            $response->headers->clearCookie(self::STATE_COOKIE, '/');
 
             $this->authenticationService->authenticate(
                 new OAuthUserData(
@@ -61,21 +84,6 @@ abstract class AbstractOAuthAuthController extends AbstractController
             );
 
             return $response;
-        } catch (InvalidStateException $e) {
-            $session = $request->hasSession() ? $request->getSession() : null;
-            $expectedState = $session?->get('knpu.oauth2_client_state');
-            $actualState = $request->query->get('state') ?? $request->request->get('state');
-
-            $this->logger->error('OAuth invalid state', [
-                'provider' => $this->provider->value,
-                'expected_state' => $expectedState ? substr($expectedState, 0, 8) . '...' : 'null',
-                'actual_state' => $actualState ? substr($actualState, 0, 8) . '...' : 'null',
-                'has_session' => $request->hasSession(),
-                'session_id' => $session?->getId() ? substr($session->getId(), 0, 8) . '...' : 'null',
-                'has_session_cookie' => $request->cookies->has(session_name()),
-            ]);
-
-            return $this->redirect('/sign-in?error=' . urlencode($e->getMessage()));
         } catch (\Exception $e) {
             return $this->redirect('/sign-in?error=' . urlencode($e->getMessage()));
         }

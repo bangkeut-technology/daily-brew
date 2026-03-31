@@ -2,11 +2,10 @@
 framework:
     secret: '%env(APP_SECRET)%'
 
-    # SameSite=None required for Apple Sign In (cross-origin POST callback).
     session:
         enabled: true
         cookie_secure: auto
-        cookie_samesite: none
+        cookie_samesite: lax
         cookie_httponly: true
         cookie_domain: '%env(COOKIE_DOMAIN)%'
 
@@ -19,7 +18,10 @@ framework:
 when@prod:
     framework:
         session:
+            # SameSite=None required for Apple Sign In (cross-origin POST callback).
+            # Secure=true is mandatory for SameSite=None.
             cookie_secure: true
+            cookie_samesite: none
 
 when@test:
     framework:
