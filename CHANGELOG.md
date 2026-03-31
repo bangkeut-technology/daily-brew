@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.12.0...v1.13.0) (2026-03-31)
+
+
+### Features
+
+* **security:** add OAuth route exemption to security rules ([a49e297](https://github.com/bangkeut-technology/daily-brew/commit/a49e29764f08772edaec4eecacd3d68254bea0ce))
+
 ## [1.12.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.11.1...v1.12.0) (2026-03-31)
 
 
