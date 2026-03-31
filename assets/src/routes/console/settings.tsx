@@ -931,18 +931,29 @@ function SettingsPage() {
                         id="geo-radius"
                         name="radius"
                         type="number"
-                        min={10}
+                        min={50}
                         max={5000}
-                        value={geofencingRadius}
-                        onChange={(e) => setGeofencingRadius(parseInt(e.target.value, 10) || 100)}
+                        value={geofencingRadius || ''}
+                        onChange={(e) => setGeofencingRadius(e.target.value === '' ? 0 : parseInt(e.target.value, 10) || 0)}
+                        onBlur={() => {
+                          if (geofencingRadius > 0 && geofencingRadius < 50) {
+                            toast.error('Minimum radius is 50m due to GPS accuracy. Reset to 100m.');
+                            setGeofencingRadius(100);
+                          } else if (geofencingRadius === 0) {
+                            setGeofencingRadius(100);
+                          }
+                        }}
                         className="w-full px-3 py-2 rounded-lg text-[15px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono"
                       />
+                      {geofencingRadius > 0 && geofencingRadius < 50 && (
+                        <p className="text-[13px] text-red mt-1">Minimum 50m — GPS is not accurate below this</p>
+                      )}
                     </div>
                   </div>
 
                   <p className="text-[14px] text-text-tertiary">
                     Staff must be within{' '}
-                    <span className="font-medium text-text-secondary">{geofencingRadius}m</span> of
+                    <span className="font-medium text-text-secondary">{geofencingRadius || 100}m</span> of
                     this location to check in.
                   </p>
 
