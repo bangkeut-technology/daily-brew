@@ -9,8 +9,11 @@ use App\Security\OAuthAuthenticationService;
 use App\Security\OAuthUserData;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\OAuth2ClientInterface;
+use KnpU\OAuth2ClientBundle\Exception\InvalidStateException;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 abstract class AbstractOAuthAuthController extends AbstractController
@@ -20,6 +23,7 @@ abstract class AbstractOAuthAuthController extends AbstractController
         protected readonly OAuthProviderEnum          $provider,
         protected readonly ClientRegistry             $clientRegistry,
         protected readonly OAuthAuthenticationService $authenticationService,
+        protected readonly LoggerInterface            $logger,
         protected readonly string                     $redirectRoute = '/auth/callback',
     ) {}
 
@@ -38,7 +42,7 @@ abstract class AbstractOAuthAuthController extends AbstractController
         return $this->getClient()->redirect();
     }
 
-    public function callback(): Response
+    public function callback(Request $request): Response
     {
         try {
             $oauthUser = $this->getClient()->fetchUser();
@@ -57,6 +61,21 @@ abstract class AbstractOAuthAuthController extends AbstractController
             );
 
             return $response;
+        } catch (InvalidStateException $e) {
+            $session = $request->hasSession() ? $request->getSession() : null;
+            $expectedState = $session?->get('knpu.oauth2_client_state');
+            $actualState = $request->query->get('state') ?? $request->request->get('state');
+
+            $this->logger->error('OAuth invalid state', [
+                'provider' => $this->provider->value,
+                'expected_state' => $expectedState ? substr($expectedState, 0, 8) . '...' : 'null',
+                'actual_state' => $actualState ? substr($actualState, 0, 8) . '...' : 'null',
+                'has_session' => $request->hasSession(),
+                'session_id' => $session?->getId() ? substr($session->getId(), 0, 8) . '...' : 'null',
+                'has_session_cookie' => $request->cookies->has(session_name()),
+            ]);
+
+            return $this->redirect('/sign-in?error=' . urlencode($e->getMessage()));
         } catch (\Exception $e) {
             return $this->redirect('/sign-in?error=' . urlencode($e->getMessage()));
         }
