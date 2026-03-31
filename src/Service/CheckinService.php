@@ -55,12 +55,16 @@ class CheckinService
             }
             $fenceLat = $setting->getGeofencingLatitude();
             $fenceLng = $setting->getGeofencingLongitude();
-            $fenceRadius = $setting->getGeofencingRadiusMeters() ?? 100;
+            $fenceRadius = max($setting->getGeofencingRadiusMeters() ?? 100, 50);
 
             if ($fenceLat !== null && $fenceLng !== null) {
                 $distance = $this->haversineDistance($fenceLat, $fenceLng, $latitude, $longitude);
                 if ($distance > $fenceRadius) {
-                    throw new AccessDeniedHttpException('Check-in not allowed from this location — outside geofence');
+                    throw new AccessDeniedHttpException(sprintf(
+                        'Check-in not allowed from this location — you are %dm away (allowed: %dm)',
+                        (int) round($distance),
+                        $fenceRadius,
+                    ));
                 }
             }
         }

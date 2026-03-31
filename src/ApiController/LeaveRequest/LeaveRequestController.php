@@ -30,8 +30,10 @@ class LeaveRequestController extends AbstractController
     public function list(
         string $workspacePublicId,
         Request $request,
+        #[CurrentUser] User $user,
         WorkspaceRepository $workspaceRepository,
         LeaveRequestRepository $leaveRequestRepository,
+        EmployeeRepository $employeeRepository,
         PlanService $planService,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
@@ -50,8 +52,18 @@ class LeaveRequestController extends AbstractController
 
         $leaveRequests = $leaveRequestRepository->findByWorkspace($workspace, $statusEnum);
 
+        // Non-owners can only see their own leave requests
+        $isOwner = $workspace->getOwner()?->getId() === $user->getId();
+        if (!$isOwner) {
+            $employee = $employeeRepository->findOneByLinkedUserAndWorkspace($user, $workspace);
+            if ($employee !== null) {
+                $employeeId = $employee->getId();
+                $leaveRequests = array_filter($leaveRequests, fn ($lr) => $lr->getEmployee()->getId() === $employeeId);
+            }
+        }
+
         return $this->jsonSuccess(
-            array_map(fn ($lr) => LeaveRequestDTO::fromEntity($lr)->toArray(), $leaveRequests),
+            array_values(array_map(fn ($lr) => LeaveRequestDTO::fromEntity($lr)->toArray(), $leaveRequests)),
         );
     }
 

@@ -105,7 +105,8 @@ class WorkspaceSettingController extends AbstractController
             $setting->setGeofencingLongitude($data['geofencingLongitude'] !== null ? (float) $data['geofencingLongitude'] : null);
         }
         if (array_key_exists('geofencingRadiusMeters', $data)) {
-            $setting->setGeofencingRadiusMeters($data['geofencingRadiusMeters'] !== null ? (int) $data['geofencingRadiusMeters'] : null);
+            $radius = $data['geofencingRadiusMeters'] !== null ? max((int) $data['geofencingRadiusMeters'], 50) : null;
+            $setting->setGeofencingRadiusMeters($radius);
         }
 
         // General settings
