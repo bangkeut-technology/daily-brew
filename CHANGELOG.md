@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.11.1...v1.12.0) (2026-03-31)
+
+
+### Features
+
+* implement notification and email systems for closures, summaries, leave requests, and shifts ([66aeee7](https://github.com/bangkeut-technology/daily-brew/commit/66aeee737b6481ee86beb84b2d8d5c317b36436d))
+
 ## [1.10.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.9.0...v1.10.0) (2026-03-30)
 
 
