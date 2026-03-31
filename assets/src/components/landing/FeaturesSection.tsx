@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   MapPin,
   CalendarDays,
+  Bell,
   Crown,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -62,6 +63,13 @@ const features = [
     title: 'Per-day schedules',
     desc: 'Set different shift hours for each day of the week — perfect for varying opening times.',
     accent: '#3B6FA0',
+    espresso: true,
+  },
+  {
+    icon: <Bell size={22} strokeWidth={1.8} />,
+    title: 'Push & email notifications',
+    desc: 'Get notified of leave requests, approvals, shift changes, and closures via push and email. Daily summary included.',
+    accent: '#6B4226',
     espresso: true,
   },
 ];

@@ -30,6 +30,8 @@ const comparisonRows: { section?: string; feature: string; free: boolean | strin
   { feature: 'Geofencing for check-in & out', free: false, espresso: true, double: true },
   { feature: 'Per-day shift schedules', free: false, espresso: true, double: true },
   { feature: 'BasilBook staff linking', free: false, espresso: true, double: true },
+  { feature: 'Push & email notifications', free: false, espresso: true, double: true },
+  { feature: 'Daily attendance summary', free: false, espresso: true, double: true },
   { feature: '14-day free trial', free: false, espresso: true, double: true },
 
   // Double Espresso

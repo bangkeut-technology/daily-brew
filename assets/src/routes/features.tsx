@@ -2,7 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
 import {
   QrCode, Users, Clock, Coffee, Shield, LayoutDashboard,
-  MapPin, CalendarDays, ChevronRight, Crown,
+  MapPin, CalendarDays, Bell, ChevronRight, Crown,
 } from 'lucide-react';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
@@ -68,6 +68,12 @@ const espressoFeatures = [
     title: 'Leave request management',
     desc: 'Staff submit leave requests. Owners approve or reject with a note. Track paid vs unpaid leave with full history.',
     accent: '#4A7C59',
+  },
+  {
+    icon: <Bell size={28} strokeWidth={1.6} />,
+    title: 'Push & email notifications',
+    desc: 'Real-time push notifications and email alerts for leave requests, approvals, shift changes, closures, and daily attendance summaries.',
+    accent: '#6B4226',
   },
 ];
 

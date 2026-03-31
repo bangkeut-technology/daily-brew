@@ -33,6 +33,9 @@ Any request to add the above should be deferred to a future milestone.
 - Per-day shift schedules (ShiftTimeRule per day-of-week)
 - Leave request management
 - Employee username for BasilBook staff linking
+- Push notifications (Expo) for leave requests, shift changes, closures
+- Email notifications (Mailgun) for all events
+- Daily attendance summary notification (push + email)
 
 ### Double Espresso Plan ($39.99/month · $399/year)
 - Unlimited employees
@@ -143,6 +146,13 @@ Users can be owners (create workspaces) or employees (linked to an employee reco
 - createdAt, updatedAt
 - Helper: `isFullDay()` — returns true when both startTime and endTime are null
 
+**DeviceToken**
+- id, publicId
+- token (string 255, unique) — Expo push token
+- platform (string 20) — ios, android, or web
+- user → User (ManyToOne, not null, CASCADE delete)
+- createdAt, updatedAt
+
 ---
 
 ## Key Business Rules
@@ -234,6 +244,21 @@ One Attendance record per Employee per day. Attempting a second check-in on the 
 - On workspace switch, both localStorage and server are updated
 - On sign-in to a new device, workspace is restored from server if localStorage is empty
 
+### Notifications (Espresso)
+Push (Expo) and email (Mailgun) notifications are sent for the following events:
+- **Leave request submitted** → notify workspace owner
+- **Leave request approved/rejected** → notify employee (linked user)
+- **Shift assigned/changed** → notify employee (linked user)
+- **Closure created** → notify all linked employees in workspace
+- **Daily attendance summary** → notify workspace owner (via `app:send-daily-summary` cron command)
+
+All notifications include a `data` payload with `type` and `workspacePublicId` for mobile deep linking.
+
+### Device token API (no locale prefix)
+- `POST /api/v1/devices` — register push token (`{ token, platform: "ios"|"android"|"web" }`)
+- `DELETE /api/v1/devices/{token}` — unregister push token (own tokens only)
+- If a token already exists, it's re-assigned to the current user (handles device transfers)
+
 ---
 
 ## Authentication
@@ -250,8 +275,10 @@ QR encodes `dailybrew:ws:{qrToken}` (data payload, not a URL). Employee opens Da
 
 Symfony 7 + Doctrine ORM + LexikJWTAuthenticationBundle + KnpPaginatorBundle.
 
-- API prefix: `/api/v1/{_locale}` (en, fr, km) — except Checkin routes which use `/api/v1/checkin/` (no locale)
+- API prefix: `/api/v1/{_locale}` (en, fr, km) — except Checkin and Device routes which use `/api/v1/` (no locale)
 - Controller + Trait pattern, business logic in `src/Service/`
+- Notifications: `ExpoPushService` (Expo push API), `EmailService` (Symfony Mailer + Mailgun), orchestrated by `NotificationService`
+- Daily summary command: `app:send-daily-summary` (cron, Espresso workspaces only)
 - Multi-tenancy: Workspace is root aggregate, WorkspaceVoter handles authorization
 
 ---
@@ -334,6 +361,9 @@ php bin/console lexik:jwt:generate-keypair
 npm ci
 npm run router:generate
 npm run dev
+
+# Daily summary notification (run via cron, e.g. daily at 18:00)
+php bin/console app:send-daily-summary
 ```
 
 ---
@@ -429,6 +459,5 @@ DailyBrew employees can be linked to BasilBook staff records via the `username` 
 - KPI / evaluation / scoring
 - Team members / manager roles (only owner role for now)
 - Employee mobile app (Expo) — check-in is mobile web only
-- Push notifications
 - Export to CSV/Excel
 - Demo mode

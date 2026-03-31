@@ -38,6 +38,8 @@ const espressoPlan = {
     { text: 'Geofencing for check-in & out', included: true },
     { text: 'Per-day shift schedules', included: true },
     { text: 'BasilBook staff linking', included: true },
+    { text: 'Push & email notifications', included: true },
+    { text: 'Daily attendance summary', included: true },
     { text: '14-day free trial', included: true },
   ],
 };

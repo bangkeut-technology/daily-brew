@@ -17,6 +17,8 @@ DailyBrew helps restaurant owners manage their team's daily attendance through Q
 - IP restriction for check-in locations (with "Use my current IP" helper)
 - Geofencing for check-in (GPS radius)
 - Dual role system — users can be owners and/or employees across workspaces
+- Push notifications via Expo (leave requests, shift changes, closures)
+- Email notifications via Mailgun (same events + daily attendance summary for Espresso)
 - Multi-language support (English, French, Khmer)
 - Dark mode with warm coffee tones
 
@@ -34,6 +36,8 @@ DailyBrew helps restaurant owners manage their team's daily attendance through Q
 | Geofencing | - | Yes | Yes |
 | Per-day shift schedules | - | Yes | Yes |
 | Employee username (BasilBook) | - | Yes | Yes |
+| Push & email notifications | - | Yes | Yes |
+| Daily attendance summary | - | Yes | Yes |
 | Priority support | - | - | Yes |
 
 Payments are handled via **Paddle**.
@@ -57,6 +61,11 @@ Payments are handled via **Paddle**.
 - i18next (en, fr, km)
 - Lucide React (icons)
 - Sonner (toasts)
+
+### Notifications
+- Expo Push Notifications (mobile push)
+- Symfony Mailer + Mailgun (email)
+- Console command for daily summary (`app:send-daily-summary`)
 
 ## Getting Started
 
@@ -138,6 +147,7 @@ src/
     Attendance/           # Attendance log
     LeaveRequest/         # Leave request management
     Checkin/              # QR check-in endpoint (auth required)
+    Device/               # Push notification device token registration
     Paddle/               # Paddle webhook handler
     Plan/                 # Plan/subscription info
     Dev/                  # Dev-only endpoints (plan toggle)
@@ -186,9 +196,13 @@ assets/src/
 - `GET /api/v1/{locale}/workspaces/{publicId}/attendances`
 - `GET /api/v1/{locale}/workspaces/{publicId}/settings/my-ip` — returns client IP as seen by server
 
-### QR Check-in (authenticated)
+### QR Check-in (authenticated, no locale)
 - `GET /api/v1/checkin/{qrToken}`
 - `POST /api/v1/checkin/{qrToken}`
+
+### Device Tokens (authenticated, no locale)
+- `POST /api/v1/devices` — register push notification token
+- `DELETE /api/v1/devices/{token}` — unregister push notification token
 
 ### Webhooks (public)
 - `POST /api/v1/webhooks/paddle`
