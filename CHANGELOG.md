@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.13.0...v1.14.0) (2026-03-31)
+
+
+### Features
+
+* **ui:** add WorkspaceSelectorModal component and enhance workspace handling ([86c4f82](https://github.com/bangkeut-technology/daily-brew/commit/86c4f826c49eaf5c43b4b66391ce39555162b282))
+
 ## [1.13.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.12.0...v1.13.0) (2026-03-31)
 
 
