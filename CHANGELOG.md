@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.21.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.20.0...v1.21.0) (2026-03-31)
+
+
+### Features
+
+* **oauth:** implement stateless OAuth state handling using cookies ([5088a63](https://github.com/bangkeut-technology/daily-brew/commit/5088a632d77e9c6454d327b542fd5a8c4d41bac5))
+
 ## [1.20.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.19.0...v1.20.0) (2026-03-31)
 
 
