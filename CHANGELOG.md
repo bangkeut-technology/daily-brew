@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.14.0...v1.15.0) (2026-03-31)
+
+
+### Features
+
+* add push and email notifications for key events, daily summaries, and UI updates ([c3d23c0](https://github.com/bangkeut-technology/daily-brew/commit/c3d23c000fb0521f2e3c0dd28837d16d41a1fe5b))
+
 ## [1.14.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.13.0...v1.14.0) (2026-03-31)
 
 
