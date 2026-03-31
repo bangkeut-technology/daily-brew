@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.17.0...v1.18.0) (2026-03-31)
+
+
+### Features
+
+* **config:** enhance session security and update Apple OAuth settings ([fa45688](https://github.com/bangkeut-technology/daily-brew/commit/fa45688d92114282d2adea6aae033b432c0d027a))
+
 ## [1.17.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.16.0...v1.17.0) (2026-03-31)
 
 
