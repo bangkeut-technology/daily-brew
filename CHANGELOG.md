@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.15.0...v1.16.0) (2026-03-31)
+
+
+### Features
+
+* **auth:** enhance Apple Sign-In support and update session settings ([34567b7](https://github.com/bangkeut-technology/daily-brew/commit/34567b7859d02d63492aaf4fe0988091e214918f))
+
 ## [1.15.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.14.0...v1.15.0) (2026-03-31)
 
 
