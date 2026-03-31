@@ -8,7 +8,10 @@ framework:
         cookie_secure: auto
         cookie_samesite: none
         cookie_httponly: true
-        cookie_domain: '%env(default::COOKIE_DOMAIN)%'
+        cookie_domain: '%env(COOKIE_DOMAIN)%'
+
+    trusted_proxies: '%env(TRUSTED_PROXIES)%'
+    trusted_headers: ['x-forwarded-for', 'x-forwarded-proto', 'x-forwarded-host']
 
     #esi: true
     #fragments: true

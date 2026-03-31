@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { useAuthenticationState } from '@/hooks/use-authentication';
@@ -8,7 +8,6 @@ import { Eye, EyeOff, QrCode, Users, Clock, LayoutDashboard, Shield, MapPin } fr
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loadAppleSDK, appleSignIn } from '@/lib/oauth';
 import { LogoBrand } from '@/components/shared/Logo';
 import { motion } from 'framer-motion';
 
@@ -38,10 +37,9 @@ const floatingIcons = [
 function SignUpPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { register: registerUser, loginWithApple } = useAuth();
+  const { register: registerUser } = useAuth();
   const auth = useAuthenticationState();
   const [showPassword, setShowPassword] = useState(false);
-  const [appleLoading, setAppleLoading] = useState(false);
 
   const {
     register,
@@ -71,26 +69,6 @@ function SignUpPage() {
       toast.error(message);
     }
   };
-
-  const handleAppleSignIn = useCallback(async () => {
-    setAppleLoading(true);
-    try {
-      const clientId = window.__DAILYBREW__?.appleClientId;
-      if (!clientId) throw new Error('Apple client ID not configured');
-      await loadAppleSDK();
-      const { identityToken, email } = await appleSignIn(clientId, window.location.origin);
-      const result = await loginWithApple(identityToken, email);
-      if (result?.user?.onboardingCompleted === false) {
-        navigate({ to: '/onboarding' });
-      } else {
-        window.location.href = '/console/dashboard';
-      }
-    } catch {
-      toast.error('Apple sign-in failed');
-    } finally {
-      setAppleLoading(false);
-    }
-  }, [loginWithApple, navigate]);
 
   if (auth.status === 'authenticated') return null;
 
@@ -155,15 +133,13 @@ function SignUpPage() {
               <GoogleIcon />
               Sign up with Google
             </a>
-            <button
-              type="button"
-              onClick={handleAppleSignIn}
-              disabled={appleLoading}
-              className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg text-[15px] font-medium bg-glass-bg border border-cream-3 text-text-primary transition-all hover:bg-cream-3/50 cursor-pointer disabled:opacity-50"
+            <a
+              href="/oauth/auth/apple"
+              className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg text-[15px] font-medium bg-glass-bg border border-cream-3 text-text-primary no-underline transition-all hover:bg-cream-3/50"
             >
               <AppleIcon />
-              {appleLoading ? t('common.loading') : 'Sign up with Apple'}
-            </button>
+              Sign up with Apple
+            </a>
           </div>
 
           <div className="flex items-center gap-3 mb-5">
