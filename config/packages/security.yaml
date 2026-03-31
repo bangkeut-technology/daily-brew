@@ -42,6 +42,11 @@ security:
                 check_path: gesdinet_jwt_refresh_token
             provider: daily_brew_user_provider
 
+        oauth:
+            pattern: '^/oauth/'
+            stateless: false
+            security: false
+
         main:
             pattern: ^/
             stateless: true
