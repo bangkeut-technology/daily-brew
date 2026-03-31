@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.19.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.18.0...v1.19.0) (2026-03-31)
+
+
+### Features
+
+* **oauth:** add request handling and logging for invalid state errors ([0c068fb](https://github.com/bangkeut-technology/daily-brew/commit/0c068fb5b17052b588ba893ffc03ddb82e0bdb1e))
+
 ## [1.18.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.17.0...v1.18.0) (2026-03-31)
 
 
