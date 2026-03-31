@@ -15,12 +15,12 @@ knpu_oauth2_client:
             client_id: '%env(APPLE_CLIENT_ID)%'
             team_id: '%env(APPLE_TEAM_ID)%'
             key_file_id: '%env(APPLE_KEY_ID)%'
-            key_file_path: '%env(resolve:APPLE_KEY_PATH)%'
+            key_file_path: '%env(resolve:APPLE_PRIVATE_KEY)%'
             redirect_route: dailybrew_oauth_auth_apple_callback
         apple_connect:
             type: apple
             client_id: '%env(APPLE_CLIENT_ID)%'
             team_id: '%env(APPLE_TEAM_ID)%'
             key_file_id: '%env(APPLE_KEY_ID)%'
-            key_file_path: '%env(resolve:APPLE_KEY_PATH)%'
+            key_file_path: '%env(resolve:APPLE_PRIVATE_KEY)%'
             redirect_route: dailybrew_oauth_connect_apple_callback
