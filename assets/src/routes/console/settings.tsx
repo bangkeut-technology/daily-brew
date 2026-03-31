@@ -78,6 +78,7 @@ function SettingsPage() {
   const { openCheckout } = usePaddle();
   const devToggle = useDevTogglePlan();
   const isDev = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
+  const paddlePortalDomain = window.__DAILYBREW__?.paddleEnvironment === 'sandbox' ? 'sandbox-customer-portal.paddle.com' : 'customer-portal.paddle.com';
   const [billing, setBilling] = useState<'monthly' | 'annual'>('annual');
   const [wsModalOpen, setWsModalOpen] = useState(false);
   const [editingWsId, setEditingWsId] = useState<string | null>(null);
@@ -356,7 +357,7 @@ function SettingsPage() {
                         <div className="flex gap-2">
                           <button
                             onClick={() => {
-                              window.open(`https://customer.paddle.com/subscriptions/${plan.paddleSubscriptionId}/update`, '_blank');
+                              window.open(`https://${paddlePortalDomain}/subscriptions/${plan.paddleSubscriptionId}/update-payment-method`, '_blank');
                             }}
                             className="flex-1 px-3 py-2 rounded-lg text-[14px] font-medium bg-glass-bg text-text-primary border border-cream-3 cursor-pointer hover:bg-cream-3 transition-colors"
                           >
@@ -364,7 +365,7 @@ function SettingsPage() {
                           </button>
                           <button
                             onClick={() => {
-                              window.open(`https://customer.paddle.com/subscriptions/${plan.paddleSubscriptionId}/cancel`, '_blank');
+                              window.open(`https://${paddlePortalDomain}/subscriptions/${plan.paddleSubscriptionId}/cancel`, '_blank');
                             }}
                             className="px-3 py-2 rounded-lg text-[14px] font-medium bg-transparent text-red border border-red/20 cursor-pointer hover:bg-red/5 transition-colors"
                           >
