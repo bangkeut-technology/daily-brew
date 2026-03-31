@@ -26,6 +26,8 @@
         "symfony/form": "8.0.*",
         "symfony/framework-bundle": "8.0.*",
         "symfony/http-client": "8.0.*",
+        "symfony/mailer": "8.0.*",
+        "symfony/mailgun-mailer": "8.0.*",
         "symfony/monolog-bundle": "^4.0",
         "symfony/password-hasher": "8.0.*",
         "symfony/rate-limiter": "8.0.*",

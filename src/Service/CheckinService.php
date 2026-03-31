@@ -22,6 +22,7 @@ class CheckinService
         private AttendanceRepository $attendanceRepository,
         private ClosurePeriodRepository $closurePeriodRepository,
         private LeaveRequestRepository $leaveRequestRepository,
+        private PlanService $planService,
     ) {}
 
     public function checkin(
@@ -179,15 +180,18 @@ class CheckinService
 
     /**
      * Resolve effective start time for a shift on a given date.
-     * Checks ShiftTimeRule per-day override first, falls back to default.
+     * Checks ShiftTimeRule per-day override first (Espresso+ only), falls back to default.
      */
     private function resolveEffectiveStartTime(\App\Entity\Shift $shift, \DateTimeInterface $date): ?\DateTimeInterface
     {
-        $dayOfWeek = DayOfWeekEnum::tryFrom((int) $date->format('N'));
-        if ($dayOfWeek !== null) {
-            foreach ($shift->getTimeRules() as $rule) {
-                if ($rule->getDayOfWeek() === $dayOfWeek) {
-                    return \DateTimeImmutable::createFromFormat('H:i', $rule->getStartTime()) ?: null;
+        $workspace = $shift->getWorkspace();
+        if ($workspace !== null && $this->planService->canUseShiftTimeRules($workspace)) {
+            $dayOfWeek = DayOfWeekEnum::tryFrom((int) $date->format('N'));
+            if ($dayOfWeek !== null) {
+                foreach ($shift->getTimeRules() as $rule) {
+                    if ($rule->getDayOfWeek() === $dayOfWeek) {
+                        return \DateTimeImmutable::createFromFormat('H:i', $rule->getStartTime()) ?: null;
+                    }
                 }
             }
         }
@@ -196,11 +200,14 @@ class CheckinService
 
     private function resolveEffectiveEndTime(\App\Entity\Shift $shift, \DateTimeInterface $date): ?\DateTimeInterface
     {
-        $dayOfWeek = DayOfWeekEnum::tryFrom((int) $date->format('N'));
-        if ($dayOfWeek !== null) {
-            foreach ($shift->getTimeRules() as $rule) {
-                if ($rule->getDayOfWeek() === $dayOfWeek) {
-                    return \DateTimeImmutable::createFromFormat('H:i', $rule->getEndTime()) ?: null;
+        $workspace = $shift->getWorkspace();
+        if ($workspace !== null && $this->planService->canUseShiftTimeRules($workspace)) {
+            $dayOfWeek = DayOfWeekEnum::tryFrom((int) $date->format('N'));
+            if ($dayOfWeek !== null) {
+                foreach ($shift->getTimeRules() as $rule) {
+                    if ($rule->getDayOfWeek() === $dayOfWeek) {
+                        return \DateTimeImmutable::createFromFormat('H:i', $rule->getEndTime()) ?: null;
+                    }
                 }
             }
         }

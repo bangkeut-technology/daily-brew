@@ -1,0 +1,21 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block title %}Leave request {{ decision }}{% endblock %}
+
+{% block content %}
+  <h1>Leave request {{ decision }}</h1>
+  <p>Your leave request has been <strong>{{ decision }}</strong>.</p>
+
+  <div class="detail-row">
+    <span class="detail-label">Dates</span>
+    <span class="detail-value">{{ dates }}</span>
+  </div>
+  <div class="detail-row">
+    <span class="detail-label">Status</span>
+    <span class="detail-value">
+      <span class="badge {{ decision == 'approved' ? 'badge-green' : 'badge-red' }}">
+        {{ decision|capitalize }}
+      </span>
+    </span>
+  </div>
+{% endblock %}

@@ -54,10 +54,13 @@ function ShiftsPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await createShift.mutateAsync({ name, startTime, endTime });
+      const newShift = await createShift.mutateAsync({ name, startTime, endTime });
       toast.success('Shift created');
       setShowForm(false);
       setName('');
+      if (plan?.canUseShiftTimeRules) {
+        setSelectedShift(newShift.publicId);
+      }
     } catch {
       toast.error('Failed to create shift');
     }
@@ -320,7 +323,7 @@ function ShiftCard({
   const durationMins = durationMinutes % 60;
 
   return (
-    <GlassCard hover={!isExpanded && !showAssign && !isEditing}>
+    <GlassCard hover={!isExpanded && !showAssign && !isEditing} className={isExpanded ? 'overflow-visible' : undefined}>
       {/* Header with time accent bar */}
       <div className="relative">
         <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-linear-to-r from-amber to-coffee" />

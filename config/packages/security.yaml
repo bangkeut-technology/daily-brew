@@ -53,6 +53,8 @@ security:
           roles: PUBLIC_ACCESS
         - path: '^/api/v1/checkin'
           roles: IS_AUTHENTICATED_FULLY
+        - path: '^/api/v1/devices'
+          roles: IS_AUTHENTICATED_FULLY
         - path: '^/api/v1/[a-z]+/auth'
           roles: PUBLIC_ACCESS
         - path: '^/api/v1/token/refresh'

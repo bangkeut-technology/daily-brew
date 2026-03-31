@@ -26,11 +26,21 @@ dailybrew_api_v1_:
     resource:
         path: '../src/ApiController/'
         namespace: App\ApiController
-        exclude: '../src/ApiController/{Checkin,Paddle,RevenueCat,Dev}'
+        exclude: '../src/ApiController/{Checkin,Device,Paddle,RevenueCat,Dev}'
     type: attribute
     prefix: /api/v1/{_locale}
     requirements:
         _locale: en|fr|km
+    name_prefix: dailybrew_api_v1_
+    options:
+        strict_requirements: true
+
+dailybrew_api_v1_device_:
+    resource:
+        path: '../src/ApiController/Device/'
+        namespace: App\ApiController\Device
+    type: attribute
+    prefix: /api/v1
     name_prefix: dailybrew_api_v1_
     options:
         strict_requirements: true

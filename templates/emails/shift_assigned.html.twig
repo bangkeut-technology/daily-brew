@@ -1,0 +1,17 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block title %}Shift assigned{% endblock %}
+
+{% block content %}
+  <h1>Shift assigned</h1>
+  <p>You have been assigned to a new shift in {{ workspaceName }}.</p>
+
+  <div class="detail-row">
+    <span class="detail-label">Shift</span>
+    <span class="detail-value">{{ shiftName }}</span>
+  </div>
+  <div class="detail-row">
+    <span class="detail-label">Hours</span>
+    <span class="detail-value">{{ shiftStart }} &ndash; {{ shiftEnd }}</span>
+  </div>
+{% endblock %}

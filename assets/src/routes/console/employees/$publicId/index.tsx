@@ -4,13 +4,15 @@ import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Copy, Pencil, X, Check, Link2, Mail, Unlink, Info } from 'lucide-react';
+import { Copy, Pencil, X, Check, Link2, Mail, Unlink, Info, AtSign } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useMemo } from 'react';
 import * as Popover from '@radix-ui/react-popover';
 import { useEmployee, useUpdateEmployee } from '@/hooks/queries/useEmployees';
 import { useShifts } from '@/hooks/queries/useShifts';
+import { usePlan } from '@/hooks/queries/usePlan';
 import { getWorkspacePublicId } from '@/lib/auth';
+import { cn } from '@/lib/utils';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { Avatar } from '@/components/shared/Avatar';
@@ -25,6 +27,7 @@ const editEmployeeSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
   phoneNumber: z.string().optional(),
+  username: z.string().optional(),
   dob: z.string().optional(),
   joinedAt: z.string().optional(),
   shiftPublicId: z.string().optional(),
@@ -44,6 +47,7 @@ function EmployeeDetailPage() {
   const { data: employee, isLoading } = useEmployee(workspaceId, publicId);
   const fmtDate = useDateFormat();
   const { data: shifts } = useShifts(workspaceId);
+  const { data: plan } = usePlan(workspaceId);
   const updateEmployee = useUpdateEmployee(workspaceId);
   const [isEditing, setIsEditing] = useState(false);
   const [linkUserId, setLinkUserId] = useState('');
@@ -63,6 +67,7 @@ function EmployeeDetailPage() {
           firstName: employee.firstName,
           lastName: employee.lastName,
           phoneNumber: employee.phoneNumber || '',
+          username: employee.username || '',
           dob: employee.dob || '',
           joinedAt: employee.joinedAt || '',
           shiftPublicId: employee.shiftPublicId || '',
@@ -118,6 +123,7 @@ function EmployeeDetailPage() {
         firstName: values.firstName,
         lastName: values.lastName,
         phoneNumber: values.phoneNumber || undefined,
+        username: values.username || null,
         dob: values.dob || null,
         joinedAt: values.joinedAt || null,
         shiftPublicId: values.shiftPublicId || null,
@@ -181,6 +187,37 @@ function EmployeeDetailPage() {
                   {t('employee.phoneNumber', 'Phone number')}
                 </label>
                 <input id="edit-phone" type="text" {...register('phoneNumber')} className={inputClassName} />
+              </div>
+
+              {/* Username — Espresso only, for BasilBook linking */}
+              <div>
+                <label htmlFor="edit-username" className="flex items-center gap-1.5 text-[14px] font-medium text-text-secondary mb-1.5">
+                  <AtSign size={12} />
+                  Username
+                  {!plan?.isEspresso && (
+                    <span className="text-[12px] font-medium px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
+                      Espresso
+                    </span>
+                  )}
+                </label>
+                {plan?.isEspresso ? (
+                  <>
+                    <input
+                      id="edit-username"
+                      type="text"
+                      {...register('username')}
+                      placeholder="e.g. vandeth.tho"
+                      className={cn(inputClassName, 'font-mono')}
+                    />
+                    <p className="text-[12.5px] text-text-tertiary mt-1">
+                      Unique identifier to link this employee with BasilBook staff records. Must match the staff name or ID used in your POS system.
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-[13px] text-text-tertiary">
+                    Upgrade to Espresso to link employees with BasilBook for cross-product staff tracking.
+                  </p>
+                )}
               </div>
 
               <div>

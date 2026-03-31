@@ -10,6 +10,7 @@ class ClosurePeriodService
 {
     public function __construct(
         private EntityManagerInterface $em,
+        private NotificationService $notificationService,
     ) {}
 
     public function create(Workspace $workspace, string $name, \DateTimeInterface $startDate, \DateTimeInterface $endDate): ClosurePeriod
@@ -22,6 +23,8 @@ class ClosurePeriodService
 
         $this->em->persist($closure);
         $this->em->flush();
+
+        $this->notificationService->notifyClosureCreated($closure);
 
         return $closure;
     }

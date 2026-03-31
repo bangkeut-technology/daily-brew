@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { cn } from '@/lib/utils';
 
 interface GlassCardProps {
   children: ReactNode;
@@ -6,19 +7,14 @@ interface GlassCardProps {
   hover?: boolean;
 }
 
-export function GlassCard({ children, className = '', hover = true }: GlassCardProps) {
+export function GlassCard({ children, className, hover = true }: GlassCardProps) {
   return (
     <div
-      className={`
-        bg-glass-bg backdrop-blur-md
-        border border-glass-border
-        rounded-2xl
-        shadow-[0_2px_12px_rgba(107,66,38,0.05)]
-        overflow-hidden
-        transition-all duration-200
-        ${hover ? 'hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(107,66,38,0.10)]' : ''}
-        ${className}
-      `}
+      className={cn(
+        'bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl shadow-[0_2px_12px_rgba(107,66,38,0.05)] overflow-hidden transition-all duration-200',
+        hover && 'hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(107,66,38,0.10)]',
+        className,
+      )}
     >
       {children}
     </div>

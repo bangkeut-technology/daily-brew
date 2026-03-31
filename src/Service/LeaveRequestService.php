@@ -20,6 +20,7 @@ class LeaveRequestService
         private EntityManagerInterface $em,
         private ClosurePeriodRepository $closurePeriodRepository,
         private LeaveRequestRepository $leaveRequestRepository,
+        private NotificationService $notificationService,
     ) {}
 
     public function create(
@@ -64,6 +65,8 @@ class LeaveRequestService
         $this->em->persist($leaveRequest);
         $this->em->flush();
 
+        $this->notificationService->notifyLeaveRequestSubmitted($leaveRequest);
+
         return $leaveRequest;
     }
 
@@ -73,6 +76,8 @@ class LeaveRequestService
         $leaveRequest->setReviewedAt(new \DateTimeImmutable());
         $leaveRequest->setReviewedBy($reviewedBy);
         $this->em->flush();
+
+        $this->notificationService->notifyLeaveRequestApproved($leaveRequest);
 
         return $leaveRequest;
     }
@@ -86,6 +91,8 @@ class LeaveRequestService
             $leaveRequest->setReviewNote($reviewNote);
         }
         $this->em->flush();
+
+        $this->notificationService->notifyLeaveRequestRejected($leaveRequest);
 
         return $leaveRequest;
     }

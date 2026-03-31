@@ -15,6 +15,7 @@ class EmployeeService
 {
     public function __construct(
         private EntityManagerInterface $em,
+        private NotificationService $notificationService,
     ) {}
 
     public function create(
@@ -47,6 +48,7 @@ class EmployeeService
         ?Shift $shift,
         ?bool $active = null,
     ): Employee {
+        $previousShift = $employee->getShift();
         $employee->setFirstName($firstName);
         $employee->setLastName($lastName);
         $employee->setPhoneNumber($phoneNumber);
@@ -55,6 +57,10 @@ class EmployeeService
             $employee->setStatus($active ? EmployeeStatusEnum::ACTIVE : EmployeeStatusEnum::INACTIVE);
         }
         $this->em->flush();
+
+        if ($shift !== null && $shift !== $previousShift) {
+            $this->notificationService->notifyShiftAssigned($employee);
+        }
 
         return $employee;
     }

@@ -1,0 +1,17 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block title %}Closure announced{% endblock %}
+
+{% block content %}
+  <h1>Closure announced</h1>
+  <p>A closure has been announced for {{ workspaceName }}. No attendance will be expected during this period.</p>
+
+  <div class="detail-row">
+    <span class="detail-label">Name</span>
+    <span class="detail-value">{{ closureName }}</span>
+  </div>
+  <div class="detail-row">
+    <span class="detail-label">Dates</span>
+    <span class="detail-value">{{ dates }}</span>
+  </div>
+{% endblock %}
