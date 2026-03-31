@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.20.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.19.0...v1.20.0) (2026-03-31)
+
+
+### Features
+
+* **logging:** configure rotating file handlers for improved log management ([7facfb8](https://github.com/bangkeut-technology/daily-brew/commit/7facfb8a298b22fab1dc19107236d644063a8b00))
+
 ## [1.19.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.18.0...v1.19.0) (2026-03-31)
 
 
