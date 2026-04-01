@@ -36,9 +36,9 @@ class CheckinService
         $workspace = $employee->getWorkspace();
         $setting = $workspace?->getSetting();
         $wsTz = new \DateTimeZone($setting?->getTimezone() ?? 'UTC');
-        $nowUtc = new DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $nowUtc = DateService::now();
         $now = $nowUtc->setTimezone($wsTz); // for time comparisons (late/early)
-        $today = new DateTimeImmutable('today', $wsTz);
+        $today = DateService::today($wsTz);
 
         // IP restriction check
         if ($setting !== null && $setting->isIpRestrictionEnabled()) {
@@ -174,7 +174,7 @@ class CheckinService
         $tz = new \DateTimeZone($employee->getWorkspace()?->getSetting()?->getTimezone() ?? 'UTC');
         return $this->attendanceRepository->findByEmployeeAndDate(
             $employee,
-            new DateTimeImmutable('today', $tz)
+            DateService::today($tz)
         );
     }
 

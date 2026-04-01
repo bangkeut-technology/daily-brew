@@ -104,7 +104,7 @@ class SeedReviewerCommand extends Command
         // ── Upgrade to Espresso ──────────────────────────────────
         $subscription = $this->subscriptionRepository->findByWorkspace($workspace);
         $subscription->setPlan(PlanEnum::Espresso);
-        $subscription->setCurrentPeriodEnd(new \DateTime('+1 year'));
+        $subscription->setCurrentPeriodEnd(new \DateTime('+1 year', new \DateTimeZone('UTC')));
         $this->em->flush();
         $io->text('Upgraded to Espresso plan');
 
@@ -179,8 +179,8 @@ class SeedReviewerCommand extends Command
         $closure->setWorkspace($workspace);
         $closure->setName('Khmer New Year');
         $closure->setNameCanonical('khmer new year');
-        $closure->setStartDate(new \DateTime('+30 days'));
-        $closure->setEndDate(new \DateTime('+33 days'));
+        $closure->setStartDate(new \DateTime('+30 days', $utc));
+        $closure->setEndDate(new \DateTime('+33 days', $utc));
         $this->em->persist($closure);
         $io->text('Created closure: Khmer New Year');
 
@@ -268,13 +268,13 @@ class SeedReviewerCommand extends Command
         $leave1->setEmployee($employeeEntities[1]);
         $leave1->setWorkspace($workspace);
         $leave1->setRequestedBy($owner);
-        $leave1->setStartDate(new \DateTimeImmutable('-14 days'));
-        $leave1->setEndDate(new \DateTimeImmutable('-13 days'));
+        $leave1->setStartDate(new \DateTimeImmutable('-14 days', $utc));
+        $leave1->setEndDate(new \DateTimeImmutable('-13 days', $utc));
         $leave1->setReason('Family event');
         $leave1->setType(LeaveTypeEnum::PAID);
         $leave1->setStatus(LeaveRequestStatusEnum::APPROVED);
         $leave1->setReviewedBy($owner);
-        $leave1->setReviewedAt(new \DateTimeImmutable('-15 days'));
+        $leave1->setReviewedAt(new \DateTimeImmutable('-15 days', $utc));
         $this->em->persist($leave1);
 
         // Pending leave (upcoming)
@@ -282,8 +282,8 @@ class SeedReviewerCommand extends Command
         $leave2->setEmployee($employeeEntities[2]);
         $leave2->setWorkspace($workspace);
         $leave2->setRequestedBy($owner);
-        $leave2->setStartDate(new \DateTimeImmutable('+3 days'));
-        $leave2->setEndDate(new \DateTimeImmutable('+4 days'));
+        $leave2->setStartDate(new \DateTimeImmutable('+3 days', $utc));
+        $leave2->setEndDate(new \DateTimeImmutable('+4 days', $utc));
         $leave2->setReason('Medical appointment');
         $leave2->setType(LeaveTypeEnum::PAID);
         $leave2->setStatus(LeaveRequestStatusEnum::PENDING);
@@ -294,13 +294,13 @@ class SeedReviewerCommand extends Command
         $leave3->setEmployee($employeeEntities[4]);
         $leave3->setWorkspace($workspace);
         $leave3->setRequestedBy($owner);
-        $leave3->setStartDate(new \DateTimeImmutable('+1 day'));
-        $leave3->setEndDate(new \DateTimeImmutable('+1 day'));
+        $leave3->setStartDate(new \DateTimeImmutable('+1 day', $utc));
+        $leave3->setEndDate(new \DateTimeImmutable('+1 day', $utc));
         $leave3->setReason('Personal day');
         $leave3->setType(LeaveTypeEnum::UNPAID);
         $leave3->setStatus(LeaveRequestStatusEnum::REJECTED);
         $leave3->setReviewedBy($owner);
-        $leave3->setReviewedAt(new \DateTimeImmutable('-1 day'));
+        $leave3->setReviewedAt(new \DateTimeImmutable('-1 day', $utc));
         $leave3->setReviewNote('Short staffed this week');
         $this->em->persist($leave3);
 

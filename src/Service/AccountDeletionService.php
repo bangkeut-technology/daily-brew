@@ -24,7 +24,7 @@ final readonly class AccountDeletionService
 
     public function softDelete(User $user): void
     {
-        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $now = DateService::now();
 
         // Revoke all refresh tokens before clearing the email
         $this->refreshTokenRepository->revokeByUsername($user->getUserIdentifier());

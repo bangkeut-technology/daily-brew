@@ -186,7 +186,7 @@ class Workspace extends AbstractBaseEntity
     {
         $this->imageFile = $imageFile;
         if (null !== $imageFile) {
-            $this->updatedAt = new DateTimeImmutable();
+            $this->updatedAt = \App\Service\DateService::now();
         }
         return $this;
     }

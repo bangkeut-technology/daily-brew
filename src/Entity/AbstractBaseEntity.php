@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Service\DateService;
 use App\Util\TokenGenerator;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -28,8 +29,8 @@ abstract class AbstractBaseEntity
     public function __construct()
     {
         $this->publicId = TokenGenerator::generatePublicId();
-        $this->createdAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
-        $this->updatedAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $this->createdAt = DateService::now();
+        $this->updatedAt = DateService::now();
     }
 
     public function getId(): ?int
@@ -55,6 +56,6 @@ abstract class AbstractBaseEntity
     #[ORM\PreUpdate]
     public function onPreUpdate(): void
     {
-        $this->updatedAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = DateService::now();
     }
 }

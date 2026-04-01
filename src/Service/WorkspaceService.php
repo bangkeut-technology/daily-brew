@@ -65,7 +65,7 @@ class WorkspaceService
 
     public function delete(Workspace $workspace): void
     {
-        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $now = DateService::now();
 
         // Cancel active subscription before deleting
         $subscription = $this->subscriptionRepository->findByWorkspace($workspace);
@@ -95,7 +95,7 @@ class WorkspaceService
 
         // Mark as canceled locally regardless
         $subscription->setStatus(SubscriptionStatusEnum::Canceled);
-        $subscription->setCanceledAt(new \DateTime('now', new \DateTimeZone('UTC')));
+        $subscription->setCanceledAt(DateService::mutableNow());
     }
 
     private function cancelPaddleSubscription(string $paddleSubscriptionId): void

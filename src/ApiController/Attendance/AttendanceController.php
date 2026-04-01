@@ -36,7 +36,7 @@ class AttendanceController extends AbstractController
 
         $this->denyAccessUnlessGranted(WorkspaceVoter::VIEW, $workspace);
 
-        $from = $request->query->get('from', (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d'));
+        $from = $request->query->get('from', \App\Service\DateService::now()->format('Y-m-d'));
         $to = $request->query->get('to', $from);
 
         $attendances = $attendanceRepository->findByWorkspaceAndDateRange(

@@ -83,7 +83,7 @@ class EmployeeService
     public function delete(Employee $employee): void
     {
         $linkedUser = $employee->getLinkedUser();
-        $employee->setDeletedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
+        $employee->setDeletedAt(DateService::now());
         $employee->setLinkedUser(null);
 
         // Clear currentWorkspace if the deleted employee's user was viewing this workspace

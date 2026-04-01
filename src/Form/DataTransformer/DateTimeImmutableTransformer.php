@@ -35,6 +35,6 @@ class DateTimeImmutableTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value): ?DateTimeImmutable
     {
-        return null === $value ? $value : new DateTimeImmutable($value);
+        return null === $value ? $value : new DateTimeImmutable($value, new \DateTimeZone('UTC'));
     }
 }

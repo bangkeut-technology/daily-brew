@@ -40,7 +40,7 @@ class PasswordResetController extends AbstractController
 
         $token = bin2hex(random_bytes(32));
         $user->setPasswordResetToken($token);
-        $user->setPasswordResetExpiresAt(new \DateTimeImmutable('+1 hour'));
+        $user->setPasswordResetExpiresAt(\App\Service\DateService::relative('+1 hour'));
         $em->flush();
 
         // In production, send email here. In dev mode, return the token.
@@ -78,7 +78,7 @@ class PasswordResetController extends AbstractController
             return $this->jsonError('Invalid or expired reset token', 400);
         }
 
-        if ($user->getPasswordResetExpiresAt() < new \DateTimeImmutable('now', new \DateTimeZone('UTC'))) {
+        if ($user->getPasswordResetExpiresAt() < \App\Service\DateService::now()) {
             $user->setPasswordResetToken(null);
             $user->setPasswordResetExpiresAt(null);
             $em->flush();

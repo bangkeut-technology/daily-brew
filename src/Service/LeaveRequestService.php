@@ -73,7 +73,7 @@ class LeaveRequestService
     public function approve(LeaveRequest $leaveRequest, ?User $reviewedBy = null): LeaveRequest
     {
         $leaveRequest->setStatus(LeaveRequestStatusEnum::APPROVED);
-        $leaveRequest->setReviewedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
+        $leaveRequest->setReviewedAt(DateService::now());
         $leaveRequest->setReviewedBy($reviewedBy);
         $this->em->flush();
 
@@ -85,7 +85,7 @@ class LeaveRequestService
     public function reject(LeaveRequest $leaveRequest, ?User $reviewedBy = null, ?string $reviewNote = null): LeaveRequest
     {
         $leaveRequest->setStatus(LeaveRequestStatusEnum::REJECTED);
-        $leaveRequest->setReviewedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
+        $leaveRequest->setReviewedAt(DateService::now());
         $leaveRequest->setReviewedBy($reviewedBy);
         if ($reviewNote !== null) {
             $leaveRequest->setReviewNote($reviewNote);
