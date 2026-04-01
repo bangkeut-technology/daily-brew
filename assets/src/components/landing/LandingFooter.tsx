@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 
 const productLinks = [
   { label: 'Features', to: '/features' },
+  { label: 'How it works', to: '/how-it-works' },
   { label: 'Pricing', to: '/pricing' },
   { label: 'FAQ', to: '/faq' },
   { label: 'Support', to: '/support' },

@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
+import { PageSeo } from '@/components/shared/PageSeo';
 
 export const Route = createFileRoute('/privacy')({
   component: PrivacyPage,
@@ -9,6 +10,11 @@ export const Route = createFileRoute('/privacy')({
 function PrivacyPage() {
   return (
     <div className="min-h-screen flex flex-col">
+      <PageSeo
+        title="Privacy policy"
+        description="How DailyBrew collects, uses, and protects your data. Learn about our privacy practices for attendance tracking, notifications, and payment processing."
+        path="/privacy"
+      />
       <LandingNav />
       <main className="flex-1 pt-28 pb-16 px-6 md:px-8 max-w-3xl mx-auto w-full page-enter">
         <h1 className="text-[30px] font-semibold text-text-primary font-serif mb-2">

@@ -2,10 +2,12 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
 import {
   QrCode, Users, Clock, Coffee, Shield, LayoutDashboard,
-  MapPin, CalendarDays, Bell, ChevronRight, Crown,
+  MapPin, CalendarDays, Bell, ChevronRight, Crown, Smartphone,
+  Globe, Moon, Zap, CheckCircle,
 } from 'lucide-react';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
+import { PageSeo } from '@/components/shared/PageSeo';
 
 export const Route = createFileRoute('/features')({
   component: FeaturesPage,
@@ -15,32 +17,38 @@ const coreFeatures = [
   {
     icon: <QrCode size={28} strokeWidth={1.6} />,
     title: 'QR code check-in',
-    desc: 'Each employee gets a unique QR code. Staff scan with any phone browser — no app needed, no login required. One tap to check in, one tap to check out.',
+    desc: 'Display one QR code at your restaurant. Staff scan it from the DailyBrew app to check in and out — no extra hardware needed.',
     accent: '#C17F3B',
   },
   {
     icon: <Users size={28} strokeWidth={1.6} />,
     title: 'Employee management',
-    desc: 'Add staff, assign them to shifts, generate QR codes, and track their attendance history in one place. Active/inactive status management.',
+    desc: 'Add staff, assign them to shifts, and track their attendance history. Manage active and inactive employees from one screen.',
     accent: '#4A7C59',
   },
   {
     icon: <Clock size={28} strokeWidth={1.6} />,
     title: 'Shift tracking',
-    desc: 'Define morning, evening, or custom shifts with start and end times. Late arrivals and early departures are detected automatically with configurable grace periods.',
+    desc: 'Define morning, evening, or custom shifts with start and end times. Late arrivals and early departures are flagged automatically with configurable grace periods.',
     accent: '#3B6FA0',
   },
   {
     icon: <Coffee size={28} strokeWidth={1.6} />,
     title: 'Closure periods',
-    desc: 'Mark holidays, renovations, or any days your restaurant is closed. No attendance is expected — no false absences during closures.',
+    desc: 'Mark holidays, renovations, or any days your restaurant is closed. Attendance is paused automatically — no false absences.',
     accent: '#9B6B45',
   },
   {
     icon: <LayoutDashboard size={28} strokeWidth={1.6} />,
     title: 'Real-time dashboard',
-    desc: 'See who\'s present, late, on leave, or absent at a glance. Today\'s stats and recent attendance in one beautiful view.',
+    desc: 'See who is present, late, on leave, or absent at a glance. Owner and employee dashboards with live stats and recent history.',
     accent: '#6B4226',
+  },
+  {
+    icon: <Globe size={28} strokeWidth={1.6} />,
+    title: 'Multi-language',
+    desc: 'Available in English, French, and Khmer. Staff can use the app in the language they are most comfortable with.',
+    accent: '#4A7C59',
   },
 ];
 
@@ -48,13 +56,19 @@ const espressoFeatures = [
   {
     icon: <Shield size={28} strokeWidth={1.6} />,
     title: 'IP restriction',
-    desc: 'Only allow check-ins from specific IP addresses — like your restaurant\'s WiFi. Prevents staff from checking in remotely.',
+    desc: 'Only allow check-ins from specific IP addresses — like your restaurant WiFi. Prevent staff from checking in remotely. "Use my current IP" button for easy setup.',
     accent: '#C0392B',
+  },
+  {
+    icon: <Smartphone size={28} strokeWidth={1.6} />,
+    title: 'Device verification',
+    desc: 'Bind check-in and check-out to a single device per employee per day. Prevents buddy punching — if someone checks in on their phone, they must check out on the same phone.',
+    accent: '#9B6B45',
   },
   {
     icon: <MapPin size={28} strokeWidth={1.6} />,
     title: 'Geofencing',
-    desc: 'Set a GPS location and radius for your restaurant. Staff must be physically nearby to check in. Configurable from 50m to 500m.',
+    desc: 'Set a GPS location and radius for your restaurant. Staff must be physically within range to check in. Configurable radius to match your venue.',
     accent: '#7C5C9B',
   },
   {
@@ -66,7 +80,7 @@ const espressoFeatures = [
   {
     icon: <Users size={28} strokeWidth={1.6} />,
     title: 'Leave request management',
-    desc: 'Staff submit leave requests. Owners approve or reject with a note. Track paid vs unpaid leave with full history.',
+    desc: 'Employees submit leave requests (paid or unpaid, full or partial day). Owners approve or reject with a note. Full history and status tracking.',
     accent: '#4A7C59',
   },
   {
@@ -77,9 +91,23 @@ const espressoFeatures = [
   },
 ];
 
+const whyReasons = [
+  { icon: <Zap size={18} />, text: 'Set up in under 5 minutes' },
+  { icon: <QrCode size={18} />, text: 'No hardware — just a printed QR code' },
+  { icon: <Smartphone size={18} />, text: 'Works on any smartphone' },
+  { icon: <Moon size={18} />, text: 'Dark mode for late shifts' },
+  { icon: <Globe size={18} />, text: 'English, French, and Khmer' },
+  { icon: <CheckCircle size={18} />, text: 'Free for up to 10 employees' },
+];
+
 function FeaturesPage() {
   return (
     <div className="min-h-screen">
+      <PageSeo
+        title="Features"
+        description="QR check-in, shift tracking, geofencing, device verification, leave management, and push notifications. Everything your restaurant needs for staff attendance."
+        path="/features"
+      />
       <LandingNav />
 
       <div className="pt-28 pb-20 px-6 md:px-8 max-w-5xl mx-auto page-enter">
@@ -97,7 +125,8 @@ function FeaturesPage() {
             Everything you need to track attendance
           </h1>
           <p className="text-[17px] text-text-secondary mt-4 max-w-xl mx-auto">
-            From QR check-in to geofencing — simple tools that work for restaurants of any size.
+            From QR check-in to geofencing — simple tools that work for
+            restaurants of any size.
           </p>
         </motion.div>
 
@@ -126,17 +155,58 @@ function FeaturesPage() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
           >
-            <Crown size={16} className="text-amber" />
-            <h2 className="text-[13px] uppercase tracking-[2px] font-medium text-amber">
-              Espresso features
-            </h2>
+            <div className="flex-1 h-px bg-cream-3 hidden md:block" />
+            <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber/8 border border-amber/15">
+              <Crown size={14} className="text-amber" />
+              <h2 className="text-[13px] uppercase tracking-[2px] font-medium text-amber">
+                Espresso plan
+              </h2>
+            </div>
+            <div className="flex-1 h-px bg-cream-3 hidden md:block" />
           </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {espressoFeatures.map((f, i) => (
               <FeatureCard key={f.title} feature={f} index={i} espresso />
             ))}
           </div>
         </div>
+
+        {/* Why DailyBrew */}
+        <motion.div
+          className="mb-20 bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-8 md:p-10 shadow-[0_2px_12px_rgba(107,66,38,0.05)]"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="text-center mb-8">
+            <h2 className="text-[24px] font-semibold text-text-primary font-serif mb-2">
+              Why restaurant teams choose DailyBrew
+            </h2>
+            <p className="text-[15px] text-text-secondary">
+              Built specifically for restaurants, cafes, and small teams.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {whyReasons.map((r, i) => (
+              <motion.div
+                key={r.text}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl bg-cream/40 dark:bg-cream/5"
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.3, delay: i * 0.05 }}
+              >
+                <div className="w-8 h-8 rounded-lg bg-coffee/10 flex items-center justify-center text-coffee flex-shrink-0">
+                  {r.icon}
+                </div>
+                <span className="text-[14.5px] text-text-primary font-medium">
+                  {r.text}
+                </span>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
 
         {/* CTA */}
         <motion.div
@@ -151,7 +221,7 @@ function FeaturesPage() {
           <p className="text-[16px] text-text-secondary mb-6">
             Free for up to 10 employees. No credit card required.
           </p>
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               to="/sign-up"
               className="btn-shimmer flex items-center gap-1.5 px-6 py-2.5 rounded-lg text-[15px] font-semibold text-white no-underline transition-all hover:-translate-y-px"
@@ -163,7 +233,13 @@ function FeaturesPage() {
               to="/pricing"
               className="px-6 py-2.5 rounded-lg text-[15px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 no-underline transition-all hover:bg-cream-3"
             >
-              View pricing
+              Compare plans
+            </Link>
+            <Link
+              to="/how-it-works"
+              className="px-6 py-2.5 rounded-lg text-[15px] font-medium text-text-secondary no-underline transition-all hover:text-coffee"
+            >
+              See how it works
             </Link>
           </div>
         </motion.div>
@@ -189,7 +265,7 @@ function FeatureCard({
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.4, delay: index * 0.08 }}
+      transition={{ duration: 0.4, delay: (index % 3) * 0.08 }}
     >
       {/* Accent bar */}
       <div

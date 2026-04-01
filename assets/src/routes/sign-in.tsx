@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LogoBrand } from '@/components/shared/Logo';
+import { PageSeo } from '@/components/shared/PageSeo';
 import { motion } from 'framer-motion';
 
 const signInSchema = z.object({
@@ -82,6 +83,11 @@ function SignInPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-6 py-12 relative overflow-hidden">
+      <PageSeo
+        title="Sign in"
+        description="Sign in to DailyBrew to manage your restaurant staff attendance, shifts, and leave requests."
+        path="/sign-in"
+      />
       {/* Background gradient orbs */}
       <div className="absolute inset-0 pointer-events-none">
         <motion.div

@@ -7,6 +7,7 @@ import { LogoBrand } from '@/components/shared/Logo';
 
 const navLinks = [
   { label: 'Features', href: '/features' },
+  { label: 'How it works', href: '/how-it-works' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Support', href: '/support' },
   { label: 'FAQ', href: '/faq' },

@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
+import { PageSeo } from '@/components/shared/PageSeo';
 import { Trash2, ShieldCheck, Mail } from 'lucide-react';
 
 export const Route = createFileRoute('/delete-account')({
@@ -10,6 +11,11 @@ export const Route = createFileRoute('/delete-account')({
 function DeleteAccountPage() {
   return (
     <div className="min-h-screen flex flex-col">
+      <PageSeo
+        title="Delete your account"
+        description="Request deletion of your DailyBrew account and all associated data including attendance records, workspaces, and employee profiles."
+        path="/delete-account"
+      />
       <LandingNav />
       <main className="flex-1 pt-28 pb-16 px-6 md:px-8 max-w-3xl mx-auto w-full page-enter">
         <h1 className="text-[30px] font-semibold text-text-primary font-serif mb-2">

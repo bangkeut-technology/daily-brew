@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
+import { PageSeo } from '@/components/shared/PageSeo';
 
 export const Route = createFileRoute('/terms')({
   component: TermsPage,
@@ -9,6 +10,11 @@ export const Route = createFileRoute('/terms')({
 function TermsPage() {
   return (
     <div className="min-h-screen flex flex-col">
+      <PageSeo
+        title="Terms of use"
+        description="Terms governing the use of DailyBrew, including subscription plans, QR check-in, data handling, and account responsibilities."
+        path="/terms"
+      />
       <LandingNav />
       <main className="flex-1 pt-28 pb-16 px-6 md:px-8 max-w-3xl mx-auto w-full page-enter">
         <h1 className="text-[30px] font-semibold text-text-primary font-serif mb-2">

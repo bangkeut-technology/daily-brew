@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { PricingSection } from '@/components/landing/PricingSection';
 import { LandingFooter } from '@/components/landing/LandingFooter';
+import { PageSeo } from '@/components/shared/PageSeo';
 import { cn } from '@/lib/utils';
 
 export const Route = createFileRoute('/pricing')({
@@ -138,6 +139,11 @@ function FaqItem({
 function PricingPage() {
   return (
     <div className="min-h-screen flex flex-col">
+      <PageSeo
+        title="Pricing"
+        description="DailyBrew plans start free for up to 10 employees. Espresso at $12.99/month adds geofencing, device verification, and leave management. Double Espresso for unlimited staff."
+        path="/pricing"
+      />
       <LandingNav />
 
       <main className="page-enter pt-20">

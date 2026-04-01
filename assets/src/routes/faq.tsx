@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
+import { PageSeo } from '@/components/shared/PageSeo';
 
 export const Route = createFileRoute('/faq')({
   component: FaqPage,
@@ -170,6 +171,11 @@ function AccordionItem({
 function FaqPage() {
   return (
     <div className="min-h-screen flex flex-col">
+      <PageSeo
+        title="FAQ"
+        description="Frequently asked questions about DailyBrew. Learn about QR check-in, shifts, leave requests, pricing, and how to get started with attendance tracking."
+        path="/faq"
+      />
       <LandingNav />
 
       <main className="page-enter pt-20">

@@ -15,6 +15,7 @@ import {
 import { motion } from 'framer-motion';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
+import { PageSeo } from '@/components/shared/PageSeo';
 import { cn } from '@/lib/utils';
 
 export const Route = createFileRoute('/support')({
@@ -94,6 +95,12 @@ function SupportPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <LandingNav />
+
+      <PageSeo
+        title="Support"
+        description="Get help with DailyBrew. Contact our team, browse guides, or submit feature requests for your restaurant attendance tracking."
+        path="/support"
+      />
 
       <main className="page-enter pt-20">
         {/* Hero */}
