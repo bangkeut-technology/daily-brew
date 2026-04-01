@@ -33,34 +33,38 @@ export const Route = createFileRoute('/console/settings')({
   component: SettingsPage,
 });
 
-const TIMEZONE_OPTIONS = [
-  { value: 'Pacific/Honolulu', label: 'Hawaii (UTC-10)' },
-  { value: 'America/Anchorage', label: 'Alaska (UTC-9)' },
-  { value: 'America/Los_Angeles', label: 'Pacific Time (UTC-8)' },
-  { value: 'America/Denver', label: 'Mountain Time (UTC-7)' },
-  { value: 'America/Chicago', label: 'Central Time (UTC-6)' },
-  { value: 'America/New_York', label: 'Eastern Time (UTC-5)' },
-  { value: 'America/Sao_Paulo', label: 'Brasilia (UTC-3)' },
-  { value: 'Atlantic/Reykjavik', label: 'Iceland (UTC+0)' },
-  { value: 'Europe/London', label: 'London (UTC+0)' },
-  { value: 'Europe/Paris', label: 'Paris (UTC+1)' },
-  { value: 'Europe/Berlin', label: 'Berlin (UTC+1)' },
-  { value: 'Europe/Istanbul', label: 'Istanbul (UTC+3)' },
-  { value: 'Asia/Dubai', label: 'Dubai (UTC+4)' },
-  { value: 'Asia/Kolkata', label: 'India (UTC+5:30)' },
-  { value: 'Asia/Dhaka', label: 'Dhaka (UTC+6)' },
-  { value: 'Asia/Bangkok', label: 'Bangkok (UTC+7)' },
-  { value: 'Asia/Phnom_Penh', label: 'Phnom Penh (UTC+7)' },
-  { value: 'Asia/Ho_Chi_Minh', label: 'Ho Chi Minh (UTC+7)' },
-  { value: 'Asia/Singapore', label: 'Singapore (UTC+8)' },
-  { value: 'Asia/Shanghai', label: 'China (UTC+8)' },
-  { value: 'Asia/Hong_Kong', label: 'Hong Kong (UTC+8)' },
-  { value: 'Asia/Taipei', label: 'Taipei (UTC+8)' },
-  { value: 'Asia/Seoul', label: 'Seoul (UTC+9)' },
-  { value: 'Asia/Tokyo', label: 'Tokyo (UTC+9)' },
-  { value: 'Australia/Sydney', label: 'Sydney (UTC+11)' },
-  { value: 'Pacific/Auckland', label: 'Auckland (UTC+12)' },
-];
+function buildTimezoneOptions(): { value: string; label: string }[] {
+  const now = new Date();
+  const zones = typeof Intl.supportedValuesOf === 'function'
+    ? Intl.supportedValuesOf('timeZone')
+    : [
+        'Pacific/Honolulu', 'America/Anchorage', 'America/Los_Angeles', 'America/Denver',
+        'America/Chicago', 'America/New_York', 'America/Sao_Paulo', 'Atlantic/Reykjavik',
+        'Europe/London', 'Europe/Paris', 'Europe/Berlin', 'Europe/Istanbul', 'Asia/Dubai',
+        'Asia/Kolkata', 'Asia/Dhaka', 'Asia/Bangkok', 'Asia/Phnom_Penh', 'Asia/Ho_Chi_Minh',
+        'Asia/Singapore', 'Asia/Shanghai', 'Asia/Hong_Kong', 'Asia/Taipei', 'Asia/Seoul',
+        'Asia/Tokyo', 'Australia/Sydney', 'Pacific/Auckland',
+      ];
+
+  return zones
+    .map((tz) => {
+      const formatted = now.toLocaleString('en-US', { timeZone: tz, timeZoneName: 'shortOffset' });
+      const m = formatted.match(/GMT([+-])(\d{1,2})(?::(\d{2}))?$/);
+      const offsetMin = m
+        ? (m[1] === '+' ? 1 : -1) * (parseInt(m[2]) * 60 + parseInt(m[3] || '0'))
+        : 0;
+      const sign = offsetMin >= 0 ? '+' : '-';
+      const absH = Math.floor(Math.abs(offsetMin) / 60);
+      const absM = Math.abs(offsetMin) % 60;
+      const utc = absM ? `UTC${sign}${absH}:${String(absM).padStart(2, '0')}` : `UTC${sign}${absH}`;
+      const city = tz.split('/').pop()!.replace(/_/g, ' ');
+      return { value: tz, label: `${city} (${utc})`, _offsetMin: offsetMin };
+    })
+    .sort((a, b) => a._offsetMin - b._offsetMin || a.label.localeCompare(b.label))
+    .map(({ value, label }) => ({ value, label }));
+}
+
+const TIMEZONE_OPTIONS = buildTimezoneOptions();
 
 function SettingsPage() {
   const { t } = useTranslation();

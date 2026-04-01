@@ -42,12 +42,13 @@ class WorkspaceController extends AbstractController
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
         $name = $data['name'] ?? '';
+        $timezone = $data['timezone'] ?? null;
 
         if (empty($name)) {
             return $this->jsonError('Name is required');
         }
 
-        $workspace = $workspaceService->create($user, $name);
+        $workspace = $workspaceService->create($user, $name, $timezone);
 
         return $this->jsonCreated([
             'publicId' => (string) $workspace->getPublicId(),

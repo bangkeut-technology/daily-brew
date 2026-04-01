@@ -98,18 +98,20 @@ class SeedReviewerCommand extends Command
         $io->text('Upgraded to Espresso plan');
 
         // ── Shifts ───────────────────────────────────────────────
+        $tz = new \DateTimeZone('Asia/Phnom_Penh');
+
         $morningShift = $this->shiftService->create(
             $workspace,
             'Morning',
-            new \DateTime('07:00'),
-            new \DateTime('15:00'),
+            new \DateTime('07:00', $tz),
+            new \DateTime('15:00', $tz),
         );
 
         $eveningShift = $this->shiftService->create(
             $workspace,
             'Evening',
-            new \DateTime('15:00'),
-            new \DateTime('23:00'),
+            new \DateTime('15:00', $tz),
+            new \DateTime('23:00', $tz),
         );
         $io->text('Created shifts: Morning (07:00–15:00), Evening (15:00–23:00)');
 
@@ -173,7 +175,6 @@ class SeedReviewerCommand extends Command
 
         // ── Attendance records (last 7 days) ─────────────────────
         $attendanceCount = 0;
-        $tz = new \DateTimeZone('Asia/Phnom_Penh');
 
         for ($d = 6; $d >= 0; $d--) {
             $date = new \DateTimeImmutable("-{$d} days", $tz);

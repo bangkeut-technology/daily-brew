@@ -27,7 +27,8 @@ export function useCreateWorkspace() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (name: string) => {
-      const { data } = await apiAxios.post<Workspace>('/workspaces', { name });
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const { data } = await apiAxios.post<Workspace>('/workspaces', { name, timezone });
       return data;
     },
     onSuccess: () => {

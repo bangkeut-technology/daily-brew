@@ -16,7 +16,7 @@ class WorkspaceService
         private EntityManagerInterface $em,
     ) {}
 
-    public function create(User $owner, string $name): Workspace
+    public function create(User $owner, string $name, ?string $timezone = null): Workspace
     {
         $workspace = new Workspace();
         $workspace->setName($name);
@@ -24,6 +24,11 @@ class WorkspaceService
 
         $setting = new WorkspaceSetting();
         $setting->setWorkspace($workspace);
+
+        if ($timezone !== null && \in_array($timezone, \DateTimeZone::listIdentifiers(), true)) {
+            $setting->setTimezone($timezone);
+        }
+
         $workspace->setSetting($setting);
 
         $subscription = new Subscription();
