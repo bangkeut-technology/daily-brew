@@ -10,6 +10,7 @@ use App\Entity\LeaveRequest;
 use App\Enum\LeaveRequestStatusEnum;
 use App\Enum\LeaveTypeEnum;
 use App\Repository\UserRepository;
+use App\Repository\WorkspaceRepository;
 use App\Service\AuthService;
 use App\Service\EmployeeService;
 use App\Service\ShiftService;
@@ -18,6 +19,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -34,6 +36,7 @@ class SeedReviewerCommand extends Command
     public function __construct(
         private EntityManagerInterface $em,
         private UserRepository $userRepository,
+        private WorkspaceRepository $workspaceRepository,
         private AuthService $authService,
         private WorkspaceService $workspaceService,
         private ShiftService $shiftService,
@@ -42,16 +45,26 @@ class SeedReviewerCommand extends Command
         parent::__construct();
     }
 
+    protected function configure(): void
+    {
+        $this->addOption('fresh', null, InputOption::VALUE_NONE, 'Delete existing reviewer data and re-seed');
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+        $fresh = $input->getOption('fresh');
 
-        // Abort if the reviewer account already exists
         $existing = $this->userRepository->findByEmail(self::OWNER_EMAIL);
-        if ($existing !== null) {
-            $io->warning('Reviewer account already exists (' . self::OWNER_EMAIL . '). Skipping.');
 
-            return Command::SUCCESS;
+        if ($existing !== null) {
+            if (!$fresh) {
+                $io->warning('Reviewer account already exists. Run with --fresh to re-seed.');
+
+                return Command::SUCCESS;
+            }
+
+            $this->purgeReviewerData($existing, $io);
         }
 
         // ── Owner account ────────────────────────────────────────
@@ -109,8 +122,8 @@ class SeedReviewerCommand extends Command
         $closure->setWorkspace($workspace);
         $closure->setName('Khmer New Year');
         $closure->setNameCanonical('khmer new year');
-        $closure->setStartDate(new \DateTimeImmutable('+30 days'));
-        $closure->setEndDate(new \DateTimeImmutable('+33 days'));
+        $closure->setStartDate(new \DateTime('+30 days'));
+        $closure->setEndDate(new \DateTime('+33 days'));
         $this->em->persist($closure);
         $io->text('Created closure: Khmer New Year');
 
@@ -248,5 +261,51 @@ class SeedReviewerCommand extends Command
         );
 
         return Command::SUCCESS;
+    }
+
+    private function purgeReviewerData(\App\Entity\User $user, SymfonyStyle $io): void
+    {
+        $io->text('Purging existing reviewer data...');
+
+        $conn = $this->em->getConnection();
+        $userId = $user->getId();
+
+        // Clear currentWorkspace FK on the user first
+        $conn->executeStatement('UPDATE daily_brew_users SET current_workspace_id = NULL WHERE id = ?', [$userId]);
+
+        // Find all workspaces owned by this user
+        $wsIds = $conn->fetchFirstColumn('SELECT id FROM daily_brew_workspaces WHERE owner_id = ?', [$userId]);
+
+        foreach ($wsIds as $wsId) {
+            $conn->executeStatement('DELETE FROM daily_brew_leave_requests WHERE workspace_id = ?', [$wsId]);
+            $conn->executeStatement('DELETE FROM daily_brew_attendances WHERE workspace_id = ?', [$wsId]);
+            $conn->executeStatement('DELETE FROM daily_brew_closure_periods WHERE workspace_id = ?', [$wsId]);
+            $conn->executeStatement(
+                'DELETE FROM daily_brew_shift_time_rules WHERE shift_id IN (SELECT id FROM daily_brew_shifts WHERE workspace_id = ?)',
+                [$wsId],
+            );
+            $conn->executeStatement('DELETE FROM daily_brew_shifts WHERE workspace_id = ?', [$wsId]);
+            $conn->executeStatement('DELETE FROM daily_brew_employees WHERE workspace_id = ?', [$wsId]);
+            $conn->executeStatement('DELETE FROM daily_brew_subscriptions WHERE workspace_id = ?', [$wsId]);
+            $conn->executeStatement('DELETE FROM daily_brew_workspace_settings WHERE workspace_id = ?', [$wsId]);
+            $conn->executeStatement('DELETE FROM daily_brew_workspaces WHERE id = ?', [$wsId]);
+        }
+
+        $this->safeDelete($conn, 'DELETE FROM daily_brew_device_tokens WHERE user_id = ?', [$userId]);
+        $this->safeDelete($conn, 'DELETE FROM daily_brew_refresh_tokens WHERE username = ?', [self::OWNER_EMAIL]);
+        $conn->executeStatement('DELETE FROM daily_brew_users WHERE id = ?', [$userId]);
+
+        $this->em->clear();
+
+        $io->text('Purged existing reviewer data');
+    }
+
+    private function safeDelete(\Doctrine\DBAL\Connection $conn, string $sql, array $params): void
+    {
+        try {
+            $conn->executeStatement($sql, $params);
+        } catch (\Doctrine\DBAL\Exception\TableNotFoundException) {
+            // Table not yet migrated — skip
+        }
     }
 }
