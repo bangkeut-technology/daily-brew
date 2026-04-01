@@ -191,7 +191,7 @@ class LeaveRequestController extends AbstractController
             }
         }
 
-        $leaveRequest->setDeletedAt(new \DateTimeImmutable());
+        $leaveRequest->setDeletedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
         $em->flush();
 
         return $this->jsonSuccess(null, 204);

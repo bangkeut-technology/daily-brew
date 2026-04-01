@@ -15,6 +15,7 @@ final readonly class AccountDeletionService
 {
     public function __construct(
         private EntityManagerInterface  $em,
+        private WorkspaceService        $workspaceService,
         private WorkspaceRepository     $workspaceRepository,
         private EmployeeRepository      $employeeRepository,
         private LeaveRequestRepository  $leaveRequestRepository,
@@ -23,19 +24,15 @@ final readonly class AccountDeletionService
 
     public function softDelete(User $user): void
     {
-        $now = new \DateTimeImmutable();
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
 
         // Revoke all refresh tokens before clearing the email
         $this->refreshTokenRepository->revokeByUsername($user->getUserIdentifier());
 
-        // Soft-delete owned workspaces and their employees
+        // Soft-delete owned workspaces (cancels subscriptions + employees)
         $ownedWorkspaces = $this->workspaceRepository->findByOwner($user);
         foreach ($ownedWorkspaces as $workspace) {
-            foreach ($workspace->getEmployees() as $employee) {
-                $employee->setDeletedAt($now);
-                $employee->setLinkedUser(null);
-            }
-            $workspace->setDeletedAt($now);
+            $this->workspaceService->delete($workspace);
         }
 
         // Soft-delete any remaining employees created by this user

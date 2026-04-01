@@ -153,7 +153,7 @@ class Subscription extends AbstractBaseEntity
         if (!$this->isTrialing() || $this->trialEndsAt === null) {
             return null;
         }
-        $now = new \DateTimeImmutable();
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
         $diff = $now->diff($this->trialEndsAt);
         return $diff->invert ? 0 : $diff->days + 1;
     }

@@ -78,7 +78,7 @@ class PasswordResetController extends AbstractController
             return $this->jsonError('Invalid or expired reset token', 400);
         }
 
-        if ($user->getPasswordResetExpiresAt() < new \DateTimeImmutable()) {
+        if ($user->getPasswordResetExpiresAt() < new \DateTimeImmutable('now', new \DateTimeZone('UTC'))) {
             $user->setPasswordResetToken(null);
             $user->setPasswordResetExpiresAt(null);
             $em->flush();

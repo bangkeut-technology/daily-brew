@@ -38,6 +38,7 @@ services:
             $appleIosClientId:             '%apple_ios_client_id%'
             $kernelEnvironment:            '%kernel.environment%'
             $paddleEnvironment:            '%paddle_environment%'
+            $paddleApiKey:                 '%paddle_api_key%'
             $paddleClientSideToken:        '%paddle_client_side_token%'
             $paddlePriceIdEspressoMonthly: '%paddle_price_id_espresso_monthly%'
             $paddlePriceIdEspressoAnnual:  '%paddle_price_id_espresso_annual%'

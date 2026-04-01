@@ -8,12 +8,22 @@ use App\Entity\Subscription;
 use App\Entity\User;
 use App\Entity\Workspace;
 use App\Entity\WorkspaceSetting;
+use App\Enum\SubscriptionSourceEnum;
+use App\Enum\SubscriptionStatusEnum;
+use App\Repository\SubscriptionRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class WorkspaceService
 {
     public function __construct(
         private EntityManagerInterface $em,
+        private SubscriptionRepository $subscriptionRepository,
+        private HttpClientInterface $httpClient,
+        private LoggerInterface $logger,
+        private string $paddleApiKey,
+        private string $paddleEnvironment,
     ) {}
 
     public function create(User $owner, string $name, ?string $timezone = null): Workspace
@@ -55,7 +65,13 @@ class WorkspaceService
 
     public function delete(Workspace $workspace): void
     {
-        $now = new \DateTimeImmutable();
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+
+        // Cancel active subscription before deleting
+        $subscription = $this->subscriptionRepository->findByWorkspace($workspace);
+        if ($subscription !== null && $subscription->isActive()) {
+            $this->cancelSubscription($subscription);
+        }
 
         // Soft-delete all employees in this workspace
         foreach ($workspace->getEmployees() as $employee) {
@@ -65,5 +81,44 @@ class WorkspaceService
 
         $workspace->setDeletedAt($now);
         $this->em->flush();
+    }
+
+    private function cancelSubscription(Subscription $subscription): void
+    {
+        // Cancel via Paddle API if it's a paid Paddle subscription
+        if (
+            $subscription->getSource() === SubscriptionSourceEnum::Paddle
+            && $subscription->getPaddleSubscriptionId() !== null
+        ) {
+            $this->cancelPaddleSubscription($subscription->getPaddleSubscriptionId());
+        }
+
+        // Mark as canceled locally regardless
+        $subscription->setStatus(SubscriptionStatusEnum::Canceled);
+        $subscription->setCanceledAt(new \DateTime('now', new \DateTimeZone('UTC')));
+    }
+
+    private function cancelPaddleSubscription(string $paddleSubscriptionId): void
+    {
+        $baseUrl = $this->paddleEnvironment === 'sandbox'
+            ? 'https://sandbox-api.paddle.com'
+            : 'https://api.paddle.com';
+
+        try {
+            $this->httpClient->request('POST', $baseUrl . '/subscriptions/' . $paddleSubscriptionId . '/cancel', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->paddleApiKey,
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => [
+                    'effective_from' => 'immediately',
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            $this->logger->error('Failed to cancel Paddle subscription: ' . $e->getMessage(), [
+                'paddleSubscriptionId' => $paddleSubscriptionId,
+            ]);
+            // Don't block workspace deletion if Paddle API fails
+        }
     }
 }

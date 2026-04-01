@@ -111,7 +111,7 @@ class RevenueCatWebhookService
         if ($subscription === null) return;
 
         $subscription->setStatus(SubscriptionStatusEnum::Canceled);
-        $subscription->setCanceledAt(new \DateTimeImmutable());
+        $subscription->setCanceledAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
         $this->subscriptionRepository->flush();
     }
 

@@ -114,7 +114,7 @@ class PaddleWebhookService
         if ($subscription === null) return;
 
         $subscription->setStatus(SubscriptionStatusEnum::Canceled);
-        $subscription->setCanceledAt(new \DateTime());
+        $subscription->setCanceledAt(new \DateTime('now', new \DateTimeZone('UTC')));
         $this->em->flush();
     }
 
