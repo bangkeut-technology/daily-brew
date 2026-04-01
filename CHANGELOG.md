@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.22.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.21.0...v1.22.0) (2026-04-01)
+
+
+### Features
+
+* add account deletion page and seed reviewer command ([ca4b6c1](https://github.com/bangkeut-technology/daily-brew/commit/ca4b6c120695b97a3184c463030d072fb183ba3b))
+* **onboarding:** enhance role selection with skip option and refactor sign-in flow ([01dcc7b](https://github.com/bangkeut-technology/daily-brew/commit/01dcc7bd7a8a7c7d1f91e221ca7857ba72defb81))
+* **routes:** add "How it works" page and SEO meta management ([110ebe1](https://github.com/bangkeut-technology/daily-brew/commit/110ebe157e2a0f78982c114ad80261004b60f1ec))
+* **seed-reviewer:** add `--fresh` option and implement reviewer data purge ([11bf3f7](https://github.com/bangkeut-technology/daily-brew/commit/11bf3f72bdf09d1a69bfa3f20fb5c7c48fd0d178))
+
 ## [1.21.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.20.0...v1.21.0) (2026-03-31)
 
 
