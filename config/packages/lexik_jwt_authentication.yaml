@@ -6,7 +6,7 @@ lexik_jwt_authentication:
     remove_token_from_body_when_cookies_used: false
     set_cookies:
         BEARER:
-            lifetime: null
+            lifetime: 2592000
             samesite: lax
             path: /
             httpOnly: true
