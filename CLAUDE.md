@@ -25,7 +25,7 @@ Symfony backend + React frontend (Symfony Webpack Encore).
 
 Any request to add the above should be deferred to a future milestone.
 
-### Espresso Plan ($12.99/month · $129/year)
+### Espresso Plan ($14.99/month · $149/year)
 - Up to 20 employees (free = 10 max)
 - IP restriction for check-in
 - Device verification for check-in (same device for in/out, prevent double check-in)
