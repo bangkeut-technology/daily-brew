@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.27.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.26.0...v1.27.0) (2026-04-01)
+
+
+### Features
+
+* **workspaces:** enhance timezone handling across services and documentation ([249e2e3](https://github.com/bangkeut-technology/daily-brew/commit/249e2e3d435fa43700c784011a4eb37798b72cb9))
+
 ## [1.26.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.25.0...v1.26.0) (2026-04-01)
 
 
