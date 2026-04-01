@@ -25,7 +25,7 @@ DailyBrew helps restaurant owners manage their team's daily attendance through Q
 
 ## Plans
 
-| Feature                       | Free     | Espresso ($12.99/mo) | Double Espresso ($39.99/mo) |
+| Feature                       | Free     | Espresso ($14.99/mo) | Double Espresso ($39.99/mo) |
 |-------------------------------|----------|----------------------|-----------------------------|
 | Employees                     | Up to 10 | Up to 20             | Unlimited                   |
 | QR check-in                   | Yes      | Yes                  | Yes                         |

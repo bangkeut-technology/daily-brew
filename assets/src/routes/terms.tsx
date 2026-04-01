@@ -56,7 +56,7 @@ function TermsPage() {
                 tracking, and closure scheduling.
               </li>
               <li>
-                <strong>Espresso plan ($12.99/month or $129/year):</strong> up
+                <strong>Espresso plan ($14.99/month or $149/year):</strong> up
                 to 20 active employees. Adds IP restriction, device
                 verification, geofencing for check-in, per-day shift schedules,
                 leave request management, employee username for BasilBook staff

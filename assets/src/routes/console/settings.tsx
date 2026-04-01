@@ -327,7 +327,7 @@ function SettingsPage() {
                           </button>
                         </div>
                         <span className="text-[15px] font-semibold text-text-primary">
-                          {billing === 'annual' ? '$129/year' : '$12.99/month'}
+                          {billing === 'annual' ? '$149/year' : '$14.99/month'}
                         </span>
                       </div>
                       {billing === 'annual' && (

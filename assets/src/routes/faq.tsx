@@ -57,7 +57,7 @@ const faqSections: FaqSection[] = [
       {
         question: 'How much does Espresso cost?',
         answer:
-          'Espresso costs $12.99 per month, or $129 per year if you choose annual billing. The yearly plan saves you $26.88 compared to paying monthly.',
+          'Espresso costs $14.99 per month, or $149 per year if you choose annual billing. The yearly plan saves you $30.88 compared to paying monthly.',
       },
       {
         question: 'Can I cancel anytime?',
