@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.24.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.23.0...v1.24.0) (2026-04-01)
+
+
+### Features
+
+* **dashboard:** enhance Manager and Owner views with role-specific features ([5428341](https://github.com/bangkeut-technology/daily-brew/commit/54283415ad6edccd9e4fd89a516164242d418679))
+* **managers:** introduce manager role and role promotion ([a3cdd65](https://github.com/bangkeut-technology/daily-brew/commit/a3cdd65ea1efde473f26bb0b84d758e47c11da52))
+* **routes:** add demo, roles, and manager check-in card components ([319bbe1](https://github.com/bangkeut-technology/daily-brew/commit/319bbe1ec781328bd497266cac47ca265566ce46))
+
 ## [1.23.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.22.0...v1.23.0) (2026-04-01)
 
 
