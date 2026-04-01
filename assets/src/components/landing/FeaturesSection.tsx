@@ -1,76 +1,83 @@
+import { Link } from '@tanstack/react-router';
 import {
   QrCode,
   Users,
   Clock,
+  LayoutDashboard,
   Coffee,
   Shield,
-  LayoutDashboard,
   MapPin,
   CalendarDays,
   Bell,
+  Smartphone,
   Crown,
+  ChevronRight,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const features = [
+const coreFeatures = [
   {
     icon: <QrCode size={22} strokeWidth={1.8} />,
     title: 'QR check-in',
-    desc: 'Each employee gets a unique QR code. Staff scan with any phone — no app download, no login.',
+    desc: 'One QR code per workspace. Staff scan it to check in and out — fast, contactless, no extra hardware.',
     accent: '#C17F3B',
   },
   {
     icon: <Users size={22} strokeWidth={1.8} />,
     title: 'Employee management',
-    desc: 'Add staff, assign shifts, generate QR codes, and track attendance history in one place.',
+    desc: 'Add staff, assign shifts, and track attendance history. Manage active and inactive employees.',
     accent: '#4A7C59',
   },
   {
     icon: <Clock size={22} strokeWidth={1.8} />,
     title: 'Shift tracking',
-    desc: 'Define morning, evening, or custom shifts. Late arrivals and early departures flagged automatically.',
+    desc: 'Define morning, evening, or custom shifts. Late arrivals and early departures are flagged automatically.',
     accent: '#3B6FA0',
   },
   {
     icon: <LayoutDashboard size={22} strokeWidth={1.8} />,
     title: 'Real-time dashboard',
-    desc: "See who's present, late, on leave, or absent — all at a glance, updated live.",
+    desc: "See who's present, late, on leave, or absent. Live stats for owners and employees.",
     accent: '#9B6B45',
   },
+];
+
+const espressoFeatures = [
   {
     icon: <Coffee size={22} strokeWidth={1.8} />,
     title: 'Leave requests',
-    desc: 'Staff submit leave from their phone. Owners approve or reject with one tap.',
+    desc: 'Staff submit leave from their phone. Owners approve or reject with one tap. Full or partial day.',
     accent: '#6B4226',
-    espresso: true,
   },
   {
     icon: <Shield size={22} strokeWidth={1.8} />,
     title: 'IP restriction',
-    desc: 'Lock check-ins to your restaurant Wi-Fi. Prevent staff from punching in remotely.',
+    desc: "Lock check-ins to your restaurant's WiFi. Prevent remote punching.",
     accent: '#C0392B',
-    espresso: true,
+  },
+  {
+    icon: <Smartphone size={22} strokeWidth={1.8} />,
+    title: 'Device verification',
+    desc: 'Bind check-in/out to one device per employee per day. Prevents buddy punching.',
+    accent: '#9B6B45',
   },
   {
     icon: <MapPin size={22} strokeWidth={1.8} />,
     title: 'Geofencing',
-    desc: 'Restrict check-ins to a geographic radius around your restaurant.',
+    desc: 'Restrict check-ins to a GPS radius around your restaurant.',
     accent: '#7C5C9B',
-    espresso: true,
   },
   {
     icon: <CalendarDays size={22} strokeWidth={1.8} />,
     title: 'Per-day schedules',
-    desc: 'Set different shift hours for each day of the week — perfect for varying opening times.',
+    desc: 'Set different shift hours for each day of the week.',
     accent: '#3B6FA0',
-    espresso: true,
   },
   {
     icon: <Bell size={22} strokeWidth={1.8} />,
-    title: 'Push & email notifications',
-    desc: 'Get notified of leave requests, approvals, shift changes, and closures via push and email. Daily summary included.',
+    title: 'Notifications',
+    desc: 'Push and email alerts for leave requests, shift changes, closures, and daily summaries.',
     accent: '#6B4226',
-    espresso: true,
   },
 ];
 
@@ -97,7 +104,7 @@ export function FeaturesSection() {
 
       {/* Core features — 2x2 grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
-        {features.slice(0, 4).map((f, index) => (
+        {coreFeatures.map((f, index) => (
           <FeatureCard key={f.title} feature={f} index={index} />
         ))}
       </div>
@@ -120,12 +127,29 @@ export function FeaturesSection() {
         <div className="flex-1 h-px bg-cream-3" />
       </motion.div>
 
-      {/* Espresso features — 2x2 grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {features.slice(4).map((f, index) => (
+      {/* Espresso features — 3x2 grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {espressoFeatures.map((f, index) => (
           <FeatureCard key={f.title} feature={f} index={index + 4} />
         ))}
       </div>
+
+      {/* Link to full features page */}
+      <motion.div
+        className="text-center mt-12"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4, delay: 0.3 }}
+      >
+        <Link
+          to="/features"
+          className="inline-flex items-center gap-1.5 text-[15px] font-medium text-coffee hover:text-coffee-light no-underline transition-colors"
+        >
+          See all features in detail
+          <ChevronRight size={14} />
+        </Link>
+      </motion.div>
     </section>
   );
 }
@@ -134,7 +158,7 @@ function FeatureCard({
   feature: f,
   index,
 }: {
-  feature: (typeof features)[number];
+  feature: { icon: React.ReactNode; title: string; desc: string; accent: string };
   index: number;
 }) {
   return (
@@ -143,7 +167,7 @@ function FeatureCard({
       initial={{ opacity: 0, y: 25 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.4, delay: (index % 4) * 0.08 }}
+      transition={{ duration: 0.4, delay: (index % 3) * 0.08 }}
     >
       {/* Top accent bar */}
       <div
@@ -159,16 +183,9 @@ function FeatureCard({
           {f.icon}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1.5">
-            <h4 className="text-[16px] font-semibold text-text-primary">
-              {f.title}
-            </h4>
-            {f.espresso && (
-              <span className="text-[11px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
-                Espresso
-              </span>
-            )}
-          </div>
+          <h4 className="text-[16px] font-semibold text-text-primary mb-1.5">
+            {f.title}
+          </h4>
           <p className="text-[14.5px] text-text-secondary leading-relaxed">
             {f.desc}
           </p>

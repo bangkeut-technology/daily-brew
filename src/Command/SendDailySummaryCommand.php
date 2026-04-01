@@ -17,18 +17,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
-    name: 'app:send-daily-summary',
+    name: 'dailybrew:send-daily-summary',
     description: 'Send daily attendance summary notifications to Espresso workspace owners',
 )]
 class SendDailySummaryCommand extends Command
 {
     public function __construct(
-        private WorkspaceRepository $workspaceRepository,
-        private EmployeeRepository $employeeRepository,
-        private AttendanceRepository $attendanceRepository,
-        private LeaveRequestRepository $leaveRequestRepository,
-        private PlanService $planService,
-        private NotificationService $notificationService,
+        private readonly WorkspaceRepository    $workspaceRepository,
+        private readonly EmployeeRepository     $employeeRepository,
+        private readonly AttendanceRepository   $attendanceRepository,
+        private readonly LeaveRequestRepository $leaveRequestRepository,
+        private readonly PlanService            $planService,
+        private readonly NotificationService    $notificationService,
     ) {
         parent::__construct();
     }

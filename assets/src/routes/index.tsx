@@ -3,6 +3,7 @@ import { LandingNav } from '@/components/landing/LandingNav';
 import { HeroSection } from '@/components/landing/HeroSection';
 import { HowItWorksSection } from '@/components/landing/HowItWorksSection';
 import { FeaturesSection } from '@/components/landing/FeaturesSection';
+import { BuiltForSection } from '@/components/landing/BuiltForSection';
 import { PricingSection } from '@/components/landing/PricingSection';
 import { ContactSection } from '@/components/landing/ContactSection';
 import { LandingFooter } from '@/components/landing/LandingFooter';
@@ -24,6 +25,7 @@ function LandingPage() {
       <HeroSection />
       <HowItWorksSection />
       <FeaturesSection />
+      <BuiltForSection />
       <PricingSection />
       <ContactSection />
       <LandingFooter />

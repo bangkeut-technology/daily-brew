@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { ChevronRight, QrCode, CheckCircle } from 'lucide-react';
+import { ChevronRight, QrCode, CheckCircle, Clock, Users, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -12,6 +12,13 @@ const floatingCardVariants = {
     transition: { duration: 0.7, delay: 0.6 + i * 0.15, ease: [0.22, 1, 0.36, 1] as const },
   }),
 };
+
+const trustItems = [
+  { icon: <QrCode size={14} />, text: 'QR check-in' },
+  { icon: <Clock size={14} />, text: 'Shift tracking' },
+  { icon: <Users size={14} />, text: 'Leave management' },
+  { icon: <Shield size={14} />, text: 'Geofencing' },
+];
 
 export function HeroSection() {
   return (
@@ -68,8 +75,8 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              QR check-ins, shift tracking, and leave management for your
-              restaurant. No app installs, no complexity — just scan and go.
+              One QR code at your restaurant. Staff scan to check in.
+              You see who's here, who's late, and who's on leave — all in real time.
             </motion.p>
 
             <motion.div
@@ -86,28 +93,55 @@ export function HeroSection() {
                 <ChevronRight size={16} />
               </Link>
               <Link
-                to="/pricing"
+                to="/how-it-works"
                 className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-[16px] font-medium text-text-primary bg-glass-bg backdrop-blur-sm border border-glass-border hover:bg-cream-3 transition-all duration-200 no-underline cursor-pointer"
               >
-                View pricing
+                See how it works
               </Link>
             </motion.div>
 
-            <motion.p
-              className="text-[14px] text-text-tertiary mt-5"
+            <motion.div
+              className="flex items-center gap-4 mt-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
             >
-              No credit card required
-            </motion.p>
+              <p className="text-[13.5px] text-text-tertiary">
+                No credit card required
+              </p>
+              <span className="w-1 h-1 rounded-full bg-cream-3" />
+              <p className="text-[13.5px] text-text-tertiary">
+                Set up in under 5 minutes
+              </p>
+            </motion.div>
           </div>
 
-          {/* Right — floating dashboard preview */}
-          <div className="relative hidden lg:block">
+          {/* Right — dashboard preview with side cards */}
+          <div className="hidden lg:flex flex-col gap-4">
+            {/* Notification card — above dashboard */}
+            <motion.div
+              className="self-end bg-glass-bg backdrop-blur-xl border border-glass-border rounded-xl px-4 py-3 shadow-[0_4px_20px_rgba(107,66,38,0.08)]"
+              custom={3}
+              variants={floatingCardVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-full bg-green/10 flex items-center justify-center">
+                  <CheckCircle size={14} className="text-green" />
+                </div>
+                <div>
+                  <p className="text-[12.5px] font-medium text-text-primary">
+                    Sophea checked in
+                  </p>
+                  <p className="text-[11px] text-text-tertiary">Just now — on time</p>
+                </div>
+              </div>
+            </motion.div>
+
             {/* Main dashboard card */}
             <motion.div
-              className="relative bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl p-6 shadow-[0_8px_40px_rgba(107,66,38,0.08)]"
+              className="bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl p-6 shadow-[0_8px_40px_rgba(107,66,38,0.08)]"
               custom={0}
               variants={floatingCardVariants}
               initial="hidden"
@@ -137,7 +171,7 @@ export function HeroSection() {
                   { label: 'Leave', value: '1', color: '#3B6FA0' },
                   { label: 'Absent', value: '0', color: '#C0392B' },
                 ].map((s) => (
-                  <div key={s.label} className="bg-cream/60 rounded-xl p-2.5 text-center">
+                  <div key={s.label} className="bg-cream/60 dark:bg-cream/5 rounded-xl p-2.5 text-center">
                     <p
                       className="text-[20px] font-semibold leading-none mb-0.5"
                       style={{ color: s.color }}
@@ -154,13 +188,13 @@ export function HeroSection() {
               {/* Attendance rows */}
               <div className="space-y-0">
                 {[
-                  { name: 'Sophea Keo', initials: 'SK', shift: 'Morning', time: '07:58', status: 'On time', statusColor: '#4A7C59', grad: 0 },
-                  { name: 'Dara Pich', initials: 'DP', shift: 'Morning', time: '08:12', status: 'Late', statusColor: '#C17F3B', grad: 1 },
-                  { name: 'Vanna Sok', initials: 'VS', shift: 'Evening', time: '—', status: 'On leave', statusColor: '#3B6FA0', grad: 2 },
+                  { name: 'Sophea Chan', initials: 'SC', shift: 'Morning', time: '06:58', status: 'On time', statusColor: '#4A7C59', grad: 0 },
+                  { name: 'Dara Sok', initials: 'DS', shift: 'Morning', time: '07:12', status: 'Late', statusColor: '#C17F3B', grad: 1 },
+                  { name: 'Sreyleak Heng', initials: 'SH', shift: 'Evening', time: '—', status: 'On leave', statusColor: '#3B6FA0', grad: 2 },
                 ].map((r, i) => (
                   <div
                     key={r.name}
-                    className={cn('flex items-center gap-2.5 px-3 py-2.5 rounded-lg', i === 0 && 'bg-cream/40')}
+                    className={cn('flex items-center gap-2.5 px-3 py-2.5 rounded-lg', i === 0 && 'bg-cream/40 dark:bg-cream/5')}
                   >
                     <div
                       className="w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-semibold text-white shrink-0"
@@ -197,14 +231,13 @@ export function HeroSection() {
               </div>
             </motion.div>
 
-            {/* Floating QR card */}
+            {/* QR card — below dashboard */}
             <motion.div
-              className="absolute -bottom-6 -left-8 bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl p-4 shadow-[0_8px_30px_rgba(107,66,38,0.10)] w-[160px]"
+              className="self-start bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl p-4 shadow-[0_4px_20px_rgba(107,66,38,0.08)] w-[150px]"
               custom={2}
               variants={floatingCardVariants}
               initial="hidden"
               animate="visible"
-              whileHover={{ y: -4 }}
             >
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-6 h-6 rounded-lg bg-coffee/10 flex items-center justify-center">
@@ -212,22 +245,17 @@ export function HeroSection() {
                 </div>
                 <p className="text-[12px] font-medium text-text-primary">QR Check-in</p>
               </div>
-              {/* Mini QR code */}
-              <div className="w-full aspect-square rounded-xl bg-cream-3/40 flex items-center justify-center p-3">
+              <div className="w-full aspect-square rounded-xl bg-cream-3/40 dark:bg-cream-3/10 flex items-center justify-center p-3">
                 <svg viewBox="0 0 21 21" className="w-full h-full" shapeRendering="crispEdges">
-                  {/* Top-left finder */}
                   <rect x="0" y="0" width="7" height="7" fill="currentColor" className="text-coffee" />
                   <rect x="1" y="1" width="5" height="5" fill="currentColor" className="text-cream-3/60" />
                   <rect x="2" y="2" width="3" height="3" fill="currentColor" className="text-coffee" />
-                  {/* Top-right finder */}
                   <rect x="14" y="0" width="7" height="7" fill="currentColor" className="text-coffee" />
                   <rect x="15" y="1" width="5" height="5" fill="currentColor" className="text-cream-3/60" />
                   <rect x="16" y="2" width="3" height="3" fill="currentColor" className="text-coffee" />
-                  {/* Bottom-left finder */}
                   <rect x="0" y="14" width="7" height="7" fill="currentColor" className="text-coffee" />
                   <rect x="1" y="15" width="5" height="5" fill="currentColor" className="text-cream-3/60" />
                   <rect x="2" y="16" width="3" height="3" fill="currentColor" className="text-coffee" />
-                  {/* Data modules */}
                   {[
                     [8,0],[10,0],[8,2],[9,2],[10,3],[8,4],[10,4],
                     [0,8],[2,8],[4,8],[6,8],[8,8],[10,8],[12,8],[14,8],[16,8],[18,8],[20,8],
@@ -243,31 +271,31 @@ export function HeroSection() {
                 </svg>
               </div>
             </motion.div>
-
-            {/* Floating notification */}
-            <motion.div
-              className="absolute -top-4 -right-4 bg-glass-bg backdrop-blur-xl border border-glass-border rounded-xl px-4 py-3 shadow-[0_8px_30px_rgba(107,66,38,0.10)]"
-              custom={3}
-              variants={floatingCardVariants}
-              initial="hidden"
-              animate="visible"
-              whileHover={{ y: -3 }}
-            >
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-full bg-green/10 flex items-center justify-center">
-                  <CheckCircle size={14} className="text-green" />
-                </div>
-                <div>
-                  <p className="text-[12.5px] font-medium text-text-primary">
-                    Check-in recorded
-                  </p>
-                  <p className="text-[11px] text-text-tertiary">Just now</p>
-                </div>
-              </div>
-            </motion.div>
           </div>
         </div>
       </div>
+
+      {/* Trust strip */}
+      <motion.div
+        className="relative z-10 max-w-4xl mx-auto mt-20"
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.7 }}
+      >
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          {trustItems.map((item) => (
+            <div
+              key={item.text}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-glass-bg backdrop-blur-sm border border-glass-border"
+            >
+              <span className="text-coffee">{item.icon}</span>
+              <span className="text-[13.5px] font-medium text-text-secondary">
+                {item.text}
+              </span>
+            </div>
+          ))}
+        </div>
+      </motion.div>
     </section>
   );
 }
