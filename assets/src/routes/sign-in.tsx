@@ -67,13 +67,9 @@ function SignInPage() {
 
   const onSubmit = async (data: SignInForm) => {
     try {
-      const result = await login(data.email, data.password);
-      if (result?.user?.onboardingCompleted === false) {
-        navigate({ to: '/onboarding' });
-      } else {
-        // Let the console route handle workspace selection
-        window.location.href = '/console/dashboard';
-      }
+      await login(data.email, data.password);
+      // Full reload so the server embeds the authenticated user into __DAILYBREW__
+      window.location.replace('/console/dashboard');
     } catch {
       toast.error('Invalid email or password');
     }

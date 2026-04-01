@@ -157,7 +157,7 @@ function OnboardingPage() {
               exit="exit"
               transition={{ duration: 0.3, ease: 'easeOut' }}
             >
-              <RoleSelectionStep onSelect={handleSelectRole} />
+              <RoleSelectionStep onSelect={handleSelectRole} onSkip={handleSkipEmployee} />
             </motion.div>
           )}
 
@@ -251,7 +251,7 @@ function WelcomeStep({ onContinue }: { onContinue: () => void }) {
   );
 }
 
-function RoleSelectionStep({ onSelect }: { onSelect: (role: 'owner' | 'employee') => void }) {
+function RoleSelectionStep({ onSelect, onSkip }: { onSelect: (role: 'owner' | 'employee') => void; onSkip: () => void }) {
   const { t } = useTranslation();
 
   return (
@@ -302,6 +302,13 @@ function RoleSelectionStep({ onSelect }: { onSelect: (role: 'owner' | 'employee'
           </div>
         </button>
       </div>
+
+      <button
+        onClick={onSkip}
+        className="mt-6 text-[14.5px] text-text-tertiary hover:text-text-secondary font-sans bg-transparent border-none cursor-pointer transition-colors"
+      >
+        {t('onboarding.skipForNow', 'Skip for now')}
+      </button>
     </div>
   );
 }

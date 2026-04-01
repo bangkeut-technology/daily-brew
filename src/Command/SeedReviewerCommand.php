@@ -74,6 +74,8 @@ class SeedReviewerCommand extends Command
             'John',
             'Doe',
         );
+        $owner->setOnboardingCompleted(true);
+        $this->em->flush();
         $io->text('Created owner: ' . self::OWNER_EMAIL);
 
         // ── Workspace ────────────────────────────────────────────
