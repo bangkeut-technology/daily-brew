@@ -12,6 +12,7 @@ const productLinks = [
 const legalLinks = [
   { label: 'Privacy policy', to: '/privacy' },
   { label: 'Terms of use', to: '/terms' },
+  { label: 'Delete account', to: '/delete-account' },
 ];
 
 export function LandingFooter() {
