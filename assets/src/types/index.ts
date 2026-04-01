@@ -184,6 +184,8 @@ export interface RoleContext {
     workspaceName: string | null;
     employeePublicId: string;
     employeeName: string;
-    role: 'employee' | 'manager';
+    role: EmployeeRole;
   }[];
 }
+
+export type EmployeeRole = 'employee' | 'manager';

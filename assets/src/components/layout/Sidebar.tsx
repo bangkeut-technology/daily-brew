@@ -20,6 +20,7 @@ import { LogoBrand } from '@/components/shared/Logo';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
 import { useTheme } from 'next-themes';
 import { Sun, Moon } from 'lucide-react';
+import {EmployeeRole} from "@/types";
 
 interface NavItemDef {
     to: string;
@@ -198,7 +199,7 @@ export function Sidebar() {
                             ...(roleContext.ownedWorkspaces ?? []).map((ws) => ({ ...ws, role: 'owner' as const })),
                             ...(roleContext.linkedWorkspaces ?? [])
                                 .filter((lw) => lw.workspacePublicId && !roleContext.ownedWorkspaces?.some((ow) => ow.publicId === lw.workspacePublicId))
-                                .map((lw) => ({ publicId: lw.workspacePublicId!, name: lw.workspaceName ?? '', role: (lw.role === 'manager' ? 'manager' : 'employee') as const })),
+                                .map((lw) => ({ publicId: lw.workspacePublicId!, name: lw.workspaceName ?? '', role: (lw.role === 'manager' ? 'manager' : 'employee') as EmployeeRole })),
                         ]}
                         planLabel={plan?.planLabel}
                         isEspresso={plan?.isEspresso}

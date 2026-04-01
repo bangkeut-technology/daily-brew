@@ -14,7 +14,10 @@ import { AttendanceRow } from '@/components/shared/AttendanceRow';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { GuidedTour } from '@/components/shared/GuidedTour';
 import { usePlan } from '@/hooks/queries/usePlan';
+import { useRoleContext } from '@/hooks/queries/useRoleContext';
+import { useWorkspace } from '@/hooks/queries/useWorkspaces';
 import { useLeaveRequests, useUpdateLeaveRequest } from '@/hooks/queries/useLeaveRequests';
+import { ManagerCheckinCard } from './ManagerCheckinCard';
 import { useClosures } from '@/hooks/queries/useClosures';
 import { usePaddle } from '@/hooks/usePaddle';
 import { useDateFormat } from '@/hooks/useDateFormat';
@@ -25,7 +28,10 @@ export function OwnerDashboard() {
   const { data, isLoading } = useDashboard(workspaceId);
   const { data: workspaces } = useWorkspaces();
   const { data: plan } = usePlan(workspaceId);
+  const { data: roleContext } = useRoleContext();
+  const { data: workspace } = useWorkspace(workspaceId);
   const canUseLeave = plan?.canUseLeaveRequests ?? false;
+  const isManagerView = !!roleContext?.isManager && !roleContext?.isOwner;
   const { data: leaveRequests } = useLeaveRequests(canUseLeave ? workspaceId : '');
   const updateLeave = useUpdateLeaveRequest(workspaceId);
   const { openCheckout } = usePaddle();
@@ -162,16 +168,28 @@ export function OwnerDashboard() {
     <div className="page-enter">
       <PageHeader
         title={t('nav.dashboard')}
-        badge={plan ? (
-          <Link to="/console/settings" className="no-underline">
-            <span className={cn(
-              'text-[12px] font-semibold px-2 py-0.5 rounded-full',
-              plan.isEspresso ? 'bg-green/10 text-green' : 'bg-cream-3 text-text-tertiary',
-            )}>
-              {plan.planLabel}
-            </span>
-          </Link>
-        ) : undefined}
+        badge={
+          <div className="flex items-center gap-1.5">
+            {roleContext && (
+              <span className={cn(
+                'text-[12px] font-semibold px-2 py-0.5 rounded-full',
+                roleContext.isOwner ? 'bg-coffee/10 text-coffee' : roleContext.isManager ? 'bg-amber/10 text-amber' : 'bg-blue/10 text-blue',
+              )}>
+                {roleContext.isOwner ? 'Owner' : roleContext.isManager ? 'Manager' : 'Employee'}
+              </span>
+            )}
+            {plan && (
+              <Link to="/console/settings" className="no-underline">
+                <span className={cn(
+                  'text-[12px] font-semibold px-2 py-0.5 rounded-full',
+                  plan.isEspresso ? 'bg-green/10 text-green' : 'bg-cream-3 text-text-tertiary',
+                )}>
+                  {plan.planLabel}
+                </span>
+              </Link>
+            )}
+          </div>
+        }
         action={
           <div className="flex items-center gap-2">
             {data.pendingLeaves > 0 && canUseLeave && (
@@ -184,14 +202,16 @@ export function OwnerDashboard() {
                 </span>
               </Link>
             )}
-            <Link
-              to="/console/employees/new"
-              data-tour="add-employee"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[14px] font-medium bg-coffee text-white no-underline border-none cursor-pointer transition-all hover:bg-coffee-light"
-            >
-              <UserPlus size={13} />
-              {t('dashboard.addEmployee', 'Add employee')}
-            </Link>
+            {!isManagerView && (
+              <Link
+                to="/console/employees/new"
+                data-tour="add-employee"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[14px] font-medium bg-coffee text-white no-underline border-none cursor-pointer transition-all hover:bg-coffee-light"
+              >
+                <UserPlus size={13} />
+                {t('dashboard.addEmployee', 'Add employee')}
+              </Link>
+            )}
             <Link
               to="/console/attendance"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[14px] font-medium bg-glass-bg text-text-primary border border-cream-3 no-underline cursor-pointer transition-all hover:bg-cream-3"
@@ -219,8 +239,15 @@ export function OwnerDashboard() {
         </p>
       </div>
 
-      {/* QR Check-in card */}
-      {currentWs?.qrToken && (
+      {/* Manager check-in card */}
+      {isManagerView && workspace?.qrToken && (
+        <div className="mb-6">
+          <ManagerCheckinCard qrToken={workspace.qrToken} />
+        </div>
+      )}
+
+      {/* QR Check-in card — owner only */}
+      {!isManagerView && currentWs?.qrToken && (
         <GlassCard hover={false} className="mb-6">
           <div className="p-5 flex items-center gap-5">
             <div className="p-3 bg-white rounded-xl shadow-[0_2px_8px_rgba(107,66,38,0.06)] shrink-0">
@@ -356,9 +383,11 @@ export function OwnerDashboard() {
               <GlassCardHeader
                 title="Upcoming closures"
                 action={
-                  <Link to="/console/closures" className="text-xs text-amber font-medium cursor-pointer no-underline">
-                    Manage &rarr;
-                  </Link>
+                  !isManagerView ? (
+                    <Link to="/console/closures" className="text-xs text-amber font-medium cursor-pointer no-underline">
+                      Manage &rarr;
+                    </Link>
+                  ) : undefined
                 }
               />
               <div>

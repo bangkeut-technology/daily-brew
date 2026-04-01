@@ -155,7 +155,12 @@ export function EmployeeDashboard() {
           <h1 className="text-[26px] font-semibold text-text-primary leading-tight font-serif">
             {t('dashboard.welcomeBack', 'Welcome back')}, {employee.name.split(' ')[0]}
           </h1>
-          <p className="text-[15px] text-text-tertiary font-sans mt-0.5">{todayStr}</p>
+          <div className="flex items-center gap-1.5 mt-1">
+            <span className="text-[12px] font-semibold px-2 py-0.5 rounded-full bg-blue/10 text-blue">
+              Employee
+            </span>
+            <span className="text-[15px] text-text-tertiary font-sans">{todayStr}</span>
+          </div>
         </div>
       </div>
       <p className="text-[15px] text-text-secondary mb-6 leading-relaxed">
