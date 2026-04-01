@@ -20,7 +20,8 @@ final readonly class DashboardService
 
     public function getTodayStats(Workspace $workspace): array
     {
-        $today = new \DateTimeImmutable('today');
+        $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
+        $today = new \DateTimeImmutable('today', $tz);
         $totalActive = $this->employeeRepository->countActiveByWorkspace($workspace);
         $presentCount = $this->attendanceRepository->countByWorkspaceAndDate($workspace, $today);
         $lateCount = $this->attendanceRepository->countLateByWorkspaceAndDate($workspace, $today);
@@ -29,8 +30,6 @@ final readonly class DashboardService
 
         $recentAttendance = $this->attendanceRepository->findByWorkspaceAndDate($workspace, $today);
         $pendingLeaves = $this->leaveRequestRepository->countPendingByWorkspace($workspace);
-
-        $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
 
         return [
             'totalEmployees' => $totalActive,

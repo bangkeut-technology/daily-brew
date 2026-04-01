@@ -87,7 +87,7 @@ class SeedReviewerCommand extends Command
         $io->text('Created owner: ' . self::OWNER_EMAIL);
 
         // ── Workspace ────────────────────────────────────────────
-        $workspace = $this->workspaceService->create($owner, self::WORKSPACE_NAME);
+        $workspace = $this->workspaceService->create($owner, self::WORKSPACE_NAME, 'Asia/Phnom_Penh');
         $io->text('Created workspace: ' . self::WORKSPACE_NAME);
 
         // ── Upgrade to Espresso ──────────────────────────────────
