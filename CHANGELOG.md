@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.23.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.22.0...v1.23.0) (2026-04-01)
+
+
+### Features
+
+* **jwt-auth:** set default token cookie lifetime to 30 days ([7c9ffff](https://github.com/bangkeut-technology/daily-brew/commit/7c9ffff9e029ab5f3bccc44d895338756b20d23f))
+* **landing:** redesign sections for better clarity and engagement ([f671002](https://github.com/bangkeut-technology/daily-brew/commit/f6710026ff5c2a9628865ae36918da6e7cccc560))
+* **landing:** redesign sections for better clarity and engagement ([c507526](https://github.com/bangkeut-technology/daily-brew/commit/c50752699c698e5cf0e806624f13d53fd05065e3))
+* **landing:** redesign sections for better clarity and engagement ([8a6cd8e](https://github.com/bangkeut-technology/daily-brew/commit/8a6cd8e5c7927ccd25e07f8b7ea611747abf3297))
+
 ## [1.22.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.21.0...v1.22.0) (2026-04-01)
 
 
