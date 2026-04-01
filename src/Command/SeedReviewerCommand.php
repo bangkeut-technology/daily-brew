@@ -7,8 +7,11 @@ namespace App\Command;
 use App\Entity\Attendance;
 use App\Entity\ClosurePeriod;
 use App\Entity\LeaveRequest;
+use App\Enum\EmployeeRoleEnum;
 use App\Enum\LeaveRequestStatusEnum;
 use App\Enum\LeaveTypeEnum;
+use App\Enum\PlanEnum;
+use App\Repository\SubscriptionRepository;
 use App\Repository\UserRepository;
 use App\Repository\WorkspaceRepository;
 use App\Service\AuthService;
@@ -31,12 +34,17 @@ class SeedReviewerCommand extends Command
 {
     private const OWNER_EMAIL = 'reviewer@dailybrew.work';
     private const OWNER_PASSWORD = 'DailyBrew2026!';
+    private const MANAGER_EMAIL = 'manager@dailybrew.work';
+    private const MANAGER_PASSWORD = 'DailyBrew2026!';
+    private const EMPLOYEE_EMAIL = 'employee@dailybrew.work';
+    private const EMPLOYEE_PASSWORD = 'DailyBrew2026!';
     private const WORKSPACE_NAME = 'The Daily Grind';
 
     public function __construct(
         private EntityManagerInterface $em,
         private UserRepository $userRepository,
         private WorkspaceRepository $workspaceRepository,
+        private SubscriptionRepository $subscriptionRepository,
         private AuthService $authService,
         private WorkspaceService $workspaceService,
         private ShiftService $shiftService,
@@ -82,6 +90,13 @@ class SeedReviewerCommand extends Command
         $workspace = $this->workspaceService->create($owner, self::WORKSPACE_NAME);
         $io->text('Created workspace: ' . self::WORKSPACE_NAME);
 
+        // ── Upgrade to Espresso ──────────────────────────────────
+        $subscription = $this->subscriptionRepository->findByWorkspace($workspace);
+        $subscription->setPlan(PlanEnum::Espresso);
+        $subscription->setCurrentPeriodEnd(new \DateTime('+1 year'));
+        $this->em->flush();
+        $io->text('Upgraded to Espresso plan');
+
         // ── Shifts ───────────────────────────────────────────────
         $morningShift = $this->shiftService->create(
             $workspace,
@@ -118,6 +133,31 @@ class SeedReviewerCommand extends Command
             );
         }
         $io->text(sprintf('Created %d employees', count($employeeEntities)));
+
+        // ── Manager account (linked to Sophea Chan) ──────────────
+        $managerUser = $this->authService->register(
+            self::MANAGER_EMAIL,
+            self::MANAGER_PASSWORD,
+            'Sophea',
+            'Chan',
+        );
+        $managerUser->setOnboardingCompleted(true);
+        $this->employeeService->linkUser($employeeEntities[0], $managerUser);
+        $employeeEntities[0]->setRole(EmployeeRoleEnum::MANAGER);
+        $this->em->flush();
+        $io->text('Created manager: ' . self::MANAGER_EMAIL . ' (Sophea Chan)');
+
+        // ── Employee account (linked to Dara Sok) ────────────────
+        $employeeUser = $this->authService->register(
+            self::EMPLOYEE_EMAIL,
+            self::EMPLOYEE_PASSWORD,
+            'Dara',
+            'Sok',
+        );
+        $employeeUser->setOnboardingCompleted(true);
+        $this->employeeService->linkUser($employeeEntities[1], $employeeUser);
+        $this->em->flush();
+        $io->text('Created employee: ' . self::EMPLOYEE_EMAIL . ' (Dara Sok)');
 
         // ── Closure period ───────────────────────────────────────
         $closure = new ClosurePeriod();
@@ -247,14 +287,23 @@ class SeedReviewerCommand extends Command
         $this->em->flush();
 
         $io->newLine();
-        $io->success('Reviewer account seeded successfully');
+        $io->success('Reviewer accounts seeded successfully');
+        $io->table(
+            ['Role', 'Email', 'Password'],
+            [
+                ['Owner', self::OWNER_EMAIL, self::OWNER_PASSWORD],
+                ['Manager', self::MANAGER_EMAIL, self::MANAGER_PASSWORD],
+                ['Employee', self::EMPLOYEE_EMAIL, self::EMPLOYEE_PASSWORD],
+            ],
+        );
         $io->table(
             ['Field', 'Value'],
             [
-                ['Email', self::OWNER_EMAIL],
-                ['Password', self::OWNER_PASSWORD],
                 ['Workspace', self::WORKSPACE_NAME],
+                ['Plan', 'Espresso'],
                 ['Employees', (string) count($employeeEntities)],
+                ['Manager', 'Sophea Chan (' . self::MANAGER_EMAIL . ')'],
+                ['Employee', 'Dara Sok (' . self::EMPLOYEE_EMAIL . ')'],
                 ['Shifts', '2 (Morning, Evening)'],
                 ['Attendance', $attendanceCount . ' records (last 7 weekdays)'],
                 ['Leave requests', '3 (approved, pending, rejected)'],
@@ -295,7 +344,13 @@ class SeedReviewerCommand extends Command
 
         $this->safeDelete($conn, 'DELETE FROM daily_brew_device_tokens WHERE user_id = ?', [$userId]);
         $this->safeDelete($conn, 'DELETE FROM daily_brew_refresh_tokens WHERE username = ?', [self::OWNER_EMAIL]);
+        $this->safeDelete($conn, 'DELETE FROM daily_brew_refresh_tokens WHERE username = ?', [self::MANAGER_EMAIL]);
+        $this->safeDelete($conn, 'DELETE FROM daily_brew_refresh_tokens WHERE username = ?', [self::EMPLOYEE_EMAIL]);
         $conn->executeStatement('DELETE FROM daily_brew_users WHERE id = ?', [$userId]);
+
+        // Delete manager and employee user accounts
+        $conn->executeStatement('UPDATE daily_brew_users SET current_workspace_id = NULL WHERE email_canonical IN (?, ?)', [self::MANAGER_EMAIL, self::EMPLOYEE_EMAIL]);
+        $conn->executeStatement('DELETE FROM daily_brew_users WHERE email_canonical IN (?, ?)', [self::MANAGER_EMAIL, self::EMPLOYEE_EMAIL]);
 
         $this->em->clear();
 

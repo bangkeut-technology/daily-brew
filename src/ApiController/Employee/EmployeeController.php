@@ -7,6 +7,7 @@ namespace App\ApiController\Employee;
 use App\ApiController\Trait\ApiResponseTrait;
 use App\DTO\AttendanceDTO;
 use App\DTO\EmployeeDTO;
+use App\Enum\EmployeeRoleEnum;
 use App\Repository\AttendanceRepository;
 use App\Repository\EmployeeRepository;
 use App\Repository\ShiftRepository;
@@ -215,6 +216,53 @@ class EmployeeController extends AbstractController
             }
         }
 
+        $employeeRepository->flush();
+
+        return $this->jsonSuccess(EmployeeDTO::fromEntity($employee)->toArray());
+    }
+
+    #[Route('/{publicId}/role', name: 'employees_update_role', methods: ['PUT'])]
+    public function updateRole(
+        string $workspacePublicId,
+        string $publicId,
+        Request $request,
+        WorkspaceRepository $workspaceRepository,
+        EmployeeRepository $employeeRepository,
+        PlanService $planService,
+    ): JsonResponse {
+        $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
+        if ($workspace === null) {
+            throw new NotFoundHttpException('Workspace not found');
+        }
+
+        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
+
+        $employee = $employeeRepository->findByPublicId($publicId);
+        if ($employee === null || $employee->getWorkspace()?->getId() !== $workspace->getId()) {
+            throw new NotFoundHttpException('Employee not found');
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $role = EmployeeRoleEnum::tryFrom($data['role'] ?? '');
+        if ($role === null) {
+            return $this->jsonError('Role must be "employee" or "manager"');
+        }
+
+        if ($role === EmployeeRoleEnum::MANAGER) {
+            if ($employee->getLinkedUser() === null) {
+                return $this->jsonError('Employee must have a linked user account to be promoted to manager', 400);
+            }
+
+            if (!$planService->canPromoteToManager($workspace)) {
+                $limit = $planService->getManagerLimit($workspace);
+                if ($limit === 0) {
+                    return $this->jsonError('Manager role requires the Espresso plan', 402);
+                }
+                return $this->jsonError("Manager limit reached ($limit). Upgrade for more.", 402);
+            }
+        }
+
+        $employee->setRole($role);
         $employeeRepository->flush();
 
         return $this->jsonSuccess(EmployeeDTO::fromEntity($employee)->toArray());

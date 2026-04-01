@@ -37,7 +37,8 @@ function LeaveRequestsPage() {
   const { data: plan, isLoading: planLoading } = usePlan(workspaceId);
   const { data: roleContext, isLoading: roleLoading } = useRoleContext();
   const canUse = plan?.canUseLeaveRequests ?? false;
-  const isEmployee = !!roleContext && roleContext.isEmployee && !roleContext.isOwner;
+  const isManager = roleContext?.isManager ?? false;
+  const isEmployee = !!roleContext && roleContext.isEmployee && !roleContext.isOwner && !isManager;
   const employee = roleContext?.employee ?? null;
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('');
   const [showUpgrade, setShowUpgrade] = useState(true);

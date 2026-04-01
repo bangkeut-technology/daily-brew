@@ -6,6 +6,8 @@ import { useAuthenticationState } from '@/hooks/use-authentication';
 const productLinks = [
   { label: 'Features', to: '/features' },
   { label: 'How it works', to: '/how-it-works' },
+  { label: 'Roles & permissions', to: '/roles' },
+  { label: 'Try demo', to: '/demo' },
   { label: 'Pricing', to: '/pricing' },
   { label: 'FAQ', to: '/faq' },
   { label: 'Support', to: '/support' },

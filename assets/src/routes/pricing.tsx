@@ -32,16 +32,17 @@ const comparisonRows: { section?: string; feature: string; free: boolean | strin
   { feature: 'Per-day shift schedules', free: false, espresso: true, double: true },
   { feature: 'BasilBook staff linking', free: false, espresso: true, double: true },
   { feature: 'Push & email notifications', free: false, espresso: true, double: true },
+  { feature: 'Manager role', free: false, espresso: 'Up to 2', double: 'Unlimited' },
   { feature: 'Daily attendance summary', free: false, espresso: true, double: true },
   { feature: '14-day free trial', free: false, espresso: true, double: true },
 
   // Double Espresso
   { section: 'Double Espresso features', feature: 'Unlimited employees', free: false, espresso: false, double: true },
+  { feature: 'Unlimited managers', free: false, espresso: false, double: true },
   { feature: 'Priority support', free: false, espresso: false, double: true },
   { feature: 'Multiple QR stations (roadmap)', free: false, espresso: false, double: true },
   { feature: 'Per-QR geofence & settings (roadmap)', free: false, espresso: false, double: true },
   { feature: 'Employee assignment per QR (roadmap)', free: false, espresso: false, double: true },
-  { feature: 'Manager role (roadmap)', free: false, espresso: false, double: true },
   { feature: 'White-label branding (roadmap)', free: false, espresso: false, double: true },
 ];
 

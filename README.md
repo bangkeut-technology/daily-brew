@@ -13,6 +13,7 @@ DailyBrew helps restaurant owners manage their team's daily attendance through Q
 - Shift and closure management
 - Leave request workflow — employees submit (full-day or partial-day with time range), owners approve/reject, employees can cancel pending requests
 - Owner dashboard with today's attendance stats
+- Manager role — promote trusted employees to approve leave and view all attendance (Espresso: up to 2, Double Espresso: unlimited)
 - Employee dashboard with personal attendance, shift, and leave request submission
 - IP restriction for check-in locations (with "Use my current IP" helper)
 - Geofencing for check-in (GPS radius)
@@ -24,21 +25,22 @@ DailyBrew helps restaurant owners manage their team's daily attendance through Q
 
 ## Plans
 
-| Feature | Free | Espresso ($12.99/mo) | Double Espresso ($39.99/mo) |
-|---|---|---|---|
-| Employees | Up to 10 | Up to 20 | Unlimited |
-| QR check-in | Yes | Yes | Yes |
-| Shifts & closures | Yes | Yes | Yes |
-| Dashboard & attendance log | Yes | Yes | Yes |
-| Leave requests | - | Yes | Yes |
-| IP restriction | - | Yes | Yes |
-| Device verification | - | Yes | Yes |
-| Geofencing | - | Yes | Yes |
-| Per-day shift schedules | - | Yes | Yes |
-| Employee username (BasilBook) | - | Yes | Yes |
-| Push & email notifications | - | Yes | Yes |
-| Daily attendance summary | - | Yes | Yes |
-| Priority support | - | - | Yes |
+| Feature                       | Free     | Espresso ($12.99/mo) | Double Espresso ($39.99/mo) |
+|-------------------------------|----------|----------------------|-----------------------------|
+| Employees                     | Up to 10 | Up to 20             | Unlimited                   |
+| QR check-in                   | Yes      | Yes                  | Yes                         |
+| Shifts & closures             | Yes      | Yes                  | Yes                         |
+| Dashboard & attendance log    | Yes      | Yes                  | Yes                         |
+| Leave requests                | -        | Yes                  | Yes                         |
+| Manager role                  | -        | Up to 2              | Unlimited                   |
+| IP restriction                | -        | Yes                  | Yes                         |
+| Device verification           | -        | Yes                  | Yes                         |
+| Geofencing                    | -        | Yes                  | Yes                         |
+| Per-day shift schedules       | -        | Yes                  | Yes                         |
+| Employee username (BasilBook) | -        | Yes                  | Yes                         |
+| Push & email notifications    | -        | Yes                  | Yes                         |
+| Daily attendance summary      | -        | Yes                  | Yes                         |
+| Priority support              | -        | -                    | Yes                         |
 
 Payments are handled via **Paddle**.
 
@@ -134,6 +136,32 @@ When creating a Paddle checkout, pass the workspace ID in `custom_data`:
 }
 ```
 
+## Reviewer / Demo Accounts
+
+Seed a fully configured demo workspace (Espresso plan) for App Store / Google Play reviewers or live demos:
+
+```bash
+php bin/console dailybrew:seed-reviewer         # first run
+php bin/console dailybrew:seed-reviewer --fresh  # re-seed (purge + recreate)
+```
+
+| Role     | Email                   | Linked to                                            |
+|----------|-------------------------|------------------------------------------------------|
+| Owner    | reviewer@dailybrew.work | Full dashboard access                                |
+| Manager  | manager@dailybrew.work  | Sophea Chan — can approve leave, view all attendance |
+| Employee | employee@dailybrew.work | Dara Sok — can view own attendance, submit leave     |
+
+All share the same password: `DailyBrew2026!`
+
+The demo workspace ("The Daily Grind") is pre-configured with the **Espresso plan** and includes:
+- 5 employees across 2 shifts (Morning & Evening)
+- 1 manager (Sophea Chan)
+- 7 days of attendance records with late arrivals, early departures, and absences
+- 3 leave requests (approved, pending, rejected)
+- 1 upcoming closure (Khmer New Year)
+
+All three accounts can be used to experience the app from each role's perspective — owner, manager, and employee.
+
 ## Project Structure
 
 ```
@@ -189,10 +217,11 @@ assets/src/
 
 ### Resources (authenticated, scoped to workspace)
 - `GET/POST /api/v1/{locale}/workspaces/{publicId}/employees`
+- `PUT /api/v1/{locale}/workspaces/{publicId}/employees/{publicId}/role` — promote/demote (owner only)
 - `GET/POST /api/v1/{locale}/workspaces/{publicId}/shifts`
 - `GET/POST /api/v1/{locale}/workspaces/{publicId}/closures`
 - `GET/POST /api/v1/{locale}/workspaces/{publicId}/leave-requests`
-- `DELETE /api/v1/{locale}/workspaces/{publicId}/leave-requests/{publicId}` — cancel pending leave request (employee: own only, owner: any)
+- `DELETE /api/v1/{locale}/workspaces/{publicId}/leave-requests/{publicId}` — cancel leave request (employee: own pending only, owner/manager: any)
 - `GET /api/v1/{locale}/workspaces/{publicId}/attendances`
 - `GET /api/v1/{locale}/workspaces/{publicId}/settings/my-ip` — returns client IP as seen by server
 

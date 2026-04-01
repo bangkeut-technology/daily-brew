@@ -66,6 +66,7 @@ export interface Employee {
   username: string | null;
   phoneNumber: string | null;
   active: boolean;
+  role: 'employee' | 'manager';
   shiftName: string | null;
   shiftPublicId: string | null;
   dob: string | null;
@@ -158,6 +159,9 @@ export interface PlanDetails {
   canUseLeaveRequests: boolean;
   canUseShiftTimeRules: boolean;
   canUseDeviceVerification: boolean;
+  canUseManagers: boolean;
+  managerLimit: number | null;
+  managerCount: number;
   currentPeriodEnd: string | null;
   status: string;
   paddleSubscriptionId: string | null;
@@ -166,6 +170,7 @@ export interface PlanDetails {
 export interface RoleContext {
   isOwner: boolean;
   isEmployee: boolean;
+  isManager: boolean;
   onboardingCompleted: boolean;
   ownedWorkspaces: { publicId: string; name: string }[];
   employee: {
@@ -179,5 +184,6 @@ export interface RoleContext {
     workspaceName: string | null;
     employeePublicId: string;
     employeeName: string;
+    role: 'employee' | 'manager';
   }[];
 }

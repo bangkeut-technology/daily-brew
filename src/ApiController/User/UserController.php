@@ -109,6 +109,7 @@ class UserController extends AbstractController
         return $this->jsonSuccess([
             'isOwner' => $isOwnerOfCurrent,
             'isEmployee' => $currentEmployee !== null,
+            'isManager' => $currentEmployee?->isManager() ?? false,
             'onboardingCompleted' => $user->isOnboardingCompleted(),
             'ownedWorkspaces' => array_map(fn ($w) => [
                 'publicId' => (string) $w->getPublicId(),
@@ -125,6 +126,7 @@ class UserController extends AbstractController
                 'workspaceName' => $emp->getWorkspace()?->getName(),
                 'employeePublicId' => (string) $emp->getPublicId(),
                 'employeeName' => $emp->getName(),
+                'role' => $emp->getRole()->value,
             ], $linkedEmployees),
         ]);
     }

@@ -4,11 +4,11 @@ import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Copy, Pencil, X, Check, Link2, Mail, Unlink, Info, AtSign } from 'lucide-react';
+import { Copy, Pencil, X, Check, Link2, Mail, Unlink, Info, AtSign, ShieldCheck, ShieldOff } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useMemo } from 'react';
 import * as Popover from '@radix-ui/react-popover';
-import { useEmployee, useUpdateEmployee } from '@/hooks/queries/useEmployees';
+import { useEmployee, useUpdateEmployee, useUpdateEmployeeRole } from '@/hooks/queries/useEmployees';
 import { useShifts } from '@/hooks/queries/useShifts';
 import { usePlan } from '@/hooks/queries/usePlan';
 import { getWorkspacePublicId } from '@/lib/auth';
@@ -49,6 +49,7 @@ function EmployeeDetailPage() {
   const { data: shifts } = useShifts(workspaceId);
   const { data: plan } = usePlan(workspaceId);
   const updateEmployee = useUpdateEmployee(workspaceId);
+  const updateRole = useUpdateEmployeeRole(workspaceId);
   const [isEditing, setIsEditing] = useState(false);
   const [linkUserId, setLinkUserId] = useState('');
   const [showUnlinkConfirm, setShowUnlinkConfirm] = useState(false);
@@ -145,14 +146,41 @@ function EmployeeDetailPage() {
         title={fullName}
         action={
           !isEditing ? (
-            <button
-              type="button"
-              onClick={handleStartEdit}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
-            >
-              <Pencil size={14} />
-              {t('common.edit', 'Edit')}
-            </button>
+            <div className="flex items-center gap-2">
+              {plan?.canUseManagers && employee.linkedUserPublicId && (
+                <button
+                  type="button"
+                  disabled={updateRole.isPending}
+                  onClick={() => {
+                    const newRole = employee.role === 'manager' ? 'employee' : 'manager';
+                    updateRole.mutate(
+                      { publicId: employee.publicId, role: newRole },
+                      {
+                        onSuccess: () => toast.success(newRole === 'manager' ? 'Promoted to manager' : 'Demoted to employee'),
+                        onError: (err: any) => toast.error(err?.response?.data?.message || 'Failed to update role'),
+                      },
+                    );
+                  }}
+                  className={cn(
+                    'flex items-center gap-1.5 px-3 py-2 rounded-lg text-[14px] font-medium border-none cursor-pointer transition-all duration-150 disabled:opacity-50',
+                    employee.role === 'manager'
+                      ? 'bg-red/10 text-red hover:bg-red/18'
+                      : 'bg-amber/10 text-amber hover:bg-amber/18',
+                  )}
+                >
+                  {employee.role === 'manager' ? <ShieldOff size={14} /> : <ShieldCheck size={14} />}
+                  {employee.role === 'manager' ? 'Demote' : 'Promote to manager'}
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={handleStartEdit}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
+              >
+                <Pencil size={14} />
+                {t('common.edit', 'Edit')}
+              </button>
+            </div>
           ) : undefined
         }
       />
@@ -299,11 +327,14 @@ function EmployeeDetailPage() {
                     {employee.username && (
                       <p className="text-[14px] text-text-tertiary font-mono mt-0.5">@{employee.username}</p>
                     )}
-                    <div className="mt-1.5">
+                    <div className="mt-1.5 flex items-center gap-1.5">
                       <StatusBadge
                         label={employee.active ? t('employee.active') : t('employee.inactive')}
                         variant={employee.active ? 'green' : 'gray'}
                       />
+                      {employee.role === 'manager' && (
+                        <StatusBadge label="Manager" variant="amber" />
+                      )}
                     </div>
                   </div>
                 </div>

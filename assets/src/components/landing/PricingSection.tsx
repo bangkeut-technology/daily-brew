@@ -37,6 +37,7 @@ const espressoPlan = {
     { text: 'Device verification for check-in & out', included: true },
     { text: 'Geofencing for check-in & out', included: true },
     { text: 'Per-day shift schedules', included: true },
+    { text: 'Manager role (up to 2)', included: true },
     { text: 'BasilBook staff linking', included: true },
     { text: 'Push & email notifications', included: true },
     { text: 'Daily attendance summary', included: true },
@@ -52,6 +53,7 @@ const doubleEspressoPlan = {
   features: [
     { text: 'Unlimited employees', included: true },
     { text: 'Everything in Espresso', included: true },
+    { text: 'Unlimited managers', included: true },
     { text: 'Priority support', included: true },
     { text: 'Multiple QR stations', included: true, roadmap: true },
     { text: 'Per-QR geofence & settings', included: true, roadmap: true },

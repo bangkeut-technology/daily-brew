@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 interface WorkspaceItem {
   publicId: string;
   name: string;
-  role: 'owner' | 'employee';
+  role: 'owner' | 'manager' | 'employee';
 }
 
 interface WorkspaceSwitcherProps {
@@ -75,7 +75,7 @@ export function WorkspaceSwitcher({ workspaces, planLabel, isEspresso }: Workspa
               </p>
               <div className="flex items-center gap-1.5 flex-wrap">
                 <p className="text-[12px] text-text-tertiary leading-tight shrink-0">
-                  {current?.role === 'employee' ? 'Employee' : t('workspace.label')}
+                  {current?.role === 'manager' ? 'Manager' : current?.role === 'employee' ? 'Employee' : t('workspace.label')}
                 </p>
                 {planLabel && (
                   <span className={cn(
@@ -121,7 +121,7 @@ export function WorkspaceSwitcher({ workspaces, planLabel, isEspresso }: Workspa
                 </div>
                 <div className="flex-1 min-w-0">
                   <span className="block truncate">{ws.name}</span>
-                  <span className="text-[11px] text-text-tertiary">{ws.role === 'employee' ? 'Employee' : 'Owner'}</span>
+                  <span className="text-[11px] text-text-tertiary">{ws.role === 'owner' ? 'Owner' : ws.role === 'manager' ? 'Manager' : 'Employee'}</span>
                 </div>
                 {ws.publicId === currentId && (
                   <Check size={14} className="text-coffee flex-shrink-0" />

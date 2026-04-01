@@ -32,7 +32,7 @@ const faqSections: FaqSection[] = [
       {
         question: 'Who is DailyBrew for?',
         answer:
-          'DailyBrew is designed for restaurant owners and their staff. Owners manage the workspace, create shifts, and track attendance from the dashboard. Staff check in and out by scanning their unique QR code on their phone.',
+          'DailyBrew is designed for restaurant owners, managers, and staff. Owners manage the workspace, shifts, and employees. Managers can approve leave and oversee attendance. Staff check in and out by scanning the workspace QR code.',
       },
       {
         question: 'Is there a mobile app?',
@@ -52,7 +52,7 @@ const faqSections: FaqSection[] = [
       {
         question: "What's included in Espresso?",
         answer:
-          'Espresso gives you unlimited employees, leave request management, IP restriction for check-in, geofencing, per-day shift schedules, and priority support from our team.',
+          'Espresso supports up to 20 employees and adds leave request management, IP restriction, device verification, geofencing, per-day shift schedules, manager role (up to 2), push and email notifications, and daily attendance summaries.',
       },
       {
         question: 'How much does Espresso cost?',
@@ -72,7 +72,7 @@ const faqSections: FaqSection[] = [
       {
         question: 'How does QR check-in work?',
         answer:
-          'Each employee is assigned a unique QR code when you add them to your workspace. Staff scan the code with their phone camera, which opens a mobile web page. From there, they simply tap the Check In button to record their arrival, and tap Check Out when they leave.',
+          'Each workspace has a unique QR code. Display it at your restaurant entrance. Staff open the DailyBrew app, scan the QR code, and tap the Check In button to record their arrival. They scan again and tap Check Out when they leave.',
       },
       {
         question: 'What is geofencing?',
@@ -88,6 +88,31 @@ const faqSections: FaqSection[] = [
         question: 'What happens during closures?',
         answer:
           'When you define a closure period (for example, a holiday or renovation), no attendance is expected on those dates. The system skips those days entirely, so employees will not be marked as absent during closures.',
+      },
+    ],
+  },
+  {
+    title: 'Manager role',
+    items: [
+      {
+        question: 'What is the manager role?',
+        answer:
+          'The manager role lets you promote trusted employees to managers. Managers can view all attendance records, approve or reject leave requests, and cancel leave requests — without having full owner access to settings, shifts, or employee management.',
+      },
+      {
+        question: 'How many managers can I have?',
+        answer:
+          'On the Espresso plan, you can have up to 2 managers per workspace. The Double Espresso plan allows unlimited managers.',
+      },
+      {
+        question: 'How do I promote an employee to manager?',
+        answer:
+          'Go to the employee detail page and click "Promote to manager". The employee must have a linked user account (they need to sign in to use manager features). You can demote them back to a regular employee at any time.',
+      },
+      {
+        question: 'What can a manager NOT do?',
+        answer:
+          'Managers cannot add, edit, or delete employees. They cannot manage shifts, closures, or workspace settings. They cannot manage billing or promote other employees. These actions are reserved for the workspace owner.',
       },
     ],
   },

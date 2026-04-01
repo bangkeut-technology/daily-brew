@@ -201,6 +201,9 @@ function EmployeeListPage() {
                           variant={employee.active ? 'green' : 'gray'}
                         />
                       </button>
+                      {employee.role === 'manager' && (
+                        <StatusBadge label="Manager" variant="amber" />
+                      )}
                     </div>
                     <button
                       onClick={(e) => {

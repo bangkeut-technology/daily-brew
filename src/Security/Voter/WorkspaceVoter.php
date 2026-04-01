@@ -21,6 +21,7 @@ class WorkspaceVoter extends Voter
     public const string VIEW = 'WORKSPACE_VIEW';
     public const string EDIT = 'WORKSPACE_EDIT';
     public const string DELETE = 'WORKSPACE_DELETE';
+    public const string MANAGE = 'WORKSPACE_MANAGE';
 
     public function __construct(
         private readonly EmployeeRepository $employeeRepository,
@@ -28,7 +29,7 @@ class WorkspaceVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        if (!in_array($attribute, [self::VIEW, self::EDIT, self::DELETE])) {
+        if (!in_array($attribute, [self::VIEW, self::EDIT, self::DELETE, self::MANAGE])) {
             return false;
         }
 
@@ -59,12 +60,19 @@ class WorkspaceVoter extends Voter
             return true;
         }
 
-        // Employees can VIEW workspace resources (read-only)
+        $employee = $this->employeeRepository->findOneByLinkedUserAndWorkspace($user, $workspace);
+        if ($employee === null) {
+            return false;
+        }
+
+        // MANAGE: owner or manager (approve/reject leave, view all attendance)
+        if ($attribute === self::MANAGE) {
+            return $employee->isManager();
+        }
+
+        // VIEW: any linked employee
         if ($attribute === self::VIEW) {
-            $employee = $this->employeeRepository->findOneByLinkedUserAndWorkspace($user, $workspace);
-            if ($employee !== null) {
-                return true;
-            }
+            return true;
         }
 
         // EDIT and DELETE are owner-only

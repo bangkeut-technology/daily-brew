@@ -52,10 +52,11 @@ class LeaveRequestController extends AbstractController
 
         $leaveRequests = $leaveRequestRepository->findByWorkspace($workspace, $statusEnum);
 
-        // Non-owners can only see their own leave requests
+        // Owners and managers see all leave requests; employees see only their own
         $isOwner = $workspace->getOwner()?->getId() === $user->getId();
-        if (!$isOwner) {
-            $employee = $employeeRepository->findOneByLinkedUserAndWorkspace($user, $workspace);
+        $employee = $employeeRepository->findOneByLinkedUserAndWorkspace($user, $workspace);
+        $isManager = $employee?->isManager() ?? false;
+        if (!$isOwner && !$isManager) {
             if ($employee !== null) {
                 $employeeId = $employee->getId();
                 $leaveRequests = array_filter($leaveRequests, fn ($lr) => $lr->getEmployee()->getId() === $employeeId);
@@ -94,9 +95,11 @@ class LeaveRequestController extends AbstractController
             throw $this->createNotFoundException('Employee not found');
         }
 
-        // Employees can only submit leave requests for themselves
+        // Owners and managers can submit for any employee; employees only for themselves
         $isOwner = $workspace->getOwner()?->getId() === $user->getId();
-        if (!$isOwner && $employee->getLinkedUser()?->getId() !== $user->getId()) {
+        $currentEmployee = $employeeRepository->findOneByLinkedUserAndWorkspace($user, $workspace);
+        $isManager = $currentEmployee?->isManager() ?? false;
+        if (!$isOwner && !$isManager && $employee->getLinkedUser()?->getId() !== $user->getId()) {
             return $this->jsonError('You can only submit leave requests for yourself', 403);
         }
 
@@ -137,7 +140,7 @@ class LeaveRequestController extends AbstractController
             throw new NotFoundHttpException('Leave request not found');
         }
 
-        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $leaveRequest);
+        $this->denyAccessUnlessGranted(WorkspaceVoter::MANAGE, $workspace);
 
         $data = json_decode($request->getContent(), true);
         $status = $data['status'] ?? '';
@@ -160,6 +163,7 @@ class LeaveRequestController extends AbstractController
         #[CurrentUser] User $user,
         WorkspaceRepository $workspaceRepository,
         LeaveRequestRepository $leaveRequestRepository,
+        EmployeeRepository $employeeRepository,
         \Doctrine\ORM\EntityManagerInterface $em,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
@@ -174,9 +178,11 @@ class LeaveRequestController extends AbstractController
             throw new NotFoundHttpException('Leave request not found');
         }
 
-        // Employees can only delete their own pending requests
+        // Owners and managers can cancel any request; employees can only cancel their own pending ones
         $isOwner = $workspace->getOwner()?->getId() === $user->getId();
-        if (!$isOwner) {
+        $emp = $employeeRepository->findOneByLinkedUserAndWorkspace($user, $workspace);
+        $isManager = $emp?->isManager() ?? false;
+        if (!$isOwner && !$isManager) {
             if ($leaveRequest->getRequestedBy()?->getId() !== $user->getId()) {
                 return $this->jsonError('You can only cancel your own leave requests', 403);
             }

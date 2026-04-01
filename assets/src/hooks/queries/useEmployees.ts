@@ -86,6 +86,24 @@ export function useUpdateEmployee(workspacePublicId: string) {
   });
 }
 
+export function useUpdateEmployeeRole(workspacePublicId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ publicId, role }: { publicId: string; role: 'employee' | 'manager' }) => {
+      const { data } = await apiAxios.put<Employee>(
+        `/workspaces/${workspacePublicId}/employees/${publicId}/role`,
+        { role },
+      );
+      return data;
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['employees', workspacePublicId] });
+      queryClient.invalidateQueries({ queryKey: ['employees', workspacePublicId, variables.publicId] });
+      queryClient.invalidateQueries({ queryKey: ['plan', workspacePublicId] });
+    },
+  });
+}
+
 export function useDeleteEmployee(workspacePublicId: string) {
   const queryClient = useQueryClient();
   return useMutation({

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import {
   QrCode, Users, Clock, Coffee, Shield, LayoutDashboard,
   MapPin, CalendarDays, Bell, ChevronRight, Crown, Smartphone,
-  Globe, Moon, Zap, CheckCircle,
+  Globe, Moon, Zap, CheckCircle, ShieldCheck,
 } from 'lucide-react';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
@@ -84,10 +84,16 @@ const espressoFeatures = [
     accent: '#4A7C59',
   },
   {
+    icon: <ShieldCheck size={28} strokeWidth={1.6} />,
+    title: 'Manager role',
+    desc: 'Promote up to 2 trusted employees to managers (Espresso) or unlimited (Double Espresso). Managers can approve/reject leave requests, view all attendance, and cancel leave — without access to employee management, shifts, closures, or settings.',
+    accent: '#6B4226',
+  },
+  {
     icon: <Bell size={28} strokeWidth={1.6} />,
     title: 'Push & email notifications',
     desc: 'Real-time push notifications and email alerts for leave requests, approvals, shift changes, closures, and daily attendance summaries.',
-    accent: '#6B4226',
+    accent: '#C17F3B',
   },
 ];
 
@@ -170,6 +176,120 @@ function FeaturesPage() {
             ))}
           </div>
         </div>
+
+        {/* Manager role spotlight */}
+        <motion.div
+          className="mb-20"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="text-center mb-10">
+            <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
+              New feature
+            </p>
+            <h2 className="text-[28px] md:text-[34px] font-semibold text-text-primary font-serif leading-tight">
+              Manager role
+            </h2>
+            <p className="text-[16px] text-text-secondary mt-3 max-w-lg mx-auto">
+              You can't always be at the restaurant. Promote trusted staff to
+              handle day-to-day attendance and leave management for you.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* What managers can do */}
+            <div className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 shadow-[0_2px_12px_rgba(107,66,38,0.05)]">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-xl bg-green/10 flex items-center justify-center">
+                  <CheckCircle size={20} className="text-green" />
+                </div>
+                <h3 className="text-[17px] font-semibold text-text-primary">
+                  What managers can do
+                </h3>
+              </div>
+              <ul className="space-y-3">
+                {[
+                  'View the full attendance dashboard for all employees',
+                  'See all attendance records — not just their own',
+                  'Approve or reject leave requests',
+                  'Cancel leave requests on behalf of employees',
+                  'Submit leave requests for any employee',
+                  'Still check in and out like a regular employee',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2.5">
+                    <CheckCircle size={14} className="text-green mt-0.5 flex-shrink-0" />
+                    <span className="text-[14.5px] text-text-secondary">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* What stays owner-only */}
+            <div className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 shadow-[0_2px_12px_rgba(107,66,38,0.05)]">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-xl bg-red/10 flex items-center justify-center">
+                  <Shield size={20} className="text-red" />
+                </div>
+                <h3 className="text-[17px] font-semibold text-text-primary">
+                  What stays owner-only
+                </h3>
+              </div>
+              <ul className="space-y-3">
+                {[
+                  'Adding, editing, or removing employees',
+                  'Creating and managing shifts',
+                  'Scheduling closure periods',
+                  'Workspace settings (IP, geofencing, device verification)',
+                  'Billing and subscription management',
+                  'Promoting or demoting managers',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2.5">
+                    <Shield size={14} className="text-red mt-0.5 flex-shrink-0" />
+                    <span className="text-[14.5px] text-text-secondary">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* How to promote */}
+          <div className="mt-6 bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 shadow-[0_2px_12px_rgba(107,66,38,0.05)]">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-coffee/10 flex items-center justify-center">
+                <ShieldCheck size={20} className="text-coffee" />
+              </div>
+              <h3 className="text-[17px] font-semibold text-text-primary">
+                How to promote an employee
+              </h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[
+                { step: '1', title: 'Link their account', desc: 'The employee must have a linked user account — they need to sign in to access manager features.' },
+                { step: '2', title: 'Go to employee detail', desc: 'Navigate to the employee detail page from your Employees list.' },
+                { step: '3', title: 'Tap promote', desc: 'Click "Promote to manager". You can demote them back to a regular employee at any time.' },
+              ].map((s) => (
+                <div key={s.step} className="flex items-start gap-3">
+                  <span className="w-7 h-7 rounded-full bg-coffee flex items-center justify-center text-[13px] font-bold text-white flex-shrink-0">
+                    {s.step}
+                  </span>
+                  <div>
+                    <p className="text-[15px] font-semibold text-text-primary mb-0.5">{s.title}</p>
+                    <p className="text-[13.5px] text-text-secondary leading-relaxed">{s.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-5 flex items-center gap-3 px-4 py-3 rounded-xl bg-amber/8 border border-amber/15">
+              <Crown size={16} className="text-amber flex-shrink-0" />
+              <p className="text-[14px] text-text-secondary">
+                <span className="font-medium text-amber">Espresso plan:</span> up to 2 managers per workspace.{' '}
+                <span className="font-medium text-amber">Double Espresso:</span> unlimited managers.
+              </p>
+            </div>
+          </div>
+        </motion.div>
 
         {/* Why DailyBrew */}
         <motion.div

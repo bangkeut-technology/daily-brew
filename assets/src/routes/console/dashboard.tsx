@@ -33,12 +33,13 @@ function DashboardPage() {
     );
   }
 
-  // Employee dashboard if user is an employee (not an owner) in this workspace
-  if (roleContext.isEmployee && !roleContext.isOwner) {
+  // Managers see the owner dashboard (attendance overview, leave approvals)
+  // Regular employees see the employee dashboard (own data only)
+  if (roleContext.isEmployee && !roleContext.isOwner && !roleContext.isManager) {
     return <EmployeeDashboard />;
   }
 
-  // Owner dashboard
+  // Owner and manager dashboard
   return <OwnerDashboard />;
 }
 

@@ -10,6 +10,7 @@ import {
   CalendarDays,
   Bell,
   Smartphone,
+  ShieldCheck,
   Crown,
   ChevronRight,
 } from 'lucide-react';
@@ -74,10 +75,16 @@ const espressoFeatures = [
     accent: '#3B6FA0',
   },
   {
+    icon: <ShieldCheck size={22} strokeWidth={1.8} />,
+    title: 'Manager role',
+    desc: 'Promote trusted staff to managers. They can approve leave and view all attendance.',
+    accent: '#6B4226',
+  },
+  {
     icon: <Bell size={22} strokeWidth={1.8} />,
     title: 'Notifications',
     desc: 'Push and email alerts for leave requests, shift changes, closures, and daily summaries.',
-    accent: '#6B4226',
+    accent: '#C17F3B',
   },
 ];
 

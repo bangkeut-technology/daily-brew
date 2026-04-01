@@ -56,7 +56,8 @@ function AttendancePage() {
   const { data: roleContext, isLoading: roleLoading } = useRoleContext();
   const fmtDate = useDateFormat();
 
-  const isEmployee = !!roleContext && roleContext.isEmployee && !roleContext.isOwner;
+  const isManager = roleContext?.isManager ?? false;
+  const isEmployee = !!roleContext && roleContext.isEmployee && !roleContext.isOwner && !isManager;
   const employeePublicId = roleContext?.employee?.publicId;
 
   const setFrom = (value: string) => {

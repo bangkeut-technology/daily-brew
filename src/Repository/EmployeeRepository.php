@@ -7,6 +7,7 @@ namespace App\Repository;
 use App\Entity\Employee;
 use App\Entity\User;
 use App\Entity\Workspace;
+use App\Enum\EmployeeRoleEnum;
 use App\Enum\EmployeeStatusEnum;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -97,6 +98,21 @@ class EmployeeRepository extends AbstractRepository
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    public function countManagersByWorkspace(Workspace $workspace): int
+    {
+        return (int) $this->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->where('e.workspace = :ws')
+            ->andWhere('e.role = :role')
+            ->andWhere('e.status = :status')
+            ->andWhere('e.deletedAt IS NULL')
+            ->setParameter('ws', $workspace)
+            ->setParameter('role', EmployeeRoleEnum::MANAGER)
+            ->setParameter('status', EmployeeStatusEnum::ACTIVE)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     /** Soft-delete all employees created by the given user. */

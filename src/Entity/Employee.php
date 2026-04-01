@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\EmployeeRoleEnum;
 use App\Enum\EmployeeStatusEnum;
 use App\Repository\EmployeeRepository;
 use DateTimeImmutable;
@@ -60,6 +61,10 @@ class Employee extends AbstractBaseEntity
     #[ORM\Column(type: 'string', enumType: EmployeeStatusEnum::class)]
     #[Groups(['employee:read'])]
     private EmployeeStatusEnum $status = EmployeeStatusEnum::ACTIVE;
+
+    #[ORM\Column(type: 'string', enumType: EmployeeRoleEnum::class, options: ['default' => 'employee'])]
+    #[Groups(['employee:read'])]
+    private EmployeeRoleEnum $role = EmployeeRoleEnum::EMPLOYEE;
 
     /** The user who created this employee (workspace owner). */
     #[ORM\ManyToOne(targetEntity: User::class)]
@@ -213,6 +218,24 @@ class Employee extends AbstractBaseEntity
     public function isActive(): bool
     {
         return $this->status === EmployeeStatusEnum::ACTIVE;
+    }
+
+    // ── Role ─────────────────────────────────────────────────
+
+    public function getRole(): EmployeeRoleEnum
+    {
+        return $this->role;
+    }
+
+    public function setRole(EmployeeRoleEnum $role): static
+    {
+        $this->role = $role;
+        return $this;
+    }
+
+    public function isManager(): bool
+    {
+        return $this->role === EmployeeRoleEnum::MANAGER;
     }
 
     // ── Relations ──────────────────────────────────────────────

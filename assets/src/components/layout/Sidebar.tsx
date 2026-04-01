@@ -43,6 +43,12 @@ const ownerManageNav: NavItemDef[] = [
     { to: '/console/settings', icon: Settings, label: 'nav.settings', tourId: 'nav-settings' },
 ];
 
+const managerMainNav: NavItemDef[] = [
+    { to: '/console/dashboard', icon: LayoutDashboard, label: 'nav.dashboard' },
+    { to: '/console/attendance', icon: CalendarCheck, label: 'nav.attendance' },
+    { to: '/console/leave', icon: FileText, label: 'nav.leaveRequests', espresso: true },
+];
+
 const employeeMainNav: NavItemDef[] = [
     { to: '/console/dashboard', icon: LayoutDashboard, label: 'nav.dashboard' },
     { to: '/console/attendance', icon: CalendarCheck, label: 'nav.myAttendance' },
@@ -165,11 +171,14 @@ export function Sidebar() {
 
     const isOwner = roleContext?.isOwner ?? false;
     const isEmployee = roleContext?.isEmployee ?? false;
+    const isManager = roleContext?.isManager ?? false;
     const roleLoaded = !!roleContext;
     // Show owner nav if owner of current workspace, or if no role loaded yet (loading state)
     const showOwnerView = !roleLoaded || isOwner;
-    // Show employee nav only when explicitly employee and NOT owner in this workspace
-    const showEmployeeView = roleLoaded && isEmployee && !isOwner;
+    // Show manager nav when employee is manager and NOT owner
+    const showManagerView = roleLoaded && isManager && !isOwner;
+    // Show employee nav only when explicitly employee, NOT owner, and NOT manager
+    const showEmployeeView = roleLoaded && isEmployee && !isOwner && !isManager;
 
     const canUseLeaveRequests = plan?.canUseLeaveRequests ?? false;
     const hasWorkspace = !!workspacePublicId;
@@ -189,7 +198,7 @@ export function Sidebar() {
                             ...(roleContext.ownedWorkspaces ?? []).map((ws) => ({ ...ws, role: 'owner' as const })),
                             ...(roleContext.linkedWorkspaces ?? [])
                                 .filter((lw) => lw.workspacePublicId && !roleContext.ownedWorkspaces?.some((ow) => ow.publicId === lw.workspacePublicId))
-                                .map((lw) => ({ publicId: lw.workspacePublicId!, name: lw.workspaceName ?? '', role: 'employee' as const })),
+                                .map((lw) => ({ publicId: lw.workspacePublicId!, name: lw.workspaceName ?? '', role: (lw.role === 'manager' ? 'manager' : 'employee') as const })),
                         ]}
                         planLabel={plan?.planLabel}
                         isEspresso={plan?.isEspresso}
@@ -209,6 +218,17 @@ export function Sidebar() {
                         />
                         <Divider />
                         <NavSection items={ownerManageNav} disabled={!hasWorkspace} />
+                    </>
+                )}
+
+                {showManagerView && (
+                    <>
+                        <NavItem to="/console/dashboard" icon={LayoutDashboard} label="nav.dashboard" />
+                        <NavSection
+                            items={managerMainNav.filter((i) => i.to !== '/console/dashboard')}
+                            canUseLeaveRequests={canUseLeaveRequests}
+                            disabled={!hasWorkspace}
+                        />
                     </>
                 )}
 

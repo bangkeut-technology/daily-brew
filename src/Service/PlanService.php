@@ -13,6 +13,7 @@ class PlanService
 {
     public const FREE_EMPLOYEE_LIMIT = 10;
     public const ESPRESSO_EMPLOYEE_LIMIT = 20;
+    public const ESPRESSO_MANAGER_LIMIT = 2;
 
     public function __construct(
         private SubscriptionRepository $subscriptionRepository,
@@ -77,6 +78,35 @@ class PlanService
         return $this->isAtLeastEspresso($workspace);
     }
 
+    public function canUseManagers(Workspace $workspace): bool
+    {
+        return $this->isAtLeastEspresso($workspace);
+    }
+
+    public function getManagerLimit(Workspace $workspace): ?int
+    {
+        $plan = $this->getPlan($workspace);
+        return match ($plan) {
+            PlanEnum::Free => 0,
+            PlanEnum::Espresso => self::ESPRESSO_MANAGER_LIMIT,
+            PlanEnum::DoubleEspresso => null, // unlimited
+        };
+    }
+
+    public function canPromoteToManager(Workspace $workspace): bool
+    {
+        $limit = $this->getManagerLimit($workspace);
+        if ($limit === null) {
+            return true; // unlimited
+        }
+        if ($limit === 0) {
+            return false;
+        }
+
+        $count = $this->employeeRepository->countManagersByWorkspace($workspace);
+        return $count < $limit;
+    }
+
     public function getEmployeeLimit(Workspace $workspace): ?int
     {
         $plan = $this->getPlan($workspace);
@@ -121,6 +151,9 @@ class PlanService
             'canUseLeaveRequests' => $this->canUseLeaveRequests($workspace),
             'canUseShiftTimeRules' => $this->canUseShiftTimeRules($workspace),
             'canUseDeviceVerification' => $this->canUseDeviceVerification($workspace),
+            'canUseManagers' => $this->canUseManagers($workspace),
+            'managerLimit' => $this->getManagerLimit($workspace),
+            'managerCount' => $this->employeeRepository->countManagersByWorkspace($workspace),
             'currentPeriodEnd' => $subscription?->getCurrentPeriodEnd()?->format('c'),
             'status' => $subscription?->getStatus()->value ?? 'active',
             'source' => $subscription?->getSource()?->value ?? null,

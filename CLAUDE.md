@@ -33,6 +33,7 @@ Any request to add the above should be deferred to a future milestone.
 - Per-day shift schedules (ShiftTimeRule per day-of-week)
 - Leave request management
 - Employee username for BasilBook staff linking
+- Manager role (up to 2 per workspace) — can approve/reject leave, view all attendance
 - Push notifications (Expo) for leave requests, shift changes, closures
 - Email notifications (Mailgun) for all events
 - Daily attendance summary notification (push + email)
@@ -40,8 +41,9 @@ Any request to add the above should be deferred to a future milestone.
 ### Double Espresso Plan ($39.99/month · $399/year)
 - Unlimited employees
 - Everything in Espresso
+- Unlimited managers
 - Priority support
-- Future: Multiple QR codes per workspace, manager role, white-label branding
+- Future: Multiple QR codes per workspace, white-label branding
 
 ### Dual Role System
 Users can be owners (create workspaces) or employees (linked to an employee record).
@@ -112,6 +114,7 @@ Users can be owners (create workspaces) or employees (linked to an employee reco
 - phoneNumber (nullable)
 - dob (date, nullable) — date of birth
 - joinedAt (date, nullable) — join date
+- role (enum: employee/manager, default employee) — workspace-level role
 - status (enum: active/inactive, default active)
 - deletedAt (datetime, nullable) — soft delete
 - createdAt, updatedAt
@@ -224,6 +227,15 @@ On check-out via QR:
   - Employee entering their employee public ID during onboarding
 - Unlinking is available from the employee detail page (with confirmation modal)
 - Role context returns `linkedWorkspaces[]` — all workspaces where the user is an employee
+
+### Manager role (Espresso)
+- Employee can be promoted to manager by the workspace owner from the employee detail page
+- Managers must have a linked user account
+- Espresso plan: up to 2 managers per workspace; Double Espresso: unlimited
+- Manager can: view all attendance, approve/reject leave requests, view all leave requests, cancel leave requests
+- Manager cannot: add/edit/delete employees, manage shifts/closures/settings, manage billing, promote other managers
+- WorkspaceVoter `MANAGE` attribute grants manager-level access (owner + manager)
+- `EDIT` and `DELETE` remain owner-only
 
 ### Employee duplication prevention
 - Backend checks for existing employee with same firstName + lastName in the workspace before creation
@@ -457,7 +469,7 @@ DailyBrew employees can be linked to BasilBook staff records via the `username` 
 
 - Payroll / payslip generation
 - KPI / evaluation / scoring
-- Team members / manager roles (only owner role for now)
+- Team members (multi-manager hierarchy beyond owner + manager)
 - Employee mobile app (Expo) — check-in is mobile web only
 - Export to CSV/Excel
 - Demo mode
