@@ -20,6 +20,7 @@ DailyBrew helps restaurant owners manage their team's daily attendance through Q
 - Dual role system — users can be owners and/or employees across workspaces
 - Push notifications via Expo (leave requests, shift changes, closures)
 - Email notifications via Mailgun (same events + daily attendance summary for Espresso)
+- Per-workspace timezone with auto-detection — works worldwide (Asia, Europe, Americas)
 - Multi-language support (English, French, Khmer)
 - Dark mode with warm coffee tones
 
@@ -85,6 +86,9 @@ composer install
 
 # Configure database in .env
 # DATABASE_URL="mysql://user:pass@127.0.0.1:3306/dailybrew?serverVersion=8.0.32&charset=utf8mb4"
+
+# Ensure PHP timezone is set to UTC (in php.ini)
+# date.timezone = UTC
 
 # Create database and run migrations
 php bin/console doctrine:database:create

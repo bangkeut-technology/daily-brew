@@ -79,7 +79,7 @@ Users can be owners (create workspaces) or employees (linked to an employee reco
 - ipRestrictionEnabled (boolean, default false)
 - allowedIps (array, nullable) — IPs allowed to scan QR codes
 - deviceVerificationEnabled (boolean, default false) — Espresso only
-- timezone (string, default "Asia/Phnom_Penh")
+- timezone (string, default "Asia/Phnom_Penh") — auto-detected from browser on workspace creation
 - dateFormat (string, default "DD/MM/YYYY") — DD/MM/YYYY, MM/DD/YYYY, or YYYY-MM-DD
 - geofencingEnabled (boolean, default false)
 - geofencingLatitude (float, nullable)
@@ -178,7 +178,17 @@ Before creating any attendance record, check if the date falls within any Closur
 CheckinService blocks check-in for employees with an approved full-day leave for the current date. Checkin status API returns `onLeave` (boolean) and `leaveIsFullDay` (boolean) fields.
 
 ### Late / left early detection
-Computed at check-in/out time relative to the Employee's assigned Shift + grace minutes. If no Shift, always false.
+Computed at check-in/out time relative to the Employee's assigned Shift + grace minutes. If no Shift, always false. All time comparisons use the workspace timezone from `WorkspaceSetting.timezone`.
+
+### Timezone handling
+- **Server PHP timezone**: must be set to `UTC` (`date.timezone = UTC` in php.ini)
+- **Workspace timezone**: stored per-workspace in `WorkspaceSetting.timezone` (IANA format, e.g. `Asia/Phnom_Penh`, `Europe/Paris`)
+- **Auto-detection**: on workspace creation, the browser's `Intl.DateTimeFormat().resolvedOptions().timeZone` is sent and validated against `DateTimeZone::listIdentifiers()`
+- **Settings page**: timezone selector uses `Intl.supportedValuesOf('timeZone')` to list all IANA timezones dynamically, sorted by UTC offset, with DST-aware offset labels
+- **Rule**: always pass an explicit `DateTimeZone` when constructing dates — never rely on PHP's default. Store datetimes in UTC, compare in workspace timezone
+- **CheckinService**: reads `WorkspaceSetting.timezone`, converts `now` to workspace TZ for late/early detection, computes `today` in workspace TZ for date-based lookups
+- **DashboardService**: same pattern — `today` is computed in workspace TZ so queries return correct results regardless of server timezone
+- **Seeder**: shift and attendance times must use the workspace timezone (`new \DateTime('07:00', $tz)`) — never omit the timezone parameter
 
 ### QR check-in — workspace-level QR code
 - Each workspace has a `qrToken` (20-char random string) generated on creation
@@ -351,6 +361,7 @@ Route `/console/dashboard` (when `isOwner`):
 ### Settings page
 - Espresso-gated toggles (IP restriction, device verification, geofencing) display as OFF when the current plan does not support them, regardless of the persisted server state
 - "Use my current IP" button calls `GET /workspaces/{publicId}/settings/my-ip`
+- Timezone selector dynamically generated from `Intl.supportedValuesOf('timeZone')` with current UTC offset (DST-aware), fallback to curated list for older browsers
 
 ### Check-in mobile page
 Route `/checkin/:qrToken`:

@@ -98,20 +98,20 @@ class SeedReviewerCommand extends Command
         $io->text('Upgraded to Espresso plan');
 
         // ── Shifts ───────────────────────────────────────────────
-        $tz = new \DateTimeZone('Asia/Phnom_Penh');
-
+        // Shift times are conceptual (Doctrine `time` type) — no timezone needed.
+        // Matches how the API creates them: \DateTime::createFromFormat('H:i', '07:00')
         $morningShift = $this->shiftService->create(
             $workspace,
             'Morning',
-            new \DateTime('07:00', $tz),
-            new \DateTime('15:00', $tz),
+            new \DateTime('07:00'),
+            new \DateTime('15:00'),
         );
 
         $eveningShift = $this->shiftService->create(
             $workspace,
             'Evening',
-            new \DateTime('15:00', $tz),
-            new \DateTime('23:00', $tz),
+            new \DateTime('15:00'),
+            new \DateTime('23:00'),
         );
         $io->text('Created shifts: Morning (07:00–15:00), Evening (15:00–23:00)');
 
@@ -174,7 +174,13 @@ class SeedReviewerCommand extends Command
         $io->text('Created closure: Khmer New Year');
 
         // ── Attendance records (last 7 days) ─────────────────────
+        // CheckinService stores checkInAt/checkOutAt in UTC ($nowUtc).
+        // Doctrine datetime_immutable has no TZ info — values are read back as server-default (UTC).
+        // AttendanceDTO then converts UTC → workspace TZ for display.
+        // So seeder must also store in UTC: build time in workspace TZ, then ->setTimezone(UTC).
         $attendanceCount = 0;
+        $tz = new \DateTimeZone('Asia/Phnom_Penh');
+        $utc = new \DateTimeZone('UTC');
 
         for ($d = 6; $d >= 0; $d--) {
             $date = new \DateTimeImmutable("-{$d} days", $tz);
@@ -200,6 +206,7 @@ class SeedReviewerCommand extends Command
                 // Simulate some variation: occasional late arrival
                 $lateMinutes = ($d === 3 && $i === 0) ? 12 : (($d === 1 && $i === 2) ? 8 : 0);
 
+                // Build check-in time in workspace TZ, then convert to UTC for storage
                 $checkInTime = \DateTimeImmutable::createFromFormat(
                     'Y-m-d H:i',
                     $date->format('Y-m-d') . ' ' . $shiftStart->format('H:i'),
@@ -208,6 +215,7 @@ class SeedReviewerCommand extends Command
                 if ($lateMinutes > 0) {
                     $checkInTime = $checkInTime->modify("+{$lateMinutes} minutes");
                 }
+                $checkInTime = $checkInTime->setTimezone($utc);
 
                 // Simulate occasional early departure
                 $earlyMinutes = ($d === 2 && $i === 4) ? 15 : 0;
@@ -220,6 +228,7 @@ class SeedReviewerCommand extends Command
                 if ($earlyMinutes > 0) {
                     $checkOutTime = $checkOutTime->modify("-{$earlyMinutes} minutes");
                 }
+                $checkOutTime = $checkOutTime->setTimezone($utc);
 
                 // Skip one employee on one day to show "absent"
                 if ($d === 4 && $i === 3) {
