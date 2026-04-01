@@ -7,6 +7,8 @@ interface CustomDatePickerProps {
   onChange: (value: string) => void;
   className?: string;
   isDateDisabled?: (dateStr: string) => boolean;
+  /** Override "today" (YYYY-MM-DD) for workspace-TZ-aware highlight. Defaults to browser local. */
+  todayOverride?: string;
 }
 
 const WEEKDAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
@@ -41,7 +43,7 @@ function getFirstDayOfWeek(year: number, month: number) {
 
 type PickerView = 'days' | 'months' | 'years';
 
-export function CustomDatePicker({ value, onChange, className = '', isDateDisabled }: CustomDatePickerProps) {
+export function CustomDatePicker({ value, onChange, className = '', isDateDisabled, todayOverride }: CustomDatePickerProps) {
   const [open, setOpen] = useState(false);
   const [pickerView, setPickerView] = useState<PickerView>('days');
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -116,8 +118,8 @@ export function CustomDatePicker({ value, onChange, className = '', isDateDisabl
 
   const [selectedYear, selectedMonth, selectedDay] = value ? parseYMD(value) : [-1, -1, -1];
 
-  const today = new Date();
-  const todayStr = formatDate(today.getFullYear(), today.getMonth(), today.getDate());
+  const todayStr = todayOverride ?? (() => { const t = new Date(); return formatDate(t.getFullYear(), t.getMonth(), t.getDate()); })();
+  const [todayYear, todayMonth] = parseYMD(todayStr);
 
   const currentYear = new Date().getFullYear();
   const yearRange = Array.from({ length: 100 }, (_, i) => currentYear - 80 + i);
@@ -207,7 +209,7 @@ export function CustomDatePicker({ value, onChange, className = '', isDateDisabl
                     'py-2 rounded-lg text-[14px] font-medium border-none cursor-pointer transition-colors',
                     i === viewMonth
                       ? 'bg-coffee text-white'
-                      : i === today.getMonth() && viewYear === today.getFullYear()
+                      : i === todayMonth && viewYear === todayYear
                         ? 'bg-amber/12 text-amber hover:bg-amber/20'
                         : 'bg-transparent text-text-primary hover:bg-cream-3/40'
                   )}
@@ -230,7 +232,7 @@ export function CustomDatePicker({ value, onChange, className = '', isDateDisabl
                     'py-2 rounded-lg text-[14px] font-medium border-none cursor-pointer transition-colors',
                     y === viewYear
                       ? 'bg-coffee text-white'
-                      : y === today.getFullYear()
+                      : y === todayYear
                         ? 'bg-amber/12 text-amber hover:bg-amber/20'
                         : 'bg-transparent text-text-primary hover:bg-cream-3/40'
                   )}

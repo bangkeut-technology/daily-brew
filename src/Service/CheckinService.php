@@ -190,7 +190,7 @@ class CheckinService
             if ($dayOfWeek !== null) {
                 foreach ($shift->getTimeRules() as $rule) {
                     if ($rule->getDayOfWeek() === $dayOfWeek) {
-                        return \DateTimeImmutable::createFromFormat('H:i', $rule->getStartTime()) ?: null;
+                        return DateService::createFromFormat('H:i', $rule->getStartTime()) ?: null;
                     }
                 }
             }
@@ -206,7 +206,7 @@ class CheckinService
             if ($dayOfWeek !== null) {
                 foreach ($shift->getTimeRules() as $rule) {
                     if ($rule->getDayOfWeek() === $dayOfWeek) {
-                        return \DateTimeImmutable::createFromFormat('H:i', $rule->getEndTime()) ?: null;
+                        return DateService::createFromFormat('H:i', $rule->getEndTime()) ?: null;
                     }
                 }
             }

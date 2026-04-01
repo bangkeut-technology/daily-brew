@@ -185,10 +185,44 @@ Computed at check-in/out time relative to the Employee's assigned Shift + grace 
 - **Workspace timezone**: stored per-workspace in `WorkspaceSetting.timezone` (IANA format, e.g. `Asia/Phnom_Penh`, `Europe/Paris`)
 - **Auto-detection**: on workspace creation, the browser's `Intl.DateTimeFormat().resolvedOptions().timeZone` is sent and validated against `DateTimeZone::listIdentifiers()`
 - **Settings page**: timezone selector uses `Intl.supportedValuesOf('timeZone')` to list all IANA timezones dynamically, sorted by UTC offset, with DST-aware offset labels
-- **Rule**: always pass an explicit `DateTimeZone` when constructing dates — never rely on PHP's default. Store datetimes in UTC, compare in workspace timezone
-- **CheckinService**: reads `WorkspaceSetting.timezone`, converts `now` to workspace TZ for late/early detection, computes `today` in workspace TZ for date-based lookups
-- **DashboardService**: same pattern — `today` is computed in workspace TZ so queries return correct results regardless of server timezone
-- **Seeder**: shift and attendance times must use the workspace timezone (`new \DateTime('07:00', $tz)`) — never omit the timezone parameter
+
+#### DateService (`src/Service/DateService.php`)
+**Every `DateTime` / `DateTimeImmutable` in the codebase MUST go through `DateService`.** Never write `new \DateTime()` or `new \DateTimeImmutable()` directly.
+
+| Method | Returns | Use for |
+|---|---|---|
+| `DateService::now()` | `DateTimeImmutable` (UTC) | Timestamps: createdAt, reviewedAt, canceledAt, deletedAt |
+| `DateService::today($tz)` | `DateTimeImmutable` (midnight in `$tz`) | Date-based lookups: "today's attendance", closure checks |
+| `DateService::relative('+1 hour')` | `DateTimeImmutable` (UTC) | Expiry times, relative dates |
+| `DateService::parse('2026-04-01')` | `DateTimeImmutable` (UTC) | User-supplied date strings |
+| `DateService::createFromFormat($fmt, $val, $tz?)` | `DateTimeImmutable` | Shift time parsing, custom formats |
+| `DateService::toUtc($dt)` | `DateTimeImmutable` (UTC) | Convert workspace-local to UTC for storage |
+| `DateService::mutableNow()` | `DateTime` (UTC) | Doctrine `datetime` columns |
+| `DateService::mutableRelative($expr)` | `DateTime` (UTC) | Doctrine `datetime` columns with offset |
+| `DateService::mutableParse($val)` | `DateTime` (UTC) | Doctrine `datetime` columns from strings |
+| `DateService::utc()` | `DateTimeZone` | Shared UTC timezone instance |
+
+#### Backend rules
+- **Storage**: all `datetime` / `datetime_immutable` columns store UTC
+- **Date columns**: `date` / `date_immutable` store the workspace-local calendar date (set via `DateService::today($wsTz)`)
+- **Display**: `AttendanceDTO::fromEntity()` and `AttendanceController` convert UTC → workspace TZ using `setTimezone($tz)` before formatting
+- **Late/early detection**: `CheckinService` uses `DateService::now()` for storage, converts to workspace TZ for time comparisons
+- **Seeder**: forces `date_default_timezone_set('UTC')` at start, uses `DateService` for all dates, converts attendance times from workspace TZ to UTC via `->setTimezone($utc)`
+
+#### Frontend timezone utilities
+- **`lib/timezone.ts`**: `todayInTimezone(tz)`, `parseDateAsUTC(dateStr)`, `formatDateUTC(date)`, `nowInTimezone(tz)`, `startOfMonthInTimezone(tz)`
+- **`hooks/useWorkspaceTimezone.ts`**: returns `{ timezone, today(), startOfMonth(), todayMidnight(), parseDate() }` — all workspace-TZ-aware
+- **`lib/dateFormat.ts`**: `formatDate()` uses UTC getters for YYYY-MM-DD strings to prevent browser-TZ day shift
+- **Rule**: never use `new Date().toISOString().split('T')[0]` for "today" — use `wsTz.today()` instead
+- **Rule**: never use `new Date(dateStr)` for YYYY-MM-DD strings — use `parseDateAsUTC(dateStr)` to prevent day shift
+- **Rule**: all date comparisons (closures, leaves, attendance ranges) must use `parseDateAsUTC()` on both sides
+- **CustomDatePicker**: accepts optional `todayOverride` prop for workspace-TZ-aware "today" highlight
+
+### Workspace deletion
+- `WorkspaceService::delete()` cancels active Paddle subscription via API before soft-deleting
+- `AccountDeletionService::softDelete()` delegates to `WorkspaceService::delete()` for each owned workspace
+- Subscription is marked as `Canceled` with `canceledAt` timestamp locally, regardless of Paddle API response
+- Paddle API failure does not block workspace deletion (logged and swallowed)
 
 ### QR check-in — workspace-level QR code
 - Each workspace has a `qrToken` (20-char random string) generated on creation
