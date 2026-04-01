@@ -21,7 +21,7 @@ final readonly class DashboardService
     public function getTodayStats(Workspace $workspace): array
     {
         $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
-        $today = new \DateTimeImmutable('today', $tz);
+        $today = DateService::today($tz);
         $totalActive = $this->employeeRepository->countActiveByWorkspace($workspace);
         $presentCount = $this->attendanceRepository->countByWorkspaceAndDate($workspace, $today);
         $lateCount = $this->attendanceRepository->countLateByWorkspaceAndDate($workspace, $today);

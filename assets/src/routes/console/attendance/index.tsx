@@ -12,21 +12,13 @@ import { AttendanceRow } from '@/components/shared/AttendanceRow';
 import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { useDateFormat } from '@/hooks/useDateFormat';
+import { useWorkspaceTimezone } from '@/hooks/useWorkspaceTimezone';
 
-function getStartOfMonth(): string {
-  const now = new Date();
-  return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-01`;
-}
-
-function getToday(): string {
-  return new Date().toISOString().split('T')[0];
-}
-
-function getSearchParams() {
+function getSearchParams(today: () => string, startOfMonth: () => string) {
   const params = new URLSearchParams(window.location.search);
   return {
-    from: params.get('from') || getStartOfMonth(),
-    to: params.get('to') || getToday(),
+    from: params.get('from') || startOfMonth(),
+    to: params.get('to') || today(),
     employee: params.get('employee') || '',
   };
 }
@@ -46,7 +38,8 @@ export const Route = createFileRoute('/console/attendance/')({
 
 function AttendancePage() {
   const { t } = useTranslation();
-  const initial = getSearchParams();
+  const wsTz = useWorkspaceTimezone();
+  const initial = getSearchParams(wsTz.today, wsTz.startOfMonth);
   const [from, setFromState] = useState(initial.from);
   const [to, setToState] = useState(initial.to);
   const [employeeFilter, setEmployeeFilterState] = useState(initial.employee);

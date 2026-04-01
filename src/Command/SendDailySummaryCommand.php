@@ -45,7 +45,7 @@ class SendDailySummaryCommand extends Command
             }
 
             $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
-            $today = new \DateTimeImmutable('today', $tz);
+            $today = \App\Service\DateService::today($tz);
 
             $totalEmployees = $this->employeeRepository->countActiveByWorkspace($workspace);
             if ($totalEmployees === 0) {

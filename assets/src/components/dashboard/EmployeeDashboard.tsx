@@ -21,6 +21,8 @@ import { getWorkspacePublicId } from '@/lib/auth';
 import { useLeaveRequests, useDeleteLeaveRequest } from '@/hooks/queries/useLeaveRequests';
 import { useClosures } from '@/hooks/queries/useClosures';
 import { useDateFormat } from '@/hooks/useDateFormat';
+import { useWorkspaceTimezone } from '@/hooks/useWorkspaceTimezone';
+import { parseDateAsUTC, nowInTimezone } from '@/lib/timezone';
 import { Avatar } from '@/components/shared/Avatar';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { StatusBadge } from '@/components/shared/StatusBadge';
@@ -35,11 +37,12 @@ function formatTime(time: string | null): string {
 }
 
 function formatDate(iso: string): string {
-  const d = new Date(iso);
+  const d = new Date(iso + 'T12:00:00Z');
   return d.toLocaleDateString(undefined, {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
+    timeZone: 'UTC',
   });
 }
 
@@ -138,8 +141,9 @@ export function EmployeeDashboard() {
   const onLeave = (checkinData as { onLeave?: boolean })?.onLeave ?? false;
   const leaveIsFullDay = (checkinData as { leaveIsFullDay?: boolean })?.leaveIsFullDay ?? false;
 
-  const now = new Date();
-  const todayStr = now.toLocaleDateString(undefined, {
+  const wsTz = useWorkspaceTimezone();
+  const wsNow = nowInTimezone(wsTz.timezone);
+  const todayStr = wsNow.toLocaleDateString(undefined, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -176,18 +180,16 @@ export function EmployeeDashboard() {
 
       {/* Closure notice */}
       {(() => {
-        const now = new Date();
-        now.setHours(0, 0, 0, 0);
+        const todayMid = wsTz.todayMidnight();
         const activeClosure = (closures ?? []).find((c) => {
-          const s = new Date(c.startDate);
-          const e = new Date(c.endDate);
-          return now >= s && now <= e;
+          const s = parseDateAsUTC(c.startDate);
+          const e = parseDateAsUTC(c.endDate);
+          return todayMid >= s && todayMid <= e;
         });
         const nextClosure = (closures ?? []).find((c) => {
-          const s = new Date(c.startDate);
-          const in7 = new Date();
-          in7.setDate(in7.getDate() + 7);
-          return s > now && s <= in7;
+          const s = parseDateAsUTC(c.startDate);
+          const in7 = new Date(todayMid.getTime() + 7 * 86400000);
+          return s > todayMid && s <= in7;
         });
 
         return (
@@ -425,10 +427,9 @@ export function EmployeeDashboard() {
         <GlassCardHeader title={t('dashboard.upcomingClosures', 'Upcoming closures')} />
         <div className="px-5 py-4">
           {(() => {
-            const nowDate = new Date();
-            nowDate.setHours(0, 0, 0, 0);
+            const nowDate = wsTz.todayMidnight();
             const upcoming = (closures ?? [])
-              .filter((c) => new Date(c.endDate) >= nowDate)
+              .filter((c) => parseDateAsUTC(c.endDate) >= nowDate)
               .sort((a, b) => a.startDate.localeCompare(b.startDate))
               .slice(0, 5);
 
@@ -451,8 +452,8 @@ export function EmployeeDashboard() {
             return (
               <div className="space-y-2">
                 {upcoming.map((c) => {
-                  const start = new Date(c.startDate);
-                  const end = new Date(c.endDate);
+                  const start = parseDateAsUTC(c.startDate);
+                  const end = parseDateAsUTC(c.endDate);
                   const isActive = nowDate >= start && nowDate <= end;
                   return (
                     <div key={c.publicId} className="flex items-center gap-3 py-2">
@@ -479,7 +480,7 @@ export function EmployeeDashboard() {
       {/* Pending & upcoming leave requests */}
       {(() => {
         const pendingLeaves = (allLeaves ?? [])
-          .filter((l) => l.employeePublicId === employee.publicId && (l.status === 'pending' || (l.status === 'approved' && l.endDate >= new Date().toISOString().split('T')[0])))
+          .filter((l) => l.employeePublicId === employee.publicId && (l.status === 'pending' || (l.status === 'approved' && l.endDate >= wsTz.today())))
           .sort((a, b) => a.startDate.localeCompare(b.startDate))
           .slice(0, 5);
 
@@ -541,11 +542,10 @@ export function EmployeeDashboard() {
                 }[] = [];
 
                 // Build last 7 days from today's data and placeholders
-                const todayDate = new Date();
+                const todayMid = wsTz.todayMidnight();
                 for (let i = 0; i < 7; i++) {
-                  const d = new Date(todayDate);
-                  d.setDate(d.getDate() - i);
-                  const dateStr = d.toISOString().split('T')[0];
+                  const d = new Date(todayMid.getTime() - i * 86400000);
+                  const dateStr = `${d.getUTCFullYear()}-${(d.getUTCMonth() + 1).toString().padStart(2, '0')}-${d.getUTCDate().toString().padStart(2, '0')}`;
                   const label = formatDate(dateStr);
 
                   if (i === 0 && today) {
@@ -591,7 +591,7 @@ export function EmployeeDashboard() {
                       </>
                     ) : (
                       <StatusBadge
-                        label={day.date === new Date().toISOString().split('T')[0]
+                        label={day.date === wsTz.today()
                           ? t('dashboard.notYet', 'Not yet')
                           : '\u2014'}
                         variant="gray"

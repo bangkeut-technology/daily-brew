@@ -9,6 +9,7 @@ import { CustomTimePicker } from '@/components/shared/CustomTimePicker';
 import { Toggle } from '@/components/shared/Toggle';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import type { ClosurePeriod } from '@/types';
+import { parseDateAsUTC, formatDateUTC } from '@/lib/timezone';
 
 interface LeaveRequestModalProps {
   open: boolean;
@@ -22,12 +23,12 @@ interface LeaveRequestModalProps {
 function buildClosureDateSet(closures: ClosurePeriod[]): Set<string> {
   const set = new Set<string>();
   for (const c of closures) {
-    const start = new Date(c.startDate);
-    const end = new Date(c.endDate);
+    const start = parseDateAsUTC(c.startDate);
+    const end = parseDateAsUTC(c.endDate);
     const d = new Date(start);
     while (d <= end) {
-      set.add(d.toISOString().split('T')[0]);
-      d.setDate(d.getDate() + 1);
+      set.add(formatDateUTC(d));
+      d.setUTCDate(d.getUTCDate() + 1);
     }
   }
   return set;

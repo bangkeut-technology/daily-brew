@@ -65,8 +65,8 @@ class ClosureController extends AbstractController
         $closure = $closureService->create(
             $workspace,
             $data['name'],
-            new \DateTime($data['startDate']),
-            new \DateTime($data['endDate']),
+            \App\Service\DateService::mutableParse($data['startDate']),
+            \App\Service\DateService::mutableParse($data['endDate']),
         );
 
         return $this->jsonCreated([
@@ -103,8 +103,8 @@ class ClosureController extends AbstractController
         $closure = $closureService->update(
             $closure,
             $data['name'] ?? $closure->getName(),
-            isset($data['startDate']) ? new \DateTime($data['startDate']) : $closure->getStartDate(),
-            isset($data['endDate']) ? new \DateTime($data['endDate']) : $closure->getEndDate(),
+            isset($data['startDate']) ? \App\Service\DateService::mutableParse($data['startDate']) : $closure->getStartDate(),
+            isset($data['endDate']) ? \App\Service\DateService::mutableParse($data['endDate']) : $closure->getEndDate(),
         );
 
         return $this->jsonSuccess([

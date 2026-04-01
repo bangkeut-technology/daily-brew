@@ -15,6 +15,7 @@ use App\Repository\SubscriptionRepository;
 use App\Repository\UserRepository;
 use App\Repository\WorkspaceRepository;
 use App\Service\AuthService;
+use App\Service\DateService;
 use App\Service\EmployeeService;
 use App\Service\ShiftService;
 use App\Service\WorkspaceService;
@@ -104,7 +105,7 @@ class SeedReviewerCommand extends Command
         // ── Upgrade to Espresso ──────────────────────────────────
         $subscription = $this->subscriptionRepository->findByWorkspace($workspace);
         $subscription->setPlan(PlanEnum::Espresso);
-        $subscription->setCurrentPeriodEnd(new \DateTime('+1 year', new \DateTimeZone('UTC')));
+        $subscription->setCurrentPeriodEnd(DateService::mutableRelative('+1 year'));
         $this->em->flush();
         $io->text('Upgraded to Espresso plan');
 
@@ -114,15 +115,15 @@ class SeedReviewerCommand extends Command
         $morningShift = $this->shiftService->create(
             $workspace,
             'Morning',
-            new \DateTime('07:00'),
-            new \DateTime('15:00'),
+            DateService::mutableParse('07:00'),
+            DateService::mutableParse('15:00'),
         );
 
         $eveningShift = $this->shiftService->create(
             $workspace,
             'Evening',
-            new \DateTime('15:00'),
-            new \DateTime('23:00'),
+            DateService::mutableParse('15:00'),
+            DateService::mutableParse('23:00'),
         );
         $io->text('Created shifts: Morning (07:00–15:00), Evening (15:00–23:00)');
 
@@ -179,8 +180,8 @@ class SeedReviewerCommand extends Command
         $closure->setWorkspace($workspace);
         $closure->setName('Khmer New Year');
         $closure->setNameCanonical('khmer new year');
-        $closure->setStartDate(new \DateTime('+30 days', $utc));
-        $closure->setEndDate(new \DateTime('+33 days', $utc));
+        $closure->setStartDate(DateService::mutableRelative('+30 days'));
+        $closure->setEndDate(DateService::mutableRelative('+33 days'));
         $this->em->persist($closure);
         $io->text('Created closure: Khmer New Year');
 
@@ -268,13 +269,13 @@ class SeedReviewerCommand extends Command
         $leave1->setEmployee($employeeEntities[1]);
         $leave1->setWorkspace($workspace);
         $leave1->setRequestedBy($owner);
-        $leave1->setStartDate(new \DateTimeImmutable('-14 days', $utc));
-        $leave1->setEndDate(new \DateTimeImmutable('-13 days', $utc));
+        $leave1->setStartDate(DateService::relative('-14 days'));
+        $leave1->setEndDate(DateService::relative('-13 days'));
         $leave1->setReason('Family event');
         $leave1->setType(LeaveTypeEnum::PAID);
         $leave1->setStatus(LeaveRequestStatusEnum::APPROVED);
         $leave1->setReviewedBy($owner);
-        $leave1->setReviewedAt(new \DateTimeImmutable('-15 days', $utc));
+        $leave1->setReviewedAt(DateService::relative('-15 days'));
         $this->em->persist($leave1);
 
         // Pending leave (upcoming)
@@ -282,8 +283,8 @@ class SeedReviewerCommand extends Command
         $leave2->setEmployee($employeeEntities[2]);
         $leave2->setWorkspace($workspace);
         $leave2->setRequestedBy($owner);
-        $leave2->setStartDate(new \DateTimeImmutable('+3 days', $utc));
-        $leave2->setEndDate(new \DateTimeImmutable('+4 days', $utc));
+        $leave2->setStartDate(DateService::relative('+3 days'));
+        $leave2->setEndDate(DateService::relative('+4 days'));
         $leave2->setReason('Medical appointment');
         $leave2->setType(LeaveTypeEnum::PAID);
         $leave2->setStatus(LeaveRequestStatusEnum::PENDING);
@@ -294,13 +295,13 @@ class SeedReviewerCommand extends Command
         $leave3->setEmployee($employeeEntities[4]);
         $leave3->setWorkspace($workspace);
         $leave3->setRequestedBy($owner);
-        $leave3->setStartDate(new \DateTimeImmutable('+1 day', $utc));
-        $leave3->setEndDate(new \DateTimeImmutable('+1 day', $utc));
+        $leave3->setStartDate(DateService::relative('+1 day'));
+        $leave3->setEndDate(DateService::relative('+1 day'));
         $leave3->setReason('Personal day');
         $leave3->setType(LeaveTypeEnum::UNPAID);
         $leave3->setStatus(LeaveRequestStatusEnum::REJECTED);
         $leave3->setReviewedBy($owner);
-        $leave3->setReviewedAt(new \DateTimeImmutable('-1 day', $utc));
+        $leave3->setReviewedAt(DateService::relative('-1 day'));
         $leave3->setReviewNote('Short staffed this week');
         $this->em->persist($leave3);
 

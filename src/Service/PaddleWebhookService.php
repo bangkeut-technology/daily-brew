@@ -70,14 +70,14 @@ class PaddleWebhookService
         $subscription->setPaddleCustomerId($data['customer_id'] ?? null);
 
         if (isset($data['current_billing_period']['ends_at'])) {
-            $subscription->setCurrentPeriodEnd(new \DateTime($data['current_billing_period']['ends_at']));
+            $subscription->setCurrentPeriodEnd(DateService::mutableParse($data['current_billing_period']['ends_at']));
         }
 
         // Paddle trial period
         if (isset($data['scheduled_change']['action']) && $data['scheduled_change']['action'] === 'resume') {
             // Trial with scheduled resume = trial ends at the effective_at date
             if (isset($data['scheduled_change']['effective_at'])) {
-                $subscription->setTrialEndsAt(new \DateTime($data['scheduled_change']['effective_at']));
+                $subscription->setTrialEndsAt(DateService::mutableParse($data['scheduled_change']['effective_at']));
             }
         }
 
@@ -92,12 +92,12 @@ class PaddleWebhookService
         $subscription->setStatus($this->mapStatus($data['status'] ?? 'active'));
 
         if (isset($data['current_billing_period']['ends_at'])) {
-            $subscription->setCurrentPeriodEnd(new \DateTime($data['current_billing_period']['ends_at']));
+            $subscription->setCurrentPeriodEnd(DateService::mutableParse($data['current_billing_period']['ends_at']));
         }
 
         // Update trial end date if still trialing
         if (($data['status'] ?? '') === 'trialing' && isset($data['next_billed_at'])) {
-            $subscription->setTrialEndsAt(new \DateTime($data['next_billed_at']));
+            $subscription->setTrialEndsAt(DateService::mutableParse($data['next_billed_at']));
         }
 
         // Clear trial when no longer trialing

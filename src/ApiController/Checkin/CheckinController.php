@@ -45,7 +45,7 @@ class CheckinController extends AbstractController
         $shift = $employee->getShift();
 
         $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
-        $todayDate = new \DateTimeImmutable('today', $tz);
+        $todayDate = \App\Service\DateService::today($tz);
         $approvedLeave = $leaveRequestRepository->findApprovedForEmployeeOnDate($employee, $todayDate);
 
         return $this->jsonSuccess([

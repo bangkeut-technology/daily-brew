@@ -99,11 +99,11 @@ class EmployeeController extends AbstractController
         }
 
         if (!empty($data['dob'])) {
-            $employee->setDob(new \DateTimeImmutable($data['dob']));
+            $employee->setDob(\App\Service\DateService::parse($data['dob']));
         }
 
         if (!empty($data['joinedAt'])) {
-            $employee->setJoinedAt(new \DateTimeImmutable($data['joinedAt']));
+            $employee->setJoinedAt(\App\Service\DateService::parse($data['joinedAt']));
         }
 
         if (!empty($data['linkedUserPublicId'])) {
@@ -194,11 +194,11 @@ class EmployeeController extends AbstractController
         }
 
         if (array_key_exists('dob', $data)) {
-            $employee->setDob(!empty($data['dob']) ? new \DateTimeImmutable($data['dob']) : null);
+            $employee->setDob(!empty($data['dob']) ? \App\Service\DateService::parse($data['dob']) : null);
         }
 
         if (array_key_exists('joinedAt', $data)) {
-            $employee->setJoinedAt(!empty($data['joinedAt']) ? new \DateTimeImmutable($data['joinedAt']) : null);
+            $employee->setJoinedAt(!empty($data['joinedAt']) ? \App\Service\DateService::parse($data['joinedAt']) : null);
         }
 
         // Handle linking/unlinking user account

@@ -41,8 +41,8 @@ class AttendanceController extends AbstractController
 
         $attendances = $attendanceRepository->findByWorkspaceAndDateRange(
             $workspace,
-            new \DateTime($from),
-            new \DateTime($to),
+            \App\Service\DateService::mutableParse($from),
+            \App\Service\DateService::mutableParse($to),
         );
 
         // Owners and managers see all attendance; employees see only their own

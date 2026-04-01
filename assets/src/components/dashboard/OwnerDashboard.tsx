@@ -21,6 +21,8 @@ import { ManagerCheckinCard } from './ManagerCheckinCard';
 import { useClosures } from '@/hooks/queries/useClosures';
 import { usePaddle } from '@/hooks/usePaddle';
 import { useDateFormat } from '@/hooks/useDateFormat';
+import { useWorkspaceTimezone } from '@/hooks/useWorkspaceTimezone';
+import { parseDateAsUTC, formatDateUTC } from '@/lib/timezone';
 
 export function OwnerDashboard() {
   const { t } = useTranslation();
@@ -39,31 +41,28 @@ export function OwnerDashboard() {
   const { data: closures } = useClosures(workspaceId);
   const currentWs = workspaces?.find((ws) => ws.publicId === workspaceId);
 
-  // Current + upcoming closures
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  // Current + upcoming closures (workspace-TZ-aware)
+  const wsTz = useWorkspaceTimezone();
+  const today = wsTz.todayMidnight();
+  const todayStr = wsTz.today();
   const activeClosures = (closures ?? []).filter((c) => {
-    const start = new Date(c.startDate);
-    const end = new Date(c.endDate);
+    const start = parseDateAsUTC(c.startDate);
+    const end = parseDateAsUTC(c.endDate);
     return today >= start && today <= end;
   });
   const upcomingClosures = (closures ?? []).filter((c) => {
-    const start = new Date(c.startDate);
-    const in30Days = new Date();
-    in30Days.setDate(in30Days.getDate() + 30);
-    return start > today && start <= in30Days;
+    const start = parseDateAsUTC(c.startDate);
+    const in30 = new Date(today.getTime() + 30 * 86400000);
+    return start > today && start <= in30;
   }).slice(0, 3);
 
   // Upcoming pending + approved leaves (next 14 days)
   const upcomingLeaves = (leaveRequests ?? [])
     .filter((lr) => {
       if (lr.status !== 'approved' && lr.status !== 'pending') return false;
-      const end = new Date(lr.endDate);
-      const now = new Date();
-      now.setHours(0, 0, 0, 0);
-      const in14Days = new Date();
-      in14Days.setDate(in14Days.getDate() + 14);
-      return end >= now && new Date(lr.startDate) <= in14Days;
+      const end = parseDateAsUTC(lr.endDate);
+      const in14 = new Date(today.getTime() + 14 * 86400000);
+      return end >= today && parseDateAsUTC(lr.startDate) <= in14;
     })
     .sort((a, b) => a.startDate.localeCompare(b.startDate))
     .slice(0, 5);
@@ -401,8 +400,8 @@ export function OwnerDashboard() {
               />
               <div>
                 {upcomingClosures.map((c) => {
-                  const start = new Date(c.startDate);
-                  const daysUntil = Math.round((start.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                  const start = parseDateAsUTC(c.startDate);
+                  const daysUntil = Math.round((start.getTime() - today.getTime()) / 86400000);
                   return (
                     <div key={c.publicId} className="flex items-center gap-3 px-5 py-3 border-b border-cream-3/50 last:border-0">
                       <CalendarOff size={14} className="text-amber shrink-0" />
