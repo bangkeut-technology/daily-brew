@@ -15,6 +15,8 @@ import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { useDateFormat } from '@/hooks/useDateFormat';
+import { useWorkspaceTimezone } from '@/hooks/useWorkspaceTimezone';
+import { parseDateAsUTC } from '@/lib/timezone';
 
 const createClosureSchema = z
   .object({
@@ -249,12 +251,12 @@ function ClosureCard({ closure, fmtDate, onDelete, onUpdate, deleting, updating 
   const [editStart, setEditStart] = useState(closure.startDate);
   const [editEnd, setEditEnd] = useState(closure.endDate);
 
-  const start = new Date(closure.startDate);
-  const end = new Date(closure.endDate);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const wsTz = useWorkspaceTimezone();
+  const start = parseDateAsUTC(closure.startDate);
+  const end = parseDateAsUTC(closure.endDate);
+  const today = wsTz.todayMidnight();
 
-  const days = Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+  const days = Math.round((end.getTime() - start.getTime()) / 86400000) + 1;
   const isActive = today >= start && today <= end;
   const isPast = today > end;
   const isUpcoming = today < start;

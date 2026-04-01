@@ -20,6 +20,12 @@ function pad(n: number) {
   return n.toString().padStart(2, '0');
 }
 
+/** Parse "YYYY-MM-DD" without timezone shift. Returns [year, month (0-based), day]. */
+function parseYMD(s: string): [number, number, number] {
+  const [y, m, d] = s.split('-').map(Number);
+  return [y, m - 1, d];
+}
+
 function formatDate(year: number, month: number, day: number) {
   return `${year}-${pad(month + 1)}-${pad(day)}`;
 }
@@ -42,15 +48,15 @@ export function CustomDatePicker({ value, onChange, className = '', isDateDisabl
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [dropUp, setDropUp] = useState(false);
 
-  const parsed = value ? new Date(value) : new Date();
-  const [viewYear, setViewYear] = useState(parsed.getFullYear());
-  const [viewMonth, setViewMonth] = useState(parsed.getMonth());
+  const [parsedY, parsedM] = value ? parseYMD(value) : [new Date().getFullYear(), new Date().getMonth()];
+  const [viewYear, setViewYear] = useState(parsedY);
+  const [viewMonth, setViewMonth] = useState(parsedM);
 
   useEffect(() => {
     if (value) {
-      const d = new Date(value);
-      setViewYear(d.getFullYear());
-      setViewMonth(d.getMonth());
+      const [y, m] = parseYMD(value);
+      setViewYear(y);
+      setViewMonth(m);
     }
   }, [value, open]);
 
@@ -108,9 +114,7 @@ export function CustomDatePicker({ value, onChange, className = '', isDateDisabl
     return items;
   }, [viewYear, viewMonth]);
 
-  const selectedDay = value ? new Date(value).getDate() : -1;
-  const selectedMonth = value ? new Date(value).getMonth() : -1;
-  const selectedYear = value ? new Date(value).getFullYear() : -1;
+  const [selectedYear, selectedMonth, selectedDay] = value ? parseYMD(value) : [-1, -1, -1];
 
   const today = new Date();
   const todayStr = formatDate(today.getFullYear(), today.getMonth(), today.getDate());
@@ -119,7 +123,7 @@ export function CustomDatePicker({ value, onChange, className = '', isDateDisabl
   const yearRange = Array.from({ length: 100 }, (_, i) => currentYear - 80 + i);
 
   const displayValue = value
-    ? new Date(value).toLocaleDateString('default', { year: 'numeric', month: 'short', day: 'numeric' })
+    ? (() => { const [y, m, d] = parseYMD(value); return new Date(y, m, d).toLocaleDateString('default', { year: 'numeric', month: 'short', day: 'numeric' }); })()
     : '';
 
   return (

@@ -65,7 +65,7 @@ export function ManagerCheckinCard({ qrToken }: ManagerCheckinCardProps) {
               {completed
                 ? 'Shift complete'
                 : checkedIn
-                  ? `Checked in at ${today?.checkInAt ? new Date(today.checkInAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}`
+                  ? `Checked in at ${today?.checkInAt ?? '—'}`
                   : 'Not checked in yet'}
             </p>
             {data.shiftName && (
