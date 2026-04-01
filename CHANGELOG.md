@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.26.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.25.0...v1.26.0) (2026-04-01)
+
+
+### Features
+
+* **workspaces:** add timezone support when creating a workspace ([f45ba5d](https://github.com/bangkeut-technology/daily-brew/commit/f45ba5dbd27a791f79f856a551423145d128dfba))
+
 ## [1.25.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.24.2...v1.25.0) (2026-04-01)
 
 
