@@ -26,8 +26,8 @@ const freePlan = {
 
 const espressoPlan = {
   name: 'Espresso',
-  monthly: { price: '$12.99', period: '/month' },
-  yearly: { price: '$129', period: '/year', savings: 'Save $26.88', monthly: '$10.75' },
+  monthly: { price: '$14.99', period: '/month' },
+  yearly: { price: '$149', period: '/year', savings: 'Save $30.88', monthly: '$12.42' },
   subtitle: 'For growing restaurants',
   features: [
     { text: 'Up to 20 employees', included: true },

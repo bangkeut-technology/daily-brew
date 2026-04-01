@@ -142,7 +142,7 @@ function PricingPage() {
     <div className="min-h-screen flex flex-col">
       <PageSeo
         title="Pricing"
-        description="DailyBrew plans start free for up to 10 employees. Espresso at $12.99/month adds geofencing, device verification, and leave management. Double Espresso for unlimited staff."
+        description="DailyBrew plans start free for up to 10 employees. Espresso at $14.99/month adds geofencing, device verification, and leave management. Double Espresso for unlimited staff."
         path="/pricing"
       />
       <LandingNav />
