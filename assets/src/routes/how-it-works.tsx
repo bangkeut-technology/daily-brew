@@ -139,7 +139,7 @@ function HowItWorksPage() {
                 style={{ background: step.accent }}
               />
 
-              <div className="flex flex-col md:flex-row md:items-start gap-6">
+              <div className="flex flex-col md:flex-row md:items-center gap-6">
                 {/* Step number + icon */}
                 <div className="flex items-center gap-4 md:flex-col md:items-center md:min-w-[80px]">
                   <div className="relative">

@@ -55,13 +55,13 @@ export function HowItWorksSection() {
       </motion.div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
-        {/* Connecting line (desktop) */}
-        <div className="hidden lg:block absolute top-[36px] left-[calc(12.5%+36px)] right-[calc(12.5%+36px)] h-px bg-cream-3" />
+        {/* Connecting line (desktop) — centered vertically on the icon row */}
+        <div className="hidden lg:block absolute top-[36px] left-[calc(12.5%+36px)] right-[calc(12.5%+36px)] h-px bg-cream-3 z-0" />
 
         {steps.map((step, i) => (
           <motion.div
             key={step.number}
-            className="relative flex flex-col items-center text-center"
+            className="relative z-10 flex flex-col items-center text-center"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
