@@ -1,9 +1,10 @@
 import { Link } from '@tanstack/react-router';
 import { useState, useEffect, useCallback } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, LayoutDashboard } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { LogoBrand } from '@/components/shared/Logo';
+import { useAuthenticationState } from '@/hooks/use-authentication';
 
 const navLinks = [
   { label: 'Features', href: '/features' },
@@ -16,6 +17,8 @@ const navLinks = [
 export function LandingNav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const auth = useAuthenticationState();
+  const isAuthenticated = auth.status === 'authenticated';
 
   const onScroll = useCallback(() => {
     setScrolled(window.scrollY > 20);
@@ -67,18 +70,30 @@ export function LandingNav() {
             </Link>
           ))}
           <div className="w-px h-4 bg-cream-3" />
-          <Link
-            to="/sign-in"
-            className="text-[15px] font-medium text-text-secondary hover:text-text-primary no-underline transition-colors duration-200"
-          >
-            Sign in
-          </Link>
-          <Link
-            to="/sign-up"
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] no-underline"
-          >
-            Get started
-          </Link>
+          {isAuthenticated ? (
+            <Link
+              to="/console/dashboard"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] no-underline"
+            >
+              <LayoutDashboard size={14} />
+              Console
+            </Link>
+          ) : (
+            <>
+              <Link
+                to="/sign-in"
+                className="text-[15px] font-medium text-text-secondary hover:text-text-primary no-underline transition-colors duration-200"
+              >
+                Sign in
+              </Link>
+              <Link
+                to="/sign-up"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] no-underline"
+              >
+                Get started
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile hamburger */}
@@ -111,20 +126,33 @@ export function LandingNav() {
               </Link>
             ))}
             <div className="h-px bg-cream-3 my-2" />
-            <Link
-              to="/sign-in"
-              onClick={() => setMobileOpen(false)}
-              className="block text-[16px] font-medium text-text-secondary no-underline py-1"
-            >
-              Sign in
-            </Link>
-            <Link
-              to="/sign-up"
-              onClick={() => setMobileOpen(false)}
-              className="inline-flex items-center px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white no-underline"
-            >
-              Get started
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                to="/console/dashboard"
+                onClick={() => setMobileOpen(false)}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white no-underline"
+              >
+                <LayoutDashboard size={14} />
+                Console
+              </Link>
+            ) : (
+              <>
+                <Link
+                  to="/sign-in"
+                  onClick={() => setMobileOpen(false)}
+                  className="block text-[16px] font-medium text-text-secondary no-underline py-1"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  to="/sign-up"
+                  onClick={() => setMobileOpen(false)}
+                  className="inline-flex items-center px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white no-underline"
+                >
+                  Get started
+                </Link>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

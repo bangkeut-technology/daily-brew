@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router';
-import { Coffee } from 'lucide-react';
+import { Coffee, LayoutDashboard } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuthenticationState } from '@/hooks/use-authentication';
 
 const productLinks = [
   { label: 'Features', to: '/features' },
@@ -17,6 +18,9 @@ const legalLinks = [
 ];
 
 export function LandingFooter() {
+  const auth = useAuthenticationState();
+  const isAuthenticated = auth.status === 'authenticated';
+
   return (
     <footer className="relative bg-cream-2/50 backdrop-blur-sm border-t border-cream-3/50 mt-10">
       <div className="max-w-5xl mx-auto px-6 md:px-8 py-14">
@@ -94,25 +98,39 @@ export function LandingFooter() {
             transition={{ duration: 0.4, delay: 0.3 }}
           >
             <p className="text-[13px] uppercase tracking-[1.5px] font-medium text-text-tertiary mb-4">
-              Get started
+              {isAuthenticated ? 'Dashboard' : 'Get started'}
             </p>
             <ul className="space-y-2.5">
-              <li>
-                <Link
-                  to="/sign-up"
-                  className="text-[15px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
-                >
-                  Create account
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/sign-in"
-                  className="text-[15px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
-                >
-                  Sign in
-                </Link>
-              </li>
+              {isAuthenticated ? (
+                <li>
+                  <Link
+                    to="/console/dashboard"
+                    className="inline-flex items-center gap-1.5 text-[15px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
+                  >
+                    <LayoutDashboard size={13} />
+                    Console
+                  </Link>
+                </li>
+              ) : (
+                <>
+                  <li>
+                    <Link
+                      to="/sign-up"
+                      className="text-[15px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
+                    >
+                      Create account
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/sign-in"
+                      className="text-[15px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
+                    >
+                      Sign in
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </motion.div>
         </div>
