@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Crown, Inbox, Plus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLeaveRequests, useUpdateLeaveRequest, useDeleteLeaveRequest } from '@/hooks/queries/useLeaveRequests';
+import { useEmployees } from '@/hooks/queries/useEmployees';
 import { useClosures } from '@/hooks/queries/useClosures';
 import { useRoleContext } from '@/hooks/queries/useRoleContext';
 import { usePlan } from '@/hooks/queries/usePlan';
@@ -38,8 +39,11 @@ function LeaveRequestsPage() {
   const { data: roleContext, isLoading: roleLoading } = useRoleContext();
   const canUse = plan?.canUseLeaveRequests ?? false;
   const isManager = roleContext?.isManager ?? false;
-  const isEmployee = !!roleContext && roleContext.isEmployee && !roleContext.isOwner && !isManager;
+  const isOwner = roleContext?.isOwner ?? false;
+  const isEmployee = !!roleContext && roleContext.isEmployee && !isOwner && !isManager;
+  const canManage = isOwner || isManager;
   const employee = roleContext?.employee ?? null;
+  const { data: employees } = useEmployees(canManage ? workspaceId : '');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('');
   const [showUpgrade, setShowUpgrade] = useState(true);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
@@ -48,6 +52,7 @@ function LeaveRequestsPage() {
   const updateLeave = useUpdateLeaveRequest(workspaceId);
   const deleteLeave = useDeleteLeaveRequest(workspaceId);
   const fmtDate = useDateFormat();
+  const [confirmCancelId, setConfirmCancelId] = useState<string | null>(null);
 
   if (planLoading || roleLoading) {
     return (
@@ -97,8 +102,6 @@ function LeaveRequestsPage() {
     }
   };
 
-  const [confirmCancelId, setConfirmCancelId] = useState<string | null>(null);
-
   const handleCancelLeave = async () => {
     if (!confirmCancelId) return;
     try {
@@ -134,15 +137,13 @@ function LeaveRequestsPage() {
       />
 
       <div className="flex items-center gap-3 mb-6">
-        {isEmployee && employee && (
-          <button
-            onClick={() => setShowSubmitModal(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-[15px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light transition-colors"
-          >
-            <Plus size={14} />
-            {t('leave.submitRequest', 'Submit leave request')}
-          </button>
-        )}
+        <button
+          onClick={() => setShowSubmitModal(true)}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl text-[15px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light transition-colors"
+        >
+          <Plus size={14} />
+          {t('leave.submitRequest', 'Submit leave request')}
+        </button>
       </div>
 
       <div className="flex gap-2 mb-6">
@@ -240,7 +241,16 @@ function LeaveRequestsPage() {
         </GlassCard>
       )}
 
-      {isEmployee && employee && (
+      {canManage ? (
+        <LeaveRequestModal
+          open={showSubmitModal}
+          onOpenChange={setShowSubmitModal}
+          workspacePublicId={workspaceId}
+          employeePublicId={employee?.publicId}
+          employees={(employees ?? []).filter((e) => e.active).map((e) => ({ publicId: e.publicId, name: e.name }))}
+          closures={closures}
+        />
+      ) : employee ? (
         <LeaveRequestModal
           open={showSubmitModal}
           onOpenChange={setShowSubmitModal}
@@ -248,7 +258,7 @@ function LeaveRequestsPage() {
           employeePublicId={employee.publicId}
           closures={closures}
         />
-      )}
+      ) : null}
 
       <ConfirmModal
         open={confirmCancelId !== null}

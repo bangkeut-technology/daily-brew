@@ -142,6 +142,7 @@ class SeedReviewerCommand extends Command
             'Chan',
         );
         $managerUser->setOnboardingCompleted(true);
+        $managerUser->setCurrentWorkspace($workspace);
         $this->employeeService->linkUser($employeeEntities[0], $managerUser);
         $employeeEntities[0]->setRole(EmployeeRoleEnum::MANAGER);
         $this->em->flush();
@@ -155,6 +156,7 @@ class SeedReviewerCommand extends Command
             'Sok',
         );
         $employeeUser->setOnboardingCompleted(true);
+        $employeeUser->setCurrentWorkspace($workspace);
         $this->employeeService->linkUser($employeeEntities[1], $employeeUser);
         $this->em->flush();
         $io->text('Created employee: ' . self::EMPLOYEE_EMAIL . ' (Dara Sok)');

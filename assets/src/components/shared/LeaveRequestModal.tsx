@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Dialog from '@radix-ui/react-dialog';
 import { toast } from 'sonner';
@@ -7,13 +7,15 @@ import { useCreateLeaveRequest } from '@/hooks/queries/useLeaveRequests';
 import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
 import { CustomTimePicker } from '@/components/shared/CustomTimePicker';
 import { Toggle } from '@/components/shared/Toggle';
+import { CustomSelect } from '@/components/shared/CustomSelect';
 import type { ClosurePeriod } from '@/types';
 
 interface LeaveRequestModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   workspacePublicId: string;
-  employeePublicId: string;
+  employeePublicId?: string;
+  employees?: { publicId: string; name: string }[];
   closures?: ClosurePeriod[];
 }
 
@@ -36,10 +38,12 @@ export function LeaveRequestModal({
   onOpenChange,
   workspacePublicId,
   employeePublicId,
+  employees,
   closures = [],
 }: LeaveRequestModalProps) {
   const { t } = useTranslation();
   const createLeave = useCreateLeaveRequest(workspacePublicId);
+  const [selectedEmployee, setSelectedEmployee] = useState(employeePublicId ?? '');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [reason, setReason] = useState('');
@@ -47,10 +51,20 @@ export function LeaveRequestModal({
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('17:00');
 
+  const resolvedEmployeeId = employees ? selectedEmployee : (employeePublicId ?? '');
+
+  // Pre-select the employee when modal opens
+  useEffect(() => {
+    if (open && employeePublicId) {
+      setSelectedEmployee(employeePublicId);
+    }
+  }, [open, employeePublicId]);
+
   const closureDates = buildClosureDateSet(closures);
   const isDateDisabled = (dateStr: string) => closureDates.has(dateStr);
 
   const reset = () => {
+    setSelectedEmployee(employeePublicId ?? '');
     setStartDate('');
     setEndDate('');
     setReason('');
@@ -60,10 +74,10 @@ export function LeaveRequestModal({
   };
 
   const handleSubmit = async () => {
-    if (!startDate || !endDate || !reason.trim()) return;
+    if (!resolvedEmployeeId || !startDate || !endDate || !reason.trim()) return;
     try {
       await createLeave.mutateAsync({
-        employeePublicId,
+        employeePublicId: resolvedEmployeeId,
         startDate,
         endDate,
         reason: reason.trim(),
@@ -97,6 +111,20 @@ export function LeaveRequestModal({
             <Dialog.Description className="text-[14.5px] text-text-secondary leading-relaxed -mt-2">
               {t('leave.submitDescription', 'Select the dates you need off and provide a reason.')}
             </Dialog.Description>
+
+            {employees && employees.length > 0 && (
+              <div>
+                <label className="block text-[13px] font-medium text-text-secondary mb-1">
+                  {t('leave.employee', 'Employee')}
+                </label>
+                <CustomSelect
+                  value={selectedEmployee}
+                  onChange={setSelectedEmployee}
+                  options={employees.map((e) => ({ value: e.publicId, label: e.name }))}
+                  placeholder={t('leave.selectEmployee', 'Select an employee')}
+                />
+              </div>
+            )}
 
             <div>
               <label htmlFor="leave-start" className="block text-[13px] font-medium text-text-secondary mb-1">
@@ -177,7 +205,7 @@ export function LeaveRequestModal({
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={!startDate || !endDate || !reason.trim() || createLeave.isPending}
+                disabled={!resolvedEmployeeId || !startDate || !endDate || !reason.trim() || createLeave.isPending}
                 className="px-4 py-2 rounded-lg text-[15px] font-medium text-white bg-coffee border-none cursor-pointer hover:bg-coffee-light transition-colors disabled:opacity-50"
               >
                 {createLeave.isPending ? t('common.loading', 'Loading...') : t('common.submit', 'Submit')}

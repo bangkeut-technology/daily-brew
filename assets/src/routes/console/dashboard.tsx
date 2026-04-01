@@ -36,11 +36,11 @@ function DashboardPage() {
   // Managers see the owner dashboard (attendance overview, leave approvals)
   // Regular employees see the employee dashboard (own data only)
   if (roleContext.isEmployee && !roleContext.isOwner && !roleContext.isManager) {
-    return <EmployeeDashboard />;
+    return <EmployeeDashboard key="employee" />;
   }
 
   // Owner and manager dashboard
-  return <OwnerDashboard />;
+  return <OwnerDashboard key="owner" />;
 }
 
 function NoWorkspaceView() {

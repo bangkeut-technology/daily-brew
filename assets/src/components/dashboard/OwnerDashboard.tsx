@@ -202,6 +202,15 @@ export function OwnerDashboard() {
                 </span>
               </Link>
             )}
+            {isManagerView && canUseLeave && (
+              <Link
+                to="/console/leave"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[14px] font-medium bg-coffee text-white no-underline border-none cursor-pointer transition-all hover:bg-coffee-light"
+              >
+                <CalendarDays size={13} />
+                {t('nav.leaveRequests', 'Leave requests')}
+              </Link>
+            )}
             {!isManagerView && (
               <Link
                 to="/console/employees/new"
@@ -223,7 +232,14 @@ export function OwnerDashboard() {
         }
       />
 
-      <GuidedTour />
+      {!isManagerView && <GuidedTour />}
+
+      {/* Manager check-in card — top of page for visibility */}
+      {isManagerView && workspace?.qrToken && (
+        <div className="mb-6">
+          <ManagerCheckinCard qrToken={workspace.qrToken} />
+        </div>
+      )}
 
       {/* Welcome + summary text */}
       <div className="mb-6">
@@ -238,13 +254,6 @@ export function OwnerDashboard() {
           }
         </p>
       </div>
-
-      {/* Manager check-in card */}
-      {isManagerView && workspace?.qrToken && (
-        <div className="mb-6">
-          <ManagerCheckinCard qrToken={workspace.qrToken} />
-        </div>
-      )}
 
       {/* QR Check-in card — owner only */}
       {!isManagerView && currentWs?.qrToken && (
