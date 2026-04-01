@@ -36,7 +36,7 @@ class CheckinService
         $workspace = $employee->getWorkspace();
         $setting = $workspace?->getSetting();
         $wsTz = new \DateTimeZone($setting?->getTimezone() ?? 'UTC');
-        $nowUtc = new DateTimeImmutable();
+        $nowUtc = new DateTimeImmutable('now', new \DateTimeZone('UTC'));
         $now = $nowUtc->setTimezone($wsTz); // for time comparisons (late/early)
         $today = new DateTimeImmutable('today', $wsTz);
 

@@ -63,6 +63,17 @@ class SeedReviewerCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $fresh = $input->getOption('fresh');
 
+        $io->text(sprintf('PHP default timezone: %s', date_default_timezone_get()));
+
+        // Ensure UTC to match web server — prevents TZ mismatch between CLI and FPM
+        if (date_default_timezone_get() !== 'UTC') {
+            $io->warning(sprintf(
+                'PHP CLI timezone is "%s" (expected UTC). Forcing UTC for this command.',
+                date_default_timezone_get(),
+            ));
+            date_default_timezone_set('UTC');
+        }
+
         $existing = $this->userRepository->findByEmail(self::OWNER_EMAIL);
 
         if ($existing !== null) {

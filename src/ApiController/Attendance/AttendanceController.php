@@ -45,10 +45,11 @@ class AttendanceController extends AbstractController
             new \DateTime($to),
         );
 
-        // Non-owners can only see their own attendance
+        // Owners and managers see all attendance; employees see only their own
         $isOwner = $workspace->getOwner()?->getId() === $user->getId();
-        if (!$isOwner) {
-            $employee = $employeeRepository->findOneByLinkedUserAndWorkspace($user, $workspace);
+        $employee = $employeeRepository->findOneByLinkedUserAndWorkspace($user, $workspace);
+        $isManager = $employee?->isManager() ?? false;
+        if (!$isOwner && !$isManager) {
             if ($employee !== null) {
                 $employeeId = $employee->getId();
                 $attendances = array_filter($attendances, fn ($a) => $a->getEmployee()->getId() === $employeeId);
