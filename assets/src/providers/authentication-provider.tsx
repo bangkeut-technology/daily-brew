@@ -15,15 +15,10 @@ function getInitialState(): AuthenticationState {
             workspace: undefined,
         };
     }
-    if (serverUser === null) {
-        // Server confirmed no user — skip the API call
-        return {
-            status: 'unauthenticated',
-            user: undefined,
-            workspace: undefined,
-        };
-    }
-    // Fallback: server didn't provide user info, check via API
+    // Server returned null (expired JWT) or undefined — try API call which
+    // triggers the refresh-token interceptor if the JWT has expired.
+    // This prevents logout when only the short-lived JWT expired but the
+    // long-lived refresh token is still valid.
     return {
         status: 'loading',
         user: undefined,
