@@ -13,6 +13,7 @@ import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { useDateFormat } from '@/hooks/useDateFormat';
 import { useWorkspaceTimezone } from '@/hooks/useWorkspaceTimezone';
+import type { AttendanceStatus } from '@/types';
 
 function getSearchParams(today: () => string, startOfMonth: () => string) {
   const params = new URLSearchParams(window.location.search);
@@ -36,6 +37,13 @@ export const Route = createFileRoute('/console/attendance/')({
   component: AttendancePage,
 });
 
+const STATUS_OPTIONS: { value: string; labelKey: string; fallback: string }[] = [
+  { value: '', labelKey: 'attendance.allStatuses', fallback: 'All statuses' },
+  { value: 'present', labelKey: 'attendance.present', fallback: 'Present' },
+  { value: 'absent', labelKey: 'attendance.absent', fallback: 'Absent' },
+  { value: 'on_leave', labelKey: 'attendance.onLeave', fallback: 'On leave' },
+];
+
 function AttendancePage() {
   const { t } = useTranslation();
   const wsTz = useWorkspaceTimezone();
@@ -43,6 +51,7 @@ function AttendancePage() {
   const [from, setFromState] = useState(initial.from);
   const [to, setToState] = useState(initial.to);
   const [employeeFilter, setEmployeeFilterState] = useState(initial.employee);
+  const [statusFilter, setStatusFilter] = useState<string>('');
   const workspaceId = getWorkspacePublicId() || '';
   const { data: attendance, isLoading } = useAttendance(workspaceId, from, to);
   const { data: employees } = useEmployees(workspaceId);
@@ -70,14 +79,36 @@ function AttendancePage() {
 
   // For employees, always filter to their own records; for owners, use the dropdown filter
   const activeFilter = isEmployee && employeePublicId ? employeePublicId : employeeFilter;
-  const filtered = activeFilter
+  let filtered = activeFilter
     ? attendance?.filter((a) => a.employeePublicId === activeFilter)
     : attendance;
+
+  // Apply status filter
+  if (statusFilter) {
+    filtered = filtered?.filter((a) => a.status === statusFilter);
+  }
 
   const employeeOptions = [
     { value: '', label: t('attendance.allEmployees', 'All employees') },
     ...(employees?.map((e) => ({ value: e.publicId, label: e.name })) ?? []),
   ];
+
+  const statusOptions = STATUS_OPTIONS.map((o) => ({
+    value: o.value,
+    label: t(o.labelKey, o.fallback),
+  }));
+
+  // Compute status counts for the header
+  const statusCounts = attendance?.reduce(
+    (acc, a) => {
+      const empMatch = !activeFilter || a.employeePublicId === activeFilter;
+      if (empMatch && a.status) {
+        acc[a.status] = (acc[a.status] || 0) + 1;
+      }
+      return acc;
+    },
+    {} as Record<AttendanceStatus, number>,
+  );
 
   if (roleLoading) {
     return (
@@ -95,7 +126,7 @@ function AttendancePage() {
       <p className="text-[15px] text-text-secondary mb-5 -mt-2 leading-relaxed">
         {isEmployee
           ? t('attendance.employeeDescription', 'Your check-in and check-out history. Filter by date range.')
-          : t('attendance.ownerDescription', 'View check-in and check-out records for all employees. Filter by date range or employee.')}
+          : t('attendance.ownerDescription', 'View attendance records for all employees. Filter by date, employee, or status.')}
       </p>
 
       <div className="flex flex-wrap items-end gap-3 mb-6">
@@ -124,7 +155,32 @@ function AttendancePage() {
             />
           </div>
         )}
+        <div className="w-40">
+          <label id="attendance-status-label" className="block text-[13px] font-medium text-text-secondary mb-1">
+            {t('attendance.status', 'Status')}
+          </label>
+          <CustomSelect
+            value={statusFilter}
+            onChange={setStatusFilter}
+            options={statusOptions}
+            placeholder={t('attendance.allStatuses', 'All statuses')}
+          />
+        </div>
       </div>
+
+      {statusCounts && (
+        <div className="flex flex-wrap gap-3 mb-5">
+          <span className="text-[13px] font-medium text-green">
+            {t('attendance.present', 'Present')}: {statusCounts.present || 0}
+          </span>
+          <span className="text-[13px] font-medium text-red">
+            {t('attendance.absent', 'Absent')}: {statusCounts.absent || 0}
+          </span>
+          <span className="text-[13px] font-medium text-blue">
+            {t('attendance.onLeave', 'On leave')}: {statusCounts.on_leave || 0}
+          </span>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
@@ -145,7 +201,7 @@ function AttendancePage() {
               <span className="flex items-center gap-1.5 text-[14px] text-text-tertiary">
                 <CalendarDays size={13} />
                 {from === to ? fmtDate(from) : `${fmtDate(from)} – ${fmtDate(to)}`}
-                <span className="ml-1">({filtered?.length} records)</span>
+                <span className="ml-1">({filtered?.length} {t('attendance.records', 'records')})</span>
               </span>
             }
           />
@@ -160,6 +216,8 @@ function AttendancePage() {
                 isLate={a.isLate}
                 leftEarly={a.leftEarly}
                 index={i}
+                status={a.status}
+                date={from !== to ? fmtDate(a.date) : undefined}
               />
             ))}
           </div>

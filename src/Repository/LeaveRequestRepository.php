@@ -109,6 +109,23 @@ class LeaveRequestRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    /** @return LeaveRequest[] */
+    public function findApprovedByWorkspaceAndDateRange(Workspace $workspace, \DateTimeInterface $from, \DateTimeInterface $to): array
+    {
+        return $this->createQueryBuilder('lr')
+            ->where('lr.workspace = :workspace')
+            ->andWhere('lr.startDate <= :to')
+            ->andWhere('lr.endDate >= :from')
+            ->andWhere('lr.status = :status')
+            ->andWhere('lr.deletedAt IS NULL')
+            ->setParameter('workspace', $workspace)
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->setParameter('status', LeaveRequestStatusEnum::APPROVED)
+            ->getQuery()
+            ->getResult();
+    }
+
     /** Soft-delete all leave requests made by the given user. */
     public function softDeleteByRequestedBy(User $user, \DateTimeImmutable $deletedAt): void
     {

@@ -77,6 +77,8 @@ export interface Employee {
   attendance?: AttendanceRecord[];
 }
 
+export type AttendanceStatus = 'present' | 'absent' | 'on_leave';
+
 export interface AttendanceRecord {
   publicId: string;
   employeePublicId?: string;
@@ -87,6 +89,7 @@ export interface AttendanceRecord {
   checkOutAt: string | null;
   isLate: boolean;
   leftEarly: boolean;
+  status?: AttendanceStatus;
 }
 
 export interface LeaveRequest {

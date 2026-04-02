@@ -7,23 +7,9 @@ import { getWorkspacePublicId, clearWorkspacePublicId } from '@/lib/auth';
 import type { AuthenticationState } from '@/contexts/authentication-context';
 
 function getInitialState(): AuthenticationState {
-    const serverUser = window.__DAILYBREW__?.user;
-    if (serverUser && typeof serverUser === 'object' && 'publicId' in serverUser) {
-        return {
-            status: 'authenticated',
-            user: serverUser as AuthenticationState['user'],
-            workspace: undefined,
-        };
-    }
-    if (serverUser === null) {
-        // Server confirmed no user — skip the API call
-        return {
-            status: 'unauthenticated',
-            user: undefined,
-            workspace: undefined,
-        };
-    }
-    // Fallback: server didn't provide user info, check via API
+    // Always verify auth state via API — the main firewall does not authenticate,
+    // so the SPA checks via the /api firewall where the Axios interceptor handles
+    // JWT refresh transparently.
     return {
         status: 'loading',
         user: undefined,

@@ -49,9 +49,7 @@ security:
 
         main:
             pattern: ^/
-            stateless: true
-            jwt: ~
-            provider: daily_brew_user_provider
+            security: false
 
     access_control:
         - path: '^/api/v1/webhooks'
