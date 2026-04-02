@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router';
+import { BasilBookBrand } from '@/components/shared/BasilBookBrand';
 import {
   QrCode,
   Users,
@@ -83,7 +84,7 @@ const espressoFeatures = [
   },
   {
     icon: <ArrowRightLeft size={22} strokeWidth={1.8} />,
-    title: 'BasilBook integration',
+    title: <><BasilBookBrand className="text-[16px]" /> integration</>,
     desc: 'Sync staff attendance to your accounting system. Link employees by username and pull data via API.',
     accent: '#2bb673',
   },
@@ -119,7 +120,7 @@ export function FeaturesSection() {
       {/* Core features — 2x2 grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
         {coreFeatures.map((f, index) => (
-          <FeatureCard key={f.title} feature={f} index={index} />
+          <FeatureCard key={index} feature={f} index={index} />
         ))}
       </div>
 
@@ -144,7 +145,7 @@ export function FeaturesSection() {
       {/* Espresso features — 3x2 grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {espressoFeatures.map((f, index) => (
-          <FeatureCard key={f.title} feature={f} index={index + 4} />
+          <FeatureCard key={index} feature={f} index={index + 4} />
         ))}
       </div>
 
@@ -172,7 +173,7 @@ function FeatureCard({
   feature: f,
   index,
 }: {
-  feature: { icon: React.ReactNode; title: string; desc: string; accent: string };
+  feature: { icon: React.ReactNode; title: React.ReactNode; desc: string; accent: string };
   index: number;
 }) {
   return (

@@ -1,17 +1,18 @@
 import { motion } from 'framer-motion';
 import { ArrowRightLeft, FileText, Clock, ChevronRight, Crown } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
+import { BasilBookBrand } from '@/components/shared/BasilBookBrand';
 
 const benefits = [
   {
     icon: <ArrowRightLeft size={18} strokeWidth={1.8} />,
-    title: 'Staff attendance synced to accounting',
-    desc: 'BasilBook pulls attendance data via API — match who worked with what was sold.',
+    title: 'Attendance synced to accounting',
+    desc: 'Pulls attendance data via API — match who worked with what was sold.',
   },
   {
     icon: <FileText size={18} strokeWidth={1.8} />,
     title: 'Username-based staff linking',
-    desc: 'Link DailyBrew employees to BasilBook staff with a shared username. One identity across both systems.',
+    desc: 'Link employees across both systems with a shared username. One identity, two products.',
   },
   {
     icon: <Clock size={18} strokeWidth={1.8} />,
@@ -34,7 +35,7 @@ export function IntegrationSection() {
           Integration
         </p>
         <h3 className="text-[30px] md:text-[36px] font-semibold text-text-primary font-serif leading-tight">
-          Works with BasilBook
+          Works with <BasilBookBrand />
         </h3>
         <p className="text-[16px] text-text-secondary mt-3 max-w-lg mx-auto">
           Connect staff attendance to your restaurant accounting.
@@ -90,7 +91,7 @@ export function IntegrationSection() {
                 className="w-12 h-12 rounded-xl"
               />
               <div>
-                <p className="text-[17px] font-semibold text-text-primary">BasilBook</p>
+                <p className="text-[17px]"><BasilBookBrand /></p>
                 <p className="text-[13px] text-text-tertiary">Accounting</p>
               </div>
             </a>
@@ -125,7 +126,7 @@ export function IntegrationSection() {
             <div className="flex-1">
               <p className="text-[14.5px] text-text-secondary leading-relaxed">
                 <span className="font-medium text-text-primary">How it works:</span>{' '}
-                Generate an API token in DailyBrew settings. BasilBook uses it to pull attendance data
+                Generate an API token in DailyBrew settings. <BasilBookBrand className="text-[14.5px]" /> uses it to pull attendance data
                 for employees with matching usernames — check-in times, late flags, and shift info.
               </p>
             </div>
@@ -152,7 +153,7 @@ export function IntegrationSection() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-[15px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 no-underline transition-all hover:bg-cream-3"
             >
-              Learn about BasilBook
+              Learn about <BasilBookBrand className="text-[15px]" />
             </a>
           </div>
         </div>

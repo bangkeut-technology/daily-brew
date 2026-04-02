@@ -6,13 +6,14 @@ import { LandingNav } from '@/components/landing/LandingNav';
 import { PricingSection } from '@/components/landing/PricingSection';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { PageSeo } from '@/components/shared/PageSeo';
+import { BasilBookBrand } from '@/components/shared/BasilBookBrand';
 import { cn } from '@/lib/utils';
 
 export const Route = createFileRoute('/pricing')({
   component: PricingPage,
 });
 
-const comparisonRows: { section?: string; feature: string; free: boolean | string; espresso: boolean | string; double: boolean | string }[] = [
+const comparisonRows: { section?: string; feature: string; featureNode?: React.ReactNode; free: boolean | string; espresso: boolean | string; double: boolean | string }[] = [
   // Core
   { section: 'Core', feature: 'Employees', free: 'Up to 10', espresso: 'Up to 20', double: 'Unlimited' },
   { feature: 'Workspace QR code check-in', free: true, espresso: true, double: true },
@@ -30,7 +31,7 @@ const comparisonRows: { section?: string; feature: string; free: boolean | strin
   { feature: 'Device verification for check-in & out', free: false, espresso: true, double: true },
   { feature: 'Geofencing for check-in & out', free: false, espresso: true, double: true },
   { feature: 'Per-day shift schedules', free: false, espresso: true, double: true },
-  { feature: 'BasilBook integration + API', free: false, espresso: true, double: true },
+  { feature: 'BasilBook integration + API', featureNode: <><BasilBookBrand className="text-[15px]" /> integration + API</>, free: false, espresso: true, double: true },
   { feature: 'Push & email notifications', free: false, espresso: true, double: true },
   { feature: 'Manager role', free: false, espresso: 'Up to 2', double: 'Unlimited' },
   { feature: 'Daily attendance summary', free: false, espresso: true, double: true },
@@ -219,7 +220,7 @@ function PricingPage() {
                 transition={{ duration: 0.3, delay: 0.15 + i * 0.03 }}
               >
                 <span className="text-[15px] text-text-secondary">
-                  {row.feature}
+                  {row.featureNode ?? row.feature}
                 </span>
                 <span className="flex justify-center">
                   <CellValue value={row.free} />

@@ -3,6 +3,7 @@ import { Check, X, Crown, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { BasilBookBrand } from '@/components/shared/BasilBookBrand';
 
 const freePlan = {
   name: 'Free',
@@ -38,7 +39,7 @@ const espressoPlan = {
     { text: 'Geofencing for check-in & out', included: true },
     { text: 'Per-day shift schedules', included: true },
     { text: 'Manager role (up to 2)', included: true },
-    { text: 'BasilBook integration + API', included: true },
+    { text: <><BasilBookBrand className="text-[15px]" /> integration + API</>, included: true },
     { text: 'Push & email notifications', included: true },
     { text: 'Daily attendance summary', included: true },
     { text: '14-day free trial', included: true },
@@ -231,8 +232,8 @@ export function PricingSection() {
           </p>
 
           <ul className="relative space-y-3 mb-8 flex-1">
-            {espressoPlan.features.map((f) => (
-              <li key={f.text} className="flex items-center gap-2.5">
+            {espressoPlan.features.map((f, i) => (
+              <li key={i} className="flex items-center gap-2.5">
                 <Check size={15} className="text-green shrink-0" strokeWidth={2.5} />
                 <span className="text-[15px] text-text-secondary">{f.text}</span>
               </li>

@@ -8,6 +8,7 @@ import {
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { PageSeo } from '@/components/shared/PageSeo';
+import { BasilBookBrand } from '@/components/shared/BasilBookBrand';
 
 export const Route = createFileRoute('/features')({
   component: FeaturesPage,
@@ -92,6 +93,7 @@ const espressoFeatures = [
   {
     icon: <ArrowRightLeft size={28} strokeWidth={1.6} />,
     title: 'BasilBook integration',
+    titleNode: <><BasilBookBrand className="text-[16px]" /> integration</>,
     desc: 'Connect DailyBrew to BasilBook, your restaurant accounting system. Link employees by username and let BasilBook pull attendance data via a secure API — check-in times, late flags, and shift info for any date range.',
     accent: '#2bb673',
   },
@@ -381,7 +383,7 @@ function FeatureCard({
   index,
   espresso,
 }: {
-  feature: { icon: React.ReactNode; title: string; desc: string; accent: string };
+  feature: { icon: React.ReactNode; title: string; titleNode?: React.ReactNode; desc: string; accent: string };
   index: number;
   espresso?: boolean;
 }) {
@@ -413,7 +415,7 @@ function FeatureCard({
         </div>
         <div className="flex items-center gap-2 mb-2">
           <h3 className="text-[16px] font-semibold text-text-primary">
-            {feature.title}
+            {feature.titleNode ?? feature.title}
           </h3>
           {espresso && (
             <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded-full bg-amber/10 text-amber uppercase tracking-wider">
