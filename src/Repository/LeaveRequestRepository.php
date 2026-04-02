@@ -76,6 +76,23 @@ class LeaveRequestRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    /** @return LeaveRequest[] */
+    public function findApprovedInRange(Employee $employee, \DateTimeInterface $from, \DateTimeInterface $to): array
+    {
+        return $this->createQueryBuilder('lr')
+            ->where('lr.employee = :employee')
+            ->andWhere('lr.startDate <= :to')
+            ->andWhere('lr.endDate >= :from')
+            ->andWhere('lr.status = :status')
+            ->andWhere('lr.deletedAt IS NULL')
+            ->setParameter('employee', $employee)
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->setParameter('status', LeaveRequestStatusEnum::APPROVED)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findApprovedForEmployeeOnDate(Employee $employee, \DateTimeInterface $date): ?LeaveRequest
     {
         return $this->createQueryBuilder('lr')
