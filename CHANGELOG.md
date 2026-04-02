@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.29.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.28.0...v1.29.0) (2026-04-02)
+
+
+### Features
+
+* **api-tokens:** introduce API token support for external integrations (e.g., BasilBook) ([570c0ed](https://github.com/bangkeut-technology/daily-brew/commit/570c0ed95a7eea4d42a6aa330b5fda285609f18d))
+
 ## [1.28.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.27.2...v1.28.0) (2026-04-02)
 
 
