@@ -30,7 +30,7 @@ const comparisonRows: { section?: string; feature: string; free: boolean | strin
   { feature: 'Device verification for check-in & out', free: false, espresso: true, double: true },
   { feature: 'Geofencing for check-in & out', free: false, espresso: true, double: true },
   { feature: 'Per-day shift schedules', free: false, espresso: true, double: true },
-  { feature: 'BasilBook staff linking', free: false, espresso: true, double: true },
+  { feature: 'BasilBook integration + API', free: false, espresso: true, double: true },
   { feature: 'Push & email notifications', free: false, espresso: true, double: true },
   { feature: 'Manager role', free: false, espresso: 'Up to 2', double: 'Unlimited' },
   { feature: 'Daily attendance summary', free: false, espresso: true, double: true },
@@ -66,6 +66,11 @@ const faqItems = [
     question: 'Can I cancel anytime?',
     answer:
       'Yes, there are no contracts or lock-in periods. You can cancel your Espresso subscription at any time and continue using the Free plan.',
+  },
+  {
+    question: 'How does the BasilBook integration work?',
+    answer:
+      'With an Espresso or Double Espresso plan, you can generate an API token from your workspace settings. BasilBook uses this token to pull attendance data for employees that share a username across both systems. The API returns check-in/out times, late/early flags, and shift info for any date range.',
   },
 ];
 

@@ -156,6 +156,16 @@ Users can be owners (create workspaces) or employees (linked to an employee reco
 - user → User (ManyToOne, not null, CASCADE delete)
 - createdAt, updatedAt
 
+**ApiToken**
+- id, publicId
+- prefix (string 8) — first 8 chars of raw token, for UI display
+- tokenHash (string 64, unique) — SHA-256 hash; plain token never stored
+- name (string 100) — human-readable label (e.g. "BasilBook production")
+- workspace → Workspace (ManyToOne, CASCADE delete)
+- lastUsedAt (datetime, nullable) — updated on each authenticated request
+- revokedAt (datetime, nullable) — null = active
+- createdAt
+
 ---
 
 ## Key Business Rules
@@ -506,7 +516,94 @@ Warm cafe aesthetic with glassmorphism. Dark mode supported with warm coffee ton
 
 ## BasilBook Integration
 
-DailyBrew employees can be linked to BasilBook staff records via the `username` field (Espresso plan required). This enables cross-product insights — matching attendance data with POS sales data. The username must match the staff name or ID used in BasilBook/POS system.
+BasilBook is an external accounting system. DailyBrew employees can be linked to BasilBook staff records via the `username` field (Espresso plan required). This enables cross-product insights — matching attendance data with accounting/sales data. The username must match the staff name or ID used in BasilBook.
+
+### API Tokens (Espresso)
+
+External integrations authenticate via API tokens stored in the `daily_brew_api_tokens` table.
+
+**ApiToken entity:**
+- `prefix` (string 8) — first 8 chars of the raw token, for UI identification (e.g. `db_a3xK9...`)
+- `tokenHash` (string 64, unique) — SHA-256 hash of the full token; plain token never stored
+- `name` (string 100) — human-readable label (e.g. "BasilBook production")
+- `workspace` → Workspace (ManyToOne, CASCADE delete)
+- `lastUsedAt` (datetime, nullable) — updated on each authenticated request
+- `revokedAt` (datetime, nullable) — set on revocation; `null` = active
+
+Token format: `db_` prefix + 45 alphanumeric characters (e.g. `db_a3xK9mP2nR7bQ4wY8cD1fG6hJ0kL5oU9sT3vX...`).
+
+**Owner API (JWT auth, with locale prefix):**
+- `GET /api/v1/{locale}/workspaces/{id}/api-tokens` — list all tokens (active + revoked)
+- `POST /api/v1/{locale}/workspaces/{id}/api-tokens` — generate new token (body: `{ "name": "BasilBook" }`)
+  - Returns the plain token **once** in the response; subsequent requests only show the prefix
+- `DELETE /api/v1/{locale}/workspaces/{id}/api-tokens/{tokenPublicId}` — revoke a token
+
+### BasilBook Attendance API
+
+External endpoint for BasilBook to pull attendance data. Authenticated via `X-Api-Key` header (no JWT, no locale).
+
+**Security:** `BasilBookApiKeyAuthenticator` hashes the incoming key, looks up the active token, resolves the workspace, and authenticates as the workspace owner. Separate firewall (`basilbook`) in security.yaml.
+
+**Endpoint:**
+```
+GET /api/v1/basilbook/attendances?from=2026-04-01&to=2026-04-30
+Header: X-Api-Key: db_a3xK9mP2nR7bQ4wY8cD1fG6hJ0kL5oU9sT3vX...
+```
+
+**Rules:**
+- Requires Espresso plan (403 if not)
+- Both `from` and `to` required (YYYY-MM-DD format)
+- Max range: 93 days
+- Only returns employees with a `username` (the BasilBook linking field)
+- Times formatted in workspace timezone
+
+**Response:**
+```json
+{
+  "workspace": "The Daily Grind",
+  "timezone": "Asia/Phnom_Penh",
+  "from": "2026-04-01",
+  "to": "2026-04-30",
+  "employees": [
+    {
+      "username": "john_doe",
+      "name": "John Doe",
+      "shiftName": "Morning",
+      "records": [
+        {
+          "date": "2026-04-01",
+          "checkInAt": "08:02",
+          "checkOutAt": "17:05",
+          "isLate": false,
+          "leftEarly": false
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Response field reference:**
+
+| Field | Type | Description |
+|---|---|---|
+| `workspace` | string | Restaurant name |
+| `timezone` | string | IANA timezone — all times are formatted in this TZ |
+| `from` / `to` | string | Requested date range (YYYY-MM-DD) |
+| `employees[].username` | string | BasilBook linking key |
+| `employees[].name` | string | Employee full name |
+| `employees[].shiftName` | string \| null | Assigned shift, or null |
+| `employees[].records[]` | array | Attendance entries in the period (absent days omitted) |
+| `records[].date` | string | Calendar date (YYYY-MM-DD) |
+| `records[].checkInAt` | string \| null | Check-in time (HH:mm in workspace TZ), null if not checked in |
+| `records[].checkOutAt` | string \| null | Check-out time (HH:mm in workspace TZ), null if not checked out |
+| `records[].isLate` | boolean | Late relative to shift start time |
+| `records[].leftEarly` | boolean | Left before shift end time |
+
+**Notes:**
+- Days with no attendance record are **not** included in `records[]` — absence is implied by missing dates
+- An employee who checked in but not yet out has `checkOutAt: null`
+- `isLate` and `leftEarly` are always `false` if the employee has no assigned shift
 
 ---
 

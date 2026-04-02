@@ -34,6 +34,13 @@ security:
             provider: daily_brew_user_provider
             context:  'dailybrew'
 
+        basilbook:
+            pattern: '^/api/v1/basilbook'
+            stateless: true
+            custom_authenticators:
+                - App\Security\BasilBookApiKeyAuthenticator
+            provider: daily_brew_user_provider
+
         api:
             pattern: ^/api
             stateless: true
@@ -55,6 +62,8 @@ security:
 
 
     access_control:
+        - path: '^/api/v1/basilbook'
+          roles: IS_AUTHENTICATED_FULLY
         - path: '^/api/v1/webhooks'
           roles: PUBLIC_ACCESS
         - path: '^/api/v1/checkin'

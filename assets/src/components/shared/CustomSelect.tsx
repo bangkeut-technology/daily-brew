@@ -72,7 +72,7 @@ export function CustomSelect({
     : options;
 
   return (
-    <div className={cn('relative', className)}>
+    <div className={cn('relative', open && 'z-[100]', className)}>
       <button
         ref={triggerRef}
         type="button"

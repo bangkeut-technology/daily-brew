@@ -39,6 +39,7 @@ DailyBrew helps restaurant owners manage their team's daily attendance through Q
 | Geofencing                    | -        | Yes                  | Yes                         |
 | Per-day shift schedules       | -        | Yes                  | Yes                         |
 | Employee username (BasilBook) | -        | Yes                  | Yes                         |
+| BasilBook API (attendance)    | -        | Yes                  | Yes                         |
 | Push & email notifications    | -        | Yes                  | Yes                         |
 | Daily attendance summary      | -        | Yes                  | Yes                         |
 | Priority support              | -        | -                    | Yes                         |
@@ -172,7 +173,7 @@ All three accounts can be used to experience the app from each role's perspectiv
 src/
   ApiController/          # API controllers
     Auth/                 # Login, register, OAuth
-    Workspace/            # Workspace CRUD, settings, dashboard
+    Workspace/            # Workspace CRUD, settings, dashboard, API tokens
     Employee/             # Employee CRUD
     Shift/                # Shift CRUD
     Closure/              # Closure CRUD
@@ -180,13 +181,14 @@ src/
     LeaveRequest/         # Leave request management
     Checkin/              # QR check-in endpoint (auth required)
     Device/               # Push notification device token registration
+    BasilBook/            # External API for BasilBook integration
     Paddle/               # Paddle webhook handler
     Plan/                 # Plan/subscription info
     Dev/                  # Dev-only endpoints (plan toggle)
   Entity/                 # Doctrine entities
   Repository/             # Doctrine repositories
   Service/                # Business logic
-  Security/Voter/         # WorkspaceVoter (authorization)
+  Security/               # WorkspaceVoter, BasilBookApiKeyAuthenticator
   Enum/                   # Plan, LeaveRequestStatus, SubscriptionStatus
   EventSubscriber/        # Exception handling, rate limiting
 
@@ -229,6 +231,11 @@ assets/src/
 - `GET /api/v1/{locale}/workspaces/{publicId}/attendances`
 - `GET /api/v1/{locale}/workspaces/{publicId}/settings/my-ip` — returns client IP as seen by server
 
+### API Tokens (authenticated, owner only)
+- `GET /api/v1/{locale}/workspaces/{publicId}/api-tokens` — list all tokens
+- `POST /api/v1/{locale}/workspaces/{publicId}/api-tokens` — generate token (body: `{ "name": "BasilBook" }`)
+- `DELETE /api/v1/{locale}/workspaces/{publicId}/api-tokens/{tokenPublicId}` — revoke token
+
 ### QR Check-in (authenticated, no locale)
 - `GET /api/v1/checkin/{qrToken}`
 - `POST /api/v1/checkin/{qrToken}`
@@ -239,6 +246,81 @@ assets/src/
 
 ### Webhooks (public)
 - `POST /api/v1/webhooks/paddle`
+
+### BasilBook API (API key auth, no locale)
+
+External API for BasilBook (accounting system) to retrieve attendance data. Authenticated via `X-Api-Key` header instead of JWT.
+
+- `GET /api/v1/basilbook/attendances?from=YYYY-MM-DD&to=YYYY-MM-DD`
+
+**Authentication:** The workspace owner generates an API token from the settings page (or via the API tokens endpoint above). BasilBook sends the token in the `X-Api-Key` header. Tokens are hashed (SHA-256) in the database — the plain token is only shown once on creation.
+
+**Example:**
+
+```bash
+curl "https://dailybrew.work/api/v1/basilbook/attendances?from=2026-04-01&to=2026-04-30" \
+  -H "X-Api-Key: db_a3xK9mP2nR7bQ4wY8cD1fG6hJ0kL5oU9sT3vX..."
+```
+
+**Response:**
+
+```json
+{
+  "workspace": "The Daily Grind",
+  "timezone": "Asia/Phnom_Penh",
+  "from": "2026-04-01",
+  "to": "2026-04-30",
+  "employees": [
+    {
+      "username": "john_doe",
+      "name": "John Doe",
+      "shiftName": "Morning",
+      "records": [
+        {
+          "date": "2026-04-01",
+          "checkInAt": "08:02",
+          "checkOutAt": "17:05",
+          "isLate": false,
+          "leftEarly": false
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Response fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `workspace` | string | Restaurant name |
+| `timezone` | string | IANA timezone — all times formatted in this TZ |
+| `from` / `to` | string | Requested date range (YYYY-MM-DD) |
+| `employees[].username` | string | BasilBook staff linking key |
+| `employees[].name` | string | Employee full name |
+| `employees[].shiftName` | string \| null | Assigned shift, or null |
+| `employees[].records[]` | array | Attendance entries (absent days omitted) |
+| `records[].date` | string | Calendar date (YYYY-MM-DD) |
+| `records[].checkInAt` | string \| null | Check-in time (HH:mm in workspace TZ) |
+| `records[].checkOutAt` | string \| null | Check-out time (HH:mm in workspace TZ) |
+| `records[].isLate` | boolean | Late relative to shift start |
+| `records[].leftEarly` | boolean | Left before shift end |
+
+**Rules:**
+- Requires Espresso plan (403 if not)
+- Both `from` and `to` are required (YYYY-MM-DD)
+- Maximum range: 93 days
+- Only employees with a `username` are included
+- Days with no attendance are omitted — absence = missing date
+- `isLate`/`leftEarly` are always `false` if employee has no shift
+
+**Errors:**
+
+| Status | Meaning |
+|--------|---------|
+| 401 | Missing or invalid API key |
+| 403 | Workspace not on Espresso plan |
+| 422 | Invalid or missing date parameters |
 
 ## Design
 

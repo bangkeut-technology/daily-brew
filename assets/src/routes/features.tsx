@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import {
   QrCode, Users, Clock, Coffee, Shield, LayoutDashboard,
   MapPin, CalendarDays, Bell, ChevronRight, Crown, Smartphone,
-  Globe, Moon, Zap, CheckCircle, ShieldCheck,
+  Globe, Moon, Zap, CheckCircle, ShieldCheck, ArrowRightLeft,
 } from 'lucide-react';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
@@ -88,6 +88,12 @@ const espressoFeatures = [
     title: 'Manager role',
     desc: 'Promote up to 2 trusted employees to managers (Espresso) or unlimited (Double Espresso). Managers can approve/reject leave requests, view all attendance, and cancel leave — without access to employee management, shifts, closures, or settings.',
     accent: '#6B4226',
+  },
+  {
+    icon: <ArrowRightLeft size={28} strokeWidth={1.6} />,
+    title: 'BasilBook integration',
+    desc: 'Connect DailyBrew to BasilBook, your restaurant accounting system. Link employees by username and let BasilBook pull attendance data via a secure API — check-in times, late flags, and shift info for any date range.',
+    accent: '#2bb673',
   },
   {
     icon: <Bell size={28} strokeWidth={1.6} />,

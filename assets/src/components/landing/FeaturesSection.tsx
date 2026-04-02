@@ -11,6 +11,7 @@ import {
   Bell,
   Smartphone,
   ShieldCheck,
+  ArrowRightLeft,
   Crown,
   ChevronRight,
 } from 'lucide-react';
@@ -79,6 +80,12 @@ const espressoFeatures = [
     title: 'Manager role',
     desc: 'Promote trusted staff to managers. They can approve leave and view all attendance.',
     accent: '#6B4226',
+  },
+  {
+    icon: <ArrowRightLeft size={22} strokeWidth={1.8} />,
+    title: 'BasilBook integration',
+    desc: 'Sync staff attendance to your accounting system. Link employees by username and pull data via API.',
+    accent: '#2bb673',
   },
   {
     icon: <Bell size={22} strokeWidth={1.8} />,

@@ -115,6 +115,21 @@ class EmployeeRepository extends AbstractRepository
             ->getSingleScalarResult();
     }
 
+    /** @return Employee[] Active employees with a username (for BasilBook integration). */
+    public function findWithUsernameByWorkspace(Workspace $workspace): array
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.workspace = :ws')
+            ->andWhere('e.username IS NOT NULL')
+            ->andWhere('e.status = :status')
+            ->andWhere('e.deletedAt IS NULL')
+            ->setParameter('ws', $workspace)
+            ->setParameter('status', EmployeeStatusEnum::ACTIVE)
+            ->orderBy('e.firstName', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     /** Soft-delete all employees created by the given user. */
     public function softDeleteByCreator(User $user, \DateTimeImmutable $deletedAt): void
     {
