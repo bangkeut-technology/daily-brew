@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.28.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.27.2...v1.28.0) (2026-04-02)
+
+
+### Features
+
+* **security:** add user context support and enhance SPA rendering with user data ([311dace](https://github.com/bangkeut-technology/daily-brew/commit/311daceec3c439cae0aa94a107f773f002744f0e))
+
+
+### Bug Fixes
+
+* **attendance:** ensure `pill` state is nullable and conditionally render pill element ([00824e5](https://github.com/bangkeut-technology/daily-brew/commit/00824e5e679790d2b59c352fd286dd83e182dfec))
+
 ## [1.27.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.26.0...v1.27.0) (2026-04-01)
 
 
