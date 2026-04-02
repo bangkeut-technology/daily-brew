@@ -199,6 +199,26 @@ function AttendancePage() {
               onChange={setEmployeeFilter}
               options={employeeOptions}
               placeholder={t('attendance.allEmployees', 'All employees')}
+              renderOption={(opt, idx) =>
+                opt.value ? (
+                  <>
+                    <Avatar name={opt.label} index={idx - 1} size={22} />
+                    <span className="truncate">{opt.label}</span>
+                  </>
+                ) : (
+                  opt.label
+                )
+              }
+              renderSelected={(opt) =>
+                opt.value ? (
+                  <>
+                    <Avatar name={opt.label} index={employees?.findIndex((e) => e.publicId === opt.value) ?? 0} size={20} />
+                    <span className="truncate">{opt.label}</span>
+                  </>
+                ) : (
+                  <>{opt.label}</>
+                )
+              }
             />
           </div>
         )}
@@ -380,7 +400,7 @@ function SegmentedControl({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const [pill, setPill] = useState({ left: 0, width: 0 });
+  const [pill, setPill] = useState<{ left: number; width: number } | null>(null);
 
   const measure = useCallback(() => {
     const idx = VIEW_TABS.findIndex((tab) => tab.value === view);
@@ -399,10 +419,12 @@ function SegmentedControl({
       ref={containerRef}
       className="relative flex gap-1 ml-auto bg-glass-bg border border-glass-border rounded-xl p-1"
     >
-      <div
-        className="absolute top-1 bottom-1 rounded-lg bg-coffee transition-all duration-250 ease-out"
-        style={{ left: pill.left, width: pill.width }}
-      />
+      {pill && (
+        <div
+          className="absolute top-1 bottom-1 rounded-lg bg-coffee transition-all duration-250 ease-out"
+          style={{ left: pill.left, width: pill.width }}
+        />
+      )}
       {VIEW_TABS.map((tab, i) => {
         const Icon = tab.icon;
         const active = view === tab.value;

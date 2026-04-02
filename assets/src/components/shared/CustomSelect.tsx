@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { ChevronDown, Check, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -14,6 +14,8 @@ interface CustomSelectProps {
   placeholder?: string;
   className?: string;
   searchable?: boolean;
+  renderOption?: (option: SelectOption, index: number) => React.ReactNode;
+  renderSelected?: (option: SelectOption) => React.ReactNode;
 }
 
 export function CustomSelect({
@@ -23,6 +25,8 @@ export function CustomSelect({
   placeholder = 'Select\u2026',
   className = '',
   searchable,
+  renderOption,
+  renderSelected,
 }: CustomSelectProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -75,8 +79,8 @@ export function CustomSelect({
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none transition-colors cursor-pointer focus:border-coffee focus:ring-1 focus:ring-coffee/20"
       >
-        <span className={cn(!selected && 'text-text-tertiary')}>
-          {selected ? selected.label : placeholder}
+        <span className={cn('flex items-center gap-2 min-w-0', !selected && 'text-text-tertiary')}>
+          {selected ? (renderSelected ? renderSelected(selected) : selected.label) : placeholder}
         </span>
         <ChevronDown
           size={14}
@@ -87,7 +91,7 @@ export function CustomSelect({
       {open && (
         <div
           ref={dropdownRef}
-          className="absolute left-0 w-full rounded-xl bg-glass-bg backdrop-blur-xl border border-glass-border shadow-lg overflow-hidden z-[9999]"
+          className="absolute left-0 w-full rounded-xl bg-cream dark:bg-[#1E1916] border border-glass-border shadow-lg overflow-hidden z-[9999]"
           style={dropUp ? { bottom: '100%', marginBottom: 4 } : { top: '100%', marginTop: 4 }}
         >
           {showSearch && (
@@ -109,7 +113,7 @@ export function CustomSelect({
             {filtered.length === 0 ? (
               <p className="px-3 py-2 text-[14px] text-text-tertiary text-center">No results</p>
             ) : (
-              filtered.map((option) => (
+              filtered.map((option, idx) => (
                 <button
                   key={option.value}
                   type="button"
@@ -125,7 +129,9 @@ export function CustomSelect({
                       : 'bg-transparent text-text-primary hover:bg-cream-3/40'
                   )}
                 >
-                  <span className="flex-1">{option.label}</span>
+                  <span className="flex-1 flex items-center gap-2 min-w-0">
+                    {renderOption ? renderOption(option, idx) : option.label}
+                  </span>
                   {option.value === value && <Check size={13} className="text-coffee flex-shrink-0" />}
                 </button>
               ))

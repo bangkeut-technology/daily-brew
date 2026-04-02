@@ -145,7 +145,7 @@ export function CustomDatePicker({ value, onChange, className = '', isDateDisabl
       {open && (
         <div
           ref={dropdownRef}
-          className="absolute left-0 w-[280px] rounded-xl bg-glass-bg backdrop-blur-xl border border-glass-border shadow-lg overflow-hidden z-[9999]"
+          className="absolute left-0 w-[280px] rounded-xl bg-cream dark:bg-[#1E1916] border border-glass-border shadow-lg overflow-hidden z-[9999]"
           style={dropUp ? { bottom: '100%', marginBottom: 4 } : { top: '100%', marginTop: 4 }}
         >
           {/* Header */}
