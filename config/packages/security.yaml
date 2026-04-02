@@ -50,6 +50,7 @@ security:
         main:
             pattern: ^/
             stateless: true
+            entry_point: jwt
             jwt: ~
             refresh_jwt:
                 check_path: gesdinet_jwt_refresh_token

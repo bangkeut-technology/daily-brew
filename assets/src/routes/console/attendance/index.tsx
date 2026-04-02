@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CalendarDays, ClipboardList, LayoutGrid, List } from 'lucide-react';
+import { CalendarDays, ClipboardList, GanttChart, LayoutGrid, List } from 'lucide-react';
 import { useAttendance } from '@/hooks/queries/useAttendance';
 import { useAttendanceSummary } from '@/hooks/queries/useAttendanceSummary';
 import { useEmployees } from '@/hooks/queries/useEmployees';
@@ -18,9 +18,17 @@ import { useDateFormat } from '@/hooks/useDateFormat';
 import { cn } from '@/lib/utils';
 import type { AttendanceDayStatus } from '@/types';
 
+type ViewMode = 'gantt' | 'summary' | 'log';
+
 function getStartOfMonth(): string {
   const now = new Date();
   return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-01`;
+}
+
+function getEndOfMonth(): string {
+  const now = new Date();
+  const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  return `${last.getFullYear()}-${(last.getMonth() + 1).toString().padStart(2, '0')}-${last.getDate().toString().padStart(2, '0')}`;
 }
 
 function getToday(): string {
@@ -33,7 +41,7 @@ function getSearchParams() {
     from: params.get('from') || getStartOfMonth(),
     to: params.get('to') || getToday(),
     employee: params.get('employee') || '',
-    view: (params.get('view') || 'summary') as 'log' | 'summary',
+    view: (params.get('view') || 'gantt') as ViewMode,
   };
 }
 
@@ -46,6 +54,8 @@ function updateSearchParams(from: string, to: string, employee: string, view: st
   url.searchParams.set('view', view);
   window.history.replaceState({}, '', url.toString());
 }
+
+/* ── Status helpers ── */
 
 function dayStatusBadge(day: AttendanceDayStatus) {
   switch (day.status) {
@@ -71,6 +81,26 @@ function formatDayLabel(dateStr: string): string {
   return `${weekday} ${day}`;
 }
 
+/** Letter code + color for the Gantt grid cell */
+function ganttCell(day: AttendanceDayStatus): { code: string; bg: string; text: string; title: string } {
+  switch (day.status) {
+    case 'present':
+      if (day.isLate)
+        return { code: 'Lt', bg: 'bg-amber/15', text: 'text-amber', title: `Late \u2014 ${day.checkInAt || ''}` };
+      if (day.leftEarly)
+        return { code: 'E', bg: 'bg-amber/15', text: 'text-amber', title: `Left early \u2014 ${day.checkOutAt || ''}` };
+      return { code: 'P', bg: 'bg-green/12', text: 'text-green', title: `Present \u2014 ${day.checkInAt || ''}${day.checkOutAt ? ` \u2192 ${day.checkOutAt}` : ''}` };
+    case 'absent':
+      return { code: 'A', bg: 'bg-red/12', text: 'text-red', title: 'Absent' };
+    case 'leave':
+      return { code: 'Lv', bg: 'bg-[#3B6FA0]/12', text: 'text-blue', title: day.leaveType === 'paid' ? 'Paid leave' : 'Unpaid leave' };
+    case 'closure':
+      return { code: 'C', bg: 'bg-[#AE9D95]/10', text: 'text-text-tertiary', title: 'Closed' };
+    case 'upcoming':
+      return { code: '\u2013', bg: '', text: 'text-text-tertiary/40', title: 'Upcoming' };
+  }
+}
+
 export const Route = createFileRoute('/console/attendance/')({
   component: AttendancePage,
 });
@@ -81,7 +111,7 @@ function AttendancePage() {
   const [from, setFromState] = useState(initial.from);
   const [to, setToState] = useState(initial.to);
   const [employeeFilter, setEmployeeFilterState] = useState(initial.employee);
-  const [view, setViewState] = useState<'log' | 'summary'>(initial.view);
+  const [view, setViewState] = useState<ViewMode>(initial.view);
   const workspaceId = getWorkspacePublicId() || '';
   const { data: attendance, isLoading } = useAttendance(workspaceId, from, to);
   const { data: summary, isLoading: summaryLoading } = useAttendanceSummary(workspaceId, from, to);
@@ -108,9 +138,16 @@ function AttendancePage() {
     updateSearchParams(from, to, value, view);
   };
 
-  const setView = (v: 'log' | 'summary') => {
+  const setView = (v: ViewMode) => {
     setViewState(v);
-    updateSearchParams(from, to, employeeFilter, v);
+    // When switching to gantt, auto-expand to full month
+    if (v === 'gantt') {
+      const newTo = getEndOfMonth();
+      setToState(newTo);
+      updateSearchParams(from, newTo, employeeFilter, v);
+    } else {
+      updateSearchParams(from, to, employeeFilter, v);
+    }
   };
 
   // For employees, always filter to their own records; for owners, use the dropdown filter
@@ -127,6 +164,9 @@ function AttendancePage() {
     { value: '', label: t('attendance.allEmployees', 'All employees') },
     ...(employees?.map((e) => ({ value: e.publicId, label: e.name })) ?? []),
   ];
+
+  // Extract day numbers from the first employee's days for the Gantt header
+  const ganttDays = filteredSummary?.[0]?.days ?? [];
 
   if (roleLoading) {
     return (
@@ -177,6 +217,18 @@ function AttendancePage() {
         )}
         <div className="flex gap-1 ml-auto bg-glass-bg border border-glass-border rounded-xl p-1">
           <button
+            onClick={() => setView('gantt')}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-150 cursor-pointer border-none',
+              view === 'gantt'
+                ? 'bg-coffee text-white'
+                : 'text-text-secondary hover:text-text-primary hover:bg-cream-3/50 bg-transparent',
+            )}
+          >
+            <GanttChart size={14} />
+            {t('attendance.gantt', 'Monthly')}
+          </button>
+          <button
             onClick={() => setView('summary')}
             className={cn(
               'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-150 cursor-pointer border-none',
@@ -203,19 +255,111 @@ function AttendancePage() {
         </div>
       </div>
 
+      {/* ── Legend (shown for gantt and summary) ── */}
+      {view !== 'log' && (
+        <div className="flex flex-wrap gap-3 mb-4 text-[12px] font-medium">
+          <span className="flex items-center gap-1"><span className="inline-block w-5 h-5 rounded bg-green/12 text-green text-center leading-5 font-mono text-[11px]">P</span> Present</span>
+          <span className="flex items-center gap-1"><span className="inline-block w-5 h-5 rounded bg-red/12 text-red text-center leading-5 font-mono text-[11px]">A</span> Absent</span>
+          <span className="flex items-center gap-1"><span className="inline-block w-5 h-5 rounded bg-amber/15 text-amber text-center leading-5 font-mono text-[11px]">Lt</span> Late</span>
+          <span className="flex items-center gap-1"><span className="inline-block w-5 h-5 rounded bg-amber/15 text-amber text-center leading-5 font-mono text-[11px]">E</span> Early leave</span>
+          <span className="flex items-center gap-1"><span className="inline-block w-5 h-5 rounded bg-[#3B6FA0]/12 text-blue text-center leading-5 font-mono text-[11px]">Lv</span> Leave</span>
+          <span className="flex items-center gap-1"><span className="inline-block w-5 h-5 rounded bg-[#AE9D95]/10 text-text-tertiary text-center leading-5 font-mono text-[11px]">C</span> Closed</span>
+        </div>
+      )}
+
       {loading ? (
         <div className="flex items-center justify-center py-12">
           <p className="text-[15px] text-text-tertiary">{t('common.loading')}</p>
         </div>
+      ) : view === 'gantt' ? (
+        /* ── Gantt (monthly grid) view ── */
+        !filteredSummary?.length ? (
+          <EmptyState t={t} />
+        ) : (
+          <GlassCard hover={false}>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-[12px]">
+                <thead>
+                  <tr>
+                    <th className="sticky left-0 z-10 bg-glass-bg backdrop-blur-md text-left px-3 py-2.5 text-[13px] font-semibold text-text-primary border-b border-cream-3/60 min-w-[140px]">
+                      {t('attendance.employee', 'Employee')}
+                    </th>
+                    {ganttDays.map((day) => {
+                      const d = new Date(day.date + 'T00:00:00');
+                      const dayNum = d.getDate();
+                      const weekday = d.toLocaleDateString('en', { weekday: 'narrow' });
+                      const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+                      return (
+                        <th
+                          key={day.date}
+                          className={cn(
+                            'px-0.5 py-2 text-center font-medium border-b border-cream-3/60 min-w-[32px]',
+                            isWeekend ? 'text-text-tertiary/60' : 'text-text-secondary',
+                          )}
+                        >
+                          <div className="text-[10px] leading-tight">{weekday}</div>
+                          <div className="text-[12px] tabular-nums leading-tight">{dayNum}</div>
+                        </th>
+                      );
+                    })}
+                    <th className="px-3 py-2.5 text-center text-[11px] font-semibold text-text-secondary border-b border-cream-3/60 min-w-[32px]">P</th>
+                    <th className="px-3 py-2.5 text-center text-[11px] font-semibold text-red border-b border-cream-3/60 min-w-[32px]">A</th>
+                    <th className="px-3 py-2.5 text-center text-[11px] font-semibold text-amber border-b border-cream-3/60 min-w-[32px]">Lt</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredSummary.map((emp, empIdx) => {
+                    const presentCount = emp.days.filter((d) => d.status === 'present').length;
+                    const absentCount = emp.days.filter((d) => d.status === 'absent').length;
+                    const lateCount = emp.days.filter((d) => d.status === 'present' && d.isLate).length;
+
+                    return (
+                      <tr key={emp.employeePublicId} className="hover:bg-cream-3/25 transition-colors duration-[120ms]">
+                        <td className="sticky left-0 z-10 bg-glass-bg backdrop-blur-md px-3 py-2 border-b border-cream-3/30">
+                          <div className="flex items-center gap-2">
+                            <Avatar name={emp.employeeName} index={empIdx} size={26} />
+                            <div>
+                              <div className="text-[13px] font-medium text-text-primary leading-tight truncate max-w-[120px]">
+                                {emp.employeeName}
+                              </div>
+                              <div className="text-[10.5px] text-text-tertiary leading-tight">
+                                {emp.shiftName || 'No shift'}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        {emp.days.map((day) => {
+                          const cell = ganttCell(day);
+                          return (
+                            <td key={day.date} className="px-0.5 py-1.5 text-center border-b border-cream-3/30">
+                              <span
+                                title={cell.title}
+                                className={cn(
+                                  'inline-flex items-center justify-center w-[28px] h-[24px] rounded text-[11px] font-semibold font-mono cursor-default',
+                                  cell.bg,
+                                  cell.text,
+                                )}
+                              >
+                                {cell.code}
+                              </span>
+                            </td>
+                          );
+                        })}
+                        <td className="px-3 py-2 text-center text-[12px] font-semibold text-green tabular-nums border-b border-cream-3/30">{presentCount}</td>
+                        <td className="px-3 py-2 text-center text-[12px] font-semibold text-red tabular-nums border-b border-cream-3/30">{absentCount}</td>
+                        <td className="px-3 py-2 text-center text-[12px] font-semibold text-amber tabular-nums border-b border-cream-3/30">{lateCount}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </GlassCard>
+        )
       ) : view === 'summary' ? (
         /* ── Summary view ── */
         !filteredSummary?.length ? (
-          <div className="border-[1.5px] border-dashed border-cream-3 rounded-2xl bg-glass-bg backdrop-blur-md flex flex-col items-center justify-center min-h-[200px]">
-            <ClipboardList size={28} className="text-text-tertiary mb-2" />
-            <span className="text-[15px] text-text-tertiary">
-              {t('attendance.noRecords', 'No attendance records for this period')}
-            </span>
-          </div>
+          <EmptyState t={t} />
         ) : (
           <div className="flex flex-col gap-4">
             {filteredSummary.map((emp, empIdx) => {
@@ -286,12 +430,7 @@ function AttendancePage() {
       ) : (
         /* ── Log view (original) ── */
         filtered?.length === 0 ? (
-          <div className="border-[1.5px] border-dashed border-cream-3 rounded-2xl bg-glass-bg backdrop-blur-md flex flex-col items-center justify-center min-h-[200px]">
-            <ClipboardList size={28} className="text-text-tertiary mb-2" />
-            <span className="text-[15px] text-text-tertiary">
-              {t('attendance.noRecords', 'No attendance records for this period')}
-            </span>
-          </div>
+          <EmptyState t={t} />
         ) : (
           <GlassCard hover={false}>
             <GlassCardHeader
@@ -321,6 +460,17 @@ function AttendancePage() {
           </GlassCard>
         )
       )}
+    </div>
+  );
+}
+
+function EmptyState({ t }: { t: (key: string, fallback: string) => string }) {
+  return (
+    <div className="border-[1.5px] border-dashed border-cream-3 rounded-2xl bg-glass-bg backdrop-blur-md flex flex-col items-center justify-center min-h-[200px]">
+      <ClipboardList size={28} className="text-text-tertiary mb-2" />
+      <span className="text-[15px] text-text-tertiary">
+        {t('attendance.noRecords', 'No attendance records for this period')}
+      </span>
     </div>
   );
 }
