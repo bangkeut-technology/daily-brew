@@ -45,7 +45,7 @@
                 paddleClientSideToken: '{{ paddleClientSideToken|e('js') }}',
                 paddlePriceIdMonthly: '{{ paddlePriceIdEspressoMonthly|e('js') }}',
                 paddlePriceIdAnnual: '{{ paddlePriceIdEspressoAnnual|e('js') }}',
-                user: null
+                user: {{ user is not null ? user|json_encode|raw : 'null' }}
             };
         </script>
     {% endblock %}

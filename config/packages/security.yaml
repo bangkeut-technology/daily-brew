@@ -32,6 +32,7 @@ security:
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
             provider: daily_brew_user_provider
+            context:  'dailybrew'
 
         api:
             pattern: ^/api
@@ -41,6 +42,7 @@ security:
             refresh_jwt:
                 check_path: gesdinet_jwt_refresh_token
             provider: daily_brew_user_provider
+            context:  'dailybrew'
 
         oauth:
             pattern: '^/oauth/'
@@ -50,11 +52,12 @@ security:
         main:
             pattern: ^/
             stateless: true
-            entry_point: jwt
             jwt: ~
             refresh_jwt:
                 check_path: gesdinet_jwt_refresh_token
             provider: daily_brew_user_provider
+            context:  'dailybrew'
+
 
     access_control:
         - path: '^/api/v1/webhooks'
