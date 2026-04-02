@@ -203,8 +203,8 @@ class AttendanceController extends AbstractController
         $from = $request->query->get('from', DateService::today($wsTz)->format('Y-m-d'));
         $to = $request->query->get('to', $from);
 
-        $fromDate = DateService::parse($from);
-        $toDate = DateService::parse($to);
+        $fromDate = DateService::mutableParse($from);
+        $toDate = DateService::mutableParse($to);
 
         // Determine which employees to include
         $isOwner = $workspace->getOwner()?->getId() === $user->getId();
@@ -223,9 +223,7 @@ class AttendanceController extends AbstractController
         }
 
         // Index attendance records by (employeeId, date)
-        $attendances = $attendanceRepository->findByWorkspaceAndDateRange(
-            $workspace, DateService::mutableParse($from), DateService::mutableParse($to),
-        );
+        $attendances = $attendanceRepository->findByWorkspaceAndDateRange($workspace, $fromDate, $toDate);
         $attendanceMap = [];
         foreach ($attendances as $a) {
             $key = $a->getEmployee()->getId() . '_' . $a->getDate()->format('Y-m-d');
@@ -234,32 +232,31 @@ class AttendanceController extends AbstractController
 
         // Collect closure dates in range
         $closureDates = [];
-        $closures = $closurePeriodRepository->findAllOverlappingRange($workspace, $fromDate, $toDate);
+        $closures = $closurePeriodRepository->findByWorkspace($workspace);
         foreach ($closures as $closure) {
-            $period = new \DatePeriod(
-                \DateTimeImmutable::createFromInterface($closure->getStartDate()),
-                new \DateInterval('P1D'),
-                \DateTimeImmutable::createFromInterface($closure->getEndDate())->modify('+1 day'),
-            );
-            foreach ($period as $d) {
-                $closureDates[$d->format('Y-m-d')] = true;
+            $cStart = max($fromDate->getTimestamp(), $closure->getStartDate()->getTimestamp());
+            $cEnd = min($toDate->getTimestamp(), $closure->getEndDate()->getTimestamp());
+            $current = new \DateTime('@' . $cStart);
+            $end = new \DateTime('@' . $cEnd);
+            while ($current <= $end) {
+                $closureDates[$current->format('Y-m-d')] = true;
+                $current->modify('+1 day');
             }
         }
 
-        // Collect approved leaves indexed by (employeeId, date) — bulk load
-        $approvedLeaves = $leaveRequestRepository->findApprovedByWorkspaceAndDateRange(
-            $workspace, $fromDate, $toDate,
-        );
+        // Collect approved leaves indexed by (employeeId, date)
         $leaveMap = [];
-        foreach ($approvedLeaves as $leave) {
-            $empId = $leave->getEmployee()->getId();
-            $period = new \DatePeriod(
-                \DateTimeImmutable::createFromInterface($leave->getStartDate()),
-                new \DateInterval('P1D'),
-                \DateTimeImmutable::createFromInterface($leave->getEndDate())->modify('+1 day'),
-            );
-            foreach ($period as $d) {
-                $leaveMap[$empId . '_' . $d->format('Y-m-d')] = $leave;
+        foreach ($employees as $emp) {
+            $leaves = $leaveRequestRepository->findApprovedInRange($emp, $fromDate, $toDate);
+            foreach ($leaves as $leave) {
+                $lStart = max($fromDate->getTimestamp(), $leave->getStartDate()->getTimestamp());
+                $lEnd = min($toDate->getTimestamp(), $leave->getEndDate()->getTimestamp());
+                $current = new \DateTime('@' . $lStart);
+                $end = new \DateTime('@' . $lEnd);
+                while ($current <= $end) {
+                    $leaveMap[$emp->getId() . '_' . $current->format('Y-m-d')] = $leave;
+                    $current->modify('+1 day');
+                }
             }
         }
 
@@ -271,10 +268,10 @@ class AttendanceController extends AbstractController
         $wsTodayStr = DateService::today($wsTz)->format('Y-m-d');
 
         $result = [];
-        $datePeriod = new \DatePeriod($fromDate, new \DateInterval('P1D'), $toDate->modify('+1 day'));
         foreach ($employees as $emp) {
             $days = [];
-            foreach ($datePeriod as $day) {
+            $period = new \DatePeriod($fromDate, new \DateInterval('P1D'), (clone $toDate)->modify('+1 day'));
+            foreach ($period as $day) {
                 $dateStr = $day->format('Y-m-d');
                 $key = $emp->getId() . '_' . $dateStr;
 

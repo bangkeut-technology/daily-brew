@@ -3,7 +3,3 @@ gesdinet_jwt_refresh_token:
     ttl: 2592000
     cookie:
         enabled: true
-        same_site: lax
-        path: /
-        http_only: true
-        secure: auto

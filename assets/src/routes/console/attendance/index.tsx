@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CalendarDays, ClipboardList, GanttChart, LayoutGrid, List } from 'lucide-react';
+import { CalendarDays, ChevronDown, ClipboardList, GanttChart, LayoutGrid, List } from 'lucide-react';
 import { useAttendance } from '@/hooks/queries/useAttendance';
 import { useAttendanceSummary } from '@/hooks/queries/useAttendanceSummary';
 import { useEmployees } from '@/hooks/queries/useEmployees';
@@ -202,44 +202,7 @@ function AttendancePage() {
             />
           </div>
         )}
-        <div className="flex gap-1 ml-auto bg-glass-bg border border-glass-border rounded-xl p-1">
-          <button
-            onClick={() => setView('gantt')}
-            className={cn(
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-150 cursor-pointer border-none',
-              view === 'gantt'
-                ? 'bg-coffee text-white'
-                : 'text-text-secondary hover:text-text-primary hover:bg-cream-3/50 bg-transparent',
-            )}
-          >
-            <GanttChart size={14} />
-            {t('attendance.gantt', 'Monthly')}
-          </button>
-          <button
-            onClick={() => setView('summary')}
-            className={cn(
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-150 cursor-pointer border-none',
-              view === 'summary'
-                ? 'bg-coffee text-white'
-                : 'text-text-secondary hover:text-text-primary hover:bg-cream-3/50 bg-transparent',
-            )}
-          >
-            <LayoutGrid size={14} />
-            {t('attendance.summary', 'Summary')}
-          </button>
-          <button
-            onClick={() => setView('log')}
-            className={cn(
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-150 cursor-pointer border-none',
-              view === 'log'
-                ? 'bg-coffee text-white'
-                : 'text-text-secondary hover:text-text-primary hover:bg-cream-3/50 bg-transparent',
-            )}
-          >
-            <List size={14} />
-            {t('attendance.log', 'Log')}
-          </button>
-        </div>
+        <SegmentedControl view={view} setView={setView} t={t} />
       </div>
 
       {/* ── Legend (shown for gantt and summary) ── */}
@@ -344,74 +307,19 @@ function AttendancePage() {
           </GlassCard>
         )
       ) : view === 'summary' ? (
-        /* ── Summary view ── */
+        /* ── Summary view (collapsible) ── */
         !filteredSummary?.length ? (
           <EmptyState t={t} />
         ) : (
           <div className="flex flex-col gap-4">
-            {filteredSummary.map((emp, empIdx) => {
-              const presentDays = emp.days.filter((d) => d.status === 'present').length;
-              const absentDays = emp.days.filter((d) => d.status === 'absent').length;
-              const leaveDays = emp.days.filter((d) => d.status === 'leave').length;
-              const lateDays = emp.days.filter((d) => d.status === 'present' && d.isLate).length;
-
-              return (
-                <GlassCard key={emp.employeePublicId} hover={false}>
-                  <div className="flex items-center gap-3 px-5 py-3 border-b border-cream-3/60">
-                    <Avatar name={emp.employeeName} index={empIdx} size={36} />
-                    <div className="flex-1">
-                      <div className="text-[15.5px] font-medium text-text-primary font-sans">
-                        {emp.employeeName}
-                      </div>
-                      <div className="text-[13px] text-text-tertiary font-sans">
-                        {emp.shiftName || t('attendance.noShift', 'No shift')}
-                      </div>
-                    </div>
-                    <div className="flex gap-2 flex-wrap justify-end">
-                      <span className="text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-green/10 text-green">
-                        {presentDays} {t('attendance.present', 'present')}
-                      </span>
-                      {absentDays > 0 && (
-                        <span className="text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-red/10 text-red">
-                          {absentDays} {t('attendance.absent', 'absent')}
-                        </span>
-                      )}
-                      {lateDays > 0 && (
-                        <span className="text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
-                          {lateDays} {t('attendance.late', 'late')}
-                        </span>
-                      )}
-                      {leaveDays > 0 && (
-                        <span className="text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-[#3B6FA0]/10 text-blue">
-                          {leaveDays} {t('attendance.onLeave', 'on leave')}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="divide-y divide-cream-3/40">
-                    {emp.days.map((day) => (
-                      <div
-                        key={day.date}
-                        className="flex items-center gap-3 px-5 py-2 transition-colors duration-[120ms] hover:bg-cream-3/35 cursor-default"
-                      >
-                        <div className="w-[72px] text-[13.5px] text-text-secondary font-sans">
-                          {formatDayLabel(day.date)}
-                        </div>
-                        <div className="flex-1 text-[14px] font-mono tabular-nums text-text-secondary">
-                          {day.status === 'present' && (
-                            <>
-                              {day.checkInAt}
-                              {day.checkOutAt ? ` \u2192 ${day.checkOutAt}` : ''}
-                            </>
-                          )}
-                        </div>
-                        {dayStatusBadge(day)}
-                      </div>
-                    ))}
-                  </div>
-                </GlassCard>
-              );
-            })}
+            {filteredSummary.map((emp, empIdx) => (
+              <SummaryCard
+                key={emp.employeePublicId}
+                emp={emp}
+                empIdx={empIdx}
+                t={t}
+              />
+            ))}
           </div>
         )
       ) : (
@@ -450,6 +358,163 @@ function AttendancePage() {
         )
       )}
     </div>
+  );
+}
+
+/* ── Segmented control with sliding pill ── */
+
+const VIEW_TABS: { value: ViewMode; icon: typeof GanttChart; labelKey: string; fallback: string }[] = [
+  { value: 'gantt', icon: GanttChart, labelKey: 'attendance.gantt', fallback: 'Monthly' },
+  { value: 'summary', icon: LayoutGrid, labelKey: 'attendance.summary', fallback: 'Summary' },
+  { value: 'log', icon: List, labelKey: 'attendance.log', fallback: 'Log' },
+];
+
+function SegmentedControl({
+  view,
+  setView,
+  t,
+}: {
+  view: ViewMode;
+  setView: (v: ViewMode) => void;
+  t: (key: string, fallback: string) => string;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [pill, setPill] = useState({ left: 0, width: 0 });
+
+  const measure = useCallback(() => {
+    const idx = VIEW_TABS.findIndex((tab) => tab.value === view);
+    const btn = btnRefs.current[idx];
+    const container = containerRef.current;
+    if (!btn || !container) return;
+    const cRect = container.getBoundingClientRect();
+    const bRect = btn.getBoundingClientRect();
+    setPill({ left: bRect.left - cRect.left, width: bRect.width });
+  }, [view]);
+
+  useEffect(() => { measure(); }, [measure]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative flex gap-1 ml-auto bg-glass-bg border border-glass-border rounded-xl p-1"
+    >
+      <div
+        className="absolute top-1 bottom-1 rounded-lg bg-coffee transition-all duration-250 ease-out"
+        style={{ left: pill.left, width: pill.width }}
+      />
+      {VIEW_TABS.map((tab, i) => {
+        const Icon = tab.icon;
+        const active = view === tab.value;
+        return (
+          <button
+            key={tab.value}
+            ref={(el) => { btnRefs.current[i] = el; }}
+            onClick={() => setView(tab.value)}
+            className={cn(
+              'relative z-[1] flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium cursor-pointer border-none bg-transparent transition-colors duration-200',
+              active ? 'text-white' : 'text-text-secondary hover:text-text-primary',
+            )}
+          >
+            <Icon size={14} />
+            {t(tab.labelKey, tab.fallback)}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ── Summary card with animated collapse ── */
+
+function SummaryCard({
+  emp,
+  empIdx,
+  t,
+}: {
+  emp: import('@/types').AttendanceSummaryEmployee;
+  empIdx: number;
+  t: (key: string, fallback: string) => string;
+}) {
+  const [open, setOpen] = useState(false);
+  const presentDays = emp.days.filter((d) => d.status === 'present').length;
+  const absentDays = emp.days.filter((d) => d.status === 'absent').length;
+  const leaveDays = emp.days.filter((d) => d.status === 'leave').length;
+  const lateDays = emp.days.filter((d) => d.status === 'present' && d.isLate).length;
+
+  return (
+    <GlassCard hover={false}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-3 px-5 py-3 w-full text-left cursor-pointer bg-transparent border-none"
+      >
+        <Avatar name={emp.employeeName} index={empIdx} size={36} />
+        <div className="flex-1 min-w-0">
+          <div className="text-[15.5px] font-medium text-text-primary font-sans">
+            {emp.employeeName}
+          </div>
+          <div className="text-[13px] text-text-tertiary font-sans">
+            {emp.shiftName || t('attendance.noShift', 'No shift')}
+          </div>
+        </div>
+        <div className="flex gap-2 flex-wrap justify-end">
+          <span className="text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-green/10 text-green">
+            {presentDays} {t('attendance.present', 'present')}
+          </span>
+          {absentDays > 0 && (
+            <span className="text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-red/10 text-red">
+              {absentDays} {t('attendance.absent', 'absent')}
+            </span>
+          )}
+          {lateDays > 0 && (
+            <span className="text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
+              {lateDays} {t('attendance.late', 'late')}
+            </span>
+          )}
+          {leaveDays > 0 && (
+            <span className="text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-[#3B6FA0]/10 text-blue">
+              {leaveDays} {t('attendance.onLeave', 'on leave')}
+            </span>
+          )}
+        </div>
+        <ChevronDown
+          size={16}
+          className={cn(
+            'text-text-tertiary transition-transform duration-250 ease-out shrink-0',
+            open && 'rotate-180',
+          )}
+        />
+      </button>
+      <div
+        className="grid transition-[grid-template-rows] duration-250 ease-out"
+        style={{ gridTemplateRows: open ? '1fr' : '0fr' }}
+      >
+        <div className="overflow-hidden">
+          <div className="divide-y divide-cream-3/40 border-t border-cream-3/60">
+            {emp.days.map((day) => (
+              <div
+                key={day.date}
+                className="flex items-center gap-3 px-5 py-2 transition-colors duration-[120ms] hover:bg-cream-3/35 cursor-default"
+              >
+                <div className="w-[72px] text-[13.5px] text-text-secondary font-sans">
+                  {formatDayLabel(day.date)}
+                </div>
+                <div className="flex-1 text-[14px] font-mono tabular-nums text-text-secondary">
+                  {day.status === 'present' && (
+                    <>
+                      {day.checkInAt}
+                      {day.checkOutAt ? ` \u2192 ${day.checkOutAt}` : ''}
+                    </>
+                  )}
+                </div>
+                {dayStatusBadge(day)}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </GlassCard>
   );
 }
 

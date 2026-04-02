@@ -115,12 +115,14 @@ class CheckinService
             $attendance->setCheckInDeviceName($deviceName);
 
             // Late detection (ShiftTimeRule-aware)
+            // Shift times are stored as bare H:i values representing workspace-local time,
+            // so we compare them against $now which is already in the workspace timezone.
             $shift = $employee->getShift();
             if ($shift !== null) {
                 $shiftStart = $this->resolveEffectiveStartTime($shift, $now);
                 if ($shiftStart !== null) {
                     $grace = $shift->getGraceLateMinutes();
-                    $startMinutes = (int) $shiftStart->format('G') * 60 + (int) $shiftStart->format('i');
+                    $startMinutes = $this->timeToMinutes($shiftStart);
                     $startMinutes += $grace;
                     $checkInMinutes = (int) $now->format('G') * 60 + (int) $now->format('i');
                     $attendance->setIsLate($checkInMinutes > $startMinutes);
@@ -154,7 +156,7 @@ class CheckinService
                 $shiftEnd = $this->resolveEffectiveEndTime($shift, $now);
                 if ($shiftEnd !== null) {
                     $grace = $shift->getGraceEarlyMinutes();
-                    $endMinutes = (int) $shiftEnd->format('G') * 60 + (int) $shiftEnd->format('i');
+                    $endMinutes = $this->timeToMinutes($shiftEnd);
                     $endMinutes -= $grace;
                     $checkOutMinutes = (int) $now->format('G') * 60 + (int) $now->format('i');
                     $attendance->setLeftEarly($checkOutMinutes < $endMinutes);
@@ -212,6 +214,23 @@ class CheckinService
             }
         }
         return $shift->getEndTime();
+    }
+
+    /**
+     * Extract minutes-since-midnight from a time value.
+     *
+     * Shift times are conceptually "wall-clock" values (e.g. 08:00 means 8 AM
+     * in the workspace timezone) regardless of the DateTimeZone attached to the
+     * object.  Doctrine's `time` type hydrates with the server default TZ and
+     * DateService::createFromFormat uses UTC, but either way the H:i digits
+     * represent the intended local time.  We therefore read just the hour and
+     * minute digits — never converting to another timezone.
+     */
+    private function timeToMinutes(\DateTimeInterface $time): int
+    {
+        // format('G') gives 0-23 hour without leading zero; 'i' gives 00-59 minutes.
+        // These reflect the digits stored in the DB, not a TZ-converted wall-clock.
+        return (int) $time->format('G') * 60 + (int) $time->format('i');
     }
 
     /**
