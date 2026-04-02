@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.30.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.29.0...v1.30.0) (2026-04-02)
+
+
+### Features
+
+* **shared, service-worker:** add branded gradient component for "BasilBook" and integrate custom service worker setup ([70dda52](https://github.com/bangkeut-technology/daily-brew/commit/70dda52a20da78f107b2e2fd7928f3d4129667ef))
+
 ## [1.29.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.28.0...v1.29.0) (2026-04-02)
 
 
