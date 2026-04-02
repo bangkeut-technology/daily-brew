@@ -25,6 +25,10 @@ export const axios = defaultAxios.default.create({
 
 const ResponseHandler = (response: AxiosResponse) => response;
 
+// Mutex: ensure only one refresh request runs at a time.
+// Concurrent 401s queue behind the first refresh call.
+let refreshPromise: Promise<void> | null = null;
+
 const ResponseErrorHandler = async (error: any) => {
     const { response, config } = error;
     if (!response) return Promise.reject(error);
@@ -38,9 +42,17 @@ const ResponseErrorHandler = async (error: any) => {
     ) {
         config.__isRetryRequest = true;
         try {
-            await axios.post('/token/refresh');
+            // If a refresh is already in-flight, wait for it instead of firing another
+            if (!refreshPromise) {
+                refreshPromise = axios.post('/token/refresh').then(
+                    () => {},
+                    (err) => { throw err; },
+                ).finally(() => { refreshPromise = null; });
+            }
+            await refreshPromise;
             return apiAxios(config);
         } catch {
+            refreshPromise = null;
             return Promise.reject(error);
         }
     }

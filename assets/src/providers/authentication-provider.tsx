@@ -7,9 +7,18 @@ import { getWorkspacePublicId, clearWorkspacePublicId } from '@/lib/auth';
 import type { AuthenticationState } from '@/contexts/authentication-context';
 
 function getInitialState(): AuthenticationState {
-    // Always verify auth state via API — the main firewall does not authenticate,
-    // so the SPA checks via the /api firewall where the Axios interceptor handles
-    // JWT refresh transparently.
+    const serverUser = window.__DAILYBREW__?.user;
+    if (serverUser && typeof serverUser === 'object' && 'publicId' in serverUser) {
+        return {
+            status: 'authenticated',
+            user: serverUser as AuthenticationState['user'],
+            workspace: undefined,
+        };
+    }
+    // Server returned null (expired JWT) or undefined — try API call which
+    // triggers the refresh-token interceptor if the JWT has expired.
+    // This prevents logout when only the short-lived JWT expired but the
+    // long-lived refresh token is still valid.
     return {
         status: 'loading',
         user: undefined,

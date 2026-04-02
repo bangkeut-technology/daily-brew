@@ -92,6 +92,23 @@ export interface AttendanceRecord {
   status?: AttendanceStatus;
 }
 
+export interface AttendanceDayStatus {
+  date: string;
+  status: 'present' | 'absent' | 'leave' | 'closure' | 'upcoming';
+  checkInAt?: string | null;
+  checkOutAt?: string | null;
+  isLate?: boolean;
+  leftEarly?: boolean;
+  leaveType?: 'paid' | 'unpaid';
+}
+
+export interface AttendanceSummaryEmployee {
+  employeePublicId: string;
+  employeeName: string;
+  shiftName: string | null;
+  days: AttendanceDayStatus[];
+}
+
 export interface LeaveRequest {
   publicId: string;
   employeePublicId: string;

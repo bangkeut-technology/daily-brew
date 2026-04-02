@@ -49,7 +49,12 @@ security:
 
         main:
             pattern: ^/
-            security: false
+            stateless: true
+            entry_point: jwt
+            jwt: ~
+            refresh_jwt:
+                check_path: gesdinet_jwt_refresh_token
+            provider: daily_brew_user_provider
 
     access_control:
         - path: '^/api/v1/webhooks'
