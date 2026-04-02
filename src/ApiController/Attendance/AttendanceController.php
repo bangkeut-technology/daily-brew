@@ -199,12 +199,12 @@ class AttendanceController extends AbstractController
 
         $this->denyAccessUnlessGranted(WorkspaceVoter::VIEW, $workspace);
 
-        $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
-        $from = $request->query->get('from', (new \DateTime('now', $tz))->format('Y-m-d'));
+        $wsTz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
+        $from = $request->query->get('from', DateService::today($wsTz)->format('Y-m-d'));
         $to = $request->query->get('to', $from);
 
-        $fromDate = new \DateTime($from, $tz);
-        $toDate = new \DateTime($to, $tz);
+        $fromDate = DateService::parse($from);
+        $toDate = DateService::parse($to);
 
         // Determine which employees to include
         $isOwner = $workspace->getOwner()?->getId() === $user->getId();
@@ -223,7 +223,9 @@ class AttendanceController extends AbstractController
         }
 
         // Index attendance records by (employeeId, date)
-        $attendances = $attendanceRepository->findByWorkspaceAndDateRange($workspace, $fromDate, $toDate);
+        $attendances = $attendanceRepository->findByWorkspaceAndDateRange(
+            $workspace, DateService::mutableParse($from), DateService::mutableParse($to),
+        );
         $attendanceMap = [];
         foreach ($attendances as $a) {
             $key = $a->getEmployee()->getId() . '_' . $a->getDate()->format('Y-m-d');
@@ -232,46 +234,47 @@ class AttendanceController extends AbstractController
 
         // Collect closure dates in range
         $closureDates = [];
-        $closures = $closurePeriodRepository->findByWorkspace($workspace);
+        $closures = $closurePeriodRepository->findAllOverlappingRange($workspace, $fromDate, $toDate);
         foreach ($closures as $closure) {
-            $cStart = max($fromDate->getTimestamp(), $closure->getStartDate()->getTimestamp());
-            $cEnd = min($toDate->getTimestamp(), $closure->getEndDate()->getTimestamp());
-            $current = new \DateTime('@' . $cStart);
-            $end = new \DateTime('@' . $cEnd);
-            while ($current <= $end) {
-                $closureDates[$current->format('Y-m-d')] = true;
-                $current->modify('+1 day');
+            $period = new \DatePeriod(
+                \DateTimeImmutable::createFromInterface($closure->getStartDate()),
+                new \DateInterval('P1D'),
+                \DateTimeImmutable::createFromInterface($closure->getEndDate())->modify('+1 day'),
+            );
+            foreach ($period as $d) {
+                $closureDates[$d->format('Y-m-d')] = true;
             }
         }
 
-        // Collect approved leaves indexed by (employeeId, date)
+        // Collect approved leaves indexed by (employeeId, date) — bulk load
+        $approvedLeaves = $leaveRequestRepository->findApprovedByWorkspaceAndDateRange(
+            $workspace, $fromDate, $toDate,
+        );
         $leaveMap = [];
-        foreach ($employees as $emp) {
-            $leaves = $leaveRequestRepository->findApprovedInRange($emp, $fromDate, $toDate);
-            foreach ($leaves as $leave) {
-                $lStart = max($fromDate->getTimestamp(), $leave->getStartDate()->getTimestamp());
-                $lEnd = min($toDate->getTimestamp(), $leave->getEndDate()->getTimestamp());
-                $current = new \DateTime('@' . $lStart);
-                $end = new \DateTime('@' . $lEnd);
-                while ($current <= $end) {
-                    $leaveMap[$emp->getId() . '_' . $current->format('Y-m-d')] = $leave;
-                    $current->modify('+1 day');
-                }
+        foreach ($approvedLeaves as $leave) {
+            $empId = $leave->getEmployee()->getId();
+            $period = new \DatePeriod(
+                \DateTimeImmutable::createFromInterface($leave->getStartDate()),
+                new \DateInterval('P1D'),
+                \DateTimeImmutable::createFromInterface($leave->getEndDate())->modify('+1 day'),
+            );
+            foreach ($period as $d) {
+                $leaveMap[$empId . '_' . $d->format('Y-m-d')] = $leave;
             }
         }
 
-        $formatTime = static function (?\DateTimeInterface $dt) use ($tz): ?string {
+        $formatTime = static function (?\DateTimeInterface $dt) use ($wsTz): ?string {
             if ($dt === null) return null;
-            return \DateTimeImmutable::createFromInterface($dt)->setTimezone($tz)->format('H:i');
+            return \DateTimeImmutable::createFromInterface($dt)->setTimezone($wsTz)->format('H:i');
         };
 
-        $today = new \DateTimeImmutable('today', $tz);
+        $wsTodayStr = DateService::today($wsTz)->format('Y-m-d');
 
         $result = [];
+        $datePeriod = new \DatePeriod($fromDate, new \DateInterval('P1D'), $toDate->modify('+1 day'));
         foreach ($employees as $emp) {
             $days = [];
-            $period = new \DatePeriod($fromDate, new \DateInterval('P1D'), (clone $toDate)->modify('+1 day'));
-            foreach ($period as $day) {
+            foreach ($datePeriod as $day) {
                 $dateStr = $day->format('Y-m-d');
                 $key = $emp->getId() . '_' . $dateStr;
 
@@ -306,7 +309,7 @@ class AttendanceController extends AbstractController
                 }
 
                 // Future dates are not yet absent
-                if (new \DateTimeImmutable($dateStr, $tz) > $today) {
+                if ($dateStr > $wsTodayStr) {
                     $days[] = ['date' => $dateStr, 'status' => 'upcoming'];
                 } else {
                     $days[] = ['date' => $dateStr, 'status' => 'absent'];

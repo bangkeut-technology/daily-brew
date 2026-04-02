@@ -69,3 +69,13 @@ export function startOfMonthInTimezone(tz: string): string {
   const today = todayInTimezone(tz);
   return today.slice(0, 8) + '01';
 }
+
+/**
+ * Get the end-of-month date string in workspace timezone.
+ */
+export function endOfMonthInTimezone(tz: string): string {
+  const today = todayInTimezone(tz);
+  const [y, m] = today.split('-').map(Number);
+  const lastDay = new Date(Date.UTC(y, m, 0)).getUTCDate();
+  return `${y}-${String(m).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+}

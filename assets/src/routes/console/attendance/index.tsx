@@ -6,7 +6,9 @@ import { useAttendance } from '@/hooks/queries/useAttendance';
 import { useAttendanceSummary } from '@/hooks/queries/useAttendanceSummary';
 import { useEmployees } from '@/hooks/queries/useEmployees';
 import { useRoleContext } from '@/hooks/queries/useRoleContext';
+import { useWorkspaceTimezone } from '@/hooks/useWorkspaceTimezone';
 import { getWorkspacePublicId } from '@/lib/auth';
+import { endOfMonthInTimezone, parseDateAsUTC } from '@/lib/timezone';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { AttendanceRow } from '@/components/shared/AttendanceRow';
@@ -19,31 +21,6 @@ import { cn } from '@/lib/utils';
 import type { AttendanceDayStatus } from '@/types';
 
 type ViewMode = 'gantt' | 'summary' | 'log';
-
-function getStartOfMonth(): string {
-  const now = new Date();
-  return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-01`;
-}
-
-function getEndOfMonth(): string {
-  const now = new Date();
-  const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  return `${last.getFullYear()}-${(last.getMonth() + 1).toString().padStart(2, '0')}-${last.getDate().toString().padStart(2, '0')}`;
-}
-
-function getToday(): string {
-  return new Date().toISOString().split('T')[0];
-}
-
-function getSearchParams() {
-  const params = new URLSearchParams(window.location.search);
-  return {
-    from: params.get('from') || getStartOfMonth(),
-    to: params.get('to') || getToday(),
-    employee: params.get('employee') || '',
-    view: (params.get('view') || 'gantt') as ViewMode,
-  };
-}
 
 function updateSearchParams(from: string, to: string, employee: string, view: string) {
   const url = new URL(window.location.href);
@@ -75,9 +52,9 @@ function dayStatusBadge(day: AttendanceDayStatus) {
 }
 
 function formatDayLabel(dateStr: string): string {
-  const d = new Date(dateStr + 'T00:00:00');
-  const weekday = d.toLocaleDateString('en', { weekday: 'short' });
-  const day = d.getDate();
+  const d = parseDateAsUTC(dateStr);
+  const weekday = d.toLocaleDateString('en', { weekday: 'short', timeZone: 'UTC' });
+  const day = d.getUTCDate();
   return `${weekday} ${day}`;
 }
 
@@ -107,11 +84,21 @@ export const Route = createFileRoute('/console/attendance/')({
 
 function AttendancePage() {
   const { t } = useTranslation();
-  const initial = getSearchParams();
-  const [from, setFromState] = useState(initial.from);
-  const [to, setToState] = useState(initial.to);
-  const [employeeFilter, setEmployeeFilterState] = useState(initial.employee);
-  const [view, setViewState] = useState<ViewMode>(initial.view);
+  const wsTz = useWorkspaceTimezone();
+
+  // Read URL params; fall back to workspace-TZ-aware defaults
+  const [from, setFromState] = useState(() => {
+    return new URLSearchParams(window.location.search).get('from') || wsTz.startOfMonth();
+  });
+  const [to, setToState] = useState(() => {
+    return new URLSearchParams(window.location.search).get('to') || wsTz.today();
+  });
+  const [employeeFilter, setEmployeeFilterState] = useState(
+    () => new URLSearchParams(window.location.search).get('employee') || '',
+  );
+  const [view, setViewState] = useState<ViewMode>(
+    () => (new URLSearchParams(window.location.search).get('view') || 'gantt') as ViewMode,
+  );
   const workspaceId = getWorkspacePublicId() || '';
   const { data: attendance, isLoading } = useAttendance(workspaceId, from, to);
   const { data: summary, isLoading: summaryLoading } = useAttendanceSummary(workspaceId, from, to);
@@ -142,7 +129,7 @@ function AttendancePage() {
     setViewState(v);
     // When switching to gantt, auto-expand to full month
     if (v === 'gantt') {
-      const newTo = getEndOfMonth();
+      const newTo = endOfMonthInTimezone(wsTz.timezone);
       setToState(newTo);
       updateSearchParams(from, newTo, employeeFilter, v);
     } else {
@@ -285,10 +272,10 @@ function AttendancePage() {
                       {t('attendance.employee', 'Employee')}
                     </th>
                     {ganttDays.map((day) => {
-                      const d = new Date(day.date + 'T00:00:00');
-                      const dayNum = d.getDate();
-                      const weekday = d.toLocaleDateString('en', { weekday: 'narrow' });
-                      const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+                      const d = parseDateAsUTC(day.date);
+                      const dayNum = d.getUTCDate();
+                      const weekday = d.toLocaleDateString('en', { weekday: 'narrow', timeZone: 'UTC' });
+                      const isWeekend = d.getUTCDay() === 0 || d.getUTCDay() === 6;
                       return (
                         <th
                           key={day.date}
@@ -449,10 +436,12 @@ function AttendancePage() {
                   key={a.publicId}
                   employee={a.employeeName || ''}
                   shift={a.shiftName || null}
+                  date={fmtDate(a.date)}
                   time={a.checkInAt}
                   checkOut={a.checkOutAt}
                   isLate={a.isLate}
                   leftEarly={a.leftEarly}
+                  status={a.status}
                   index={i}
                 />
               ))}
