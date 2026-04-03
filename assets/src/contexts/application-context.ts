@@ -9,7 +9,7 @@ export interface ApplicationConfig {
 
 export const ApplicationContext = createContext<ApplicationConfig>({
     maxFreeEmployees: 5,
-    contactEmail: 'support@dailybrew.work',
+    contactEmail: 'support@mail.dailybrew.work',
     googleClientId: '',
     appleClientId: '',
 });

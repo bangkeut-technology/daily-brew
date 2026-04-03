@@ -21,7 +21,7 @@ parameters:
     apple_client_id:                  '%env(APPLE_CLIENT_ID)%'
     apple_ios_client_id:              '%env(APPLE_IOS_CLIENT_ID)%'
     max_free_employees:               10
-    contact_email:                    'support@dailybrew.work'
+    contact_email:                    'support@mail.dailybrew.work'
     jwt_token_ttl:                    3600
     supportdock_api_key:              '%env(SUPPORTDOCK_API_KEY)%'
     mailgun_webhook_signing_key:      '%env(MAILGUN_WEBHOOK_SIGNING_KEY)%'
