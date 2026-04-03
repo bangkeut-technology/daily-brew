@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.31.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.30.2...v1.31.0) (2026-04-03)
+
+
+### Features
+
+* **settings, support:** add workspace deletion and dynamic FAQs support ([edf52dc](https://github.com/bangkeut-technology/daily-brew/commit/edf52dc0b6e90ccc38579f399b5f38f99f3cca94))
+
 ## [1.30.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.29.0...v1.30.0) (2026-04-02)
 
 
