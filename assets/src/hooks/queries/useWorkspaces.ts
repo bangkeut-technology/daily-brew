@@ -63,6 +63,18 @@ export function useWorkspaceSettings(workspacePublicId: string) {
   });
 }
 
+export function useDeleteWorkspace() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (publicId: string) => {
+      await apiAxios.delete(`/workspaces/${publicId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['workspaces'] });
+    },
+  });
+}
+
 export function useUpdateWorkspaceSettings(workspacePublicId: string) {
   const queryClient = useQueryClient();
   return useMutation({

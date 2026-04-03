@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Mail,
   Send,
@@ -7,16 +7,11 @@ import {
   Lightbulb,
   HelpCircle,
   MessageSquare,
-  Rocket,
-  QrCode,
-  Clock,
-  CalendarOff,
-  CreditCard,
-  ShieldCheck,
+  ChevronDown,
   CheckCircle2,
   Loader2,
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -46,41 +41,71 @@ const feedbackTypes = [
   { value: 'general' as const, label: 'General', icon: MessageSquare, color: 'text-coffee' },
 ];
 
-const commonTopics = [
-  {
-    icon: Rocket,
-    title: 'Getting started',
-    description: 'Create your workspace, add employees, and generate QR codes in minutes.',
-  },
-  {
-    icon: QrCode,
-    title: 'QR check-in',
-    description: 'Learn how staff scan their unique QR code to check in and out each day.',
-  },
-  {
-    icon: Clock,
-    title: 'Shift management',
-    description: 'Set up morning, evening, or custom shifts and assign them to employees.',
-  },
-  {
-    icon: CalendarOff,
-    title: 'Leave requests',
-    description: 'How employees submit leave and how owners approve or reject requests.',
-  },
-  {
-    icon: CreditCard,
-    title: 'Billing & plans',
-    description: 'Understand Free vs Espresso, manage subscriptions, and update payment details.',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Account & security',
-    description: 'Password resets, OAuth sign-in, IP restrictions, and keeping your data safe.',
-  },
-];
+interface FaqItem {
+  id: string;
+  question: string;
+  answer: string;
+  sortOrder: number;
+}
+
+function AccordionItem({ question, answer, index }: { question: string; answer: string; index: number }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <motion.div
+      className="border-b border-cream-3/50 last:border-b-0"
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.3, delay: index * 0.04 }}
+    >
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-6 py-4 text-left bg-transparent border-none cursor-pointer group"
+      >
+        <span className="text-[16px] font-medium text-text-primary pr-4 group-hover:text-coffee transition-colors duration-200">
+          {question}
+        </span>
+        <motion.span
+          animate={{ rotate: open ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+          className="shrink-0"
+        >
+          <ChevronDown size={16} className="text-text-tertiary" />
+        </motion.span>
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+            <div className="px-6 pb-5">
+              <p className="text-[15px] text-text-secondary leading-relaxed">
+                {answer}
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
 
 function SupportPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [faqs, setFaqs] = useState<FaqItem[]>([]);
+  const [faqsLoading, setFaqsLoading] = useState(true);
+
+  useEffect(() => {
+    axios.get('/support/faqs')
+      .then((res) => setFaqs(res.data ?? []))
+      .catch(() => {})
+      .finally(() => setFaqsLoading(false));
+  }, []);
 
   const {
     register,
@@ -260,51 +285,45 @@ function SupportPage() {
           </motion.div>
         </section>
 
-        {/* Common topics */}
-        <section className="py-16 px-6 md:px-8 max-w-4xl mx-auto">
-          <motion.div
-            className="text-center mb-10"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
-              Help center
-            </p>
-            <h2 className="text-[30px] md:text-[36px] font-semibold text-text-primary font-serif leading-tight">
-              Common topics
-            </h2>
-            <p className="text-[16px] text-text-secondary mt-3 max-w-md mx-auto">
-              Quick answers to the most common questions.
-            </p>
-          </motion.div>
+        {/* FAQs from SupportDock */}
+        {!faqsLoading && faqs.length > 0 && (
+          <section className="py-16 px-6 md:px-8 max-w-3xl mx-auto">
+            <motion.div
+              className="text-center mb-10"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
+                FAQ
+              </p>
+              <h2 className="text-[30px] md:text-[36px] font-semibold text-text-primary font-serif leading-tight">
+                Frequently asked questions
+              </h2>
+              <p className="text-[16px] text-text-secondary mt-3 max-w-md mx-auto">
+                Quick answers to the most common questions.
+              </p>
+            </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {commonTopics.map((topic, i) => (
-              <motion.div
-                key={topic.title}
-                className="group relative bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 shadow-[0_2px_12px_rgba(107,66,38,0.05)] overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_6px_20px_rgba(107,66,38,0.10)]"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.07 }}
-              >
-                <div className="relative">
-                  <div className="w-10 h-10 rounded-xl bg-amber/10 flex items-center justify-center text-amber mb-4">
-                    <topic.icon size={18} strokeWidth={1.8} />
-                  </div>
-                  <h3 className="text-[16px] font-semibold text-text-primary mb-1.5">
-                    {topic.title}
-                  </h3>
-                  <p className="text-[14px] text-text-secondary leading-relaxed">
-                    {topic.description}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </section>
+            <motion.div
+              className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl shadow-[0_2px_12px_rgba(107,66,38,0.05)] overflow-hidden"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4 }}
+            >
+              {faqs.map((faq, i) => (
+                <AccordionItem
+                  key={faq.id}
+                  question={faq.question}
+                  answer={faq.answer}
+                  index={i}
+                />
+              ))}
+            </motion.div>
+          </section>
+        )}
 
         {/* Bottom email fallback */}
         <section className="py-16 px-6 md:px-8 max-w-2xl mx-auto">

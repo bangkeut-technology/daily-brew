@@ -1,10 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import * as Dialog from '@radix-ui/react-dialog';
-import { Crown, Check, MapPin, Navigation, Smartphone, Building2, Users, Calendar, Plus, X, Copy, Pencil } from 'lucide-react';
+import { Crown, Check, MapPin, Navigation, Smartphone, Building2, Users, Calendar, Plus, X, Copy, Pencil, Trash2 } from 'lucide-react';
 import { useDateFormat } from '@/hooks/useDateFormat';
 import { usePaddle } from '@/hooks/usePaddle';
 import { useDevTogglePlan } from '@/hooks/useDevTogglePlan';
@@ -15,6 +15,7 @@ import {
   useWorkspaces,
   useCreateWorkspace,
   useUpdateWorkspace,
+  useDeleteWorkspace,
   useWorkspaceSettings,
   useUpdateWorkspaceSettings,
 } from '@/hooks/queries/useWorkspaces';
@@ -22,12 +23,13 @@ import { usePlan } from '@/hooks/queries/usePlan';
 import { useEmployees } from '@/hooks/queries/useEmployees';
 import { useShifts } from '@/hooks/queries/useShifts';
 import { apiAxios } from '@/lib/apiAxios';
-import { getWorkspacePublicId, setWorkspacePublicId } from '@/lib/auth';
+import { getWorkspacePublicId, setWorkspacePublicId, clearWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { Toggle } from '@/components/shared/Toggle';
+import { ConfirmModal } from '@/components/shared/ConfirmModal';
 
 export const Route = createFileRoute('/console/settings')({
   component: SettingsPage,
@@ -72,6 +74,7 @@ function SettingsPage() {
   const { data: workspaces } = useWorkspaces();
   const createWs = useCreateWorkspace();
   const updateWs = useUpdateWorkspace();
+  const deleteWs = useDeleteWorkspace();
   const { data: settings } = useWorkspaceSettings(currentWsId);
   const updateSettings = useUpdateWorkspaceSettings(currentWsId);
   const { data: plan } = usePlan(currentWsId);
@@ -81,12 +84,14 @@ function SettingsPage() {
   const fmtDate = useDateFormat();
   const { openCheckout } = usePaddle();
   const devToggle = useDevTogglePlan();
+  const navigate = useNavigate();
   const isDev = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
   const paddlePortalDomain = window.__DAILYBREW__?.paddleEnvironment === 'sandbox' ? 'sandbox-customer-portal.paddle.com' : 'customer-portal.paddle.com';
   const [billing, setBilling] = useState<'monthly' | 'annual'>('annual');
   const [wsModalOpen, setWsModalOpen] = useState(false);
   const [editingWsId, setEditingWsId] = useState<string | null>(null);
   const [editWsName, setEditWsName] = useState('');
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   const [ipEnabled, setIpEnabled] = useState(false);
   const [allowedIps, setAllowedIps] = useState('');
@@ -983,6 +988,55 @@ function SettingsPage() {
           </GlassCard>
         )}
       </div>
+
+      {/* Danger zone */}
+      <div className="mt-8">
+        <GlassCard>
+          <GlassCardHeader title="Danger zone" />
+          <div className="px-6 pb-6">
+            <div className="flex items-center justify-between gap-4 p-4 rounded-xl border border-red/20 bg-red/5">
+              <div>
+                <p className="text-[15px] font-medium text-text-primary mb-0.5">
+                  Delete this workspace
+                </p>
+                <p className="text-[13px] text-text-secondary">
+                  Permanently delete this workspace and all its data. This action cannot be undone.
+                </p>
+              </div>
+              <button
+                onClick={() => setDeleteConfirmOpen(true)}
+                className="shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-white bg-red border-none cursor-pointer transition-colors hover:bg-red/85"
+              >
+                <Trash2 size={13} />
+                Delete workspace
+              </button>
+            </div>
+          </div>
+        </GlassCard>
+      </div>
+
+      <ConfirmModal
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        title="Delete workspace"
+        description={`Are you sure you want to delete "${workspaces?.find((ws) => ws.publicId === currentWsId)?.name ?? 'this workspace'}"? All employees, attendance records, shifts, closures, and leave requests will be permanently deleted. Any active subscription will be canceled.`}
+        confirmLabel="Delete workspace"
+        cancelLabel={t('common.cancel')}
+        variant="danger"
+        loading={deleteWs.isPending}
+        onConfirm={() => {
+          deleteWs.mutate(currentWsId, {
+            onSuccess: () => {
+              clearWorkspacePublicId();
+              toast.success('Workspace deleted');
+              navigate({ to: '/console/dashboard', replace: true });
+            },
+            onError: () => {
+              toast.error('Failed to delete workspace');
+            },
+          });
+        }}
+      />
 
       {upgradeModal.feature && (
         <UpgradeModal

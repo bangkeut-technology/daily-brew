@@ -82,4 +82,26 @@ class SupportDockService
             return false;
         }
     }
+
+    /**
+     * @return array<int, array{id: string, question: string, answer: string, sortOrder: int}>
+     */
+    public function listFAQs(): array
+    {
+        if ($this->client === null) {
+            $this->logger->warning('SupportDock API key not configured, skipping FAQ fetch');
+
+            return [];
+        }
+
+        try {
+            return $this->client->listFAQs();
+        } catch (\Throwable $e) {
+            $this->logger->error('SupportDock FAQ fetch failed', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return [];
+        }
+    }
 }

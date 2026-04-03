@@ -58,4 +58,11 @@ class FeedbackController extends AbstractController
 
         return $this->jsonSuccess(['submitted' => true]);
     }
+
+    #[Route('/support/faqs', name: 'support_faqs', methods: ['GET'])]
+    public function faqs(
+        SupportDockService $supportDock,
+    ): JsonResponse {
+        return $this->jsonSuccess($supportDock->listFAQs());
+    }
 }

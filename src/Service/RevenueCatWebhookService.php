@@ -29,10 +29,10 @@ class RevenueCatWebhookService
         private LoggerInterface $logger,
     ) {}
 
-    public function handleEvent(array $event): void
+    public function handleEvent(array $payload): void
     {
-        $eventType = $event['type'] ?? '';
-        $eventData = $event['event'] ?? [];
+        $eventData = $payload['event'] ?? $payload;
+        $eventType = $eventData['type'] ?? '';
 
         match ($eventType) {
             'INITIAL_PURCHASE' => $this->handlePurchase($eventData),
@@ -58,7 +58,7 @@ class RevenueCatWebhookService
             $this->subscriptionRepository->persist($subscription);
         }
 
-        $subscription->setPlan(PlanEnum::Espresso);
+        $subscription->setPlan($this->resolvePlan($data));
         $subscription->setSource(SubscriptionSourceEnum::RevenueCat);
         $subscription->setRevenuecatSubscriptionId($data['original_transaction_id'] ?? $data['id'] ?? null);
 
@@ -150,6 +150,20 @@ class RevenueCatWebhookService
 
         $this->logger->warning('RevenueCat subscription not found for event', $data);
         return null;
+    }
+
+    private const PRODUCT_PLAN_MAP = [
+        'work.dailybrew.mobile.espresso.monthly' => PlanEnum::Espresso,
+        'work.dailybrew.mobile.espresso.annual' => PlanEnum::Espresso,
+        'work.dailybrew.mobile.doubleespresso.monthly' => PlanEnum::DoubleEspresso,
+        'work.dailybrew.mobile.doubleespresso.annual' => PlanEnum::DoubleEspresso,
+    ];
+
+    private function resolvePlan(array $data): PlanEnum
+    {
+        $productId = $data['product_id'] ?? '';
+
+        return self::PRODUCT_PLAN_MAP[$productId] ?? PlanEnum::Espresso;
     }
 
     private function resolveWorkspace(string $appUserId): ?\App\Entity\Workspace
