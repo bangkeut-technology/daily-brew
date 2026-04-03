@@ -224,7 +224,7 @@ export function PricingSection() {
           </div>
           {yearly && (
             <p className="relative text-[13.5px] text-green font-medium mb-3">
-              That's just ${espressoPlan.yearly.monthly}/month
+              That's just {espressoPlan.yearly.monthly}/month
             </p>
           )}
           <p className="relative text-[14.5px] text-text-secondary mb-7">
@@ -283,7 +283,7 @@ export function PricingSection() {
           </div>
           {yearly && (
             <p className="relative text-[13.5px] text-green font-medium mb-3">
-              That's just ${doubleEspressoPlan.yearly.monthly}/month
+              That's just {doubleEspressoPlan.yearly.monthly}/month
             </p>
           )}
           <p className="relative text-[14.5px] text-text-secondary mb-7">
