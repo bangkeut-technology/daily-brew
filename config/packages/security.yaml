@@ -18,6 +18,11 @@ security:
             stateless: true
             security: false
 
+        support:
+            pattern: '^/api/v1/support'
+            stateless: true
+            security: false
+
         auth:
             pattern: '^/api/v1/[a-z]+/auth'
             stateless: true
@@ -65,6 +70,8 @@ security:
         - path: '^/api/v1/basilbook'
           roles: IS_AUTHENTICATED_FULLY
         - path: '^/api/v1/webhooks'
+          roles: PUBLIC_ACCESS
+        - path: '^/api/v1/support'
           roles: PUBLIC_ACCESS
         - path: '^/api/v1/checkin'
           roles: IS_AUTHENTICATED_FULLY

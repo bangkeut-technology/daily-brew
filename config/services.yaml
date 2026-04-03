@@ -23,6 +23,8 @@ parameters:
     max_free_employees:               10
     contact_email:                    'support@dailybrew.work'
     jwt_token_ttl:                    3600
+    supportdock_api_key:              '%env(SUPPORTDOCK_API_KEY)%'
+    mailgun_webhook_signing_key:      '%env(MAILGUN_WEBHOOK_SIGNING_KEY)%'
 
 services:
     _defaults:
@@ -43,6 +45,8 @@ services:
             $paddlePriceIdEspressoMonthly: '%paddle_price_id_espresso_monthly%'
             $paddlePriceIdEspressoAnnual:  '%paddle_price_id_espresso_annual%'
             $noReplyEmail:                 '%no_reply_email%'
+            $supportdockApiKey:            '%supportdock_api_key%'
+            $mailgunWebhookSigningKey:     '%mailgun_webhook_signing_key%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name

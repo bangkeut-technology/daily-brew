@@ -4,8 +4,60 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a592c90f45243091279251569fad549a",
+    "content-hash": "fb711c7e356448c19d3753613b0d18b3",
     "packages": [
+        {
+            "name": "bangkeut-technology/supportdock-sdk",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bangkeut-technology/supportdock-sdk.git",
+                "reference": "eaa14c1c23c93f8539944993a2550f551d7d20d8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bangkeut-technology/supportdock-sdk/zipball/eaa14c1c23c93f8539944993a2550f551d7d20d8",
+                "reference": "eaa14c1c23c93f8539944993a2550f551d7d20d8",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": ">=8.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.0|^11.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SupportDock\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "SupportDock",
+                    "email": "support@supportdock.io"
+                }
+            ],
+            "description": "SupportDock PHP SDK — submit feedback and manage FAQs from your PHP application",
+            "keywords": [
+                "FAQ",
+                "feedback",
+                "sdk",
+                "support",
+                "supportdock"
+            ],
+            "support": {
+                "issues": "https://github.com/bangkeut-technology/supportdock-sdk/issues",
+                "source": "https://github.com/bangkeut-technology/supportdock-sdk/tree/main"
+            },
+            "time": "2026-04-03T04:00:47+00:00"
+        },
         {
             "name": "doctrine/collections",
             "version": "2.6.0",
@@ -10314,7 +10366,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "bangkeut-technology/supportdock-sdk": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
