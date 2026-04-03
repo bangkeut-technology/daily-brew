@@ -13,7 +13,6 @@ parameters:
     paddle_client_side_token:         '%env(PADDLE_CLIENT_SIDE_TOKEN)%'
     paddle_price_id_espresso_monthly: '%env(PADDLE_PRICE_ID_ESPRESSO_MONTHLY)%'
     paddle_price_id_espresso_annual:  '%env(PADDLE_PRICE_ID_ESPRESSO_ANNUAL)%'
-    revenuecat_webhook_secret:        '%env(REVENUECAT_WEBHOOK_SECRET)%'
     no_reply_email:                   '%env(NO_REPLY_EMAIL)%'
     google_client_id:                 '%env(GOOGLE_CLIENT_ID)%'
     google_ios_client_id:             '%env(GOOGLE_IOS_CLIENT_ID)%'

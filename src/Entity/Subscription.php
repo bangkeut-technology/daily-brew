@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Enum\PlanEnum;
-use App\Enum\SubscriptionSourceEnum;
 use App\Enum\SubscriptionStatusEnum;
 use App\Repository\SubscriptionRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -23,17 +22,11 @@ class Subscription extends AbstractBaseEntity
     #[ORM\Column(length: 20, enumType: SubscriptionStatusEnum::class)]
     private SubscriptionStatusEnum $status = SubscriptionStatusEnum::Active;
 
-    #[ORM\Column(length: 20, enumType: SubscriptionSourceEnum::class)]
-    private SubscriptionSourceEnum $source = SubscriptionSourceEnum::Paddle;
-
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $paddleSubscriptionId = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $paddleCustomerId = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $revenuecatSubscriptionId = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $currentPeriodEnd = null;
@@ -96,28 +89,6 @@ class Subscription extends AbstractBaseEntity
     public function setPaddleCustomerId(?string $paddleCustomerId): static
     {
         $this->paddleCustomerId = $paddleCustomerId;
-        return $this;
-    }
-
-    public function getSource(): SubscriptionSourceEnum
-    {
-        return $this->source;
-    }
-
-    public function setSource(SubscriptionSourceEnum $source): static
-    {
-        $this->source = $source;
-        return $this;
-    }
-
-    public function getRevenuecatSubscriptionId(): ?string
-    {
-        return $this->revenuecatSubscriptionId;
-    }
-
-    public function setRevenuecatSubscriptionId(?string $revenuecatSubscriptionId): static
-    {
-        $this->revenuecatSubscriptionId = $revenuecatSubscriptionId;
         return $this;
     }
 

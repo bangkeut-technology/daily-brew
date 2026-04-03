@@ -8,7 +8,6 @@ use App\Entity\Subscription;
 use App\Entity\User;
 use App\Entity\Workspace;
 use App\Entity\WorkspaceSetting;
-use App\Enum\SubscriptionSourceEnum;
 use App\Enum\SubscriptionStatusEnum;
 use App\Repository\SubscriptionRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -85,11 +84,8 @@ class WorkspaceService
 
     private function cancelSubscription(Subscription $subscription): void
     {
-        // Cancel via Paddle API if it's a paid Paddle subscription
-        if (
-            $subscription->getSource() === SubscriptionSourceEnum::Paddle
-            && $subscription->getPaddleSubscriptionId() !== null
-        ) {
+        // Cancel via Paddle API if it's a paid subscription
+        if ($subscription->getPaddleSubscriptionId() !== null) {
             $this->cancelPaddleSubscription($subscription->getPaddleSubscriptionId());
         }
 

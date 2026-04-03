@@ -4,7 +4,6 @@ namespace App\Service;
 
 use App\Entity\Subscription;
 use App\Enum\PlanEnum;
-use App\Enum\SubscriptionSourceEnum;
 use App\Enum\SubscriptionStatusEnum;
 use App\Repository\SubscriptionRepository;
 use App\Repository\WorkspaceRepository;
@@ -64,7 +63,6 @@ class PaddleWebhookService
         }
 
         $subscription->setPlan(PlanEnum::Espresso);
-        $subscription->setSource(SubscriptionSourceEnum::Paddle);
         $subscription->setStatus($this->mapStatus($data['status'] ?? 'active'));
         $subscription->setPaddleSubscriptionId($paddleSubId);
         $subscription->setPaddleCustomerId($data['customer_id'] ?? null);

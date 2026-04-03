@@ -23,8 +23,4 @@ class SubscriptionRepository extends AbstractRepository
         return $this->findOneBy(['paddleSubscriptionId' => $paddleSubscriptionId]);
     }
 
-    public function findByRevenuecatSubscriptionId(string $revenuecatSubscriptionId): ?Subscription
-    {
-        return $this->findOneBy(['revenuecatSubscriptionId' => $revenuecatSubscriptionId]);
-    }
 }
