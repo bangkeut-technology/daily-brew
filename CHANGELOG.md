@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.31.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.30.1...v1.31.0) (2026-04-03)
+
+
+### Features
+
+* **support:** introduce feedback and Mailgun inbound controllers with new SupportDock integration ([1ae449a](https://github.com/bangkeut-technology/daily-brew/commit/1ae449a228dcf58133a11165e7df18f56153e812))
+
+
+### Bug Fixes
+
+* **pricing:** remove unnecessary dollar sign for plan monthly pricing display ([9fa84e3](https://github.com/bangkeut-technology/daily-brew/commit/9fa84e34a8372cc4eef0680fb73e1ceb73531e54))
+
 ## [1.30.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.29.0...v1.30.0) (2026-04-02)
 
 
