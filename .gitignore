@@ -35,6 +35,7 @@ Screenshot*.png
 
 /public/images/
 /public/tmp/
+/public/sw.js
 
 .idea
 
