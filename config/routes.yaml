@@ -26,7 +26,7 @@ dailybrew_api_v1_:
     resource:
         path: '../src/ApiController/'
         namespace: App\ApiController
-        exclude: '../src/ApiController/{Checkin,Device,Paddle,RevenueCat,Dev,BasilBook,Support}'
+        exclude: '../src/ApiController/{Checkin,Device,Paddle,Dev,BasilBook,Support}'
     type: attribute
     prefix: /api/v1/{_locale}
     requirements:
@@ -59,16 +59,6 @@ dailybrew_api_v1_webhooks_paddle_:
     resource:
         path: '../src/ApiController/Paddle/'
         namespace: App\ApiController\Paddle
-    type: attribute
-    prefix: /api/v1
-    name_prefix: dailybrew_api_v1_
-    options:
-        strict_requirements: true
-
-dailybrew_api_v1_webhooks_revenuecat_:
-    resource:
-        path: '../src/ApiController/RevenueCat/'
-        namespace: App\ApiController\RevenueCat
     type: attribute
     prefix: /api/v1
     name_prefix: dailybrew_api_v1_

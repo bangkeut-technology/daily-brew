@@ -274,7 +274,7 @@ function PricingPage() {
           >
             Still have questions?{' '}
             <a
-              href="mailto:support@dailybrew.work"
+              href="mailto:support@mail.dailybrew.work"
               className="text-coffee font-medium no-underline hover:text-coffee-light transition-colors"
             >
               Reach out to us

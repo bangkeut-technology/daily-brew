@@ -94,10 +94,10 @@ function DeleteAccountPage() {
               If you are unable to sign in and want your account deleted, email
               us at{' '}
               <a
-                href="mailto:support@dailybrew.work?subject=Account%20deletion%20request"
+                href="mailto:support@mail.dailybrew.work?subject=Account%20deletion%20request"
                 className="text-coffee font-medium no-underline hover:text-coffee-light"
               >
-                support@dailybrew.work
+                support@mail.dailybrew.work
               </a>{' '}
               with the subject line "Account deletion request" and the email
               address associated with your account. We will process your request

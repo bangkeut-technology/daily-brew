@@ -169,10 +169,10 @@ function TermsPage() {
             <p>
               For questions about these terms, email us at{' '}
               <a
-                href="mailto:support@dailybrew.work"
+                href="mailto:support@mail.dailybrew.work"
                 className="text-coffee font-medium no-underline hover:text-coffee-light"
               >
-                support@dailybrew.work
+                support@mail.dailybrew.work
               </a>
               .
             </p>

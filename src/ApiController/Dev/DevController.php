@@ -8,7 +8,6 @@ use App\ApiController\Trait\ApiResponseTrait;
 use App\Entity\Subscription;
 use App\Entity\User;
 use App\Enum\PlanEnum;
-use App\Enum\SubscriptionSourceEnum;
 use App\Enum\SubscriptionStatusEnum;
 use App\Repository\SubscriptionRepository;
 use App\Repository\WorkspaceRepository;
@@ -74,7 +73,6 @@ class DevController extends AbstractController
         }
 
         $subscription->setPlan($plan);
-        $subscription->setSource(SubscriptionSourceEnum::Paddle);
         $subscription->setStatus(SubscriptionStatusEnum::Active);
         $subscription->setCurrentPeriodEnd(\App\Service\DateService::mutableRelative('+30 days'));
         $subscription->setTrialEndsAt(null);

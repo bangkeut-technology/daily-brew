@@ -344,11 +344,11 @@ function SupportPage() {
               You can also reach us directly at the address below.
             </p>
             <a
-              href="mailto:support@dailybrew.work"
+              href="mailto:support@mail.dailybrew.work"
               className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-[15px] font-medium bg-coffee text-white no-underline transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
             >
               <Mail size={14} />
-              support@dailybrew.work
+              support@mail.dailybrew.work
             </a>
           </motion.div>
         </section>

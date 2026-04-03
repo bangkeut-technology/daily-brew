@@ -40,7 +40,7 @@ export function ApplicationProvider({ children }: Props) {
         data ??= window.__DAILYBREW__;
         return {
             maxFreeEmployees: (data?.maxFreeEmployees as number) ?? 5,
-            contactEmail: (data?.contactEmail as string) ?? 'support@dailybrew.work',
+            contactEmail: (data?.contactEmail as string) ?? 'support@mail.dailybrew.work',
             googleClientId: (data?.googleClientId as string) ?? '',
             appleClientId: (data?.appleClientId as string) ?? '',
         };
