@@ -4,13 +4,15 @@ import {
   QrCode, Users, Clock, Coffee, Shield, LayoutDashboard,
   MapPin, CalendarDays, Bell, ChevronRight, Crown, Smartphone,
   Globe, Moon, Zap, CheckCircle, ShieldCheck, ArrowRightLeft,
+  Wifi, Ban, Fingerprint, UserX, Locate, CircleDot,
+  Eye, CalendarCheck, Link2, Key,
 } from 'lucide-react';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { PageSeo } from '@/components/shared/PageSeo';
 import { BasilBookBrand } from '@/components/shared/BasilBookBrand';
 
-export const Route = createFileRoute('/features')({
+export const Route = createFileRoute('/features/')({
   component: FeaturesPage,
 });
 
@@ -53,25 +55,81 @@ const coreFeatures = [
   },
 ];
 
-const espressoFeatures = [
+const featuredEspresso = [
   {
     icon: <Shield size={28} strokeWidth={1.6} />,
     title: 'IP restriction',
-    desc: 'Only allow check-ins from specific IP addresses — like your restaurant WiFi. Prevent staff from checking in remotely. "Use my current IP" button for easy setup.',
+    tag: 'Security',
+    tagColor: 'text-red bg-red/8',
     accent: '#C0392B',
+    link: '/features/ip-restriction',
+    desc: 'Lock check-ins to your restaurant\'s WiFi or network. If staff aren\'t on an approved IP, they can\'t clock in — no remote punching.',
+    highlights: [
+      { icon: <Wifi size={14} />, text: 'Lock to restaurant WiFi' },
+      { icon: <Ban size={14} />, text: 'Block remote check-ins' },
+      { icon: <CheckCircle size={14} />, text: '"Use my current IP" auto-setup' },
+    ],
   },
   {
     icon: <Smartphone size={28} strokeWidth={1.6} />,
     title: 'Device verification',
-    desc: 'Bind check-in and check-out to a single device per employee per day. Prevents buddy punching — if someone checks in on their phone, they must check out on the same phone.',
+    tag: 'Anti-fraud',
+    tagColor: 'text-coffee bg-coffee/8',
     accent: '#9B6B45',
+    link: '/features/device-verification',
+    desc: 'Each employee must check in and out from the same device per day. Stops buddy punching — a colleague can\'t clock out on someone else\'s phone.',
+    highlights: [
+      { icon: <Fingerprint size={14} />, text: 'One device per employee per day' },
+      { icon: <UserX size={14} />, text: 'Prevents buddy punching' },
+      { icon: <CheckCircle size={14} />, text: 'Zero setup for staff' },
+    ],
   },
   {
     icon: <MapPin size={28} strokeWidth={1.6} />,
     title: 'Geofencing',
-    desc: 'Set a GPS location and radius for your restaurant. Staff must be physically within range to check in. Configurable radius to match your venue.',
+    tag: 'Location',
+    tagColor: 'text-[#7C5C9B] bg-[#7C5C9B]/8',
     accent: '#7C5C9B',
+    link: '/features/geofencing',
+    desc: 'Draw a virtual perimeter around your restaurant. Staff must be physically within the GPS radius to check in — configurable from 50m to 5,000m.',
+    highlights: [
+      { icon: <Locate size={14} />, text: 'GPS location verification' },
+      { icon: <CircleDot size={14} />, text: 'Configurable radius (50–5,000m)' },
+      { icon: <CheckCircle size={14} />, text: 'One-time browser prompt' },
+    ],
   },
+  {
+    icon: <ShieldCheck size={28} strokeWidth={1.6} />,
+    title: 'Roles and permissions',
+    tag: 'Delegation',
+    tagColor: 'text-coffee bg-coffee/8',
+    accent: '#6B4226',
+    link: '/roles',
+    desc: 'Promote trusted staff to managers. They can approve leave, view all attendance, and handle day-to-day operations — while you keep full control over settings and billing.',
+    highlights: [
+      { icon: <Eye size={14} />, text: 'Managers see all attendance' },
+      { icon: <CalendarCheck size={14} />, text: 'Approve/reject leave requests' },
+      { icon: <Shield size={14} />, text: 'Owner keeps full control' },
+    ],
+  },
+  {
+    icon: <ArrowRightLeft size={28} strokeWidth={1.6} />,
+    title: 'BasilBook integration',
+    titleNode: <><BasilBookBrand className="text-[16px]" /> integration</>,
+    tag: 'Integration',
+    tagColor: 'text-[#2bb673] bg-[#2bb673]/8',
+    accent: '#2bb673',
+    link: '/features/basilbook-integration',
+    desc: 'Connect DailyBrew to your BasilBook accounting system. Link employees by username and let BasilBook pull attendance data via a secure API.',
+    highlights: [
+      { icon: <Link2 size={14} />, text: 'Link staff by username' },
+      { icon: <Key size={14} />, text: 'Secure API token authentication' },
+      { icon: <ArrowRightLeft size={14} />, text: 'Automatic data sync' },
+    ],
+  },
+];
+
+const espressoFeatures = [
   {
     icon: <CalendarDays size={28} strokeWidth={1.6} />,
     title: 'Per-day shift schedules',
@@ -83,19 +141,6 @@ const espressoFeatures = [
     title: 'Leave request management',
     desc: 'Employees submit leave requests (paid or unpaid, full or partial day). Owners approve or reject with a note. Full history and status tracking.',
     accent: '#4A7C59',
-  },
-  {
-    icon: <ShieldCheck size={28} strokeWidth={1.6} />,
-    title: 'Manager role',
-    desc: 'Promote up to 2 trusted employees to managers (Espresso) or unlimited (Double Espresso). Managers can approve/reject leave requests, view all attendance, and cancel leave — without access to employee management, shifts, closures, or settings.',
-    accent: '#6B4226',
-  },
-  {
-    icon: <ArrowRightLeft size={28} strokeWidth={1.6} />,
-    title: 'BasilBook integration',
-    titleNode: <><BasilBookBrand className="text-[16px]" /> integration</>,
-    desc: 'Connect DailyBrew to BasilBook, your restaurant accounting system. Link employees by username and let BasilBook pull attendance data via a secure API — check-in times, late flags, and shift info for any date range.',
-    accent: '#2bb673',
   },
   {
     icon: <Bell size={28} strokeWidth={1.6} />,
@@ -164,7 +209,7 @@ function FeaturesPage() {
         {/* Espresso features */}
         <div className="mb-20">
           <motion.div
-            className="flex items-center justify-center gap-2 mb-8"
+            className="flex items-center justify-center gap-2 mb-10"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -178,126 +223,26 @@ function FeaturesPage() {
             </div>
             <div className="flex-1 h-px bg-cream-3 hidden md:block" />
           </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+
+          {/* Featured — two-section cards (first 4 in 2-col, BasilBook full-width) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+            {featuredEspresso.slice(0, 4).map((f, i) => (
+              <FeaturedCard key={f.title} feature={f} index={i} />
+            ))}
+          </div>
+          {featuredEspresso[4] && (
+            <div className="mb-5">
+              <FeaturedCardWide feature={featuredEspresso[4]} />
+            </div>
+          )}
+
+          {/* Regular espresso features */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {espressoFeatures.map((f, i) => (
               <FeatureCard key={f.title} feature={f} index={i} espresso />
             ))}
           </div>
         </div>
-
-        {/* Manager role spotlight */}
-        <motion.div
-          className="mb-20"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="text-center mb-10">
-            <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
-              New feature
-            </p>
-            <h2 className="text-[28px] md:text-[34px] font-semibold text-text-primary font-serif leading-tight">
-              Manager role
-            </h2>
-            <p className="text-[16px] text-text-secondary mt-3 max-w-lg mx-auto">
-              You can't always be at the restaurant. Promote trusted staff to
-              handle day-to-day attendance and leave management for you.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* What managers can do */}
-            <div className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 shadow-[0_2px_12px_rgba(107,66,38,0.05)]">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 rounded-xl bg-green/10 flex items-center justify-center">
-                  <CheckCircle size={20} className="text-green" />
-                </div>
-                <h3 className="text-[17px] font-semibold text-text-primary">
-                  What managers can do
-                </h3>
-              </div>
-              <ul className="space-y-3">
-                {[
-                  'View the full attendance dashboard for all employees',
-                  'See all attendance records — not just their own',
-                  'Approve or reject leave requests',
-                  'Cancel leave requests on behalf of employees',
-                  'Submit leave requests for any employee',
-                  'Still check in and out like a regular employee',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-2.5">
-                    <CheckCircle size={14} className="text-green mt-0.5 flex-shrink-0" />
-                    <span className="text-[14.5px] text-text-secondary">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* What stays owner-only */}
-            <div className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 shadow-[0_2px_12px_rgba(107,66,38,0.05)]">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 rounded-xl bg-red/10 flex items-center justify-center">
-                  <Shield size={20} className="text-red" />
-                </div>
-                <h3 className="text-[17px] font-semibold text-text-primary">
-                  What stays owner-only
-                </h3>
-              </div>
-              <ul className="space-y-3">
-                {[
-                  'Adding, editing, or removing employees',
-                  'Creating and managing shifts',
-                  'Scheduling closure periods',
-                  'Workspace settings (IP, geofencing, device verification)',
-                  'Billing and subscription management',
-                  'Promoting or demoting managers',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-2.5">
-                    <Shield size={14} className="text-red mt-0.5 flex-shrink-0" />
-                    <span className="text-[14.5px] text-text-secondary">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          {/* How to promote */}
-          <div className="mt-6 bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 shadow-[0_2px_12px_rgba(107,66,38,0.05)]">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-coffee/10 flex items-center justify-center">
-                <ShieldCheck size={20} className="text-coffee" />
-              </div>
-              <h3 className="text-[17px] font-semibold text-text-primary">
-                How to promote an employee
-              </h3>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {[
-                { step: '1', title: 'Link their account', desc: 'The employee must have a linked user account — they need to sign in to access manager features.' },
-                { step: '2', title: 'Go to employee detail', desc: 'Navigate to the employee detail page from your Employees list.' },
-                { step: '3', title: 'Tap promote', desc: 'Click "Promote to manager". You can demote them back to a regular employee at any time.' },
-              ].map((s) => (
-                <div key={s.step} className="flex items-start gap-3">
-                  <span className="w-7 h-7 rounded-full bg-coffee flex items-center justify-center text-[13px] font-bold text-white flex-shrink-0">
-                    {s.step}
-                  </span>
-                  <div>
-                    <p className="text-[15px] font-semibold text-text-primary mb-0.5">{s.title}</p>
-                    <p className="text-[13.5px] text-text-secondary leading-relaxed">{s.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-5 flex items-center gap-3 px-4 py-3 rounded-xl bg-amber/8 border border-amber/15">
-              <Crown size={16} className="text-amber flex-shrink-0" />
-              <p className="text-[14px] text-text-secondary">
-                <span className="font-medium text-amber">Espresso plan:</span> up to 2 managers per workspace.{' '}
-                <span className="font-medium text-amber">Double Espresso:</span> unlimited managers.
-              </p>
-            </div>
-          </div>
-        </motion.div>
 
         {/* Why DailyBrew */}
         <motion.div
@@ -375,6 +320,149 @@ function FeaturesPage() {
 
       <LandingFooter />
     </div>
+  );
+}
+
+function FeaturedCard({
+  feature: f,
+  index,
+}: {
+  feature: typeof featuredEspresso[number];
+  index: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4, delay: (index % 2) * 0.1 }}
+    >
+      <a
+        href={f.link}
+        className="group relative block no-underline overflow-hidden bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl shadow-[0_2px_12px_rgba(107,66,38,0.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(107,66,38,0.10)]"
+      >
+        {/* Accent bar */}
+        <div
+          className="absolute top-0 left-0 right-0 h-[3px] opacity-60 group-hover:opacity-100 transition-opacity"
+          style={{ background: f.accent }}
+        />
+
+        <div className="p-6 pb-0">
+          {/* Header */}
+          <div className="flex items-center gap-3 mb-4">
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-200 group-hover:scale-110"
+              style={{ background: `${f.accent}12`, color: f.accent }}
+            >
+              {f.icon}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-0.5">
+                <h3 className="text-[17px] font-semibold text-text-primary">{'titleNode' in f && f.titleNode ? f.titleNode : f.title}</h3>
+                <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded-full bg-amber/10 text-amber uppercase tracking-wider">
+                  Espresso
+                </span>
+              </div>
+              <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded-full ${f.tagColor} uppercase tracking-wider`}>
+                {f.tag}
+              </span>
+            </div>
+          </div>
+          {/* Description */}
+          <p className="text-[14.5px] text-text-secondary leading-relaxed">
+            {f.desc}
+          </p>
+        </div>
+
+        {/* Divider + highlights */}
+        <div className="mx-6 mt-4 pt-4 pb-5 border-t border-cream-3 dark:border-cream-3/40">
+          <ul className="space-y-2.5">
+            {f.highlights.map((h) => (
+              <li key={h.text} className="flex items-center gap-2.5">
+                <span style={{ color: f.accent }} className="flex-shrink-0">{h.icon}</span>
+                <span className="text-[13.5px] text-text-secondary">{h.text}</span>
+              </li>
+            ))}
+          </ul>
+          <span className="inline-flex items-center gap-1 mt-4 text-[13.5px] font-medium text-coffee group-hover:text-coffee-light transition-colors">
+            Learn more
+            <ChevronRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+          </span>
+        </div>
+      </a>
+    </motion.div>
+  );
+}
+
+function FeaturedCardWide({
+  feature: f,
+}: {
+  feature: typeof featuredEspresso[number];
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4, delay: 0.1 }}
+    >
+      <a
+        href={f.link}
+        className="group relative block no-underline overflow-hidden bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl shadow-[0_2px_12px_rgba(107,66,38,0.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(107,66,38,0.10)]"
+      >
+        {/* Accent bar */}
+        <div
+          className="absolute top-0 left-0 right-0 h-[3px] opacity-60 group-hover:opacity-100 transition-opacity"
+          style={{ background: f.accent }}
+        />
+
+        <div className="p-6 md:p-8">
+          <div className="flex flex-col md:flex-row md:items-start gap-6">
+            {/* Left — icon + description */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-4">
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-200 group-hover:scale-110"
+                  style={{ background: `${f.accent}12`, color: f.accent }}
+                >
+                  {f.icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <h3 className="text-[17px] font-semibold text-text-primary">{'titleNode' in f && f.titleNode ? f.titleNode : f.title}</h3>
+                    <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded-full bg-amber/10 text-amber uppercase tracking-wider">
+                      Espresso
+                    </span>
+                  </div>
+                  <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded-full ${f.tagColor} uppercase tracking-wider`}>
+                    {f.tag}
+                  </span>
+                </div>
+              </div>
+              <p className="text-[14.5px] text-text-secondary leading-relaxed">
+                {f.desc}
+              </p>
+            </div>
+
+            {/* Right — highlights */}
+            <div className="md:w-[280px] flex-shrink-0 md:border-l md:border-cream-3 md:dark:border-cream-3/40 md:pl-6">
+              <ul className="space-y-2.5">
+                {f.highlights.map((h) => (
+                  <li key={h.text} className="flex items-center gap-2.5">
+                    <span style={{ color: f.accent }} className="flex-shrink-0">{h.icon}</span>
+                    <span className="text-[13.5px] text-text-secondary">{h.text}</span>
+                  </li>
+                ))}
+              </ul>
+              <span className="inline-flex items-center gap-1 mt-4 text-[13.5px] font-medium text-coffee group-hover:text-coffee-light transition-colors">
+                Learn more
+                <ChevronRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+              </span>
+            </div>
+          </div>
+        </div>
+      </a>
+    </motion.div>
   );
 }
 
