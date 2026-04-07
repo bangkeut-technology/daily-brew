@@ -330,9 +330,9 @@ erDiagram
         int id PK
         uuid publicId UK
         string email UK
-        string password "nullable"
-        string googleId "nullable"
-        string appleId "nullable"
+        string password
+        string googleId
+        string appleId
         datetime createdAt
         datetime updatedAt
     }
@@ -341,7 +341,7 @@ erDiagram
         int id PK
         uuid publicId UK
         string name
-        string qrToken UK "24 chars"
+        string qrToken UK
         datetime createdAt
         datetime updatedAt
     }
@@ -349,14 +349,14 @@ erDiagram
     WorkspaceSetting {
         int id PK
         boolean ipRestrictionEnabled
-        json allowedIps "nullable"
+        json allowedIps
         boolean deviceVerificationEnabled
-        string timezone "default Asia/Phnom_Penh"
+        string timezone
         string dateFormat
         boolean geofencingEnabled
-        float geofencingLatitude "nullable"
-        float geofencingLongitude "nullable"
-        int geofencingRadiusMeters "nullable"
+        float geofencingLatitude
+        float geofencingLongitude
+        int geofencingRadiusMeters
     }
 
     Shift {
@@ -383,13 +383,13 @@ erDiagram
         uuid publicId UK
         string firstName
         string lastName
-        string username "nullable, unique"
-        string phoneNumber "nullable"
-        date dob "nullable"
-        date joinedAt "nullable"
-        enum role "employee | manager"
-        enum status "active | inactive"
-        datetime deletedAt "nullable, soft delete"
+        string username UK
+        string phoneNumber
+        date dob
+        date joinedAt
+        enum role
+        enum status
+        datetime deletedAt
         datetime createdAt
         datetime updatedAt
     }
@@ -398,15 +398,15 @@ erDiagram
         int id PK
         uuid publicId UK
         date date
-        datetime checkInAt "nullable"
-        datetime checkOutAt "nullable"
+        datetime checkInAt
+        datetime checkOutAt
         boolean isLate
         boolean leftEarly
-        string ipAddress "nullable"
-        string checkInDeviceId "nullable"
-        string checkInDeviceName "nullable"
-        string checkOutDeviceId "nullable"
-        string checkOutDeviceName "nullable"
+        string ipAddress
+        string checkInDeviceId
+        string checkInDeviceName
+        string checkOutDeviceId
+        string checkOutDeviceName
         datetime createdAt
         datetime updatedAt
     }
@@ -416,12 +416,12 @@ erDiagram
         uuid publicId UK
         date startDate
         date endDate
-        time startTime "nullable, partial-day"
-        time endTime "nullable, partial-day"
-        text reason "nullable"
-        enum type "paid | unpaid"
-        enum status "pending | approved | rejected"
-        datetime reviewedAt "nullable"
+        time startTime
+        time endTime
+        text reason
+        enum type
+        enum status
+        datetime reviewedAt
         datetime createdAt
         datetime updatedAt
     }
@@ -429,8 +429,8 @@ erDiagram
     DeviceToken {
         int id PK
         uuid publicId UK
-        string token UK "Expo push token"
-        string platform "ios | android | web"
+        string token UK
+        string platform
         datetime createdAt
         datetime updatedAt
     }
@@ -438,30 +438,30 @@ erDiagram
     ApiToken {
         int id PK
         uuid publicId UK
-        string prefix "first 8 chars"
-        string tokenHash UK "SHA-256"
+        string prefix
+        string tokenHash UK
         string name
-        datetime lastUsedAt "nullable"
-        datetime revokedAt "nullable"
+        datetime lastUsedAt
+        datetime revokedAt
         datetime createdAt
     }
 
-    User ||--o{ Workspace : "owns"
-    User ||--o| Workspace : "currentWorkspace"
-    User ||--o{ Employee : "creates (owner)"
-    User ||--o{ Employee : "linkedUser (nullable)"
-    User ||--o{ DeviceToken : "has"
+    User ||--o{ Workspace : owns
+    User ||--o| Workspace : currentWorkspace
+    User ||--o{ Employee : creates
+    User ||--o{ Employee : linkedUser
+    User ||--o{ DeviceToken : has
 
-    Workspace ||--|| WorkspaceSetting : "has"
-    Workspace ||--o{ Shift : "has"
-    Workspace ||--o{ Closure : "has"
-    Workspace ||--o{ Employee : "belongs to"
-    Workspace ||--o{ ApiToken : "has"
+    Workspace ||--|| WorkspaceSetting : has
+    Workspace ||--o{ Shift : has
+    Workspace ||--o{ Closure : has
+    Workspace ||--o{ Employee : contains
+    Workspace ||--o{ ApiToken : has
 
-    Shift ||--o{ Employee : "assigned to"
+    Shift ||--o{ Employee : assigned
 
-    Employee ||--o{ Attendance : "records"
-    Employee ||--o{ LeaveRequest : "submits"
+    Employee ||--o{ Attendance : records
+    Employee ||--o{ LeaveRequest : submits
 ```
 
 ## Design
