@@ -322,6 +322,148 @@ curl "https://dailybrew.work/api/v1/basilbook/attendances?from=2026-04-01&to=202
 | 403 | Workspace not on Espresso plan |
 | 422 | Invalid or missing date parameters |
 
+## Entity-Relationship Model
+
+```mermaid
+erDiagram
+    User {
+        int id PK
+        uuid publicId UK
+        string email UK
+        string password "nullable"
+        string googleId "nullable"
+        string appleId "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    Workspace {
+        int id PK
+        uuid publicId UK
+        string name
+        string qrToken UK "24 chars"
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    WorkspaceSetting {
+        int id PK
+        boolean ipRestrictionEnabled
+        json allowedIps "nullable"
+        boolean deviceVerificationEnabled
+        string timezone "default Asia/Phnom_Penh"
+        string dateFormat
+        boolean geofencingEnabled
+        float geofencingLatitude "nullable"
+        float geofencingLongitude "nullable"
+        int geofencingRadiusMeters "nullable"
+    }
+
+    Shift {
+        int id PK
+        uuid publicId UK
+        string name
+        time startTime
+        time endTime
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    Closure {
+        int id PK
+        uuid publicId UK
+        string name
+        date startDate
+        date endDate
+        datetime createdAt
+    }
+
+    Employee {
+        int id PK
+        uuid publicId UK
+        string firstName
+        string lastName
+        string username "nullable, unique"
+        string phoneNumber "nullable"
+        date dob "nullable"
+        date joinedAt "nullable"
+        enum role "employee | manager"
+        enum status "active | inactive"
+        datetime deletedAt "nullable, soft delete"
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    Attendance {
+        int id PK
+        uuid publicId UK
+        date date
+        datetime checkInAt "nullable"
+        datetime checkOutAt "nullable"
+        boolean isLate
+        boolean leftEarly
+        string ipAddress "nullable"
+        string checkInDeviceId "nullable"
+        string checkInDeviceName "nullable"
+        string checkOutDeviceId "nullable"
+        string checkOutDeviceName "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    LeaveRequest {
+        int id PK
+        uuid publicId UK
+        date startDate
+        date endDate
+        time startTime "nullable, partial-day"
+        time endTime "nullable, partial-day"
+        text reason "nullable"
+        enum type "paid | unpaid"
+        enum status "pending | approved | rejected"
+        datetime reviewedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    DeviceToken {
+        int id PK
+        uuid publicId UK
+        string token UK "Expo push token"
+        string platform "ios | android | web"
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    ApiToken {
+        int id PK
+        uuid publicId UK
+        string prefix "first 8 chars"
+        string tokenHash UK "SHA-256"
+        string name
+        datetime lastUsedAt "nullable"
+        datetime revokedAt "nullable"
+        datetime createdAt
+    }
+
+    User ||--o{ Workspace : "owns"
+    User ||--o| Workspace : "currentWorkspace"
+    User ||--o{ Employee : "creates (owner)"
+    User ||--o{ Employee : "linkedUser (nullable)"
+    User ||--o{ DeviceToken : "has"
+
+    Workspace ||--|| WorkspaceSetting : "has"
+    Workspace ||--o{ Shift : "has"
+    Workspace ||--o{ Closure : "has"
+    Workspace ||--o{ Employee : "belongs to"
+    Workspace ||--o{ ApiToken : "has"
+
+    Shift ||--o{ Employee : "assigned to"
+
+    Employee ||--o{ Attendance : "records"
+    Employee ||--o{ LeaveRequest : "submits"
+```
+
 ## Design
 
 Warm cafe aesthetic with glassmorphism. Cream backgrounds (#FAF7F2), coffee brown primary (#6B4226), amber accent (#C17F3B). Serif headings, system sans-serif body.
