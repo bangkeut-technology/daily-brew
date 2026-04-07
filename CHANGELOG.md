@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.32.4](https://github.com/bangkeut-technology/daily-brew/compare/v1.32.3...v1.32.4) (2026-04-07)
+
+
+### Bug Fixes
+
+* **readme:** remove quoted comments from Mermaid ERD for GitHub compatibility ([2f5d25c](https://github.com/bangkeut-technology/daily-brew/commit/2f5d25c685da8fe9ca67bb0c8a87a39250ea1230))
+
 ## [1.31.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.30.2...v1.31.0) (2026-04-03)
 
 
