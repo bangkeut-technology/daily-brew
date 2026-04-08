@@ -352,6 +352,26 @@ class SeedReviewerCommand extends Command
             ],
         );
 
+        // ── QR codes for testing ─────────────────────────────────
+        $io->section('QR codes for scanner testing');
+        $io->text('Workspace check-in QR data:');
+        $io->text(sprintf('  dailybrew:ws:%s', $workspace->getQrToken()));
+        $io->newLine();
+
+        $io->text('Employee QR data (for linking via scanner):');
+        $employeeQrRows = [];
+        foreach ($employeeEntities as $emp) {
+            $employeeQrRows[] = [
+                $emp->getFirstName() . ' ' . $emp->getLastName(),
+                $emp->getPublicId(),
+                'dailybrew:emp:' . $emp->getPublicId(),
+            ];
+        }
+        $io->table(
+            ['Employee', 'Public ID', 'QR data'],
+            $employeeQrRows,
+        );
+
         return Command::SUCCESS;
     }
 
