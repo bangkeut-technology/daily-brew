@@ -20,6 +20,10 @@ use App\Service\EmployeeService;
 use App\Service\ShiftService;
 use App\Service\WorkspaceService;
 use Doctrine\ORM\EntityManagerInterface;
+use Endroid\QrCode\Color\Color;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -352,27 +356,46 @@ class SeedReviewerCommand extends Command
             ],
         );
 
-        // ── QR codes for testing ─────────────────────────────────
-        $io->section('QR codes for scanner testing');
-        $io->text('Workspace check-in QR data:');
-        $io->text(sprintf('  dailybrew:ws:%s', $workspace->getQrToken()));
-        $io->newLine();
-
-        $io->text('Employee QR data (for linking via scanner):');
-        $employeeQrRows = [];
-        foreach ($employeeEntities as $emp) {
-            $employeeQrRows[] = [
-                $emp->getFirstName() . ' ' . $emp->getLastName(),
-                $emp->getPublicId(),
-                'dailybrew:emp:' . $emp->getPublicId(),
-            ];
-        }
-        $io->table(
-            ['Employee', 'Public ID', 'QR data'],
-            $employeeQrRows,
-        );
+        // ── QR code images for App Store review ─────────────────
+        $io->section('QR code images for App Store review');
+        $this->generateQrImages($workspace, $employeeEntities, $io);
 
         return Command::SUCCESS;
+    }
+
+    private function generateQrImages(\App\Entity\Workspace $workspace, array $employees, SymfonyStyle $io): void
+    {
+        $dir = dirname(__DIR__, 2) . '/var/qr';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $writer = new PngWriter();
+        $coffee = new Color(107, 66, 38); // #6B4226
+
+        // Workspace check-in QR
+        $wsData = sprintf('dailybrew:ws:%s', $workspace->getQrToken());
+        $wsQr = new QrCode($wsData, errorCorrectionLevel: ErrorCorrectionLevel::Medium, size: 400, foregroundColor: $coffee);
+        $wsResult = $writer->write($wsQr);
+        $wsPath = $dir . '/workspace-checkin-qr.png';
+        file_put_contents($wsPath, $wsResult->getString());
+        $io->text(sprintf('Workspace check-in QR: %s', $wsPath));
+        $io->text(sprintf('  Data: %s', $wsData));
+
+        // Employee linking QRs
+        foreach ($employees as $emp) {
+            $empData = sprintf('dailybrew:emp:%s', $emp->getPublicId());
+            $empQr = new QrCode($empData, errorCorrectionLevel: ErrorCorrectionLevel::Medium, size: 400, foregroundColor: $coffee);
+            $empResult = $writer->write($empQr);
+            $name = strtolower($emp->getFirstName() . '-' . $emp->getLastName());
+            $empPath = $dir . '/' . $name . '-qr.png';
+            file_put_contents($empPath, $empResult->getString());
+            $io->text(sprintf('%s %s QR: %s', $emp->getFirstName(), $emp->getLastName(), $empPath));
+        }
+
+        $io->newLine();
+        $io->text(sprintf('All QR images saved to: %s', $dir));
+        $io->text('Upload workspace-checkin-qr.png to App Store Connect for reviewer testing.');
     }
 
     private function purgeReviewerData(\App\Entity\User $user, SymfonyStyle $io): void
