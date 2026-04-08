@@ -39,6 +39,8 @@ class SeedReviewerCommand extends Command
     private const MANAGER_PASSWORD = 'DailyBrew2026!';
     private const EMPLOYEE_EMAIL = 'employee@dailybrew.work';
     private const EMPLOYEE_PASSWORD = 'DailyBrew2026!';
+    private const UNLINK_EMAIL = 'unlink@dailybrew.work';
+    private const UNLINK_PASSWORD = 'DailyBrew2026!';
     private const WORKSPACE_NAME = 'The Daily Grind';
 
     public function __construct(
@@ -174,6 +176,19 @@ class SeedReviewerCommand extends Command
         $this->employeeService->linkUser($employeeEntities[1], $employeeUser);
         $this->em->flush();
         $io->text('Created employee: ' . self::EMPLOYEE_EMAIL . ' (Dara Sok)');
+
+        // ── Unlink test account (linked to Sreyleak Heng) ─────
+        $unlinkUser = $this->authService->register(
+            self::UNLINK_EMAIL,
+            self::UNLINK_PASSWORD,
+            'Sreyleak',
+            'Heng',
+        );
+        $unlinkUser->setOnboardingCompleted(true);
+        $unlinkUser->setCurrentWorkspace($workspace);
+        $this->employeeService->linkUser($employeeEntities[2], $unlinkUser);
+        $this->em->flush();
+        $io->text('Created unlink test: ' . self::UNLINK_EMAIL . ' (Sreyleak Heng)');
 
         // ── Closure period ───────────────────────────────────────
         $closure = new ClosurePeriod();
@@ -318,6 +333,7 @@ class SeedReviewerCommand extends Command
                 ['Owner', self::OWNER_EMAIL, self::OWNER_PASSWORD],
                 ['Manager', self::MANAGER_EMAIL, self::MANAGER_PASSWORD],
                 ['Employee', self::EMPLOYEE_EMAIL, self::EMPLOYEE_PASSWORD],
+                ['Unlink test', self::UNLINK_EMAIL, self::UNLINK_PASSWORD],
             ],
         );
         $io->table(
@@ -328,6 +344,7 @@ class SeedReviewerCommand extends Command
                 ['Employees', (string) count($employeeEntities)],
                 ['Manager', 'Sophea Chan (' . self::MANAGER_EMAIL . ')'],
                 ['Employee', 'Dara Sok (' . self::EMPLOYEE_EMAIL . ')'],
+                ['Unlink test', 'Sreyleak Heng (' . self::UNLINK_EMAIL . ')'],
                 ['Shifts', '2 (Morning, Evening)'],
                 ['Attendance', $attendanceCount . ' records (last 7 weekdays)'],
                 ['Leave requests', '3 (approved, pending, rejected)'],
@@ -370,11 +387,12 @@ class SeedReviewerCommand extends Command
         $this->safeDelete($conn, 'DELETE FROM daily_brew_refresh_tokens WHERE username = ?', [self::OWNER_EMAIL]);
         $this->safeDelete($conn, 'DELETE FROM daily_brew_refresh_tokens WHERE username = ?', [self::MANAGER_EMAIL]);
         $this->safeDelete($conn, 'DELETE FROM daily_brew_refresh_tokens WHERE username = ?', [self::EMPLOYEE_EMAIL]);
+        $this->safeDelete($conn, 'DELETE FROM daily_brew_refresh_tokens WHERE username = ?', [self::UNLINK_EMAIL]);
         $conn->executeStatement('DELETE FROM daily_brew_users WHERE id = ?', [$userId]);
 
-        // Delete manager and employee user accounts
-        $conn->executeStatement('UPDATE daily_brew_users SET current_workspace_id = NULL WHERE email_canonical IN (?, ?)', [self::MANAGER_EMAIL, self::EMPLOYEE_EMAIL]);
-        $conn->executeStatement('DELETE FROM daily_brew_users WHERE email_canonical IN (?, ?)', [self::MANAGER_EMAIL, self::EMPLOYEE_EMAIL]);
+        // Delete manager, employee, and unlink user accounts
+        $conn->executeStatement('UPDATE daily_brew_users SET current_workspace_id = NULL WHERE email_canonical IN (?, ?, ?)', [self::MANAGER_EMAIL, self::EMPLOYEE_EMAIL, self::UNLINK_EMAIL]);
+        $conn->executeStatement('DELETE FROM daily_brew_users WHERE email_canonical IN (?, ?, ?)', [self::MANAGER_EMAIL, self::EMPLOYEE_EMAIL, self::UNLINK_EMAIL]);
 
         $this->em->clear();
 
