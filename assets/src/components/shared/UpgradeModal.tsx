@@ -10,6 +10,7 @@ import {
   Smartphone,
   FileText,
   Clock,
+  Send,
   Check,
   X,
   type LucideIcon,
@@ -28,6 +29,7 @@ const featureConfig: Record<EspressoFeature, { icon: LucideIcon; titleKey: strin
   deviceVerification: { icon: Smartphone, titleKey: 'upgrade.deviceVerification.title', descKey: 'upgrade.deviceVerification.description' },
   leaveRequests: { icon: FileText, titleKey: 'upgrade.leaveRequests.title', descKey: 'upgrade.leaveRequests.description' },
   shiftTimeRules: { icon: Clock, titleKey: 'upgrade.shiftTimeRules.title', descKey: 'upgrade.shiftTimeRules.description' },
+  telegramNotifications: { icon: Send, titleKey: 'upgrade.telegramNotifications.title', descKey: 'upgrade.telegramNotifications.description' },
 };
 
 const espressoBenefits = [
@@ -37,6 +39,7 @@ const espressoBenefits = [
   'Leave requests',
   'Per-day schedules',
   'Device verification',
+  'Telegram notifications',
 ];
 
 export function UpgradeModal({ open, onOpenChange, feature }: UpgradeModalProps) {

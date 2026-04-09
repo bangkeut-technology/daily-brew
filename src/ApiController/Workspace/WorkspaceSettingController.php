@@ -109,6 +109,21 @@ class WorkspaceSettingController extends AbstractController
             $setting->setGeofencingRadiusMeters($radius);
         }
 
+        // Telegram notifications (Espresso gated)
+        if (isset($data['telegramNotificationsEnabled']) && $data['telegramNotificationsEnabled']) {
+            if (!$planService->canUseTelegramNotifications($workspace)) {
+                return $this->jsonError('Telegram notifications require the Espresso plan', 402);
+            }
+            $setting->setTelegramNotificationsEnabled(true);
+        } elseif (isset($data['telegramNotificationsEnabled'])) {
+            $setting->setTelegramNotificationsEnabled(false);
+        }
+
+        if (array_key_exists('telegramChatId', $data)) {
+            $chatId = $data['telegramChatId'];
+            $setting->setTelegramChatId(is_string($chatId) && $chatId !== '' ? $chatId : null);
+        }
+
         // General settings
         if (isset($data['timezone'])) {
             $setting->setTimezone($data['timezone']);
@@ -150,6 +165,8 @@ class WorkspaceSettingController extends AbstractController
             'geofencingLatitude' => $setting?->getGeofencingLatitude(),
             'geofencingLongitude' => $setting?->getGeofencingLongitude(),
             'geofencingRadiusMeters' => $setting?->getGeofencingRadiusMeters() ?? 100,
+            'telegramNotificationsEnabled' => $setting?->isTelegramNotificationsEnabled() ?? false,
+            'telegramChatId' => $setting?->getTelegramChatId(),
         ];
     }
 }

@@ -30,6 +30,8 @@ export interface WorkspaceSetting {
   geofencingLatitude: number | null;
   geofencingLongitude: number | null;
   geofencingRadiusMeters: number | null;
+  telegramNotificationsEnabled: boolean;
+  telegramChatId: string | null;
 }
 
 export interface ShiftTimeRule {
@@ -180,6 +182,7 @@ export interface PlanDetails {
   canUseShiftTimeRules: boolean;
   canUseDeviceVerification: boolean;
   canUseManagers: boolean;
+  canUseTelegramNotifications: boolean;
   managerLimit: number | null;
   managerCount: number;
   currentPeriodEnd: string | null;

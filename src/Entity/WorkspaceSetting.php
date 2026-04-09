@@ -51,6 +51,12 @@ class WorkspaceSetting extends AbstractBaseEntity
     #[ORM\Column(type: 'integer', nullable: true, options: ['default' => 100])]
     private ?int $geofencingRadiusMeters = 100;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $telegramNotificationsEnabled = false;
+
+    #[ORM\Column(length: 64, nullable: true)]
+    private ?string $telegramChatId = null;
+
     // ── Workspace ──────────────────────────────────────────────
 
     public function getWorkspace(): ?Workspace
@@ -168,6 +174,30 @@ class WorkspaceSetting extends AbstractBaseEntity
     public function setGeofencingRadiusMeters(?int $geofencingRadiusMeters): static
     {
         $this->geofencingRadiusMeters = $geofencingRadiusMeters;
+        return $this;
+    }
+
+    // ── Telegram ──────────────────────────────────────────────
+
+    public function isTelegramNotificationsEnabled(): bool
+    {
+        return $this->telegramNotificationsEnabled;
+    }
+
+    public function setTelegramNotificationsEnabled(bool $telegramNotificationsEnabled): static
+    {
+        $this->telegramNotificationsEnabled = $telegramNotificationsEnabled;
+        return $this;
+    }
+
+    public function getTelegramChatId(): ?string
+    {
+        return $this->telegramChatId;
+    }
+
+    public function setTelegramChatId(?string $telegramChatId): static
+    {
+        $this->telegramChatId = $telegramChatId;
         return $this;
     }
 }

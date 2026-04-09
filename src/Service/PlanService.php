@@ -83,6 +83,11 @@ class PlanService
         return $this->isAtLeastEspresso($workspace);
     }
 
+    public function canUseTelegramNotifications(Workspace $workspace): bool
+    {
+        return $this->isAtLeastEspresso($workspace);
+    }
+
     public function getManagerLimit(Workspace $workspace): ?int
     {
         $plan = $this->getPlan($workspace);
@@ -152,6 +157,7 @@ class PlanService
             'canUseShiftTimeRules' => $this->canUseShiftTimeRules($workspace),
             'canUseDeviceVerification' => $this->canUseDeviceVerification($workspace),
             'canUseManagers' => $this->canUseManagers($workspace),
+            'canUseTelegramNotifications' => $this->canUseTelegramNotifications($workspace),
             'managerLimit' => $this->getManagerLimit($workspace),
             'managerCount' => $this->employeeRepository->countManagersByWorkspace($workspace),
             'currentPeriodEnd' => $subscription?->getCurrentPeriodEnd()?->format('c'),

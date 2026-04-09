@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import * as Dialog from '@radix-ui/react-dialog';
-import { Crown, Check, MapPin, Navigation, Smartphone, Building2, Users, Calendar, Plus, X, Copy, Pencil, Trash2 } from 'lucide-react';
+import { Crown, Check, MapPin, Navigation, Smartphone, Building2, Users, Calendar, Plus, X, Copy, Pencil, Trash2, Send } from 'lucide-react';
 import { useDateFormat } from '@/hooks/useDateFormat';
 import { usePaddle } from '@/hooks/usePaddle';
 import { useDevTogglePlan } from '@/hooks/useDevTogglePlan';
@@ -102,6 +102,10 @@ function SettingsPage() {
   // Device verification state
   const [deviceVerificationEnabled, setDeviceVerificationEnabled] = useState(false);
 
+  // Telegram state
+  const [telegramEnabled, setTelegramEnabled] = useState(false);
+  const [telegramChatId, setTelegramChatId] = useState('');
+
   // Geofencing state
   const [geofencingEnabled, setGeofencingEnabled] = useState(false);
   const [geofencingLat, setGeofencingLat] = useState<number | null>(null);
@@ -116,6 +120,8 @@ function SettingsPage() {
       setTimezone(settings.timezone);
       setDateFormat(settings.dateFormat || 'DD/MM/YYYY');
       setDeviceVerificationEnabled(settings.deviceVerificationEnabled);
+      setTelegramEnabled(settings.telegramNotificationsEnabled);
+      setTelegramChatId(settings.telegramChatId || '');
       setGeofencingEnabled(settings.geofencingEnabled);
       setGeofencingLat(settings.geofencingLatitude);
       setGeofencingLng(settings.geofencingLongitude);
@@ -138,6 +144,8 @@ function SettingsPage() {
         geofencingLatitude: geofencingEnabled ? geofencingLat : null,
         geofencingLongitude: geofencingEnabled ? geofencingLng : null,
         geofencingRadiusMeters: geofencingEnabled ? geofencingRadius : null,
+        telegramNotificationsEnabled: telegramEnabled,
+        telegramChatId: telegramEnabled ? (telegramChatId.trim() || null) : null,
       });
       toast.success('Settings saved');
     } catch {
@@ -974,6 +982,75 @@ function SettingsPage() {
                       </span>
                     </div>
                   )}
+
+                  <button
+                    onClick={handleSaveSettings}
+                    disabled={updateSettings.isPending}
+                    className="px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50"
+                  >
+                    {updateSettings.isPending ? t('common.loading') : t('common.save')}
+                  </button>
+                </div>
+              )}
+            </div>
+          </GlassCard>
+        )}
+        {/* Telegram notifications */}
+        {currentWsId && (
+          <GlassCard hover={false} className="lg:col-span-2">
+            <GlassCardHeader
+              title="Telegram notifications"
+              action={
+                <div className="flex items-center gap-2">
+                  <Send size={14} className="text-amber" />
+                  {telegramEnabled && plan?.canUseTelegramNotifications && (
+                    <StatusBadge label="Active" variant="green" />
+                  )}
+                </div>
+              }
+            />
+            <div className="p-5 space-y-4">
+              <div className="flex items-center gap-2">
+                <Toggle
+                  id="telegram-notifications"
+                  checked={telegramEnabled && (plan?.canUseTelegramNotifications ?? false)}
+                  onChange={(v) => {
+                    if (!plan?.canUseTelegramNotifications) { upgradeModal.openFor('telegramNotifications'); return; }
+                    setTelegramEnabled(v);
+                  }}
+                />
+                <label htmlFor="telegram-notifications" className="text-[15px] text-text-primary cursor-pointer">
+                  Enable Telegram notifications
+                  {!plan?.canUseTelegramNotifications && (
+                    <span className="ml-1.5 text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
+                      Espresso
+                    </span>
+                  )}
+                </label>
+              </div>
+              <p className="text-[14px] text-text-tertiary leading-relaxed">
+                Send leave requests, shift changes, closures, and daily summaries to a Telegram chat or group.
+              </p>
+
+              {telegramEnabled && plan?.canUseTelegramNotifications && (
+                <div className="space-y-3">
+                  <div>
+                    <label htmlFor="telegram-chat-id" className="block text-[13px] font-medium text-text-secondary mb-1">
+                      Chat ID
+                    </label>
+                    <input
+                      id="telegram-chat-id"
+                      name="telegramChatId"
+                      type="text"
+                      value={telegramChatId}
+                      onChange={(e) => setTelegramChatId(e.target.value)}
+                      placeholder="-1001234567890"
+                      className="w-full px-3 py-2 rounded-lg text-[15px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono"
+                    />
+                    <p className="text-[12.5px] text-text-tertiary mt-1">
+                      Send <span className="font-mono text-text-secondary">/start</span> to your bot, then use <span className="font-mono text-text-secondary">@userinfobot</span> or the Telegram Bot API to get your chat ID. For groups, add the bot and use the group chat ID.
+                    </p>
+                  </div>
 
                   <button
                     onClick={handleSaveSettings}
