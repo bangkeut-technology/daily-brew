@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.33.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.32.4...v1.33.0) (2026-04-09)
+
+
+### Features
+
+* **notifications:** add Telegram notification channel (Espresso) ([407eed3](https://github.com/bangkeut-technology/daily-brew/commit/407eed3fac6929e16f535cac709ce73714a1b7ed))
+* **notifications:** add Telegram notification channel (Espresso) ([c6978c5](https://github.com/bangkeut-technology/daily-brew/commit/c6978c52592f915af5feff2fdd6af742e68283dc))
+
 ## [1.32.4](https://github.com/bangkeut-technology/daily-brew/compare/v1.32.3...v1.32.4) (2026-04-07)
 
 
