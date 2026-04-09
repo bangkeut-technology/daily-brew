@@ -199,6 +199,10 @@
     "shiftTimeRules": {
       "title": "Unlock per-day schedules",
       "description": "Override shift hours for specific days of the week. Perfect for restaurants with different hours on weekends."
+    },
+    "telegramNotifications": {
+      "title": "Unlock Telegram notifications",
+      "description": "Send real-time leave requests, shift changes, closures, and daily summaries to a Telegram chat or group."
     }
   }
 }

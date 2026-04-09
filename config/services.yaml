@@ -24,6 +24,8 @@ parameters:
     jwt_token_ttl:                    3600
     supportdock_api_key:              '%env(SUPPORTDOCK_API_KEY)%'
     mailgun_webhook_signing_key:      '%env(MAILGUN_WEBHOOK_SIGNING_KEY)%'
+    telegram_bot_token:               '%env(TELEGRAM_BOT_TOKEN)%'
+    telegram_webhook_secret:           '%env(TELEGRAM_WEBHOOK_TOKEN)%'
 
 services:
     _defaults:
@@ -46,6 +48,8 @@ services:
             $noReplyEmail:                 '%no_reply_email%'
             $supportdockApiKey:            '%supportdock_api_key%'
             $mailgunWebhookSigningKey:     '%mailgun_webhook_signing_key%'
+            $telegramBotToken:             '%telegram_bot_token%'
+            $telegramWebhookSecret:         '%telegram_webhook_secret%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name

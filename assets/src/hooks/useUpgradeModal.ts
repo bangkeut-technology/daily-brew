@@ -5,7 +5,8 @@ export type EspressoFeature =
   | 'geofencing'
   | 'deviceVerification'
   | 'leaveRequests'
-  | 'shiftTimeRules';
+  | 'shiftTimeRules'
+  | 'telegramNotifications';
 
 export function useUpgradeModal() {
   const [feature, setFeature] = useState<EspressoFeature | null>(null);

@@ -106,6 +106,10 @@
     "shiftTimeRules": {
       "title": "D\u00e9bloquer les horaires par jour",
       "description": "Modifiez les heures de travail pour des jours sp\u00e9cifiques. Id\u00e9al pour les restaurants avec des horaires diff\u00e9rents le week-end."
+    },
+    "telegramNotifications": {
+      "title": "D\u00e9bloquer les notifications Telegram",
+      "description": "Envoyez les demandes de cong\u00e9, les changements d'\u00e9quipe, les fermetures et les r\u00e9sum\u00e9s quotidiens dans un chat ou groupe Telegram."
     }
   }
 }

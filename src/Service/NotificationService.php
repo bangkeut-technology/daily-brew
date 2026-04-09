@@ -17,6 +17,7 @@ class NotificationService
     public function __construct(
         private ExpoPushService $expoPushService,
         private EmailService $emailService,
+        private TelegramService $telegramService,
         private DeviceTokenRepository $deviceTokenRepository,
         private EmployeeRepository $employeeRepository,
     ) {}
@@ -54,6 +55,16 @@ class NotificationService
                 'reason' => $leaveRequest->getReason(),
             ],
         );
+
+        // Telegram
+        $reason = $leaveRequest->getReason();
+        $tgText = sprintf(
+            "📋 <b>New leave request</b>\n%s requested leave for %s%s",
+            $employee->getName(),
+            $dates,
+            $reason ? "\nReason: " . $reason : '',
+        );
+        $this->sendTelegram($workspace, $tgText);
     }
 
     public function notifyLeaveRequestApproved(LeaveRequest $leaveRequest): void
@@ -101,6 +112,16 @@ class NotificationService
                 'shiftEnd' => $shiftEnd,
             ],
         );
+
+        // Telegram
+        $tgText = sprintf(
+            "🔔 <b>Shift assigned</b>\n%s → %s (%s – %s)",
+            $employee->getName(),
+            $shift->getName(),
+            $shiftStart,
+            $shiftEnd,
+        );
+        $this->sendTelegram($employee->getWorkspace(), $tgText);
     }
 
     public function notifyClosureCreated(ClosurePeriod $closure): void
@@ -138,6 +159,14 @@ class NotificationService
                 'dates' => $dates,
             ],
         );
+
+        // Telegram
+        $tgText = sprintf(
+            "🚫 <b>Closure announced</b>\n%s: %s",
+            $closure->getName(),
+            $dates,
+        );
+        $this->sendTelegram($workspace, $tgText);
     }
 
     /**
@@ -189,6 +218,17 @@ class NotificationService
                 'absentCount' => $absentCount,
             ],
         );
+
+        // Telegram
+        $tgText = sprintf(
+            "📊 <b>%s</b>\n✅ %d present · ⏰ %d late · 🏖 %d on leave · ❌ %d absent",
+            $subject,
+            $presentCount,
+            $lateCount,
+            $onLeaveCount,
+            $absentCount,
+        );
+        $this->sendTelegram($workspace, $tgText);
     }
 
     private function notifyLeaveRequestDecision(LeaveRequest $leaveRequest, string $decision): void
@@ -220,6 +260,17 @@ class NotificationService
                 'dates' => $dates,
             ],
         );
+
+        // Telegram
+        $icon = $decision === 'approved' ? '✅' : '❌';
+        $tgText = sprintf(
+            "%s <b>Leave request %s</b>\n%s — %s",
+            $icon,
+            $decision,
+            $employee->getName(),
+            $dates,
+        );
+        $this->sendTelegram($leaveRequest->getWorkspace(), $tgText);
     }
 
     private function formatDateRange(\DateTimeInterface $start, \DateTimeInterface $end): string
@@ -230,6 +281,24 @@ class NotificationService
         }
 
         return $dates;
+    }
+
+    /**
+     * Send a Telegram message to the workspace chat if enabled.
+     */
+    private function sendTelegram(Workspace $workspace, string $text): void
+    {
+        $setting = $workspace->getSetting();
+        if ($setting === null || !$setting->isTelegramNotificationsEnabled()) {
+            return;
+        }
+
+        $chatId = $setting->getTelegramChatId();
+        if ($chatId === null || $chatId === '') {
+            return;
+        }
+
+        $this->telegramService->send($chatId, $text);
     }
 
     /**
