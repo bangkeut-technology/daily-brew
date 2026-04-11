@@ -162,7 +162,6 @@ class PlanService
             'managerCount' => $this->employeeRepository->countManagersByWorkspace($workspace),
             'currentPeriodEnd' => $subscription?->getCurrentPeriodEnd()?->format('c'),
             'status' => $subscription?->getStatus()->value ?? 'active',
-            'source' => $subscription?->getSource()?->value ?? null,
             'paddleSubscriptionId' => $subscription?->getPaddleSubscriptionId(),
         ];
     }
