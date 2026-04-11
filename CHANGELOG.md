@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.35.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.35.0...v1.35.1) (2026-04-11)
+
+
+### Bug Fixes
+
+* **oauth:** use correct canonicalizeEmail() method in OAuthAuthenticationService ([d4ce0e5](https://github.com/bangkeut-technology/daily-brew/commit/d4ce0e54bb78e912eb2f4105a581587932a1cd50))
+
 ## [1.35.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.34.0...v1.35.0) (2026-04-11)
 
 
