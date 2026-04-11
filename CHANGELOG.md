@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.33.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.33.1...v1.33.2) (2026-04-11)
+
+
+### Bug Fixes
+
+* **deploy:** add migrations to deploy pipeline and remove dead getSource() call ([09cf4a9](https://github.com/bangkeut-technology/daily-brew/commit/09cf4a9300117366e61d9b4cc1ba5fdfce353f8f))
+
 ## [1.33.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.32.4...v1.33.0) (2026-04-09)
 
 
