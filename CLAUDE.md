@@ -42,8 +42,9 @@ Any request to add the above should be deferred to a future milestone.
 - Unlimited employees
 - Everything in Espresso
 - Unlimited managers
+- Multiple QR codes per workspace (each QR acts as a sub-workspace with its own manager)
 - Priority support
-- Future: Multiple QR codes per workspace, white-label branding
+- Future: White-label branding
 
 ### Dual Role System
 Users can be owners (create workspaces) or employees (linked to an employee record).
@@ -165,6 +166,148 @@ Users can be owners (create workspaces) or employees (linked to an employee reco
 - lastUsedAt (datetime, nullable) — updated on each authenticated request
 - revokedAt (datetime, nullable) — null = active
 - createdAt
+
+### Entity-Relationship Diagram
+
+```mermaid
+erDiagram
+    User {
+        int id PK
+        uuid publicId UK
+        string email UK
+        string password
+        string googleId
+        string appleId
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    Workspace {
+        int id PK
+        uuid publicId UK
+        string name
+        string qrToken UK
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    WorkspaceSetting {
+        int id PK
+        boolean ipRestrictionEnabled
+        json allowedIps
+        boolean deviceVerificationEnabled
+        string timezone
+        string dateFormat
+        boolean geofencingEnabled
+        float geofencingLatitude
+        float geofencingLongitude
+        int geofencingRadiusMeters
+    }
+
+    Shift {
+        int id PK
+        uuid publicId UK
+        string name
+        time startTime
+        time endTime
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    Closure {
+        int id PK
+        uuid publicId UK
+        string name
+        date startDate
+        date endDate
+        datetime createdAt
+    }
+
+    Employee {
+        int id PK
+        uuid publicId UK
+        string firstName
+        string lastName
+        string username UK
+        string phoneNumber
+        date dob
+        date joinedAt
+        enum role
+        enum status
+        datetime deletedAt
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    Attendance {
+        int id PK
+        uuid publicId UK
+        date date
+        datetime checkInAt
+        datetime checkOutAt
+        boolean isLate
+        boolean leftEarly
+        string ipAddress
+        string checkInDeviceId
+        string checkInDeviceName
+        string checkOutDeviceId
+        string checkOutDeviceName
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    LeaveRequest {
+        int id PK
+        uuid publicId UK
+        date startDate
+        date endDate
+        time startTime
+        time endTime
+        text reason
+        enum type
+        enum status
+        datetime reviewedAt
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    DeviceToken {
+        int id PK
+        uuid publicId UK
+        string token UK
+        string platform
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    ApiToken {
+        int id PK
+        uuid publicId UK
+        string prefix
+        string tokenHash UK
+        string name
+        datetime lastUsedAt
+        datetime revokedAt
+        datetime createdAt
+    }
+
+    User ||--o{ Workspace : owns
+    User ||--o| Workspace : currentWorkspace
+    User ||--o{ Employee : creates
+    User ||--o{ Employee : linkedUser
+    User ||--o{ DeviceToken : has
+
+    Workspace ||--|| WorkspaceSetting : has
+    Workspace ||--o{ Shift : has
+    Workspace ||--o{ Closure : has
+    Workspace ||--o{ Employee : contains
+    Workspace ||--o{ ApiToken : has
+
+    Shift ||--o{ Employee : assigned
+
+    Employee ||--o{ Attendance : records
+    Employee ||--o{ LeaveRequest : submits
+```
 
 ---
 
@@ -334,6 +477,92 @@ JWT via LexikJWTAuthenticationBundle. Flows: email+password, Google OAuth, Apple
 ## QR Check-in Flow
 
 QR encodes `dailybrew:ws:{qrToken}` (data payload, not a URL). Employee opens DailyBrew mobile app → scans QR → app parses token → calls `POST /api/v1/checkin/{qrToken}` with JWT auth. Backend resolves employee from auth user + workspace. Validates IP, device, geofence if enabled → creates/updates Attendance record. Auth always required.
+
+### Check-in Flow Diagram
+
+```mermaid
+flowchart TD
+    A[Employee scans QR code] --> B{Signed in?}
+    B -- No --> C[Show sign-in required]
+    B -- Yes --> D[Resolve employee from user + workspace]
+    D --> E{Employee found?}
+    E -- No --> F[403 Not registered]
+    E -- Yes --> G{On approved full-day leave?}
+    G -- Yes --> H[Block check-in: on leave]
+    G -- No --> I{Closure today?}
+    I -- Yes --> J[Block: workspace closed]
+    I -- No --> K{IP restriction enabled?}
+    K -- Yes --> L{IP allowed?}
+    L -- No --> M[403 IP restricted]
+    L -- Yes --> N{Device verification enabled?}
+    K -- No --> N
+    N -- Yes --> O{Device already used by another employee today?}
+    O -- Yes --> P[403 Device already used]
+    O -- No --> Q{Geofencing enabled?}
+    N -- No --> Q
+    Q -- Yes --> R{Within radius?}
+    R -- No --> S[403 Outside geofence]
+    R -- Yes --> T{Already checked in today?}
+    Q -- No --> T
+    T -- Yes --> U{Already checked out?}
+    T -- No --> V[Create Attendance + check in]
+    U -- Yes --> W[Show completed state]
+    U -- No --> X{Device verification enabled?}
+    X -- Yes --> Y{Same device as check-in?}
+    Y -- No --> Z[403 Device mismatch]
+    Y -- Yes --> AA[Check out]
+    X -- No --> AA
+    V --> AB[Compute isLate from shift]
+    AA --> AC[Compute leftEarly from shift]
+```
+
+### Leave Request Flow Diagram
+
+```mermaid
+flowchart TD
+    A[Employee submits leave request] --> B{startDate <= endDate?}
+    B -- No --> C[400 Invalid dates]
+    B -- Yes --> D{Overlaps with closure?}
+    D -- Yes --> E[409 Conflicts with closure]
+    D -- No --> F{Overlaps existing pending/approved leave?}
+    F -- Yes --> G[409 Duplicate leave]
+    F -- No --> H[Create LeaveRequest - status: pending]
+    H --> I[Notify workspace owner - push + email]
+    I --> J{Owner/manager reviews}
+    J --> K[Approve]
+    J --> L[Reject]
+    K --> M[Status: approved + notify employee]
+    L --> N[Status: rejected + notify employee]
+    H --> O{Employee cancels?}
+    O --> P[Delete pending request]
+```
+
+### Authentication Flow Diagram
+
+```mermaid
+flowchart TD
+    A[User opens app] --> B{Has JWT token?}
+    B -- Yes --> C{Token valid?}
+    C -- Yes --> D[Load workspace from server/localStorage]
+    C -- No --> E[Redirect to sign-in]
+    B -- No --> E
+    E --> F{Auth method}
+    F --> G[Email + password]
+    F --> H[Google OAuth]
+    F --> I[Apple OAuth]
+    G --> J[POST /auth/login]
+    H --> K[POST /auth/google]
+    I --> L[POST /auth/apple]
+    J --> M[Return JWT]
+    K --> M
+    L --> M
+    M --> N{First login / no workspace?}
+    N -- Yes --> O[Onboarding wizard]
+    N -- No --> D
+    O --> P{Choose role}
+    P --> Q[Owner: create workspace]
+    P --> R[Employee: link to workspace]
+```
 
 ---
 

@@ -13,7 +13,7 @@ DailyBrew helps restaurant owners manage their team's daily attendance through Q
 - Shift and closure management
 - Leave request workflow — employees submit (full-day or partial-day with time range), owners approve/reject, employees can cancel pending requests
 - Owner dashboard with today's attendance stats
-- Manager role — promote trusted employees to approve leave and view all attendance (Espresso: up to 2, Double Espresso: unlimited)
+- Manager role — promote trusted employees to approve leave and view all attendance (Espresso: up to 2, Double Espresso: unlimited, assigned per QR sub-workspace)
 - Employee dashboard with personal attendance, shift, and leave request submission
 - IP restriction for check-in locations (with "Use my current IP" helper)
 - Geofencing for check-in (GPS radius)
@@ -34,6 +34,7 @@ DailyBrew helps restaurant owners manage their team's daily attendance through Q
 | Dashboard & attendance log    | Yes      | Yes                  | Yes                         |
 | Leave requests                | -        | Yes                  | Yes                         |
 | Manager role                  | -        | Up to 2              | Unlimited                   |
+| Multiple QR codes (sub-workspaces) | -   | -                    | Yes                         |
 | IP restriction                | -        | Yes                  | Yes                         |
 | Device verification           | -        | Yes                  | Yes                         |
 | Geofencing                    | -        | Yes                  | Yes                         |
@@ -462,6 +463,94 @@ erDiagram
 
     Employee ||--o{ Attendance : records
     Employee ||--o{ LeaveRequest : submits
+```
+
+## Flow Diagrams
+
+### QR Check-in Flow
+
+```mermaid
+flowchart TD
+    A[Employee scans QR code] --> B{Signed in?}
+    B -- No --> C[Show sign-in required]
+    B -- Yes --> D[Resolve employee from user + workspace]
+    D --> E{Employee found?}
+    E -- No --> F[403 Not registered]
+    E -- Yes --> G{On approved full-day leave?}
+    G -- Yes --> H[Block check-in: on leave]
+    G -- No --> I{Closure today?}
+    I -- Yes --> J[Block: workspace closed]
+    I -- No --> K{IP restriction enabled?}
+    K -- Yes --> L{IP allowed?}
+    L -- No --> M[403 IP restricted]
+    L -- Yes --> N{Device verification enabled?}
+    K -- No --> N
+    N -- Yes --> O{Device already used by another employee today?}
+    O -- Yes --> P[403 Device already used]
+    O -- No --> Q{Geofencing enabled?}
+    N -- No --> Q
+    Q -- Yes --> R{Within radius?}
+    R -- No --> S[403 Outside geofence]
+    R -- Yes --> T{Already checked in today?}
+    Q -- No --> T
+    T -- Yes --> U{Already checked out?}
+    T -- No --> V[Create Attendance + check in]
+    U -- Yes --> W[Show completed state]
+    U -- No --> X{Device verification enabled?}
+    X -- Yes --> Y{Same device as check-in?}
+    Y -- No --> Z[403 Device mismatch]
+    Y -- Yes --> AA[Check out]
+    X -- No --> AA
+    V --> AB[Compute isLate from shift]
+    AA --> AC[Compute leftEarly from shift]
+```
+
+### Leave Request Flow
+
+```mermaid
+flowchart TD
+    A[Employee submits leave request] --> B{startDate <= endDate?}
+    B -- No --> C[400 Invalid dates]
+    B -- Yes --> D{Overlaps with closure?}
+    D -- Yes --> E[409 Conflicts with closure]
+    D -- No --> F{Overlaps existing pending/approved leave?}
+    F -- Yes --> G[409 Duplicate leave]
+    F -- No --> H[Create LeaveRequest - status: pending]
+    H --> I[Notify workspace owner - push + email]
+    I --> J{Owner/manager reviews}
+    J --> K[Approve]
+    J --> L[Reject]
+    K --> M[Status: approved + notify employee]
+    L --> N[Status: rejected + notify employee]
+    H --> O{Employee cancels?}
+    O --> P[Delete pending request]
+```
+
+### Authentication Flow
+
+```mermaid
+flowchart TD
+    A[User opens app] --> B{Has JWT token?}
+    B -- Yes --> C{Token valid?}
+    C -- Yes --> D[Load workspace from server/localStorage]
+    C -- No --> E[Redirect to sign-in]
+    B -- No --> E
+    E --> F{Auth method}
+    F --> G[Email + password]
+    F --> H[Google OAuth]
+    F --> I[Apple OAuth]
+    G --> J[POST /auth/login]
+    H --> K[POST /auth/google]
+    I --> L[POST /auth/apple]
+    J --> M[Return JWT]
+    K --> M
+    L --> M
+    M --> N{First login / no workspace?}
+    N -- Yes --> O[Onboarding wizard]
+    N -- No --> D
+    O --> P{Choose role}
+    P --> Q[Owner: create workspace]
+    P --> R[Employee: link to workspace]
 ```
 
 ## Design
