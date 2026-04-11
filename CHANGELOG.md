@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.35.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.34.0...v1.35.0) (2026-04-11)
+
+
+### Features
+
+* **frontend:** add App Store download badge to landing, footer, and auth pages ([703254c](https://github.com/bangkeut-technology/daily-brew/commit/703254c0b86f4e6a0d55b5a0c2f22aa3aa0ec6aa))
+
+
+### Bug Fixes
+
+* **logging:** add action_level to fingers_crossed monolog handler ([ab1e883](https://github.com/bangkeut-technology/daily-brew/commit/ab1e8835e09fb17cb1d13d5f4c616ddd7af6c6b4))
+
 ## [1.34.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.33.2...v1.34.0) (2026-04-11)
 
 
