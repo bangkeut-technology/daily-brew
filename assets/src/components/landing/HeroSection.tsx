@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { ChevronRight, QrCode, CheckCircle, Clock, Users, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { AppStoreBadge } from '@/components/shared/AppStoreBadge';
 
 const floatingCardVariants = {
   hidden: { opacity: 0, scale: 0.92, y: 30 },
@@ -101,7 +102,7 @@ export function HeroSection() {
             </motion.div>
 
             <motion.div
-              className="flex items-center gap-4 mt-6"
+              className="flex flex-wrap items-center gap-4 mt-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.5 }}
@@ -113,6 +114,15 @@ export function HeroSection() {
               <p className="text-[13.5px] text-text-tertiary">
                 Set up in under 5 minutes
               </p>
+            </motion.div>
+
+            <motion.div
+              className="mt-6"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+            >
+              <AppStoreBadge className="inline-block opacity-80 hover:opacity-100 transition-opacity" />
             </motion.div>
           </div>
 

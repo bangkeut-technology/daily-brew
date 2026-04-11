@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { Coffee, LayoutDashboard } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuthenticationState } from '@/hooks/use-authentication';
+import { AppStoreBadge } from '@/components/shared/AppStoreBadge';
 
 const productLinks = [
   { label: 'Features', to: '/features' },
@@ -42,6 +43,7 @@ export function LandingFooter() {
               Staff attendance and leave tracking for restaurants. Simple, warm,
               and built for teams that move fast.
             </p>
+            <AppStoreBadge className="inline-block mt-4 opacity-80 hover:opacity-100 transition-opacity" />
           </motion.div>
 
           {/* Product */}

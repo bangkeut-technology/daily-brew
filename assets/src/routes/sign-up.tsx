@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LogoBrand } from '@/components/shared/Logo';
 import { PageSeo } from '@/components/shared/PageSeo';
+import { AppStoreBadge } from '@/components/shared/AppStoreBadge';
 import { motion } from 'framer-motion';
 
 const signUpSchema = z.object({
@@ -263,10 +264,13 @@ function SignUpPage() {
           </div>
         </div>
 
-        <div className="mt-6 text-center space-x-3">
-          <Link to="/privacy" className="text-[13px] text-text-tertiary hover:text-text-secondary no-underline transition-colors">Privacy</Link>
-          <span className="text-[13px] text-text-tertiary">&middot;</span>
-          <Link to="/terms" className="text-[13px] text-text-tertiary hover:text-text-secondary no-underline transition-colors">Terms</Link>
+        <div className="mt-6 flex flex-col items-center gap-4">
+          <AppStoreBadge className="opacity-70 hover:opacity-100 transition-opacity" />
+          <div className="space-x-3">
+            <Link to="/privacy" className="text-[13px] text-text-tertiary hover:text-text-secondary no-underline transition-colors">Privacy</Link>
+            <span className="text-[13px] text-text-tertiary">&middot;</span>
+            <Link to="/terms" className="text-[13px] text-text-tertiary hover:text-text-secondary no-underline transition-colors">Terms</Link>
+          </div>
         </div>
       </div>
     </div>
