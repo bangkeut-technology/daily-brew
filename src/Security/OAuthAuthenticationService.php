@@ -36,7 +36,7 @@ final readonly class OAuthAuthenticationService
         if ($user === null) {
             $user = new User();
             $user->setEmail($data->email);
-            $user->setEmailCanonical($this->canonicalizer->canonicalize($data->email));
+            $user->setEmailCanonical($this->canonicalizer->canonicalizeEmail($data->email));
             $user->setFirstName($data->firstName);
             $user->setLastName($data->lastName);
             $user->linkOAuth($data->provider, $data->providerId);
