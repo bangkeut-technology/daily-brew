@@ -28,7 +28,9 @@ export const Route = createFileRoute('/support')({
 
 const feedbackSchema = z.object({
   type: z.enum(['bug', 'feature', 'question', 'general']),
+  name: z.string().min(1, 'Please enter your name'),
   email: z.string().email('Please enter a valid email'),
+  subject: z.string().min(1, 'Please enter a subject'),
   message: z.string().min(10, 'Message must be at least 10 characters'),
 });
 
@@ -116,7 +118,7 @@ function SupportPage() {
     formState: { errors, isSubmitting },
   } = useForm<FeedbackForm>({
     resolver: zodResolver(feedbackSchema),
-    defaultValues: { type: 'general', email: '', message: '' },
+    defaultValues: { type: 'general', name: '', email: '', subject: '', message: '' },
   });
 
   const selectedType = watch('type');
@@ -125,7 +127,9 @@ function SupportPage() {
     try {
       await axios.post('/support/feedback', {
         type: data.type,
+        name: data.name,
         email: data.email,
+        subject: data.subject,
         message: data.message,
         page: '/support',
       });
@@ -223,6 +227,29 @@ function SupportPage() {
                   )}
                 </div>
 
+                {/* Name */}
+                <div>
+                  <label htmlFor="support-name" className="block text-[13px] font-medium text-text-secondary mb-1.5">
+                    Your name
+                  </label>
+                  <input
+                    id="support-name"
+                    name="name"
+                    type="text"
+                    {...register('name')}
+                    placeholder="John Doe"
+                    className={cn(
+                      'w-full px-4 py-3 rounded-xl bg-glass-bg backdrop-blur-md border text-[15px] text-text-primary placeholder:text-text-tertiary outline-none transition-all duration-200',
+                      errors.name
+                        ? 'border-red/50 focus:border-red/70'
+                        : 'border-glass-border focus:border-amber/40 focus:shadow-[0_4px_16px_rgba(193,127,59,0.10)]',
+                    )}
+                  />
+                  {errors.name && (
+                    <p className="text-[12px] text-red mt-1">{errors.name.message}</p>
+                  )}
+                </div>
+
                 {/* Email */}
                 <div>
                   <label htmlFor="support-email" className="block text-[13px] font-medium text-text-secondary mb-1.5">
@@ -242,6 +269,29 @@ function SupportPage() {
                   />
                   {errors.email && (
                     <p className="text-[12px] text-red mt-1">{errors.email.message}</p>
+                  )}
+                </div>
+
+                {/* Subject */}
+                <div>
+                  <label htmlFor="support-subject" className="block text-[13px] font-medium text-text-secondary mb-1.5">
+                    Subject
+                  </label>
+                  <input
+                    id="support-subject"
+                    name="subject"
+                    type="text"
+                    {...register('subject')}
+                    placeholder="Brief summary of your request"
+                    className={cn(
+                      'w-full px-4 py-3 rounded-xl bg-glass-bg backdrop-blur-md border text-[15px] text-text-primary placeholder:text-text-tertiary outline-none transition-all duration-200',
+                      errors.subject
+                        ? 'border-red/50 focus:border-red/70'
+                        : 'border-glass-border focus:border-amber/40 focus:shadow-[0_4px_16px_rgba(193,127,59,0.10)]',
+                    )}
+                  />
+                  {errors.subject && (
+                    <p className="text-[12px] text-red mt-1">{errors.subject.message}</p>
                   )}
                 </div>
 

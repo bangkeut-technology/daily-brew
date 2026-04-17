@@ -29,8 +29,10 @@ class FeedbackController extends AbstractController
         }
 
         $type = $data['type'] ?? '';
+        $name = trim($data['name'] ?? '');
         $message = trim($data['message'] ?? '');
         $email = trim($data['email'] ?? '');
+        $subject = trim($data['subject'] ?? '');
 
         if (!in_array($type, self::ALLOWED_TYPES, true)) {
             return $this->jsonError('Invalid type. Must be one of: ' . implode(', ', self::ALLOWED_TYPES));
@@ -48,6 +50,8 @@ class FeedbackController extends AbstractController
             type: $type,
             message: $message,
             email: $email ?: null,
+            name: $name ?: null,
+            subject: $subject ?: null,
             source: 'website',
             metadata: ['page' => $data['page'] ?? '/support'],
         );
