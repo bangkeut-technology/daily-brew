@@ -16,6 +16,8 @@ class FeedbackController extends AbstractController
     use ApiResponseTrait;
 
     private const ALLOWED_TYPES = ['bug', 'feature', 'question', 'general'];
+    private const MAX_IMAGES = 3;
+    private const ALLOWED_IMAGE_PATTERN = '/^data:image\/(png|jpeg|webp|gif);base64,/';
 
     #[Route('/support/feedback', name: 'support_feedback', methods: ['POST'])]
     public function submit(
@@ -46,6 +48,19 @@ class FeedbackController extends AbstractController
             return $this->jsonError('Invalid email address');
         }
 
+        $images = $data['images'] ?? [];
+        if (!is_array($images)) {
+            return $this->jsonError('Images must be an array');
+        }
+        if (count($images) > self::MAX_IMAGES) {
+            return $this->jsonError(sprintf('Maximum %d images allowed', self::MAX_IMAGES));
+        }
+        foreach ($images as $image) {
+            if (!is_string($image) || !preg_match(self::ALLOWED_IMAGE_PATTERN, $image)) {
+                return $this->jsonError('Images must be base64-encoded data URLs (PNG, JPEG, WebP, or GIF)');
+            }
+        }
+
         $success = $supportDock->sendFeedback(
             type: $type,
             message: $message,
@@ -54,6 +69,7 @@ class FeedbackController extends AbstractController
             subject: $subject ?: null,
             source: 'website',
             metadata: ['page' => $data['page'] ?? '/support'],
+            images: $images,
         );
 
         if (!$success) {

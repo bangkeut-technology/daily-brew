@@ -33,6 +33,7 @@ class SupportDockService
      * @param string|null $subject  Email subject (for inbound emails)
      * @param string      $source   Origin identifier
      * @param array       $metadata Extra context
+     * @param string[]    $images   Base64 data-URL images (max 3)
      */
     public function sendFeedback(
         string $type,
@@ -42,6 +43,7 @@ class SupportDockService
         ?string $subject = null,
         string $source = 'website',
         array $metadata = [],
+        array $images = [],
     ): bool {
         $options = [
             'type' => $type,
@@ -60,6 +62,9 @@ class SupportDockService
         }
         if (!empty($metadata)) {
             $options['metadata'] = $metadata;
+        }
+        if (!empty($images)) {
+            $options['images'] = $images;
         }
 
         if ($this->client === null) {

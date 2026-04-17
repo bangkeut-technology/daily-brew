@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Mail,
   Send,
@@ -10,6 +10,8 @@ import {
   ChevronDown,
   CheckCircle2,
   Loader2,
+  ImagePlus,
+  X,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
@@ -97,10 +99,24 @@ function AccordionItem({ question, answer, index }: { question: string; answer: 
   );
 }
 
+const MAX_IMAGES = 3;
+const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
+
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 function SupportPage() {
   const [submitted, setSubmitted] = useState(false);
   const [faqs, setFaqs] = useState<FaqItem[]>([]);
   const [faqsLoading, setFaqsLoading] = useState(true);
+  const [images, setImages] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     axios.get('/support/faqs')
@@ -123,6 +139,28 @@ function SupportPage() {
 
   const selectedType = watch('type');
 
+  const handleImageAdd = useCallback(async (files: FileList | null) => {
+    if (!files) return;
+    const remaining = MAX_IMAGES - images.length;
+    if (remaining <= 0) {
+      toast.error(`Maximum ${MAX_IMAGES} images allowed`);
+      return;
+    }
+    const selected = Array.from(files).slice(0, remaining);
+    const invalid = selected.filter((f) => !ACCEPTED_TYPES.includes(f.type));
+    if (invalid.length > 0) {
+      toast.error('Only PNG, JPEG, WebP, and GIF images are allowed');
+      return;
+    }
+    const dataUrls = await Promise.all(selected.map(fileToDataUrl));
+    setImages((prev) => [...prev, ...dataUrls]);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }, [images.length]);
+
+  const removeImage = useCallback((index: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
   const onSubmit = async (data: FeedbackForm) => {
     try {
       await axios.post('/support/feedback', {
@@ -131,9 +169,11 @@ function SupportPage() {
         email: data.email,
         subject: data.subject,
         message: data.message,
+        images,
         page: '/support',
       });
       setSubmitted(true);
+      setImages([]);
       reset();
     } catch {
       toast.error('Failed to send message. Please try again.');
@@ -234,7 +274,6 @@ function SupportPage() {
                   </label>
                   <input
                     id="support-name"
-                    name="name"
                     type="text"
                     {...register('name')}
                     placeholder="John Doe"
@@ -279,7 +318,6 @@ function SupportPage() {
                   </label>
                   <input
                     id="support-subject"
-                    name="subject"
                     type="text"
                     {...register('subject')}
                     placeholder="Brief summary of your request"
@@ -315,6 +353,47 @@ function SupportPage() {
                   {errors.message && (
                     <p className="text-[12px] text-red mt-1">{errors.message.message}</p>
                   )}
+                </div>
+
+                {/* Images */}
+                <div>
+                  <label className="block text-[13px] font-medium text-text-secondary mb-1.5">
+                    Screenshots <span className="text-text-tertiary font-normal">(optional, max {MAX_IMAGES})</span>
+                  </label>
+                  <div className="flex flex-wrap gap-3">
+                    {images.map((src, i) => (
+                      <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden border border-glass-border group">
+                        <img src={src} alt={`Attachment ${i + 1}`} className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(i)}
+                          className="absolute top-1 right-1 w-5 h-5 rounded-full bg-red/80 text-white flex items-center justify-center cursor-pointer transition-opacity duration-150 hover:bg-red"
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                    ))}
+                    {images.length < MAX_IMAGES && (
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-20 h-20 rounded-xl border-2 border-dashed border-cream-3 bg-glass-bg flex flex-col items-center justify-center gap-1 text-text-tertiary transition-all duration-150 hover:border-coffee/40 hover:text-coffee cursor-pointer"
+                      >
+                        <ImagePlus size={18} strokeWidth={1.5} />
+                        <span className="text-[10px] font-medium">Add</span>
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    id="support-images"
+                    name="images"
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/gif"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => handleImageAdd(e.target.files)}
+                  />
                 </div>
 
                 {/* Submit */}
