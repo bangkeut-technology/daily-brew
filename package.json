@@ -22,7 +22,7 @@
         "typescript": "^6.0.3",
         "typescript-eslint": "^8.59.0",
         "webpack": "^5.106.2",
-        "webpack-cli": "^7.0.2",
+        "webpack-cli": "^6.0.0",
         "workbox-webpack-plugin": "^7.4.0"
     },
     "license": "UNLICENSED",
@@ -41,6 +41,13 @@
         "assets/src/**/*.{ts,tsx}": [
             "eslint --fix"
         ]
+    },
+    "overrides": {
+        "ajv": "8.18.0",
+        "fork-ts-checker-webpack-plugin": {
+            "ajv": "6.12.6",
+            "schema-utils": "3.3.0"
+        }
     },
     "dependencies": {
         "@hookform/resolvers": "^5.2.2",
