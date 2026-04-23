@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.36.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.35.1...v1.36.0) (2026-04-23)
+
+
+### Features
+
+* **support:** add image upload to support feedback form ([b027d6a](https://github.com/bangkeut-technology/daily-brew/commit/b027d6a3fa202ae833fe1726dd5821df4cfb9d98))
+* **support:** add name and subject fields to support feedback form ([fc592c0](https://github.com/bangkeut-technology/daily-brew/commit/fc592c0606fa4da7e6caa0e965f11b17fa8ffccf))
+
+
+### Bug Fixes
+
+* **deps:** resolve ajv version conflict for webpack build ([1452497](https://github.com/bangkeut-technology/daily-brew/commit/14524974b87bf807ec8fea511a98491241e5fd50))
+
 ## [1.35.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.35.0...v1.35.1) (2026-04-11)
 
 
