@@ -8,18 +8,18 @@ use App\Entity\User;
 use App\Repository\EmployeeRepository;
 use App\Repository\LeaveRequestRepository;
 use App\Repository\RefreshTokenRepository;
+use App\Repository\UserRepository;
 use App\Repository\WorkspaceRepository;
-use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class AccountDeletionService
 {
     public function __construct(
-        private EntityManagerInterface  $em,
         private WorkspaceService        $workspaceService,
         private WorkspaceRepository     $workspaceRepository,
         private EmployeeRepository      $employeeRepository,
         private LeaveRequestRepository  $leaveRequestRepository,
         private RefreshTokenRepository  $refreshTokenRepository,
+        private UserRepository          $userRepository,
     ) {}
 
     public function softDelete(User $user): void
@@ -58,6 +58,6 @@ final readonly class AccountDeletionService
         $user->setGoogleId(null);
         $user->setAppleId(null);
 
-        $this->em->flush();
+        $this->userRepository->flush();
     }
 }

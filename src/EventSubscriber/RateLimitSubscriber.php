@@ -10,11 +10,11 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 
-class RateLimitSubscriber implements EventSubscriberInterface
+readonly class RateLimitSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly RateLimiterFactory $authLoginLimiter,
-        private readonly RateLimiterFactory $authRegisterLimiter,
+        private RateLimiterFactory $authLoginLimiter,
+        private RateLimiterFactory $authRegisterLimiter,
     ) {}
 
     public static function getSubscribedEvents(): array

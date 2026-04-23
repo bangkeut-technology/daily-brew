@@ -6,10 +6,12 @@ namespace App\Repository;
 
 use App\Entity\ApiToken;
 use App\Entity\Workspace;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class ApiTokenRepository extends ServiceEntityRepository
+/**
+ * @extends AbstractRepository<ApiToken>
+ */
+class ApiTokenRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -51,13 +53,4 @@ class ApiTokenRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function persist(ApiToken $token): void
-    {
-        $this->getEntityManager()->persist($token);
-    }
-
-    public function flush(): void
-    {
-        $this->getEntityManager()->flush();
-    }
 }

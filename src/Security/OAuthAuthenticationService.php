@@ -8,7 +8,6 @@ use App\Entity\User;
 use App\Enum\OAuthProviderEnum;
 use App\Repository\UserRepository;
 use App\Service\CanonicalizerService;
-use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Security\Http\Authentication\AuthenticationSuccessHandler;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,7 +15,6 @@ final readonly class OAuthAuthenticationService
 {
     public function __construct(
         private UserRepository               $userRepository,
-        private EntityManagerInterface       $em,
         private AuthenticationSuccessHandler $successHandler,
         private CanonicalizerService         $canonicalizer,
     ) {}
@@ -40,10 +38,10 @@ final readonly class OAuthAuthenticationService
             $user->setFirstName($data->firstName);
             $user->setLastName($data->lastName);
             $user->linkOAuth($data->provider, $data->providerId);
-            $this->em->persist($user);
+            $this->userRepository->persist($user);
         }
 
-        $this->em->flush();
+        $this->userRepository->flush();
 
         // Use Lexik's handler — sets both BEARER and refresh_token cookies
         $authResponse = $this->successHandler->handleAuthenticationSuccess($user);
@@ -67,7 +65,7 @@ final readonly class OAuthAuthenticationService
         }
 
         $user->linkOAuth($provider, $providerId);
-        $this->em->flush();
+        $this->userRepository->flush();
     }
 
     /**
@@ -86,6 +84,6 @@ final readonly class OAuthAuthenticationService
         }
 
         $user->unlinkOAuth($provider);
-        $this->em->flush();
+        $this->userRepository->flush();
     }
 }

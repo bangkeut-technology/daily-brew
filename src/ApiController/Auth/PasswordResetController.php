@@ -6,7 +6,6 @@ namespace App\ApiController\Auth;
 
 use App\ApiController\Trait\ApiResponseTrait;
 use App\Repository\UserRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +21,6 @@ class PasswordResetController extends AbstractController
     public function forgotPassword(
         Request $request,
         UserRepository $userRepository,
-        EntityManagerInterface $em,
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
         $email = $data['email'] ?? '';
@@ -41,7 +39,7 @@ class PasswordResetController extends AbstractController
         $token = bin2hex(random_bytes(32));
         $user->setPasswordResetToken($token);
         $user->setPasswordResetExpiresAt(\App\Service\DateService::relative('+1 hour'));
-        $em->flush();
+        $userRepository->flush();
 
         // In production, send email here. In dev mode, return the token.
         $response = ['message' => 'If an account exists, a reset link has been sent.'];
@@ -58,7 +56,6 @@ class PasswordResetController extends AbstractController
         Request $request,
         UserRepository $userRepository,
         UserPasswordHasherInterface $passwordHasher,
-        EntityManagerInterface $em,
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
         $token = $data['token'] ?? '';
@@ -81,14 +78,14 @@ class PasswordResetController extends AbstractController
         if ($user->getPasswordResetExpiresAt() < \App\Service\DateService::now()) {
             $user->setPasswordResetToken(null);
             $user->setPasswordResetExpiresAt(null);
-            $em->flush();
+            $userRepository->flush();
             return $this->jsonError('Reset token has expired', 400);
         }
 
         $user->setPassword($passwordHasher->hashPassword($user, $password));
         $user->setPasswordResetToken(null);
         $user->setPasswordResetExpiresAt(null);
-        $em->flush();
+        $userRepository->flush();
 
         return $this->jsonSuccess(['message' => 'Password has been reset successfully']);
     }

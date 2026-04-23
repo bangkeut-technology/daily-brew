@@ -23,7 +23,7 @@ class DashboardController extends AbstractController
     ): JsonResponse {
         $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
         if ($workspace === null) {
-            throw new NotFoundHttpException('Workspace not found');
+            throw $this->createNotFoundException('Workspace not found');
         }
 
         $this->denyAccessUnlessGranted(WorkspaceVoter::VIEW, $workspace);

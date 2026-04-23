@@ -20,6 +20,8 @@ class SpaController extends AbstractController
         string $paddleClientSideToken,
         string $paddlePriceIdEspressoMonthly,
         string $paddlePriceIdEspressoAnnual,
+        string $paddlePriceIdDoubleEspressoMonthly,
+        string $paddlePriceIdDoubleEspressoAnnual,
     ): Response {
         return $this->render('page/index.html.twig', [
             'maxFreeEmployees' => $maxFreeEmployees,
@@ -30,6 +32,8 @@ class SpaController extends AbstractController
             'paddleClientSideToken' => $paddleClientSideToken,
             'paddlePriceIdEspressoMonthly' => $paddlePriceIdEspressoMonthly,
             'paddlePriceIdEspressoAnnual' => $paddlePriceIdEspressoAnnual,
+            'paddlePriceIdDoubleEspressoMonthly' => $paddlePriceIdDoubleEspressoMonthly,
+            'paddlePriceIdDoubleEspressoAnnual' => $paddlePriceIdDoubleEspressoAnnual,
             'user' => null,
         ]);
     }

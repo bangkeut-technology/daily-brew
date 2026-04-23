@@ -4,19 +4,16 @@ namespace App\Repository;
 
 use App\Entity\ClosurePeriod;
 use App\Entity\Workspace;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class ClosurePeriodRepository extends ServiceEntityRepository
+/**
+ * @extends AbstractRepository<ClosurePeriod>
+ */
+class ClosurePeriodRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, ClosurePeriod::class);
-    }
-
-    public function findByPublicId(string $publicId): ?ClosurePeriod
-    {
-        return $this->findOneBy(['publicId' => $publicId]);
     }
 
     /** @return ClosurePeriod[] */

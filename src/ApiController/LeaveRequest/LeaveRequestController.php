@@ -164,7 +164,6 @@ class LeaveRequestController extends AbstractController
         WorkspaceRepository $workspaceRepository,
         LeaveRequestRepository $leaveRequestRepository,
         EmployeeRepository $employeeRepository,
-        \Doctrine\ORM\EntityManagerInterface $em,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
         if ($workspace === null) {
@@ -192,7 +191,7 @@ class LeaveRequestController extends AbstractController
         }
 
         $leaveRequest->setDeletedAt(\App\Service\DateService::now());
-        $em->flush();
+        $leaveRequestRepository->flush();
 
         return $this->jsonSuccess(null, 204);
     }

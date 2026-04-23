@@ -9,11 +9,11 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class ExceptionSubscriber implements EventSubscriberInterface
+readonly class ExceptionSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private LoggerInterface $logger,
-        private string $kernelEnvironment = 'prod',
+        private string          $kernelEnvironment = 'prod',
     ) {}
 
     public static function getSubscribedEvents(): array

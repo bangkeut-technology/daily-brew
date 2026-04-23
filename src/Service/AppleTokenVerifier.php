@@ -15,8 +15,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final readonly class AppleTokenVerifier
 {
-    private const APPLE_KEYS_URL = 'https://appleid.apple.com/auth/keys';
-    private const APPLE_ISSUER = 'https://appleid.apple.com';
+    private const string APPLE_KEYS_URL = 'https://appleid.apple.com/auth/keys';
+    private const string APPLE_ISSUER = 'https://appleid.apple.com';
 
     public function __construct(
         private HttpClientInterface $httpClient,

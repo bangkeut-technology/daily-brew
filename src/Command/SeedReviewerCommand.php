@@ -11,6 +11,9 @@ use App\Enum\EmployeeRoleEnum;
 use App\Enum\LeaveRequestStatusEnum;
 use App\Enum\LeaveTypeEnum;
 use App\Enum\PlanEnum;
+use App\Repository\AttendanceRepository;
+use App\Repository\ClosurePeriodRepository;
+use App\Repository\LeaveRequestRepository;
 use App\Repository\SubscriptionRepository;
 use App\Repository\UserRepository;
 use App\Repository\WorkspaceRepository;
@@ -19,7 +22,7 @@ use App\Service\DateService;
 use App\Service\EmployeeService;
 use App\Service\ShiftService;
 use App\Service\WorkspaceService;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -42,10 +45,13 @@ class SeedReviewerCommand extends Command
     private const WORKSPACE_NAME = 'The Daily Grind';
 
     public function __construct(
-        private EntityManagerInterface $em,
+        private Connection $connection,
         private UserRepository $userRepository,
         private WorkspaceRepository $workspaceRepository,
         private SubscriptionRepository $subscriptionRepository,
+        private AttendanceRepository $attendanceRepository,
+        private ClosurePeriodRepository $closurePeriodRepository,
+        private LeaveRequestRepository $leaveRequestRepository,
         private AuthService $authService,
         private WorkspaceService $workspaceService,
         private ShiftService $shiftService,
@@ -95,7 +101,7 @@ class SeedReviewerCommand extends Command
             'Doe',
         );
         $owner->setOnboardingCompleted(true);
-        $this->em->flush();
+        $this->userRepository->flush();
         $io->text('Created owner: ' . self::OWNER_EMAIL);
 
         // ── Workspace ────────────────────────────────────────────
@@ -106,7 +112,7 @@ class SeedReviewerCommand extends Command
         $subscription = $this->subscriptionRepository->findByWorkspace($workspace);
         $subscription->setPlan(PlanEnum::Espresso);
         $subscription->setCurrentPeriodEnd(DateService::mutableRelative('+1 year'));
-        $this->em->flush();
+        $this->subscriptionRepository->flush();
         $io->text('Upgraded to Espresso plan');
 
         // ── Shifts ───────────────────────────────────────────────
@@ -159,7 +165,7 @@ class SeedReviewerCommand extends Command
         $managerUser->setCurrentWorkspace($workspace);
         $this->employeeService->linkUser($employeeEntities[0], $managerUser);
         $employeeEntities[0]->setRole(EmployeeRoleEnum::MANAGER);
-        $this->em->flush();
+        $this->userRepository->flush();
         $io->text('Created manager: ' . self::MANAGER_EMAIL . ' (Sophea Chan)');
 
         // ── Employee account (linked to Dara Sok) ────────────────
@@ -172,7 +178,7 @@ class SeedReviewerCommand extends Command
         $employeeUser->setOnboardingCompleted(true);
         $employeeUser->setCurrentWorkspace($workspace);
         $this->employeeService->linkUser($employeeEntities[1], $employeeUser);
-        $this->em->flush();
+        $this->userRepository->flush();
         $io->text('Created employee: ' . self::EMPLOYEE_EMAIL . ' (Dara Sok)');
 
         // ── Closure period ───────────────────────────────────────
@@ -182,7 +188,7 @@ class SeedReviewerCommand extends Command
         $closure->setNameCanonical('khmer new year');
         $closure->setStartDate(DateService::mutableRelative('+30 days'));
         $closure->setEndDate(DateService::mutableRelative('+33 days'));
-        $this->em->persist($closure);
+        $this->closurePeriodRepository->update($closure, false);
         $io->text('Created closure: Khmer New Year');
 
         // ── Attendance records (last 7 days) ─────────────────────
@@ -257,7 +263,7 @@ class SeedReviewerCommand extends Command
                 $attendance->setLeftEarly($earlyMinutes > 0);
                 $attendance->setIpAddress('127.0.0.1');
 
-                $this->em->persist($attendance);
+                $this->attendanceRepository->update($attendance, false);
                 $attendanceCount++;
             }
         }
@@ -276,7 +282,7 @@ class SeedReviewerCommand extends Command
         $leave1->setStatus(LeaveRequestStatusEnum::APPROVED);
         $leave1->setReviewedBy($owner);
         $leave1->setReviewedAt(DateService::relative('-15 days'));
-        $this->em->persist($leave1);
+        $this->leaveRequestRepository->update($leave1, false);
 
         // Pending leave (upcoming)
         $leave2 = new LeaveRequest();
@@ -288,7 +294,7 @@ class SeedReviewerCommand extends Command
         $leave2->setReason('Medical appointment');
         $leave2->setType(LeaveTypeEnum::PAID);
         $leave2->setStatus(LeaveRequestStatusEnum::PENDING);
-        $this->em->persist($leave2);
+        $this->leaveRequestRepository->update($leave2, false);
 
         // Rejected leave
         $leave3 = new LeaveRequest();
@@ -303,12 +309,12 @@ class SeedReviewerCommand extends Command
         $leave3->setReviewedBy($owner);
         $leave3->setReviewedAt(DateService::relative('-1 day'));
         $leave3->setReviewNote('Short staffed this week');
-        $this->em->persist($leave3);
+        $this->leaveRequestRepository->update($leave3, false);
 
         $io->text('Created 3 leave requests (approved, pending, rejected)');
 
         // ── Flush remaining entities ─────────────────────────────
-        $this->em->flush();
+        $this->userRepository->flush();
 
         $io->newLine();
         $io->success('Reviewer accounts seeded successfully');
@@ -342,7 +348,7 @@ class SeedReviewerCommand extends Command
     {
         $io->text('Purging existing reviewer data...');
 
-        $conn = $this->em->getConnection();
+        $conn = $this->connection;
         $userId = $user->getId();
 
         // Clear currentWorkspace FK on the user first
@@ -376,7 +382,7 @@ class SeedReviewerCommand extends Command
         $conn->executeStatement('UPDATE daily_brew_users SET current_workspace_id = NULL WHERE email_canonical IN (?, ?)', [self::MANAGER_EMAIL, self::EMPLOYEE_EMAIL]);
         $conn->executeStatement('DELETE FROM daily_brew_users WHERE email_canonical IN (?, ?)', [self::MANAGER_EMAIL, self::EMPLOYEE_EMAIL]);
 
-        $this->em->clear();
+        $this->userRepository->clear();
 
         $io->text('Purged existing reviewer data');
     }

@@ -9,12 +9,12 @@ use App\Entity\Shift;
 use App\Entity\User;
 use App\Entity\Workspace;
 use App\Enum\EmployeeStatusEnum;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\EmployeeRepository;
 
 class EmployeeService
 {
     public function __construct(
-        private EntityManagerInterface $em,
+        private EmployeeRepository $employeeRepository,
         private NotificationService $notificationService,
     ) {}
 
@@ -34,8 +34,8 @@ class EmployeeService
         // Set the workspace owner as the creator
         $employee->setUser($workspace->getOwner());
 
-        $this->em->persist($employee);
-        $this->em->flush();
+        $this->employeeRepository->persist($employee);
+        $this->employeeRepository->flush();
 
         return $employee;
     }
@@ -56,7 +56,7 @@ class EmployeeService
         if ($active !== null) {
             $employee->setStatus($active ? EmployeeStatusEnum::ACTIVE : EmployeeStatusEnum::INACTIVE);
         }
-        $this->em->flush();
+        $this->employeeRepository->flush();
 
         if ($shift !== null && $shift !== $previousShift) {
             $this->notificationService->notifyShiftAssigned($employee);
@@ -75,7 +75,7 @@ class EmployeeService
             $this->clearCurrentWorkspaceIfMatches($previousUser, $employee->getWorkspace());
         }
 
-        $this->em->flush();
+        $this->employeeRepository->flush();
 
         return $employee;
     }
@@ -91,7 +91,7 @@ class EmployeeService
             $this->clearCurrentWorkspaceIfMatches($linkedUser, $employee->getWorkspace());
         }
 
-        $this->em->flush();
+        $this->employeeRepository->flush();
     }
 
     private function clearCurrentWorkspaceIfMatches(User $user, ?Workspace $workspace): void

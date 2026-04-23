@@ -27,7 +27,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 class BasilBookApiKeyAuthenticator extends AbstractAuthenticator
 {
     public function __construct(
-        private ApiTokenRepository $apiTokenRepository,
+        private readonly ApiTokenRepository $apiTokenRepository,
     ) {}
 
     public function supports(Request $request): ?bool

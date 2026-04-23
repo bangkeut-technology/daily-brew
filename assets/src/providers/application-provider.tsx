@@ -11,8 +11,10 @@ declare global {
             appleClientId?: string;
             paddleEnvironment?: string;
             paddleClientSideToken?: string;
-            paddlePriceIdMonthly?: string;
-            paddlePriceIdAnnual?: string;
+            paddlePriceIdEspressoMonthly?: string;
+            paddlePriceIdEspressoAnnual?: string;
+            paddlePriceIdDoubleEspressoMonthly?: string;
+            paddlePriceIdDoubleEspressoAnnual?: string;
         };
         Paddle?: {
             Environment?: {

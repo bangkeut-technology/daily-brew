@@ -11,14 +11,12 @@ use App\Repository\AttendanceRepository;
 use App\Repository\ClosurePeriodRepository;
 use App\Repository\LeaveRequestRepository;
 use DateTimeImmutable;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class CheckinService
 {
     public function __construct(
-        private EntityManagerInterface $em,
         private AttendanceRepository $attendanceRepository,
         private ClosurePeriodRepository $closurePeriodRepository,
         private LeaveRequestRepository $leaveRequestRepository,
@@ -129,7 +127,7 @@ class CheckinService
                 }
             }
 
-            $this->em->persist($attendance);
+            $this->attendanceRepository->persist($attendance);
         } elseif ($attendance->getCheckOutAt() === null) {
             // Device verification check (Espresso feature)
             if (
@@ -166,7 +164,7 @@ class CheckinService
             throw new BadRequestHttpException('Already checked in and out for today');
         }
 
-        $this->em->flush();
+        $this->attendanceRepository->flush();
 
         return $attendance;
     }

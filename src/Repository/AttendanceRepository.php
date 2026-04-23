@@ -5,19 +5,16 @@ namespace App\Repository;
 use App\Entity\Attendance;
 use App\Entity\Employee;
 use App\Entity\Workspace;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class AttendanceRepository extends ServiceEntityRepository
+/**
+ * @extends AbstractRepository<Attendance>
+ */
+class AttendanceRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Attendance::class);
-    }
-
-    public function findByPublicId(string $publicId): ?Attendance
-    {
-        return $this->findOneBy(['publicId' => $publicId]);
     }
 
     public function findByEmployeeAndDate(Employee $employee, \DateTimeInterface $date): ?Attendance

@@ -7,12 +7,12 @@ namespace App\Service;
 use App\Entity\Shift;
 use App\Entity\ShiftTimeRule;
 use App\Enum\DayOfWeekEnum;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\ShiftTimeRuleRepository;
 
 class ShiftTimeRuleService
 {
     public function __construct(
-        private EntityManagerInterface $em,
+        private ShiftTimeRuleRepository $shiftTimeRuleRepository,
     ) {}
 
     public function create(Shift $shift, DayOfWeekEnum $dayOfWeek, string $startTime, string $endTime): ShiftTimeRule
@@ -24,8 +24,8 @@ class ShiftTimeRuleService
         $rule->setEndTime($endTime);
 
         $shift->addTimeRule($rule);
-        $this->em->persist($rule);
-        $this->em->flush();
+        $this->shiftTimeRuleRepository->persist($rule);
+        $this->shiftTimeRuleRepository->flush();
 
         return $rule;
     }
@@ -34,14 +34,13 @@ class ShiftTimeRuleService
     {
         $rule->setStartTime($startTime);
         $rule->setEndTime($endTime);
-        $this->em->flush();
+        $this->shiftTimeRuleRepository->flush();
 
         return $rule;
     }
 
     public function delete(ShiftTimeRule $rule): void
     {
-        $this->em->remove($rule);
-        $this->em->flush();
+        $this->shiftTimeRuleRepository->delete($rule);
     }
 }

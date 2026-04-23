@@ -6,15 +6,20 @@ namespace App\Service;
 
 use App\Entity\Shift;
 use App\Entity\Workspace;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\ShiftRepository;
+use DateTimeInterface;
+use Random\RandomException;
 
-class ShiftService
+readonly class ShiftService
 {
     public function __construct(
-        private EntityManagerInterface $em,
+        private ShiftRepository $shiftRepository,
     ) {}
 
-    public function create(Workspace $workspace, string $name, \DateTimeInterface $startTime, \DateTimeInterface $endTime): Shift
+    /**
+     * @throws RandomException
+     */
+    public function create(Workspace $workspace, string $name, DateTimeInterface $startTime, DateTimeInterface $endTime): Shift
     {
         $shift = new Shift();
         $shift->setWorkspace($workspace);
@@ -22,25 +27,23 @@ class ShiftService
         $shift->setStartTime($startTime);
         $shift->setEndTime($endTime);
 
-        $this->em->persist($shift);
-        $this->em->flush();
+        $this->shiftRepository->update($shift);
 
         return $shift;
     }
 
-    public function update(Shift $shift, string $name, \DateTimeInterface $startTime, \DateTimeInterface $endTime): Shift
+    public function update(Shift $shift, string $name, DateTimeInterface $startTime, DateTimeInterface $endTime): Shift
     {
         $shift->setName($name);
         $shift->setStartTime($startTime);
         $shift->setEndTime($endTime);
-        $this->em->flush();
+        $this->shiftRepository->update($shift);
 
         return $shift;
     }
 
     public function delete(Shift $shift): void
     {
-        $this->em->remove($shift);
-        $this->em->flush();
+        $this->shiftRepository->delete($shift);
     }
 }

@@ -12,8 +12,8 @@ class SupportDockService
     private ?SupportDockClient $client = null;
 
     public function __construct(
-        private LoggerInterface $logger,
-        string $supportdockApiKey,
+        private readonly LoggerInterface $logger,
+        string                           $supportdockApiKey,
     ) {
         if ($supportdockApiKey !== '') {
             $this->client = new SupportDockClient([

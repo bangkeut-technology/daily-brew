@@ -27,10 +27,11 @@ export function usePaddle() {
     initialized.current = true;
   }, []);
 
-  const openCheckout = useCallback((billing: 'monthly' | 'annual') => {
-    const priceId = billing === 'annual'
-      ? window.__DAILYBREW__?.paddlePriceIdAnnual
-      : window.__DAILYBREW__?.paddlePriceIdMonthly;
+  const openCheckout = useCallback((billing: 'monthly' | 'annual', plan: 'espresso' | 'double_espresso' = 'espresso') => {
+    const d = window.__DAILYBREW__;
+    const priceId = plan === 'double_espresso'
+      ? (billing === 'annual' ? d?.paddlePriceIdDoubleEspressoAnnual : d?.paddlePriceIdDoubleEspressoMonthly)
+      : (billing === 'annual' ? d?.paddlePriceIdEspressoAnnual : d?.paddlePriceIdEspressoMonthly);
 
     if (!priceId || !window.Paddle) {
       console.error('Paddle not initialized or price ID missing');

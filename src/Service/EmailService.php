@@ -14,9 +14,9 @@ class EmailService
     private Address $from;
 
     public function __construct(
-        private MailerInterface $mailer,
-        private LoggerInterface $logger,
-        string $noReplyEmail,
+        private readonly MailerInterface $mailer,
+        private readonly LoggerInterface $logger,
+        string                           $noReplyEmail,
     ) {
         $this->from = Address::create($noReplyEmail);
     }
@@ -30,7 +30,7 @@ class EmailService
         string $template,
         array $context = [],
     ): void {
-        $email = (new TemplatedEmail())
+        $email = new TemplatedEmail()
             ->from($this->from)
             ->to($to)
             ->subject($subject)

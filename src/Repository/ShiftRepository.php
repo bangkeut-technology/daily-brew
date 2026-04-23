@@ -7,7 +7,7 @@ use App\Entity\Workspace;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class ShiftRepository extends ServiceEntityRepository
+class ShiftRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

@@ -6,7 +6,9 @@ namespace App\Entity;
 
 use App\Service\DateService;
 use App\Util\TokenGenerator;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Random\RandomException;
 
 #[ORM\MappedSuperclass]
 #[ORM\HasLifecycleCallbacks]
@@ -21,11 +23,14 @@ abstract class AbstractBaseEntity
     protected string $publicId;
 
     #[ORM\Column]
-    protected \DateTimeImmutable $createdAt;
+    protected DateTimeImmutable $createdAt;
 
     #[ORM\Column]
-    protected \DateTimeImmutable $updatedAt;
+    protected DateTimeImmutable $updatedAt;
 
+    /**
+     * @throws RandomException
+     */
     public function __construct()
     {
         $this->publicId = TokenGenerator::generatePublicId();
@@ -43,12 +48,12 @@ abstract class AbstractBaseEntity
         return $this->publicId;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): \DateTimeImmutable
+    public function getUpdatedAt(): DateTimeImmutable
     {
         return $this->updatedAt;
     }

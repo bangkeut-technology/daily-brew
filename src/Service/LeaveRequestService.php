@@ -11,28 +11,30 @@ use App\Entity\Workspace;
 use App\Enum\LeaveRequestStatusEnum;
 use App\Repository\ClosurePeriodRepository;
 use App\Repository\LeaveRequestRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use DateTimeInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class LeaveRequestService
+readonly class LeaveRequestService
 {
     public function __construct(
-        private EntityManagerInterface $em,
         private ClosurePeriodRepository $closurePeriodRepository,
-        private LeaveRequestRepository $leaveRequestRepository,
-        private NotificationService $notificationService,
-    ) {}
+        private LeaveRequestRepository  $leaveRequestRepository,
+        private NotificationService     $notificationService,
+    )
+    {
+    }
 
     public function create(
-        Employee $employee,
-        Workspace $workspace,
-        User $requestedBy,
-        \DateTimeInterface $startDate,
-        \DateTimeInterface $endDate,
-        ?string $reason = null,
-        ?\DateTimeInterface $startTime = null,
-        ?\DateTimeInterface $endTime = null,
-    ): LeaveRequest {
+        Employee           $employee,
+        Workspace          $workspace,
+        User               $requestedBy,
+        DateTimeInterface  $startDate,
+        DateTimeInterface  $endDate,
+        ?string            $reason = null,
+        ?DateTimeInterface $startTime = null,
+        ?DateTimeInterface $endTime = null,
+    ): LeaveRequest
+    {
         if ($startDate > $endDate) {
             throw new BadRequestHttpException('Start date must be before or equal to end date');
         }
@@ -62,8 +64,8 @@ class LeaveRequestService
             $leaveRequest->setEndTime(\DateTimeImmutable::createFromInterface($endTime));
         }
 
-        $this->em->persist($leaveRequest);
-        $this->em->flush();
+        $this->leaveRequestRepository->persist($leaveRequest);
+        $this->leaveRequestRepository->flush();
 
         $this->notificationService->notifyLeaveRequestSubmitted($leaveRequest);
 
@@ -75,7 +77,7 @@ class LeaveRequestService
         $leaveRequest->setStatus(LeaveRequestStatusEnum::APPROVED);
         $leaveRequest->setReviewedAt(DateService::now());
         $leaveRequest->setReviewedBy($reviewedBy);
-        $this->em->flush();
+        $this->leaveRequestRepository->flush();
 
         $this->notificationService->notifyLeaveRequestApproved($leaveRequest);
 
@@ -90,7 +92,7 @@ class LeaveRequestService
         if ($reviewNote !== null) {
             $leaveRequest->setReviewNote($reviewNote);
         }
-        $this->em->flush();
+        $this->leaveRequestRepository->flush();
 
         $this->notificationService->notifyLeaveRequestRejected($leaveRequest);
 

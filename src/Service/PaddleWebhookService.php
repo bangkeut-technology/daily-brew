@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 
 namespace App\Service;
 
@@ -7,17 +9,34 @@ use App\Enum\PlanEnum;
 use App\Enum\SubscriptionStatusEnum;
 use App\Repository\SubscriptionRepository;
 use App\Repository\WorkspaceRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
-class PaddleWebhookService
+/**
+ * Handles Paddle webhook events.
+ *
+ * @see https://developer.paddle.com/guides/webhooks
+ *
+ * Class PaddleWebhookService
+ * @package App\Service
+ * @author Vandeth Tho <thovandeth@gmail.com>
+ */
+readonly class PaddleWebhookService
 {
+    private array $doubleEspressoPriceIds;
+    private array $espressoPriceIds;
+
     public function __construct(
-        private EntityManagerInterface $em,
         private SubscriptionRepository $subscriptionRepository,
         private WorkspaceRepository $workspaceRepository,
         private LoggerInterface $logger,
-    ) {}
+        string $paddlePriceIdEspressoMonthly,
+        string $paddlePriceIdEspressoAnnual,
+        string $paddlePriceIdDoubleEspressoMonthly,
+        string $paddlePriceIdDoubleEspressoAnnual,
+    ) {
+        $this->doubleEspressoPriceIds = array_filter([$paddlePriceIdDoubleEspressoMonthly, $paddlePriceIdDoubleEspressoAnnual]);
+        $this->espressoPriceIds = array_filter([$paddlePriceIdEspressoMonthly, $paddlePriceIdEspressoAnnual]);
+    }
 
     public function handleEvent(array $event): void
     {
@@ -59,10 +78,10 @@ class PaddleWebhookService
         if ($subscription === null) {
             $subscription = new Subscription();
             $subscription->setWorkspace($workspace);
-            $this->em->persist($subscription);
+            $this->subscriptionRepository->persist($subscription);
         }
 
-        $subscription->setPlan(PlanEnum::Espresso);
+        $subscription->setPlan($this->resolvePlanFromItems($data['items'] ?? []));
         $subscription->setStatus($this->mapStatus($data['status'] ?? 'active'));
         $subscription->setPaddleSubscriptionId($paddleSubId);
         $subscription->setPaddleCustomerId($data['customer_id'] ?? null);
@@ -79,7 +98,7 @@ class PaddleWebhookService
             }
         }
 
-        $this->em->flush();
+        $this->subscriptionRepository->flush();
     }
 
     private function handleSubscriptionUpdated(array $data): void
@@ -88,6 +107,11 @@ class PaddleWebhookService
         if ($subscription === null) return;
 
         $subscription->setStatus($this->mapStatus($data['status'] ?? 'active'));
+
+        // Update plan if items are present (handles upgrades/downgrades)
+        if (!empty($data['items'])) {
+            $subscription->setPlan($this->resolvePlanFromItems($data['items']));
+        }
 
         if (isset($data['current_billing_period']['ends_at'])) {
             $subscription->setCurrentPeriodEnd(DateService::mutableParse($data['current_billing_period']['ends_at']));
@@ -103,7 +127,7 @@ class PaddleWebhookService
             $subscription->setTrialEndsAt(null);
         }
 
-        $this->em->flush();
+        $this->subscriptionRepository->flush();
     }
 
     private function handleSubscriptionCanceled(array $data): void
@@ -113,7 +137,7 @@ class PaddleWebhookService
 
         $subscription->setStatus(SubscriptionStatusEnum::Canceled);
         $subscription->setCanceledAt(DateService::mutableNow());
-        $this->em->flush();
+        $this->subscriptionRepository->flush();
     }
 
     private function handleSubscriptionPaused(array $data): void
@@ -122,7 +146,7 @@ class PaddleWebhookService
         if ($subscription === null) return;
 
         $subscription->setStatus(SubscriptionStatusEnum::Paused);
-        $this->em->flush();
+        $this->subscriptionRepository->flush();
     }
 
     private function handleSubscriptionResumed(array $data): void
@@ -131,7 +155,7 @@ class PaddleWebhookService
         if ($subscription === null) return;
 
         $subscription->setStatus(SubscriptionStatusEnum::Active);
-        $this->em->flush();
+        $this->subscriptionRepository->flush();
     }
 
     private function handleSubscriptionPastDue(array $data): void
@@ -140,7 +164,7 @@ class PaddleWebhookService
         if ($subscription === null) return;
 
         $subscription->setStatus(SubscriptionStatusEnum::PastDue);
-        $this->em->flush();
+        $this->subscriptionRepository->flush();
     }
 
     private function findByPaddleId(string $paddleSubId): ?Subscription
@@ -150,6 +174,35 @@ class PaddleWebhookService
             $this->logger->warning('Paddle subscription not found: ' . $paddleSubId);
         }
         return $subscription;
+    }
+
+    /**
+     * Resolves the plan from the Paddle webhook items array.
+     * Paddle sends items[].price.id — we match against configured price IDs.
+     */
+    private function resolvePlanFromItems(array $items): PlanEnum
+    {
+        foreach ($items as $item) {
+            $priceId = $item['price']['id'] ?? null;
+            if ($priceId === null) {
+                continue;
+            }
+
+            if (in_array($priceId, $this->doubleEspressoPriceIds, true)) {
+                return PlanEnum::DoubleEspresso;
+            }
+
+            if (in_array($priceId, $this->espressoPriceIds, true)) {
+                return PlanEnum::Espresso;
+            }
+        }
+
+        // Fallback to Espresso if no price ID matched (backwards compatibility)
+        $this->logger->warning('Could not resolve plan from Paddle items, defaulting to Espresso', [
+            'items' => $items,
+        ]);
+
+        return PlanEnum::Espresso;
     }
 
     private function mapStatus(string $paddleStatus): SubscriptionStatusEnum

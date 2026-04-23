@@ -4,14 +4,16 @@ namespace App\Service;
 
 use App\Entity\ClosurePeriod;
 use App\Entity\Workspace;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\ClosurePeriodRepository;
 
-class ClosurePeriodService
+readonly class ClosurePeriodService
 {
     public function __construct(
-        private EntityManagerInterface $em,
-        private NotificationService $notificationService,
-    ) {}
+        private ClosurePeriodRepository $closurePeriodRepository,
+        private NotificationService     $notificationService,
+    )
+    {
+    }
 
     public function create(Workspace $workspace, string $name, \DateTimeInterface $startDate, \DateTimeInterface $endDate): ClosurePeriod
     {
@@ -21,8 +23,8 @@ class ClosurePeriodService
         $closure->setStartDate($startDate);
         $closure->setEndDate($endDate);
 
-        $this->em->persist($closure);
-        $this->em->flush();
+        $this->closurePeriodRepository->persist($closure);
+        $this->closurePeriodRepository->flush();
 
         $this->notificationService->notifyClosureCreated($closure);
 
@@ -34,14 +36,13 @@ class ClosurePeriodService
         $closure->setName($name);
         $closure->setStartDate($startDate);
         $closure->setEndDate($endDate);
-        $this->em->flush();
+        $this->closurePeriodRepository->flush();
 
         return $closure;
     }
 
     public function delete(ClosurePeriod $closure): void
     {
-        $this->em->remove($closure);
-        $this->em->flush();
+        $this->closurePeriodRepository->delete($closure);
     }
 }

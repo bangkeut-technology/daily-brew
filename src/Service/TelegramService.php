@@ -9,12 +9,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class TelegramService
 {
-    private const API_BASE = 'https://api.telegram.org/bot';
+    private const string API_BASE = 'https://api.telegram.org/bot';
 
     public function __construct(
-        private HttpClientInterface $httpClient,
-        private LoggerInterface $logger,
-        private string $telegramBotToken,
+        private readonly HttpClientInterface $httpClient,
+        private readonly LoggerInterface     $logger,
+        private readonly string              $telegramBotToken,
     ) {}
 
     /**

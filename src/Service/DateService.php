@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use DateTimeZone;
+
 /**
  * Centralised date/time factory — every DateTime in the app goes through here.
  * Guarantees UTC storage and explicit workspace-TZ conversions.
  */
 final class DateService
 {
-    private static \DateTimeZone $utc;
+    private static DateTimeZone $utc;
 
-    public static function utc(): \DateTimeZone
+    public static function utc(): DateTimeZone
     {
-        return self::$utc ??= new \DateTimeZone('UTC');
+        return self::$utc ??= new DateTimeZone('UTC');
     }
 
     /** Current instant in UTC. */
@@ -24,7 +26,7 @@ final class DateService
     }
 
     /** Midnight "today" in the given timezone (for date-based lookups). */
-    public static function today(\DateTimeZone $tz): \DateTimeImmutable
+    public static function today(DateTimeZone $tz): \DateTimeImmutable
     {
         return new \DateTimeImmutable('today', $tz);
     }
@@ -42,7 +44,7 @@ final class DateService
     }
 
     /** Parse with a specific format and optional timezone (defaults to UTC). */
-    public static function createFromFormat(string $format, string $value, ?\DateTimeZone $tz = null): \DateTimeImmutable
+    public static function createFromFormat(string $format, string $value, ?DateTimeZone $tz = null): \DateTimeImmutable
     {
         $dt = \DateTimeImmutable::createFromFormat($format, $value, $tz ?? self::utc());
         if ($dt === false) {

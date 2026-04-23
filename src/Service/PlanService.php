@@ -11,13 +11,13 @@ use App\Repository\SubscriptionRepository;
 
 class PlanService
 {
-    public const FREE_EMPLOYEE_LIMIT = 10;
-    public const ESPRESSO_EMPLOYEE_LIMIT = 20;
-    public const ESPRESSO_MANAGER_LIMIT = 2;
+    public const int FREE_EMPLOYEE_LIMIT = 10;
+    public const int ESPRESSO_EMPLOYEE_LIMIT = 20;
+    public const int ESPRESSO_MANAGER_LIMIT = 2;
 
     public function __construct(
-        private SubscriptionRepository $subscriptionRepository,
-        private EmployeeRepository $employeeRepository,
+        private readonly SubscriptionRepository $subscriptionRepository,
+        private readonly EmployeeRepository     $employeeRepository,
     ) {}
 
     public function getPlan(Workspace $workspace): PlanEnum

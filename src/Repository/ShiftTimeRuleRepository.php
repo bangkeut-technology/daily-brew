@@ -7,13 +7,12 @@ namespace App\Repository;
 use App\Entity\Shift;
 use App\Entity\ShiftTimeRule;
 use App\Enum\DayOfWeekEnum;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<ShiftTimeRule>
+ * @extends AbstractRepository<ShiftTimeRule>
  */
-class ShiftTimeRuleRepository extends ServiceEntityRepository
+class ShiftTimeRuleRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

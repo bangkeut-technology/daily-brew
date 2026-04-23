@@ -9,22 +9,16 @@ use App\Entity\LeaveRequest;
 use App\Entity\User;
 use App\Entity\Workspace;
 use App\Enum\LeaveRequestStatusEnum;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<LeaveRequest>
+ * @extends AbstractRepository<LeaveRequest>
  */
-class LeaveRequestRepository extends ServiceEntityRepository
+class LeaveRequestRepository extends AbstractRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, LeaveRequest::class);
-    }
-
-    public function findByPublicId(string $publicId): ?LeaveRequest
-    {
-        return $this->findOneBy(['publicId' => $publicId]);
     }
 
     /** @return LeaveRequest[] */

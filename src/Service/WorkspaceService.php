@@ -10,14 +10,16 @@ use App\Entity\Workspace;
 use App\Entity\WorkspaceSetting;
 use App\Enum\SubscriptionStatusEnum;
 use App\Repository\SubscriptionRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\WorkspaceRepository;
+use App\Repository\WorkspaceSettingRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class WorkspaceService
 {
     public function __construct(
-        private EntityManagerInterface $em,
+        private WorkspaceRepository $workspaceRepository,
+        private WorkspaceSettingRepository $workspaceSettingRepository,
         private SubscriptionRepository $subscriptionRepository,
         private HttpClientInterface $httpClient,
         private LoggerInterface $logger,
@@ -46,10 +48,10 @@ class WorkspaceService
         // Set as current workspace for the owner
         $owner->setCurrentWorkspace($workspace);
 
-        $this->em->persist($workspace);
-        $this->em->persist($setting);
-        $this->em->persist($subscription);
-        $this->em->flush();
+        $this->workspaceRepository->persist($workspace);
+        $this->workspaceSettingRepository->persist($setting);
+        $this->subscriptionRepository->persist($subscription);
+        $this->workspaceRepository->flush();
 
         return $workspace;
     }
@@ -57,7 +59,7 @@ class WorkspaceService
     public function update(Workspace $workspace, string $name): Workspace
     {
         $workspace->setName($name);
-        $this->em->flush();
+        $this->workspaceRepository->flush();
 
         return $workspace;
     }
@@ -79,7 +81,7 @@ class WorkspaceService
         }
 
         $workspace->setDeletedAt($now);
-        $this->em->flush();
+        $this->workspaceRepository->flush();
     }
 
     private function cancelSubscription(Subscription $subscription): void

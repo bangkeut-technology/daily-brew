@@ -405,9 +405,11 @@ function SettingsPage() {
                   <div className="flex items-center gap-2 mb-1">
                     <Crown size={16} className="text-coffee" />
                     <h3 className="text-[17px] font-semibold text-text-primary">Double Espresso</h3>
-                    <span className="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-coffee/10 text-coffee">
-                      Coming soon
-                    </span>
+                    {!window.__DAILYBREW__?.paddlePriceIdDoubleEspressoMonthly && (
+                      <span className="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-coffee/10 text-coffee">
+                        Coming soon
+                      </span>
+                    )}
                   </div>
                   <p className="text-[14px] text-text-tertiary mb-1">$39.99/month</p>
                   <p className="text-[14px] text-text-tertiary mb-4">For large teams</p>
@@ -434,12 +436,53 @@ function SettingsPage() {
                     ))}
                   </ul>
                   {(plan.plan === 'free' || plan.plan === 'espresso') && (
-                    <button
-                      disabled
-                      className="mt-4 w-full px-4 py-2.5 rounded-lg text-[15px] font-semibold bg-glass-bg text-text-secondary border border-cream-3 cursor-not-allowed opacity-70"
-                    >
-                      Coming soon
-                    </button>
+                    window.__DAILYBREW__?.paddlePriceIdDoubleEspressoMonthly ? (
+                      <div className="mt-4 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1 rounded-full bg-cream-3/50 p-0.5">
+                            <button
+                              type="button"
+                              onClick={() => setBilling('monthly')}
+                              className={cn(
+                                'px-3 py-1 rounded-full text-[13px] font-medium border-none cursor-pointer transition-colors',
+                                billing === 'monthly' ? 'bg-coffee text-white' : 'bg-transparent text-text-secondary',
+                              )}
+                            >
+                              Monthly
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setBilling('annual')}
+                              className={cn(
+                                'px-3 py-1 rounded-full text-[13px] font-medium border-none cursor-pointer transition-colors',
+                                billing === 'annual' ? 'bg-coffee text-white' : 'bg-transparent text-text-secondary',
+                              )}
+                            >
+                              Annual
+                            </button>
+                          </div>
+                          <span className="text-[15px] font-semibold text-text-primary">
+                            {billing === 'annual' ? '$399/year' : '$39.99/month'}
+                          </span>
+                        </div>
+                        {billing === 'annual' && (
+                          <p className="text-[12.5px] text-green font-medium">Save 17% vs monthly</p>
+                        )}
+                        <button
+                          onClick={() => openCheckout(billing, 'double_espresso')}
+                          className="w-full px-4 py-2.5 rounded-lg text-[15px] font-semibold bg-linear-to-r from-coffee to-amber text-white border-none cursor-pointer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,66,38,0.3)]"
+                        >
+                          Upgrade to Double Espresso
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        disabled
+                        className="mt-4 w-full px-4 py-2.5 rounded-lg text-[15px] font-semibold bg-glass-bg text-text-secondary border border-cream-3 cursor-not-allowed opacity-70"
+                      >
+                        Coming soon
+                      </button>
+                    )
                   )}
                   {plan.plan === 'double_espresso' && plan.currentPeriodEnd && (
                     <div className="mt-4 text-[13px] text-text-tertiary">

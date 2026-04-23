@@ -4,13 +4,11 @@ namespace App\Service;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AuthService
 {
     public function __construct(
-        private EntityManagerInterface $em,
         private UserRepository $userRepository,
         private UserPasswordHasherInterface $passwordHasher,
     ) {}
@@ -29,8 +27,8 @@ class AuthService
         $user->setLastName($lastName);
         $user->setPassword($this->passwordHasher->hashPassword($user, $password));
 
-        $this->em->persist($user);
-        $this->em->flush();
+        $this->userRepository->persist($user);
+        $this->userRepository->flush();
 
         return $user;
     }
@@ -55,8 +53,8 @@ class AuthService
         $user->setEmail($email);
         $user->setEmailCanonical(mb_strtolower($email));
         $user->setGoogleId($googleId);
-        $this->em->persist($user);
-        $this->em->flush();
+        $this->userRepository->persist($user);
+        $this->userRepository->flush();
 
         return $user;
     }
@@ -83,8 +81,8 @@ class AuthService
         $user->setAppleId($appleId);
         $user->setFirstName($firstName);
         $user->setLastName($lastName);
-        $this->em->persist($user);
-        $this->em->flush();
+        $this->userRepository->persist($user);
+        $this->userRepository->flush();
 
         return $user;
     }
@@ -101,7 +99,7 @@ class AuthService
         }
 
         $user->setGoogleId($googleId);
-        $this->em->flush();
+        $this->userRepository->flush();
     }
 
     public function disconnectGoogle(User $user): void
@@ -113,7 +111,7 @@ class AuthService
         $this->ensureHasAlternativeLogin($user, 'google');
 
         $user->setGoogleId(null);
-        $this->em->flush();
+        $this->userRepository->flush();
     }
 
     /**
@@ -128,7 +126,7 @@ class AuthService
         }
 
         $user->setAppleId($appleId);
-        $this->em->flush();
+        $this->userRepository->flush();
     }
 
     public function disconnectApple(User $user): void
@@ -140,7 +138,7 @@ class AuthService
         $this->ensureHasAlternativeLogin($user, 'apple');
 
         $user->setAppleId(null);
-        $this->em->flush();
+        $this->userRepository->flush();
     }
 
     /**

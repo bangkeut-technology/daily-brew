@@ -12,15 +12,17 @@ use App\Entity\Workspace;
 use App\Repository\DeviceTokenRepository;
 use App\Repository\EmployeeRepository;
 
-class NotificationService
+readonly class NotificationService
 {
     public function __construct(
-        private ExpoPushService $expoPushService,
-        private EmailService $emailService,
-        private TelegramService $telegramService,
+        private ExpoPushService       $expoPushService,
+        private EmailService          $emailService,
+        private TelegramService       $telegramService,
         private DeviceTokenRepository $deviceTokenRepository,
-        private EmployeeRepository $employeeRepository,
-    ) {}
+        private EmployeeRepository    $employeeRepository,
+    )
+    {
+    }
 
     public function notifyLeaveRequestSubmitted(LeaveRequest $leaveRequest): void
     {
@@ -49,10 +51,10 @@ class NotificationService
             'New leave request — ' . $employee->getName(),
             'emails/leave_request_submitted.html.twig',
             [
-                'employeeName' => $employee->getName(),
+                'employeeName'  => $employee->getName(),
                 'workspaceName' => $workspace->getName(),
-                'dates' => $dates,
-                'reason' => $leaveRequest->getReason(),
+                'dates'         => $dates,
+                'reason'        => $leaveRequest->getReason(),
             ],
         );
 
@@ -107,9 +109,9 @@ class NotificationService
             'emails/shift_assigned.html.twig',
             [
                 'workspaceName' => $employee->getWorkspace()->getName(),
-                'shiftName' => $shift->getName(),
-                'shiftStart' => $shiftStart,
-                'shiftEnd' => $shiftEnd,
+                'shiftName'     => $shift->getName(),
+                'shiftStart'    => $shiftStart,
+                'shiftEnd'      => $shiftEnd,
             ],
         );
 
@@ -155,8 +157,8 @@ class NotificationService
             'emails/closure_created.html.twig',
             [
                 'workspaceName' => $workspace->getName(),
-                'closureName' => $closure->getName(),
-                'dates' => $dates,
+                'closureName'   => $closure->getName(),
+                'dates'         => $dates,
             ],
         );
 
@@ -174,11 +176,12 @@ class NotificationService
      */
     public function notifyDailySummary(
         Workspace $workspace,
-        int $totalEmployees,
-        int $presentCount,
-        int $lateCount,
-        int $onLeaveCount,
-    ): void {
+        int       $totalEmployees,
+        int       $presentCount,
+        int       $lateCount,
+        int       $onLeaveCount,
+    ): void
+    {
         $owner = $workspace->getOwner();
         if ($owner === null) {
             return;
@@ -210,12 +213,12 @@ class NotificationService
             $subject,
             'emails/daily_summary.html.twig',
             [
-                'workspaceName' => $workspace->getName(),
+                'workspaceName'  => $workspace->getName(),
                 'totalEmployees' => $totalEmployees,
-                'presentCount' => $presentCount,
-                'lateCount' => $lateCount,
-                'onLeaveCount' => $onLeaveCount,
-                'absentCount' => $absentCount,
+                'presentCount'   => $presentCount,
+                'lateCount'      => $lateCount,
+                'onLeaveCount'   => $onLeaveCount,
+                'absentCount'    => $absentCount,
             ],
         );
 
@@ -257,7 +260,7 @@ class NotificationService
             'emails/leave_request_decision.html.twig',
             [
                 'decision' => $decision,
-                'dates' => $dates,
+                'dates'    => $dates,
             ],
         );
 

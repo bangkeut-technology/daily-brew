@@ -15,9 +15,9 @@ class FeedbackController extends AbstractController
 {
     use ApiResponseTrait;
 
-    private const ALLOWED_TYPES = ['bug', 'feature', 'question', 'general'];
-    private const MAX_IMAGES = 3;
-    private const ALLOWED_IMAGE_PATTERN = '/^data:image\/(png|jpeg|webp|gif);base64,/';
+    private const array ALLOWED_TYPES = ['bug', 'feature', 'question', 'general'];
+    private const int MAX_IMAGES = 3;
+    private const string ALLOWED_IMAGE_PATTERN = '/^data:image\/(png|jpeg|webp|gif);base64,/';
 
     #[Route('/support/feedback', name: 'support_feedback', methods: ['POST'])]
     public function submit(
@@ -68,7 +68,11 @@ class FeedbackController extends AbstractController
             name: $name ?: null,
             subject: $subject ?: null,
             source: 'website',
-            metadata: ['page' => $data['page'] ?? '/support'],
+            metadata: [
+                'page' => $data['page'] ?? '/support',
+                'platform' => $request->headers->get('User-Agent', 'unknown'),
+                'appVersion' => $this->getParameter('app.version'),
+            ],
             images: $images,
         );
 

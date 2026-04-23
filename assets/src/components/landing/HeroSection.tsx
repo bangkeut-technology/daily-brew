@@ -3,6 +3,7 @@ import { ChevronRight, QrCode, CheckCircle, Clock, Users, Shield } from 'lucide-
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { AppStoreBadge } from '@/components/shared/AppStoreBadge';
+import { PlayStoreBadge } from '@/components/shared/PlayStoreBadge';
 
 const floatingCardVariants = {
   hidden: { opacity: 0, scale: 0.92, y: 30 },
@@ -122,7 +123,10 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
             >
-              <AppStoreBadge className="inline-block opacity-80 hover:opacity-100 transition-opacity" />
+              <div className="flex flex-wrap items-center gap-3">
+                <AppStoreBadge className="inline-block opacity-80 hover:opacity-100 transition-opacity" />
+                <PlayStoreBadge className="inline-block opacity-80 hover:opacity-100 transition-opacity" />
+              </div>
             </motion.div>
           </div>
 
