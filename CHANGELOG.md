@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.36.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.36.0...v1.36.1) (2026-04-24)
+
+
+### Bug Fixes
+
+* Play Store badge icon and ajv dependency resolution ([ff89b03](https://github.com/bangkeut-technology/daily-brew/commit/ff89b03fda6bb67efe6149217119fe2b20560932))
+
 ## [1.36.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.35.1...v1.36.0) (2026-04-23)
 
 
