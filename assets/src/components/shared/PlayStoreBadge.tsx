@@ -18,10 +18,8 @@ export function PlayStoreBadge({ className }: { className?: string }) {
       >
         <rect width="135" height="40" rx="6" fill="currentColor" className="text-text-primary" />
         <g fill="white">
-          {/* Play triangle */}
-          <path d="M19.5 10.1l-1.2-.7c-.4-.2-.8-.1-1 .2L10 19.4l7.3 9.8c.2.3.6.4 1 .2l1.2-.7L13 19.4l6.5-9.3z" />
-          <path d="M24.7 17.4L21 15.2l-3.5 4.2 3.5 4.2 3.7-2.2c1-.6 1-1.6 0-2.2l-.8-.5-.2-.1-.3-.2-.7-.4-.3-.2-.2-.1z" opacity="0.8" />
-          <path d="M10 19.4L17.3 9.6c.2-.3.6-.4 1-.2l1.2.7L13 19.4l6.5 9.3-1.2.7c-.4.2-.8.1-1-.2L10 19.4z" opacity="0.6" />
+          {/* Google Play icon */}
+          <path d="M11.1 8.05l8.28 4.78c.56.32.56.84 0 1.16l-8.28 4.78c-.56.32-1.02.06-1.02-.58V8.63c0-.64.46-.9 1.02-.58z" />
           {/* "GET IT ON" */}
           <text x="32" y="14" fontFamily="system-ui, -apple-system, sans-serif" fontSize="5" fontWeight="400" letterSpacing="0.05em">
             GET IT ON

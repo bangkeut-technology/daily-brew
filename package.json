@@ -1,5 +1,6 @@
 {
     "devDependencies": {
+        "ajv": "^8.18.0",
         "@babel/core": "^7.29.0",
         "@babel/preset-env": "^7.29.2",
         "@babel/preset-react": "^7.28.5",
@@ -43,10 +44,13 @@
         ]
     },
     "overrides": {
-        "ajv": "8.18.0",
+        "ajv": "$ajv",
         "fork-ts-checker-webpack-plugin": {
             "ajv": "6.12.6",
             "schema-utils": "3.3.0"
+        },
+        "eslint": {
+            "ajv": "6.12.6"
         }
     },
     "dependencies": {
