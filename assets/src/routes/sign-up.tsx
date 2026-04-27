@@ -267,8 +267,8 @@ function SignUpPage() {
 
         <div className="mt-6 flex flex-col items-center gap-4">
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <AppStoreBadge className="opacity-70 hover:opacity-100 transition-opacity" />
-            <PlayStoreBadge className="opacity-70 hover:opacity-100 transition-opacity" />
+            <AppStoreBadge className="opacity-90 hover:opacity-100 transition-opacity" />
+            <PlayStoreBadge className="opacity-90 hover:opacity-100 transition-opacity" />
           </div>
           <div className="space-x-3">
             <Link to="/privacy" className="text-[13px] text-text-tertiary hover:text-text-secondary no-underline transition-colors">Privacy</Link>

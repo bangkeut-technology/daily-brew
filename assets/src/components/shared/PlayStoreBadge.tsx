@@ -16,10 +16,13 @@ export function PlayStoreBadge({ className }: { className?: string }) {
         width={135}
         height={40}
       >
-        <rect width="135" height="40" rx="6" fill="currentColor" className="text-text-primary" />
+        <rect width="135" height="40" rx="6" fill="#000000" />
+        {/* Google Play 4-color icon */}
+        <polygon points="10,8 10,15 18,15" fill="#00D7FE" />
+        <polygon points="10,8 18,15 22,15" fill="#FFCE00" />
+        <polygon points="10,22 10,15 18,15" fill="#00F176" />
+        <polygon points="10,22 18,15 22,15" fill="#FF3D00" />
         <g fill="white">
-          {/* Google Play icon */}
-          <path d="M11.1 8.05l8.28 4.78c.56.32.56.84 0 1.16l-8.28 4.78c-.56.32-1.02.06-1.02-.58V8.63c0-.64.46-.9 1.02-.58z" />
           {/* "GET IT ON" */}
           <text x="32" y="14" fontFamily="system-ui, -apple-system, sans-serif" fontSize="5" fontWeight="400" letterSpacing="0.05em">
             GET IT ON
