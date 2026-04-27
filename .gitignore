@@ -42,3 +42,5 @@ Screenshot*.png
 .tanstack
 
 .DS_Store
+
+tsconfig.tsbuildinfo
