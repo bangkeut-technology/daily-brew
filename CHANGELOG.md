@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.36.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.36.1...v1.36.2) (2026-04-27)
+
+
+### Bug Fixes
+
+* app store badges visible in dark mode and use real Google Play 4-color icon ([80d2f65](https://github.com/bangkeut-technology/daily-brew/commit/80d2f65ec5ac6edf9a9bd67b1054b4eab2a00ea2))
+
 ## [1.36.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.36.0...v1.36.1) (2026-04-24)
 
 
