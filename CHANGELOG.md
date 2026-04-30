@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.37.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.36.2...v1.37.0) (2026-04-30)
+
+
+### Features
+
+* add refund policy page for Paddle website approval ([bf87304](https://github.com/bangkeut-technology/daily-brew/commit/bf87304711577168816bfbaede99d325e66b0c0a))
+
 ## [1.36.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.36.1...v1.36.2) (2026-04-27)
 
 
