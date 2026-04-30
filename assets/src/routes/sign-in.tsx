@@ -233,6 +233,8 @@ function SignInPage() {
             <Link to="/privacy" className="text-[13px] text-text-tertiary hover:text-text-secondary no-underline transition-colors">Privacy</Link>
             <span className="text-[13px] text-text-tertiary">&middot;</span>
             <Link to="/terms" className="text-[13px] text-text-tertiary hover:text-text-secondary no-underline transition-colors">Terms</Link>
+            <span className="text-[13px] text-text-tertiary">&middot;</span>
+            <Link to="/refund" className="text-[13px] text-text-tertiary hover:text-text-secondary no-underline transition-colors">Refund</Link>
           </div>
         </div>
       </div>

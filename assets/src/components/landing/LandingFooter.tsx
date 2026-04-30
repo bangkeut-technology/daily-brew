@@ -18,6 +18,7 @@ const productLinks = [
 const legalLinks = [
   { label: 'Privacy policy', to: '/privacy' },
   { label: 'Terms of use', to: '/terms' },
+  { label: 'Refund policy', to: '/refund' },
   { label: 'Delete account', to: '/delete-account' },
 ];
 
