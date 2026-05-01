@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.39.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.38.0...v1.39.0) (2026-05-01)
+
+
+### Features
+
+* **admin:** add CLI command to promote user to super admin ([6b0d60f](https://github.com/bangkeut-technology/daily-brew/commit/6b0d60fd874c3b90f99cb2332e49128673534059))
+
 ## [1.38.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.37.0...v1.38.0) (2026-05-01)
 
 
