@@ -42,7 +42,7 @@ Any request to add the above should be deferred to a future milestone.
 - Unlimited employees
 - Everything in Espresso
 - Unlimited managers
-- Multiple QR codes per workspace (each QR acts as a sub-workspace with its own manager)
+- Multiple sub-QR codes per workspace — each with its own assigned employees, optional per-QR manager, and optional per-cluster setting overrides (IP / geofence / device verification) that default to inheriting from the workspace
 - Priority support
 - Future: White-label branding
 
@@ -123,6 +123,8 @@ Users can be owners (create workspaces) or employees (linked to an employee reco
 **Attendance**
 - id, publicId
 - employeeId → Employee (ManyToOne)
+- workspaceId → Workspace (ManyToOne, nullable)
+- qrCodeId → WorkspaceQrCode (ManyToOne, nullable, ON DELETE SET NULL) — null = main workspace QR; set when checked in via a sub-QR
 - date (date)
 - checkInAt (datetime, nullable)
 - checkOutAt (datetime, nullable)
@@ -135,6 +137,19 @@ Users can be owners (create workspaces) or employees (linked to an employee reco
 - checkOutDeviceName (string 255, nullable) — audit trail
 - createdAt, updatedAt
 - Unique constraint: (employeeId, date)
+
+**WorkspaceQrCode** (Double Espresso)
+- id, publicId
+- workspace → Workspace (ManyToOne, CASCADE delete)
+- qrToken (string 24, unique) — encoded as `dailybrew:wqr:{qrToken}`
+- name (string 100) — e.g. "Floor 1", "Kitchen entrance"
+- manager → Employee (ManyToOne, nullable, ON DELETE SET NULL) — per-QR manager, must have a linked user
+- assignedEmployees ⇄ Employee (ManyToMany, owning side, join table `daily_brew_workspace_qr_code_employees`) — only listed employees can scan this QR
+- inheritIpSettings (boolean, default true) + ipRestrictionEnabled, allowedIps (overrides used when not inheriting)
+- inheritGeofencing (boolean, default true) + geofencingEnabled, geofencingLatitude, geofencingLongitude, geofencingRadiusMeters
+- inheritDeviceVerification (boolean, default true) + deviceVerificationEnabled
+- createdAt, updatedAt
+- Timezone is **always** inherited from the parent workspace — sub-QRs do not override it
 
 **LeaveRequest**
 - id, publicId
@@ -291,6 +306,25 @@ erDiagram
         datetime createdAt
     }
 
+    WorkspaceQrCode {
+        int id PK
+        uuid publicId UK
+        string qrToken UK
+        string name
+        boolean inheritIpSettings
+        boolean ipRestrictionEnabled
+        json allowedIps
+        boolean inheritGeofencing
+        boolean geofencingEnabled
+        float geofencingLatitude
+        float geofencingLongitude
+        int geofencingRadiusMeters
+        boolean inheritDeviceVerification
+        boolean deviceVerificationEnabled
+        datetime createdAt
+        datetime updatedAt
+    }
+
     User ||--o{ Workspace : owns
     User ||--o| Workspace : currentWorkspace
     User ||--o{ Employee : creates
@@ -302,11 +336,15 @@ erDiagram
     Workspace ||--o{ Closure : has
     Workspace ||--o{ Employee : contains
     Workspace ||--o{ ApiToken : has
+    Workspace ||--o{ WorkspaceQrCode : has
 
     Shift ||--o{ Employee : assigned
 
     Employee ||--o{ Attendance : records
     Employee ||--o{ LeaveRequest : submits
+    Employee }o--o{ WorkspaceQrCode : assignedTo
+    Employee ||--o| WorkspaceQrCode : managesQr
+    WorkspaceQrCode ||--o{ Attendance : recordedVia
 ```
 
 ---
@@ -380,11 +418,42 @@ Computed at check-in/out time relative to the Employee's assigned Shift + grace 
 ### QR check-in — workspace-level QR code
 - Each workspace has a `qrToken` (20-char random string) generated on creation
 - QR encodes `dailybrew:ws:{qrToken}` — NOT a URL, just data for the mobile app
-- ONE QR code per workspace — displayed at the restaurant entrance
+- This **main** workspace QR is universal — every active employee in the workspace can scan it
 - Employee opens DailyBrew mobile app → scans QR → app extracts token → calls `POST /api/v1/checkin/{qrToken}`
 - Employee must be signed in to check in — system resolves employee from auth session + workspace
 - All employees need a linked user account to check in
 - Web route `/checkin/{qrToken}` exists as a fallback for testing only
+
+### Sub-QR check-in (Double Espresso)
+- A workspace may also have multiple `WorkspaceQrCode` records, each with its own `qrToken` encoded as `dailybrew:wqr:{qrToken}`
+- Each sub-QR has an explicit `assignedEmployees` ManyToMany list — only those employees can scan it
+- Mobile app inspects the QR prefix (`ws:` vs `wqr:`) and routes accordingly:
+  - `dailybrew:ws:{token}` → `POST /api/v1/checkin/{token}` (existing)
+  - `dailybrew:wqr:{token}` → `POST /api/v1/checkin/qr/{token}` (new)
+- Sub-QR pipeline mirrors the main pipeline (same closure / leave / shift / late detection logic) but:
+  - Resolves the workspace via `qrCode.workspace`
+  - Rejects with 403 if the employee is not in `qrCode.assignedEmployees`
+  - Builds settings via `EffectiveCheckinSettings::fromQrCode($qrCode)` which applies inheritance rules
+  - Stores `qrCode` on the resulting `Attendance` for per-location reporting
+- Main workspace QR continues to work for everyone, including employees assigned to sub-QRs
+
+### Sub-QR setting inheritance (Double Espresso)
+- Settings cluster into 3 groups, each with its own inherit flag on `WorkspaceQrCode`:
+  - **IP restriction**: `inheritIpSettings` — when true, uses `WorkspaceSetting.ipRestrictionEnabled` + `allowedIps`; when false, uses the QR's own override values
+  - **Geofencing**: `inheritGeofencing` — same pattern for `geofencingEnabled` + lat/lng/radius
+  - **Device verification**: `inheritDeviceVerification` — same pattern for `deviceVerificationEnabled`
+- All three flags default to `true` on creation
+- Timezone is **always** inherited (single restaurant, single TZ)
+- Resolution centralized in `App\Service\Checkin\EffectiveCheckinSettings::fromWorkspace()` and `::fromQrCode()`
+- `CheckinService::checkin()` accepts an optional `EffectiveCheckinSettings` parameter — when omitted, builds from the workspace (preserves main-QR behavior)
+- **User-facing wording**: never say "inherit" or "override" — those are dev terms. The toggle in the QR edit modal reads **"Same as workspace"** (on) vs custom rules (off). When on, show a small caption indicating the workspace's current value (e.g. "Currently turned on at the workspace level"). When off, the override controls become editable with the caption "Custom rules for this QR — workspace settings are ignored."
+
+### Per-QR manager (Double Espresso)
+- A `WorkspaceQrCode` may have an optional `manager` Employee FK
+- Manager must have a linked user account; backend rejects assignment otherwise
+- Per-QR manager has `WorkspaceVoter::MANAGE` rights only on `Attendance` / `LeaveRequest` whose employee is in `qrCode.assignedEmployees` — narrower scope than the workspace-wide Espresso manager
+- A workspace-wide manager (`Employee.role = MANAGER`) keeps full workspace scope, independent of any QR assignment
+- Per-QR manager has no rights to edit shifts, closures, employees, settings, or the QR itself — those remain owner-only
 
 ### QR check-in IP restriction
 On check-in via QR:
@@ -467,6 +536,67 @@ All notifications include a `data` payload with `type` and `workspacePublicId` f
 - `POST /api/v1/devices` — register push token (`{ token, platform: "ios"|"android"|"web" }`)
 - `DELETE /api/v1/devices/{token}` — unregister push token (own tokens only)
 - If a token already exists, it's re-assigned to the current user (handles device transfers)
+
+### Sub-QR API (Double Espresso, owner-only except sub-QR check-in)
+
+**Sub-QR check-in (no locale prefix, JWT required):**
+- `GET  /api/v1/checkin/qr/{qrToken}` — status (employee name, shift, today's attendance, on-leave flag)
+- `POST /api/v1/checkin/qr/{qrToken}` — perform check-in/out (`{ latitude?, longitude?, deviceId?, deviceName? }`)
+
+**Sub-QR management (with locale prefix):**
+- `GET    /api/v1/{locale}/workspaces/{publicId}/qr-codes` — list all sub-QRs (member VIEW)
+- `POST   /api/v1/{locale}/workspaces/{publicId}/qr-codes` — create (owner EDIT, plan-gated → 402)
+- `GET    /api/v1/{locale}/workspaces/{publicId}/qr-codes/{qrPublicId}` — show
+- `PATCH  /api/v1/{locale}/workspaces/{publicId}/qr-codes/{qrPublicId}` — partial update (name, manager, assignments, per-cluster overrides)
+- `DELETE /api/v1/{locale}/workspaces/{publicId}/qr-codes/{qrPublicId}` — delete (sets `Attendance.qr_code_id` to NULL on existing records)
+
+Plan check via `PlanService::canUseSubQrCodes()` (Double Espresso only); surfaced to the frontend as `canUseSubQrCodes` on the plan endpoint.
+
+### Platform admin section (`/admin/*`)
+
+Internal panel for **DailyBrew staff** managing the platform across all tenants — not a customer-facing feature. Gated by `ROLE_SUPER_ADMIN` on `User`.
+
+**Auth model — bootstrap allowlist + UI promotion:**
+- Env var `ADMIN_EMAILS` is a comma-separated allowlist of staff emails (e.g. `ADMIN_EMAILS=foo@team.com,bar@team.com`).
+- `App\Service\SuperAdminSyncService::syncFor(User $user)` runs on every successful authentication (`AuthenticationSuccessListener`). It is **bootstrap-only**: grants `ROLE_SUPER_ADMIN` if email is in the allowlist and not already admin; **never revokes**.
+- After bootstrap, role management lives in the admin UI: `POST /admin/users/{publicId}/promote` and `POST /admin/users/{publicId}/demote`.
+- To forcibly revoke an allowlisted admin: remove the email from `ADMIN_EMAILS` *first*, then demote via UI (otherwise the env stays as the source-of-truth gate but doesn't re-promote).
+- Self-demote is rejected with 400 ("You cannot demote yourself"). Enforced backend-side, not just UI.
+- `UserDTO` exposes `isSuperAdmin` boolean to the frontend; auth context picks it up after login or `/users/me` fetch.
+
+**Access control** (`config/packages/security.yaml`):
+- `^/api/v1/{locale}/admin` → `ROLE_SUPER_ADMIN` only. Falls through the standard `api` JWT firewall.
+
+**Endpoints** (all under `/api/v1/{locale}/admin`):
+- `GET  /dashboard` — totals (users, workspaces, employees, subscriptions)
+- `GET  /workspaces` — paginated list, `?search=`, `?plan=`, `?includeDeleted=` (plan filter pushed into query via `LEFT JOIN Subscription` so pagination is correct; `free` matches workspaces with no subscription too)
+- `GET  /workspaces/{publicId}` — full detail (owner, subscription, settings, counts)
+- `POST /workspaces/{publicId}/cancel-subscription` — force-cancel via `WorkspaceService::forceCancelSubscription()` (calls Paddle API + marks canceled locally; 409 if no subscription)
+- `POST /workspaces/{publicId}/restore` — un-soft-delete the workspace + any employees soft-deleted alongside it. Returns `restoredEmployees` count. Severed `Employee.linkedUser` associations are NOT reconnected — owner must re-link manually.
+- `GET  /users` — paginated list, `?search=`, `?superAdminOnly=`
+- `GET  /users/{publicId}` — full detail (owned + linked workspaces)
+- `POST /users/{publicId}/promote` — grant `ROLE_SUPER_ADMIN`
+- `POST /users/{publicId}/demote` — revoke `ROLE_SUPER_ADMIN` (rejects self with 400)
+- `GET  /subscriptions` — paginated list, `?status=`, `?plan=`
+- `GET  /audit-log` — paginated 50/page, `?action=`, `?targetType=` — append-only history of admin actions
+
+**Audit log:**
+- `App\Entity\AdminAuditLog` records every admin mutation (promote, demote, cancel-subscription, restore-workspace).
+- Snapshot fields: `actorEmail` and `targetLabel` are stored at write time so the row remains meaningful after the actor or target is deleted.
+- `actor` FK uses `ON DELETE SET NULL` — audit rows survive user deletion.
+- `App\Service\AdminAuditService::record()` is **wrap-and-log** — failures are caught and sent to the logger (no 500 to the operator). The underlying admin action has already flushed before this is called, so a failed audit cannot roll the action back.
+- Indexes: `created_at` (DESC list ordering) and `(target_type, target_public_id)` (look up history for an entity).
+
+**Frontend**:
+- Routes under `/admin/*` (top-level, separate from `/console/*`). Layout in `assets/src/routes/admin/route.tsx` — own sidebar with Dashboard / Workspaces / Users / Subscriptions / Audit log + "Back to console" link.
+- Hard gate: layout redirects to `/console/dashboard` via `useNavigate({ replace: true })` when `auth.user?.isSuperAdmin !== true`.
+- Style: same warm-cafe palette but denser table layouts (text-[13.5px] rows, `bg-cream-3/40` table head, reusable `Pagination` component exported from `assets/src/routes/admin/workspaces/index.tsx`).
+- Pages: `/admin`, `/admin/workspaces`, `/admin/workspaces/$publicId`, `/admin/users`, `/admin/users/$publicId`, `/admin/subscriptions`, `/admin/audit-log`.
+- **Quick actions in tables**:
+  - User list rows have inline promote/demote icon buttons (demote uses `ConfirmModal`, self is disabled with tooltip).
+  - Workspace list rows have an inline restore icon button when `deletedAt !== null`.
+  - Workspace detail page header shows context-aware action: "Restore workspace" if soft-deleted, "Cancel subscription" if active sub, otherwise nothing.
+- All admin pages avoid native `<select>`/`<input type="checkbox">` per the project UI rules — use `CustomSelect` and `Toggle` instead.
 
 ---
 
@@ -582,7 +712,7 @@ Symfony 7 + Doctrine ORM + LexikJWTAuthenticationBundle + KnpPaginatorBundle.
 
 React 19 + TypeScript, TanStack Router (file-based) + TanStack Query, shadcn/ui + Radix, Tailwind CSS v4, Zod + React Hook Form, Axios, i18next (en/fr/km), Lucide React icons, Sonner toasts, clsx + tailwind-merge via `cn()` utility (`@/lib/utils`).
 
-Routes: `/sign-in`, `/sign-up`, `/auth/callback`, `/checkin/:qrToken` (public/auth), `/console/*` (auth guard) with dashboard, employees, attendance, leave, shifts, closures, settings, profile.
+Routes: `/sign-in`, `/sign-up`, `/auth/callback`, `/checkin/:qrToken` (public/auth), `/console/*` (auth guard) with dashboard, employees, attendance, leave, shifts, closures, settings, profile, and `qr-codes` (Double Espresso only — sub-QR management).
 
 ### Custom UI Components (assets/src/components/shared/)
 - **GlassCard** / **GlassCardHeader** — glass-morphism card with optional hover lift

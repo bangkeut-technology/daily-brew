@@ -1,87 +1,149 @@
 {
   "app": "DailyBrew",
   "nav": {
-    "dashboard": "\u1795\u17d2\u1791\u17b6\u17c6\u1784\u1782\u17d2\u179a\u17b6\u1794\u17cb\u1782\u17d2\u179a\u1784",
-    "employees": "\u1794\u17bb\u1782\u17d2\u1782\u179b\u17b7\u1780",
-    "attendance": "\u1780\u17b6\u179a\u1785\u17bc\u179b\u179a\u17bd\u1798",
-    "leaveRequests": "\u179f\u17c6\u178e\u17be\u1788\u17b6\u1785\u17b7\u178f\u17d2\u178f",
-    "shifts": "\u1780\u17b6\u179a\u1794\u17d2\u179a\u17bb\u179f",
-    "closures": "\u1780\u17b6\u179a\u1794\u17b7\u1791",
-    "settings": "\u1780\u17b6\u179a\u1780\u17c6\u178e\u178f\u17cb",
-    "profile": "\u1794\u17d2\u179a\u17c2\u1780\u1794\u17d2\u179a\u17c4\u17a0\u17d2\u179c\u17b8\u179b",
-    "signOut": "\u1785\u17b6\u1780\u1785\u17c1\u178f"
+    "dashboard": "ផ្ទាំងគ្រប់គ្រង",
+    "employees": "បុគ្គលិក",
+    "attendance": "ការចូលរួម",
+    "leaveRequests": "សំណើឈប់",
+    "shifts": "ការប្រុស",
+    "closures": "ការបិទ",
+    "qrCodes": "កូដ QR",
+    "settings": "ការកំណត់",
+    "profile": "ប្រវត្តិរូប",
+    "signOut": "ចាកចេញ"
   },
   "auth": {
-    "signIn": "\u1785\u17bc\u179b",
-    "signUp": "\u1785\u17bb\u17c7\u1788\u17d2\u1798\u17c4\u17c7",
-    "email": "\u17a2\u17ca\u17b8\u1798\u17c2\u179b",
-    "password": "\u1796\u17b6\u1780\u17d2\u1799\u179f\u1798\u17d2\u1784\u17b6\u178f\u17cb"
+    "signIn": "ចូល",
+    "signUp": "ចុះឈ្មោះ",
+    "email": "អ៊ីមែល",
+    "password": "ពាក្យសម្ងាត់"
   },
   "dashboard": {
-    "emptyWelcome": "\u179f\u17bc\u1798\u179f\u17d2\u179c\u17b6\u1782\u1798\u1793\u17cd\u1798\u1780\u1780\u17b6\u1793\u17cb\u1780\u17b6\u179a\u1784\u17b6\u179a\u179a\u1794\u179f\u17cb\u17a2\u17d2\u1793\u1780!",
-    "emptySubtitle": "\u1797\u17c5\u178f\u17d2\u178f\u17b6\u17c6\u1784\u179a\u1794\u179f\u17cb\u17a2\u17d2\u1793\u1780\u179a\u17bd\u1785\u179a\u17b6\u179b\u17cb\u17a0\u17be\u1799\u17d4 \u179f\u17bc\u1798\u1794\u1793\u17d2\u1790\u17c2\u1798\u1780\u17d2\u179a\u17bb\u1798\u179a\u1794\u179f\u17cb\u17a2\u17d2\u1793\u1780 \u178e\u17b7\u1784\u1785\u17b6\u1794\u17cb\u1795\u17d2\u178f\u17be\u1798\u178f\u17b6\u1798\u178a\u17b6\u1793\u1780\u17b6\u179a\u1785\u17bc\u179b\u179a\u17bd\u1798\u17d4",
-    "emptyAddEmployee": "\u1794\u1793\u17d2\u1790\u17c2\u1798\u1794\u17bb\u1782\u17d2\u1782\u179b\u17b7\u1780\u178a\u17c6\u1794\u17bc\u1784\u179a\u1794\u179f\u17cb\u17a2\u17d2\u1793\u1780",
-    "emptyAddEmployeeDesc": "\u1794\u1784\u17d2\u1780\u17be\u178f\u1794\u17d2\u179a\u17c2\u1780\u17b7\u179b \u1793\u17b7\u1784\u1780\u17bc\u178a QR \u179f\u1798\u17d2\u179a\u17b6\u1794\u17cb\u1780\u17b6\u179a\u1785\u17bc\u179b\u179a\u17bd\u1798",
-    "emptyCreateShift": "\u1794\u1784\u17d2\u1780\u17be\u178f\u1780\u17b6\u179a\u1794\u17d2\u179a\u17bb\u179f",
-    "emptyCreateShiftDesc": "\u1780\u17c6\u178e\u178f\u17cb\u1798\u17c9\u17c4\u1784\u1796\u17c1\u179b\u1796\u17d2\u179a\u17b9\u1780 \u179b\u17d2\u1784\u17b6\u1785 \u17ac\u1795\u17d2\u179f\u17c1\u1784\u1791\u17c0\u178f",
-    "emptyConfigure": "\u1780\u17c6\u178e\u178f\u17cb\u1780\u17b6\u179a\u1780\u17c6\u178e\u178f\u17cb",
-    "emptyConfigureDesc": "\u178f\u17c6\u1794\u1793\u17cb\u178f\u17c6\u1794\u1793\u17cb\u1798\u17c9\u17c4\u1784 \u1780\u17b6\u179a\u1780\u17c6\u178e\u178f\u17cb IP \u1793\u17b7\u1784\u1795\u17d2\u179f\u17c1\u1784\u1791\u17c0\u178f"
+    "emptyWelcome": "សូមស្វាគមន៍មកកាន់ការងាររបស់អ្នក!",
+    "emptySubtitle": "ភោជនីយដ្ឋានរបស់អ្នករាល់ហើយ។ សូមបន្ថែមក្រុមរបស់អ្នក ដើម្បីចាប់ផ្តើមតាមដានការចូលរួម។",
+    "emptyAddEmployee": "បន្ថែមបុគ្គលិកដំបូងរបស់អ្នក",
+    "emptyAddEmployeeDesc": "បង្កើតប្រវត្តិរូប និងកូដ QR សម្រាប់ការចូលរួម",
+    "emptyCreateShift": "បង្កើតការប្រុស",
+    "emptyCreateShiftDesc": "កំណត់ម៉ោងពេលព្រឹក ល្ងាច ឬផ្សេងទៀត",
+    "emptyConfigure": "កំណត់ការកំណត់",
+    "emptyConfigureDesc": "តំបន់តំបន់ម៉ោង ការកំណត់ IP និងផ្សេងទៀត"
   },
   "workspace": {
-    "label": "\u1780\u17b6\u179a\u1784\u17b6\u179a",
-    "noWorkspace": "\u1782\u17d2\u1798\u17b6\u1793\u1780\u17b6\u179a\u1784\u17b6\u179a",
-    "create": "\u1780\u17b6\u179a\u1784\u17b6\u179a\u1790\u17d2\u1798\u17b8",
-    "newPlaceholder": "\u1788\u17d2\u1798\u17c4\u17c7\u1797\u17c5\u178f\u17d2\u178f\u17b6\u17c6\u1784",
-    "createFailed": "\u1794\u179a\u17b6\u1787\u17d0\u1799\u1780\u17d2\u1793\u17bb\u1784\u1780\u17b6\u179a\u1794\u1784\u17d2\u1780\u17be\u178f"
+    "label": "ការងារ",
+    "noWorkspace": "គ្មានការងារ",
+    "create": "ការងារថ្មី",
+    "newPlaceholder": "ឈ្មោះភោជនីយដ្ឋាន",
+    "createFailed": "បរាជ័យក្នុងការបង្កើត"
   },
   "settings": {
-    "deviceVerification": "\u1780\u17b6\u179a\u1795\u17d2\u1791\u17c0\u1784\u1795\u17d2\u1791\u17b6\u178f\u17cb\u17a7\u1794\u1780\u179a\u178e\u17cd",
-    "enableDeviceVerification": "\u1794\u17be\u1780\u1780\u17b6\u179a\u1795\u17d2\u1791\u17c0\u1784\u1795\u17d2\u1791\u17b6\u178f\u17cb\u17a7\u1794\u1780\u179a\u178e\u17cd",
-    "deviceVerificationDesc": "\u178f\u1798\u17d2\u179a\u17bc\u179c\u17b2\u17d2\u1799\u1794\u17d2\u179a\u17be\u17a7\u1794\u1780\u179a\u178e\u17cd\u178a\u17c2\u179b\u1780\u17d2\u1793\u17bb\u1784\u1780\u17b6\u179a\u1785\u17bc\u179b\u179a\u17bd\u1798\u1785\u17bc\u179b \u1793\u17b7\u1784\u1785\u17c1\u1789\u179a\u17bd\u1798 \u1793\u17b7\u1784\u1780\u17b6\u179a\u1794\u17d2\u179a\u17be\u17a7\u1794\u1780\u179a\u178e\u17cd\u1798\u17bd\u1799\u1785\u17bc\u179b\u179a\u17bd\u1798\u1794\u17bb\u1782\u17d2\u1782\u179b\u17b7\u1780\u1785\u17d2\u179a\u17be\u1793",
-    "deviceVerificationEspresso": "\u1780\u17b6\u179a\u1795\u17d2\u1791\u17c0\u1784\u1795\u17d2\u1791\u17b6\u178f\u17cb\u17a7\u1794\u1780\u179a\u178e\u17cd\u178f\u17d2\u179a\u17bc\u179c\u1780\u17b6\u179a Espresso"
+    "deviceVerification": "ការផ្ទៀងផ្ទាត់ឧបករណ៍",
+    "enableDeviceVerification": "បើកការផ្ទៀងផ្ទាត់ឧបករណ៍",
+    "deviceVerificationDesc": "តម្រូវឲ្យប្រើឧបករណ៍ដែលគ្នុងការចូលរួមចូល និងចេញរួម និងការបរើឧបករណ៍មួយចូលរួមបុគ្គលិកច្រើន",
+    "deviceVerificationEspresso": "ការផ្ទៀងផ្ទាត់ឧបករណ៍ត្រូវការ Espresso"
   },
   "checkin": {
-    "deviceMismatch": "\u1780\u17b6\u179a\u1785\u17c1\u1789\u179a\u17bd\u1798\u178f\u17d2\u179a\u17bc\u179c\u1792\u17d2\u179c\u17be\u17a1\u17be\u1784\u1796\u17b8\u17a7\u1794\u1780\u179a\u178e\u17cd\u178a\u17c2\u179b\u1780\u17d2\u1793\u17bb\u1784\u1780\u17b6\u179a\u1785\u17bc\u179b\u179a\u17bd\u1798",
-    "deviceAlreadyUsed": "\u17a7\u1794\u1780\u179a\u178e\u17cd\u1793\u17c1\u17c7\u178f\u17d2\u179a\u17bc\u179c\u1794\u17b6\u1793\u1794\u17d2\u179a\u17be\u178a\u17be\u1798\u17d2\u1794\u17b8\u1785\u17bc\u179b\u179a\u17bd\u1798\u1794\u17bb\u1782\u17d2\u1782\u179b\u17b7\u1780\u1795\u17d2\u179f\u17c1\u1784\u1791\u17c0\u178f\u17a0\u17be\u1799\u1790\u17d2\u1784\u17c3\u1793\u17c1\u17c7"
+    "deviceMismatch": "ការចេញរួមត្រូវធ្វើឡើងពីឧបករណ៍ដែលគ្នុងការចូលរួម",
+    "deviceAlreadyUsed": "ឧបករណ៍នេះត្រូវបានប្រើដើម្បីចូលរួមបុគ្គលិកផ្សេងទៀតហើយថ្ងៃនេះ"
   },
   "plan": {
-    "deviceVerification": "\u1780\u17b6\u179a\u1795\u17d2\u1791\u17c0\u1784\u1795\u17d2\u1791\u17b6\u178f\u17cb\u17a7\u1794\u1780\u179a\u178e\u17cd\u179f\u1798\u17d2\u179a\u17b6\u1794\u17cb\u1780\u17b6\u179a\u1785\u17bc\u179b\u179a\u17bd\u1798"
+    "deviceVerification": "ការផ្ទៀងផ្ទាត់ឧបករណ៍សម្រាប់ការចូលរួម"
   },
   "common": {
-    "save": "\u179a\u1780\u17d2\u179f\u17b6\u1791\u17bb\u1780",
-    "cancel": "\u1794\u17c4\u17c7\u1794\u1784\u17cb",
-    "delete": "\u179b\u17bb\u1794",
-    "loading": "\u1780\u17c6\u1796\u17bb\u1784\u1791\u17b6\u178e\u17b7\u1789...",
-    "noResults": "\u1782\u17d2\u1798\u17b6\u1793\u179b\u1791\u17d2\u1792\u1795\u179b"
+    "save": "រក្សាទុក",
+    "cancel": "បោះបង់",
+    "delete": "លុប",
+    "loading": "កំពុងទាញិញ...",
+    "noResults": "គ្មានលទ្ធផល",
+    "discard": "បោះបង់",
+    "on": "បើក",
+    "off": "បិទ"
+  },
+  "qrCodes": {
+    "new": "កូដ QR ថ្មី",
+    "edit": "កែកូដ QR",
+    "intro": "បង្កើតកូដ QR បន្ថែមសម្រាប់ផ្នែក ឬជាន់ផ្សេងគ្នា។ មានតែបុគ្គលិកដែលត្រូវបានចាត់តាំងប៉ុណ្ណោះអាចស្កែនកូដ QR រង។ ការកំណត់អាចស្នងពីការងារ ឬកំណត់ឡើងវិញតាមកូដ QR។",
+    "empty": "មិនទាន់មានកូដ QR ទេ",
+    "emptyHint": "ចុច​ដើម្បីបន្ថែម",
+    "name": "ឈ្មោះ",
+    "namePlaceholder": "ឧទាហរណ៍ ជាន់ទី១, ច្រកចូលផ្ទះបាយ",
+    "nameRequired": "តម្រូវឲ្យមានឈ្មោះ",
+    "manager": "ប្រធាន (ស្រេចចិត្ត)",
+    "selectManager": "ជ្រើសរើសប្រធាន…",
+    "noManager": "គ្មានប្រធាន",
+    "managerHint": "ប្រធានត្រូវមានគណនីអ្នកប្រើភ្ជាប់។ គាត់អាចអនុម័ត/បដិសេធការឈប់សម្រាក់សម្រាប់បុគ្គលិកដែលចាត់តាំង។",
+    "managedBy": "គ្រប់គ្រងដោយ",
+    "assignedEmployees": "បុគ្គលិកដែលចាត់តាំង",
+    "assignedCount": "{{count}} ត្រូវបានចាត់តាំង",
+    "noEmployees": "មិនទាន់មានបុគ្គលិកក្នុងការងារនេះទេ។",
+    "searchEmployees": "ស្វែងរកបុគ្គលិក…",
+    "noSearchResults": "គ្មានបុគ្គលិកត្រូវនឹងការស្វែងរករបស់អ្នក។",
+    "ipRestriction": "ការដាក់កំហិត IP",
+    "ipRestrictionDesc": "អនុញ្ញាតការចូលរួមតាម QR នេះ តែពីអាស័យដ្ឋានបណ្ដាញដែលបានបញ្ជាក់ប៉ុណ្ណោះ (ឧ. Wi-Fi របស់ភោជនីយដ្ឋានរបស់អ្នក)។ នៅពេលស្នង ច្បាប់ IP របស់ការងារនឹងមានសុពលភាព។",
+    "geofencing": "Geofencing",
+    "geofencingDesc": "តម្រូវឲ្យបុគ្គលិកនៅក្បែរទីតាំងជាក់លាក់មួយ ដើម្បីចូលរួមតាម QR នេះ។ មានប្រយោជន៍សម្រាប់បំបែកជាន់ ឬតំបន់ខាងក្រៅ។ កាំអប្បបរមា ៥០ ម៉ែត្រ។",
+    "deviceVerification": "ការផ្ទៀងផ្ទាត់ឧបករណ៍",
+    "deviceVerificationDesc": "ភ្ជាប់ការចូលរួម/ចេញរួម ជាមួយឧបករណ៍មួយដោយបុគ្គលិកម្នាក់ក្នុងមួយថ្ងៃ។ ការពារទូរស័ព្ទមួយមិនឲ្យចូលរួមជំនួសបុគ្គលិកច្រើន ហើយតម្រូវឲ្យចេញរួមពីឧបករណ៍ដូចគ្នានឹងការចូលរួម។",
+    "ip": "IP",
+    "geofence": "តំបន់",
+    "device": "ឧបករណ៍",
+    "enable": "បើក",
+    "allowedIps": "IP អនុញ្ញាត (មួយក្នុងមួយជួរ)",
+    "latitude": "រយៈ",
+    "longitude": "បណ្ដោយ",
+    "radiusMeters": "កាំ (ម៉ែត្រ, អប្បបរមា ៥០)",
+    "sameAsWorkspace": "ដូចការងារ",
+    "workspaceOn": "បច្ចុប្បន្នបើកនៅកម្រិតការងារ",
+    "workspaceOff": "បច្ចុប្បន្នបិទនៅកម្រិតការងារ",
+    "customForThisQr": "ច្បាប់ផ្ទាល់សម្រាប់ QR នេះ — ការកំណត់ការងារត្រូវបានមិនយកចិត្តទុកដាក់។",
+    "summaryWorkspace": "ការងារ",
+    "summaryCustomOn": "ផ្ទាល់ · បើក",
+    "summaryCustomOff": "ផ្ទាល់ · បិទ",
+    "createSuccess": "កូដ QR ត្រូវបានបង្កើត",
+    "createError": "បរាជ័យក្នុងការបង្កើតកូដ QR",
+    "updateSuccess": "កូដ QR ត្រូវបានធ្វើបច្ចុប្បន្នភាព",
+    "updateError": "បរាជ័យក្នុងការធ្វើបច្ចុប្បន្នភាព",
+    "deleteSuccess": "កូដ QR ត្រូវបានលុប",
+    "deleteError": "បរាជ័យក្នុងការលុប",
+    "deleteTitle": "លុបកូដ QR",
+    "deleteConfirm": "លុប {{name}} មែនទេ? បុគ្គលិកដែលត្រូវបានចាត់តាំងនឹងបាត់បង់ការចូលប្រើ។ មិនអាចត្រឡប់វិញបានទេ។",
+    "planGate": "កូដ QR ច្រើនត្រូវការគម្រោង Double Espresso",
+    "afterCreateHint": "អ្នកនឹងត្រូវបាននាំទៅទំព័រលម្អិតកូដ QR ដើម្បីចាត់តាំងបុគ្គលិក និងកែប្រែការកំណត់។",
+    "backToList": "ត្រឡប់ទៅបញ្ជីកូដ QR",
+    "detail": "កូដ QR",
+    "qrPreview": "មើល QR",
+    "payload": "ខ្លឹមសារដែលបានកំសាន្ត",
+    "payloadCopied": "បានចម្លងទៅក្ដារតម្បៀតខ្ទាស់",
+    "identity": "អត្តសញ្ញាណ",
+    "unsavedChanges": "អ្នកមានការផ្លាស់ប្ដូរដែលមិនបានរក្សាទុក"
   },
   "upgrade": {
-    "espressoFeature": "\u1798\u17bb\u1781\u1784\u17b6\u179a Espresso",
-    "espressoIncludes": "Espresso \u179a\u17bd\u1798\u1798\u17b6\u1793",
-    "upgradeButton": "\u178a\u17c6\u17a1\u17be\u1784\u1780\u17b6\u179a\u1791\u17c5 Espresso",
-    "maybeLater": "\u1796\u17c1\u179b\u1780\u17d2\u179a\u17c4\u1799",
+    "espressoFeature": "មុខងារ Espresso",
+    "espressoIncludes": "Espresso រួមមាន",
+    "upgradeButton": "ដំឡើងការទៅ Espresso",
+    "maybeLater": "ពេលក្រោយ",
     "ipRestriction": {
-      "title": "\u1794\u17be\u1780\u178a\u17c6\u178e\u17be\u179a\u1780\u17b6\u179a\u1780\u17c6\u178e\u178f\u17cb IP",
+      "title": "បើកដំណើរការការកំណត់ IP",
       "description": "Restrict QR check-ins to specific IP addresses."
     },
     "geofencing": {
-      "title": "\u1794\u17be\u1780\u178a\u17c6\u178e\u17be\u179a\u1780\u17b6\u179a geofencing",
+      "title": "បើកដំណើរការ geofencing",
       "description": "Set a geographic boundary around your restaurant."
     },
     "deviceVerification": {
-      "title": "\u1794\u17be\u1780\u178a\u17c6\u178e\u17be\u179a\u1780\u17b6\u179a\u1795\u17d2\u1791\u17c0\u1784\u1795\u17d2\u1791\u17b6\u178f\u17cb\u17a7\u1794\u1780\u179a\u178e\u17cd",
+      "title": "បើកដំណើរការការផ្ទៀងផ្ទាត់ឧបករណ៍",
       "description": "Prevent buddy punching by requiring the same device."
     },
     "leaveRequests": {
-      "title": "\u1794\u17be\u1780\u178a\u17c6\u178e\u17be\u179a\u1780\u17b6\u179a\u179f\u17c6\u178e\u17be\u179f\u17c6\u179a\u17b6\u1780\u17cb\u1788\u1794\u17cb",
+      "title": "បើកដំណើរការការសំណើសំរាក់ឈប់",
       "description": "Let your staff submit leave requests directly."
     },
     "shiftTimeRules": {
-      "title": "\u1794\u17be\u1780\u178a\u17c6\u178e\u17be\u179a\u1780\u17b6\u179a\u1780\u17c6\u178e\u178f\u17cb\u1798\u17c9\u17c4\u1784\u178f\u17b6\u1798\u1790\u17d2\u1784\u17c3",
+      "title": "បើកដំណើរការការកំណត់ម៉ោងតាមថ្ងៃ",
       "description": "Override shift hours for specific days of the week."
     },
     "telegramNotifications": {
-      "title": "\u1794\u17be\u1780\u178a\u17c6\u178e\u17be\u179a\u1780\u17b6\u179a\u1787\u17bc\u1793\u178a\u17c6\u178e\u17b9\u1784 Telegram",
-      "description": "\u1795\u17d2\u1789\u17be\u179f\u17c6\u178e\u17be\u179f\u17c6\u179a\u17b6\u1780\u17cb\u1788\u1794\u17cb \u1780\u17b6\u179a\u1795\u17d2\u179b\u17b6\u179f\u17cb\u1780\u17b6\u179a\u1784\u17b6\u179a \u1780\u17b6\u179a\u1794\u17b7\u178f \u1793\u17b7\u1784\u179f\u1784\u17d2\u1781\u17c1\u1794\u1794\u17d2\u179a\u1785\u17b6\u17c6\u1790\u17d2\u1784\u17c3\u1791\u17c5 Telegram\u17d4"
+      "title": "បើកដំណើរការការជូនដំណឹង Telegram",
+      "description": "ផ្ញើសំណើសំរាក់ឈប់ ការផ្លាស់ការងារ ការបិទ និងសង្ខេបប្រចាំថ្ងៃទៅ Telegram។"
     }
   }
 }

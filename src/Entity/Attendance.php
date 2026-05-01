@@ -79,6 +79,12 @@ class Attendance extends AbstractBaseEntity
     #[Groups(['attendance:read'])]
     private ?Workspace $workspace = null;
 
+    /** Sub-QR used for check-in (null = main workspace QR). */
+    #[ORM\ManyToOne(targetEntity: WorkspaceQrCode::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    #[Groups(['attendance:read'])]
+    private ?WorkspaceQrCode $qrCode = null;
+
     // ── Date ───────────────────────────────────────────────────
 
     public function getDate(): ?DateTimeImmutable
@@ -202,6 +208,17 @@ class Attendance extends AbstractBaseEntity
     public function setWorkspace(?Workspace $workspace): static
     {
         $this->workspace = $workspace;
+        return $this;
+    }
+
+    public function getQrCode(): ?WorkspaceQrCode
+    {
+        return $this->qrCode;
+    }
+
+    public function setQrCode(?WorkspaceQrCode $qrCode): static
+    {
+        $this->qrCode = $qrCode;
         return $this;
     }
 }

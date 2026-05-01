@@ -99,6 +99,10 @@ class Workspace extends AbstractBaseEntity
     #[ORM\OneToMany(targetEntity: LeaveRequest::class, mappedBy: 'workspace')]
     private Collection $leaveRequests;
 
+    /** @var Collection<int, WorkspaceQrCode> */
+    #[ORM\OneToMany(targetEntity: WorkspaceQrCode::class, mappedBy: 'workspace', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $qrCodes;
+
     public function __construct()
     {
         parent::__construct();
@@ -108,6 +112,7 @@ class Workspace extends AbstractBaseEntity
         $this->closurePeriods = new ArrayCollection();
         $this->attendances = new ArrayCollection();
         $this->leaveRequests = new ArrayCollection();
+        $this->qrCodes = new ArrayCollection();
     }
 
     // ── Core ───────────────────────────────────────────────────
@@ -276,5 +281,11 @@ class Workspace extends AbstractBaseEntity
     public function getLeaveRequests(): Collection
     {
         return $this->leaveRequests;
+    }
+
+    /** @return Collection<int, WorkspaceQrCode> */
+    public function getQrCodes(): Collection
+    {
+        return $this->qrCodes;
     }
 }

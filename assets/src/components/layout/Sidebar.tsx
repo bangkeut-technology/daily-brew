@@ -10,6 +10,7 @@ import {
     UserCircle,
     LogOut,
     Crown,
+    QrCode,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePlan } from '@/hooks/queries/usePlan';
@@ -182,7 +183,16 @@ export function Sidebar() {
     const showEmployeeView = roleLoaded && isEmployee && !isOwner && !isManager;
 
     const canUseLeaveRequests = plan?.canUseLeaveRequests ?? false;
+    const canUseSubQrCodes = plan?.canUseSubQrCodes ?? false;
     const hasWorkspace = !!workspacePublicId;
+
+    const resolvedManageNav: NavItemDef[] = canUseSubQrCodes
+        ? [
+              ...ownerManageNav.slice(0, ownerManageNav.length - 1),
+              { to: '/console/qr-codes', icon: QrCode, label: 'nav.qrCodes' },
+              ownerManageNav[ownerManageNav.length - 1],
+          ]
+        : ownerManageNav;
 
     return (
         <aside className="fixed left-0 top-0 bottom-0 w-55 bg-cream-2 border-r border-cream-3 flex flex-col z-10">
@@ -218,7 +228,7 @@ export function Sidebar() {
                             disabled={!hasWorkspace}
                         />
                         <Divider />
-                        <NavSection items={ownerManageNav} disabled={!hasWorkspace} />
+                        <NavSection items={resolvedManageNav} disabled={!hasWorkspace} />
                     </>
                 )}
 

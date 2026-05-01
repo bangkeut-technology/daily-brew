@@ -90,10 +90,15 @@ class Employee extends AbstractBaseEntity
     #[ORM\OneToMany(targetEntity: Attendance::class, mappedBy: 'employee', orphanRemoval: true)]
     private Collection $attendances;
 
+    /** @var Collection<int, WorkspaceQrCode> */
+    #[ORM\ManyToMany(targetEntity: WorkspaceQrCode::class, mappedBy: 'assignedEmployees')]
+    private Collection $assignedQrCodes;
+
     public function __construct()
     {
         parent::__construct();
         $this->attendances = new ArrayCollection();
+        $this->assignedQrCodes = new ArrayCollection();
     }
 
     // ── Name ───────────────────────────────────────────────────
@@ -288,6 +293,12 @@ class Employee extends AbstractBaseEntity
     public function getAttendances(): Collection
     {
         return $this->attendances;
+    }
+
+    /** @return Collection<int, WorkspaceQrCode> */
+    public function getAssignedQrCodes(): Collection
+    {
+        return $this->assignedQrCodes;
     }
 
     public function __toString(): string

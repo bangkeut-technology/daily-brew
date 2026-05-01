@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\EventListener;
 
 use App\Entity\User;
+use App\Enum\UserRoleEnum;
+use App\Service\SuperAdminSyncService;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationSuccessEvent;
 
 /**
@@ -13,6 +15,10 @@ use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationSuccessEvent;
  */
 final class AuthenticationSuccessListener
 {
+    public function __construct(
+        private readonly SuperAdminSyncService $superAdminSync,
+    ) {}
+
     public function onAuthenticationSuccessResponse(AuthenticationSuccessEvent $event): void
     {
         $data = $event->getData();
@@ -22,6 +28,8 @@ final class AuthenticationSuccessListener
             return;
         }
 
+        $this->superAdminSync->syncFor($user);
+
         $data['user'] = [
             'publicId' => (string) $user->getPublicId(),
             'email' => $user->getEmail(),
@@ -30,6 +38,7 @@ final class AuthenticationSuccessListener
             'fullName' => $user->getFullName(),
             'locale' => $user->getLocale(),
             'onboardingCompleted' => $user->isOnboardingCompleted(),
+            'isSuperAdmin' => $user->hasRole(UserRoleEnum::SUPER_ADMIN->value),
         ];
 
         $event->setData($data);

@@ -96,6 +96,20 @@ class WorkspaceService
         $subscription->setCanceledAt(DateService::mutableNow());
     }
 
+    /**
+     * Force-cancel a subscription from the admin panel. Same Paddle-call-then-local-mark
+     * behavior as workspace deletion, but as an explicit operator action that does NOT
+     * delete the workspace. Idempotent — calling on an already-canceled subscription is a no-op.
+     */
+    public function forceCancelSubscription(Subscription $subscription): void
+    {
+        if ($subscription->getStatus() === SubscriptionStatusEnum::Canceled) {
+            return;
+        }
+        $this->cancelSubscription($subscription);
+        $this->subscriptionRepository->flush();
+    }
+
     private function cancelPaddleSubscription(string $paddleSubscriptionId): void
     {
         $baseUrl = $this->paddleEnvironment === 'sandbox'

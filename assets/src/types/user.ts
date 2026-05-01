@@ -7,6 +7,7 @@ export interface User {
   locale?: string;
   onboardingCompleted?: boolean;
   currentWorkspacePublicId?: string | null;
+  isSuperAdmin?: boolean;
 }
 
 export interface Workspace {

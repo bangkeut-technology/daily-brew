@@ -88,6 +88,11 @@ class PlanService
         return $this->isAtLeastEspresso($workspace);
     }
 
+    public function canUseSubQrCodes(Workspace $workspace): bool
+    {
+        return $this->isDoubleEspresso($workspace);
+    }
+
     public function getManagerLimit(Workspace $workspace): ?int
     {
         $plan = $this->getPlan($workspace);
@@ -158,6 +163,7 @@ class PlanService
             'canUseDeviceVerification' => $this->canUseDeviceVerification($workspace),
             'canUseManagers' => $this->canUseManagers($workspace),
             'canUseTelegramNotifications' => $this->canUseTelegramNotifications($workspace),
+            'canUseSubQrCodes' => $this->canUseSubQrCodes($workspace),
             'managerLimit' => $this->getManagerLimit($workspace),
             'managerCount' => $this->employeeRepository->countManagersByWorkspace($workspace),
             'currentPeriodEnd' => $subscription?->getCurrentPeriodEnd()?->format('c'),

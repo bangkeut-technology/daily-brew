@@ -22,6 +22,7 @@ class SpaController extends AbstractController
         string $paddlePriceIdEspressoAnnual,
         string $paddlePriceIdDoubleEspressoMonthly,
         string $paddlePriceIdDoubleEspressoAnnual,
+        string $gaMeasurementId,
     ): Response {
         return $this->render('page/index.html.twig', [
             'maxFreeEmployees' => $maxFreeEmployees,
@@ -34,6 +35,7 @@ class SpaController extends AbstractController
             'paddlePriceIdEspressoAnnual' => $paddlePriceIdEspressoAnnual,
             'paddlePriceIdDoubleEspressoMonthly' => $paddlePriceIdDoubleEspressoMonthly,
             'paddlePriceIdDoubleEspressoAnnual' => $paddlePriceIdDoubleEspressoAnnual,
+            'gaMeasurementId' => $gaMeasurementId,
             'user' => null,
         ]);
     }

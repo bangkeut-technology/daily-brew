@@ -2,14 +2,15 @@
   "app": "DailyBrew",
   "nav": {
     "dashboard": "Tableau de bord",
-    "employees": "Employ\u00e9s",
-    "attendance": "Pr\u00e9sence",
-    "leaveRequests": "Demandes de cong\u00e9",
+    "employees": "Employés",
+    "attendance": "Présence",
+    "leaveRequests": "Demandes de congé",
     "shifts": "Horaires",
     "closures": "Fermetures",
-    "settings": "Param\u00e8tres",
+    "qrCodes": "Codes QR",
+    "settings": "Paramètres",
     "profile": "Profil",
-    "signOut": "D\u00e9connexion"
+    "signOut": "Déconnexion"
   },
   "auth": {
     "signIn": "Connexion",
@@ -17,99 +18,160 @@
     "email": "Email",
     "password": "Mot de passe",
     "confirmPassword": "Confirmer le mot de passe",
-    "forgotPassword": "Mot de passe oubli\u00e9 ?",
+    "forgotPassword": "Mot de passe oublié ?",
     "noAccount": "Pas encore de compte ?",
-    "hasAccount": "D\u00e9j\u00e0 un compte ?",
+    "hasAccount": "Déjà un compte ?",
     "orContinueWith": "Ou continuer avec",
     "google": "Google",
     "apple": "Apple"
   },
   "dashboard": {
-    "present": "Pr\u00e9sents aujourd'hui",
-    "late": "Arriv\u00e9es en retard",
-    "onLeave": "En cong\u00e9",
+    "present": "Présents aujourd'hui",
+    "late": "Arrivées en retard",
+    "onLeave": "En congé",
     "absent": "Absents",
-    "todayAttendance": "Pr\u00e9sence du jour",
+    "todayAttendance": "Présence du jour",
     "viewAll": "Tout voir",
-    "ofEmployees": "sur {count} employ\u00e9s",
+    "ofEmployees": "sur {count} employés",
     "emptyWelcome": "Bienvenue dans votre espace !",
-    "emptySubtitle": "Votre restaurant est pr\u00eat. Ajoutez votre \u00e9quipe pour commencer le suivi des pr\u00e9sences.",
-    "emptyAddEmployee": "Ajouter un employ\u00e9",
-    "emptyAddEmployeeDesc": "Cr\u00e9ez un profil et un code QR pour le pointage",
-    "emptyCreateShift": "Cr\u00e9er un horaire",
-    "emptyCreateShiftDesc": "D\u00e9finissez les heures du matin, du soir ou personnalis\u00e9es",
-    "emptyConfigure": "Configurer les param\u00e8tres",
+    "emptySubtitle": "Votre restaurant est prêt. Ajoutez votre équipe pour commencer le suivi des présences.",
+    "emptyAddEmployee": "Ajouter un employé",
+    "emptyAddEmployeeDesc": "Créez un profil et un code QR pour le pointage",
+    "emptyCreateShift": "Créer un horaire",
+    "emptyCreateShiftDesc": "Définissez les heures du matin, du soir ou personnalisées",
+    "emptyConfigure": "Configurer les paramètres",
     "emptyConfigureDesc": "Fuseau horaire, restriction IP et plus"
   },
   "employee": {
-    "add": "Ajouter un employ\u00e9",
+    "add": "Ajouter un employé",
     "name": "Nom",
-    "phone": "T\u00e9l\u00e9phone",
+    "phone": "Téléphone",
     "shift": "Horaire",
     "status": "Statut",
     "active": "Actif",
     "inactive": "Inactif",
     "qrCode": "Code QR",
-    "attendanceHistory": "Historique de pr\u00e9sence"
+    "attendanceHistory": "Historique de présence"
   },
   "workspace": {
     "label": "Espace de travail",
     "noWorkspace": "Aucun espace",
     "create": "Nouvel espace",
     "newPlaceholder": "Nom du restaurant",
-    "createFailed": "\u00c9chec de la cr\u00e9ation"
+    "createFailed": "Échec de la création"
   },
   "settings": {
-    "deviceVerification": "V\u00e9rification de l'appareil",
-    "enableDeviceVerification": "Activer la v\u00e9rification de l'appareil",
-    "deviceVerificationDesc": "Exiger le m\u00eame appareil pour le pointage d'entr\u00e9e et de sortie, et emp\u00eacher un appareil de pointer pour plusieurs employ\u00e9s",
-    "deviceVerificationEspresso": "La v\u00e9rification de l'appareil n\u00e9cessite Espresso"
+    "deviceVerification": "Vérification de l'appareil",
+    "enableDeviceVerification": "Activer la vérification de l'appareil",
+    "deviceVerificationDesc": "Exiger le même appareil pour le pointage d'entrée et de sortie, et empêcher un appareil de pointer pour plusieurs employés",
+    "deviceVerificationEspresso": "La vérification de l'appareil nécessite Espresso"
   },
   "checkin": {
-    "deviceMismatch": "Le pointage de sortie doit \u00eatre effectu\u00e9 depuis le m\u00eame appareil que le pointage d'entr\u00e9e",
-    "deviceAlreadyUsed": "Cet appareil a d\u00e9j\u00e0 \u00e9t\u00e9 utilis\u00e9 pour pointer un autre employ\u00e9 aujourd'hui"
+    "deviceMismatch": "Le pointage de sortie doit être effectué depuis le même appareil que le pointage d'entrée",
+    "deviceAlreadyUsed": "Cet appareil a déjà été utilisé pour pointer un autre employé aujourd'hui"
   },
   "plan": {
-    "deviceVerification": "V\u00e9rification de l'appareil pour le pointage"
+    "deviceVerification": "Vérification de l'appareil pour le pointage"
   },
   "common": {
     "save": "Enregistrer",
     "cancel": "Annuler",
     "delete": "Supprimer",
     "edit": "Modifier",
-    "create": "Cr\u00e9er",
+    "create": "Créer",
     "search": "Rechercher",
     "loading": "Chargement...",
-    "noResults": "Aucun r\u00e9sultat"
+    "noResults": "Aucun résultat",
+    "discard": "Abandonner",
+    "on": "activé",
+    "off": "désactivé"
+  },
+  "qrCodes": {
+    "new": "Nouveau code QR",
+    "edit": "Modifier le code QR",
+    "intro": "Créez des codes QR supplémentaires pour différentes sections ou étages. Seuls les employés assignés peuvent scanner un sous-QR. Les paramètres peuvent être hérités du restaurant ou redéfinis par QR.",
+    "empty": "Aucun code QR pour le moment",
+    "emptyHint": "Cliquez pour en ajouter un",
+    "name": "Nom",
+    "namePlaceholder": "ex. Étage 1, Entrée cuisine",
+    "nameRequired": "Le nom est requis",
+    "manager": "Responsable (optionnel)",
+    "selectManager": "Sélectionner un responsable…",
+    "noManager": "Aucun responsable",
+    "managerHint": "Le responsable doit avoir un compte utilisateur lié. Il peut approuver/rejeter les congés des employés assignés.",
+    "managedBy": "Géré par",
+    "assignedEmployees": "Employés assignés",
+    "assignedCount": "{{count}} assignés",
+    "noEmployees": "Aucun employé dans cet espace pour l'instant.",
+    "searchEmployees": "Rechercher des employés…",
+    "noSearchResults": "Aucun employé ne correspond à votre recherche.",
+    "ipRestriction": "Restriction IP",
+    "ipRestrictionDesc": "Autoriser le pointage via ce QR uniquement depuis les adresses réseau listées (par ex. le Wi-Fi de votre restaurant). Lorsqu'il est hérité, les règles IP du restaurant s'appliquent.",
+    "geofencing": "Géofencing",
+    "geofencingDesc": "Exiger que les employés soient physiquement proches d'un point pour pointer via ce QR. Utile pour séparer les étages ou les zones extérieures. Rayon minimum 50 mètres.",
+    "deviceVerification": "Vérification d'appareil",
+    "deviceVerificationDesc": "Lier le pointage entrée/sortie à un seul appareil par employé et par jour. Empêche un téléphone de pointer plusieurs employés et oblige la sortie depuis le même appareil que l'entrée.",
+    "ip": "IP",
+    "geofence": "Zone",
+    "device": "Appareil",
+    "enable": "Activer",
+    "allowedIps": "IP autorisées (une par ligne)",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "radiusMeters": "Rayon (mètres, min 50)",
+    "sameAsWorkspace": "Comme le restaurant",
+    "workspaceOn": "Actuellement activé au niveau du restaurant",
+    "workspaceOff": "Actuellement désactivé au niveau du restaurant",
+    "customForThisQr": "Règles personnalisées pour ce QR — les paramètres du restaurant sont ignorés.",
+    "summaryWorkspace": "restaurant",
+    "summaryCustomOn": "perso · activé",
+    "summaryCustomOff": "perso · désactivé",
+    "createSuccess": "Code QR créé",
+    "createError": "Échec de la création du code QR",
+    "updateSuccess": "Code QR mis à jour",
+    "updateError": "Échec de la mise à jour du code QR",
+    "deleteSuccess": "Code QR supprimé",
+    "deleteError": "Échec de la suppression du code QR",
+    "deleteTitle": "Supprimer le code QR",
+    "deleteConfirm": "Supprimer {{name}} ? Les employés assignés perdront l'accès. Cette action est irréversible.",
+    "planGate": "Plusieurs codes QR nécessitent le forfait Double Espresso",
+    "afterCreateHint": "Vous serez redirigé vers la page du code QR pour assigner des employés et ajuster les paramètres.",
+    "backToList": "Retour aux codes QR",
+    "detail": "Code QR",
+    "qrPreview": "Aperçu QR",
+    "payload": "Contenu encodé",
+    "payloadCopied": "Copié dans le presse-papier",
+    "identity": "Identité",
+    "unsavedChanges": "Vous avez des modifications non enregistrées"
   },
   "upgrade": {
-    "espressoFeature": "Fonctionnalit\u00e9 Espresso",
+    "espressoFeature": "Fonctionnalité Espresso",
     "espressoIncludes": "Espresso inclut",
-    "upgradeButton": "Passer \u00e0 Espresso",
-    "maybeLater": "Peut-\u00eatre plus tard",
+    "upgradeButton": "Passer à Espresso",
+    "maybeLater": "Peut-être plus tard",
     "ipRestriction": {
-      "title": "D\u00e9bloquer la restriction IP",
-      "description": "Limitez les pointages QR \u00e0 des adresses IP sp\u00e9cifiques. Assurez-vous que le personnel ne peut pointer que depuis le r\u00e9seau de votre restaurant."
+      "title": "Débloquer la restriction IP",
+      "description": "Limitez les pointages QR à des adresses IP spécifiques. Assurez-vous que le personnel ne peut pointer que depuis le réseau de votre restaurant."
     },
     "geofencing": {
-      "title": "D\u00e9bloquer le g\u00e9ofencing",
-      "description": "D\u00e9finissez une zone g\u00e9ographique autour de votre restaurant. Le personnel ne peut pointer que lorsqu'il est physiquement \u00e0 proximit\u00e9."
+      "title": "Débloquer le géofencing",
+      "description": "Définissez une zone géographique autour de votre restaurant. Le personnel ne peut pointer que lorsqu'il est physiquement à proximité."
     },
     "deviceVerification": {
-      "title": "D\u00e9bloquer la v\u00e9rification d'appareil",
-      "description": "Emp\u00eachez la fraude en exigeant le m\u00eame appareil pour le pointage d'entr\u00e9e et de sortie."
+      "title": "Débloquer la vérification d'appareil",
+      "description": "Empêchez la fraude en exigeant le même appareil pour le pointage d'entrée et de sortie."
     },
     "leaveRequests": {
-      "title": "D\u00e9bloquer les demandes de cong\u00e9",
-      "description": "Permettez \u00e0 votre personnel de soumettre des demandes de cong\u00e9. Examinez, approuvez ou rejetez depuis votre tableau de bord."
+      "title": "Débloquer les demandes de congé",
+      "description": "Permettez à votre personnel de soumettre des demandes de congé. Examinez, approuvez ou rejetez depuis votre tableau de bord."
     },
     "shiftTimeRules": {
-      "title": "D\u00e9bloquer les horaires par jour",
-      "description": "Modifiez les heures de travail pour des jours sp\u00e9cifiques. Id\u00e9al pour les restaurants avec des horaires diff\u00e9rents le week-end."
+      "title": "Débloquer les horaires par jour",
+      "description": "Modifiez les heures de travail pour des jours spécifiques. Idéal pour les restaurants avec des horaires différents le week-end."
     },
     "telegramNotifications": {
-      "title": "D\u00e9bloquer les notifications Telegram",
-      "description": "Envoyez les demandes de cong\u00e9, les changements d'\u00e9quipe, les fermetures et les r\u00e9sum\u00e9s quotidiens dans un chat ou groupe Telegram."
+      "title": "Débloquer les notifications Telegram",
+      "description": "Envoyez les demandes de congé, les changements d'équipe, les fermetures et les résumés quotidiens dans un chat ou groupe Telegram."
     }
   }
 }

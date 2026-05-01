@@ -21,6 +21,16 @@
     <meta name="twitter:description" content="QR check-in, shift tracking, and leave management for restaurants. Free for up to 10 employees." />
     <meta name="twitter:image" content="https://dailybrew.work/android-chrome-512.png" />
 
+    {% if gaMeasurementId is defined and gaMeasurementId is not empty %}
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ gaMeasurementId|e('html_attr') }}"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '{{ gaMeasurementId|e('js') }}');
+        </script>
+    {% endif %}
+
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}" />
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32.png') }}" />
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16.png') }}" />

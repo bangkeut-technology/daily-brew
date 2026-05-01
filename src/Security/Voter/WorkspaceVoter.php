@@ -11,6 +11,7 @@ use App\Entity\LeaveRequest;
 use App\Entity\Shift;
 use App\Entity\User;
 use App\Entity\Workspace;
+use App\Entity\WorkspaceQrCode;
 use App\Repository\EmployeeRepository;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
@@ -38,7 +39,8 @@ class WorkspaceVoter extends Voter
             || $subject instanceof Shift
             || $subject instanceof ClosurePeriod
             || $subject instanceof Attendance
-            || $subject instanceof LeaveRequest;
+            || $subject instanceof LeaveRequest
+            || $subject instanceof WorkspaceQrCode;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool
@@ -65,9 +67,13 @@ class WorkspaceVoter extends Voter
             return false;
         }
 
-        // MANAGE: owner or manager (approve/reject leave, view all attendance)
+        // MANAGE: owner, workspace-wide manager, or per-QR manager scoped to subject
         if ($attribute === self::MANAGE) {
-            return $employee->isManager();
+            if ($employee->isManager()) {
+                return true;
+            }
+
+            return $this->isPerQrManagerForSubject($employee, $subject);
         }
 
         // VIEW: any linked employee
@@ -76,6 +82,30 @@ class WorkspaceVoter extends Voter
         }
 
         // EDIT and DELETE are owner-only
+        return false;
+    }
+
+    /**
+     * A per-QR manager has MANAGE rights only on Attendance / LeaveRequest
+     * for an employee assigned to a QR they manage.
+     */
+    private function isPerQrManagerForSubject(Employee $managerEmployee, mixed $subject): bool
+    {
+        $subjectEmployee = match (true) {
+            $subject instanceof Attendance, $subject instanceof LeaveRequest => $subject->getEmployee(),
+            default => null,
+        };
+
+        if ($subjectEmployee === null) {
+            return false;
+        }
+
+        foreach ($subjectEmployee->getAssignedQrCodes() as $qrCode) {
+            if ($qrCode->getManager()?->getId() === $managerEmployee->getId()) {
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -91,6 +121,10 @@ class WorkspaceVoter extends Voter
 
         if ($subject instanceof Attendance || $subject instanceof LeaveRequest) {
             return $subject->getEmployee()?->getWorkspace();
+        }
+
+        if ($subject instanceof WorkspaceQrCode) {
+            return $subject->getWorkspace();
         }
 
         return null;

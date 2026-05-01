@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\DTO;
 
 use App\Entity\User;
+use App\Enum\UserRoleEnum;
 
 final readonly class UserDTO
 {
@@ -17,6 +18,7 @@ final readonly class UserDTO
         public ?string $locale,
         public bool    $onboardingCompleted,
         public ?string $currentWorkspacePublicId,
+        public bool    $isSuperAdmin,
     ) {}
 
     public static function fromEntity(User $u): self
@@ -30,6 +32,7 @@ final readonly class UserDTO
             locale: $u->getLocale(),
             onboardingCompleted: $u->isOnboardingCompleted(),
             currentWorkspacePublicId: $u->getCurrentWorkspace() ? (string) $u->getCurrentWorkspace()->getPublicId() : null,
+            isSuperAdmin: $u->hasRole(UserRoleEnum::SUPER_ADMIN->value),
         );
     }
 
@@ -44,6 +47,7 @@ final readonly class UserDTO
             'locale' => $this->locale,
             'onboardingCompleted' => $this->onboardingCompleted,
             'currentWorkspacePublicId' => $this->currentWorkspacePublicId,
+            'isSuperAdmin' => $this->isSuperAdmin,
         ];
     }
 }

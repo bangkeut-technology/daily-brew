@@ -6,10 +6,12 @@ namespace App\Service;
 
 use App\Entity\Attendance;
 use App\Entity\Employee;
+use App\Entity\WorkspaceQrCode;
 use App\Enum\DayOfWeekEnum;
 use App\Repository\AttendanceRepository;
 use App\Repository\ClosurePeriodRepository;
 use App\Repository\LeaveRequestRepository;
+use App\Service\Checkin\EffectiveCheckinSettings;
 use DateTimeImmutable;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -30,30 +32,35 @@ class CheckinService
         ?float $longitude = null,
         ?string $deviceId = null,
         ?string $deviceName = null,
+        ?EffectiveCheckinSettings $settings = null,
+        ?WorkspaceQrCode $qrCode = null,
     ): Attendance {
         $workspace = $employee->getWorkspace();
-        $setting = $workspace?->getSetting();
-        $wsTz = new \DateTimeZone($setting?->getTimezone() ?? 'UTC');
+        $settings ??= $workspace !== null
+            ? EffectiveCheckinSettings::fromWorkspace($workspace)
+            : new EffectiveCheckinSettings('UTC', false, null, false, null, null, null, false);
+
+        $wsTz = new \DateTimeZone($settings->timezone);
         $nowUtc = DateService::now();
         $now = $nowUtc->setTimezone($wsTz); // for time comparisons (late/early)
         $today = DateService::today($wsTz);
 
         // IP restriction check
-        if ($setting !== null && $setting->isIpRestrictionEnabled()) {
-            $allowedIps = $setting->getAllowedIps();
+        if ($settings->ipRestrictionEnabled) {
+            $allowedIps = $settings->allowedIps;
             if (!empty($allowedIps) && !in_array($clientIp, $allowedIps, true)) {
                 throw new AccessDeniedHttpException('Check-in not allowed from this location');
             }
         }
 
         // Geofencing check
-        if ($setting !== null && $setting->isGeofencingEnabled()) {
+        if ($settings->geofencingEnabled) {
             if ($latitude === null || $longitude === null) {
                 throw new AccessDeniedHttpException('Location is required for check-in at this workspace');
             }
-            $fenceLat = $setting->getGeofencingLatitude();
-            $fenceLng = $setting->getGeofencingLongitude();
-            $fenceRadius = max($setting->getGeofencingRadiusMeters() ?? 100, 50);
+            $fenceLat = $settings->geofencingLatitude;
+            $fenceLng = $settings->geofencingLongitude;
+            $fenceRadius = max($settings->geofencingRadiusMeters ?? 100, 50);
 
             if ($fenceLat !== null && $fenceLng !== null) {
                 $distance = $this->haversineDistance($fenceLat, $fenceLng, $latitude, $longitude);
@@ -84,11 +91,7 @@ class CheckinService
 
         if ($attendance === null) {
             // Device double check-in prevention (Espresso feature)
-            if (
-                $setting !== null
-                && $setting->isDeviceVerificationEnabled()
-                && $deviceId !== null
-            ) {
+            if ($settings->deviceVerificationEnabled && $deviceId !== null) {
                 $existing = $this->attendanceRepository->findByDeviceIdAndDateExcludingEmployee(
                     $workspace,
                     $deviceId,
@@ -104,6 +107,7 @@ class CheckinService
             $attendance = new Attendance();
             $attendance->setEmployee($employee);
             $attendance->setWorkspace($workspace);
+            $attendance->setQrCode($qrCode);
             $attendance->setDate($today);
             $attendance->setCheckInAt($nowUtc);
             $attendance->setCheckInLat($latitude);
@@ -131,8 +135,7 @@ class CheckinService
         } elseif ($attendance->getCheckOutAt() === null) {
             // Device verification check (Espresso feature)
             if (
-                $setting !== null
-                && $setting->isDeviceVerificationEnabled()
+                $settings->deviceVerificationEnabled
                 && $attendance->getCheckInDeviceId() !== null
                 && $deviceId !== null
                 && $deviceId !== $attendance->getCheckInDeviceId()

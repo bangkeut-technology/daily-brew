@@ -6,6 +6,120 @@ export interface User {
   fullName: string;
   locale: string;
   onboardingCompleted: boolean;
+  isSuperAdmin?: boolean;
+}
+
+export interface AdminDashboardData {
+  totals: {
+    users: number;
+    workspaces: number;
+    employees: number;
+    subscriptions: number;
+  };
+}
+
+export interface AdminPagedResponse<T> {
+  items: T[];
+  page: number;
+  pageSize: number;
+  total: number;
+}
+
+export interface AdminWorkspaceRow {
+  publicId: string;
+  name: string;
+  owner: { publicId: string; email: string; fullName: string } | null;
+  plan: string;
+  subscriptionStatus: string | null;
+  currentPeriodEnd: string | null;
+  isTrialing: boolean;
+  employeeCount: number;
+  createdAt: string;
+  deletedAt: string | null;
+}
+
+export interface AdminWorkspaceDetail {
+  publicId: string;
+  name: string;
+  qrToken: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  owner: { publicId: string; email: string; fullName: string } | null;
+  employeeCount: number;
+  qrCodeCount: number;
+  subscription: {
+    plan: string;
+    status: string;
+    paddleSubscriptionId: string | null;
+    paddleCustomerId: string | null;
+    currentPeriodEnd: string | null;
+    trialEndsAt: string | null;
+    canceledAt: string | null;
+    isActive: boolean;
+  } | null;
+  settings: {
+    timezone: string;
+    ipRestrictionEnabled: boolean;
+    geofencingEnabled: boolean;
+    deviceVerificationEnabled: boolean;
+  } | null;
+}
+
+export interface AdminUserRow {
+  publicId: string;
+  email: string;
+  fullName: string;
+  firstName: string | null;
+  lastName: string | null;
+  isSuperAdmin: boolean;
+  hasGoogle: boolean;
+  hasApple: boolean;
+  hasPassword: boolean;
+  createdAt: string;
+}
+
+export interface AdminUserDetail extends AdminUserRow {
+  locale: string | null;
+  onboardingCompleted: boolean;
+  updatedAt: string;
+  ownedWorkspaces: { publicId: string; name: string; deletedAt: string | null }[];
+  linkedWorkspaces: {
+    employeePublicId: string;
+    employeeName: string;
+    workspacePublicId: string | null;
+    workspaceName: string | null;
+    role: string;
+  }[];
+}
+
+export interface AdminAuditLogRow {
+  publicId: string;
+  action: string;
+  actionLabel: string;
+  actor: { publicId: string; email: string } | null;
+  actorEmail: string | null;
+  targetType: string;
+  targetPublicId: string | null;
+  targetLabel: string | null;
+  metadata: Record<string, unknown> | null;
+  createdAt: string;
+}
+
+export interface AdminSubscriptionRow {
+  publicId: string;
+  plan: string;
+  status: string;
+  isActive: boolean;
+  isTrialing: boolean;
+  trialDaysRemaining: number | null;
+  currentPeriodEnd: string | null;
+  trialEndsAt: string | null;
+  canceledAt: string | null;
+  paddleSubscriptionId: string | null;
+  workspace: { publicId: string; name: string };
+  owner: { publicId: string; email: string } | null;
+  createdAt: string;
 }
 
 export interface AuthResponse {
@@ -183,11 +297,53 @@ export interface PlanDetails {
   canUseDeviceVerification: boolean;
   canUseManagers: boolean;
   canUseTelegramNotifications: boolean;
+  canUseSubQrCodes: boolean;
   managerLimit: number | null;
   managerCount: number;
   currentPeriodEnd: string | null;
   status: string;
   paddleSubscriptionId: string | null;
+}
+
+export interface WorkspaceQrCodeRef {
+  publicId: string;
+  name: string;
+}
+
+export interface WorkspaceQrCode {
+  publicId: string;
+  qrToken: string;
+  name: string;
+  manager: { publicId: string; name: string } | null;
+  assignedEmployees: { publicId: string; name: string }[];
+  inheritIpSettings: boolean;
+  ipRestrictionEnabled: boolean;
+  allowedIps: string[] | null;
+  inheritGeofencing: boolean;
+  geofencingEnabled: boolean;
+  geofencingLatitude: number | null;
+  geofencingLongitude: number | null;
+  geofencingRadiusMeters: number | null;
+  inheritDeviceVerification: boolean;
+  deviceVerificationEnabled: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WorkspaceQrCodeInput {
+  name?: string;
+  managerPublicId?: string | null;
+  assignedEmployeePublicIds?: string[];
+  inheritIpSettings?: boolean;
+  ipRestrictionEnabled?: boolean;
+  allowedIps?: string[] | null;
+  inheritGeofencing?: boolean;
+  geofencingEnabled?: boolean;
+  geofencingLatitude?: number | null;
+  geofencingLongitude?: number | null;
+  geofencingRadiusMeters?: number | null;
+  inheritDeviceVerification?: boolean;
+  deviceVerificationEnabled?: boolean;
 }
 
 export interface RoleContext {
