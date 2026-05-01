@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.38.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.37.0...v1.38.0) (2026-05-01)
+
+
+### Features
+
+* add multi-QR sub-codes, platform admin section, and analytics ([44cd779](https://github.com/bangkeut-technology/daily-brew/commit/44cd779863171bb2c4eb26bb4786b575dd389edc))
+
 ## [1.37.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.36.2...v1.37.0) (2026-04-30)
 
 
