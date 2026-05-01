@@ -559,6 +559,7 @@ Internal panel for **DailyBrew staff** managing the platform across all tenants 
 **Auth model — bootstrap allowlist + UI promotion:**
 - Env var `ADMIN_EMAILS` is a comma-separated allowlist of staff emails (e.g. `ADMIN_EMAILS=foo@team.com,bar@team.com`).
 - `App\Service\SuperAdminSyncService::syncFor(User $user)` runs on every successful authentication (`AuthenticationSuccessListener`). It is **bootstrap-only**: grants `ROLE_SUPER_ADMIN` if email is in the allowlist and not already admin; **never revokes**.
+- CLI alternative for promotion — `php bin/console dailybrew:admin:promote-user <email>`. Idempotent. Useful for recovery (all admins demoted) or one-off promotion without an env redeploy. Demote and other admin actions stay in the web UI.
 - After bootstrap, role management lives in the admin UI: `POST /admin/users/{publicId}/promote` and `POST /admin/users/{publicId}/demote`.
 - To forcibly revoke an allowlisted admin: remove the email from `ADMIN_EMAILS` *first*, then demote via UI (otherwise the env stays as the source-of-truth gate but doesn't re-promote).
 - Self-demote is rejected with 400 ("You cannot demote yourself"). Enforced backend-side, not just UI.
