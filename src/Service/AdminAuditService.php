@@ -25,6 +25,8 @@ class AdminAuditService
     ) {}
 
     /**
+     * Record an admin action initiated by a logged-in user (web UI).
+     *
      * @param array<string, mixed>|null $metadata
      */
     public function record(
@@ -35,10 +37,43 @@ class AdminAuditService
         ?string $targetLabel = null,
         ?array $metadata = null,
     ): void {
+        $this->writeLog($actor, $actor->getEmail(), $action, $targetType, $targetPublicId, $targetLabel, $metadata);
+    }
+
+    /**
+     * Record an admin action initiated outside the web UI (CLI commands,
+     * automated jobs). $actorLabel is stored in the actorEmail column so the
+     * audit log row reads e.g. "cli:dailybrew:admin:promote-user".
+     *
+     * @param array<string, mixed>|null $metadata
+     */
+    public function recordSystem(
+        string $actorLabel,
+        AdminAuditActionEnum $action,
+        string $targetType,
+        ?string $targetPublicId,
+        ?string $targetLabel = null,
+        ?array $metadata = null,
+    ): void {
+        $this->writeLog(null, $actorLabel, $action, $targetType, $targetPublicId, $targetLabel, $metadata);
+    }
+
+    /**
+     * @param array<string, mixed>|null $metadata
+     */
+    private function writeLog(
+        ?User $actor,
+        ?string $actorEmail,
+        AdminAuditActionEnum $action,
+        string $targetType,
+        ?string $targetPublicId,
+        ?string $targetLabel,
+        ?array $metadata,
+    ): void {
         try {
             $log = new AdminAuditLog();
             $log->setActor($actor);
-            $log->setActorEmail($actor->getEmail());
+            $log->setActorEmail($actorEmail);
             $log->setAction($action);
             $log->setTargetType($targetType);
             $log->setTargetPublicId($targetPublicId);
@@ -53,7 +88,7 @@ class AdminAuditService
                 'action' => $action->value,
                 'targetType' => $targetType,
                 'targetPublicId' => $targetPublicId,
-                'actorEmail' => $actor->getEmail(),
+                'actorEmail' => $actorEmail,
             ]);
         }
     }
