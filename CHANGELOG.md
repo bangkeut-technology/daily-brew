@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.40.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.40.1...v1.40.2) (2026-05-02)
+
+
+### Bug Fixes
+
+* **auth:** scope BEARER cookie to /api/v1 so refresh endpoint isn't blocked ([84b8510](https://github.com/bangkeut-technology/daily-brew/commit/84b8510e3e6ef39ff00a3546dde2263d37275dd4))
+
 ## [1.40.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.40.0...v1.40.1) (2026-05-02)
 
 
