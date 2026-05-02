@@ -8,7 +8,11 @@ lexik_jwt_authentication:
         BEARER:
             lifetime: 2592000
             samesite: lax
-            path: /
+            # Scoped to /api/v1 so the cookie is NOT sent to /api/token/refresh.
+            # Otherwise the JWT authenticator picks up the expired BEARER on the
+            # refresh endpoint and rejects the request before gesdinet's refresh
+            # authenticator gets a chance to run.
+            path: /api/v1
             httpOnly: true
             secure: auto
             split:  []
