@@ -6,7 +6,6 @@ namespace App\Command;
 
 use App\Enum\UserRoleEnum;
 use App\Repository\UserRepository;
-use App\Service\CanonicalizerService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -27,7 +26,6 @@ class PromoteUserCommand extends Command
 {
     public function __construct(
         private readonly UserRepository $userRepository,
-        private readonly CanonicalizerService $canonicalizer,
     ) {
         parent::__construct();
     }
@@ -40,15 +38,14 @@ class PromoteUserCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $rawEmail = (string) $input->getArgument('email');
-        $email = $this->canonicalizer->canonicalizeEmail(trim($rawEmail));
+        $rawEmail = trim((string) $input->getArgument('email'));
 
-        if ($email === '') {
+        if ($rawEmail === '') {
             $io->error('Email is required.');
             return Command::FAILURE;
         }
 
-        $user = $this->userRepository->findByEmail($email);
+        $user = $this->userRepository->findByEmail($rawEmail);
         if ($user === null) {
             $io->error(sprintf('No user found with email "%s".', $rawEmail));
             return Command::FAILURE;
