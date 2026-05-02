@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.40.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.40.0...v1.40.1) (2026-05-02)
+
+
+### Bug Fixes
+
+* **auth:** align refresh-token route to /api/token/refresh ([2464095](https://github.com/bangkeut-technology/daily-brew/commit/2464095e6689969dc5d2bc4db74213bc256fd894))
+
 ## [1.40.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.39.0...v1.40.0) (2026-05-02)
 
 
