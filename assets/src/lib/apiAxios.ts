@@ -42,9 +42,11 @@ const ResponseErrorHandler = async (error: any) => {
     ) {
         config.__isRetryRequest = true;
         try {
-            // If a refresh is already in-flight, wait for it instead of firing another
+            // If a refresh is already in-flight, wait for it instead of firing another.
+            // Refresh route lives at /api/token/refresh (no /v1 prefix), so override
+            // the bare axios baseURL for this call only.
             if (!refreshPromise) {
-                refreshPromise = axios.post('/token/refresh').then(
+                refreshPromise = axios.post('/token/refresh', null, { baseURL: host }).then(
                     () => {},
                     (err) => { throw err; },
                 ).finally(() => { refreshPromise = null; });

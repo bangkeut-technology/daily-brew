@@ -106,4 +106,4 @@ dailybrew_api_v1_telegram_:
         strict_requirements: true
 
 gesdinet_jwt_refresh_token:
-    path: /api/v1/token/refresh
+    path: /api/token/refresh
