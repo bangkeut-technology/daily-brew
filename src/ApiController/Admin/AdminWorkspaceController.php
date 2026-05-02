@@ -8,6 +8,7 @@ use App\ApiController\Trait\ApiResponseTrait;
 use App\Entity\User;
 use App\Entity\Workspace;
 use App\Enum\AdminAuditActionEnum;
+use App\Enum\AdminAuditTargetTypeEnum;
 use App\Repository\EmployeeRepository;
 use App\Repository\SubscriptionRepository;
 use App\Repository\WorkspaceQrCodeRepository;
@@ -180,7 +181,7 @@ class AdminWorkspaceController extends AbstractController
         $auditService->record(
             actor: $currentUser,
             action: AdminAuditActionEnum::CancelSubscription,
-            targetType: 'workspace',
+            targetType: AdminAuditTargetTypeEnum::Workspace,
             targetPublicId: (string) $workspace->getPublicId(),
             targetLabel: $workspace->getName(),
             metadata: ['previousPlan' => $previousPlan, 'paddleSubscriptionId' => $subscription->getPaddleSubscriptionId()],
@@ -226,7 +227,7 @@ class AdminWorkspaceController extends AbstractController
         $auditService->record(
             actor: $currentUser,
             action: AdminAuditActionEnum::RestoreWorkspace,
-            targetType: 'workspace',
+            targetType: AdminAuditTargetTypeEnum::Workspace,
             targetPublicId: (string) $workspace->getPublicId(),
             targetLabel: $workspace->getName(),
             metadata: ['restoredEmployees' => $restoredEmployees],

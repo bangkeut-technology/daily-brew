@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Enum\AdminAuditActionEnum;
+use App\Enum\AdminAuditTargetTypeEnum;
 use App\Enum\UserRoleEnum;
 use App\Repository\UserRepository;
 use App\Service\AdminAuditService;
@@ -68,7 +69,7 @@ class PromoteUserCommand extends Command
         $this->auditService->recordSystem(
             actorLabel: self::AUDIT_ACTOR_LABEL,
             action: AdminAuditActionEnum::PromoteUser,
-            targetType: 'user',
+            targetType: AdminAuditTargetTypeEnum::User,
             targetPublicId: (string) $user->getPublicId(),
             targetLabel: $user->getEmail(),
         );

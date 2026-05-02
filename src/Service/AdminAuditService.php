@@ -7,6 +7,7 @@ namespace App\Service;
 use App\Entity\AdminAuditLog;
 use App\Entity\User;
 use App\Enum\AdminAuditActionEnum;
+use App\Enum\AdminAuditTargetTypeEnum;
 use App\Repository\AdminAuditLogRepository;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -32,7 +33,7 @@ class AdminAuditService
     public function record(
         User $actor,
         AdminAuditActionEnum $action,
-        string $targetType,
+        AdminAuditTargetTypeEnum $targetType,
         ?string $targetPublicId,
         ?string $targetLabel = null,
         ?array $metadata = null,
@@ -50,7 +51,7 @@ class AdminAuditService
     public function recordSystem(
         string $actorLabel,
         AdminAuditActionEnum $action,
-        string $targetType,
+        AdminAuditTargetTypeEnum $targetType,
         ?string $targetPublicId,
         ?string $targetLabel = null,
         ?array $metadata = null,
@@ -65,7 +66,7 @@ class AdminAuditService
         ?User $actor,
         ?string $actorEmail,
         AdminAuditActionEnum $action,
-        string $targetType,
+        AdminAuditTargetTypeEnum $targetType,
         ?string $targetPublicId,
         ?string $targetLabel,
         ?array $metadata,
@@ -75,7 +76,7 @@ class AdminAuditService
             $log->setActor($actor);
             $log->setActorEmail($actorEmail);
             $log->setAction($action);
-            $log->setTargetType($targetType);
+            $log->setTargetType($targetType->value);
             $log->setTargetPublicId($targetPublicId);
             $log->setTargetLabel($targetLabel);
             $log->setMetadata($metadata);
@@ -86,7 +87,7 @@ class AdminAuditService
             $this->logger->error('Admin audit record failed', [
                 'exception' => $e,
                 'action' => $action->value,
-                'targetType' => $targetType,
+                'targetType' => $targetType->value,
                 'targetPublicId' => $targetPublicId,
                 'actorEmail' => $actorEmail,
             ]);

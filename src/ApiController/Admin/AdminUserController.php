@@ -7,6 +7,7 @@ namespace App\ApiController\Admin;
 use App\ApiController\Trait\ApiResponseTrait;
 use App\Entity\User;
 use App\Enum\AdminAuditActionEnum;
+use App\Enum\AdminAuditTargetTypeEnum;
 use App\Enum\UserRoleEnum;
 use App\Repository\EmployeeRepository;
 use App\Repository\UserRepository;
@@ -146,7 +147,7 @@ class AdminUserController extends AbstractController
         $auditService->record(
             actor: $currentUser,
             action: AdminAuditActionEnum::PromoteUser,
-            targetType: 'user',
+            targetType: AdminAuditTargetTypeEnum::User,
             targetPublicId: (string) $user->getPublicId(),
             targetLabel: $user->getEmail(),
         );
@@ -180,7 +181,7 @@ class AdminUserController extends AbstractController
         $auditService->record(
             actor: $currentUser,
             action: AdminAuditActionEnum::DemoteUser,
-            targetType: 'user',
+            targetType: AdminAuditTargetTypeEnum::User,
             targetPublicId: (string) $user->getPublicId(),
             targetLabel: $user->getEmail(),
         );
