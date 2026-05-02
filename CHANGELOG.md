@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.41.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.40.2...v1.41.0) (2026-05-02)
+
+
+### Features
+
+* **admin:** audit-log CLI promote actions ([e77a218](https://github.com/bangkeut-technology/daily-brew/commit/e77a218666e87391dda83e8c595bc2cf03924ad1))
+
 ## [1.40.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.40.1...v1.40.2) (2026-05-02)
 
 
