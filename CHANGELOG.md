@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.40.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.39.0...v1.40.0) (2026-05-02)
+
+
+### Features
+
+* **telegram:** one-click connect, group setup, test message ([3feec5c](https://github.com/bangkeut-technology/daily-brew/commit/3feec5c1c7ad080043b20d2f2c55195204904964))
+
 ## [1.39.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.38.0...v1.39.0) (2026-05-01)
 
 
