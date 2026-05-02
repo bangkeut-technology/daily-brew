@@ -50,7 +50,10 @@ export function useUpdateWorkspace() {
   });
 }
 
-export function useWorkspaceSettings(workspacePublicId: string) {
+export function useWorkspaceSettings(
+  workspacePublicId: string,
+  options?: { refetchInterval?: number | false },
+) {
   return useQuery({
     queryKey: ['workspaces', workspacePublicId, 'settings'],
     queryFn: async () => {
@@ -60,6 +63,7 @@ export function useWorkspaceSettings(workspacePublicId: string) {
       return data;
     },
     enabled: !!workspacePublicId,
+    refetchInterval: options?.refetchInterval ?? false,
   });
 }
 
@@ -87,6 +91,30 @@ export function useUpdateWorkspaceSettings(workspacePublicId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspaces', workspacePublicId, 'settings'] });
+    },
+  });
+}
+
+export function useTelegramLinkToken(workspacePublicId: string) {
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await apiAxios.post<{
+        token: string;
+        deepLink: string;
+        expiresInSeconds: number;
+      }>(`/workspaces/${workspacePublicId}/settings/telegram-link-token`);
+      return data;
+    },
+  });
+}
+
+export function useTelegramTest(workspacePublicId: string) {
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await apiAxios.post<{ sent: boolean }>(
+        `/workspaces/${workspacePublicId}/settings/telegram-test`,
+      );
+      return data;
     },
   });
 }

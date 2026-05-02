@@ -29,8 +29,8 @@ parameters:
     mailgun_webhook_signing_key:             '%env(MAILGUN_WEBHOOK_SIGNING_KEY)%'
     telegram_bot_token:                      '%env(TELEGRAM_BOT_TOKEN)%'
     telegram_webhook_secret:                 '%env(TELEGRAM_WEBHOOK_TOKEN)%'
+    telegram_bot_username:                   '%env(string:TELEGRAM_BOT_USERNAME)%'
     ga_measurement_id:                       '%env(string:GA_MEASUREMENT_ID)%'
-    admin_emails:                            '%env(string:ADMIN_EMAILS)%'
 
 services:
     _defaults:
@@ -57,8 +57,9 @@ services:
             $mailgunWebhookSigningKey:           '%mailgun_webhook_signing_key%'
             $telegramBotToken:                   '%telegram_bot_token%'
             $telegramWebhookSecret:              '%telegram_webhook_secret%'
+            $telegramBotUsername:                '%telegram_bot_username%'
+            $appSecret:                          '%kernel.secret%'
             $gaMeasurementId:                    '%ga_measurement_id%'
-            $adminEmails:                        '%admin_emails%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name

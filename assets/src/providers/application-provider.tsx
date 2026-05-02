@@ -15,6 +15,7 @@ declare global {
             paddlePriceIdEspressoAnnual?: string;
             paddlePriceIdDoubleEspressoMonthly?: string;
             paddlePriceIdDoubleEspressoAnnual?: string;
+            telegramBotUsername?: string;
         };
         Paddle?: {
             Environment?: {

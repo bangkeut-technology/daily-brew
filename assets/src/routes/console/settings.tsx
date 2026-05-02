@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -18,6 +18,8 @@ import {
   useDeleteWorkspace,
   useWorkspaceSettings,
   useUpdateWorkspaceSettings,
+  useTelegramLinkToken,
+  useTelegramTest,
 } from '@/hooks/queries/useWorkspaces';
 import { usePlan } from '@/hooks/queries/usePlan';
 import { useEmployees } from '@/hooks/queries/useEmployees';
@@ -75,7 +77,13 @@ function SettingsPage() {
   const createWs = useCreateWorkspace();
   const updateWs = useUpdateWorkspace();
   const deleteWs = useDeleteWorkspace();
-  const { data: settings } = useWorkspaceSettings(currentWsId);
+  const [waitingForLink, setWaitingForLink] = useState(false);
+  const linkPollEndsAtRef = useRef(0);
+  const chatIdBeforeLinkRef = useRef<string | null>(null);
+  const { data: settings } = useWorkspaceSettings(
+    currentWsId,
+    { refetchInterval: waitingForLink ? 2000 : false },
+  );
   const updateSettings = useUpdateWorkspaceSettings(currentWsId);
   const { data: plan } = usePlan(currentWsId);
   const { data: employees } = useEmployees(currentWsId);
@@ -105,6 +113,9 @@ function SettingsPage() {
   // Telegram state
   const [telegramEnabled, setTelegramEnabled] = useState(false);
   const [telegramChatId, setTelegramChatId] = useState('');
+  const linkToken = useTelegramLinkToken(currentWsId);
+  const telegramTest = useTelegramTest(currentWsId);
+  const telegramBotUsername = window.__DAILYBREW__?.telegramBotUsername || '';
 
   // Geofencing state
   const [geofencingEnabled, setGeofencingEnabled] = useState(false);
@@ -163,6 +174,54 @@ function SettingsPage() {
       window.location.reload();
     } catch {
       toast.error('Failed to create workspace');
+    }
+  };
+
+  // The Telegram bot writes the chat ID server-side after the user hits
+  // Start in Telegram. The browser has no push channel for that event, so
+  // useWorkspaceSettings polls (via refetchInterval) while waitingForLink
+  // is true and we react here when the chat ID flips from its pre-link
+  // snapshot. A 30s watchdog covers the case where the user never finishes
+  // in Telegram.
+  useEffect(() => {
+    if (!waitingForLink) return;
+    const current = settings?.telegramChatId ?? null;
+    if (current && current !== chatIdBeforeLinkRef.current) {
+      setWaitingForLink(false);
+      toast.success('Telegram connected');
+    }
+  }, [waitingForLink, settings?.telegramChatId]);
+
+  useEffect(() => {
+    if (!waitingForLink) return;
+    const remaining = Math.max(0, linkPollEndsAtRef.current - Date.now());
+    const timeout = window.setTimeout(() => {
+      setWaitingForLink(false);
+      toast.error('Timed out waiting for Telegram. Try again.');
+    }, remaining);
+    return () => window.clearTimeout(timeout);
+  }, [waitingForLink]);
+
+  const handleConnectPersonalTelegram = async () => {
+    try {
+      const { deepLink, expiresInSeconds } = await linkToken.mutateAsync();
+      chatIdBeforeLinkRef.current = settings?.telegramChatId ?? null;
+      linkPollEndsAtRef.current = Date.now() + Math.min(expiresInSeconds, 30) * 1000;
+      setWaitingForLink(true);
+      window.open(deepLink, '_blank', 'noopener,noreferrer');
+    } catch {
+      toast.error('Could not generate Telegram link');
+    }
+  };
+
+  const handleSendTelegramTest = async () => {
+    try {
+      await telegramTest.mutateAsync();
+      toast.success('Test message sent');
+    } catch (err) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+        ?? 'Test failed';
+      toast.error(msg);
     }
   };
 
@@ -1076,7 +1135,68 @@ function SettingsPage() {
               </p>
 
               {telegramEnabled && plan?.canUseTelegramNotifications && (
-                <div className="space-y-3">
+                <div className="space-y-5">
+                  {/* Personal connect — one-click via /start <token> deep link */}
+                  <div className="rounded-xl border border-cream-3 bg-glass-bg/50 p-4">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div>
+                        <p className="text-[14px] font-medium text-text-primary">Personal chat</p>
+                        <p className="text-[12.5px] text-text-tertiary mt-0.5">
+                          One-click setup: open Telegram, hit Start, you're connected.
+                        </p>
+                      </div>
+                      <button
+                        onClick={handleConnectPersonalTelegram}
+                        disabled={!telegramBotUsername || linkToken.isPending || waitingForLink}
+                        className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[13.5px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50"
+                      >
+                        <Send size={13} />
+                        {waitingForLink ? 'Waiting for Telegram…' : linkToken.isPending ? 'Generating link…' : 'Connect personal Telegram'}
+                      </button>
+                    </div>
+                    {!telegramBotUsername && (
+                      <p className="text-[12.5px] text-red mt-1">
+                        Bot username is not configured on the server (TELEGRAM_BOT_USERNAME).
+                      </p>
+                    )}
+                    {waitingForLink && (
+                      <p className="text-[12.5px] text-amber mt-1">
+                        After you tap Start in Telegram, we'll detect the connection automatically.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Group setup — manual flow */}
+                  <div className="rounded-xl border border-cream-3 bg-glass-bg/50 p-4">
+                    <p className="text-[14px] font-medium text-text-primary mb-2">Group chat</p>
+                    <ol className="text-[13px] text-text-secondary leading-relaxed list-decimal pl-5 space-y-1">
+                      <li>
+                        Add{' '}
+                        {telegramBotUsername ? (
+                          <a
+                            href={`https://t.me/${telegramBotUsername}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-mono text-coffee hover:underline"
+                          >
+                            @{telegramBotUsername}
+                          </a>
+                        ) : (
+                          <span className="font-mono">your DailyBrew bot</span>
+                        )}{' '}
+                        to your staff group.
+                      </li>
+                      <li>
+                        In the group, send <span className="font-mono text-text-primary">/chatid</span>.
+                      </li>
+                      <li>The bot replies with the chat ID — paste it below.</li>
+                    </ol>
+                    <p className="text-[12px] text-text-tertiary mt-2">
+                      Group IDs start with <span className="font-mono">-</span> (e.g. <span className="font-mono">-1001234567890</span>) — paste it as-is.
+                    </p>
+                  </div>
+
+                  {/* Manual chat ID input + save */}
                   <div>
                     <label htmlFor="telegram-chat-id" className="block text-[13px] font-medium text-text-secondary mb-1">
                       Chat ID
@@ -1090,18 +1210,27 @@ function SettingsPage() {
                       placeholder="-1001234567890"
                       className="w-full px-3 py-2 rounded-lg text-[15px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono"
                     />
-                    <p className="text-[12.5px] text-text-tertiary mt-1">
-                      Send <span className="font-mono text-text-secondary">/start</span> to your bot, then use <span className="font-mono text-text-secondary">@userinfobot</span> or the Telegram Bot API to get your chat ID. For groups, add the bot and use the group chat ID.
-                    </p>
                   </div>
 
-                  <button
-                    onClick={handleSaveSettings}
-                    disabled={updateSettings.isPending}
-                    className="px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50"
-                  >
-                    {updateSettings.isPending ? t('common.loading') : t('common.save')}
-                  </button>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={handleSaveSettings}
+                      disabled={updateSettings.isPending}
+                      className="px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50"
+                    >
+                      {updateSettings.isPending ? t('common.loading') : t('common.save')}
+                    </button>
+
+                    {settings?.telegramChatId && (
+                      <button
+                        onClick={handleSendTelegramTest}
+                        disabled={telegramTest.isPending}
+                        className="px-4 py-2 rounded-lg text-[15px] font-medium bg-glass-bg text-text-primary border border-cream-3 cursor-pointer hover:bg-cream-3 disabled:opacity-50"
+                      >
+                        {telegramTest.isPending ? 'Sending…' : 'Send test message'}
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>

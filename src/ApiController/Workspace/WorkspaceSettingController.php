@@ -10,6 +10,8 @@ use App\Repository\WorkspaceRepository;
 use App\Repository\WorkspaceSettingRepository;
 use App\Security\Voter\WorkspaceVoter;
 use App\Service\PlanService;
+use App\Service\TelegramLinkTokenService;
+use App\Service\TelegramService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -151,6 +153,75 @@ class WorkspaceSettingController extends AbstractController
         $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
 
         return $this->jsonSuccess(['ip' => $request->getClientIp()]);
+    }
+
+    #[Route('/telegram-link-token', name: 'workspace_settings_telegram_link_token', methods: ['POST'])]
+    public function telegramLinkToken(
+        string $workspacePublicId,
+        WorkspaceRepository $workspaceRepository,
+        PlanService $planService,
+        TelegramLinkTokenService $tokenService,
+        string $telegramBotUsername,
+    ): JsonResponse {
+        $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
+        if ($workspace === null) {
+            throw new NotFoundHttpException('Workspace not found');
+        }
+
+        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
+
+        if (!$planService->canUseTelegramNotifications($workspace)) {
+            return $this->jsonError('Telegram notifications require the Espresso plan', 402);
+        }
+
+        if ($telegramBotUsername === '') {
+            return $this->jsonError('Telegram bot is not configured on the server', 503);
+        }
+
+        $token = $tokenService->issue((string) $workspace->getPublicId());
+
+        return $this->jsonSuccess([
+            'token' => $token,
+            'deepLink' => sprintf('https://t.me/%s?start=%s', $telegramBotUsername, $token),
+            'expiresInSeconds' => 600,
+        ]);
+    }
+
+    #[Route('/telegram-test', name: 'workspace_settings_telegram_test', methods: ['POST'])]
+    public function telegramTest(
+        string $workspacePublicId,
+        WorkspaceRepository $workspaceRepository,
+        PlanService $planService,
+        TelegramService $telegramService,
+    ): JsonResponse {
+        $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
+        if ($workspace === null) {
+            throw new NotFoundHttpException('Workspace not found');
+        }
+
+        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
+
+        if (!$planService->canUseTelegramNotifications($workspace)) {
+            return $this->jsonError('Telegram notifications require the Espresso plan', 402);
+        }
+
+        $setting = $workspace->getSetting();
+        $chatId = $setting?->getTelegramChatId();
+        if ($chatId === null || $chatId === '') {
+            return $this->jsonError('No Telegram chat is connected. Connect a chat first.', 400);
+        }
+
+        $message = sprintf(
+            "✅ <b>Test from DailyBrew</b>\n\nWorkspace: <b>%s</b>\n\nIf you can see this, Telegram notifications are working.",
+            htmlspecialchars($workspace->getName(), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+        );
+
+        $error = $telegramService->sendForResult($chatId, $message);
+        if ($error !== null) {
+            return $this->jsonError('Telegram rejected the test message: ' . $error, 502);
+        }
+
+        return $this->jsonSuccess(['sent' => true]);
     }
 
     private function serializeSetting(?WorkspaceSetting $setting): array
