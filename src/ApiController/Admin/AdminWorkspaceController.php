@@ -41,9 +41,12 @@ class AdminWorkspaceController extends AbstractController
         $plan = trim((string) $request->query->get('plan', ''));
         $includeDeleted = $request->query->getBoolean('includeDeleted');
 
+        // Subscription is joined (no association from Workspace) for the optional plan filter.
+        // Don't addSelect('s') — that triggers Doctrine's mixed-result hydration ([Workspace, Subscription])
+        // which breaks `array_map(fn (Workspace $w) ...)` downstream. Subscription is re-fetched in batchLoad.
         $qb = $workspaceRepository->createQueryBuilder('w')
             ->leftJoin('w.owner', 'o')->addSelect('o')
-            ->leftJoin(\App\Entity\Subscription::class, 's', 'WITH', 's.workspace = w')->addSelect('s')
+            ->leftJoin(\App\Entity\Subscription::class, 's', 'WITH', 's.workspace = w')
             ->orderBy('w.createdAt', 'DESC');
 
         if (!$includeDeleted) {
