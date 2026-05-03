@@ -11,10 +11,12 @@ import {
     LogOut,
     Crown,
     QrCode,
+    ShieldCheck,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePlan } from '@/hooks/queries/usePlan';
 import { useRoleContext } from '@/hooks/queries/useRoleContext';
+import { useAuthenticationState } from '@/hooks/use-authentication';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 import { LogoBrand } from '@/components/shared/Logo';
@@ -170,6 +172,8 @@ export function Sidebar() {
     const workspacePublicId = getWorkspacePublicId() ?? '';
     const { data: plan } = usePlan(workspacePublicId);
     const { data: roleContext } = useRoleContext();
+    const auth = useAuthenticationState();
+    const isSuperAdmin = auth.user?.isSuperAdmin ?? false;
 
     const isOwner = roleContext?.isOwner ?? false;
     const isEmployee = roleContext?.isEmployee ?? false;
@@ -277,6 +281,15 @@ export function Sidebar() {
                 </div>
 
                 <div className="mt-auto mb-4 space-y-1">
+                    {isSuperAdmin && (
+                        <Link
+                            to="/admin"
+                            className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer w-full font-sans text-[15.5px] text-coffee hover:bg-coffee/8 transition-all duration-180 no-underline"
+                        >
+                            <ShieldCheck size={16} />
+                            Admin panel
+                        </Link>
+                    )}
                     <ThemeToggle />
                     <button
                         onClick={signOut}
