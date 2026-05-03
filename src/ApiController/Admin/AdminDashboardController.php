@@ -11,6 +11,7 @@ use App\Entity\Workspace;
 use App\Enum\PlanEnum;
 use App\Enum\SubscriptionStatusEnum;
 use App\Repository\AdminAuditLogRepository;
+use App\Repository\AttendanceRepository;
 use App\Repository\EmployeeRepository;
 use App\Repository\SubscriptionRepository;
 use App\Repository\UserRepository;
@@ -30,6 +31,7 @@ class AdminDashboardController extends AbstractController
         UserRepository $userRepository,
         WorkspaceRepository $workspaceRepository,
         EmployeeRepository $employeeRepository,
+        AttendanceRepository $attendanceRepository,
         SubscriptionRepository $subscriptionRepository,
         AdminAuditLogRepository $auditRepository,
     ): JsonResponse {
@@ -126,6 +128,87 @@ class AdminDashboardController extends AbstractController
             ->getQuery()
             ->getSingleScalarResult();
 
+        // Attendance counted by check-in date (workspace-local), not row creation.
+        $sevenDaysAgoDate = DateService::relative('-7 days')->format('Y-m-d');
+        $thirtyDaysAgoDate = DateService::relative('-30 days')->format('Y-m-d');
+
+        $attendancesLast7d = (int) $attendanceRepository->createQueryBuilder('a')
+            ->select('COUNT(a.id)')
+            ->where('a.date >= :d')
+            ->setParameter('d', $sevenDaysAgoDate)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $attendancesLast30d = (int) $attendanceRepository->createQueryBuilder('a')
+            ->select('COUNT(a.id)')
+            ->where('a.date >= :d')
+            ->setParameter('d', $thirtyDaysAgoDate)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        // Daily chart series — last 30 days, one bucket per day, zero-filled.
+        $dayKeys = [];
+        $cursor = DateService::relative('-29 days');
+        for ($i = 0; $i < 30; $i++) {
+            $dayKeys[] = $cursor->format('Y-m-d');
+            $cursor = $cursor->modify('+1 day');
+        }
+        $emptyBuckets = array_fill_keys($dayKeys, 0);
+
+        $usersByDay = $this->bucketByDay(
+            $userRepository->createQueryBuilder('u')
+                ->select("SUBSTRING(u.createdAt, 1, 10) AS day, COUNT(u.id) AS c")
+                ->where('u.createdAt >= :d')
+                ->setParameter('d', $thirtyDaysAgo)
+                ->groupBy('day')
+                ->getQuery()
+                ->getArrayResult(),
+            $emptyBuckets,
+        );
+
+        $workspacesByDay = $this->bucketByDay(
+            $workspaceRepository->createQueryBuilder('w')
+                ->select("SUBSTRING(w.createdAt, 1, 10) AS day, COUNT(w.id) AS c")
+                ->where('w.deletedAt IS NULL')
+                ->andWhere('w.createdAt >= :d')
+                ->setParameter('d', $thirtyDaysAgo)
+                ->groupBy('day')
+                ->getQuery()
+                ->getArrayResult(),
+            $emptyBuckets,
+        );
+
+        $employeesByDay = $this->bucketByDay(
+            $employeeRepository->createQueryBuilder('e')
+                ->select("SUBSTRING(e.createdAt, 1, 10) AS day, COUNT(e.id) AS c")
+                ->where('e.deletedAt IS NULL')
+                ->andWhere('e.createdAt >= :d')
+                ->setParameter('d', $thirtyDaysAgo)
+                ->groupBy('day')
+                ->getQuery()
+                ->getArrayResult(),
+            $emptyBuckets,
+        );
+
+        $attendancesByDay = $this->bucketByDay(
+            $attendanceRepository->createQueryBuilder('a')
+                ->select("SUBSTRING(a.date, 1, 10) AS day, COUNT(a.id) AS c")
+                ->where('a.date >= :d')
+                ->setParameter('d', $thirtyDaysAgoDate)
+                ->groupBy('day')
+                ->getQuery()
+                ->getArrayResult(),
+            $emptyBuckets,
+        );
+
+        $growthSeries = array_map(fn (string $day) => [
+            'date' => $day,
+            'users' => $usersByDay[$day],
+            'workspaces' => $workspacesByDay[$day],
+            'employees' => $employeesByDay[$day],
+            'attendances' => $attendancesByDay[$day],
+        ], $dayKeys);
+
         // Last 5 signups
         /** @var User[] $recentSignups */
         $recentSignups = $userRepository->createQueryBuilder('u')
@@ -158,6 +241,7 @@ class AdminDashboardController extends AbstractController
                 'users' => $userRepository->count([]),
                 'workspaces' => $totalWorkspaces,
                 'employees' => $employeeRepository->count(['deletedAt' => null]),
+                'attendances' => $attendanceRepository->count([]),
                 'subscriptions' => $subscriptionRepository->count([]),
             ],
             'byPlan' => $byPlan,
@@ -169,7 +253,10 @@ class AdminDashboardController extends AbstractController
                 'workspacesLast30d' => $workspacesLast30d,
                 'employeesLast7d' => $employeesLast7d,
                 'employeesLast30d' => $employeesLast30d,
+                'attendancesLast7d' => $attendancesLast7d,
+                'attendancesLast30d' => $attendancesLast30d,
             ],
+            'growthSeries' => $growthSeries,
             'recentSignups' => array_map(fn (User $u) => [
                 'publicId' => (string) $u->getPublicId(),
                 'email' => $u->getEmail(),
@@ -196,5 +283,24 @@ class AdminDashboardController extends AbstractController
                 'createdAt' => $log->getCreatedAt()->format('c'),
             ], $recentActivity),
         ]);
+    }
+
+    /**
+     * @param array<int, array{day: string|null, c: int|string}> $rows
+     * @param array<string, int>                                 $emptyBuckets
+     *
+     * @return array<string, int>
+     */
+    private function bucketByDay(array $rows, array $emptyBuckets): array
+    {
+        $buckets = $emptyBuckets;
+        foreach ($rows as $row) {
+            $day = (string) ($row['day'] ?? '');
+            if (isset($buckets[$day])) {
+                $buckets[$day] = (int) $row['c'];
+            }
+        }
+
+        return $buckets;
     }
 }

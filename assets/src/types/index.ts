@@ -14,6 +14,7 @@ export interface AdminDashboardData {
     users: number;
     workspaces: number;
     employees: number;
+    attendances: number;
     subscriptions: number;
   };
   byPlan: Record<'free' | 'espresso' | 'double_espresso', number>;
@@ -25,7 +26,16 @@ export interface AdminDashboardData {
     workspacesLast30d: number;
     employeesLast7d: number;
     employeesLast30d: number;
+    attendancesLast7d: number;
+    attendancesLast30d: number;
   };
+  growthSeries: {
+    date: string;
+    users: number;
+    workspaces: number;
+    employees: number;
+    attendances: number;
+  }[];
   recentSignups: { publicId: string; email: string; fullName: string; createdAt: string }[];
   recentWorkspaces: {
     publicId: string;

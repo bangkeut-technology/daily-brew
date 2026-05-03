@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useAdminDashboard } from '@/hooks/queries/useAdmin';
 import {
   Building2,
+  CalendarCheck,
   CreditCard,
   UserCircle,
   Users,
@@ -11,6 +13,7 @@ import {
   ScrollText,
   ArrowRight,
 } from 'lucide-react';
+import type { AdminDashboardData } from '@/types';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard } from '@/components/shared/GlassCard';
 import { cn } from '@/lib/utils';
@@ -35,10 +38,11 @@ function AdminDashboardPage() {
       {data && (
         <>
           {/* Totals row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             <StatCard label="Users" value={data.totals.users} icon={UserCircle} accent="from-blue to-blue/70" />
             <StatCard label="Workspaces" value={data.totals.workspaces} icon={Building2} accent="from-coffee to-amber" />
             <StatCard label="Employees" value={data.totals.employees} icon={Users} accent="from-amber to-amber-light" />
+            <StatCard label="Attendances" value={data.totals.attendances} icon={CalendarCheck} accent="from-green to-amber" />
             <StatCard label="Subscriptions" value={data.totals.subscriptions} icon={CreditCard} accent="from-green to-green/70" />
           </div>
 
@@ -67,17 +71,22 @@ function AdminDashboardPage() {
                   <TrendingUp size={14} />
                   <span className="text-[12.5px] font-medium uppercase tracking-wide">Growth</span>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <GrowthCell label="New users · 7d" value={data.growth.usersLast7d} />
                   <GrowthCell label="New workspaces · 7d" value={data.growth.workspacesLast7d} />
                   <GrowthCell label="New employees · 7d" value={data.growth.employeesLast7d} />
+                  <GrowthCell label="Attendances · 7d" value={data.growth.attendancesLast7d} />
                   <GrowthCell label="New users · 30d" value={data.growth.usersLast30d} />
                   <GrowthCell label="New workspaces · 30d" value={data.growth.workspacesLast30d} />
                   <GrowthCell label="New employees · 30d" value={data.growth.employeesLast30d} />
+                  <GrowthCell label="Attendances · 30d" value={data.growth.attendancesLast30d} />
                 </div>
               </div>
             </GlassCard>
           </div>
+
+          {/* 30-day growth chart */}
+          <GrowthChart series={data.growthSeries} className="mt-4" />
 
           {/* Subscription status breakdown */}
           <GlassCard className="mt-4">
@@ -319,6 +328,212 @@ function ListHeader({
 
 function EmptyHint({ children }: { children: React.ReactNode }) {
   return <p className="text-[13px] text-text-tertiary py-2">{children}</p>;
+}
+
+type GrowthSeries = AdminDashboardData['growthSeries'];
+
+const SERIES_META: { key: keyof GrowthSeries[number]; label: string; color: string }[] = [
+  { key: 'attendances', label: 'Attendances', color: 'var(--color-green, #4A7C59)' },
+  { key: 'employees', label: 'Employees', color: 'var(--color-amber, #C8893E)' },
+  { key: 'workspaces', label: 'Workspaces', color: 'var(--color-coffee, #6B4226)' },
+  { key: 'users', label: 'Users', color: 'var(--color-blue, #3B6FA0)' },
+];
+
+function GrowthChart({ series, className }: { series: GrowthSeries; className?: string }) {
+  const [active, setActive] = useState<Record<string, boolean>>({
+    attendances: true,
+    employees: true,
+    workspaces: true,
+    users: true,
+  });
+  const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+
+  const width = 720;
+  const height = 220;
+  const padL = 36;
+  const padR = 12;
+  const padT = 12;
+  const padB = 26;
+  const innerW = width - padL - padR;
+  const innerH = height - padT - padB;
+  const n = series.length;
+
+  const visible = SERIES_META.filter((m) => active[m.key]);
+  const max = Math.max(
+    1,
+    ...visible.flatMap((m) => series.map((p) => p[m.key] as number)),
+  );
+
+  const x = (i: number) => (n <= 1 ? padL : padL + (i * innerW) / (n - 1));
+  const y = (v: number) => padT + innerH - (v / max) * innerH;
+
+  const yTicks = 4;
+  const tickValues = Array.from({ length: yTicks + 1 }, (_, k) => Math.round((max * k) / yTicks));
+
+  const xTickIdx = n <= 1 ? [0] : [0, Math.floor((n - 1) / 2), n - 1];
+
+  return (
+    <GlassCard className={className}>
+      <div className="px-5 py-4">
+        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+          <div className="flex items-center gap-2 text-text-tertiary">
+            <TrendingUp size={14} />
+            <span className="text-[12.5px] font-medium uppercase tracking-wide">Growth · last 30 days</span>
+          </div>
+          <div className="flex items-center gap-3 flex-wrap">
+            {SERIES_META.map((m) => {
+              const on = active[m.key];
+              return (
+                <button
+                  key={m.key as string}
+                  type="button"
+                  onClick={() => setActive((s) => ({ ...s, [m.key]: !s[m.key] }))}
+                  className={cn(
+                    'flex items-center gap-1.5 text-[12px] transition-opacity',
+                    on ? 'opacity-100' : 'opacity-40 hover:opacity-70',
+                  )}
+                >
+                  <span className="w-2.5 h-2.5 rounded-sm" style={{ background: m.color }} />
+                  <span className="text-text-secondary">{m.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="relative">
+          <svg
+            viewBox={`0 0 ${width} ${height}`}
+            preserveAspectRatio="none"
+            className="w-full h-[220px]"
+            onMouseLeave={() => setHoverIdx(null)}
+            onMouseMove={(e) => {
+              const rect = (e.currentTarget as SVGSVGElement).getBoundingClientRect();
+              const px = ((e.clientX - rect.left) / rect.width) * width;
+              if (px < padL || px > width - padR || n === 0) {
+                setHoverIdx(null);
+                return;
+              }
+              const i = n <= 1 ? 0 : Math.round(((px - padL) / innerW) * (n - 1));
+              setHoverIdx(Math.max(0, Math.min(n - 1, i)));
+            }}
+          >
+            {tickValues.map((v, k) => {
+              const yy = y(v);
+              return (
+                <g key={k}>
+                  <line
+                    x1={padL}
+                    x2={width - padR}
+                    y1={yy}
+                    y2={yy}
+                    stroke="currentColor"
+                    className="text-cream-3"
+                    strokeWidth={1}
+                  />
+                  <text
+                    x={padL - 6}
+                    y={yy + 3}
+                    textAnchor="end"
+                    className="fill-text-tertiary"
+                    style={{ fontSize: 10 }}
+                  >
+                    {v}
+                  </text>
+                </g>
+              );
+            })}
+
+            {xTickIdx.map((i) => (
+              <text
+                key={i}
+                x={x(i)}
+                y={height - 8}
+                textAnchor="middle"
+                className="fill-text-tertiary"
+                style={{ fontSize: 10 }}
+              >
+                {formatChartDate(series[i]?.date ?? '')}
+              </text>
+            ))}
+
+            {visible.map((m) => {
+              const points = series.map((p, i) => `${x(i)},${y(p[m.key] as number)}`).join(' ');
+              return (
+                <polyline
+                  key={m.key as string}
+                  points={points}
+                  fill="none"
+                  stroke={m.color}
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              );
+            })}
+
+            {hoverIdx !== null && (
+              <>
+                <line
+                  x1={x(hoverIdx)}
+                  x2={x(hoverIdx)}
+                  y1={padT}
+                  y2={padT + innerH}
+                  stroke="currentColor"
+                  className="text-text-tertiary"
+                  strokeDasharray="3 3"
+                  strokeWidth={1}
+                />
+                {visible.map((m) => (
+                  <circle
+                    key={m.key as string}
+                    cx={x(hoverIdx)}
+                    cy={y(series[hoverIdx][m.key] as number)}
+                    r={3}
+                    fill={m.color}
+                  />
+                ))}
+              </>
+            )}
+          </svg>
+
+          {hoverIdx !== null && series[hoverIdx] && (
+            <div
+              className="absolute top-0 bg-cream-1 border border-glass-border rounded-lg shadow-sm px-3 py-2 text-[12px] pointer-events-none"
+              style={{
+                left: `${(x(hoverIdx) / width) * 100}%`,
+                transform: hoverIdx > n / 2 ? 'translate(-105%, 0)' : 'translate(8px, 0)',
+              }}
+            >
+              <div className="font-medium text-text-primary mb-1 tabular-nums">
+                {formatChartDate(series[hoverIdx].date, true)}
+              </div>
+              {visible.map((m) => (
+                <div key={m.key as string} className="flex items-center gap-2 tabular-nums">
+                  <span className="w-2 h-2 rounded-sm" style={{ background: m.color }} />
+                  <span className="text-text-secondary">{m.label}</span>
+                  <span className="ml-auto font-semibold text-text-primary">
+                    {(series[hoverIdx][m.key] as number).toLocaleString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </GlassCard>
+  );
+}
+
+function formatChartDate(iso: string, withYear = false): string {
+  if (!iso) return '';
+  const [y, m, d] = iso.split('-').map((s) => Number(s));
+  const date = new Date(y, (m ?? 1) - 1, d ?? 1);
+  return date.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    ...(withYear ? { year: 'numeric' } : {}),
+  });
 }
 
 function formatRelative(iso: string): string {
