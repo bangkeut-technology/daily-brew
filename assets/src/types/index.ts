@@ -16,6 +16,31 @@ export interface AdminDashboardData {
     employees: number;
     subscriptions: number;
   };
+  byPlan: Record<'free' | 'espresso' | 'double_espresso', number>;
+  byStatus: Record<'active' | 'trialing' | 'past_due' | 'paused' | 'canceled', number>;
+  growth: {
+    usersLast7d: number;
+    usersLast30d: number;
+    workspacesLast7d: number;
+    workspacesLast30d: number;
+  };
+  recentSignups: { publicId: string; email: string; fullName: string; createdAt: string }[];
+  recentWorkspaces: {
+    publicId: string;
+    name: string;
+    owner: { publicId: string; email: string } | null;
+    createdAt: string;
+  }[];
+  recentActivity: {
+    publicId: string;
+    action: string;
+    actionLabel: string;
+    actorEmail: string | null;
+    targetType: string;
+    targetPublicId: string | null;
+    targetLabel: string | null;
+    createdAt: string;
+  }[];
 }
 
 export interface AdminPagedResponse<T> {
