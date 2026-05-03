@@ -72,13 +72,28 @@ abstract class AbstractOAuthAuthController extends AbstractController
             // Clear the state cookie
             $response->headers->clearCookie(self::STATE_COOKIE, '/');
 
+            $firstName = method_exists($oauthUser, 'getFirstName') ? $oauthUser->getFirstName() : null;
+            $lastName = method_exists($oauthUser, 'getLastName') ? $oauthUser->getLastName() : null;
+
+            // Some Google accounts (Brand Accounts, certain Workspace policies) omit
+            // given_name / family_name even with `profile` scope but still return `name`.
+            // Split the full name on first whitespace as a fallback.
+            if ($firstName === null && $lastName === null && method_exists($oauthUser, 'getName')) {
+                $name = trim((string) $oauthUser->getName());
+                if ($name !== '') {
+                    $parts = preg_split('/\s+/', $name, 2) ?: [];
+                    $firstName = $parts[0] ?? null;
+                    $lastName = $parts[1] ?? null;
+                }
+            }
+
             $this->authenticationService->authenticate(
                 new OAuthUserData(
                     provider: $this->provider,
                     providerId: $oauthUser->getId(),
                     email: strtolower($oauthUser->getEmail() ?? ''),
-                    firstName: method_exists($oauthUser, 'getFirstName') ? $oauthUser->getFirstName() : null,
-                    lastName: method_exists($oauthUser, 'getLastName') ? $oauthUser->getLastName() : null,
+                    firstName: $firstName,
+                    lastName: $lastName,
                 ),
                 $response,
             );

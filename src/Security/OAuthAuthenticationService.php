@@ -39,6 +39,17 @@ final readonly class OAuthAuthenticationService
             $user->setLastName($data->lastName);
             $user->linkOAuth($data->provider, $data->providerId);
             $this->userRepository->persist($user);
+        } else {
+            // Backfill name on existing users when we have one from OAuth and the user
+            // doesn't yet — covers users created without a name (e.g. early Google sign-ins
+            // where given_name / family_name were missing, or password sign-ups that didn't
+            // ask for a name).
+            if ($data->firstName !== null && $user->getFirstName() === null) {
+                $user->setFirstName($data->firstName);
+            }
+            if ($data->lastName !== null && $user->getLastName() === null) {
+                $user->setLastName($data->lastName);
+            }
         }
 
         $this->userRepository->flush();
