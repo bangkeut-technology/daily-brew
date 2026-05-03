@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.43.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.43.0...v1.43.1) (2026-05-03)
+
+
+### Bug Fixes
+
+* **admin:** dashboard spacing + add employee growth metrics ([974c8c1](https://github.com/bangkeut-technology/daily-brew/commit/974c8c110b050514c6a8c80ec10d1cba04f53346))
+
 ## [1.43.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.42.1...v1.43.0) (2026-05-03)
 
 
