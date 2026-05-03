@@ -9,7 +9,6 @@
         "@tanstack/router-cli": "^1.166.40",
         "@types/react": "^19.2.14",
         "@types/react-dom": "^19.2.3",
-        "ajv": "^8.20.0",
         "core-js": "^3.49.0",
         "eslint": "^10.3.0",
         "eslint-plugin-react-hooks": "^7.1.1",
@@ -44,13 +43,8 @@
         ]
     },
     "overrides": {
-        "ajv": "$ajv",
         "fork-ts-checker-webpack-plugin": {
-            "ajv": "6.12.6",
             "schema-utils": "3.3.0"
-        },
-        "eslint": {
-            "ajv": "6.12.6"
         }
     },
     "dependencies": {
