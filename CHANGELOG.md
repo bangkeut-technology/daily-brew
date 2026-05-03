@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.42.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.42.0...v1.42.1) (2026-05-03)
+
+
+### Bug Fixes
+
+* **oauth:** capture name on existing users + fall back to full name claim ([30c47a6](https://github.com/bangkeut-technology/daily-brew/commit/30c47a62f4054a69cd594b6cc6e509552f5f43bc))
+
 ## [1.42.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.41.0...v1.42.0) (2026-05-03)
 
 
