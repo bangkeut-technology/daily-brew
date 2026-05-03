@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.43.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.42.1...v1.43.0) (2026-05-03)
+
+
+### Features
+
+* **admin:** expand dashboard with plan / status / growth / recent activity ([904a8af](https://github.com/bangkeut-technology/daily-brew/commit/904a8af80a2b804898e644669a3114c999e0ef1c))
+
+
+### Bug Fixes
+
+* **build:** unbreak webpack dev by removing conflicting ajv overrides ([4794c25](https://github.com/bangkeut-technology/daily-brew/commit/4794c25611f5504314c80e602a61f71771c19209))
+
 ## [1.42.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.42.0...v1.42.1) (2026-05-03)
 
 
