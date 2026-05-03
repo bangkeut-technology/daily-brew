@@ -67,19 +67,21 @@ function AdminDashboardPage() {
                   <TrendingUp size={14} />
                   <span className="text-[12.5px] font-medium uppercase tracking-wide">Growth</span>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   <GrowthCell label="New users · 7d" value={data.growth.usersLast7d} />
-                  <GrowthCell label="New users · 30d" value={data.growth.usersLast30d} />
                   <GrowthCell label="New workspaces · 7d" value={data.growth.workspacesLast7d} />
+                  <GrowthCell label="New employees · 7d" value={data.growth.employeesLast7d} />
+                  <GrowthCell label="New users · 30d" value={data.growth.usersLast30d} />
                   <GrowthCell label="New workspaces · 30d" value={data.growth.workspacesLast30d} />
+                  <GrowthCell label="New employees · 30d" value={data.growth.employeesLast30d} />
                 </div>
               </div>
             </GlassCard>
           </div>
 
           {/* Subscription status breakdown */}
-          <GlassCard>
-            <div className="px-5 py-4 mt-4">
+          <GlassCard className="mt-4">
+            <div className="px-5 py-4">
               <div className="flex items-center gap-2 text-text-tertiary mb-3">
                 <CreditCard size={14} />
                 <span className="text-[12.5px] font-medium uppercase tracking-wide">Subscription status</span>

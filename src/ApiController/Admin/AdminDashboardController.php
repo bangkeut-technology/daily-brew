@@ -110,6 +110,22 @@ class AdminDashboardController extends AbstractController
             ->getQuery()
             ->getSingleScalarResult();
 
+        $employeesLast7d = (int) $employeeRepository->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->where('e.deletedAt IS NULL')
+            ->andWhere('e.createdAt >= :d')
+            ->setParameter('d', $sevenDaysAgo)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $employeesLast30d = (int) $employeeRepository->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->where('e.deletedAt IS NULL')
+            ->andWhere('e.createdAt >= :d')
+            ->setParameter('d', $thirtyDaysAgo)
+            ->getQuery()
+            ->getSingleScalarResult();
+
         // Last 5 signups
         /** @var User[] $recentSignups */
         $recentSignups = $userRepository->createQueryBuilder('u')
@@ -151,6 +167,8 @@ class AdminDashboardController extends AbstractController
                 'usersLast30d' => $usersLast30d,
                 'workspacesLast7d' => $workspacesLast7d,
                 'workspacesLast30d' => $workspacesLast30d,
+                'employeesLast7d' => $employeesLast7d,
+                'employeesLast30d' => $employeesLast30d,
             ],
             'recentSignups' => array_map(fn (User $u) => [
                 'publicId' => (string) $u->getPublicId(),

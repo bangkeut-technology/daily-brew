@@ -23,6 +23,8 @@ export interface AdminDashboardData {
     usersLast30d: number;
     workspacesLast7d: number;
     workspacesLast30d: number;
+    employeesLast7d: number;
+    employeesLast30d: number;
   };
   recentSignups: { publicId: string; email: string; fullName: string; createdAt: string }[];
   recentWorkspaces: {
