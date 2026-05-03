@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.44.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.43.1...v1.44.0) (2026-05-03)
+
+
+### Features
+
+* **admin:** add total attendance metric + 30-day growth chart ([49ba049](https://github.com/bangkeut-technology/daily-brew/commit/49ba0497b1cc4eb4f7a6cd3923d03deb7c4b786c))
+
 ## [1.43.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.43.0...v1.43.1) (2026-05-03)
 
 
