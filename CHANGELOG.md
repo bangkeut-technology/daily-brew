@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.42.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.41.0...v1.42.0) (2026-05-03)
+
+
+### Features
+
+* **admin:** add admin panel link in console sidebar for super admins ([5274b72](https://github.com/bangkeut-technology/daily-brew/commit/5274b722129d7f5627b662e8a05d11e479783c5e))
+
+
+### Bug Fixes
+
+* **admin:** drop addSelect('s') on Subscription class-join in workspace list ([d5abe0a](https://github.com/bangkeut-technology/daily-brew/commit/d5abe0aff851b020fda55dddd897f1c409897898))
+
 ## [1.41.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.40.2...v1.41.0) (2026-05-02)
 
 
