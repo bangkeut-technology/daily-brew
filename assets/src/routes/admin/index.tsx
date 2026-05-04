@@ -13,6 +13,16 @@ import {
   ScrollText,
   ArrowRight,
 } from 'lucide-react';
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+import type { TooltipContentProps } from 'recharts/types/component/Tooltip';
 import type { AdminDashboardData } from '@/types';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard } from '@/components/shared/GlassCard';
@@ -331,8 +341,9 @@ function EmptyHint({ children }: { children: React.ReactNode }) {
 }
 
 type GrowthSeries = AdminDashboardData['growthSeries'];
+type SeriesKey = 'attendances' | 'employees' | 'workspaces' | 'users';
 
-const SERIES_META: { key: keyof GrowthSeries[number]; label: string; color: string }[] = [
+const SERIES_META: { key: SeriesKey; label: string; color: string }[] = [
   { key: 'attendances', label: 'Attendances', color: 'var(--color-green, #4A7C59)' },
   { key: 'employees', label: 'Employees', color: 'var(--color-amber, #C8893E)' },
   { key: 'workspaces', label: 'Workspaces', color: 'var(--color-coffee, #6B4226)' },
@@ -340,37 +351,12 @@ const SERIES_META: { key: keyof GrowthSeries[number]; label: string; color: stri
 ];
 
 function GrowthChart({ series, className }: { series: GrowthSeries; className?: string }) {
-  const [active, setActive] = useState<Record<string, boolean>>({
+  const [active, setActive] = useState<Record<SeriesKey, boolean>>({
     attendances: true,
     employees: true,
     workspaces: true,
     users: true,
   });
-  const [hoverIdx, setHoverIdx] = useState<number | null>(null);
-
-  const width = 720;
-  const height = 220;
-  const padL = 36;
-  const padR = 12;
-  const padT = 12;
-  const padB = 26;
-  const innerW = width - padL - padR;
-  const innerH = height - padT - padB;
-  const n = series.length;
-
-  const visible = SERIES_META.filter((m) => active[m.key]);
-  const max = Math.max(
-    1,
-    ...visible.flatMap((m) => series.map((p) => p[m.key] as number)),
-  );
-
-  const x = (i: number) => (n <= 1 ? padL : padL + (i * innerW) / (n - 1));
-  const y = (v: number) => padT + innerH - (v / max) * innerH;
-
-  const yTicks = 4;
-  const tickValues = Array.from({ length: yTicks + 1 }, (_, k) => Math.round((max * k) / yTicks));
-
-  const xTickIdx = n <= 1 ? [0] : [0, Math.floor((n - 1) / 2), n - 1];
 
   return (
     <GlassCard className={className}>
@@ -385,7 +371,7 @@ function GrowthChart({ series, className }: { series: GrowthSeries; className?: 
               const on = active[m.key];
               return (
                 <button
-                  key={m.key as string}
+                  key={m.key}
                   type="button"
                   onClick={() => setActive((s) => ({ ...s, [m.key]: !s[m.key] }))}
                   className={cn(
@@ -401,127 +387,72 @@ function GrowthChart({ series, className }: { series: GrowthSeries; className?: 
           </div>
         </div>
 
-        <div className="relative">
-          <svg
-            viewBox={`0 0 ${width} ${height}`}
-            preserveAspectRatio="none"
-            className="w-full h-[220px]"
-            onMouseLeave={() => setHoverIdx(null)}
-            onMouseMove={(e) => {
-              const rect = (e.currentTarget as SVGSVGElement).getBoundingClientRect();
-              const px = ((e.clientX - rect.left) / rect.width) * width;
-              if (px < padL || px > width - padR || n === 0) {
-                setHoverIdx(null);
-                return;
-              }
-              const i = n <= 1 ? 0 : Math.round(((px - padL) / innerW) * (n - 1));
-              setHoverIdx(Math.max(0, Math.min(n - 1, i)));
-            }}
-          >
-            {tickValues.map((v, k) => {
-              const yy = y(v);
-              return (
-                <g key={k}>
-                  <line
-                    x1={padL}
-                    x2={width - padR}
-                    y1={yy}
-                    y2={yy}
-                    stroke="currentColor"
-                    className="text-cream-3"
-                    strokeWidth={1}
+        <div className="h-[220px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={series} margin={{ top: 8, right: 12, left: -12, bottom: 0 }}>
+              <CartesianGrid stroke="var(--color-cream-3, #E8DFD3)" strokeDasharray="0" vertical={false} />
+              <XAxis
+                dataKey="date"
+                tick={{ fill: 'var(--color-text-tertiary, #8B7E70)', fontSize: 10 }}
+                tickLine={false}
+                axisLine={{ stroke: 'var(--color-cream-3, #E8DFD3)' }}
+                tickFormatter={(v: string) => formatChartDate(v)}
+                minTickGap={32}
+              />
+              <YAxis
+                tick={{ fill: 'var(--color-text-tertiary, #8B7E70)', fontSize: 10 }}
+                tickLine={false}
+                axisLine={false}
+                width={36}
+                allowDecimals={false}
+              />
+              <Tooltip
+                cursor={{ stroke: 'var(--color-text-tertiary, #8B7E70)', strokeDasharray: '3 3', strokeWidth: 1 }}
+                content={(props) => <GrowthTooltip {...(props as TooltipContentProps<number, string>)} />}
+              />
+              {SERIES_META.map((m) =>
+                active[m.key] ? (
+                  <Line
+                    key={m.key}
+                    type="monotone"
+                    dataKey={m.key}
+                    name={m.label}
+                    stroke={m.color}
+                    strokeWidth={2}
+                    dot={false}
+                    activeDot={{ r: 3, fill: m.color, stroke: m.color }}
+                    isAnimationActive={false}
                   />
-                  <text
-                    x={padL - 6}
-                    y={yy + 3}
-                    textAnchor="end"
-                    className="fill-text-tertiary"
-                    style={{ fontSize: 10 }}
-                  >
-                    {v}
-                  </text>
-                </g>
-              );
-            })}
-
-            {xTickIdx.map((i) => (
-              <text
-                key={i}
-                x={x(i)}
-                y={height - 8}
-                textAnchor="middle"
-                className="fill-text-tertiary"
-                style={{ fontSize: 10 }}
-              >
-                {formatChartDate(series[i]?.date ?? '')}
-              </text>
-            ))}
-
-            {visible.map((m) => {
-              const points = series.map((p, i) => `${x(i)},${y(p[m.key] as number)}`).join(' ');
-              return (
-                <polyline
-                  key={m.key as string}
-                  points={points}
-                  fill="none"
-                  stroke={m.color}
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              );
-            })}
-
-            {hoverIdx !== null && (
-              <>
-                <line
-                  x1={x(hoverIdx)}
-                  x2={x(hoverIdx)}
-                  y1={padT}
-                  y2={padT + innerH}
-                  stroke="currentColor"
-                  className="text-text-tertiary"
-                  strokeDasharray="3 3"
-                  strokeWidth={1}
-                />
-                {visible.map((m) => (
-                  <circle
-                    key={m.key as string}
-                    cx={x(hoverIdx)}
-                    cy={y(series[hoverIdx][m.key] as number)}
-                    r={3}
-                    fill={m.color}
-                  />
-                ))}
-              </>
-            )}
-          </svg>
-
-          {hoverIdx !== null && series[hoverIdx] && (
-            <div
-              className="absolute top-0 bg-cream-1 border border-glass-border rounded-lg shadow-sm px-3 py-2 text-[12px] pointer-events-none"
-              style={{
-                left: `${(x(hoverIdx) / width) * 100}%`,
-                transform: hoverIdx > n / 2 ? 'translate(-105%, 0)' : 'translate(8px, 0)',
-              }}
-            >
-              <div className="font-medium text-text-primary mb-1 tabular-nums">
-                {formatChartDate(series[hoverIdx].date, true)}
-              </div>
-              {visible.map((m) => (
-                <div key={m.key as string} className="flex items-center gap-2 tabular-nums">
-                  <span className="w-2 h-2 rounded-sm" style={{ background: m.color }} />
-                  <span className="text-text-secondary">{m.label}</span>
-                  <span className="ml-auto font-semibold text-text-primary">
-                    {(series[hoverIdx][m.key] as number).toLocaleString()}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
+                ) : null,
+              )}
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </GlassCard>
+  );
+}
+
+function GrowthTooltip({ active, payload, label }: TooltipContentProps<number, string>) {
+  if (!active || !payload || payload.length === 0) return null;
+  const ordered = SERIES_META.map((m) => {
+    const item = payload.find((p) => p.dataKey === m.key);
+    return item ? { meta: m, value: Number(item.value ?? 0) } : null;
+  }).filter((x): x is { meta: (typeof SERIES_META)[number]; value: number } => x !== null);
+
+  return (
+    <div className="bg-cream-1 border border-glass-border rounded-lg shadow-sm px-3 py-2 text-[12px]">
+      <div className="font-medium text-text-primary mb-1 tabular-nums">
+        {formatChartDate(String(label ?? ''), true)}
+      </div>
+      {ordered.map(({ meta, value }) => (
+        <div key={meta.key} className="flex items-center gap-2 tabular-nums">
+          <span className="w-2 h-2 rounded-sm" style={{ background: meta.color }} />
+          <span className="text-text-secondary">{meta.label}</span>
+          <span className="ml-auto font-semibold text-text-primary">{value.toLocaleString()}</span>
+        </div>
+      ))}
+    </div>
   );
 }
 
