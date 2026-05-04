@@ -26,24 +26,25 @@ DailyBrew helps restaurant owners manage their team's daily attendance through Q
 
 ## Plans
 
-| Feature                       | Free     | Espresso ($14.99/mo) | Double Espresso ($39.99/mo) |
-|-------------------------------|----------|----------------------|-----------------------------|
-| Employees                     | Up to 10 | Up to 20             | Unlimited                   |
-| QR check-in                   | Yes      | Yes                  | Yes                         |
-| Shifts & closures             | Yes      | Yes                  | Yes                         |
-| Dashboard & attendance log    | Yes      | Yes                  | Yes                         |
-| Leave requests                | -        | Yes                  | Yes                         |
-| Manager role                  | -        | Up to 2              | Unlimited                   |
-| Multiple QR codes (sub-workspaces) | -   | -                    | Yes                         |
-| IP restriction                | -        | Yes                  | Yes                         |
-| Device verification           | -        | Yes                  | Yes                         |
-| Geofencing                    | -        | Yes                  | Yes                         |
-| Per-day shift schedules       | -        | Yes                  | Yes                         |
-| Employee username (BasilBook) | -        | Yes                  | Yes                         |
-| BasilBook API (attendance)    | -        | Yes                  | Yes                         |
-| Push & email notifications    | -        | Yes                  | Yes                         |
-| Daily attendance summary      | -        | Yes                  | Yes                         |
-| Priority support              | -        | -                    | Yes                         |
+| Feature                            | Free     | Espresso ($14.99/mo · $149/yr) | Double Espresso ($39.99/mo · $399/yr) |
+|------------------------------------|----------|--------------------------------|---------------------------------------|
+| Employees                          | Up to 10 | Up to 20                       | Unlimited                             |
+| QR check-in                        | Yes      | Yes                            | Yes                                   |
+| Shifts & closures                  | Yes      | Yes                            | Yes                                   |
+| Dashboard & attendance log         | Yes      | Yes                            | Yes                                   |
+| Leave requests                     | -        | Yes                            | Yes                                   |
+| Manager role                       | -        | Up to 2                        | Unlimited                             |
+| Multiple QR codes (sub-workspaces) | -        | -                              | Yes (per-QR IP / geofence / device)   |
+| Per-QR manager assignment          | -        | -                              | Yes                                   |
+| IP restriction                     | -        | Yes                            | Yes                                   |
+| Device verification                | -        | Yes                            | Yes                                   |
+| Geofencing                         | -        | Yes                            | Yes                                   |
+| Per-day shift schedules            | -        | Yes                            | Yes                                   |
+| Employee username (BasilBook)      | -        | Yes                            | Yes                                   |
+| BasilBook API (attendance)         | -        | Yes                            | Yes                                   |
+| Push & email notifications         | -        | Yes                            | Yes                                   |
+| Daily attendance summary           | -        | Yes                            | Yes                                   |
+| Priority support                   | -        | -                              | Yes                                   |
 
 Payments are handled via **Paddle**.
 
