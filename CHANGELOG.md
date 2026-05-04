@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.44.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.44.0...v1.44.1) (2026-05-04)
+
+
+### Miscellaneous Chores
+
+* release 1.44.1 ([666c5bf](https://github.com/bangkeut-technology/daily-brew/commit/666c5bf8f98027c45683e22eb63e4f4c82145c85))
+
 ## [1.44.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.43.1...v1.44.0) (2026-05-03)
 
 
