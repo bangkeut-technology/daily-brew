@@ -361,7 +361,7 @@ class UserController extends AbstractController
         $accountDeletionService->softDelete($user);
 
         $response = $this->jsonSuccess(['deleted' => true]);
-        $response->headers->clearCookie('BEARER', '/');
+        $response->headers->clearCookie('BEARER', '/api/v1');
         $response->headers->clearCookie('refresh_token', '/');
 
         return $response;

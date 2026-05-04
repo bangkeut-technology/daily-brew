@@ -29,13 +29,20 @@ class LogoutController extends AbstractController
             ? $this->jsonSuccess(['message' => 'Logged out'])
             : new RedirectResponse('/sign-in');
 
-        // Expire both cookies — match every attribute the browser might have stored
-        foreach (['BEARER', 'refresh_token'] as $name) {
+        // Expire both cookies. Path must match what was originally set — BEARER lives
+        // at /api/v1 (lexik_jwt_authentication.yaml), refresh_token at /. A clear
+        // cookie with a different path is treated as a separate cookie by the browser
+        // and leaves the original alive.
+        $cookies = [
+            'BEARER' => '/api/v1',
+            'refresh_token' => '/',
+        ];
+        foreach ($cookies as $name => $path) {
             $response->headers->setCookie(
                 \Symfony\Component\HttpFoundation\Cookie::create($name)
                     ->withValue('')
                     ->withExpires(1)
-                    ->withPath('/')
+                    ->withPath($path)
                     ->withDomain(null)
                     ->withSecure($request->isSecure())
                     ->withHttpOnly(true)
