@@ -15,6 +15,10 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 #[AllowMockObjectsWithoutExpectations]
 class AuthServiceTest extends TestCase
 {
+    // Placeholder used in register() calls — value never validated by the SUT,
+    // chosen to avoid tripping generic-password secret scanners on test fixtures.
+    private const string FAKE_PW = 'unit-test-placeholder';
+
     private UserRepository&MockObject $userRepo;
     private UserPasswordHasherInterface&MockObject $passwordHasher;
     private AuthService $svc;
@@ -35,7 +39,7 @@ class AuthServiceTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Email already in use');
 
-        $this->svc->register('owner@dailybrew.work', 'password123');
+        $this->svc->register('owner@dailybrew.work', self::FAKE_PW);
     }
 
     public function testRegisterPersistsHashedUserAndCanonicalizesEmail(): void
@@ -45,7 +49,7 @@ class AuthServiceTest extends TestCase
         $this->userRepo->expects($this->once())->method('persist')->with($this->isInstanceOf(User::class));
         $this->userRepo->expects($this->once())->method('flush');
 
-        $user = $this->svc->register('Owner@DailyBrew.Work', 'password123', 'Vandeth', 'Tho');
+        $user = $this->svc->register('Owner@DailyBrew.Work', self::FAKE_PW, 'Vandeth', 'Tho');
 
         $this->assertSame('Owner@DailyBrew.Work', $user->getEmail());
         $this->assertSame('owner@dailybrew.work', $user->getEmailCanonical());
