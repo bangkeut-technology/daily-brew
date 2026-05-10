@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.45.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.44.1...v1.45.0) (2026-05-10)
+
+
+### Features
+
+* **manager:** granular per-manager permissions ([edbd37b](https://github.com/bangkeut-technology/daily-brew/commit/edbd37bcd1cae25c1ccf691b97fbfb51574e861d))
+
+
+### Bug Fixes
+
+* **auth:** clear BEARER cookie at /api/v1 path on logout ([634e7d8](https://github.com/bangkeut-technology/daily-brew/commit/634e7d8f7e50dbeb3edbb81a0c8a811c1ae6c1d9))
+
 ## [1.44.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.44.0...v1.44.1) (2026-05-04)
 
 
