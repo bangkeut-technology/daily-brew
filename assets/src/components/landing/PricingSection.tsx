@@ -38,7 +38,7 @@ const espressoPlan = {
     { text: 'Device verification for check-in & out', included: true },
     { text: 'Geofencing for check-in & out', included: true },
     { text: 'Per-day shift schedules', included: true },
-    { text: 'Manager role (up to 2)', included: true },
+    { text: 'Manager role with granular permissions (up to 2)', included: true },
     { text: <><BasilBookBrand className="text-[15px]" /> integration + API</>, included: true },
     { text: 'Push & email notifications', included: true },
     { text: 'Daily attendance summary', included: true },
@@ -59,7 +59,7 @@ const doubleEspressoPlan = {
     { text: 'Multiple QR stations', included: true, roadmap: true },
     { text: 'Per-QR geofence & settings', included: true, roadmap: true },
     { text: 'Employee assignment per QR', included: true, roadmap: true },
-    { text: 'Manager role', included: true, roadmap: true },
+    { text: 'Per-QR manager assignment', included: true, roadmap: true },
     { text: 'White-label branding', included: true, roadmap: true },
   ],
 };

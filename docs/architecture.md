@@ -1,6 +1,11 @@
 # Architecture
 
-DailyBrew is multi-tenant: **Workspace** is the root aggregate, and every domain entity (Employee, Shift, Closure, LeaveRequest, Attendance, ApiToken, WorkspaceQrCode) belongs to exactly one Workspace. Cross-workspace access is impossible by construction — there are no APIs that list entities across workspaces, and every workspace-scoped controller routes through `App\Security\WorkspaceVoter` (`VIEW`, `MANAGE`, `EDIT`, `DELETE` attributes). `MANAGE` covers owner + manager actions like approving leave; `EDIT`/`DELETE` are owner-only.
+DailyBrew is multi-tenant: **Workspace** is the root aggregate, and every domain entity (Employee, Shift, Closure, LeaveRequest, Attendance, ApiToken, WorkspaceQrCode) belongs to exactly one Workspace. Cross-workspace access is impossible by construction — there are no APIs that list entities across workspaces, and every workspace-scoped controller routes through `App\Security\WorkspaceVoter`. The voter exposes three families of attributes:
+
+- `VIEW` — any member of the workspace (owner, manager, or linked employee).
+- `MANAGE` — owner + any manager. **Legacy/role-based**, kept for read-only or generic gates; new code should prefer the capability attributes below.
+- Capability attributes — `MANAGE_EMPLOYEES`, `MANAGE_SHIFTS`, `MANAGE_CLOSURES`, `MANAGE_LEAVE_REQUESTS`, `MANAGE_ATTENDANCES`. Each maps 1:1 to a `ManagerPermissionEnum` value (`manage_employees`, `manage_shifts`, `manage_closures`, `manage_leave`, `manage_attendance`) stored on `Employee.managerPermissions` (JSON array). Owners are granted everything implicitly.
+- `EDIT` / `DELETE` — on a typed entity (`Employee`, `Shift`, `ClosurePeriod`, `Attendance`, `LeaveRequest`) they resolve to the matching capability. On a `Workspace` subject they remain owner-only (rename, settings, billing, deletion).
 
 Use the diagrams below to navigate the entity model and the three primary user flows (check-in, leave request, authentication).
 
@@ -292,7 +297,7 @@ On Double Espresso, a workspace can mint additional `WorkspaceQrCode` rows ("sub
 
 `EffectiveCheckinSettings` resolves three independent clusters — IP restriction, geofencing, device verification — by reading the sub-QR's `inherit{Ip,Geofencing,DeviceVerification}` flags. When inherited, the value is read from the parent `WorkspaceSetting`; otherwise the sub-QR's own override fields are used. **Timezone is always inherited from the workspace** — sub-QRs cannot override it. The result is passed into the same `CheckinService::checkin()` call used by the main flow, so the gate order (closure → leave → IP → device → geofence → attendance) is identical.
 
-Sub-QRs also carry an optional `manager` (an Employee with a linked user) and an `assignedEmployees` set. If the set is non-empty, the backend rejects (`403`) any employee not in it. The per-QR manager has VIEW + leave-approval rights only over the assigned employees; they cannot edit shifts, closures, settings, or the QR itself — those remain owner-only.
+Sub-QRs also carry an optional `manager` (an Employee with a linked user) and an `assignedEmployees` set. If the set is non-empty, the backend rejects (`403`) any employee not in it. The per-QR manager's authority is **scoped to that QR's assigned employees**: they can act on attendance and leave for that subset only, and never on shifts, closures, settings, or the QR itself — those remain owner-only. Their workspace-wide `managerPermissions` still apply normally to employees outside this QR (e.g. a per-QR manager who also has `manage_leave` workspace-wide can still approve leave for non-assigned employees through the regular console).
 
 When an attendance row is created via a sub-QR, its `qrCode` FK is set; main-QR check-ins leave it null. The relationship is `ON DELETE SET NULL` so deleting a sub-QR retains the historical attendance audit. Per-QR manager FKs are also `ON DELETE SET NULL`.
 
@@ -338,3 +343,25 @@ Backend enforcement happens at two layers:
 2. **Service** — services that emit notifications or expose external APIs (BasilBook pull, leave notifications, daily summary) check `isAtLeastEspresso()` themselves so they can't be bypassed by a stale UI.
 
 Plan downgrades are handled in `PaddleWebhookService`. When `subscription.canceled` / `paused` / `past_due` arrives, the handlers only flip `Subscription::status` — they don't delete employees, managers, or sub-QRs. The next `canAddEmployee()` / `canPromoteToManager()` call simply returns `false` (because `getActivePlan()` now returns `Free`), so existing records remain visible until the owner upgrades or removes them. Workspace deletion is the inverse: `WorkspaceService::delete()` proactively cancels the active Paddle subscription via API before soft-deleting locally, swallowing API failures so a Paddle outage can't block the local delete.
+
+## Manager Permissions
+
+Managers are not a single binary capability — each manager carries a list of permissions stored as `Employee.managerPermissions` (JSON array of `App\Enum\ManagerPermissionEnum` values). The five permissions are:
+
+| Permission           | Grants                                                                                                  |
+|----------------------|---------------------------------------------------------------------------------------------------------|
+| `manage_employees`   | Create, edit, soft-delete employees. **Cannot** promote/demote managers or change manager permissions. |
+| `manage_shifts`      | Create, edit, delete shifts and per-day shift overrides.                                                |
+| `manage_closures`    | Create, edit, delete closure dates.                                                                     |
+| `manage_leave`       | Approve, reject, cancel any leave request; submit leave on behalf of any employee.                     |
+| `manage_attendance`  | View **all** employees' attendance and edit records when corrections are needed. Without this, the manager only sees their own attendance in `AttendanceController::list` / `summary`. |
+
+**Defaults & migration.** Newly promoted managers default to `[manage_leave, manage_attendance]` — the pre-feature behavior of "view all attendance + approve leave." A back-fill migration populated the same defaults onto existing managers so no permissions are lost on upgrade.
+
+**Owner-only actions** (never granted to managers, regardless of permissions): rename or delete the workspace, edit workspace settings, manage billing/Paddle, mint/edit sub-QR codes, and promote/demote managers or edit their permission set.
+
+**Wire-up.**
+- Frontend type: `ManagerPermission` and `MANAGER_PERMISSIONS` in `assets/src/types/index.ts`. The employee detail page renders one toggle per permission via `useUpdateManagerPermissions`.
+- Backend enum: `App\Enum\ManagerPermissionEnum`. `WorkspaceVoter` translates each capability attribute to the matching enum value via `Employee::hasManagerPermission()`.
+- API: `PATCH /api/v1/{locale}/workspaces/{publicId}/employees/{publicId}/manager-permissions` `{ permissions: string[] }` (owner only). Validation rejects unknown values.
+- Per-QR manager: their permission set is **additive** to whatever workspace-wide `managerPermissions` they hold. Specifically, `WorkspaceVoter::isPerQrManagerForSubject()` grants MANAGE on `Attendance` and `LeaveRequest` for any employee in that QR's `assignedEmployees` — even when their workspace-wide permissions don't include `manage_attendance` / `manage_leave`. It does not grant rights over shifts, closures, employees, settings, or the QR itself.

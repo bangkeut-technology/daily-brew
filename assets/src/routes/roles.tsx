@@ -8,6 +8,7 @@ import {
   UserCircle,
   Crown,
   ChevronRight,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
@@ -18,48 +19,53 @@ export const Route = createFileRoute('/roles')({
   component: RolesPage,
 });
 
+type PermissionState = boolean | 'optional';
+
 interface PermissionRow {
   section?: string;
   action: string;
   employee: boolean;
-  manager: boolean;
+  manager: PermissionState;
+  managerNote?: string;
   owner: boolean;
 }
 
 const permissions: PermissionRow[] = [
   // Dashboard
   { section: 'Dashboard', action: 'View personal dashboard', employee: true, manager: false, owner: false },
-  { action: 'View full attendance dashboard (all employees)', employee: false, manager: true, owner: true },
+  { action: 'View full attendance dashboard (all employees)', employee: false, manager: 'optional', managerNote: 'manage_attendance', owner: true },
   { action: 'View today\'s attendance stats', employee: false, manager: true, owner: true },
   { action: 'See pending leave count', employee: false, manager: true, owner: true },
 
   // Attendance
   { section: 'Attendance', action: 'Check in and check out via QR', employee: true, manager: true, owner: true },
   { action: 'View own attendance history', employee: true, manager: true, owner: true },
-  { action: 'View all employees\' attendance', employee: false, manager: true, owner: true },
+  { action: 'View all employees\' attendance', employee: false, manager: 'optional', managerNote: 'manage_attendance', owner: true },
+  { action: 'Edit / correct attendance records', employee: false, manager: 'optional', managerNote: 'manage_attendance', owner: true },
 
   // Leave requests
   { section: 'Leave requests', action: 'Submit own leave request', employee: true, manager: true, owner: true },
-  { action: 'Submit leave for any employee', employee: false, manager: true, owner: true },
+  { action: 'Submit leave for any employee', employee: false, manager: 'optional', managerNote: 'manage_leave', owner: true },
   { action: 'View own leave requests', employee: true, manager: true, owner: true },
-  { action: 'View all leave requests', employee: false, manager: true, owner: true },
-  { action: 'Approve or reject leave requests', employee: false, manager: true, owner: true },
+  { action: 'View all leave requests', employee: false, manager: 'optional', managerNote: 'manage_leave', owner: true },
+  { action: 'Approve or reject leave requests', employee: false, manager: 'optional', managerNote: 'manage_leave', owner: true },
   { action: 'Cancel own pending leave', employee: true, manager: true, owner: true },
-  { action: 'Cancel any leave request', employee: false, manager: true, owner: true },
+  { action: 'Cancel any leave request', employee: false, manager: 'optional', managerNote: 'manage_leave', owner: true },
 
   // Employee management
-  { section: 'Employee management', action: 'Add new employees', employee: false, manager: false, owner: true },
-  { action: 'Edit employee details', employee: false, manager: false, owner: true },
-  { action: 'Delete (soft) employees', employee: false, manager: false, owner: true },
+  { section: 'Employee management', action: 'Add new employees', employee: false, manager: 'optional', managerNote: 'manage_employees', owner: true },
+  { action: 'Edit employee details', employee: false, manager: 'optional', managerNote: 'manage_employees', owner: true },
+  { action: 'Delete (soft) employees', employee: false, manager: 'optional', managerNote: 'manage_employees', owner: true },
   { action: 'Link / unlink user accounts', employee: false, manager: false, owner: true },
   { action: 'Promote / demote managers', employee: false, manager: false, owner: true },
+  { action: 'Edit per-manager permissions', employee: false, manager: false, owner: true },
 
   // Shifts & closures
   { section: 'Shifts & closures', action: 'View shifts', employee: true, manager: true, owner: true },
-  { action: 'Create, edit, delete shifts', employee: false, manager: false, owner: true },
-  { action: 'Manage per-day shift schedules', employee: false, manager: false, owner: true },
+  { action: 'Create, edit, delete shifts', employee: false, manager: 'optional', managerNote: 'manage_shifts', owner: true },
+  { action: 'Manage per-day shift schedules', employee: false, manager: 'optional', managerNote: 'manage_shifts', owner: true },
   { action: 'View closure periods', employee: true, manager: true, owner: true },
-  { action: 'Create, edit, delete closures', employee: false, manager: false, owner: true },
+  { action: 'Create, edit, delete closures', employee: false, manager: 'optional', managerNote: 'manage_closures', owner: true },
 
   // Workspace settings
   { section: 'Workspace & settings', action: 'View workspace info', employee: true, manager: true, owner: true },
@@ -67,6 +73,7 @@ const permissions: PermissionRow[] = [
   { action: 'Configure IP restriction', employee: false, manager: false, owner: true },
   { action: 'Configure device verification', employee: false, manager: false, owner: true },
   { action: 'Configure geofencing', employee: false, manager: false, owner: true },
+  { action: 'Mint or edit sub-QR codes', employee: false, manager: false, owner: true },
   { action: 'Delete workspace', employee: false, manager: false, owner: true },
 
   // Billing
@@ -93,13 +100,12 @@ const roleCards = [
     icon: <ShieldCheck size={24} strokeWidth={1.6} />,
     title: 'Manager',
     badge: 'Espresso',
-    desc: 'A trusted employee promoted by the owner. Can oversee attendance and handle leave approvals without full admin access.',
+    desc: 'A trusted employee promoted by the owner. The owner picks exactly which areas the manager can administer — no all-or-nothing access.',
     color: '#C17F3B',
     highlights: [
-      'Views the full attendance dashboard',
-      'Sees all employees\' attendance records',
-      'Approves or rejects leave requests',
-      'Submits leave for any employee',
+      'Per-manager permission toggles for employees, shifts, closures, leave, and attendance',
+      'Defaults to "manage leave" + "manage attendance" on promotion',
+      'Workspace settings, billing, sub-QRs, and promoting managers stay owner-only',
       'Still checks in/out like a regular employee',
     ],
   },
@@ -224,6 +230,27 @@ function RolesPage() {
             <p className="text-[16px] text-text-secondary mt-3 max-w-lg mx-auto">
               Every action mapped to every role. No surprises.
             </p>
+
+            <div className="mt-6 inline-flex flex-wrap items-center justify-center gap-4 text-[12.5px] text-text-tertiary">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green/10">
+                  <Check size={11} className="text-green" strokeWidth={2.5} />
+                </span>
+                Always allowed
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber/15">
+                  <SlidersHorizontal size={10} className="text-amber" strokeWidth={2.5} />
+                </span>
+                Configurable per manager
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-cream-3/50">
+                  <X size={11} className="text-text-tertiary/40" strokeWidth={2} />
+                </span>
+                Not available
+              </span>
+            </div>
           </div>
 
           <div className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(107,66,38,0.05)]">
@@ -269,7 +296,7 @@ function RolesPage() {
                         <PermissionIcon allowed={row.employee} />
                       </td>
                       <td className="px-4 py-3 text-center border-b border-cream-3/50">
-                        <PermissionIcon allowed={row.manager} />
+                        <PermissionIcon allowed={row.manager} note={row.managerNote} />
                       </td>
                       <td className="px-4 py-3 text-center border-b border-cream-3/50">
                         <PermissionIcon allowed={row.owner} />
@@ -309,21 +336,21 @@ function RolesPage() {
                 color: '#3B6FA0',
               },
               {
-                level: 'MANAGE',
-                who: 'Owner, Manager',
-                desc: 'Approve/reject leave, view all attendance and leave requests across the workspace.',
+                level: 'CAPABILITY',
+                who: 'Owner + manager (per-permission)',
+                desc: 'Granular attributes — manage_employees, manage_shifts, manage_closures, manage_leave, manage_attendance — granted individually to each manager. The owner has every capability implicitly.',
                 color: '#C17F3B',
               },
               {
-                level: 'EDIT',
+                level: 'EDIT / DELETE on Workspace',
                 who: 'Owner only',
-                desc: 'Create and update employees, shifts, closures, settings, and workspace details.',
+                desc: 'Rename or delete the workspace, edit settings, manage billing, mint sub-QR codes, promote managers.',
                 color: '#4A7C59',
               },
               {
-                level: 'DELETE',
-                who: 'Owner only',
-                desc: 'Delete employees, shifts, closures, and the workspace itself.',
+                level: 'PER-QR MANAGER',
+                who: 'Manager assigned to a sub-QR',
+                desc: 'Adds attendance + leave authority over the QR\'s assigned employees, on top of any workspace-wide permissions they hold.',
                 color: '#C0392B',
               },
             ].map((p, i) => (
@@ -353,12 +380,14 @@ function RolesPage() {
 
           <div className="mt-6 px-4 py-3 rounded-xl bg-amber/8 border border-amber/15">
             <p className="text-[14px] text-text-secondary">
-              <span className="font-medium text-amber">Note:</span> Some actions
-              have additional logic beyond the voter. For example, employees can
-              only view and cancel their <em>own</em> leave requests, even though
-              they have VIEW access. Managers see all leave requests but cannot
-              edit employee records. The voter sets the baseline; controllers
-              enforce finer-grained rules.
+              <span className="font-medium text-amber">Note:</span> Granting a
+              capability is a deliberate choice per manager. A manager with{' '}
+              <code className="font-mono text-[13px]">manage_leave</code> only
+              can approve leave but won't see the employees list as editable. A
+              manager with everything but{' '}
+              <code className="font-mono text-[13px]">manage_attendance</code>{' '}
+              still only sees their own attendance. The voter enforces this
+              uniformly across every API endpoint.
             </p>
           </div>
         </motion.div>
@@ -426,12 +455,25 @@ function RolesPage() {
   );
 }
 
-function PermissionIcon({ allowed }: { allowed: boolean }) {
-  return allowed ? (
-    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green/10">
-      <Check size={14} className="text-green" strokeWidth={2.5} />
-    </span>
-  ) : (
+function PermissionIcon({ allowed, note }: { allowed: PermissionState; note?: string }) {
+  if (allowed === true) {
+    return (
+      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green/10">
+        <Check size={14} className="text-green" strokeWidth={2.5} />
+      </span>
+    );
+  }
+  if (allowed === 'optional') {
+    return (
+      <span
+        className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber/15"
+        title={note ? `Granted via ${note}` : 'Configurable per manager'}
+      >
+        <SlidersHorizontal size={12} className="text-amber" strokeWidth={2.5} />
+      </span>
+    );
+  }
+  return (
     <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-cream-3/50">
       <X size={14} className="text-text-tertiary/40" strokeWidth={2} />
     </span>

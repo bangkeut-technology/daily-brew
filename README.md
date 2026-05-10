@@ -13,7 +13,7 @@ DailyBrew helps restaurant owners manage their team's daily attendance through Q
 - Shift and closure management
 - Leave request workflow — employees submit (full-day or partial-day with time range), owners approve/reject, employees can cancel pending requests
 - Owner dashboard with today's attendance stats
-- Manager role — promote trusted employees to approve leave and view all attendance (Espresso: up to 2, Double Espresso: unlimited, assigned per QR sub-workspace)
+- Manager role with granular permissions — promote trusted employees and choose exactly which areas they can administer: employees, shifts, closures, leave, attendance. Newly promoted managers default to leave + attendance only. Workspace settings, billing, sub-QR codes, and promoting other managers stay with the owner. (Espresso: up to 2, Double Espresso: unlimited, also assignable per sub-QR)
 - Employee dashboard with personal attendance, shift, and leave request submission
 - IP restriction for check-in locations (with "Use my current IP" helper)
 - Geofencing for check-in (GPS radius)
@@ -33,7 +33,7 @@ DailyBrew helps restaurant owners manage their team's daily attendance through Q
 | Shifts & closures                  | Yes      | Yes                            | Yes                                   |
 | Dashboard & attendance log         | Yes      | Yes                            | Yes                                   |
 | Leave requests                     | -        | Yes                            | Yes                                   |
-| Manager role                       | -        | Up to 2                        | Unlimited                             |
+| Manager role (granular permissions) | -        | Up to 2                        | Unlimited                             |
 | Multiple QR codes (sub-workspaces) | -        | -                              | Yes (per-QR IP / geofence / device)   |
 | Per-QR manager assignment          | -        | -                              | Yes                                   |
 | IP restriction                     | -        | Yes                            | Yes                                   |
@@ -155,7 +155,7 @@ php bin/console dailybrew:seed-reviewer --fresh  # re-seed (purge + recreate)
 | Role     | Email                   | Linked to                                            |
 |----------|-------------------------|------------------------------------------------------|
 | Owner    | reviewer@dailybrew.work | Full dashboard access                                |
-| Manager  | manager@dailybrew.work  | Sophea Chan — can approve leave, view all attendance |
+| Manager  | manager@dailybrew.work  | Sophea Chan — granted "manage leave" + "manage attendance" by default |
 | Employee | employee@dailybrew.work | Dara Sok — can view own attendance, submit leave     |
 
 All share the same password: `DailyBrew2026!`

@@ -79,7 +79,7 @@ const espressoFeatures = [
   {
     icon: <ShieldCheck size={22} strokeWidth={1.8} />,
     title: 'Manager role',
-    desc: 'Promote trusted staff to managers. They can approve leave and view all attendance.',
+    desc: 'Promote trusted staff and pick exactly which areas they administer — five granular permissions, configurable per manager.',
     accent: '#6B4226',
   },
   {
