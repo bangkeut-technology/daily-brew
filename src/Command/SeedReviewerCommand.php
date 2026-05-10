@@ -9,6 +9,7 @@ use App\Entity\ClosurePeriod;
 use App\Entity\LeaveRequest;
 use App\Enum\EmployeeRoleEnum;
 use App\Enum\LeaveRequestStatusEnum;
+use App\Enum\ManagerPermissionEnum;
 use App\Enum\LeaveTypeEnum;
 use App\Enum\PlanEnum;
 use App\Repository\AttendanceRepository;
@@ -165,8 +166,9 @@ class SeedReviewerCommand extends Command
         $managerUser->setCurrentWorkspace($workspace);
         $this->employeeService->linkUser($employeeEntities[0], $managerUser);
         $employeeEntities[0]->setRole(EmployeeRoleEnum::MANAGER);
+        $employeeEntities[0]->setManagerPermissions(ManagerPermissionEnum::defaults());
         $this->userRepository->flush();
-        $io->text('Created manager: ' . self::MANAGER_EMAIL . ' (Sophea Chan)');
+        $io->text('Created manager: ' . self::MANAGER_EMAIL . ' (Sophea Chan, default permissions: leave + attendance)');
 
         // ── Employee account (linked to Dara Sok) ────────────────
         $employeeUser = $this->authService->register(

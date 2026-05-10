@@ -22,12 +22,13 @@ Authentication is JWT (issued at login or OAuth callback, sent as the `BEARER` c
 ## Resources (authenticated, scoped to workspace)
 
 - `GET/POST /api/v1/{locale}/workspaces/{publicId}/employees`
-- `PUT /api/v1/{locale}/workspaces/{publicId}/employees/{publicId}/role` — promote/demote (owner only)
+- `PUT /api/v1/{locale}/workspaces/{publicId}/employees/{publicId}/role` — promote/demote (owner only). Promoting seeds `managerPermissions` with the defaults `[manage_leave, manage_attendance]` when the field is empty; demoting clears it.
+- `PATCH /api/v1/{locale}/workspaces/{publicId}/employees/{publicId}/manager-permissions` — set the manager's permission list (owner only). Body: `{ "permissions": ["manage_employees", "manage_shifts", "manage_closures", "manage_leave", "manage_attendance"] }`. Unknown values are rejected.
 - `GET/POST /api/v1/{locale}/workspaces/{publicId}/shifts`
 - `GET/POST /api/v1/{locale}/workspaces/{publicId}/closures`
 - `GET/POST /api/v1/{locale}/workspaces/{publicId}/leave-requests`
-- `DELETE /api/v1/{locale}/workspaces/{publicId}/leave-requests/{publicId}` — cancel leave request (employee: own pending only, owner/manager: any)
-- `GET /api/v1/{locale}/workspaces/{publicId}/attendances`
+- `DELETE /api/v1/{locale}/workspaces/{publicId}/leave-requests/{publicId}` — cancel leave request (employee: own pending only; owner: any; manager with `manage_leave`: any; per-QR manager: any belonging to an assigned employee)
+- `GET /api/v1/{locale}/workspaces/{publicId}/attendances` — owner sees all; manager with `manage_attendance` sees all; otherwise the response is scoped to the caller's own attendance
 - `GET /api/v1/{locale}/workspaces/{publicId}/settings/my-ip` — returns client IP as seen by server
 
 ## API Tokens (authenticated, owner only)

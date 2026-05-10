@@ -32,7 +32,7 @@ const faqSections: FaqSection[] = [
       {
         question: 'Who is DailyBrew for?',
         answer:
-          'DailyBrew is designed for restaurant owners, managers, and staff. Owners manage the workspace, shifts, and employees. Managers can approve leave and oversee attendance. Staff check in and out by scanning the workspace QR code.',
+          'DailyBrew is designed for restaurant owners, managers, and staff. Owners manage the workspace, shifts, and employees. Managers receive only the permissions you grant them — for example leave approvals, attendance oversight, employee management, or any combination. Staff check in and out by scanning the workspace QR code.',
       },
       {
         question: 'Is there a mobile app?',
@@ -52,7 +52,7 @@ const faqSections: FaqSection[] = [
       {
         question: "What's included in Espresso?",
         answer:
-          'Espresso supports up to 20 employees and adds leave request management, IP restriction, device verification, geofencing, per-day shift schedules, manager role (up to 2), push and email notifications, and daily attendance summaries.',
+          'Espresso supports up to 20 employees and adds leave request management, IP restriction, device verification, geofencing, per-day shift schedules, manager role with granular permissions (up to 2), push and email notifications, and daily attendance summaries.',
       },
       {
         question: 'How much does Espresso cost?',
@@ -97,7 +97,12 @@ const faqSections: FaqSection[] = [
       {
         question: 'What is the manager role?',
         answer:
-          'The manager role lets you promote trusted employees to managers. Managers can view all attendance records, approve or reject leave requests, and cancel leave requests — without having full owner access to settings, shifts, or employee management.',
+          'The manager role lets you promote trusted employees and choose exactly which areas they can administer. Each manager has a per-permission toggle for: manage employees, manage shifts, manage closures, manage leave, and manage attendance. You can grant any combination — for example, a head waiter who only handles leave approvals, or a co-runner who manages everything except billing and settings.',
+      },
+      {
+        question: 'What are the default manager permissions?',
+        answer:
+          'Newly promoted managers start with "manage leave" and "manage attendance" enabled — meaning they can approve leave for any employee and view all attendance records. You can flip the other toggles on or off at any time from the employee detail page.',
       },
       {
         question: 'How many managers can I have?',
@@ -107,12 +112,12 @@ const faqSections: FaqSection[] = [
       {
         question: 'How do I promote an employee to manager?',
         answer:
-          'Go to the employee detail page and click "Promote to manager". The employee must have a linked user account (they need to sign in to use manager features). You can demote them back to a regular employee at any time.',
+          'Go to the employee detail page and click "Promote to manager". The employee must have a linked user account (they need to sign in to use manager features). Once promoted, a "Manager permissions" card appears below — toggle each capability on or off as needed. You can demote them back to a regular employee at any time.',
       },
       {
         question: 'What can a manager NOT do?',
         answer:
-          'Managers cannot add, edit, or delete employees. They cannot manage shifts, closures, or workspace settings. They cannot manage billing or promote other employees. These actions are reserved for the workspace owner.',
+          'No matter which permissions you grant, managers cannot rename or delete the workspace, edit workspace settings (IP / device / geofencing / timezone), manage billing, mint or edit sub-QR codes, or promote / demote other managers. These remain owner-only.',
       },
     ],
   },

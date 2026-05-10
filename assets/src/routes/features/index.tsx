@@ -105,11 +105,11 @@ const featuredEspresso = [
     tagColor: 'text-coffee bg-coffee/8',
     accent: '#6B4226',
     link: '/roles',
-    desc: 'Promote trusted staff to managers. They can approve leave, view all attendance, and handle day-to-day operations — while you keep full control over settings and billing.',
+    desc: 'Promote trusted staff to managers and choose exactly which areas they can administer — employees, shifts, closures, leave, attendance — toggle each one on or off per manager. Settings, billing and sub-QR codes always stay with the owner.',
     highlights: [
-      { icon: <Eye size={14} />, text: 'Managers see all attendance' },
-      { icon: <CalendarCheck size={14} />, text: 'Approve/reject leave requests' },
-      { icon: <Shield size={14} />, text: 'Owner keeps full control' },
+      { icon: <Eye size={14} />, text: 'Five granular permission toggles' },
+      { icon: <CalendarCheck size={14} />, text: 'Defaults to leave + attendance' },
+      { icon: <Shield size={14} />, text: 'Owner-only: settings & billing' },
     ],
   },
   {

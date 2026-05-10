@@ -198,82 +198,88 @@ function EmployeeDetailPage() {
         <GlassCard hover={false} className="lg:col-span-2">
           {isEditing ? (
             <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
-              <div>
-                <label htmlFor="edit-firstName" className="block text-[14px] font-medium text-text-secondary mb-1.5">
-                  {t('employee.firstName', 'First name')} *
-                </label>
-                <input id="edit-firstName" type="text" {...register('firstName')} className={inputClassName} />
-                {errors.firstName && (
-                  <p className="text-[13px] text-status-red mt-1">{errors.firstName.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="edit-lastName" className="block text-[14px] font-medium text-text-secondary mb-1.5">
-                  {t('employee.lastName', 'Last name')} *
-                </label>
-                <input id="edit-lastName" type="text" {...register('lastName')} className={inputClassName} />
-                {errors.lastName && (
-                  <p className="text-[13px] text-status-red mt-1">{errors.lastName.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="edit-phone" className="block text-[14px] font-medium text-text-secondary mb-1.5">
-                  {t('employee.phoneNumber', 'Phone number')}
-                </label>
-                <input id="edit-phone" type="text" {...register('phoneNumber')} className={inputClassName} />
-              </div>
-
-              {/* Username — Espresso only, for BasilBook linking */}
-              <div>
-                <label htmlFor="edit-username" className="flex items-center gap-1.5 text-[14px] font-medium text-text-secondary mb-1.5">
-                  <AtSign size={12} />
-                  Username
-                  {!plan?.isEspresso && (
-                    <span className="text-[12px] font-medium px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
-                      Espresso
-                    </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="edit-firstName" className="block text-[14px] font-medium text-text-secondary mb-1.5">
+                    {t('employee.firstName', 'First name')} *
+                  </label>
+                  <input id="edit-firstName" type="text" {...register('firstName')} className={inputClassName} />
+                  {errors.firstName && (
+                    <p className="text-[13px] text-status-red mt-1">{errors.firstName.message}</p>
                   )}
-                </label>
-                {plan?.isEspresso ? (
-                  <>
-                    <input
-                      id="edit-username"
-                      type="text"
-                      {...register('username')}
-                      placeholder="e.g. vandeth.tho"
-                      className={cn(inputClassName, 'font-mono')}
-                    />
-                    <p className="text-[12.5px] text-text-tertiary mt-1">
-                      Unique identifier to link this employee with BasilBook staff records. Must match the staff name or ID used in your POS system.
+                </div>
+
+                <div>
+                  <label htmlFor="edit-lastName" className="block text-[14px] font-medium text-text-secondary mb-1.5">
+                    {t('employee.lastName', 'Last name')} *
+                  </label>
+                  <input id="edit-lastName" type="text" {...register('lastName')} className={inputClassName} />
+                  {errors.lastName && (
+                    <p className="text-[13px] text-status-red mt-1">{errors.lastName.message}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="edit-phone" className="block text-[14px] font-medium text-text-secondary mb-1.5">
+                    {t('employee.phoneNumber', 'Phone number')}
+                  </label>
+                  <input id="edit-phone" type="text" {...register('phoneNumber')} className={inputClassName} />
+                </div>
+
+                {/* Username — Espresso only, for BasilBook linking */}
+                <div>
+                  <label htmlFor="edit-username" className="flex items-center gap-1.5 text-[14px] font-medium text-text-secondary mb-1.5">
+                    <AtSign size={12} />
+                    Username
+                    {!plan?.isEspresso && (
+                      <span className="text-[12px] font-medium px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
+                        Espresso
+                      </span>
+                    )}
+                  </label>
+                  {plan?.isEspresso ? (
+                    <>
+                      <input
+                        id="edit-username"
+                        type="text"
+                        {...register('username')}
+                        placeholder="e.g. vandeth.tho"
+                        className={cn(inputClassName, 'font-mono')}
+                      />
+                      <p className="text-[12.5px] text-text-tertiary mt-1">
+                        Unique identifier to link this employee with BasilBook staff records. Must match the staff name or ID used in your POS system.
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-[13px] text-text-tertiary">
+                      Upgrade to Espresso to link employees with BasilBook for cross-product staff tracking.
                     </p>
-                  </>
-                ) : (
-                  <p className="text-[13px] text-text-tertiary">
-                    Upgrade to Espresso to link employees with BasilBook for cross-product staff tracking.
-                  </p>
-                )}
+                  )}
+                </div>
               </div>
 
-              <div>
-                <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
-                  {t('employee.dob', 'Date of birth')}
-                </label>
-                <CustomDatePicker
-                  value={watch('dob') || ''}
-                  onChange={(v) => setValue('dob', v)}
-                />
-              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
+                    {t('employee.dob', 'Date of birth')}
+                  </label>
+                  <CustomDatePicker
+                    value={watch('dob') || ''}
+                    onChange={(v) => setValue('dob', v)}
+                  />
+                </div>
 
-              <div>
-                <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
-                  {t('employee.joinedAt', 'Join date')}
-                </label>
-                <CustomDatePicker
-                  value={watch('joinedAt') || ''}
-                  onChange={(v) => setValue('joinedAt', v)}
-                />
+                <div>
+                  <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
+                    {t('employee.joinedAt', 'Join date')}
+                  </label>
+                  <CustomDatePicker
+                    value={watch('joinedAt') || ''}
+                    onChange={(v) => setValue('joinedAt', v)}
+                  />
+                </div>
               </div>
 
               <div>
