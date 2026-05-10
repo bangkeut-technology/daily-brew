@@ -4,6 +4,7 @@ namespace App\ApiController\Attendance;
 
 use App\ApiController\Trait\ApiResponseTrait;
 use App\Entity\User;
+use App\Enum\ManagerPermissionEnum;
 use App\Repository\AttendanceRepository;
 use App\Repository\ClosurePeriodRepository;
 use App\Repository\EmployeeRepository;
@@ -52,11 +53,11 @@ class AttendanceController extends AbstractController
         // Determine role
         $isOwner = $workspace->getOwner()?->getId() === $user->getId();
         $employee = $employeeRepository->findOneByLinkedUserAndWorkspace($user, $workspace);
-        $isManager = $employee?->isManager() ?? false;
+        $canSeeAll = $isOwner || ($employee?->hasManagerPermission(ManagerPermissionEnum::MANAGE_ATTENDANCE) ?? false);
 
-        // Load active employees (filtered for non-owner/non-manager)
+        // Load active employees (filtered down to self for viewers without manage_attendance)
         $activeEmployees = $employeeRepository->findActiveByWorkspace($workspace);
-        if (!$isOwner && !$isManager && $employee !== null) {
+        if (!$canSeeAll && $employee !== null) {
             $empId = $employee->getId();
             $activeEmployees = array_filter($activeEmployees, fn ($e) => $e->getId() === $empId);
         }
@@ -209,10 +210,10 @@ class AttendanceController extends AbstractController
         // Determine which employees to include
         $isOwner = $workspace->getOwner()?->getId() === $user->getId();
         $selfEmployee = $employeeRepository->findOneByLinkedUserAndWorkspace($user, $workspace);
-        $isManager = $selfEmployee?->isManager() ?? false;
+        $canSeeAll = $isOwner || ($selfEmployee?->hasManagerPermission(ManagerPermissionEnum::MANAGE_ATTENDANCE) ?? false);
 
-        if (!$isOwner && !$isManager) {
-            // Employee sees only their own summary
+        if (!$canSeeAll) {
+            // Viewer sees only their own summary
             $employees = $selfEmployee !== null ? [$selfEmployee] : [];
         } else {
             $employees = $employeeRepository->findActiveByWorkspace($workspace);

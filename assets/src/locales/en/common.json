@@ -88,7 +88,21 @@
     "active": "Active",
     "inactive": "Inactive",
     "qrCode": "QR code",
-    "attendanceHistory": "Attendance history"
+    "attendanceHistory": "Attendance history",
+    "managerPermissionsTitle": "Manager permissions",
+    "managerPermissionsDesc": "Choose which areas this manager can administer. Workspace settings, billing, sub-QR codes and promoting other managers stay with the owner.",
+    "permEmployees": "Manage employees",
+    "permEmployeesDesc": "Create, edit, and remove employees (cannot promote managers)",
+    "permShifts": "Manage shifts",
+    "permShiftsDesc": "Create, edit, and remove shifts and per-day overrides",
+    "permClosures": "Manage closures",
+    "permClosuresDesc": "Create, edit, and remove restaurant closure dates",
+    "permLeave": "Manage leave",
+    "permLeaveDesc": "Approve, reject, and cancel leave requests for any employee",
+    "permAttendance": "Manage attendance",
+    "permAttendanceDesc": "View all attendance and edit records when corrections are needed",
+    "permSaved": "Permissions updated",
+    "permSaveError": "Failed to update permissions"
   },
   "attendance": {
     "date": "Date",

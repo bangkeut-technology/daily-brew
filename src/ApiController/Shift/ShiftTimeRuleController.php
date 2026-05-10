@@ -56,7 +56,7 @@ class ShiftTimeRuleController extends AbstractController
         ShiftTimeRuleService $ruleService,
     ): JsonResponse {
         [$workspace, $shift] = $this->resolveWorkspaceAndShift($workspacePublicId, $shiftPublicId, $workspaceRepository, $shiftRepository);
-        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
+        $this->denyAccessUnlessGranted(WorkspaceVoter::MANAGE_SHIFTS, $workspace);
 
         if (!$planService->canUseShiftTimeRules($workspace)) {
             return $this->jsonError('Per-day shift schedules require the Espresso plan', 402);
@@ -97,7 +97,7 @@ class ShiftTimeRuleController extends AbstractController
         ShiftTimeRuleService $ruleService,
     ): JsonResponse {
         [$workspace, $shift] = $this->resolveWorkspaceAndShift($workspacePublicId, $shiftPublicId, $workspaceRepository, $shiftRepository);
-        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
+        $this->denyAccessUnlessGranted(WorkspaceVoter::MANAGE_SHIFTS, $workspace);
 
         if (!$planService->canUseShiftTimeRules($workspace)) {
             return $this->jsonError('Per-day shift schedules require the Espresso plan', 402);
@@ -136,7 +136,7 @@ class ShiftTimeRuleController extends AbstractController
         ShiftTimeRuleService $ruleService,
     ): JsonResponse {
         [$workspace, $shift] = $this->resolveWorkspaceAndShift($workspacePublicId, $shiftPublicId, $workspaceRepository, $shiftRepository);
-        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
+        $this->denyAccessUnlessGranted(WorkspaceVoter::MANAGE_SHIFTS, $workspace);
 
         if (!$planService->canUseShiftTimeRules($workspace)) {
             return $this->jsonError('Per-day shift schedules require the Espresso plan', 402);

@@ -54,7 +54,7 @@ class ClosureController extends AbstractController
             throw new NotFoundHttpException('Workspace not found');
         }
 
-        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
+        $this->denyAccessUnlessGranted(WorkspaceVoter::MANAGE_CLOSURES, $workspace);
 
         $data = json_decode($request->getContent(), true);
 

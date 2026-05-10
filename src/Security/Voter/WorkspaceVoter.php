@@ -12,6 +12,7 @@ use App\Entity\Shift;
 use App\Entity\User;
 use App\Entity\Workspace;
 use App\Entity\WorkspaceQrCode;
+use App\Enum\ManagerPermissionEnum;
 use App\Repository\EmployeeRepository;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
@@ -24,13 +25,34 @@ class WorkspaceVoter extends Voter
     public const string DELETE = 'WORKSPACE_DELETE';
     public const string MANAGE = 'WORKSPACE_MANAGE';
 
+    /**
+     * Capability attributes — owner-or-manager-with-the-permission. Use these on create/list endpoints
+     * where the subject is the Workspace (no specific entity exists yet). For update/delete on an
+     * existing entity, prefer EDIT/DELETE with the entity itself as the subject — the voter will
+     * resolve the matching capability automatically.
+     */
+    public const string MANAGE_EMPLOYEES = 'WORKSPACE_MANAGE_EMPLOYEES';
+    public const string MANAGE_SHIFTS = 'WORKSPACE_MANAGE_SHIFTS';
+    public const string MANAGE_CLOSURES = 'WORKSPACE_MANAGE_CLOSURES';
+    public const string MANAGE_LEAVE_REQUESTS = 'WORKSPACE_MANAGE_LEAVE_REQUESTS';
+    public const string MANAGE_ATTENDANCES = 'WORKSPACE_MANAGE_ATTENDANCES';
+
+    private const array CAPABILITY_MAP = [
+        self::MANAGE_EMPLOYEES => 'manage_employees',
+        self::MANAGE_SHIFTS => 'manage_shifts',
+        self::MANAGE_CLOSURES => 'manage_closures',
+        self::MANAGE_LEAVE_REQUESTS => 'manage_leave',
+        self::MANAGE_ATTENDANCES => 'manage_attendance',
+    ];
+
     public function __construct(
         private readonly EmployeeRepository $employeeRepository,
     ) {}
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        if (!in_array($attribute, [self::VIEW, self::EDIT, self::DELETE, self::MANAGE])) {
+        $known = [self::VIEW, self::EDIT, self::DELETE, self::MANAGE, ...array_keys(self::CAPABILITY_MAP)];
+        if (!in_array($attribute, $known, true)) {
             return false;
         }
 
@@ -81,8 +103,50 @@ class WorkspaceVoter extends Voter
             return true;
         }
 
-        // EDIT and DELETE are owner-only
+        // Capability attributes (MANAGE_EMPLOYEES, MANAGE_SHIFTS, …)
+        if (isset(self::CAPABILITY_MAP[$attribute])) {
+            $perm = ManagerPermissionEnum::from(self::CAPABILITY_MAP[$attribute]);
+            return $employee->hasManagerPermission($perm);
+        }
+
+        // EDIT/DELETE on a typed entity: resolve to the matching capability.
+        if ($attribute === self::EDIT || $attribute === self::DELETE) {
+            $required = $this->requiredPermissionFor($subject);
+            if ($required !== null && $employee->hasManagerPermission($required)) {
+                return true;
+            }
+        }
+
         return false;
+    }
+
+    /**
+     * Map a voter subject to the manager permission that would unlock EDIT/DELETE on it.
+     * Returns null when no manager permission can grant access (e.g. Workspace settings, QR codes).
+     */
+    private function requiredPermissionFor(mixed $subject): ?ManagerPermissionEnum
+    {
+        if ($subject instanceof Employee) {
+            return ManagerPermissionEnum::MANAGE_EMPLOYEES;
+        }
+
+        if ($subject instanceof Shift) {
+            return ManagerPermissionEnum::MANAGE_SHIFTS;
+        }
+
+        if ($subject instanceof ClosurePeriod) {
+            return ManagerPermissionEnum::MANAGE_CLOSURES;
+        }
+
+        if ($subject instanceof Attendance) {
+            return ManagerPermissionEnum::MANAGE_ATTENDANCE;
+        }
+
+        if ($subject instanceof LeaveRequest) {
+            return ManagerPermissionEnum::MANAGE_LEAVE;
+        }
+
+        return null;
     }
 
     /**

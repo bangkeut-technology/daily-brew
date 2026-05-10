@@ -8,6 +8,7 @@ use App\ApiController\Trait\ApiResponseTrait;
 use App\DTO\AttendanceDTO;
 use App\DTO\EmployeeDTO;
 use App\Enum\EmployeeRoleEnum;
+use App\Enum\ManagerPermissionEnum;
 use App\Repository\AttendanceRepository;
 use App\Repository\EmployeeRepository;
 use App\Repository\ShiftRepository;
@@ -62,7 +63,7 @@ class EmployeeController extends AbstractController
             throw new NotFoundHttpException('Workspace not found');
         }
 
-        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
+        $this->denyAccessUnlessGranted(WorkspaceVoter::MANAGE_EMPLOYEES, $workspace);
 
         if (!$planService->canAddEmployee($workspace)) {
             return $this->jsonError('Employee limit reached. Upgrade to Espresso for unlimited employees.', 402);
@@ -166,12 +167,12 @@ class EmployeeController extends AbstractController
             throw new NotFoundHttpException('Workspace not found');
         }
 
-        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
-
         $employee = $employeeRepository->findByPublicId($publicId);
         if ($employee === null || $employee->getWorkspace()?->getId() !== $workspace->getId()) {
             throw new NotFoundHttpException('Employee not found');
         }
+
+        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $employee);
 
         $data = json_decode($request->getContent(), true);
 
@@ -262,7 +263,60 @@ class EmployeeController extends AbstractController
             }
         }
 
+        $previousRole = $employee->getRole();
         $employee->setRole($role);
+
+        // Seed default permissions on first promotion; clear them on demotion.
+        if ($role === EmployeeRoleEnum::MANAGER && $previousRole !== EmployeeRoleEnum::MANAGER && empty($employee->getManagerPermissionValues())) {
+            $employee->setManagerPermissions(ManagerPermissionEnum::defaults());
+        } elseif ($role !== EmployeeRoleEnum::MANAGER) {
+            $employee->setManagerPermissions([]);
+        }
+
+        $employeeRepository->flush();
+
+        return $this->jsonSuccess(EmployeeDTO::fromEntity($employee)->toArray());
+    }
+
+    #[Route('/{publicId}/manager-permissions', name: 'employees_update_manager_permissions', methods: ['PATCH'])]
+    public function updateManagerPermissions(
+        string $workspacePublicId,
+        string $publicId,
+        Request $request,
+        WorkspaceRepository $workspaceRepository,
+        EmployeeRepository $employeeRepository,
+    ): JsonResponse {
+        $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
+        if ($workspace === null) {
+            throw new NotFoundHttpException('Workspace not found');
+        }
+
+        // Granting capabilities to a manager is itself an owner-only operation.
+        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
+
+        $employee = $employeeRepository->findByPublicId($publicId);
+        if ($employee === null || $employee->getWorkspace()?->getId() !== $workspace->getId()) {
+            throw new NotFoundHttpException('Employee not found');
+        }
+
+        if (!$employee->isManager()) {
+            return $this->jsonError('Only managers can have permissions assigned', 400);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $raw = $data['permissions'] ?? null;
+        if (!is_array($raw)) {
+            return $this->jsonError('permissions must be an array of permission keys');
+        }
+
+        // Reject unknown values rather than silently dropping them.
+        foreach ($raw as $value) {
+            if (!is_string($value) || ManagerPermissionEnum::tryFrom($value) === null) {
+                return $this->jsonError("Unknown manager permission: " . (is_string($value) ? $value : '(non-string)'));
+            }
+        }
+
+        $employee->setManagerPermissions($raw);
         $employeeRepository->flush();
 
         return $this->jsonSuccess(EmployeeDTO::fromEntity($employee)->toArray());
@@ -281,12 +335,12 @@ class EmployeeController extends AbstractController
             throw new NotFoundHttpException('Workspace not found');
         }
 
-        $this->denyAccessUnlessGranted(WorkspaceVoter::DELETE, $workspace);
-
         $employee = $employeeRepository->findByPublicId($publicId);
         if ($employee === null || $employee->getWorkspace()?->getId() !== $workspace->getId()) {
             throw new NotFoundHttpException('Employee not found');
         }
+
+        $this->denyAccessUnlessGranted(WorkspaceVoter::DELETE, $employee);
 
         $employeeService->delete($employee);
 

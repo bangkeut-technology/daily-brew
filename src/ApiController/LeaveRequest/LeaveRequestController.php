@@ -8,6 +8,7 @@ use App\ApiController\Trait\ApiResponseTrait;
 use App\DTO\LeaveRequestDTO;
 use App\Entity\User;
 use App\Enum\LeaveRequestStatusEnum;
+use App\Enum\ManagerPermissionEnum;
 use App\Repository\EmployeeRepository;
 use App\Repository\LeaveRequestRepository;
 use App\Repository\WorkspaceRepository;
@@ -52,14 +53,16 @@ class LeaveRequestController extends AbstractController
 
         $leaveRequests = $leaveRequestRepository->findByWorkspace($workspace, $statusEnum);
 
-        // Owners and managers see all leave requests; employees see only their own
+        // Owners and managers with manage_leave see all leave requests; employees see only their own
         $isOwner = $workspace->getOwner()?->getId() === $user->getId();
         $employee = $employeeRepository->findOneByLinkedUserAndWorkspace($user, $workspace);
-        $isManager = $employee?->isManager() ?? false;
-        if (!$isOwner && !$isManager) {
+        $canSeeAll = $isOwner || ($employee?->hasManagerPermission(ManagerPermissionEnum::MANAGE_LEAVE) ?? false);
+        if (!$canSeeAll) {
             if ($employee !== null) {
                 $employeeId = $employee->getId();
                 $leaveRequests = array_filter($leaveRequests, fn ($lr) => $lr->getEmployee()->getId() === $employeeId);
+            } else {
+                $leaveRequests = [];
             }
         }
 
@@ -95,11 +98,11 @@ class LeaveRequestController extends AbstractController
             throw $this->createNotFoundException('Employee not found');
         }
 
-        // Owners and managers can submit for any employee; employees only for themselves
+        // Owners and managers with manage_leave can submit for any employee; otherwise only for themselves
         $isOwner = $workspace->getOwner()?->getId() === $user->getId();
         $currentEmployee = $employeeRepository->findOneByLinkedUserAndWorkspace($user, $workspace);
-        $isManager = $currentEmployee?->isManager() ?? false;
-        if (!$isOwner && !$isManager && $employee->getLinkedUser()?->getId() !== $user->getId()) {
+        $canSubmitForOthers = $isOwner || ($currentEmployee?->hasManagerPermission(ManagerPermissionEnum::MANAGE_LEAVE) ?? false);
+        if (!$canSubmitForOthers && $employee->getLinkedUser()?->getId() !== $user->getId()) {
             return $this->jsonError('You can only submit leave requests for yourself', 403);
         }
 
@@ -140,7 +143,7 @@ class LeaveRequestController extends AbstractController
             throw new NotFoundHttpException('Leave request not found');
         }
 
-        $this->denyAccessUnlessGranted(WorkspaceVoter::MANAGE, $workspace);
+        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $leaveRequest);
 
         $data = json_decode($request->getContent(), true);
         $status = $data['status'] ?? '';
@@ -177,11 +180,11 @@ class LeaveRequestController extends AbstractController
             throw new NotFoundHttpException('Leave request not found');
         }
 
-        // Owners and managers can cancel any request; employees can only cancel their own pending ones
+        // Owners and managers with manage_leave can cancel any request; otherwise only own pending ones
         $isOwner = $workspace->getOwner()?->getId() === $user->getId();
         $emp = $employeeRepository->findOneByLinkedUserAndWorkspace($user, $workspace);
-        $isManager = $emp?->isManager() ?? false;
-        if (!$isOwner && !$isManager) {
+        $canCancelAny = $isOwner || ($emp?->hasManagerPermission(ManagerPermissionEnum::MANAGE_LEAVE) ?? false);
+        if (!$canCancelAny) {
             if ($leaveRequest->getRequestedBy()?->getId() !== $user->getId()) {
                 return $this->jsonError('You can only cancel your own leave requests', 403);
             }

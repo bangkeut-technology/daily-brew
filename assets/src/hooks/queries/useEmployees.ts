@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiAxios } from '@/lib/apiAxios';
-import type { Employee } from '@/types';
+import type { Employee, ManagerPermission } from '@/types';
 
 export function useEmployees(workspacePublicId: string) {
   return useQuery({
@@ -100,6 +100,31 @@ export function useUpdateEmployeeRole(workspacePublicId: string) {
       queryClient.invalidateQueries({ queryKey: ['employees', workspacePublicId] });
       queryClient.invalidateQueries({ queryKey: ['employees', workspacePublicId, variables.publicId] });
       queryClient.invalidateQueries({ queryKey: ['plan', workspacePublicId] });
+    },
+  });
+}
+
+export function useUpdateManagerPermissions(workspacePublicId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      publicId,
+      permissions,
+    }: {
+      publicId: string;
+      permissions: ManagerPermission[];
+    }) => {
+      const { data } = await apiAxios.patch<Employee>(
+        `/workspaces/${workspacePublicId}/employees/${publicId}/manager-permissions`,
+        { permissions },
+      );
+      return data;
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['employees', workspacePublicId] });
+      queryClient.invalidateQueries({
+        queryKey: ['employees', workspacePublicId, variables.publicId],
+      });
     },
   });
 }

@@ -110,6 +110,7 @@ class UserController extends AbstractController
             'isOwner' => $isOwnerOfCurrent,
             'isEmployee' => $currentEmployee !== null,
             'isManager' => $currentEmployee?->isManager() ?? false,
+            'managerPermissions' => $currentEmployee?->getManagerPermissionValues() ?? [],
             'onboardingCompleted' => $user->isOnboardingCompleted(),
             'ownedWorkspaces' => array_map(fn ($w) => [
                 'publicId' => (string) $w->getPublicId(),

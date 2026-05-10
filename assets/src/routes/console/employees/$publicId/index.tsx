@@ -8,7 +8,14 @@ import { Copy, Pencil, X, Check, Link2, Mail, Unlink, Info, AtSign, ShieldCheck,
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useMemo } from 'react';
 import * as Popover from '@radix-ui/react-popover';
-import { useEmployee, useUpdateEmployee, useUpdateEmployeeRole } from '@/hooks/queries/useEmployees';
+import {
+  useEmployee,
+  useUpdateEmployee,
+  useUpdateEmployeeRole,
+  useUpdateManagerPermissions,
+} from '@/hooks/queries/useEmployees';
+import type { ManagerPermission } from '@/types';
+import { MANAGER_PERMISSIONS } from '@/types';
 import { useShifts } from '@/hooks/queries/useShifts';
 import { usePlan } from '@/hooks/queries/usePlan';
 import { getWorkspacePublicId } from '@/lib/auth';
@@ -50,6 +57,7 @@ function EmployeeDetailPage() {
   const { data: plan } = usePlan(workspaceId);
   const updateEmployee = useUpdateEmployee(workspaceId);
   const updateRole = useUpdateEmployeeRole(workspaceId);
+  const updatePermissions = useUpdateManagerPermissions(workspaceId);
   const [isEditing, setIsEditing] = useState(false);
   const [linkUserId, setLinkUserId] = useState('');
   const [showUnlinkConfirm, setShowUnlinkConfirm] = useState(false);
@@ -525,6 +533,48 @@ function EmployeeDetailPage() {
             </div>
           </GlassCard>
 
+        {/* Manager permissions — owner-only on the backend; rendered when this employee is a manager */}
+        {employee.role === 'manager' && (
+          <GlassCard hover={false} className="lg:col-span-2">
+            <GlassCardHeader
+              title={t('employee.managerPermissionsTitle', 'Manager permissions')}
+              action={<StatusBadge label="Manager" variant="amber" />}
+            />
+            <div className="p-5 space-y-4">
+              <p className="text-[13.5px] text-text-tertiary leading-relaxed">
+                {t(
+                  'employee.managerPermissionsDesc',
+                  "Choose which areas this manager can administer. Workspace settings, billing, sub-QR codes and promoting other managers stay with the owner.",
+                )}
+              </p>
+              <div className="divide-y divide-cream-3/50">
+                {MANAGER_PERMISSIONS.map((perm) => (
+                  <ManagerPermissionRow
+                    key={perm}
+                    perm={perm}
+                    checked={employee.managerPermissions.includes(perm)}
+                    disabled={updatePermissions.isPending}
+                    onChange={async (next) => {
+                      const set = new Set<ManagerPermission>(employee.managerPermissions);
+                      if (next) set.add(perm);
+                      else set.delete(perm);
+                      try {
+                        await updatePermissions.mutateAsync({
+                          publicId: employee.publicId,
+                          permissions: Array.from(set),
+                        });
+                        toast.success(t('employee.permSaved', 'Permissions updated'));
+                      } catch {
+                        toast.error(t('employee.permSaveError', 'Failed to update permissions'));
+                      }
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </GlassCard>
+        )}
+
         {/* Attendance history */}
         <GlassCard hover={false}>
           <GlassCardHeader
@@ -578,6 +628,71 @@ function EmployeeDetailPage() {
           </div>
         </GlassCard>
       </div>
+    </div>
+  );
+}
+
+// ── Manager permission row ────────────────────────────────────
+
+const PERMISSION_LABELS: Record<ManagerPermission, { titleKey: string; descKey: string; titleFallback: string; descFallback: string }> = {
+  manage_employees: {
+    titleKey: 'employee.permEmployees',
+    titleFallback: 'Manage employees',
+    descKey: 'employee.permEmployeesDesc',
+    descFallback: 'Create, edit, and remove employees (cannot promote managers)',
+  },
+  manage_shifts: {
+    titleKey: 'employee.permShifts',
+    titleFallback: 'Manage shifts',
+    descKey: 'employee.permShiftsDesc',
+    descFallback: 'Create, edit, and remove shifts and per-day overrides',
+  },
+  manage_closures: {
+    titleKey: 'employee.permClosures',
+    titleFallback: 'Manage closures',
+    descKey: 'employee.permClosuresDesc',
+    descFallback: 'Create, edit, and remove restaurant closure dates',
+  },
+  manage_leave: {
+    titleKey: 'employee.permLeave',
+    titleFallback: 'Manage leave',
+    descKey: 'employee.permLeaveDesc',
+    descFallback: 'Approve, reject, and cancel leave requests for any employee',
+  },
+  manage_attendance: {
+    titleKey: 'employee.permAttendance',
+    titleFallback: 'Manage attendance',
+    descKey: 'employee.permAttendanceDesc',
+    descFallback: 'View all attendance and edit records when corrections are needed',
+  },
+};
+
+function ManagerPermissionRow({
+  perm,
+  checked,
+  disabled,
+  onChange,
+}: {
+  perm: ManagerPermission;
+  checked: boolean;
+  disabled?: boolean;
+  onChange: (next: boolean) => void;
+}) {
+  const { t } = useTranslation();
+  const labels = PERMISSION_LABELS[perm];
+  const id = `manager-perm-${perm}`;
+
+  return (
+    <div className="flex items-start justify-between gap-4 py-3">
+      <div className="flex-1 min-w-0">
+        <label htmlFor={id} className="block text-[15px] font-medium text-text-primary cursor-pointer">
+          {t(labels.titleKey, labels.titleFallback)}
+        </label>
+        <p className="text-[13px] text-text-tertiary mt-0.5">
+          {t(labels.descKey, labels.descFallback)}
+        </p>
+      </div>
+      <Toggle id={id} checked={checked} onChange={onChange} disabled={disabled} />
     </div>
   );
 }

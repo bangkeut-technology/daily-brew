@@ -24,6 +24,8 @@ final readonly class EmployeeDTO
         public ?string $dob,
         public ?string $joinedAt,
         public string  $createdAt,
+        /** @var list<string> */
+        public array   $managerPermissions,
     ) {}
 
     public static function fromEntity(Employee $e): self
@@ -44,6 +46,7 @@ final readonly class EmployeeDTO
             dob: $e->getDob()?->format('Y-m-d'),
             joinedAt: $e->getJoinedAt()?->format('Y-m-d'),
             createdAt: $e->getCreatedAt()->format('c'),
+            managerPermissions: $e->getManagerPermissionValues(),
         );
     }
 
@@ -65,6 +68,7 @@ final readonly class EmployeeDTO
             'dob' => $this->dob,
             'joinedAt' => $this->joinedAt,
             'createdAt' => $this->createdAt,
+            'managerPermissions' => $this->managerPermissions,
         ];
     }
 }

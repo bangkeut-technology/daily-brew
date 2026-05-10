@@ -51,7 +51,7 @@ class ShiftController extends AbstractController
             throw new NotFoundHttpException('Workspace not found');
         }
 
-        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
+        $this->denyAccessUnlessGranted(WorkspaceVoter::MANAGE_SHIFTS, $workspace);
 
         $data = json_decode($request->getContent(), true);
 
@@ -88,7 +88,7 @@ class ShiftController extends AbstractController
             throw new NotFoundHttpException('Shift not found');
         }
 
-        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
+        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $shift);
 
         $data = json_decode($request->getContent(), true);
 
@@ -120,7 +120,7 @@ class ShiftController extends AbstractController
             throw new NotFoundHttpException('Shift not found');
         }
 
-        $this->denyAccessUnlessGranted(WorkspaceVoter::DELETE, $workspace);
+        $this->denyAccessUnlessGranted(WorkspaceVoter::DELETE, $shift);
 
         $shiftService->delete($shift);
 

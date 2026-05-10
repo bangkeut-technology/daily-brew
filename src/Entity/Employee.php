@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use App\Enum\EmployeeRoleEnum;
 use App\Enum\EmployeeStatusEnum;
+use App\Enum\ManagerPermissionEnum;
 use App\Repository\EmployeeRepository;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -65,6 +66,15 @@ class Employee extends AbstractBaseEntity
     #[ORM\Column(type: 'string', enumType: EmployeeRoleEnum::class, options: ['default' => 'employee'])]
     #[Groups(['employee:read'])]
     private EmployeeRoleEnum $role = EmployeeRoleEnum::EMPLOYEE;
+
+    /**
+     * Granular capability flags for managers — only meaningful when role = MANAGER.
+     * Stored as JSON array of ManagerPermissionEnum values.
+     *
+     * @var list<string>
+     */
+    #[ORM\Column(type: 'json', options: ['default' => '[]'])]
+    private array $managerPermissions = [];
 
     /** The user who created this employee (workspace owner). */
     #[ORM\ManyToOne(targetEntity: User::class)]
@@ -241,6 +251,38 @@ class Employee extends AbstractBaseEntity
     public function isManager(): bool
     {
         return $this->role === EmployeeRoleEnum::MANAGER;
+    }
+
+    // ── Manager permissions ────────────────────────────────────
+
+    /** @return list<ManagerPermissionEnum> */
+    public function getManagerPermissions(): array
+    {
+        return ManagerPermissionEnum::sanitize($this->managerPermissions);
+    }
+
+    /** @return list<string> */
+    public function getManagerPermissionValues(): array
+    {
+        return array_map(fn (ManagerPermissionEnum $p) => $p->value, $this->getManagerPermissions());
+    }
+
+    /** @param iterable<string|ManagerPermissionEnum> $permissions */
+    public function setManagerPermissions(iterable $permissions): static
+    {
+        $this->managerPermissions = array_map(
+            fn (ManagerPermissionEnum $p) => $p->value,
+            ManagerPermissionEnum::sanitize($permissions),
+        );
+        return $this;
+    }
+
+    public function hasManagerPermission(ManagerPermissionEnum $permission): bool
+    {
+        if (!$this->isManager()) {
+            return false;
+        }
+        return in_array($permission->value, $this->managerPermissions, true);
     }
 
     // ── Relations ──────────────────────────────────────────────

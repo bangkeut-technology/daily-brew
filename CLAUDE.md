@@ -53,7 +53,9 @@ All entities carry `id`, `publicId` (UUID), `createdAt`, `updatedAt`.
 
 **Roles & linking.**
 - User↔Employee ManyToOne; composite unique (linkedUser, workspace) — one per workspace, linkable across.
-- Manager (Espresso): linked user required, max 2 / unlimited (Double Espresso). View all attendance, approve/reject/cancel leave. Cannot edit employees/shifts/closures/settings/billing or promote. `WorkspaceVoter::MANAGE` = owner+manager; `EDIT`/`DELETE` owner-only.
+- Manager (Espresso): linked user required, max 2 / unlimited (Double Espresso). Capabilities granted per-manager via `Employee.managerPermissions` (JSON list of `ManagerPermissionEnum`): `manage_employees`, `manage_shifts`, `manage_closures`, `manage_leave`, `manage_attendance`. Newly promoted managers default to `[manage_leave, manage_attendance]` (matches pre-feature behavior of "view all attendance + approve leave"). Existing managers were back-filled to the same defaults. Cannot edit workspace settings/billing/sub-QR codes or promote managers — owner-only. `manage_attendance` controls "see all employees' attendance vs. only own" in `AttendanceController::list`/`summary`.
+- `WorkspaceVoter`: `MANAGE` = owner + any manager (legacy, role-based). Capability attributes `MANAGE_EMPLOYEES`/`_SHIFTS`/`_CLOSURES`/`_LEAVE_REQUESTS`/`_ATTENDANCES` on a `Workspace` subject (used by create/list endpoints) and `EDIT`/`DELETE` on a typed entity (`Employee`, `Shift`, `ClosurePeriod`, `Attendance`, `LeaveRequest`) both resolve to the matching `ManagerPermissionEnum`. `EDIT`/`DELETE` on a `Workspace` subject remain owner-only. Owner is granted everything.
+- Permissions managed via owner-only `PATCH /workspaces/{ws}/employees/{emp}/manager-permissions` `{ permissions: string[] }`.
 - Per-QR manager (Double Espresso): scoped to attendance/leave for employees in that QR's `assignedEmployees`. No edit rights for shifts/closures/settings/QR.
 - Employee dup: 409 on same firstName+lastName; queries filter `deletedAt IS NULL`. Attendance unique per (employee, date); double check-in returns existing.
 - `currentWorkspace` on User + localStorage; restored from server if empty.

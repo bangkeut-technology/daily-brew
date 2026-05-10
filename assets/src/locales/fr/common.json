@@ -51,7 +51,21 @@
     "active": "Actif",
     "inactive": "Inactif",
     "qrCode": "Code QR",
-    "attendanceHistory": "Historique de présence"
+    "attendanceHistory": "Historique de présence",
+    "managerPermissionsTitle": "Permissions du manager",
+    "managerPermissionsDesc": "Choisissez les domaines que ce manager peut administrer. Les paramètres de l'espace, la facturation, les codes QR et la promotion d'autres managers restent réservés au propriétaire.",
+    "permEmployees": "Gérer les employés",
+    "permEmployeesDesc": "Créer, modifier et supprimer des employés (ne peut pas promouvoir des managers)",
+    "permShifts": "Gérer les horaires",
+    "permShiftsDesc": "Créer, modifier et supprimer les horaires et les exceptions par jour",
+    "permClosures": "Gérer les fermetures",
+    "permClosuresDesc": "Créer, modifier et supprimer les jours de fermeture",
+    "permLeave": "Gérer les congés",
+    "permLeaveDesc": "Approuver, refuser et annuler les demandes de congé pour tout employé",
+    "permAttendance": "Gérer la présence",
+    "permAttendanceDesc": "Voir toute la présence et corriger les enregistrements si nécessaire",
+    "permSaved": "Permissions mises à jour",
+    "permSaveError": "Échec de la mise à jour des permissions"
   },
   "workspace": {
     "label": "Espace de travail",

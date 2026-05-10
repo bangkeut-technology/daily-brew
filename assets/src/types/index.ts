@@ -211,6 +211,21 @@ export interface ClosurePeriod {
   createdAt: string;
 }
 
+export type ManagerPermission =
+  | 'manage_employees'
+  | 'manage_shifts'
+  | 'manage_closures'
+  | 'manage_leave'
+  | 'manage_attendance';
+
+export const MANAGER_PERMISSIONS: ManagerPermission[] = [
+  'manage_employees',
+  'manage_shifts',
+  'manage_closures',
+  'manage_leave',
+  'manage_attendance',
+];
+
 export interface Employee {
   publicId: string;
   firstName: string;
@@ -227,6 +242,7 @@ export interface Employee {
   linkedUserPublicId: string | null;
   linkedUserEmail: string | null;
   createdAt: string;
+  managerPermissions: ManagerPermission[];
   attendance?: AttendanceRecord[];
 }
 
@@ -387,6 +403,7 @@ export interface RoleContext {
   isOwner: boolean;
   isEmployee: boolean;
   isManager: boolean;
+  managerPermissions: ManagerPermission[];
   onboardingCompleted: boolean;
   ownedWorkspaces: { publicId: string; name: string }[];
   employee: {
