@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.51.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.51.0...v1.51.1) (2026-05-11)
+
+
+### Bug Fixes
+
+* **employee-form:** pair DOB + Join date; Username gets its own row ([#92](https://github.com/bangkeut-technology/daily-brew/issues/92)) ([578ee5b](https://github.com/bangkeut-technology/daily-brew/commit/578ee5bb365d1d841cc768491e485e4fe81752e2))
+
 ## [1.51.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.50.1...v1.51.0) (2026-05-11)
 
 
