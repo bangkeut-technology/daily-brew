@@ -236,13 +236,25 @@ class AdminDashboardController extends AbstractController
             ->getQuery()
             ->getResult();
 
+        // Subscription headline excludes canceled rows — those are tombstones
+        // (e.g. deleted workspaces) and shouldn't inflate the live count.
+        // Active + trialing + past_due + paused all count as "real."
+        $liveSubscriptions = $subscriptionRepository->count([
+            'status' => [
+                SubscriptionStatusEnum::Active,
+                SubscriptionStatusEnum::Trialing,
+                SubscriptionStatusEnum::PastDue,
+                SubscriptionStatusEnum::Paused,
+            ],
+        ]);
+
         return $this->jsonSuccess([
             'totals' => [
                 'users' => $userRepository->count([]),
                 'workspaces' => $totalWorkspaces,
                 'employees' => $employeeRepository->count(['deletedAt' => null]),
                 'attendances' => $attendanceRepository->count([]),
-                'subscriptions' => $subscriptionRepository->count([]),
+                'subscriptions' => $liveSubscriptions,
             ],
             'byPlan' => $byPlan,
             'byStatus' => $byStatus,
