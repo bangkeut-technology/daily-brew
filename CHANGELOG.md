@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.49.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.49.0...v1.49.1) (2026-05-11)
+
+
+### Bug Fixes
+
+* **migration:** MySQL rejects literal DEFAULT '[]' on a JSON column ([#83](https://github.com/bangkeut-technology/daily-brew/issues/83)) ([93340fd](https://github.com/bangkeut-technology/daily-brew/commit/93340fd0bab7ce066b8083aac6599505a8c3ba63))
+
 ## [1.49.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.48.0...v1.49.0) (2026-05-11)
 
 
