@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.47.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.46.0...v1.47.0) (2026-05-11)
+
+
+### Features
+
+* **manager:** blur ID validation + layout fix + permission-aware sidebar ([#70](https://github.com/bangkeut-technology/daily-brew/issues/70)) ([cb71594](https://github.com/bangkeut-technology/daily-brew/commit/cb715948d72fe772d2131425a46bd4e71cda48e1))
+
 ## [1.46.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.45.0...v1.46.0) (2026-05-11)
 
 
