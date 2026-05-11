@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.46.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.45.0...v1.46.0) (2026-05-11)
+
+
+### Features
+
+* **time:** add Clock seam to DateService for deterministic time-based tests ([#67](https://github.com/bangkeut-technology/daily-brew/issues/67)) ([f4ec24f](https://github.com/bangkeut-technology/daily-brew/commit/f4ec24fc8efe3cdaf24a10a03270cb6ae2629373))
+
 ## [1.45.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.44.1...v1.45.0) (2026-05-10)
 
 
