@@ -115,6 +115,7 @@
     "roleManagerHint": "Managers need a linked user account. Link one before saving.",
     "sectionIdentity": "Identity",
     "sectionRoleSchedule": "Role & schedule",
+    "sectionSchedule": "Schedule",
     "sectionLinking": "Link user account",
     "sectionStatus": "Status"
   },

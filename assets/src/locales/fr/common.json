@@ -78,6 +78,7 @@
     "roleManagerHint": "Les managers ont besoin d'un compte utilisateur lié. Liez-en un avant d'enregistrer.",
     "sectionIdentity": "Identité",
     "sectionRoleSchedule": "Rôle et horaire",
+    "sectionSchedule": "Horaire",
     "sectionLinking": "Lier un compte utilisateur",
     "sectionStatus": "Statut"
   },
