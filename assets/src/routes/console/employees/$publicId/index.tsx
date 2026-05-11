@@ -18,6 +18,7 @@ import type { ManagerPermission } from '@/types';
 import { MANAGER_PERMISSIONS } from '@/types';
 import { useShifts } from '@/hooks/queries/useShifts';
 import { usePlan } from '@/hooks/queries/usePlan';
+import { useRoleContext } from '@/hooks/queries/useRoleContext';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { publicIdFormatError } from '@/lib/publicId';
 import { cn } from '@/lib/utils';
@@ -59,6 +60,11 @@ function EmployeeDetailPage() {
   const updateEmployee = useUpdateEmployee(workspaceId);
   const updateRole = useUpdateEmployeeRole(workspaceId);
   const updatePermissions = useUpdateManagerPermissions(workspaceId);
+  const { data: roleContext } = useRoleContext();
+  // Promote/demote and edit-manager-permissions are owner-only on the backend
+  // (see WorkspaceVoter) — hide those affordances for managers so they don't
+  // click buttons that 403.
+  const isOwner = roleContext?.isOwner ?? false;
   const [isEditing, setIsEditing] = useState(false);
   const [linkUserId, setLinkUserId] = useState('');
   const [linkUserIdError, setLinkUserIdError] = useState<string | null>(null);
@@ -163,7 +169,9 @@ function EmployeeDetailPage() {
         action={
           !isEditing ? (
             <div className="flex items-center gap-2">
-              {plan?.canUseManagers && employee.linkedUserPublicId && (
+              {/* Promote / demote is owner-only — managers see a manager-permissions card below
+                  but cannot create or remove other managers. */}
+              {isOwner && plan?.canUseManagers && employee.linkedUserPublicId && (
                 <button
                   type="button"
                   disabled={updateRole.isPending}
@@ -564,10 +572,12 @@ function EmployeeDetailPage() {
             </div>
           </GlassCard>
 
-        {/* Manager permissions — owner-only on the backend; rendered when this employee is a manager.
+        {/* Manager permissions — owner-only on the backend; rendered when this employee is a
+            manager AND the viewer is the workspace owner. Hidden from managers viewing other
+            managers since they can't edit permissions anyway.
             Sits in column 2 of the lower row, paired with the Link user account card in column 1.
             Attendance history below then spans both columns. */}
-        {employee.role === 'manager' && (
+        {isOwner && employee.role === 'manager' && (
           <GlassCard hover={false}>
             <GlassCardHeader
               title={t('employee.managerPermissionsTitle', 'Manager permissions')}
@@ -608,9 +618,9 @@ function EmployeeDetailPage() {
           </GlassCard>
         )}
 
-        {/* Attendance history — spans both columns when there's a manager-permissions card above,
-            otherwise sits in column 2 next to the Link user card. */}
-        <GlassCard hover={false} className={cn(employee.role === 'manager' && 'lg:col-span-2')}>
+        {/* Attendance history — spans both columns when there's a manager-permissions card above
+            (i.e. owner viewing a manager), otherwise sits in column 2 next to the Link user card. */}
+        <GlassCard hover={false} className={cn(isOwner && employee.role === 'manager' && 'lg:col-span-2')}>
           <GlassCardHeader
             title={t('employee.attendanceHistory', 'Attendance history')}
             action={
