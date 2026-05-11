@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.47.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.47.0...v1.47.1) (2026-05-11)
+
+
+### Bug Fixes
+
+* **manager:** permission-aware route gating + hide owner-only actions ([#72](https://github.com/bangkeut-technology/daily-brew/issues/72)) ([fe819ca](https://github.com/bangkeut-technology/daily-brew/commit/fe819caac1cb1868a017585c44ca6f2175b25401))
+
 ## [1.47.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.46.0...v1.47.0) (2026-05-11)
 
 
