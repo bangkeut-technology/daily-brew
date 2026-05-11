@@ -8,6 +8,7 @@ use App\Entity\Attendance;
 use App\Entity\Employee;
 use App\Entity\Shift;
 use App\Entity\Workspace;
+use App\Enum\EmployeeAttendanceTrackingEnum;
 use App\Repository\AttendanceRepository;
 use App\Repository\ClosurePeriodRepository;
 use App\Repository\LeaveRequestRepository;
@@ -252,6 +253,47 @@ class CheckinServiceLateEarlyTest extends TestCase
         $this->svc->checkin($emp, clientIp: '203.0.113.5', settings: $this->settings());
 
         $this->assertFalse($existing->hasLeftEarly());
+    }
+
+    // ── Attendance tracking opt-out (None) ──────────────────────────
+
+    public function testNoneTrackedEmployeeWithShiftIsNeverFlaggedAsLate(): void
+    {
+        $this->pinClockTo('2026-04-10 09:30:00');
+        $this->attendanceRepo->method('findByEmployeeAndDate')->willReturn(null);
+
+        $captured = null;
+        $this->attendanceRepo->expects($this->once())
+            ->method('persist')
+            ->with($this->callback(function (Attendance $a) use (&$captured): bool {
+                $captured = $a;
+                return true;
+            }));
+
+        // 09:30 is 30 minutes late — but None-tracked employees never get the flag,
+        // even though they DO get their check-in time recorded.
+        $emp = $this->employeeWithShift(start: '09:00:00', end: '17:00:00');
+        $emp->setAttendanceTracking(EmployeeAttendanceTrackingEnum::None);
+
+        $this->svc->checkin($emp, clientIp: '203.0.113.5', settings: $this->settings());
+
+        $this->assertFalse($captured->isLate(), 'None-tracked → never late');
+        $this->assertNotNull($captured->getCheckInAt(), 'But check-in time IS still recorded');
+    }
+
+    public function testNoneTrackedEmployeeIsNeverFlaggedAsLeftEarly(): void
+    {
+        $this->pinClockTo('2026-04-10 14:00:00');
+        $existing = $this->existingCheckInAttendance(deviceId: null);
+        $this->attendanceRepo->method('findByEmployeeAndDate')->willReturn($existing);
+
+        $emp = $this->employeeWithShift(start: '09:00:00', end: '17:00:00');
+        $emp->setAttendanceTracking(EmployeeAttendanceTrackingEnum::None);
+
+        $this->svc->checkin($emp, clientIp: '203.0.113.5', settings: $this->settings());
+
+        $this->assertFalse($existing->hasLeftEarly(), 'None-tracked → never left early');
+        $this->assertNotNull($existing->getCheckOutAt(), 'But check-out time IS still recorded');
     }
 
     // ── Timezone interaction ─────────────────────────────────────────

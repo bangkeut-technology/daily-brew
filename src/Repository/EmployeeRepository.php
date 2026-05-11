@@ -85,6 +85,31 @@ class EmployeeRepository extends AbstractRepository
             ->getSingleScalarResult();
     }
 
+    /**
+     * Active employees who are subject to attendance tracking — feeds the dashboard
+     * "absent" calculation and the daily-summary baseline. Employees with
+     * attendanceTracking=None are excluded because the owner has opted them out
+     * of absent counts entirely (admin helpers, flexible-hours staff, etc.).
+     *
+     * Note: this is intentionally distinct from countActiveByWorkspace() which
+     * still includes None-tracked employees because they occupy a seat against
+     * the plan's employee limit.
+     */
+    public function countAttendanceTrackedByWorkspace(Workspace $workspace): int
+    {
+        return (int) $this->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->where('e.workspace = :ws')
+            ->andWhere('e.status = :status')
+            ->andWhere('e.deletedAt IS NULL')
+            ->andWhere('e.attendanceTracking = :tracking')
+            ->setParameter('ws', $workspace)
+            ->setParameter('status', EmployeeStatusEnum::ACTIVE)
+            ->setParameter('tracking', \App\Enum\EmployeeAttendanceTrackingEnum::Full)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function findDuplicate(Workspace $workspace, string $firstName, string $lastName): ?Employee
     {
         return $this->createQueryBuilder('e')

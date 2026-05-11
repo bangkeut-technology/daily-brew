@@ -35,7 +35,9 @@ class DashboardServiceTest extends TestCase
     public function testGetTodayStatsAggregatesCountsAndDerivesAbsent(): void
     {
         $workspace = $this->workspaceWithTimezone('Asia/Phnom_Penh');
+        // totalEmployees (seat count) includes None-tracked; absent baseline does not.
         $this->employeeRepo->method('countActiveByWorkspace')->willReturn(10);
+        $this->employeeRepo->method('countAttendanceTrackedByWorkspace')->willReturn(10);
         $this->attendanceRepo->method('countByWorkspaceAndDate')->willReturn(7);
         $this->attendanceRepo->method('countLateByWorkspaceAndDate')->willReturn(2);
         $this->leaveRepo->method('countApprovedByWorkspaceAndDate')->willReturn(2);
@@ -59,6 +61,7 @@ class DashboardServiceTest extends TestCase
         // race between hire/check-in). Absent must never go negative.
         $workspace = $this->workspaceWithTimezone('UTC');
         $this->employeeRepo->method('countActiveByWorkspace')->willReturn(5);
+        $this->employeeRepo->method('countAttendanceTrackedByWorkspace')->willReturn(5);
         $this->attendanceRepo->method('countByWorkspaceAndDate')->willReturn(4);
         $this->attendanceRepo->method('countLateByWorkspaceAndDate')->willReturn(1);
         $this->leaveRepo->method('countApprovedByWorkspaceAndDate')->willReturn(3);
@@ -74,6 +77,7 @@ class DashboardServiceTest extends TestCase
     {
         $workspace = new Workspace();
         $this->employeeRepo->method('countActiveByWorkspace')->willReturn(0);
+        $this->employeeRepo->method('countAttendanceTrackedByWorkspace')->willReturn(0);
         $this->attendanceRepo->method('countByWorkspaceAndDate')->willReturn(0);
         $this->attendanceRepo->method('countLateByWorkspaceAndDate')->willReturn(0);
         $this->leaveRepo->method('countApprovedByWorkspaceAndDate')->willReturn(0);
@@ -84,6 +88,26 @@ class DashboardServiceTest extends TestCase
         $stats = $this->svc->getTodayStats($workspace);
 
         $this->assertSame(0, $stats['totalEmployees']);
+    }
+
+    public function testNoneTrackedEmployeesAreExcludedFromAbsentCount(): void
+    {
+        // 10 active seats, 7 are tracked; 5 present, 1 on leave → absent should be
+        // 7 (tracked baseline) - 5 - 1 = 1, NOT 10 - 5 - 1 = 4. None-tracked
+        // employees (admin helpers etc.) must never be counted as absent.
+        $workspace = $this->workspaceWithTimezone('UTC');
+        $this->employeeRepo->method('countActiveByWorkspace')->willReturn(10);
+        $this->employeeRepo->method('countAttendanceTrackedByWorkspace')->willReturn(7);
+        $this->attendanceRepo->method('countByWorkspaceAndDate')->willReturn(5);
+        $this->attendanceRepo->method('countLateByWorkspaceAndDate')->willReturn(0);
+        $this->leaveRepo->method('countApprovedByWorkspaceAndDate')->willReturn(1);
+        $this->attendanceRepo->method('findByWorkspaceAndDate')->willReturn([]);
+        $this->leaveRepo->method('countPendingByWorkspace')->willReturn(0);
+
+        $stats = $this->svc->getTodayStats($workspace);
+
+        $this->assertSame(10, $stats['totalEmployees'], 'Seat-limit count still includes None-tracked');
+        $this->assertSame(1, $stats['absent'], '7 tracked - 5 present - 1 on leave = 1');
     }
 
     private function workspaceWithTimezone(string $tz): Workspace

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiAxios } from '@/lib/apiAxios';
-import type { Employee, ManagerPermission } from '@/types';
+import type { Employee, EmployeeAttendanceTracking, ManagerPermission } from '@/types';
 
 export function useEmployees(workspacePublicId: string) {
   return useQuery({
@@ -40,6 +40,7 @@ export function useCreateEmployee(workspacePublicId: string) {
       linkedUserPublicId?: string;
       dob?: string;
       joinedAt?: string;
+      attendanceTracking?: EmployeeAttendanceTracking;
     }) => {
       const { data } = await apiAxios.post<Employee>(
         `/workspaces/${workspacePublicId}/employees`,
@@ -70,6 +71,7 @@ export function useUpdateEmployee(workspacePublicId: string) {
       linkedUserPublicId?: string | null;
       dob?: string | null;
       joinedAt?: string | null;
+      attendanceTracking?: EmployeeAttendanceTracking;
     }) => {
       const { data } = await apiAxios.put<Employee>(
         `/workspaces/${workspacePublicId}/employees/${publicId}`,

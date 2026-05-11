@@ -226,6 +226,15 @@ export const MANAGER_PERMISSIONS: ManagerPermission[] = [
   'manage_attendance',
 ];
 
+/**
+ * How an employee is treated by the attendance system. `full` (default) — counted
+ * in the dashboard absent calc, late/leftEarly flags fire when a shift is assigned.
+ * `none` — excluded from the absent calc and never flagged late/early; the employee
+ * CAN still check in (their times are recorded), but they're not penalised for
+ * skipping. Used for admin helpers and flexible-hours staff.
+ */
+export type EmployeeAttendanceTracking = 'full' | 'none';
+
 export interface Employee {
   publicId: string;
   firstName: string;
@@ -243,6 +252,7 @@ export interface Employee {
   linkedUserEmail: string | null;
   createdAt: string;
   managerPermissions: ManagerPermission[];
+  attendanceTracking: EmployeeAttendanceTracking;
   attendance?: AttendanceRecord[];
 }
 

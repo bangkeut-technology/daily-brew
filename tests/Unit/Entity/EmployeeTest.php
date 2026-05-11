@@ -8,6 +8,7 @@ use App\Entity\Employee;
 use App\Entity\Shift;
 use App\Entity\User;
 use App\Entity\Workspace;
+use App\Enum\EmployeeAttendanceTrackingEnum;
 use App\Enum\EmployeeRoleEnum;
 use App\Enum\EmployeeStatusEnum;
 use DateTimeImmutable;
@@ -126,5 +127,18 @@ class EmployeeTest extends TestCase
         $emp->setDeletedAt($now);
 
         $this->assertSame($now, $emp->getDeletedAt());
+    }
+
+    public function testAttendanceTrackingDefaultsToFullAndRoundTrips(): void
+    {
+        $emp = new Employee();
+
+        $this->assertSame(EmployeeAttendanceTrackingEnum::Full, $emp->getAttendanceTracking());
+        $this->assertTrue($emp->isAttendanceTracked());
+
+        $emp->setAttendanceTracking(EmployeeAttendanceTrackingEnum::None);
+
+        $this->assertSame(EmployeeAttendanceTrackingEnum::None, $emp->getAttendanceTracking());
+        $this->assertFalse($emp->isAttendanceTracked(), 'None-tracked → isAttendanceTracked() returns false');
     }
 }

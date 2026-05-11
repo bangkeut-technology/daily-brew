@@ -102,7 +102,12 @@
     "permAttendance": "Manage attendance",
     "permAttendanceDesc": "View all attendance and edit records when corrections are needed",
     "permSaved": "Permissions updated",
-    "permSaveError": "Failed to update permissions"
+    "permSaveError": "Failed to update permissions",
+    "attendanceTracking": "Attendance tracking",
+    "attendanceTrackingFull": "Tracked (default)",
+    "attendanceTrackingNone": "Excluded — never counted as absent",
+    "attendanceTrackingHint": "Set \"Excluded\" for staff who help run the workspace but don't follow a shift (e.g. admin helpers). They can still check in to log times — they just won't be counted as absent.",
+    "notTrackedBadge": "Not tracked"
   },
   "attendance": {
     "date": "Date",

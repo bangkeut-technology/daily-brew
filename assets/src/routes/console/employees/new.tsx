@@ -32,6 +32,7 @@ const createEmployeeSchema = z.object({
       (v) => v === undefined || v.trim() === '' || isValidPublicIdFormat(v.trim()),
       { message: 'Public ID must be 12 chars using a–z (no i, l, o) and 2–9.' },
     ),
+  attendanceTracking: z.enum(['full', 'none']),
 });
 
 type CreateEmployeeForm = z.infer<typeof createEmployeeSchema>;
@@ -72,6 +73,7 @@ function NewEmployeePage() {
       joinedAt: '',
       shiftPublicId: '',
       linkedUserPublicId: '',
+      attendanceTracking: 'full',
     },
   });
 
@@ -86,6 +88,7 @@ function NewEmployeePage() {
         joinedAt: values.joinedAt || undefined,
         shiftPublicId: values.shiftPublicId || undefined,
         linkedUserPublicId: values.linkedUserPublicId || undefined,
+        attendanceTracking: values.attendanceTracking,
       });
       toast.success(t('employee.createSuccess', 'Employee created'));
       navigate({ to: '/console/employees' });
@@ -309,6 +312,27 @@ function NewEmployeePage() {
                 </div>
               </div>
             )}
+          </div>
+
+          <div>
+            <label id="emp-tracking-label" className="block text-[14px] font-medium text-text-secondary mb-1.5">
+              {t('employee.attendanceTracking', 'Attendance tracking')}
+            </label>
+            <CustomSelect
+              value={watch('attendanceTracking') ?? 'full'}
+              onChange={(v) => setValue('attendanceTracking', v as 'full' | 'none')}
+              options={[
+                { value: 'full', label: t('employee.attendanceTrackingFull', 'Tracked (default)') },
+                { value: 'none', label: t('employee.attendanceTrackingNone', 'Excluded — never counted as absent') },
+              ]}
+              placeholder=""
+            />
+            <p className="text-[12.5px] text-text-tertiary mt-1">
+              {t(
+                'employee.attendanceTrackingHint',
+                'Set "Excluded" for staff who help run the workspace but don\'t follow a shift (e.g. admin helpers). They can still check in to log times — they just won\'t be counted as absent.',
+              )}
+            </p>
           </div>
 
           <div className="flex gap-3 pt-2">

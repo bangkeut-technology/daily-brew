@@ -119,8 +119,11 @@ class CheckinService
             // Late detection (ShiftTimeRule-aware)
             // Shift times are stored as bare H:i values representing workspace-local time,
             // so we compare them against $now which is already in the workspace timezone.
+            // Employees with attendanceTracking=None are excluded entirely — we record the
+            // time but never flag them as late, because the owner has opted them out of
+            // attendance discipline.
             $shift = $employee->getShift();
-            if ($shift !== null) {
+            if ($shift !== null && $employee->isAttendanceTracked()) {
                 $shiftStart = $this->resolveEffectiveStartTime($shift, $now);
                 if ($shiftStart !== null) {
                     $grace = $shift->getGraceLateMinutes();
@@ -152,8 +155,9 @@ class CheckinService
             $attendance->setCheckOutDeviceName($deviceName);
 
             // Left early detection (ShiftTimeRule-aware)
+            // Same exclusion as late detection — None-tracked employees never get flagged.
             $shift = $employee->getShift();
-            if ($shift !== null) {
+            if ($shift !== null && $employee->isAttendanceTracked()) {
                 $shiftEnd = $this->resolveEffectiveEndTime($shift, $now);
                 if ($shiftEnd !== null) {
                     $grace = $shift->getGraceEarlyMinutes();

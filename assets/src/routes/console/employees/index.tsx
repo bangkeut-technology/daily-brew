@@ -204,6 +204,12 @@ function EmployeeListPage() {
                       {employee.role === 'manager' && (
                         <StatusBadge label="Manager" variant="amber" />
                       )}
+                      {employee.attendanceTracking === 'none' && (
+                        <StatusBadge
+                          label={t('employee.notTrackedBadge', 'Not tracked')}
+                          variant="gray"
+                        />
+                      )}
                     </div>
                     <button
                       onClick={(e) => {

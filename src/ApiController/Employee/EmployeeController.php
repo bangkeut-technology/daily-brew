@@ -7,6 +7,7 @@ namespace App\ApiController\Employee;
 use App\ApiController\Trait\ApiResponseTrait;
 use App\DTO\AttendanceDTO;
 use App\DTO\EmployeeDTO;
+use App\Enum\EmployeeAttendanceTrackingEnum;
 use App\Enum\EmployeeRoleEnum;
 use App\Enum\ManagerPermissionEnum;
 use App\Repository\AttendanceRepository;
@@ -107,6 +108,14 @@ class EmployeeController extends AbstractController
             $employee->setJoinedAt(\App\Service\DateService::parse($data['joinedAt']));
         }
 
+        if (isset($data['attendanceTracking'])) {
+            $mode = EmployeeAttendanceTrackingEnum::tryFrom((string) $data['attendanceTracking']);
+            if ($mode === null) {
+                return $this->jsonError('attendanceTracking must be "full" or "none"');
+            }
+            $employee->setAttendanceTracking($mode);
+        }
+
         if (!empty($data['linkedUserPublicId'])) {
             $linkedUser = $userRepository->findByPublicId($data['linkedUserPublicId']);
             if ($linkedUser !== null) {
@@ -200,6 +209,14 @@ class EmployeeController extends AbstractController
 
         if (array_key_exists('joinedAt', $data)) {
             $employee->setJoinedAt(!empty($data['joinedAt']) ? \App\Service\DateService::parse($data['joinedAt']) : null);
+        }
+
+        if (array_key_exists('attendanceTracking', $data)) {
+            $mode = EmployeeAttendanceTrackingEnum::tryFrom((string) $data['attendanceTracking']);
+            if ($mode === null) {
+                return $this->jsonError('attendanceTracking must be "full" or "none"');
+            }
+            $employee->setAttendanceTracking($mode);
         }
 
         // Handle linking/unlinking user account
