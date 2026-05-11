@@ -41,6 +41,7 @@ const editEmployeeSchema = z.object({
   joinedAt: z.string().optional(),
   shiftPublicId: z.string().optional(),
   active: z.boolean(),
+  attendanceTracking: z.enum(['full', 'none']),
 });
 
 type EditEmployeeForm = z.infer<typeof editEmployeeSchema>;
@@ -89,6 +90,7 @@ function EmployeeDetailPage() {
           joinedAt: employee.joinedAt || '',
           shiftPublicId: employee.shiftPublicId || '',
           active: employee.active,
+          attendanceTracking: employee.attendanceTracking,
         }
       : undefined,
   });
@@ -151,6 +153,7 @@ function EmployeeDetailPage() {
         joinedAt: values.joinedAt || null,
         shiftPublicId: values.shiftPublicId || null,
         active: values.active,
+        attendanceTracking: values.attendanceTracking,
       });
       toast.success(t('employee.updateSuccess', 'Employee updated'));
       setIsEditing(false);
@@ -324,6 +327,27 @@ function EmployeeDetailPage() {
                 />
               </div>
 
+              <div>
+                <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
+                  {t('employee.attendanceTracking', 'Attendance tracking')}
+                </label>
+                <CustomSelect
+                  value={watch('attendanceTracking') ?? 'full'}
+                  onChange={(v) => setValue('attendanceTracking', v as 'full' | 'none')}
+                  options={[
+                    { value: 'full', label: t('employee.attendanceTrackingFull', 'Tracked (default)') },
+                    { value: 'none', label: t('employee.attendanceTrackingNone', 'Excluded — never counted as absent') },
+                  ]}
+                  placeholder=""
+                />
+                <p className="text-[12.5px] text-text-tertiary mt-1">
+                  {t(
+                    'employee.attendanceTrackingHint',
+                    'Set "Excluded" for staff who help run the workspace but don\'t follow a shift (e.g. admin helpers). They can still check in to log times — they just won\'t be counted as absent.',
+                  )}
+                </p>
+              </div>
+
               <div className="flex items-center gap-2">
                 <Toggle
                   id="active-toggle"
@@ -372,6 +396,12 @@ function EmployeeDetailPage() {
                       />
                       {employee.role === 'manager' && (
                         <StatusBadge label="Manager" variant="amber" />
+                      )}
+                      {employee.attendanceTracking === 'none' && (
+                        <StatusBadge
+                          label={t('employee.notTrackedBadge', 'Not tracked')}
+                          variant="gray"
+                        />
                       )}
                     </div>
                   </div>

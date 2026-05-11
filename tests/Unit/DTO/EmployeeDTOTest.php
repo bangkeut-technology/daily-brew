@@ -40,6 +40,19 @@ class EmployeeDTOTest extends TestCase
         $this->assertNull($dto->shiftPublicId);
         $this->assertNull($dto->dob);
         $this->assertNull($dto->joinedAt);
+        $this->assertSame('full', $dto->attendanceTracking, 'New employees default to attendanceTracking=full');
+    }
+
+    public function testFromEntityExposesNoneAttendanceTrackingWhenSet(): void
+    {
+        $emp = (new Employee())
+            ->setFirstName('Admin')
+            ->setLastName('Helper')
+            ->setAttendanceTracking(\App\Enum\EmployeeAttendanceTrackingEnum::None);
+
+        $dto = EmployeeDTO::fromEntity($emp);
+
+        $this->assertSame('none', $dto->attendanceTracking);
     }
 
     public function testFromEntityFlagsInactiveStatus(): void

@@ -66,7 +66,12 @@
     "permAttendance": "Gérer la présence",
     "permAttendanceDesc": "Voir toute la présence et corriger les enregistrements si nécessaire",
     "permSaved": "Permissions mises à jour",
-    "permSaveError": "Échec de la mise à jour des permissions"
+    "permSaveError": "Échec de la mise à jour des permissions",
+    "attendanceTracking": "Suivi de présence",
+    "attendanceTrackingFull": "Suivi (par défaut)",
+    "attendanceTrackingNone": "Exclu — jamais compté comme absent",
+    "attendanceTrackingHint": "Choisissez « Exclu » pour le personnel qui aide à gérer l'espace mais ne suit pas d'horaire (ex. assistants administratifs). Ils peuvent toujours pointer pour enregistrer leurs heures — ils ne seront simplement pas comptés comme absents.",
+    "notTrackedBadge": "Non suivi"
   },
   "workspace": {
     "label": "Espace de travail",

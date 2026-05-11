@@ -26,6 +26,7 @@ final readonly class EmployeeDTO
         public string  $createdAt,
         /** @var list<string> */
         public array   $managerPermissions,
+        public string  $attendanceTracking,
     ) {}
 
     public static function fromEntity(Employee $e): self
@@ -47,6 +48,7 @@ final readonly class EmployeeDTO
             joinedAt: $e->getJoinedAt()?->format('Y-m-d'),
             createdAt: $e->getCreatedAt()->format('c'),
             managerPermissions: $e->getManagerPermissionValues(),
+            attendanceTracking: $e->getAttendanceTracking()->value,
         );
     }
 
@@ -69,6 +71,7 @@ final readonly class EmployeeDTO
             'joinedAt' => $this->joinedAt,
             'createdAt' => $this->createdAt,
             'managerPermissions' => $this->managerPermissions,
+            'attendanceTracking' => $this->attendanceTracking,
         ];
     }
 }

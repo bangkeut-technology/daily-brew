@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\EmployeeAttendanceTrackingEnum;
 use App\Enum\EmployeeRoleEnum;
 use App\Enum\EmployeeStatusEnum;
 use App\Enum\ManagerPermissionEnum;
@@ -66,6 +67,16 @@ class Employee extends AbstractBaseEntity
     #[ORM\Column(type: 'string', enumType: EmployeeRoleEnum::class, options: ['default' => 'employee'])]
     #[Groups(['employee:read'])]
     private EmployeeRoleEnum $role = EmployeeRoleEnum::EMPLOYEE;
+
+    /**
+     * How attendance is tracked for this employee. `Full` is the default — they
+     * appear in absent calculations and late/leftEarly flags fire when a shift
+     * is assigned. `None` is for staff who shouldn't be counted (admin helpers,
+     * staff with no fixed schedule); check-in still records times if they scan.
+     */
+    #[ORM\Column(type: 'string', length: 20, enumType: EmployeeAttendanceTrackingEnum::class, options: ['default' => 'full'])]
+    #[Groups(['employee:read'])]
+    private EmployeeAttendanceTrackingEnum $attendanceTracking = EmployeeAttendanceTrackingEnum::Full;
 
     /**
      * Granular capability flags for managers — only meaningful when role = MANAGER.
@@ -251,6 +262,25 @@ class Employee extends AbstractBaseEntity
     public function isManager(): bool
     {
         return $this->role === EmployeeRoleEnum::MANAGER;
+    }
+
+    // ── Attendance tracking ──────────────────────────────────
+
+    public function getAttendanceTracking(): EmployeeAttendanceTrackingEnum
+    {
+        return $this->attendanceTracking;
+    }
+
+    public function setAttendanceTracking(EmployeeAttendanceTrackingEnum $mode): static
+    {
+        $this->attendanceTracking = $mode;
+        return $this;
+    }
+
+    /** Convenience for DashboardService / CheckinService gates. */
+    public function isAttendanceTracked(): bool
+    {
+        return $this->attendanceTracking === EmployeeAttendanceTrackingEnum::Full;
     }
 
     // ── Manager permissions ────────────────────────────────────

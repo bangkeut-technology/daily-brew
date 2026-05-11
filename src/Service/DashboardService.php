@@ -22,11 +22,14 @@ final readonly class DashboardService
     {
         $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
         $today = DateService::today($tz);
+        // Seat-limit count — includes attendanceTracking=None employees.
         $totalActive = $this->employeeRepository->countActiveByWorkspace($workspace);
+        // Absent-calc baseline — excludes None-tracked employees so they're never absent.
+        $totalTracked = $this->employeeRepository->countAttendanceTrackedByWorkspace($workspace);
         $presentCount = $this->attendanceRepository->countByWorkspaceAndDate($workspace, $today);
         $lateCount = $this->attendanceRepository->countLateByWorkspaceAndDate($workspace, $today);
         $onLeaveCount = $this->leaveRequestRepository->countApprovedByWorkspaceAndDate($workspace, $today);
-        $absentCount = max(0, $totalActive - $presentCount - $onLeaveCount);
+        $absentCount = max(0, $totalTracked - $presentCount - $onLeaveCount);
 
         $recentAttendance = $this->attendanceRepository->findByWorkspaceAndDate($workspace, $today);
         $pendingLeaves = $this->leaveRequestRepository->countPendingByWorkspace($workspace);
