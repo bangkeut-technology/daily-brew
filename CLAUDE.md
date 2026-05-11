@@ -23,7 +23,7 @@ All entities carry `id`, `publicId` (UUID), `createdAt`, `updatedAt`.
 - **Workspace** — name, qrToken (unique), owner
 - **WorkspaceSetting** (1:1) — ipRestrictionEnabled+allowedIps, deviceVerificationEnabled, timezone (IANA, default `Asia/Phnom_Penh`), dateFormat, geofencing (enabled/lat/lng/radiusMeters)
 - **Shift / Closure** — workspace+name+start/end (time / date)
-- **Employee** — workspace, user (creator), linkedUser (nullable; unique with workspace), shift, firstName, lastName, username, phoneNumber, dob, joinedAt, role (employee/manager), status, deletedAt
+- **Employee** — workspace, user (creator), linkedUser (nullable; unique with workspace), shift, firstName, lastName, username, phoneNumber, dob, joinedAt, role (employee/manager), status, attendanceTracking (`EmployeeAttendanceTrackingEnum`: `full` default | `none`), deletedAt
 - **Attendance** — employee, workspace, qrCode (nullable, ON DELETE SET NULL — null = main QR), date, checkInAt/checkOutAt, isLate, leftEarly, ipAddress, checkIn/OutDeviceId/Name. Unique (employee, date)
 - **LeaveRequest** — employee, startDate, endDate, startTime/endTime (both null = full day), reason, type (paid/unpaid), status, reviewedAt
 - **WorkspaceQrCode** (Double Espresso) — workspace (CASCADE), qrToken (unique), name, manager (Employee, nullable, ON DELETE SET NULL, linked user required), assignedEmployees M:N. Inherit flags+overrides: `inheritIpSettings`, `inheritGeofencing`, `inheritDeviceVerification`. Timezone always inherited.
@@ -35,11 +35,15 @@ All entities carry `id`, `publicId` (UUID), `createdAt`, `updatedAt`.
 
 **Closures & leave.** Skip attendance on closure dates. `LeaveRequestService::create` enforces startDate ≤ endDate, no closure overlap (`ClosurePeriodRepository::findOverlappingClosure`), no duplicate pending/approved (`LeaveRequestRepository::findOverlappingForEmployee`). CREATE uses `WorkspaceVoter::VIEW` (backend enforces self-only); employees DELETE own pending; owners/managers cancel any. `CheckinService` blocks check-in on approved full-day leave; status returns `onLeave`+`leaveIsFullDay`.
 
-**Late/early.** Computed at check-in/out vs assigned Shift + grace minutes. No shift → always false. All comparisons in workspace TZ.
+**Late/early.** Computed at check-in/out vs assigned Shift + grace minutes. No shift → always false. **`attendanceTracking=none` employees never get flagged regardless of shift** — `CheckinService` skips the late/leftEarly branches via `$employee->isAttendanceTracked()`. All comparisons in workspace TZ.
+
+**Attendance tracking modes** (`Employee.attendanceTracking`):
+- `full` (default) — counted in `DashboardService` absent calc, late/leftEarly flags fire when shift assigned.
+- `none` — excluded from absent baseline (`EmployeeRepository::countAttendanceTrackedByWorkspace` powers the calc; the existing `countActiveByWorkspace` still counts them for seat-limit checks). Check-in still allowed; times recorded; flags never set. For admin helpers and flexible-hours staff who shouldn't be "absent" if they skip a day. Editable on the new + edit employee forms via a `CustomSelect`; "Not tracked" badge on detail + list rows when set.
 
 **Timezone (critical).**
 - Server PHP `date.timezone = UTC`. Per-workspace TZ in `WorkspaceSetting.timezone` (IANA), auto-detected at creation, validated via `DateTimeZone::listIdentifiers()`. `datetime` stores UTC; `date` stores workspace-local calendar date.
-- **Mandatory `App\Service\DateService`** — never `new \DateTime`/`\DateTimeImmutable`. Methods: `now`, `today($tz)`, `relative`, `parse`, `createFromFormat`, `toUtc`, `mutableNow`/`Relative`/`Parse`, `utc`.
+- **Mandatory `App\Service\DateService`** — never `new \DateTime`/`\DateTimeImmutable`. Methods: `now`, `today($tz)`, `relative`, `parse`, `createFromFormat`, `toUtc`, `mutableNow`/`Relative`/`Parse`, `utc`. Tests pin "now" via `DateService::setClock(new MockClock(...))` (Psr\Clock — every "now"-dependent method consults it); always `DateService::setClock(null)` in `tearDown` so other tests don't inherit a frozen clock.
 - **Frontend**: `lib/timezone.ts` (`todayInTimezone`, `parseDateAsUTC`, `formatDateUTC`, `nowInTimezone`, `startOfMonthInTimezone`) + `hooks/useWorkspaceTimezone.ts`. Never `new Date().toISOString().split('T')[0]` — use `wsTz.today()`. Never `new Date('YYYY-MM-DD')` — use `parseDateAsUTC()`.
 
 **QR check-in.**
@@ -56,11 +60,13 @@ All entities carry `id`, `publicId` (UUID), `createdAt`, `updatedAt`.
 - Manager (Espresso): linked user required, max 2 / unlimited (Double Espresso). Capabilities granted per-manager via `Employee.managerPermissions` (JSON list of `ManagerPermissionEnum`): `manage_employees`, `manage_shifts`, `manage_closures`, `manage_leave`, `manage_attendance`. Newly promoted managers default to `[manage_leave, manage_attendance]` (matches pre-feature behavior of "view all attendance + approve leave"). Existing managers were back-filled to the same defaults. Cannot edit workspace settings/billing/sub-QR codes or promote managers — owner-only. `manage_attendance` controls "see all employees' attendance vs. only own" in `AttendanceController::list`/`summary`.
 - `WorkspaceVoter`: `MANAGE` = owner + any manager (legacy, role-based). Capability attributes `MANAGE_EMPLOYEES`/`_SHIFTS`/`_CLOSURES`/`_LEAVE_REQUESTS`/`_ATTENDANCES` on a `Workspace` subject (used by create/list endpoints) and `EDIT`/`DELETE` on a typed entity (`Employee`, `Shift`, `ClosurePeriod`, `Attendance`, `LeaveRequest`) both resolve to the matching `ManagerPermissionEnum`. `EDIT`/`DELETE` on a `Workspace` subject remain owner-only. Owner is granted everything.
 - Permissions managed via owner-only `PATCH /workspaces/{ws}/employees/{emp}/manager-permissions` `{ permissions: string[] }`.
-- Per-QR manager (Double Espresso): scoped to attendance/leave for employees in that QR's `assignedEmployees`. No edit rights for shifts/closures/settings/QR.
+- Role can be set in three places: dedicated `PUT /employees/{id}/role` (legacy quick-action), or as part of `POST /employees` and `PUT /employees/{id}` — all owner-only when promoting to manager, all run the same plan-limit + linkedUser checks and seed `[manage_leave, manage_attendance]` defaults on first promotion.
+- Per-QR manager (Double Espresso): scoped to attendance/leave for employees in that QR's `assignedEmployees`. No edit rights for shifts/closures/settings/QR. Per-QR scope is **additive** to workspace-wide permissions, not AND-ed.
+- **Frontend permission gating**: the sidebar builds the manager nav from `roleContext.managerPermissions` (only shows Employees / Shifts / Closures when the matching permission is granted). The `/console` route guard mirrors this via `PERMISSION_GATED_ROUTES` — manager without `manage_shifts` clicking `/console/shifts` is redirected to dashboard. Settings + QR-codes routes stay owner-only.
 - Employee dup: 409 on same firstName+lastName; queries filter `deletedAt IS NULL`. Attendance unique per (employee, date); double check-in returns existing.
 - `currentWorkspace` on User + localStorage; restored from server if empty.
 
-**Workspace deletion.** `WorkspaceService::delete()` cancels active Paddle sub via API (failure logged+swallowed) before soft-delete; sub marked Canceled locally regardless. `AccountDeletionService::softDelete()` delegates per owned WS.
+**Workspace deletion.** `WorkspaceService::delete()` cancels active Paddle sub via API (failure logged+swallowed) before soft-delete; sub marked Canceled locally regardless. Also clears `currentWorkspace` on the owner and on every linked user pointing at this workspace so the `role-context` endpoint doesn't drop them back on the deleted dashboard. `WorkspaceRepository::findByOwner()` filters `deletedAt IS NULL` — use `findAllByOwnerIncludingDeleted()` for admin views that need deletion history. `AccountDeletionService::softDelete()` delegates per owned WS.
 
 **Notifications (Espresso).** Push (Expo) + email (Mailgun) via `NotificationService` → `ExpoPushService`+`EmailService`. Events: leave submitted (→owner), approved/rejected (→employee), shift changed (→employee), closure (→linked employees), daily summary (→owner, cron `app:send-daily-summary`). Payloads include `type`+`workspacePublicId`.
 
@@ -72,7 +78,7 @@ Auth: JWT (LexikJWT) — email+password, Google OAuth, Apple OAuth. BasilBook: `
 
 Backend: Symfony 7 + Doctrine + LexikJWT + KnpPaginator. API `/api/v1/{_locale}` (en/fr/km), except checkin/device (no locale). Controller+Trait; logic in `src/Service/`. Multi-tenant: Workspace root, `WorkspaceVoter`.
 
-Frontend: React 19 + TS, TanStack Router + Query, shadcn/ui + Radix, Tailwind v4, Zod + RHF, Axios, i18next, Lucide, Sonner, `cn()` (`@/lib/utils`). Routes: `/sign-in`, `/sign-up`, `/auth/callback`, `/checkin/:qrToken`, `/console/*`, `/admin/*`. Shared (`assets/src/components/shared/`): GlassCard, CustomSelect (auto-search 8+), CustomDatePicker (`isDateDisabled`, `todayOverride`), CustomTimePicker (5-min), LeaveRequestModal, Toggle, ConfirmModal, Avatar, StatusBadge, StatCard, EmptyState, PageHeader (`badge`).
+Frontend: React 19 + TS, TanStack Router + Query, shadcn/ui + Radix, Tailwind v4, Zod + RHF, Axios, i18next, Lucide, Sonner, `cn()` (`@/lib/utils`). Routes: `/sign-in`, `/sign-up`, `/auth/callback`, `/checkin/:qrToken`, `/console/*`, `/admin/*`. Shared (`assets/src/components/shared/`): GlassCard, CustomSelect (auto-search 8+), CustomDatePicker (`isDateDisabled`, `todayOverride`), CustomTimePicker (5-min), LeaveRequestModal, Toggle, ConfirmModal, Avatar, StatusBadge, StatCard, EmptyState, PageHeader (`badge`). Public-ID format validation (`lib/publicId.ts`: `isValidPublicIdFormat`, `publicIdFormatError`) mirrors backend `TokenGenerator::generatePublicId()` — 12 chars from `abcdefghjkmnpqrstuvwxyz23456789` (no i/l/o/0/1). Used for blur validation on link-user / linkedUserPublicId fields.
 
 ## Style guide
 
