@@ -47,6 +47,7 @@
     "name": "Nom",
     "phone": "Téléphone",
     "shift": "Horaire",
+    "noShift": "Aucun horaire",
     "status": "Statut",
     "active": "Actif",
     "inactive": "Inactif",

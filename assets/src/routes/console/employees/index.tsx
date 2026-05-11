@@ -171,7 +171,7 @@ function EmployeeListPage() {
                           {fullName}
                         </div>
                         <div className="text-[13px] text-text-tertiary">
-                          {employee.shiftName || t('employee.noShift')}
+                          {employee.shiftName || t('employee.noShift', 'No shift')}
                           {employee.phoneNumber ? ` \u00b7 ${employee.phoneNumber}` : ''}
                         </div>
                       </div>

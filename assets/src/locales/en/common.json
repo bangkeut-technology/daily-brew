@@ -84,6 +84,7 @@
     "lastName": "Last name",
     "phone": "Phone",
     "shift": "Shift",
+    "noShift": "No shift",
     "status": "Status",
     "active": "Active",
     "inactive": "Inactive",
