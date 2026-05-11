@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils';
 import { useCreateEmployee } from '@/hooks/queries/useEmployees';
 import { useShifts, useCreateShift } from '@/hooks/queries/useShifts';
 import { usePlan } from '@/hooks/queries/usePlan';
-import { useRoleContext } from '@/hooks/queries/useRoleContext';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { isValidPublicIdFormat } from '@/lib/publicId';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -34,7 +33,6 @@ const createEmployeeSchema = z.object({
       { message: 'Public ID must be 12 chars using a–z (no i, l, o) and 2–9.' },
     ),
   attendanceTracking: z.enum(['full', 'none']),
-  role: z.enum(['employee', 'manager']),
 });
 
 /** Visual divider with a small label between form sections. */
@@ -63,12 +61,6 @@ function NewEmployeePage() {
   const createShift = useCreateShift(workspaceId);
   const { data: shifts } = useShifts(workspaceId);
   const { data: plan } = usePlan(workspaceId);
-  const { data: roleContext } = useRoleContext();
-  const isOwner = roleContext?.isOwner ?? false;
-  // Role picker is only meaningful when the caller can actually create a manager:
-  // owner + plan supports managers. Otherwise we silently default to 'employee'.
-  const canChooseRole = isOwner && (plan?.canUseManagers ?? false);
-
   const [showShiftForm, setShowShiftForm] = useState(false);
   const [newShiftName, setNewShiftName] = useState('');
   const [newStartTime, setNewStartTime] = useState('08:00');
@@ -93,7 +85,6 @@ function NewEmployeePage() {
       shiftPublicId: '',
       linkedUserPublicId: '',
       attendanceTracking: 'full',
-      role: 'employee',
     },
   });
 
@@ -109,8 +100,8 @@ function NewEmployeePage() {
         shiftPublicId: values.shiftPublicId || undefined,
         linkedUserPublicId: values.linkedUserPublicId || undefined,
         attendanceTracking: values.attendanceTracking,
-        // Only send role when the picker is actually shown — backend defaults to employee.
-        ...(canChooseRole ? { role: values.role } : {}),
+        // Role is not set on creation — new employees always start as 'employee'.
+        // Promote from the detail page once they have a linked user account.
       });
       toast.success(t('employee.createSuccess', 'Employee created'));
       navigate({ to: '/console/employees' });
@@ -205,36 +196,14 @@ function NewEmployeePage() {
             </div>
           </div>
 
-          {/* ── Role & schedule ──────────────────────────────────── */}
-          <SectionHeader>{t('employee.sectionRoleSchedule', 'Role & schedule')}</SectionHeader>
+          {/* ── Schedule ───────────────────────────────────────────
+              No Role picker on new-employee creation: new employees always
+              start as 'employee'. Promote from the detail page once they have
+              a linked user account. */}
+          <SectionHeader>{t('employee.sectionSchedule', 'Schedule')}</SectionHeader>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {canChooseRole && (
-              <div>
-                <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
-                  {t('employee.role', 'Role')}
-                </label>
-                <CustomSelect
-                  value={watch('role')}
-                  onChange={(v) => setValue('role', v as 'employee' | 'manager')}
-                  options={[
-                    { value: 'employee', label: t('employee.roleEmployee', 'Employee') },
-                    { value: 'manager', label: t('employee.roleManager', 'Manager') },
-                  ]}
-                  placeholder=""
-                />
-                {watch('role') === 'manager' && (
-                  <p className="text-[12.5px] text-amber mt-1">
-                    {t(
-                      'employee.roleManagerHint',
-                      'Managers need a linked user account. Set the User public ID below before saving.',
-                    )}
-                  </p>
-                )}
-              </div>
-            )}
-
-            <div className={cn(!canChooseRole && 'md:col-span-2')}>
+            <div>
               <label id="emp-shift-label" className="block text-[14px] font-medium text-text-secondary mb-1.5">
                 {t('employee.shift', 'Shift')}
               </label>
@@ -322,27 +291,27 @@ function NewEmployeePage() {
                 </div>
               )}
             </div>
-          </div>
 
-          <div>
-            <label id="emp-tracking-label" className="block text-[14px] font-medium text-text-secondary mb-1.5">
-              {t('employee.attendanceTracking', 'Attendance tracking')}
-            </label>
-            <CustomSelect
-              value={watch('attendanceTracking') ?? 'full'}
-              onChange={(v) => setValue('attendanceTracking', v as 'full' | 'none')}
-              options={[
-                { value: 'full', label: t('employee.attendanceTrackingFull', 'Tracked (default)') },
-                { value: 'none', label: t('employee.attendanceTrackingNone', 'Excluded — never counted as absent') },
-              ]}
-              placeholder=""
-            />
-            <p className="text-[12.5px] text-text-tertiary mt-1">
-              {t(
-                'employee.attendanceTrackingHint',
-                'Set "Excluded" for staff who help run the workspace but don\'t follow a shift (e.g. admin helpers). They can still check in to log times — they just won\'t be counted as absent.',
-              )}
-            </p>
+            <div>
+              <label id="emp-tracking-label" className="block text-[14px] font-medium text-text-secondary mb-1.5">
+                {t('employee.attendanceTracking', 'Attendance tracking')}
+              </label>
+              <CustomSelect
+                value={watch('attendanceTracking') ?? 'full'}
+                onChange={(v) => setValue('attendanceTracking', v as 'full' | 'none')}
+                options={[
+                  { value: 'full', label: t('employee.attendanceTrackingFull', 'Tracked (default)') },
+                  { value: 'none', label: t('employee.attendanceTrackingNone', 'Excluded — never counted as absent') },
+                ]}
+                placeholder=""
+              />
+              <p className="text-[12.5px] text-text-tertiary mt-1">
+                {t(
+                  'employee.attendanceTrackingHint',
+                  'Set "Excluded" for staff who help run the workspace but don\'t follow a shift (e.g. admin helpers). They can still check in to log times — they just won\'t be counted as absent.',
+                )}
+              </p>
+            </div>
           </div>
 
           {/* ── Linking ─────────────────────────────────────────── */}

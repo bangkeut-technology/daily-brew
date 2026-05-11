@@ -168,9 +168,12 @@ function EmployeeDetailPage() {
         shiftPublicId: values.shiftPublicId || null,
         active: values.active,
         attendanceTracking: values.attendanceTracking,
-        // Only owners can change role; for non-owners we don't send the field
-        // (the picker isn't rendered anyway and the backend would reject).
-        ...(isOwner && plan?.canUseManagers ? { role: values.role } : {}),
+        // Only send role when the picker is actually rendered (see Role & schedule
+        // section): owner + plan supports managers + employee has a linked user.
+        // The backend rejects role changes from anyone else.
+        ...(isOwner && plan?.canUseManagers && employee.linkedUserPublicId
+          ? { role: values.role }
+          : {}),
       });
       toast.success(t('employee.updateSuccess', 'Employee updated'));
       setIsEditing(false);
@@ -325,11 +328,14 @@ function EmployeeDetailPage() {
                 </div>
               </div>
 
-              {/* ── Role & schedule ──────────────────────────────────── */}
-              <SectionHeader>{t('employee.sectionRoleSchedule', 'Role & schedule')}</SectionHeader>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {isOwner && plan?.canUseManagers && (
+              {/* ── Role & schedule ───────────────────────────────────
+                  Role picker only renders for owners on a plan that supports
+                  managers AND when the employee already has a linked user —
+                  promotion requires one anyway, and showing "Manager" as an
+                  option that immediately fails validation is confusing. */}
+              {isOwner && plan?.canUseManagers && employee.linkedUserPublicId ? (
+                <>
+                  <SectionHeader>{t('employee.sectionRoleSchedule', 'Role & schedule')}</SectionHeader>
                   <div>
                     <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
                       {t('employee.role', 'Role')}
@@ -343,18 +349,14 @@ function EmployeeDetailPage() {
                       ]}
                       placeholder=""
                     />
-                    {watch('role') === 'manager' && !employee.linkedUserPublicId && (
-                      <p className="text-[12.5px] text-amber mt-1">
-                        {t(
-                          'employee.roleManagerHint',
-                          'Managers need a linked user account. Link one before saving.',
-                        )}
-                      </p>
-                    )}
                   </div>
-                )}
+                </>
+              ) : (
+                <SectionHeader>{t('employee.sectionSchedule', 'Schedule')}</SectionHeader>
+              )}
 
-                <div className={cn(!(isOwner && plan?.canUseManagers) && 'sm:col-span-2')}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
                   <label id="edit-shift-label" className="block text-[14px] font-medium text-text-secondary mb-1.5">
                     {t('employee.shift', 'Shift')}
                   </label>
@@ -371,27 +373,27 @@ function EmployeeDetailPage() {
                     placeholder={t('employee.noShift', 'No shift')}
                   />
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
-                  {t('employee.attendanceTracking', 'Attendance tracking')}
-                </label>
-                <CustomSelect
-                  value={watch('attendanceTracking') ?? 'full'}
-                  onChange={(v) => setValue('attendanceTracking', v as 'full' | 'none')}
-                  options={[
-                    { value: 'full', label: t('employee.attendanceTrackingFull', 'Tracked (default)') },
-                    { value: 'none', label: t('employee.attendanceTrackingNone', 'Excluded — never counted as absent') },
-                  ]}
-                  placeholder=""
-                />
-                <p className="text-[12.5px] text-text-tertiary mt-1">
-                  {t(
-                    'employee.attendanceTrackingHint',
-                    'Set "Excluded" for staff who help run the workspace but don\'t follow a shift (e.g. admin helpers). They can still check in to log times — they just won\'t be counted as absent.',
-                  )}
-                </p>
+                <div>
+                  <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
+                    {t('employee.attendanceTracking', 'Attendance tracking')}
+                  </label>
+                  <CustomSelect
+                    value={watch('attendanceTracking') ?? 'full'}
+                    onChange={(v) => setValue('attendanceTracking', v as 'full' | 'none')}
+                    options={[
+                      { value: 'full', label: t('employee.attendanceTrackingFull', 'Tracked (default)') },
+                      { value: 'none', label: t('employee.attendanceTrackingNone', 'Excluded — never counted as absent') },
+                    ]}
+                    placeholder=""
+                  />
+                  <p className="text-[12.5px] text-text-tertiary mt-1">
+                    {t(
+                      'employee.attendanceTrackingHint',
+                      'Set "Excluded" for staff who help run the workspace but don\'t follow a shift (e.g. admin helpers). They can still check in to log times — they just won\'t be counted as absent.',
+                    )}
+                  </p>
+                </div>
               </div>
 
               {/* ── Status ─────────────────────────────────────────── */}
