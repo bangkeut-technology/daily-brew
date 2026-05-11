@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.47.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.47.1...v1.47.2) (2026-05-11)
+
+
+### Bug Fixes
+
+* **employees:** back button on detail page + employee.noShift translation ([#74](https://github.com/bangkeut-technology/daily-brew/issues/74)) ([899ecd3](https://github.com/bangkeut-technology/daily-brew/commit/899ecd393c5d0e19edcc5c6dca5d261b97a091ae))
+
 ## [1.47.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.47.0...v1.47.1) (2026-05-11)
 
 
