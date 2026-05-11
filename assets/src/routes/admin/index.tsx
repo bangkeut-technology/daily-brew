@@ -343,11 +343,15 @@ function EmptyHint({ children }: { children: React.ReactNode }) {
 type GrowthSeries = AdminDashboardData['growthSeries'];
 type SeriesKey = 'attendances' | 'employees' | 'workspaces' | 'users';
 
+// Hardcoded distinct hues for the growth chart. Don't reuse --color-coffee
+// or --color-amber here — in dark mode the design tokens collapse them both
+// to #E8A85A, which makes the employees and workspaces lines render as one
+// indistinguishable line.
 const SERIES_META: { key: SeriesKey; label: string; color: string }[] = [
-  { key: 'attendances', label: 'Attendances', color: 'var(--color-green, #4A7C59)' },
-  { key: 'employees', label: 'Employees', color: 'var(--color-amber, #C8893E)' },
-  { key: 'workspaces', label: 'Workspaces', color: 'var(--color-coffee, #6B4226)' },
-  { key: 'users', label: 'Users', color: 'var(--color-blue, #3B6FA0)' },
+  { key: 'attendances', label: 'Attendances', color: '#4A7C59' },     // green
+  { key: 'employees',   label: 'Employees',   color: '#E8A85A' },     // amber
+  { key: 'workspaces',  label: 'Workspaces',  color: '#A26FB5' },     // purple — distinct in both modes
+  { key: 'users',       label: 'Users',       color: '#3B6FA0' },     // blue
 ];
 
 function GrowthChart({ series, className }: { series: GrowthSeries; className?: string }) {
