@@ -93,7 +93,8 @@ class AdminUserController extends AbstractController
             throw new NotFoundHttpException('User not found');
         }
 
-        $ownedWorkspaces = $workspaceRepository->findByOwner($user);
+        // Admin view shows the user's deletion history too — surface soft-deleted workspaces.
+        $ownedWorkspaces = $workspaceRepository->findAllByOwnerIncludingDeleted($user);
         $linkedEmployees = $employeeRepository->findByLinkedUser($user);
 
         return $this->jsonSuccess([

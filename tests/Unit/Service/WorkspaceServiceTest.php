@@ -116,6 +116,84 @@ class WorkspaceServiceTest extends TestCase
         $this->assertNotNull($emp2->getDeletedAt());
     }
 
+    public function testDeleteClearsOwnerCurrentWorkspaceWhenItPointsToTheDeletedOne(): void
+    {
+        // Regression guard — without this clearing, the owner's currentWorkspace
+        // stays on a soft-deleted workspace and the next page load via
+        // /users/me/role-context falls back to it, putting them back on the
+        // dead workspace's dashboard.
+        $ws = $this->workspaceWithId(7);
+        $owner = $this->user(1);
+        $owner->setCurrentWorkspace($ws);
+        $ws->setOwner($owner);
+
+        $this->subscriptionRepo->method('findByWorkspace')->willReturn(null);
+        $this->workspaceRepo->expects($this->once())->method('flush');
+
+        $this->svc->delete($ws);
+
+        $this->assertNull($owner->getCurrentWorkspace());
+    }
+
+    public function testDeleteClearsLinkedUserCurrentWorkspaceWhenItMatches(): void
+    {
+        $ws = $this->workspaceWithId(7);
+        $owner = $this->user(1);
+        $ws->setOwner($owner);
+
+        $linkedUser = $this->user(2);
+        $linkedUser->setCurrentWorkspace($ws);
+        $emp = (new Employee())->setLinkedUser($linkedUser);
+
+        $reflection = new \ReflectionClass($ws);
+        $reflection->getProperty('employees')->setValue($ws, new ArrayCollection([$emp]));
+
+        $this->subscriptionRepo->method('findByWorkspace')->willReturn(null);
+        $this->workspaceRepo->expects($this->once())->method('flush');
+
+        $this->svc->delete($ws);
+
+        $this->assertNull($linkedUser->getCurrentWorkspace());
+    }
+
+    public function testDeleteDoesNotClearOwnerCurrentWorkspacePointingToADifferentWorkspace(): void
+    {
+        $deleting = $this->workspaceWithId(7);
+        $other = $this->workspaceWithId(8);
+        $owner = $this->user(1);
+        $owner->setCurrentWorkspace($other);
+        $deleting->setOwner($owner);
+
+        $this->subscriptionRepo->method('findByWorkspace')->willReturn(null);
+        $this->workspaceRepo->expects($this->once())->method('flush');
+
+        $this->svc->delete($deleting);
+
+        $this->assertSame($other, $owner->getCurrentWorkspace());
+    }
+
+    private function user(int $id): User
+    {
+        $user = new User();
+        $ref = new \ReflectionClass($user);
+        while ($ref !== false && !$ref->hasProperty('id')) {
+            $ref = $ref->getParentClass();
+        }
+        $ref->getProperty('id')->setValue($user, $id);
+        return $user;
+    }
+
+    private function workspaceWithId(int $id): Workspace
+    {
+        $ws = new Workspace();
+        $ref = new \ReflectionClass($ws);
+        while ($ref !== false && !$ref->hasProperty('id')) {
+            $ref = $ref->getParentClass();
+        }
+        $ref->getProperty('id')->setValue($ws, $id);
+        return $ws;
+    }
+
     public function testDeleteCancelsActivePaddleSubscriptionViaApi(): void
     {
         $ws = new Workspace();
