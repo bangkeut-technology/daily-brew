@@ -19,6 +19,7 @@ import { MANAGER_PERMISSIONS } from '@/types';
 import { useShifts } from '@/hooks/queries/useShifts';
 import { usePlan } from '@/hooks/queries/usePlan';
 import { getWorkspacePublicId } from '@/lib/auth';
+import { publicIdFormatError } from '@/lib/publicId';
 import { cn } from '@/lib/utils';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
@@ -60,6 +61,7 @@ function EmployeeDetailPage() {
   const updatePermissions = useUpdateManagerPermissions(workspaceId);
   const [isEditing, setIsEditing] = useState(false);
   const [linkUserId, setLinkUserId] = useState('');
+  const [linkUserIdError, setLinkUserIdError] = useState<string | null>(null);
   const [showUnlinkConfirm, setShowUnlinkConfirm] = useState(false);
 
   const {
@@ -107,10 +109,16 @@ function EmployeeDetailPage() {
   const handleLinkUser = async () => {
     const id = linkUserId.trim();
     if (!id) return;
+    const formatError = publicIdFormatError(id);
+    if (formatError !== null) {
+      setLinkUserIdError(formatError);
+      return;
+    }
     try {
       await updateEmployee.mutateAsync({ publicId, linkedUserPublicId: id });
       toast.success(t('employee.userLinked', 'User account linked'));
       setLinkUserId('');
+      setLinkUserIdError(null);
     } catch {
       toast.error(t('employee.userLinkError', 'Failed to link user. Check the ID and try again.'));
     }
@@ -477,20 +485,37 @@ function EmployeeDetailPage() {
                         name="linkUserId"
                         type="text"
                         value={linkUserId}
-                        onChange={(e) => setLinkUserId(e.target.value)}
+                        onChange={(e) => {
+                          setLinkUserId(e.target.value);
+                          // Clear the error as the user types so they're not nagged mid-keystroke.
+                          if (linkUserIdError !== null) setLinkUserIdError(null);
+                        }}
+                        onBlur={(e) => setLinkUserIdError(publicIdFormatError(e.target.value))}
                         placeholder={t('employee.userPublicIdPlaceholder', 'Enter user public ID')}
-                        className="flex-1 px-3 py-2 rounded-lg text-[15px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono transition-colors"
+                        className={cn(
+                          'flex-1 px-3 py-2 rounded-lg text-[15px] bg-glass-bg border text-text-primary outline-none font-mono transition-colors',
+                          linkUserIdError !== null
+                            ? 'border-status-red focus:border-status-red'
+                            : 'border-cream-3 focus:border-coffee',
+                        )}
                       />
                       <button
                         type="button"
                         onClick={handleLinkUser}
-                        disabled={!linkUserId.trim() || updateEmployee.isPending}
+                        disabled={
+                          !linkUserId.trim()
+                          || linkUserIdError !== null
+                          || updateEmployee.isPending
+                        }
                         className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[14px] font-medium bg-coffee text-white border-none cursor-pointer transition-colors hover:bg-coffee-light disabled:opacity-50"
                       >
                         <Link2 size={12} />
                         Link
                       </button>
                     </div>
+                    {linkUserIdError !== null && (
+                      <p className="text-[13px] text-status-red mt-1">{linkUserIdError}</p>
+                    )}
                   </div>
 
                   <div className="border-t border-cream-3/60 pt-4">
