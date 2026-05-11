@@ -84,7 +84,12 @@ class Employee extends AbstractBaseEntity
      *
      * @var list<string>
      */
-    #[ORM\Column(type: 'json', options: ['default' => '[]'])]
+    // No `options['default']` here — MySQL rejects literal defaults on JSON
+    // columns under strict mode (it accepts only expression defaults like
+    // DEFAULT (JSON_ARRAY())). The PHP-side default `= []` initialises new
+    // rows; Version20260510120000 set the SQL DEFAULT (JSON_ARRAY()) on the
+    // existing column.
+    #[ORM\Column(type: 'json')]
     private array $managerPermissions = [];
 
     /** The user who created this employee (workspace owner). */
