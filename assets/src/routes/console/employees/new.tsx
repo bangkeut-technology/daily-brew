@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Plus, Link2, AtSign } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useCreateEmployee } from '@/hooks/queries/useEmployees';
+import { useCreateEmployee, useEmployees } from '@/hooks/queries/useEmployees';
 import { useShifts, useCreateShift } from '@/hooks/queries/useShifts';
 import { usePlan } from '@/hooks/queries/usePlan';
 import { getWorkspacePublicId } from '@/lib/auth';
@@ -17,6 +17,7 @@ import { GlassCard } from '@/components/shared/GlassCard';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { CustomTimePicker } from '@/components/shared/CustomTimePicker';
 import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
+import { JobTitleInput } from '@/components/shared/JobTitleInput';
 
 const createEmployeeSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -62,6 +63,10 @@ function NewEmployeePage() {
   const createShift = useCreateShift(workspaceId);
   const { data: shifts } = useShifts(workspaceId);
   const { data: plan } = usePlan(workspaceId);
+  const { data: existingEmployees } = useEmployees(workspaceId);
+  const workspaceJobTitles = (existingEmployees ?? [])
+    .map((e) => e.jobTitle)
+    .filter((v): v is string => !!v);
   const [showShiftForm, setShowShiftForm] = useState(false);
   const [newShiftName, setNewShiftName] = useState('');
   const [newStartTime, setNewStartTime] = useState('08:00');
@@ -150,12 +155,12 @@ function NewEmployeePage() {
               <label htmlFor="emp-jobTitle" className="block text-[14px] font-medium text-text-secondary mb-1.5">
                 {t('employee.jobTitle', 'Job title')}
               </label>
-              <input
+              <JobTitleInput
                 id="emp-jobTitle"
-                type="text"
-                {...register('jobTitle')}
+                value={watch('jobTitle') || ''}
+                onChange={(v) => setValue('jobTitle', v, { shouldDirty: true })}
                 placeholder={t('employee.jobTitlePlaceholder', 'e.g. Cashier, Cook, Waiter')}
-                className={inputClassName}
+                workspaceValues={workspaceJobTitles}
               />
             </div>
 
@@ -166,37 +171,7 @@ function NewEmployeePage() {
               <input id="emp-phone" type="text" {...register('phoneNumber')} className={inputClassName} />
             </div>
 
-            {/* Username — Espresso only, for BasilBook linking. Takes the partner cell when shown. */}
-            <div>
-              <label htmlFor="emp-username" className="flex items-center gap-1.5 text-[14px] font-medium text-text-secondary mb-1.5">
-                <AtSign size={12} />
-                Username
-                {!plan?.isEspresso && (
-                  <span className="text-[12px] font-medium px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
-                    Espresso
-                  </span>
-                )}
-              </label>
-              {plan?.isEspresso ? (
-                <>
-                  <input
-                    id="emp-username"
-                    type="text"
-                    {...register('username')}
-                    placeholder="e.g. vandeth.tho"
-                    className={cn(inputClassName, 'font-mono')}
-                  />
-                  <p className="text-[12.5px] text-text-tertiary mt-1">
-                    Unique identifier for BasilBook staff records.
-                  </p>
-                </>
-              ) : (
-                <p className="text-[13px] text-text-tertiary">
-                  Upgrade to Espresso to link employees with BasilBook.
-                </p>
-              )}
-            </div>
-
+            {/* Group the two date fields side-by-side so DOB + Join date pair naturally. */}
             <div>
               <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
                 {t('employee.dob', 'Date of birth')}
@@ -210,6 +185,38 @@ function NewEmployeePage() {
               </label>
               <CustomDatePicker value={watch('joinedAt') || ''} onChange={(v) => setValue('joinedAt', v)} />
             </div>
+          </div>
+
+          {/* Username gets its own row because the BasilBook hint paragraph is
+              long and would unbalance the grid. */}
+          <div>
+            <label htmlFor="emp-username" className="flex items-center gap-1.5 text-[14px] font-medium text-text-secondary mb-1.5">
+              <AtSign size={12} />
+              Username
+              {!plan?.isEspresso && (
+                <span className="text-[12px] font-medium px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
+                  Espresso
+                </span>
+              )}
+            </label>
+            {plan?.isEspresso ? (
+              <>
+                <input
+                  id="emp-username"
+                  type="text"
+                  {...register('username')}
+                  placeholder="e.g. vandeth.tho"
+                  className={cn(inputClassName, 'font-mono')}
+                />
+                <p className="text-[12.5px] text-text-tertiary mt-1">
+                  Unique identifier for BasilBook staff records.
+                </p>
+              </>
+            ) : (
+              <p className="text-[13px] text-text-tertiary">
+                Upgrade to Espresso to link employees with BasilBook.
+              </p>
+            )}
           </div>
 
           {/* ── Schedule ───────────────────────────────────────────

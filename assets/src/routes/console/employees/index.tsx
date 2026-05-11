@@ -167,15 +167,8 @@ function EmployeeListPage() {
                     >
                       <Avatar name={fullName} index={i} size={42} radius="12px" />
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className="text-[15.5px] font-medium text-text-primary truncate">
-                            {fullName}
-                          </span>
-                          {employee.jobTitle && (
-                            <span className="text-[13px] text-text-secondary truncate">
-                              \u00b7 {employee.jobTitle}
-                            </span>
-                          )}
+                        <div className="text-[15.5px] font-medium text-text-primary truncate">
+                          {fullName}
                         </div>
                         <div className="text-[13px] text-text-tertiary">
                           {employee.shiftName || t('employee.noShift', 'No shift')}
@@ -184,6 +177,9 @@ function EmployeeListPage() {
                       </div>
                     </Link>
                     <div className="flex items-center gap-1.5">
+                      {employee.jobTitle && (
+                        <StatusBadge label={employee.jobTitle} variant="blue" />
+                      )}
                       {employee.linkedUserEmail ? (
                         <button
                           onClick={() => setLinkFilter(linkFilter === 'linked' ? '' : 'linked')}

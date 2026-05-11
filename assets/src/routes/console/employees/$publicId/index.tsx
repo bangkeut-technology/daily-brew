@@ -10,6 +10,7 @@ import { useState, useMemo } from 'react';
 import * as Popover from '@radix-ui/react-popover';
 import {
   useEmployee,
+  useEmployees,
   useUpdateEmployee,
   useUpdateEmployeeRole,
   useUpdateManagerPermissions,
@@ -30,6 +31,7 @@ import { Toggle } from '@/components/shared/Toggle';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
+import { JobTitleInput } from '@/components/shared/JobTitleInput';
 import { useDateFormat } from '@/hooks/useDateFormat';
 
 const editEmployeeSchema = z.object({
@@ -72,6 +74,11 @@ function EmployeeDetailPage() {
   const fmtDate = useDateFormat();
   const { data: shifts } = useShifts(workspaceId);
   const { data: plan } = usePlan(workspaceId);
+  const { data: workspaceEmployees } = useEmployees(workspaceId);
+  const workspaceJobTitles = (workspaceEmployees ?? [])
+    .filter((e) => e.publicId !== publicId)
+    .map((e) => e.jobTitle)
+    .filter((v): v is string => !!v);
   const updateEmployee = useUpdateEmployee(workspaceId);
   const updateRole = useUpdateEmployeeRole(workspaceId);
   const updatePermissions = useUpdateManagerPermissions(workspaceId);
@@ -276,12 +283,12 @@ function EmployeeDetailPage() {
                   <label htmlFor="edit-jobTitle" className="block text-[14px] font-medium text-text-secondary mb-1.5">
                     {t('employee.jobTitle', 'Job title')}
                   </label>
-                  <input
+                  <JobTitleInput
                     id="edit-jobTitle"
-                    type="text"
-                    {...register('jobTitle')}
+                    value={watch('jobTitle') || ''}
+                    onChange={(v) => setValue('jobTitle', v, { shouldDirty: true })}
                     placeholder={t('employee.jobTitlePlaceholder', 'e.g. Cashier, Cook, Waiter')}
-                    className={inputClassName}
+                    workspaceValues={workspaceJobTitles}
                   />
                 </div>
 
@@ -292,37 +299,7 @@ function EmployeeDetailPage() {
                   <input id="edit-phone" type="text" {...register('phoneNumber')} className={inputClassName} />
                 </div>
 
-                {/* Username — Espresso only, for BasilBook linking */}
-                <div>
-                  <label htmlFor="edit-username" className="flex items-center gap-1.5 text-[14px] font-medium text-text-secondary mb-1.5">
-                    <AtSign size={12} />
-                    Username
-                    {!plan?.isEspresso && (
-                      <span className="text-[12px] font-medium px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
-                        Espresso
-                      </span>
-                    )}
-                  </label>
-                  {plan?.isEspresso ? (
-                    <>
-                      <input
-                        id="edit-username"
-                        type="text"
-                        {...register('username')}
-                        placeholder="e.g. vandeth.tho"
-                        className={cn(inputClassName, 'font-mono')}
-                      />
-                      <p className="text-[12.5px] text-text-tertiary mt-1">
-                        Unique identifier for BasilBook staff records.
-                      </p>
-                    </>
-                  ) : (
-                    <p className="text-[13px] text-text-tertiary">
-                      Upgrade to Espresso to link employees with BasilBook.
-                    </p>
-                  )}
-                </div>
-
+                {/* Group the two date fields side-by-side so DOB + Join date pair naturally. */}
                 <div>
                   <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
                     {t('employee.dob', 'Date of birth')}
@@ -342,6 +319,38 @@ function EmployeeDetailPage() {
                     onChange={(v) => setValue('joinedAt', v)}
                   />
                 </div>
+              </div>
+
+              {/* Username gets its own row because the BasilBook hint paragraph is
+                  long and would unbalance the grid. */}
+              <div>
+                <label htmlFor="edit-username" className="flex items-center gap-1.5 text-[14px] font-medium text-text-secondary mb-1.5">
+                  <AtSign size={12} />
+                  Username
+                  {!plan?.isEspresso && (
+                    <span className="text-[12px] font-medium px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
+                      Espresso
+                    </span>
+                  )}
+                </label>
+                {plan?.isEspresso ? (
+                  <>
+                    <input
+                      id="edit-username"
+                      type="text"
+                      {...register('username')}
+                      placeholder="e.g. vandeth.tho"
+                      className={cn(inputClassName, 'font-mono')}
+                    />
+                    <p className="text-[12.5px] text-text-tertiary mt-1">
+                      Unique identifier for BasilBook staff records.
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-[13px] text-text-tertiary">
+                    Upgrade to Espresso to link employees with BasilBook.
+                  </p>
+                )}
               </div>
 
               {/* ── Role & schedule ───────────────────────────────────
