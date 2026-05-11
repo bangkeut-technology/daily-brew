@@ -41,6 +41,7 @@ export function useCreateEmployee(workspacePublicId: string) {
       dob?: string;
       joinedAt?: string;
       attendanceTracking?: EmployeeAttendanceTracking;
+      role?: 'employee' | 'manager';
     }) => {
       const { data } = await apiAxios.post<Employee>(
         `/workspaces/${workspacePublicId}/employees`,
@@ -72,6 +73,7 @@ export function useUpdateEmployee(workspacePublicId: string) {
       dob?: string | null;
       joinedAt?: string | null;
       attendanceTracking?: EmployeeAttendanceTracking;
+      role?: 'employee' | 'manager';
     }) => {
       const { data } = await apiAxios.put<Employee>(
         `/workspaces/${workspacePublicId}/employees/${publicId}`,
