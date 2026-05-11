@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.48.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.47.2...v1.48.0) (2026-05-11)
+
+
+### Features
+
+* **employee:** attendance tracking mode (full | none) to opt staff out of absent count ([#77](https://github.com/bangkeut-technology/daily-brew/issues/77)) ([84da1c3](https://github.com/bangkeut-technology/daily-brew/commit/84da1c3365696befcb4a19703f4b11318f40b719))
+
+
+### Bug Fixes
+
+* **workspace:** hide soft-deleted workspaces + clear stale currentWorkspace ([#75](https://github.com/bangkeut-technology/daily-brew/issues/75)) ([6472d4d](https://github.com/bangkeut-technology/daily-brew/commit/6472d4d88161dd470cee0ea09970bf2dfa96a3c9))
+
 ## [1.47.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.47.1...v1.47.2) (2026-05-11)
 
 
