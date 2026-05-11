@@ -48,6 +48,8 @@ export function CustomDatePicker({ value, onChange, className = '', isDateDisabl
   const [pickerView, setPickerView] = useState<PickerView>('days');
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const yearListRef = useRef<HTMLDivElement>(null);
+  const selectedYearButtonRef = useRef<HTMLButtonElement>(null);
   const [dropUp, setDropUp] = useState(false);
 
   const [parsedY, parsedM] = value ? parseYMD(value) : [new Date().getFullYear(), new Date().getMonth()];
@@ -86,6 +88,19 @@ export function CustomDatePicker({ value, onChange, className = '', isDateDisabl
     const rect = triggerRef.current.getBoundingClientRect();
     setDropUp(window.innerHeight - rect.bottom < 340);
   }, [open]);
+
+  // When the year picker becomes visible, scroll the currently-shown year into
+  // view. The grid is 100 tall (currentYear - 80 to currentYear + 19) so without
+  // this the user opens the picker and sees ancient years at the top instead of
+  // their actual year (commonly 30-60 years back for DOB).
+  useLayoutEffect(() => {
+    if (pickerView !== 'years') return;
+    if (!selectedYearButtonRef.current || !yearListRef.current) return;
+    // Center the button in the visible area.
+    const btn = selectedYearButtonRef.current;
+    const list = yearListRef.current;
+    list.scrollTop = btn.offsetTop - list.clientHeight / 2 + btn.clientHeight / 2;
+  }, [pickerView, viewYear]);
 
   const prevMonth = () => {
     if (viewMonth === 0) { setViewMonth(11); setViewYear(viewYear - 1); }
@@ -222,10 +237,11 @@ export function CustomDatePicker({ value, onChange, className = '', isDateDisabl
 
           {/* Year picker */}
           {pickerView === 'years' && (
-            <div className="grid grid-cols-4 gap-1 p-2 max-h-[220px] overflow-y-auto">
+            <div ref={yearListRef} className="grid grid-cols-4 gap-1 p-2 max-h-[220px] overflow-y-auto">
               {yearRange.map((y) => (
                 <button
                   key={y}
+                  ref={y === viewYear ? selectedYearButtonRef : undefined}
                   type="button"
                   onClick={() => { setViewYear(y); setPickerView('months'); }}
                   className={cn(
