@@ -91,9 +91,12 @@ jobs:
 
             -
                 name: Run Migration For Test Env
+                # Fail the build if a migration is broken — running tests on a
+                # half-migrated DB can silently pass when prod would 500.
+                # --no-interaction so CI doesn't hang on the y/N prompt.
                 run:  |
                       php bin/console doctrine:database:create --if-not-exists --env=test
-                      php bin/console doctrine:migrations:migrate --env=test || echo "No migrations found or migration failed"
+                      php bin/console doctrine:migrations:migrate --env=test --no-interaction
                 env:
                     DATABASE_URL: mysql://${{ secrets.MYSQL_USER }}:${{ secrets.ENCODE_MYSQL_PASSWORD }}@127.0.0.1:${{ job.services.mysql.ports['3306'] }}/${{ secrets.MYSQL_DATABASE }}
             -
