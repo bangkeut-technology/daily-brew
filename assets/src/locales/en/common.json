@@ -108,7 +108,15 @@
     "attendanceTrackingFull": "Tracked (default)",
     "attendanceTrackingNone": "Excluded — never counted as absent",
     "attendanceTrackingHint": "Set \"Excluded\" for staff who help run the workspace but don't follow a shift (e.g. admin helpers). They can still check in to log times — they just won't be counted as absent.",
-    "notTrackedBadge": "Not tracked"
+    "notTrackedBadge": "Not tracked",
+    "role": "Role",
+    "roleEmployee": "Employee",
+    "roleManager": "Manager",
+    "roleManagerHint": "Managers need a linked user account. Link one before saving.",
+    "sectionIdentity": "Identity",
+    "sectionRoleSchedule": "Role & schedule",
+    "sectionLinking": "Link user account",
+    "sectionStatus": "Status"
   },
   "attendance": {
     "date": "Date",

@@ -71,7 +71,15 @@
     "attendanceTrackingFull": "Suivi (par défaut)",
     "attendanceTrackingNone": "Exclu — jamais compté comme absent",
     "attendanceTrackingHint": "Choisissez « Exclu » pour le personnel qui aide à gérer l'espace mais ne suit pas d'horaire (ex. assistants administratifs). Ils peuvent toujours pointer pour enregistrer leurs heures — ils ne seront simplement pas comptés comme absents.",
-    "notTrackedBadge": "Non suivi"
+    "notTrackedBadge": "Non suivi",
+    "role": "Rôle",
+    "roleEmployee": "Employé",
+    "roleManager": "Manager",
+    "roleManagerHint": "Les managers ont besoin d'un compte utilisateur lié. Liez-en un avant d'enregistrer.",
+    "sectionIdentity": "Identité",
+    "sectionRoleSchedule": "Rôle et horaire",
+    "sectionLinking": "Lier un compte utilisateur",
+    "sectionStatus": "Statut"
   },
   "workspace": {
     "label": "Espace de travail",

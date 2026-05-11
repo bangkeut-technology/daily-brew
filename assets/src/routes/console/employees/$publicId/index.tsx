@@ -42,7 +42,20 @@ const editEmployeeSchema = z.object({
   shiftPublicId: z.string().optional(),
   active: z.boolean(),
   attendanceTracking: z.enum(['full', 'none']),
+  role: z.enum(['employee', 'manager']),
 });
+
+/** Visual divider with a small label between form sections. */
+function SectionHeader({ children }: { children: import('react').ReactNode }) {
+  return (
+    <div className="flex items-center gap-3 pt-1">
+      <span className="text-[11px] uppercase tracking-[1.5px] font-semibold text-text-tertiary">
+        {children}
+      </span>
+      <div className="flex-1 h-px bg-cream-3/60" />
+    </div>
+  );
+}
 
 type EditEmployeeForm = z.infer<typeof editEmployeeSchema>;
 
@@ -91,6 +104,7 @@ function EmployeeDetailPage() {
           shiftPublicId: employee.shiftPublicId || '',
           active: employee.active,
           attendanceTracking: employee.attendanceTracking,
+          role: employee.role,
         }
       : undefined,
   });
@@ -154,6 +168,9 @@ function EmployeeDetailPage() {
         shiftPublicId: values.shiftPublicId || null,
         active: values.active,
         attendanceTracking: values.attendanceTracking,
+        // Only owners can change role; for non-owners we don't send the field
+        // (the picker isn't rendered anyway and the backend would reject).
+        ...(isOwner && plan?.canUseManagers ? { role: values.role } : {}),
       });
       toast.success(t('employee.updateSuccess', 'Employee updated'));
       setIsEditing(false);
@@ -224,7 +241,10 @@ function EmployeeDetailPage() {
         {/* Info card — full width */}
         <GlassCard hover={false} className="lg:col-span-2">
           {isEditing ? (
-            <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-5">
+              {/* ── Identity ─────────────────────────────────────────── */}
+              <SectionHeader>{t('employee.sectionIdentity', 'Identity')}</SectionHeader>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="edit-firstName" className="block text-[14px] font-medium text-text-secondary mb-1.5">
@@ -245,9 +265,7 @@ function EmployeeDetailPage() {
                     <p className="text-[13px] text-status-red mt-1">{errors.lastName.message}</p>
                   )}
                 </div>
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="edit-phone" className="block text-[14px] font-medium text-text-secondary mb-1.5">
                     {t('employee.phoneNumber', 'Phone number')}
@@ -276,18 +294,16 @@ function EmployeeDetailPage() {
                         className={cn(inputClassName, 'font-mono')}
                       />
                       <p className="text-[12.5px] text-text-tertiary mt-1">
-                        Unique identifier to link this employee with BasilBook staff records. Must match the staff name or ID used in your POS system.
+                        Unique identifier for BasilBook staff records.
                       </p>
                     </>
                   ) : (
                     <p className="text-[13px] text-text-tertiary">
-                      Upgrade to Espresso to link employees with BasilBook for cross-product staff tracking.
+                      Upgrade to Espresso to link employees with BasilBook.
                     </p>
                   )}
                 </div>
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
                     {t('employee.dob', 'Date of birth')}
@@ -309,22 +325,52 @@ function EmployeeDetailPage() {
                 </div>
               </div>
 
-              <div>
-                <label id="edit-shift-label" className="block text-[14px] font-medium text-text-secondary mb-1.5">
-                  {t('employee.shift', 'Shift')}
-                </label>
-                <CustomSelect
-                  value={watch('shiftPublicId') || ''}
-                  onChange={(v) => setValue('shiftPublicId', v)}
-                  options={[
-                    { value: '', label: t('employee.noShift', 'No shift') },
-                    ...(shifts?.map((s) => ({
-                      value: s.publicId,
-                      label: `${s.name} (${s.startTime} - ${s.endTime})`,
-                    })) ?? []),
-                  ]}
-                  placeholder={t('employee.noShift', 'No shift')}
-                />
+              {/* ── Role & schedule ──────────────────────────────────── */}
+              <SectionHeader>{t('employee.sectionRoleSchedule', 'Role & schedule')}</SectionHeader>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {isOwner && plan?.canUseManagers && (
+                  <div>
+                    <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
+                      {t('employee.role', 'Role')}
+                    </label>
+                    <CustomSelect
+                      value={watch('role')}
+                      onChange={(v) => setValue('role', v as 'employee' | 'manager')}
+                      options={[
+                        { value: 'employee', label: t('employee.roleEmployee', 'Employee') },
+                        { value: 'manager', label: t('employee.roleManager', 'Manager') },
+                      ]}
+                      placeholder=""
+                    />
+                    {watch('role') === 'manager' && !employee.linkedUserPublicId && (
+                      <p className="text-[12.5px] text-amber mt-1">
+                        {t(
+                          'employee.roleManagerHint',
+                          'Managers need a linked user account. Link one before saving.',
+                        )}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                <div className={cn(!(isOwner && plan?.canUseManagers) && 'sm:col-span-2')}>
+                  <label id="edit-shift-label" className="block text-[14px] font-medium text-text-secondary mb-1.5">
+                    {t('employee.shift', 'Shift')}
+                  </label>
+                  <CustomSelect
+                    value={watch('shiftPublicId') || ''}
+                    onChange={(v) => setValue('shiftPublicId', v)}
+                    options={[
+                      { value: '', label: t('employee.noShift', 'No shift') },
+                      ...(shifts?.map((s) => ({
+                        value: s.publicId,
+                        label: `${s.name} (${s.startTime} - ${s.endTime})`,
+                      })) ?? []),
+                    ]}
+                    placeholder={t('employee.noShift', 'No shift')}
+                  />
+                </div>
               </div>
 
               <div>
@@ -348,6 +394,9 @@ function EmployeeDetailPage() {
                 </p>
               </div>
 
+              {/* ── Status ─────────────────────────────────────────── */}
+              <SectionHeader>{t('employee.sectionStatus', 'Status')}</SectionHeader>
+
               <div className="flex items-center gap-2">
                 <Toggle
                   id="active-toggle"
@@ -359,7 +408,7 @@ function EmployeeDetailPage() {
                 </label>
               </div>
 
-              <div className="flex gap-3 pt-2">
+              <div className="flex gap-3 pt-3 border-t border-cream-3/60">
                 <button
                   type="submit"
                   disabled={updateEmployee.isPending}

@@ -123,6 +123,33 @@ class EmployeeController extends AbstractController
             }
         }
 
+        // Optional role at creation — owner-only and requires a linked user
+        // for MANAGER (so the order matters: link first, then promote). Gated
+        // by the plan's manager-limit check.
+        if (isset($data['role'])) {
+            $role = EmployeeRoleEnum::tryFrom((string) $data['role']);
+            if ($role === null) {
+                return $this->jsonError('Role must be "employee" or "manager"');
+            }
+            if ($role === EmployeeRoleEnum::MANAGER) {
+                $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
+                if ($employee->getLinkedUser() === null) {
+                    return $this->jsonError('Employee must have a linked user account to be created as manager', 400);
+                }
+                if (!$planService->canPromoteToManager($workspace)) {
+                    $limit = $planService->getManagerLimit($workspace);
+                    if ($limit === 0) {
+                        return $this->jsonError('Manager role requires the Espresso plan', 402);
+                    }
+                    return $this->jsonError("Manager limit reached ($limit). Upgrade for more.", 402);
+                }
+                $employee->setRole($role);
+                if (empty($employee->getManagerPermissionValues())) {
+                    $employee->setManagerPermissions(ManagerPermissionEnum::defaults());
+                }
+            }
+        }
+
         $employeeRepository->flush();
 
         return $this->jsonCreated(EmployeeDTO::fromEntity($employee)->toArray());
@@ -170,6 +197,7 @@ class EmployeeController extends AbstractController
         ShiftRepository $shiftRepository,
         UserRepository $userRepository,
         EmployeeService $employeeService,
+        PlanService $planService,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
         if ($workspace === null) {
@@ -217,6 +245,39 @@ class EmployeeController extends AbstractController
                 return $this->jsonError('attendanceTracking must be "full" or "none"');
             }
             $employee->setAttendanceTracking($mode);
+        }
+
+        // Role change — owner-only (same as the dedicated /role endpoint, which
+        // remains for the legacy Promote/Demote button). Validates the manager
+        // limit and seeds / clears default manager permissions on promotion
+        // and demotion.
+        if (array_key_exists('role', $data)) {
+            $role = EmployeeRoleEnum::tryFrom((string) $data['role']);
+            if ($role === null) {
+                return $this->jsonError('Role must be "employee" or "manager"');
+            }
+            $previousRole = $employee->getRole();
+            if ($role !== $previousRole) {
+                $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
+                if ($role === EmployeeRoleEnum::MANAGER) {
+                    if ($employee->getLinkedUser() === null) {
+                        return $this->jsonError('Employee must have a linked user account to be promoted to manager', 400);
+                    }
+                    if (!$planService->canPromoteToManager($workspace)) {
+                        $limit = $planService->getManagerLimit($workspace);
+                        if ($limit === 0) {
+                            return $this->jsonError('Manager role requires the Espresso plan', 402);
+                        }
+                        return $this->jsonError("Manager limit reached ($limit). Upgrade for more.", 402);
+                    }
+                }
+                $employee->setRole($role);
+                if ($role === EmployeeRoleEnum::MANAGER && empty($employee->getManagerPermissionValues())) {
+                    $employee->setManagerPermissions(ManagerPermissionEnum::defaults());
+                } elseif ($role !== EmployeeRoleEnum::MANAGER) {
+                    $employee->setManagerPermissions([]);
+                }
+            }
         }
 
         // Handle linking/unlinking user account
