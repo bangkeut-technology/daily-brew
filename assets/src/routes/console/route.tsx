@@ -4,6 +4,7 @@ import { Sidebar } from '@/components/layout/Sidebar';
 import { useAuthenticationState } from '@/hooks/use-authentication';
 import { useRoleContext } from '@/hooks/queries/useRoleContext';
 import { getWorkspacePublicId, clearWorkspacePublicId } from '@/lib/auth';
+import type { ManagerPermission } from '@/types';
 
 export const Route = createFileRoute('/console')({
   beforeLoad: ({ context, location }) => {
@@ -15,8 +16,29 @@ export const Route = createFileRoute('/console')({
   component: ConsoleLayout,
 });
 
-// Owner-only routes — employees should not access these
-const OWNER_ONLY_ROUTES = ['/console/employees', '/console/shifts', '/console/closures', '/console/settings'];
+/**
+ * Routes a regular linked employee (no manager role) must never reach.
+ * Owners always pass; managers pass only when they hold the matching
+ * permission listed in PERMISSION_GATED_ROUTES below.
+ */
+const STAFF_BLOCKED_ROUTES = [
+  '/console/employees',
+  '/console/shifts',
+  '/console/closures',
+  '/console/settings',
+  '/console/qr-codes',
+];
+
+/**
+ * Manager-accessible routes that require a specific permission.
+ * Routes NOT in this map (e.g. /console/settings, /console/qr-codes) stay
+ * owner-only regardless of manager permissions.
+ */
+const PERMISSION_GATED_ROUTES: Record<string, ManagerPermission> = {
+  '/console/employees': 'manage_employees',
+  '/console/shifts': 'manage_shifts',
+  '/console/closures': 'manage_closures',
+};
 
 function ConsoleLayout() {
   const router = useRouter();
@@ -65,17 +87,28 @@ function ConsoleLayout() {
     }
   }, [router.state.location.pathname, router]);
 
-  // Redirect employees away from owner-only routes
+  // Redirect away from routes the current role can't reach.
+  // - Owner: passes everything.
+  // - Manager with the matching permission: passes /employees, /shifts, /closures.
+  // - Manager without the permission (or regular employee): redirect to dashboard.
+  // - /settings, /qr-codes stay owner-only regardless of manager permissions.
   React.useEffect(() => {
     if (!roleContext) return;
-    const isEmployeeOnly = roleContext.isEmployee && !roleContext.isOwner;
-    if (!isEmployeeOnly) return;
+    if (roleContext.isOwner) return;
 
     const path = router.state.location.pathname;
-    const isOwnerRoute = OWNER_ONLY_ROUTES.some(
+    const blockedRoute = STAFF_BLOCKED_ROUTES.find(
       (r) => path === r || path.startsWith(r + '/'),
     );
-    if (isOwnerRoute) {
+    if (!blockedRoute) return;
+
+    const required = PERMISSION_GATED_ROUTES[blockedRoute];
+    const allowedByPermission =
+      required !== undefined
+      && roleContext.isManager
+      && roleContext.managerPermissions.includes(required);
+
+    if (!allowedByPermission) {
       router.navigate({ to: '/console/dashboard', replace: true });
     }
   }, [roleContext, router.state.location.pathname, router]);
