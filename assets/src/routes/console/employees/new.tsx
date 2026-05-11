@@ -21,6 +21,7 @@ import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
 const createEmployeeSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
+  jobTitle: z.string().optional(),
   phoneNumber: z.string().optional(),
   username: z.string().optional(),
   dob: z.string().optional(),
@@ -78,6 +79,7 @@ function NewEmployeePage() {
     defaultValues: {
       firstName: '',
       lastName: '',
+      jobTitle: '',
       phoneNumber: '',
       username: '',
       dob: '',
@@ -93,6 +95,7 @@ function NewEmployeePage() {
       await createEmployee.mutateAsync({
         firstName: values.firstName,
         lastName: values.lastName,
+        jobTitle: values.jobTitle || undefined,
         phoneNumber: values.phoneNumber || undefined,
         username: values.username || undefined,
         dob: values.dob || undefined,
@@ -141,6 +144,19 @@ function NewEmployeePage() {
               {errors.lastName && (
                 <p className="text-[13px] text-status-red mt-1">{errors.lastName.message}</p>
               )}
+            </div>
+
+            <div>
+              <label htmlFor="emp-jobTitle" className="block text-[14px] font-medium text-text-secondary mb-1.5">
+                {t('employee.jobTitle', 'Job title')}
+              </label>
+              <input
+                id="emp-jobTitle"
+                type="text"
+                {...register('jobTitle')}
+                placeholder={t('employee.jobTitlePlaceholder', 'e.g. Cashier, Cook, Waiter')}
+                className={inputClassName}
+              />
             </div>
 
             <div>

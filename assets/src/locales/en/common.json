@@ -85,6 +85,8 @@
     "phone": "Phone",
     "shift": "Shift",
     "noShift": "No shift",
+    "jobTitle": "Job title",
+    "jobTitlePlaceholder": "e.g. Cashier, Cook, Waiter",
     "status": "Status",
     "active": "Active",
     "inactive": "Inactive",

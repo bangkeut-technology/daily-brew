@@ -48,6 +48,8 @@
     "phone": "Téléphone",
     "shift": "Horaire",
     "noShift": "Aucun horaire",
+    "jobTitle": "Intitulé du poste",
+    "jobTitlePlaceholder": "ex. Caissier, Cuisinier, Serveur",
     "status": "Statut",
     "active": "Actif",
     "inactive": "Inactif",

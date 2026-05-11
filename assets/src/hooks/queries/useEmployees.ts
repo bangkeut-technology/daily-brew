@@ -36,6 +36,7 @@ export function useCreateEmployee(workspacePublicId: string) {
       lastName: string;
       phoneNumber?: string;
       username?: string;
+      jobTitle?: string;
       shiftPublicId?: string;
       linkedUserPublicId?: string;
       dob?: string;
@@ -67,6 +68,7 @@ export function useUpdateEmployee(workspacePublicId: string) {
       lastName?: string;
       phoneNumber?: string;
       username?: string | null;
+      jobTitle?: string | null;
       shiftPublicId?: string | null;
       active?: boolean;
       linkedUserPublicId?: string | null;

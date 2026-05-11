@@ -35,6 +35,7 @@ import { useDateFormat } from '@/hooks/useDateFormat';
 const editEmployeeSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
+  jobTitle: z.string().optional(),
   phoneNumber: z.string().optional(),
   username: z.string().optional(),
   dob: z.string().optional(),
@@ -97,6 +98,7 @@ function EmployeeDetailPage() {
       ? {
           firstName: employee.firstName,
           lastName: employee.lastName,
+          jobTitle: employee.jobTitle || '',
           phoneNumber: employee.phoneNumber || '',
           username: employee.username || '',
           dob: employee.dob || '',
@@ -161,6 +163,7 @@ function EmployeeDetailPage() {
         publicId: employee.publicId,
         firstName: values.firstName,
         lastName: values.lastName,
+        jobTitle: values.jobTitle || null,
         phoneNumber: values.phoneNumber || undefined,
         username: values.username || null,
         dob: values.dob || null,
@@ -267,6 +270,19 @@ function EmployeeDetailPage() {
                   {errors.lastName && (
                     <p className="text-[13px] text-status-red mt-1">{errors.lastName.message}</p>
                   )}
+                </div>
+
+                <div>
+                  <label htmlFor="edit-jobTitle" className="block text-[14px] font-medium text-text-secondary mb-1.5">
+                    {t('employee.jobTitle', 'Job title')}
+                  </label>
+                  <input
+                    id="edit-jobTitle"
+                    type="text"
+                    {...register('jobTitle')}
+                    placeholder={t('employee.jobTitlePlaceholder', 'e.g. Cashier, Cook, Waiter')}
+                    className={inputClassName}
+                  />
                 </div>
 
                 <div>
@@ -437,8 +453,11 @@ function EmployeeDetailPage() {
                   <Avatar name={fullName} index={0} size={64} radius="20px" />
                   <div>
                     <h2 className="text-[18px] font-semibold text-text-primary">{fullName}</h2>
+                    {employee.jobTitle && (
+                      <p className="text-[14px] text-text-secondary mt-0.5">{employee.jobTitle}</p>
+                    )}
                     {employee.username && (
-                      <p className="text-[14px] text-text-tertiary font-mono mt-0.5">@{employee.username}</p>
+                      <p className="text-[13px] text-text-tertiary font-mono mt-0.5">@{employee.username}</p>
                     )}
                     <div className="mt-1.5 flex items-center gap-1.5">
                       <StatusBadge

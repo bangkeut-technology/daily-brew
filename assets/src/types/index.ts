@@ -240,6 +240,8 @@ export interface Employee {
   firstName: string;
   lastName: string;
   name: string;
+  /** Free-text job title (Cashier, Cook, Waiter, etc.) — display only, not used by backend logic. */
+  jobTitle: string | null;
   username: string | null;
   phoneNumber: string | null;
   active: boolean;
