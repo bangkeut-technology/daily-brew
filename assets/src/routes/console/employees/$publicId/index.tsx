@@ -10,6 +10,7 @@ import { useState, useMemo } from 'react';
 import * as Popover from '@radix-ui/react-popover';
 import {
   useEmployee,
+  useEmployees,
   useUpdateEmployee,
   useUpdateEmployeeRole,
   useUpdateManagerPermissions,
@@ -30,6 +31,7 @@ import { Toggle } from '@/components/shared/Toggle';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
+import { JobTitleInput } from '@/components/shared/JobTitleInput';
 import { useDateFormat } from '@/hooks/useDateFormat';
 
 const editEmployeeSchema = z.object({
@@ -72,6 +74,11 @@ function EmployeeDetailPage() {
   const fmtDate = useDateFormat();
   const { data: shifts } = useShifts(workspaceId);
   const { data: plan } = usePlan(workspaceId);
+  const { data: workspaceEmployees } = useEmployees(workspaceId);
+  const workspaceJobTitles = (workspaceEmployees ?? [])
+    .filter((e) => e.publicId !== publicId)
+    .map((e) => e.jobTitle)
+    .filter((v): v is string => !!v);
   const updateEmployee = useUpdateEmployee(workspaceId);
   const updateRole = useUpdateEmployeeRole(workspaceId);
   const updatePermissions = useUpdateManagerPermissions(workspaceId);
@@ -276,12 +283,12 @@ function EmployeeDetailPage() {
                   <label htmlFor="edit-jobTitle" className="block text-[14px] font-medium text-text-secondary mb-1.5">
                     {t('employee.jobTitle', 'Job title')}
                   </label>
-                  <input
+                  <JobTitleInput
                     id="edit-jobTitle"
-                    type="text"
-                    {...register('jobTitle')}
+                    value={watch('jobTitle') || ''}
+                    onChange={(v) => setValue('jobTitle', v, { shouldDirty: true })}
                     placeholder={t('employee.jobTitlePlaceholder', 'e.g. Cashier, Cook, Waiter')}
-                    className={inputClassName}
+                    workspaceValues={workspaceJobTitles}
                   />
                 </div>
 

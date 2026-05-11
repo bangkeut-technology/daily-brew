@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Plus, Link2, AtSign } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useCreateEmployee } from '@/hooks/queries/useEmployees';
+import { useCreateEmployee, useEmployees } from '@/hooks/queries/useEmployees';
 import { useShifts, useCreateShift } from '@/hooks/queries/useShifts';
 import { usePlan } from '@/hooks/queries/usePlan';
 import { getWorkspacePublicId } from '@/lib/auth';
@@ -17,6 +17,7 @@ import { GlassCard } from '@/components/shared/GlassCard';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { CustomTimePicker } from '@/components/shared/CustomTimePicker';
 import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
+import { JobTitleInput } from '@/components/shared/JobTitleInput';
 
 const createEmployeeSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -62,6 +63,10 @@ function NewEmployeePage() {
   const createShift = useCreateShift(workspaceId);
   const { data: shifts } = useShifts(workspaceId);
   const { data: plan } = usePlan(workspaceId);
+  const { data: existingEmployees } = useEmployees(workspaceId);
+  const workspaceJobTitles = (existingEmployees ?? [])
+    .map((e) => e.jobTitle)
+    .filter((v): v is string => !!v);
   const [showShiftForm, setShowShiftForm] = useState(false);
   const [newShiftName, setNewShiftName] = useState('');
   const [newStartTime, setNewStartTime] = useState('08:00');
@@ -150,12 +155,12 @@ function NewEmployeePage() {
               <label htmlFor="emp-jobTitle" className="block text-[14px] font-medium text-text-secondary mb-1.5">
                 {t('employee.jobTitle', 'Job title')}
               </label>
-              <input
+              <JobTitleInput
                 id="emp-jobTitle"
-                type="text"
-                {...register('jobTitle')}
+                value={watch('jobTitle') || ''}
+                onChange={(v) => setValue('jobTitle', v, { shouldDirty: true })}
                 placeholder={t('employee.jobTitlePlaceholder', 'e.g. Cashier, Cook, Waiter')}
-                className={inputClassName}
+                workspaceValues={workspaceJobTitles}
               />
             </div>
 
