@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.50.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.49.1...v1.50.0) (2026-05-11)
+
+
+### Features
+
+* **employee:** inline shift + attendance; drop role picker for unlinked employees ([#85](https://github.com/bangkeut-technology/daily-brew/issues/85)) ([54f652d](https://github.com/bangkeut-technology/daily-brew/commit/54f652df8a0dc8c7695392fdeafb1b2b74ae12a3))
+
 ## [1.49.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.49.0...v1.49.1) (2026-05-11)
 
 
