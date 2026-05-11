@@ -1,10 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Copy, Pencil, X, Check, Link2, Mail, Unlink, Info, AtSign, ShieldCheck, ShieldOff } from 'lucide-react';
+import { ArrowLeft, Copy, Pencil, X, Check, Link2, Mail, Unlink, Info, AtSign, ShieldCheck, ShieldOff } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useMemo } from 'react';
 import * as Popover from '@radix-ui/react-popover';
@@ -164,6 +164,14 @@ function EmployeeDetailPage() {
 
   return (
     <div className="page-enter">
+      <Link
+        to="/console/employees"
+        className="inline-flex items-center gap-1.5 text-[13.5px] text-text-secondary hover:text-coffee mb-3 no-underline"
+      >
+        <ArrowLeft size={14} />
+        {t('employee.backToList', 'Back to employees')}
+      </Link>
+
       <PageHeader
         title={fullName}
         action={
