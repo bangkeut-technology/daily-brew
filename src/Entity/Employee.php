@@ -44,6 +44,16 @@ class Employee extends AbstractBaseEntity
     #[Groups(['employee:read'])]
     private ?string $phoneNumber = null;
 
+    /**
+     * Free-text job title — what this person does day to day (Cashier, Cook,
+     * Waiter, Barista, etc.). Optional and not validated; the owner picks
+     * whatever wording fits their restaurant. Surfaced on the detail header
+     * and list rows but not used by any backend logic.
+     */
+    #[ORM\Column(length: 100, nullable: true)]
+    #[Groups(['employee:read'])]
+    private ?string $jobTitle = null;
+
     /** Unique username for cross-product staff linking (e.g. BasilBook). */
     #[ORM\Column(length: 50, nullable: true, unique: true)]
     #[Groups(['employee:read'])]
@@ -176,6 +186,17 @@ class Employee extends AbstractBaseEntity
     }
 
     // ── Contact / Details ──────────────────────────────────────
+
+    public function getJobTitle(): ?string
+    {
+        return $this->jobTitle;
+    }
+
+    public function setJobTitle(?string $jobTitle): static
+    {
+        $this->jobTitle = $jobTitle;
+        return $this;
+    }
 
     public function getUsername(): ?string
     {

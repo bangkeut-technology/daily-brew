@@ -100,6 +100,10 @@ class EmployeeController extends AbstractController
             $employee->setUsername(trim($data['username']) ?: null);
         }
 
+        if (isset($data['jobTitle'])) {
+            $employee->setJobTitle(trim($data['jobTitle']) ?: null);
+        }
+
         if (!empty($data['dob'])) {
             $employee->setDob(\App\Service\DateService::parse($data['dob']));
         }
@@ -229,6 +233,10 @@ class EmployeeController extends AbstractController
 
         if (array_key_exists('username', $data)) {
             $employee->setUsername($data['username'] ? trim($data['username']) : null);
+        }
+
+        if (array_key_exists('jobTitle', $data)) {
+            $employee->setJobTitle($data['jobTitle'] ? trim($data['jobTitle']) : null);
         }
 
         if (array_key_exists('dob', $data)) {
