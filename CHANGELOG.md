@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.51.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.50.1...v1.51.0) (2026-05-11)
+
+
+### Features
+
+* **employee:** add jobTitle field (free text, e.g. Cashier, Cook, Waiter) ([#89](https://github.com/bangkeut-technology/daily-brew/issues/89)) ([c3244e5](https://github.com/bangkeut-technology/daily-brew/commit/c3244e59c6e45efcddb8359b160f899040838668))
+
+
+### Bug Fixes
+
+* **date-picker:** scroll year picker to the currently-shown year on open ([#90](https://github.com/bangkeut-technology/daily-brew/issues/90)) ([fba570e](https://github.com/bangkeut-technology/daily-brew/commit/fba570ee5f1683f96a8181f369df62819ebd80fc))
+
 ## [1.50.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.50.0...v1.50.1) (2026-05-11)
 
 
