@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.49.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.48.0...v1.49.0) (2026-05-11)
+
+
+### Features
+
+* **employee:** role picker + sectioned form layout for new and edit ([#78](https://github.com/bangkeut-technology/daily-brew/issues/78)) ([276a4a3](https://github.com/bangkeut-technology/daily-brew/commit/276a4a3b9ff737cea9a9a59cf2799f3fd5c15a57))
+
 ## [1.48.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.47.2...v1.48.0) (2026-05-11)
 
 
