@@ -11,6 +11,7 @@ import { useCreateEmployee } from '@/hooks/queries/useEmployees';
 import { useShifts, useCreateShift } from '@/hooks/queries/useShifts';
 import { usePlan } from '@/hooks/queries/usePlan';
 import { getWorkspacePublicId } from '@/lib/auth';
+import { isValidPublicIdFormat } from '@/lib/publicId';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard } from '@/components/shared/GlassCard';
 import { CustomSelect } from '@/components/shared/CustomSelect';
@@ -25,7 +26,12 @@ const createEmployeeSchema = z.object({
   dob: z.string().optional(),
   joinedAt: z.string().optional(),
   shiftPublicId: z.string().optional(),
-  linkedUserPublicId: z.string().optional(),
+  linkedUserPublicId: z.string()
+    .optional()
+    .refine(
+      (v) => v === undefined || v.trim() === '' || isValidPublicIdFormat(v.trim()),
+      { message: 'Public ID must be 12 chars using a–z (no i, l, o) and 2–9.' },
+    ),
 });
 
 type CreateEmployeeForm = z.infer<typeof createEmployeeSchema>;
@@ -53,6 +59,7 @@ function NewEmployeePage() {
     handleSubmit,
     setValue,
     watch,
+    trigger,
     formState: { errors },
   } = useForm<CreateEmployeeForm>({
     resolver: zodResolver(createEmployeeSchema),
@@ -197,10 +204,19 @@ function NewEmployeePage() {
             <input
               id="emp-linkedUser"
               type="text"
-              {...register('linkedUserPublicId')}
+              {...register('linkedUserPublicId', {
+                onBlur: () => trigger('linkedUserPublicId'),
+              })}
               placeholder={t('employee.userPublicIdPlaceholder', 'Optional — link to a user account')}
-              className={cn(inputClassName, 'font-mono')}
+              className={cn(
+                inputClassName,
+                'font-mono',
+                errors.linkedUserPublicId && 'border-status-red focus:border-status-red',
+              )}
             />
+            {errors.linkedUserPublicId && (
+              <p className="text-[13px] text-status-red mt-1">{errors.linkedUserPublicId.message}</p>
+            )}
             <p className="text-[12.5px] text-text-tertiary mt-1">
               {t('employee.userPublicIdHint', 'The employee can find their public ID on their profile page.')}
             </p>
