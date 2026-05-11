@@ -166,37 +166,7 @@ function NewEmployeePage() {
               <input id="emp-phone" type="text" {...register('phoneNumber')} className={inputClassName} />
             </div>
 
-            {/* Username — Espresso only, for BasilBook linking. Takes the partner cell when shown. */}
-            <div>
-              <label htmlFor="emp-username" className="flex items-center gap-1.5 text-[14px] font-medium text-text-secondary mb-1.5">
-                <AtSign size={12} />
-                Username
-                {!plan?.isEspresso && (
-                  <span className="text-[12px] font-medium px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
-                    Espresso
-                  </span>
-                )}
-              </label>
-              {plan?.isEspresso ? (
-                <>
-                  <input
-                    id="emp-username"
-                    type="text"
-                    {...register('username')}
-                    placeholder="e.g. vandeth.tho"
-                    className={cn(inputClassName, 'font-mono')}
-                  />
-                  <p className="text-[12.5px] text-text-tertiary mt-1">
-                    Unique identifier for BasilBook staff records.
-                  </p>
-                </>
-              ) : (
-                <p className="text-[13px] text-text-tertiary">
-                  Upgrade to Espresso to link employees with BasilBook.
-                </p>
-              )}
-            </div>
-
+            {/* Group the two date fields side-by-side so DOB + Join date pair naturally. */}
             <div>
               <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
                 {t('employee.dob', 'Date of birth')}
@@ -210,6 +180,38 @@ function NewEmployeePage() {
               </label>
               <CustomDatePicker value={watch('joinedAt') || ''} onChange={(v) => setValue('joinedAt', v)} />
             </div>
+          </div>
+
+          {/* Username gets its own row because the BasilBook hint paragraph is
+              long and would unbalance the grid. */}
+          <div>
+            <label htmlFor="emp-username" className="flex items-center gap-1.5 text-[14px] font-medium text-text-secondary mb-1.5">
+              <AtSign size={12} />
+              Username
+              {!plan?.isEspresso && (
+                <span className="text-[12px] font-medium px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
+                  Espresso
+                </span>
+              )}
+            </label>
+            {plan?.isEspresso ? (
+              <>
+                <input
+                  id="emp-username"
+                  type="text"
+                  {...register('username')}
+                  placeholder="e.g. vandeth.tho"
+                  className={cn(inputClassName, 'font-mono')}
+                />
+                <p className="text-[12.5px] text-text-tertiary mt-1">
+                  Unique identifier for BasilBook staff records.
+                </p>
+              </>
+            ) : (
+              <p className="text-[13px] text-text-tertiary">
+                Upgrade to Espresso to link employees with BasilBook.
+              </p>
+            )}
           </div>
 
           {/* ── Schedule ───────────────────────────────────────────
