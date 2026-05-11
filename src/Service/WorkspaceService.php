@@ -74,9 +74,23 @@ class WorkspaceService
             $this->cancelSubscription($subscription);
         }
 
-        // Soft-delete all employees in this workspace
+        // Clear currentWorkspace on the owner so they don't land back on the
+        // deleted workspace via the stored selector. Frontend localStorage is
+        // also cleared by the caller, but the server-side selector is the
+        // fallback when the query param is absent.
+        $owner = $workspace->getOwner();
+        if ($owner !== null && $owner->getCurrentWorkspace()?->getId() === $workspace->getId()) {
+            $owner->setCurrentWorkspace(null);
+        }
+
+        // Soft-delete all employees in this workspace and clear currentWorkspace
+        // on any linked user pointing here, for the same reason.
         foreach ($workspace->getEmployees() as $employee) {
             $employee->setDeletedAt($now);
+            $linkedUser = $employee->getLinkedUser();
+            if ($linkedUser !== null && $linkedUser->getCurrentWorkspace()?->getId() === $workspace->getId()) {
+                $linkedUser->setCurrentWorkspace(null);
+            }
             $employee->setLinkedUser(null);
         }
 
