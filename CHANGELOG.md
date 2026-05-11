@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.50.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.50.0...v1.50.1) (2026-05-11)
+
+
+### Bug Fixes
+
+* **admin:** distinct chart colors + exclude canceled from subscription total ([#87](https://github.com/bangkeut-technology/daily-brew/issues/87)) ([83350b6](https://github.com/bangkeut-technology/daily-brew/commit/83350b6c51623669ec1f58ee021c9b82b47eb738))
+
 ## [1.50.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.49.1...v1.50.0) (2026-05-11)
 
 
