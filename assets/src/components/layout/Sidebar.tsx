@@ -23,7 +23,7 @@ import { LogoBrand } from '@/components/shared/Logo';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
 import { useTheme } from 'next-themes';
 import { Sun, Moon } from 'lucide-react';
-import {EmployeeRole} from "@/types";
+import {EmployeeRole, ManagerPermission} from "@/types";
 
 interface NavItemDef {
     to: string;
@@ -47,11 +47,35 @@ const ownerManageNav: NavItemDef[] = [
     { to: '/console/settings', icon: Settings, label: 'nav.settings', tourId: 'nav-settings' },
 ];
 
-const managerMainNav: NavItemDef[] = [
-    { to: '/console/dashboard', icon: LayoutDashboard, label: 'nav.dashboard' },
-    { to: '/console/attendance', icon: CalendarCheck, label: 'nav.attendance' },
-    { to: '/console/leave', icon: FileText, label: 'nav.leaveRequests', espresso: true },
-];
+/**
+ * Build the manager-view nav set from a manager's granular permissions.
+ * Dashboard + Attendance are always visible (employees see their own attendance
+ * even without manage_attendance; a manager is still an employee in that
+ * respect). The rest of the items map 1:1 to a ManagerPermissionEnum case so
+ * a manager who hasn't been granted `manage_shifts` won't see Shifts in the
+ * sidebar at all.
+ *
+ * Sub-QR codes and workspace settings stay owner-only and are intentionally
+ * omitted here even for a manager with every permission.
+ */
+function buildManagerNav(permissions: ManagerPermission[]): NavItemDef[] {
+    const has = (p: ManagerPermission) => permissions.includes(p);
+    const items: NavItemDef[] = [
+        { to: '/console/dashboard', icon: LayoutDashboard, label: 'nav.dashboard' },
+        { to: '/console/attendance', icon: CalendarCheck, label: 'nav.attendance' },
+        { to: '/console/leave', icon: FileText, label: 'nav.leaveRequests', espresso: true },
+    ];
+    if (has('manage_employees')) {
+        items.push({ to: '/console/employees', icon: Users, label: 'nav.employees' });
+    }
+    if (has('manage_shifts')) {
+        items.push({ to: '/console/shifts', icon: Clock, label: 'nav.shifts' });
+    }
+    if (has('manage_closures')) {
+        items.push({ to: '/console/closures', icon: CalendarOff, label: 'nav.closures' });
+    }
+    return items;
+}
 
 const employeeMainNav: NavItemDef[] = [
     { to: '/console/dashboard', icon: LayoutDashboard, label: 'nav.dashboard' },
@@ -236,16 +260,19 @@ export function Sidebar() {
                     </>
                 )}
 
-                {showManagerView && (
-                    <>
-                        <NavItem to="/console/dashboard" icon={LayoutDashboard} label="nav.dashboard" />
-                        <NavSection
-                            items={managerMainNav.filter((i) => i.to !== '/console/dashboard')}
-                            canUseLeaveRequests={canUseLeaveRequests}
-                            disabled={!hasWorkspace}
-                        />
-                    </>
-                )}
+                {showManagerView && (() => {
+                    const managerNav = buildManagerNav(roleContext?.managerPermissions ?? []);
+                    return (
+                        <>
+                            <NavItem to="/console/dashboard" icon={LayoutDashboard} label="nav.dashboard" />
+                            <NavSection
+                                items={managerNav.filter((i) => i.to !== '/console/dashboard')}
+                                canUseLeaveRequests={canUseLeaveRequests}
+                                disabled={!hasWorkspace}
+                            />
+                        </>
+                    );
+                })()}
 
                 {showEmployeeView && (
                     <>

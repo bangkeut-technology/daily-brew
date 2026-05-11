@@ -564,9 +564,11 @@ function EmployeeDetailPage() {
             </div>
           </GlassCard>
 
-        {/* Manager permissions — owner-only on the backend; rendered when this employee is a manager */}
+        {/* Manager permissions — owner-only on the backend; rendered when this employee is a manager.
+            Sits in column 2 of the lower row, paired with the Link user account card in column 1.
+            Attendance history below then spans both columns. */}
         {employee.role === 'manager' && (
-          <GlassCard hover={false} className="lg:col-span-2">
+          <GlassCard hover={false}>
             <GlassCardHeader
               title={t('employee.managerPermissionsTitle', 'Manager permissions')}
               action={<StatusBadge label="Manager" variant="amber" />}
@@ -606,8 +608,9 @@ function EmployeeDetailPage() {
           </GlassCard>
         )}
 
-        {/* Attendance history */}
-        <GlassCard hover={false}>
+        {/* Attendance history — spans both columns when there's a manager-permissions card above,
+            otherwise sits in column 2 next to the Link user card. */}
+        <GlassCard hover={false} className={cn(employee.role === 'manager' && 'lg:col-span-2')}>
           <GlassCardHeader
             title={t('employee.attendanceHistory', 'Attendance history')}
             action={
