@@ -1,5 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { AlertTriangle, X } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 interface ConfirmModalProps {
@@ -12,6 +13,9 @@ interface ConfirmModalProps {
   variant?: 'danger' | 'default';
   loading?: boolean;
   onConfirm: () => void;
+  /** Optional content rendered between the description and the action buttons —
+   *  e.g. a date picker when confirming a dated action. */
+  children?: ReactNode;
 }
 
 export function ConfirmModal({
@@ -24,6 +28,7 @@ export function ConfirmModal({
   variant = 'default',
   loading,
   onConfirm,
+  children,
 }: ConfirmModalProps) {
   const isDanger = variant === 'danger';
 
@@ -46,6 +51,8 @@ export function ConfirmModal({
                 </Dialog.Description>
               </div>
             </div>
+
+            {children && <div className="mb-4">{children}</div>}
 
             <div className="flex justify-end gap-2">
               <button

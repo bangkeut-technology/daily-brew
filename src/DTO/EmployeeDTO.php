@@ -24,6 +24,7 @@ final readonly class EmployeeDTO
         public ?string $shiftPublicId,
         public ?string $dob,
         public ?string $joinedAt,
+        public ?string $leftAt,
         public string  $createdAt,
         /** @var list<string> */
         public array   $managerPermissions,
@@ -48,6 +49,7 @@ final readonly class EmployeeDTO
             shiftPublicId: $e->getShift() ? (string) $e->getShift()->getPublicId() : null,
             dob: $e->getDob()?->format('Y-m-d'),
             joinedAt: $e->getJoinedAt()?->format('Y-m-d'),
+            leftAt: $e->getLeftAt()?->format('Y-m-d'),
             createdAt: $e->getCreatedAt()->format('c'),
             managerPermissions: $e->getManagerPermissionValues(),
             attendanceTracking: $e->getAttendanceTracking()->value,
@@ -72,6 +74,7 @@ final readonly class EmployeeDTO
             'shiftPublicId' => $this->shiftPublicId,
             'dob' => $this->dob,
             'joinedAt' => $this->joinedAt,
+            'leftAt' => $this->leftAt,
             'createdAt' => $this->createdAt,
             'managerPermissions' => $this->managerPermissions,
             'attendanceTracking' => $this->attendanceTracking,
