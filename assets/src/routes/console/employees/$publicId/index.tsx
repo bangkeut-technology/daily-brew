@@ -33,6 +33,7 @@ import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
 import { JobTitleInput } from '@/components/shared/JobTitleInput';
 import { useDateFormat } from '@/hooks/useDateFormat';
+import { useWorkspaceTimezone } from '@/hooks/useWorkspaceTimezone';
 
 const editEmployeeSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -42,6 +43,7 @@ const editEmployeeSchema = z.object({
   username: z.string().optional(),
   dob: z.string().optional(),
   joinedAt: z.string().optional(),
+  leftAt: z.string().optional(),
   shiftPublicId: z.string().optional(),
   active: z.boolean(),
   attendanceTracking: z.enum(['full', 'none']),
@@ -91,6 +93,13 @@ function EmployeeDetailPage() {
   const [linkUserId, setLinkUserId] = useState('');
   const [linkUserIdError, setLinkUserIdError] = useState<string | null>(null);
   const [showUnlinkConfirm, setShowUnlinkConfirm] = useState(false);
+  const wsTz = useWorkspaceTimezone();
+  // Deactivation requires picking the last day worked so history stays accurate
+  // even when the owner deactivates an employee days/weeks after they actually
+  // left. Toggling Active off opens this modal; confirm flips the form's
+  // `active` to false and stamps `leftAt`. Cancel reverts.
+  const [showDeactivateModal, setShowDeactivateModal] = useState(false);
+  const [deactivateDate, setDeactivateDate] = useState('');
 
   const {
     register,
@@ -110,6 +119,7 @@ function EmployeeDetailPage() {
           username: employee.username || '',
           dob: employee.dob || '',
           joinedAt: employee.joinedAt || '',
+          leftAt: employee.leftAt || '',
           shiftPublicId: employee.shiftPublicId || '',
           active: employee.active,
           attendanceTracking: employee.attendanceTracking,
@@ -175,6 +185,10 @@ function EmployeeDetailPage() {
         username: values.username || null,
         dob: values.dob || null,
         joinedAt: values.joinedAt || null,
+        // leftAt is only meaningful when the employee is inactive; clearing on
+        // re-activation is handled server-side too, but we send null here for
+        // clarity.
+        leftAt: values.active ? null : values.leftAt || null,
         shiftPublicId: values.shiftPublicId || null,
         active: values.active,
         attendanceTracking: values.attendanceTracking,
@@ -428,11 +442,26 @@ function EmployeeDetailPage() {
                 <Toggle
                   id="active-toggle"
                   checked={watch('active')}
-                  onChange={(v) => setValue('active', v)}
+                  onChange={(v) => {
+                    if (!v) {
+                      // Opening the deactivation flow — defer flipping `active`
+                      // until the date is confirmed.
+                      setDeactivateDate(watch('leftAt') || wsTz.today());
+                      setShowDeactivateModal(true);
+                    } else {
+                      setValue('active', true, { shouldDirty: true });
+                      setValue('leftAt', '', { shouldDirty: true });
+                    }
+                  }}
                 />
                 <label htmlFor="active-toggle" className="text-[15px] text-text-secondary cursor-pointer">
                   {t('employee.active', 'Active')}
                 </label>
+                {!watch('active') && watch('leftAt') && (
+                  <span className="text-[13px] text-text-tertiary ml-2">
+                    {t('employee.lastDayWorked', 'Last day worked')}: {fmtDate(watch('leftAt') || '')}
+                  </span>
+                )}
               </div>
 
               <div className="flex gap-3 pt-3 border-t border-cream-3/60">
@@ -516,6 +545,12 @@ function EmployeeDetailPage() {
                     <div>
                       <span className="text-[13px] text-text-tertiary block">{t('employee.joinedAt', 'Join date')}</span>
                       <span className="text-[15px] text-text-secondary">{fmtDate(employee.joinedAt)}</span>
+                    </div>
+                  )}
+                  {employee.leftAt && (
+                    <div>
+                      <span className="text-[13px] text-text-tertiary block">{t('employee.lastDayWorked', 'Last day worked')}</span>
+                      <span className="text-[15px] text-text-secondary">{fmtDate(employee.leftAt)}</span>
                     </div>
                   )}
                   <div>
@@ -789,6 +824,40 @@ function EmployeeDetailPage() {
           </div>
         </GlassCard>
       </div>
+
+      {/* Deactivation modal — captures the last working day so historical
+          attendance still surfaces for prior dates and delayed deactivations
+          don't generate phantom absent rows. */}
+      <ConfirmModal
+        open={showDeactivateModal}
+        onOpenChange={(open) => {
+          if (!open) setShowDeactivateModal(false);
+        }}
+        title={t('employee.deactivateTitle', 'Deactivate employee')}
+        description={t(
+          'employee.deactivateDescription',
+          "Pick the last day this employee worked. Attendance won't be tracked after this date, but their past history stays intact.",
+        )}
+        confirmLabel={t('employee.deactivateConfirm', 'Deactivate')}
+        cancelLabel={t('common.cancel')}
+        variant="danger"
+        onConfirm={() => {
+          setValue('active', false, { shouldDirty: true });
+          setValue('leftAt', deactivateDate, { shouldDirty: true });
+          setShowDeactivateModal(false);
+        }}
+      >
+        <div className="mt-3">
+          <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
+            {t('employee.lastDayWorked', 'Last day worked')}
+          </label>
+          <CustomDatePicker
+            value={deactivateDate}
+            onChange={(v) => setDeactivateDate(v)}
+            todayOverride={wsTz.today()}
+          />
+        </div>
+      </ConfirmModal>
     </div>
   );
 }

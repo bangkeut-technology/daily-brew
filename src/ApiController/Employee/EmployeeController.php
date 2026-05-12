@@ -222,6 +222,11 @@ class EmployeeController extends AbstractController
             $shift = !empty($data['shiftPublicId']) ? $shiftRepository->findByPublicId($data['shiftPublicId']) : null;
         }
 
+        $leftAt = null;
+        if (array_key_exists('leftAt', $data) && !empty($data['leftAt'])) {
+            $leftAt = \App\Service\DateService::parse($data['leftAt']);
+        }
+
         $employee = $employeeService->update(
             $employee,
             $data['firstName'] ?? $employee->getFirstName(),
@@ -229,6 +234,7 @@ class EmployeeController extends AbstractController
             $data['phoneNumber'] ?? $employee->getPhoneNumber(),
             $shift,
             isset($data['active']) ? (bool) $data['active'] : null,
+            $leftAt,
         );
 
         if (array_key_exists('username', $data)) {

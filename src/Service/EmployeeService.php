@@ -47,6 +47,7 @@ class EmployeeService
         ?string $phoneNumber,
         ?Shift $shift,
         ?bool $active = null,
+        ?\DateTimeImmutable $leftAt = null,
     ): Employee {
         $previousShift = $employee->getShift();
         $employee->setFirstName($firstName);
@@ -54,7 +55,22 @@ class EmployeeService
         $employee->setPhoneNumber($phoneNumber);
         $employee->setShift($shift);
         if ($active !== null) {
-            $employee->setStatus($active ? EmployeeStatusEnum::ACTIVE : EmployeeStatusEnum::INACTIVE);
+            $newStatus = $active ? EmployeeStatusEnum::ACTIVE : EmployeeStatusEnum::INACTIVE;
+            $statusChanged = $newStatus !== $employee->getStatus();
+            if ($statusChanged) {
+                $employee->setStatus($newStatus);
+            }
+            // leftAt is the "last day worked" — captured from the deactivation
+            // modal so historical attendance still surfaces for prior days, and
+            // delayed deactivations don't fabricate absent rows. Cleared on
+            // re-activation regardless of what the caller passes.
+            if ($newStatus === EmployeeStatusEnum::INACTIVE) {
+                if ($statusChanged || $leftAt !== null) {
+                    $employee->setLeftAt($leftAt ?? DateService::now());
+                }
+            } else {
+                $employee->setLeftAt(null);
+            }
         }
         $this->employeeRepository->flush();
 

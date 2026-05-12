@@ -250,6 +250,8 @@ export interface Employee {
   shiftPublicId: string | null;
   dob: string | null;
   joinedAt: string | null;
+  /** Last day worked — set when the employee is deactivated. */
+  leftAt: string | null;
   linkedUserPublicId: string | null;
   linkedUserEmail: string | null;
   createdAt: string;

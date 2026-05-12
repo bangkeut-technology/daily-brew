@@ -55,8 +55,10 @@ class AttendanceController extends AbstractController
         $employee = $employeeRepository->findOneByLinkedUserAndWorkspace($user, $workspace);
         $canSeeAll = $isOwner || ($employee?->hasManagerPermission(ManagerPermissionEnum::MANAGE_ATTENDANCE) ?? false);
 
-        // Load active employees (filtered down to self for viewers without manage_attendance)
-        $activeEmployees = $employeeRepository->findActiveByWorkspace($workspace);
+        // Include employees whose active window overlaps the queried range —
+        // i.e. still active, or deactivated on/after `from`. This keeps
+        // historical absent/present rows visible for deactivated staff.
+        $activeEmployees = $employeeRepository->findActiveDuringRangeByWorkspace($workspace, $fromDate);
         if (!$canSeeAll && $employee !== null) {
             $empId = $employee->getId();
             $activeEmployees = array_filter($activeEmployees, fn ($e) => $e->getId() === $empId);
@@ -120,6 +122,13 @@ class AttendanceController extends AbstractController
             $isFuture = $dateStr > $wsTodayStr;
 
             foreach ($activeEmployees as $emp) {
+                // Skip days after the employee's last working day so deactivated
+                // staff stop appearing on dates they weren't employed.
+                $leftAt = $emp->getLeftAt()?->format('Y-m-d');
+                if ($leftAt !== null && $dateStr > $leftAt) {
+                    continue;
+                }
+
                 $key = $emp->getId() . '_' . $dateStr;
 
                 if (isset($attendanceMap[$key])) {
@@ -216,7 +225,12 @@ class AttendanceController extends AbstractController
             // Viewer sees only their own summary
             $employees = $selfEmployee !== null ? [$selfEmployee] : [];
         } else {
-            $employees = $employeeRepository->findActiveByWorkspace($workspace);
+            // See note in list(): include deactivated employees whose active
+            // window overlaps the queried range so history is preserved.
+            $employees = $employeeRepository->findActiveDuringRangeByWorkspace(
+                $workspace,
+                \DateTimeImmutable::createFromMutable($fromDate),
+            );
         }
 
         if (empty($employees)) {
@@ -270,11 +284,18 @@ class AttendanceController extends AbstractController
 
         $result = [];
         foreach ($employees as $emp) {
+            $leftAtStr = $emp->getLeftAt()?->format('Y-m-d');
             $days = [];
             $period = new \DatePeriod($fromDate, new \DateInterval('P1D'), (clone $toDate)->modify('+1 day'));
             foreach ($period as $day) {
                 $dateStr = $day->format('Y-m-d');
                 $key = $emp->getId() . '_' . $dateStr;
+
+                // Past employee's last working day — omit so they don't show
+                // absent/upcoming for dates they weren't employed.
+                if ($leftAtStr !== null && $dateStr > $leftAtStr) {
+                    continue;
+                }
 
                 if (isset($closureDates[$dateStr])) {
                     $days[] = ['date' => $dateStr, 'status' => 'closure'];

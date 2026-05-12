@@ -71,6 +71,7 @@ export function useUpdateEmployee(workspacePublicId: string) {
       jobTitle?: string | null;
       shiftPublicId?: string | null;
       active?: boolean;
+      leftAt?: string | null;
       linkedUserPublicId?: string | null;
       dob?: string | null;
       joinedAt?: string | null;

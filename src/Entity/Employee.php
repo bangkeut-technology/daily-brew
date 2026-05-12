@@ -67,6 +67,15 @@ class Employee extends AbstractBaseEntity
     #[Groups(['employee:read'])]
     private ?DateTimeImmutable $joinedAt = null;
 
+    /**
+     * When the employee was deactivated (status flipped to INACTIVE). Used so
+     * historical attendance/absent rows still surface for days they worked,
+     * while dates after this timestamp are excluded. Cleared on re-activation.
+     */
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    #[Groups(['employee:read'])]
+    private ?DateTimeImmutable $leftAt = null;
+
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?DateTimeImmutable $deletedAt = null;
 
@@ -239,6 +248,17 @@ class Employee extends AbstractBaseEntity
     public function setJoinedAt(?DateTimeImmutable $joinedAt): static
     {
         $this->joinedAt = $joinedAt;
+        return $this;
+    }
+
+    public function getLeftAt(): ?DateTimeImmutable
+    {
+        return $this->leftAt;
+    }
+
+    public function setLeftAt(?DateTimeImmutable $leftAt): static
+    {
+        $this->leftAt = $leftAt;
         return $this;
     }
 

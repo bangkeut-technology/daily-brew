@@ -72,6 +72,30 @@ class EmployeeRepository extends AbstractRepository
             ->getResult();
     }
 
+    /**
+     * Employees whose active window overlaps the given date range — i.e. either
+     * still active, or deactivated on/after `from`. Used by attendance list /
+     * summary so historical absent/present rows for deactivated employees stay
+     * visible for the days they were employed.
+     *
+     * @return Employee[]
+     */
+    public function findActiveDuringRangeByWorkspace(
+        Workspace $workspace,
+        \DateTimeImmutable $from,
+    ): array {
+        return $this->createQueryBuilder('e')
+            ->where('e.workspace = :ws')
+            ->andWhere('e.deletedAt IS NULL')
+            ->andWhere('e.status = :active OR e.leftAt >= :from')
+            ->setParameter('ws', $workspace)
+            ->setParameter('active', EmployeeStatusEnum::ACTIVE)
+            ->setParameter('from', $from)
+            ->orderBy('e.firstName', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function countActiveByWorkspace(Workspace $workspace): int
     {
         return (int) $this->createQueryBuilder('e')
