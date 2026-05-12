@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.52.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.51.1...v1.52.0) (2026-05-12)
+
+
+### Features
+
+* **employee:** track leftAt on deactivation to preserve attendance history ([#94](https://github.com/bangkeut-technology/daily-brew/issues/94)) ([ae35873](https://github.com/bangkeut-technology/daily-brew/commit/ae358737984d7d8435844f94a4e99f81cfd1c5c8))
+
 ## [1.51.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.51.0...v1.51.1) (2026-05-11)
 
 
