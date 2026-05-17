@@ -285,3 +285,20 @@ html.dark .btn-shimmer {
 .font-serif {
     font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
 }
+
+/* ---- Mobile / reduced-motion perf escape hatch ----
+   The animated body::before gradient stacked under many backdrop-filter
+   cards starves the main thread on mid-range mobile browsers, leaving the
+   page rendered but unresponsive to taps. Below 900px (and for users who
+   opt out of motion) we freeze the gradient and drop backdrop blur. */
+@media (max-width: 899px), (prefers-reduced-motion: reduce) {
+    body::before {
+        animation: none;
+    }
+
+    .glass-card,
+    [class*="backdrop-blur"] {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+}
