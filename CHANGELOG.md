@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.55.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.54.0...v1.55.0) (2026-05-18)
+
+
+### Features
+
+* **employees:** post-create onboarding guide on the detail page ([#102](https://github.com/bangkeut-technology/daily-brew/issues/102)) ([ec93b1a](https://github.com/bangkeut-technology/daily-brew/commit/ec93b1a10eee2704e33ca542e3ff53214434f880))
+
 ## [1.54.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.53.0...v1.54.0) (2026-05-18)
 
 
