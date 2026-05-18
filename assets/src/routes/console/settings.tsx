@@ -260,7 +260,10 @@ function SettingsPage() {
 
   return (
     <div className="page-enter">
-      <PageHeader title={t('nav.settings')} />
+      <PageHeader
+        title={t('nav.settings')}
+        help={{ href: '/guides/espresso', label: 'Espresso settings guide' }}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Plan card */}

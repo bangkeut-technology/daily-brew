@@ -168,7 +168,12 @@ function AttendancePage() {
 
   return (
     <div className="page-enter">
-      <PageHeader title={isEmployee ? t('nav.myAttendance', 'My Attendance') : t('nav.attendance')} />
+      <PageHeader
+        title={isEmployee ? t('nav.myAttendance', 'My Attendance') : t('nav.attendance')}
+        help={isEmployee
+          ? { href: '/guides/employee#step-employee-5', label: 'How check-in works' }
+          : { href: '/guides/owner#step-owner-7', label: 'How attendance tracking works' }}
+      />
 
       <p className="text-[15px] text-text-secondary mb-5 -mt-2 leading-relaxed">
         {isEmployee

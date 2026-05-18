@@ -59,6 +59,7 @@ function EmployeeListPage() {
     <div className="page-enter">
       <PageHeader
         title={t('nav.employees')}
+        help={{ href: '/guides/owner#step-owner-4', label: 'How to add and link employees' }}
         action={
           <Link
             to="/console/employees/new"

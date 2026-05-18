@@ -127,7 +127,10 @@ function NewEmployeePage() {
 
   return (
     <div className="page-enter">
-      <PageHeader title={t('employee.add')} />
+      <PageHeader
+        title={t('employee.add')}
+        help={{ href: '/guides/owner#step-owner-4', label: 'How to add an employee' }}
+      />
 
       <GlassCard hover={false}>
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-5">

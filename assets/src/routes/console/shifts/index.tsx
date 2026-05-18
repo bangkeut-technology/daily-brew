@@ -88,6 +88,7 @@ function ShiftsPage() {
     <div className="page-enter">
       <PageHeader
         title={t('nav.shifts')}
+        help={{ href: '/guides/owner#step-owner-3', label: 'How shifts work' }}
         action={
           <button
             onClick={() => setShowForm(!showForm)}

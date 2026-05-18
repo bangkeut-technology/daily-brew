@@ -61,7 +61,8 @@ export function PlaybookSection({ playbook }: Props) {
           return (
             <motion.li
               key={step.title}
-              className="flex items-start gap-4"
+              id={`step-${playbook.key}-${stepIndex + 1}`}
+              className="flex items-start gap-4 scroll-mt-32"
               initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
