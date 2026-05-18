@@ -811,7 +811,7 @@ function SettingsPage() {
 
         {/* IP restriction + general settings */}
         {currentWsId && (
-          <GlassCard hover={false} className="lg:col-span-2">
+          <GlassCard hover={false} className="lg:col-span-2 scroll-mt-6" id="settings-ip-restriction">
             <GlassCardHeader title="Workspace settings" />
             <div className="p-5 space-y-3">
               <div className="flex items-center gap-2">
@@ -909,7 +909,7 @@ function SettingsPage() {
 
         {/* Device verification settings */}
         {currentWsId && (
-          <GlassCard hover={false} className="lg:col-span-2">
+          <GlassCard hover={false} className="lg:col-span-2 scroll-mt-6" id="settings-device-verification">
             <GlassCardHeader
               title={t('settings.deviceVerification')}
               action={
@@ -959,7 +959,7 @@ function SettingsPage() {
 
         {/* Geofencing settings */}
         {currentWsId && (
-          <GlassCard hover={false} className="lg:col-span-2">
+          <GlassCard hover={false} className="lg:col-span-2 scroll-mt-6" id="settings-geofencing">
             <GlassCardHeader
               title="Geofencing"
               action={

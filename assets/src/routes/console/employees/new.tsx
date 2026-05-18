@@ -97,7 +97,7 @@ function NewEmployeePage() {
 
   const onSubmit = async (values: CreateEmployeeForm) => {
     try {
-      await createEmployee.mutateAsync({
+      const employee = await createEmployee.mutateAsync({
         firstName: values.firstName,
         lastName: values.lastName,
         jobTitle: values.jobTitle || undefined,
@@ -112,7 +112,11 @@ function NewEmployeePage() {
         // Promote from the detail page once they have a linked user account.
       });
       toast.success(t('employee.createSuccess', 'Employee created'));
-      navigate({ to: '/console/employees' });
+      navigate({
+        to: '/console/employees/$publicId',
+        params: { publicId: employee.publicId },
+        search: { created: true },
+      });
     } catch {
       toast.error(t('employee.createError', 'Failed to create employee'));
     }
