@@ -12,6 +12,7 @@ import {
     Crown,
     QrCode,
     ShieldCheck,
+    HelpCircle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePlan } from '@/hooks/queries/usePlan';
@@ -298,13 +299,14 @@ export function Sidebar() {
 
                 <Divider />
 
-                {/* Bottom section: Profile + Sign Out */}
+                {/* Bottom section: Profile + Help + Sign Out */}
                 <div className="space-y-0.5">
                     <NavItem
                         to="/console/profile"
                         icon={UserCircle}
                         label="nav.profile"
                     />
+                    <HelpLink />
                 </div>
 
                 <div className="mt-auto mb-4 space-y-1">
@@ -328,6 +330,21 @@ export function Sidebar() {
                 </div>
             </nav>
         </aside>
+    );
+}
+
+function HelpLink() {
+    const { t } = useTranslation();
+    return (
+        <a
+            href="/how-it-works"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer mb-px font-sans text-[15.5px] no-underline text-text-secondary hover:bg-cream-3 hover:text-text-primary transition-all duration-180 border border-transparent"
+        >
+            <HelpCircle size={16} />
+            <span className="flex-1">{t('nav.help')}</span>
+        </a>
     );
 }
 
