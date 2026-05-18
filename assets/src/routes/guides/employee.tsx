@@ -5,6 +5,7 @@ import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { PageSeo } from '@/components/shared/PageSeo';
 import { PlaybookSection } from '@/components/landing/PlaybookSection';
+import { ContinueReading } from '@/components/landing/ContinueReading';
 import { playbookByKey } from '@/components/landing/playbooks';
 
 export const Route = createFileRoute('/guides/employee')({
@@ -46,6 +47,8 @@ function EmployeeGuidePage() {
         >
           <PlaybookSection playbook={playbook} />
         </motion.div>
+
+        <ContinueReading currentKey={playbook.key} />
 
         <motion.div
           className="mt-12 flex items-center justify-center gap-3"
