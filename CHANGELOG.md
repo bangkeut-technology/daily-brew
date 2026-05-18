@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.58.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.58.0...v1.58.1) (2026-05-18)
+
+
+### Bug Fixes
+
+* **dashboard:** move useWorkspaceTimezone above early returns in EmployeeDashboard ([#111](https://github.com/bangkeut-technology/daily-brew/issues/111)) ([4135ab8](https://github.com/bangkeut-technology/daily-brew/commit/4135ab894f7c108dff9050bc1f45c3fc0b14eb66))
+
 ## [1.58.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.57.0...v1.58.0) (2026-05-18)
 
 
