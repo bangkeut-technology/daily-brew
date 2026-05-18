@@ -13,11 +13,12 @@ import {
   Bell,
   Smartphone,
   CheckCircle,
-  Crown,
+  ArrowRight,
 } from 'lucide-react';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { PageSeo } from '@/components/shared/PageSeo';
+import { playbookByKey } from '@/components/landing/playbooks';
 
 export const Route = createFileRoute('/how-it-works')({
   component: HowItWorksPage,
@@ -93,119 +94,10 @@ const employeeFeatures = [
   { icon: <CheckCircle size={18} />, label: 'See approval status in real time' },
 ];
 
-const playbooks = [
-  {
-    key: 'owner',
-    title: 'Owner setup',
-    subtitle: 'From sign-up to live attendance, in about 10 minutes.',
-    icon: <Building2 size={22} />,
-    accent: '#6B4226',
-    steps: [
-      {
-        title: 'Create your account',
-        desc: 'Sign up with email, Google, or Apple. No credit card needed.',
-      },
-      {
-        title: 'Name your restaurant',
-        desc: 'In the onboarding wizard, pick the owner role and give your workspace a name. Timezone auto-detects from your browser.',
-      },
-      {
-        title: 'Define your shifts',
-        desc: 'Console → Shifts. Add Morning, Evening, or any custom shift with start and end times.',
-      },
-      {
-        title: 'Add your employees',
-        desc: 'Console → Employees → Add. Fill in name and assign a shift. Linking to a user account is optional now — you can do it later from the employee detail page.',
-      },
-      {
-        title: 'Link an employee to a user account',
-        desc: 'Open the employee → Link user card → paste the user\'s public ID (they can copy theirs from Console → Profile). Once linked, the user signs in to see their own attendance, submit leave, and check in via the app. Unlink anytime from the same card.',
-      },
-      {
-        title: 'Display the workspace QR',
-        desc: 'Your dashboard shows the QR code. Print it and pin it at the staff entrance — one QR for the whole restaurant.',
-      },
-      {
-        title: 'Watch attendance live',
-        desc: 'As staff check in, your dashboard updates with present, late, on leave, and absent counts.',
-      },
-      {
-        title: 'Approve leave and schedule closures',
-        desc: 'Review leave requests on the Leave tab. Add closures for holidays so staff are not marked absent.',
-      },
-    ],
-  },
-  {
-    key: 'employee',
-    title: 'Employee day-to-day',
-    subtitle: 'Check in, check out, and request time off from your phone.',
-    icon: <Smartphone size={22} />,
-    accent: '#4A7C59',
-    steps: [
-      {
-        title: 'Install the DailyBrew app',
-        desc: 'Available free on the App Store and Google Play.',
-      },
-      {
-        title: 'Sign in',
-        desc: 'Use email, Google, or Apple — the same account works on every phone you sign in from.',
-      },
-      {
-        title: 'Link to your employee record',
-        desc: 'Two ways: (a) your owner pastes your user public ID — find it on Console → Profile — into the Link user card on your employee page; or (b) you paste the employee public ID your owner shares into the onboarding wizard or Console → Profile → Link to a workspace. You can link to several workspaces if you work at more than one restaurant.',
-      },
-      {
-        title: 'Scan the QR at the restaurant',
-        desc: 'Point the app at the QR on the wall. The check-in screen opens automatically.',
-      },
-      {
-        title: 'Tap Check in',
-        desc: 'On-time or Late status appears immediately, based on your assigned shift.',
-      },
-      {
-        title: 'Tap Check out at the end of your shift',
-        desc: 'Scan the same QR and tap Check out. If device verification is on, you must use the same phone you checked in with.',
-      },
-      {
-        title: 'Submit leave from the Leave tab',
-        desc: 'Pick the dates and type (paid or unpaid). Your owner gets notified and reviews it.',
-      },
-    ],
-  },
-  {
-    key: 'espresso',
-    title: 'Upgrade to Espresso',
-    subtitle: 'Unlock leave management, geofencing, managers, and BasilBook integration.',
-    icon: <Crown size={22} />,
-    accent: '#C17F3B',
-    steps: [
-      {
-        title: 'Open Settings → Subscription',
-        desc: 'From your dashboard, click Settings, then Upgrade in the Subscription card.',
-      },
-      {
-        title: 'Pick monthly or yearly',
-        desc: 'Monthly is $14.99. Yearly is $149 — about 17% cheaper. A 14-day free trial covers your first run.',
-      },
-      {
-        title: 'Lock check-in to your restaurant',
-        desc: 'Settings → enable IP restriction (use the "Use my current IP" button) or set a geofence with latitude, longitude, and radius (default 100 m).',
-      },
-      {
-        title: 'Turn on device verification',
-        desc: 'Forces each employee to use the same phone for both check-in and check-out, preventing buddy punching.',
-      },
-      {
-        title: 'Promote a manager',
-        desc: 'Employee detail → set role to manager. Managers approve leave and see all attendance, up to 2 per workspace on Espresso.',
-      },
-      {
-        title: 'Connect BasilBook',
-        desc: 'Settings → API tokens → Generate. Copy the token once and paste it into BasilBook to sync attendance with your accounting.',
-      },
-    ],
-  },
-];
+const ownerPb = playbookByKey.owner;
+const employeePb = playbookByKey.employee;
+const espressoPb = playbookByKey.espresso;
+const EspressoIcon = espressoPb.icon;
 
 function HowItWorksPage() {
   return (
@@ -321,10 +213,10 @@ function HowItWorksPage() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
           {/* Owner card */}
           <motion.div
-            className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 shadow-[0_2px_12px_rgba(107,66,38,0.05)]"
+            className="flex flex-col bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 shadow-[0_2px_12px_rgba(107,66,38,0.05)]"
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -343,7 +235,7 @@ function HowItWorksPage() {
                 </p>
               </div>
             </div>
-            <ul className="space-y-3">
+            <ul className="space-y-3 mb-6">
               {ownerFeatures.map((f) => (
                 <li key={f.label} className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-coffee/8 flex items-center justify-center text-coffee flex-shrink-0">
@@ -355,11 +247,18 @@ function HowItWorksPage() {
                 </li>
               ))}
             </ul>
+            <Link
+              to={ownerPb.to}
+              className="mt-auto inline-flex items-center justify-between gap-2 px-4 py-2.5 rounded-lg bg-coffee/8 hover:bg-coffee/12 text-coffee text-[14px] font-semibold no-underline transition-colors"
+            >
+              <span>Read the owner setup guide</span>
+              <ArrowRight size={14} />
+            </Link>
           </motion.div>
 
           {/* Employee card */}
           <motion.div
-            className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 shadow-[0_2px_12px_rgba(107,66,38,0.05)]"
+            className="flex flex-col bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 shadow-[0_2px_12px_rgba(107,66,38,0.05)]"
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -378,7 +277,7 @@ function HowItWorksPage() {
                 </p>
               </div>
             </div>
-            <ul className="space-y-3">
+            <ul className="space-y-3 mb-6">
               {employeeFeatures.map((f) => (
                 <li key={f.label} className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-green/8 flex items-center justify-center text-green flex-shrink-0">
@@ -390,89 +289,55 @@ function HowItWorksPage() {
                 </li>
               ))}
             </ul>
+            <Link
+              to={employeePb.to}
+              className="mt-auto inline-flex items-center justify-between gap-2 px-4 py-2.5 rounded-lg bg-green/8 hover:bg-green/12 text-green text-[14px] font-semibold no-underline transition-colors"
+            >
+              <span>Read the employee guide</span>
+              <ArrowRight size={14} />
+            </Link>
           </motion.div>
         </div>
 
-        {/* Step-by-step playbooks */}
+        {/* Espresso teaser */}
         <motion.div
-          className="text-center mb-12"
+          className="mb-24"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
         >
-          <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
-            Step-by-step
-          </p>
-          <h2 className="text-[30px] md:text-[36px] font-semibold text-text-primary font-serif leading-tight">
-            Quick-start playbooks
-          </h2>
-          <p className="text-[16px] text-text-secondary mt-3 max-w-lg mx-auto">
-            Pick the path that matches you — owner, employee, or upgrading to
-            Espresso.
-          </p>
-        </motion.div>
-
-        <div className="space-y-6 mb-24">
-          {playbooks.map((pb, pbIndex) => (
-            <motion.section
-              key={pb.key}
-              aria-labelledby={`playbook-${pb.key}`}
-              className="relative bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 md:p-8 overflow-hidden shadow-[0_2px_12px_rgba(107,66,38,0.05)]"
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: pbIndex * 0.1 }}
-            >
+          <Link
+            to={espressoPb.to}
+            className="group flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 no-underline shadow-[0_2px_12px_rgba(107,66,38,0.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(107,66,38,0.10)]"
+          >
+            <div className="flex items-center gap-4">
               <div
-                className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl"
-                style={{ background: pb.accent }}
+                className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: `${espressoPb.accent}14`, color: espressoPb.accent }}
+              >
+                <EspressoIcon size={22} />
+              </div>
+              <div>
+                <p className="text-[13px] font-semibold uppercase tracking-wider text-amber mb-1">
+                  Espresso plan
+                </p>
+                <h3 className="text-[18px] font-semibold text-text-primary font-serif">
+                  Ready for geofencing, managers, and BasilBook?
+                </h3>
+                <p className="text-[14px] text-text-secondary mt-1">
+                  {espressoPb.teaser}
+                </p>
+              </div>
+            </div>
+            <div className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-coffee md:flex-shrink-0">
+              <span>See the upgrade guide</span>
+              <ArrowRight
+                size={14}
+                className="transition-transform group-hover:translate-x-0.5"
               />
-
-              <header className="flex items-center gap-4 mb-6">
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: `${pb.accent}14`, color: pb.accent }}
-                >
-                  {pb.icon}
-                </div>
-                <div>
-                  <h3
-                    id={`playbook-${pb.key}`}
-                    className="text-[20px] font-semibold text-text-primary font-serif leading-tight"
-                  >
-                    {pb.title}
-                  </h3>
-                  <p className="text-[14px] text-text-secondary mt-1">
-                    {pb.subtitle}
-                  </p>
-                </div>
-              </header>
-
-              <ol className="space-y-4">
-                {pb.steps.map((step, stepIndex) => (
-                  <li key={step.title} className="flex items-start gap-4">
-                    <span
-                      className="w-7 h-7 rounded-full flex items-center justify-center text-[13px] font-bold text-white flex-shrink-0 tabular-nums"
-                      style={{ background: pb.accent }}
-                      aria-hidden="true"
-                    >
-                      {stepIndex + 1}
-                    </span>
-                    <div className="flex-1 pt-0.5">
-                      <p className="text-[15px] font-semibold text-text-primary">
-                        {step.title}
-                      </p>
-                      <p className="text-[14px] text-text-secondary leading-relaxed mt-1">
-                        {step.desc}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </motion.section>
-          ))}
-        </div>
+            </div>
+          </Link>
+        </motion.div>
 
         {/* CTA */}
         <motion.div

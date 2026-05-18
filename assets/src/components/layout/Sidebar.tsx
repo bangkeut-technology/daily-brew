@@ -337,7 +337,7 @@ function HelpLink() {
     const { t } = useTranslation();
     return (
         <a
-            href="/how-it-works"
+            href="/guides"
             target="_blank"
             rel="noopener noreferrer"
             className="relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer mb-px font-sans text-[15.5px] no-underline text-text-secondary hover:bg-cream-3 hover:text-text-primary transition-all duration-180 border border-transparent"
