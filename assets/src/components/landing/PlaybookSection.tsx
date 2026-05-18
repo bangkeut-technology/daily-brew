@@ -1,12 +1,30 @@
 import { motion } from 'framer-motion';
-import type { Playbook } from './playbooks';
+import { ArrowRight } from 'lucide-react';
+import { useAuthenticationState } from '@/hooks/use-authentication';
+import type { Playbook, PlaybookStep } from './playbooks';
 
 type Props = {
   playbook: Playbook;
 };
 
+function StepLink({ link, accent }: { link: NonNullable<PlaybookStep['link']>; accent: string }) {
+  const href = link.hash ? `${link.to}#${link.hash}` : link.to;
+  return (
+    <a
+      href={href}
+      className="mt-2 inline-flex items-center gap-1 text-[13.5px] font-semibold no-underline transition-colors hover:underline"
+      style={{ color: accent }}
+    >
+      {link.label}
+      <ArrowRight size={13} />
+    </a>
+  );
+}
+
 export function PlaybookSection({ playbook }: Props) {
   const Icon = playbook.icon;
+  const auth = useAuthenticationState();
+  const isAuthenticated = auth.status === 'authenticated';
   return (
     <section
       aria-labelledby={`playbook-${playbook.key}`}
@@ -38,32 +56,38 @@ export function PlaybookSection({ playbook }: Props) {
       </header>
 
       <ol className="space-y-4">
-        {playbook.steps.map((step, stepIndex) => (
-          <motion.li
-            key={step.title}
-            className="flex items-start gap-4"
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.3, delay: stepIndex * 0.04 }}
-          >
-            <span
-              className="w-7 h-7 rounded-full flex items-center justify-center text-[13px] font-bold text-white flex-shrink-0 tabular-nums"
-              style={{ background: playbook.accent }}
-              aria-hidden="true"
+        {playbook.steps.map((step, stepIndex) => {
+          const showLink = step.link && (step.link.requireAuth === false || isAuthenticated);
+          return (
+            <motion.li
+              key={step.title}
+              className="flex items-start gap-4"
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.3, delay: stepIndex * 0.04 }}
             >
-              {stepIndex + 1}
-            </span>
-            <div className="flex-1 pt-0.5">
-              <p className="text-[15px] font-semibold text-text-primary">
-                {step.title}
-              </p>
-              <p className="text-[14px] text-text-secondary leading-relaxed mt-1">
-                {step.desc}
-              </p>
-            </div>
-          </motion.li>
-        ))}
+              <span
+                className="w-7 h-7 rounded-full flex items-center justify-center text-[13px] font-bold text-white flex-shrink-0 tabular-nums"
+                style={{ background: playbook.accent }}
+                aria-hidden="true"
+              >
+                {stepIndex + 1}
+              </span>
+              <div className="flex-1 pt-0.5">
+                <p className="text-[15px] font-semibold text-text-primary">
+                  {step.title}
+                </p>
+                <p className="text-[14px] text-text-secondary leading-relaxed mt-1">
+                  {step.desc}
+                </p>
+                {showLink && step.link && (
+                  <StepLink link={step.link} accent={playbook.accent} />
+                )}
+              </div>
+            </motion.li>
+          );
+        })}
       </ol>
     </section>
   );
