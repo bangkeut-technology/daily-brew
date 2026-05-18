@@ -261,10 +261,8 @@ class EmployeeController extends AbstractController
             $employee->setAttendanceTracking($mode);
         }
 
-        // Role change — owner-only (same as the dedicated /role endpoint, which
-        // remains for the legacy Promote/Demote button). Validates the manager
-        // limit and seeds / clears default manager permissions on promotion
-        // and demotion.
+        // Role change — owner-only. Validates the manager limit and seeds /
+        // clears default manager permissions on promotion and demotion.
         if (array_key_exists('role', $data)) {
             $role = EmployeeRoleEnum::tryFrom((string) $data['role']);
             if ($role === null) {
@@ -307,62 +305,6 @@ class EmployeeController extends AbstractController
                     return $this->jsonError('User not found with that public ID', 404);
                 }
             }
-        }
-
-        $employeeRepository->flush();
-
-        return $this->jsonSuccess(EmployeeDTO::fromEntity($employee)->toArray());
-    }
-
-    #[Route('/{publicId}/role', name: 'employees_update_role', methods: ['PUT'])]
-    public function updateRole(
-        string $workspacePublicId,
-        string $publicId,
-        Request $request,
-        WorkspaceRepository $workspaceRepository,
-        EmployeeRepository $employeeRepository,
-        PlanService $planService,
-    ): JsonResponse {
-        $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
-        if ($workspace === null) {
-            throw new NotFoundHttpException('Workspace not found');
-        }
-
-        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
-
-        $employee = $employeeRepository->findByPublicId($publicId);
-        if ($employee === null || $employee->getWorkspace()?->getId() !== $workspace->getId()) {
-            throw new NotFoundHttpException('Employee not found');
-        }
-
-        $data = json_decode($request->getContent(), true);
-        $role = EmployeeRoleEnum::tryFrom($data['role'] ?? '');
-        if ($role === null) {
-            return $this->jsonError('Role must be "employee" or "manager"');
-        }
-
-        if ($role === EmployeeRoleEnum::MANAGER) {
-            if ($employee->getLinkedUser() === null) {
-                return $this->jsonError('Employee must have a linked user account to be promoted to manager', 400);
-            }
-
-            if (!$planService->canPromoteToManager($workspace)) {
-                $limit = $planService->getManagerLimit($workspace);
-                if ($limit === 0) {
-                    return $this->jsonError('Manager role requires the Espresso plan', 402);
-                }
-                return $this->jsonError("Manager limit reached ($limit). Upgrade for more.", 402);
-            }
-        }
-
-        $previousRole = $employee->getRole();
-        $employee->setRole($role);
-
-        // Seed default permissions on first promotion; clear them on demotion.
-        if ($role === EmployeeRoleEnum::MANAGER && $previousRole !== EmployeeRoleEnum::MANAGER && empty($employee->getManagerPermissionValues())) {
-            $employee->setManagerPermissions(ManagerPermissionEnum::defaults());
-        } elseif ($role !== EmployeeRoleEnum::MANAGER) {
-            $employee->setManagerPermissions([]);
         }
 
         $employeeRepository->flush();

@@ -12,7 +12,6 @@ import {
   useEmployee,
   useEmployees,
   useUpdateEmployee,
-  useUpdateEmployeeRole,
   useUpdateManagerPermissions,
 } from '@/hooks/queries/useEmployees';
 import type { ManagerPermission } from '@/types';
@@ -82,7 +81,6 @@ function EmployeeDetailPage() {
     .map((e) => e.jobTitle)
     .filter((v): v is string => !!v);
   const updateEmployee = useUpdateEmployee(workspaceId);
-  const updateRole = useUpdateEmployeeRole(workspaceId);
   const updatePermissions = useUpdateManagerPermissions(workspaceId);
   const { data: roleContext } = useRoleContext();
   // Promote/demote and edit-manager-permissions are owner-only on the backend
@@ -229,10 +227,10 @@ function EmployeeDetailPage() {
               {isOwner && plan?.canUseManagers && employee.linkedUserPublicId && (
                 <button
                   type="button"
-                  disabled={updateRole.isPending}
+                  disabled={updateEmployee.isPending}
                   onClick={() => {
                     const newRole = employee.role === 'manager' ? 'employee' : 'manager';
-                    updateRole.mutate(
+                    updateEmployee.mutate(
                       { publicId: employee.publicId, role: newRole },
                       {
                         onSuccess: () => toast.success(newRole === 'manager' ? 'Promoted to manager' : 'Demoted to employee'),

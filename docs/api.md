@@ -22,7 +22,7 @@ Authentication is JWT (issued at login or OAuth callback, sent as the `BEARER` c
 ## Resources (authenticated, scoped to workspace)
 
 - `GET/POST /api/v1/{locale}/workspaces/{publicId}/employees`
-- `PUT /api/v1/{locale}/workspaces/{publicId}/employees/{publicId}/role` — promote/demote (owner only). Promoting seeds `managerPermissions` with the defaults `[manage_leave, manage_attendance]` when the field is empty; demoting clears it.
+- `PUT /api/v1/{locale}/workspaces/{publicId}/employees/{publicId}` — update employee fields, including `role` for owner-only manager promotion/demotion. Promoting seeds `managerPermissions` with the defaults `[manage_leave, manage_attendance]` when the field is empty; demoting clears it.
 - `PATCH /api/v1/{locale}/workspaces/{publicId}/employees/{publicId}/manager-permissions` — set the manager's permission list (owner only). Body: `{ "permissions": ["manage_employees", "manage_shifts", "manage_closures", "manage_leave", "manage_attendance"] }`. Unknown values are rejected.
 - `GET/POST /api/v1/{locale}/workspaces/{publicId}/shifts`
 - `GET/POST /api/v1/{locale}/workspaces/{publicId}/closures`
