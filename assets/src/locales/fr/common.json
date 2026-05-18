@@ -10,6 +10,7 @@
     "qrCodes": "Codes QR",
     "settings": "Paramètres",
     "profile": "Profil",
+    "help": "Aide",
     "signOut": "Déconnexion"
   },
   "auth": {

@@ -12,6 +12,7 @@
     "qrCodes": "QR codes",
     "settings": "Settings",
     "profile": "Profile",
+    "help": "Help",
     "signOut": "Sign out"
   },
   "auth": {
