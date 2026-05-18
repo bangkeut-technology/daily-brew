@@ -8,6 +8,7 @@ import { PlayStoreBadge } from '@/components/shared/PlayStoreBadge';
 const productLinks = [
   { label: 'Features', to: '/features' },
   { label: 'How it works', to: '/how-it-works' },
+  { label: 'Guides', to: '/guides' },
   { label: 'Roles & permissions', to: '/roles' },
   { label: 'Try demo', to: '/demo' },
   { label: 'Pricing', to: '/pricing' },
