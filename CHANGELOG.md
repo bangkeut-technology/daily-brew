@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.53.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.52.0...v1.53.0) (2026-05-18)
+
+
+### Features
+
+* **console:** in-app help link + step-by-step how-it-works playbooks ([#97](https://github.com/bangkeut-technology/daily-brew/issues/97)) ([d115376](https://github.com/bangkeut-technology/daily-brew/commit/d1153767c6cbe1bc4d80dd6fc7974424639f944b))
+
+
+### Bug Fixes
+
+* disable animated body gradient and backdrop blur on mobile ([#96](https://github.com/bangkeut-technology/daily-brew/issues/96)) ([4cf7c49](https://github.com/bangkeut-technology/daily-brew/commit/4cf7c49004d9999ae838f8837177e93e31a91412))
+
 ## [1.52.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.51.1...v1.52.0) (2026-05-12)
 
 
