@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.57.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.56.0...v1.57.0) (2026-05-18)
+
+
+### Features
+
+* **guides:** deep-link landing playbook steps into the console ([#107](https://github.com/bangkeut-technology/daily-brew/issues/107)) ([1d220e5](https://github.com/bangkeut-technology/daily-brew/commit/1d220e5ed7071fee0c0b26dbf9cf8b0a9bec3895))
+
 ## [1.56.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.55.0...v1.56.0) (2026-05-18)
 
 
