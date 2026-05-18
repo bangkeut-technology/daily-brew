@@ -79,7 +79,10 @@ function NoWorkspaceView() {
 
   return (
     <div className="page-enter">
-      <PageHeader title={t('nav.dashboard')} />
+      <PageHeader
+        title={t('nav.dashboard')}
+        help={{ href: '/guides/owner', label: 'Open the owner setup guide' }}
+      />
 
       <div>
         {/* Header */}

@@ -134,6 +134,9 @@ function LeaveRequestsPage() {
     <div className="page-enter">
       <PageHeader
         title={isEmployee ? t('nav.myLeaveRequests', 'My leave requests') : t('nav.leaveRequests')}
+        help={isEmployee
+          ? { href: '/guides/employee#step-employee-7', label: 'How to submit leave' }
+          : { href: '/guides/owner#step-owner-8', label: 'How to review leave requests' }}
       />
 
       <div className="flex items-center gap-3 mb-6">

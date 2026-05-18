@@ -167,6 +167,7 @@ export function OwnerDashboard() {
     <div className="page-enter">
       <PageHeader
         title={t('nav.dashboard')}
+        help={{ href: '/guides/owner', label: 'Open the owner setup guide' }}
         badge={
           <div className="flex items-center gap-1.5">
             {roleContext && (

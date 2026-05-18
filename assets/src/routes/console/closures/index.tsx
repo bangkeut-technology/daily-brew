@@ -102,6 +102,7 @@ function ClosuresPage() {
     <div className="page-enter">
       <PageHeader
         title={t('nav.closures')}
+        help={{ href: '/guides/owner#step-owner-8', label: 'How closures and leave work' }}
         action={
           <button
             onClick={handleToggleForm}
