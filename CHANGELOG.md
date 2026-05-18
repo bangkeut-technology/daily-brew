@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.54.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.53.0...v1.54.0) (2026-05-18)
+
+
+### Features
+
+* **guides:** split how-it-works into focused per-persona guide pages ([#99](https://github.com/bangkeut-technology/daily-brew/issues/99)) ([57a98f6](https://github.com/bangkeut-technology/daily-brew/commit/57a98f66a3f387d688d06c4ebdf1b08f1106d4a7))
+
 ## [1.53.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.52.0...v1.53.0) (2026-05-18)
 
 
