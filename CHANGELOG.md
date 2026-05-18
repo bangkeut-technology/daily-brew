@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.58.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.57.0...v1.58.0) (2026-05-18)
+
+
+### Features
+
+* **console:** contextual help icons on PageHeader, linking into /guides ([#109](https://github.com/bangkeut-technology/daily-brew/issues/109)) ([136e685](https://github.com/bangkeut-technology/daily-brew/commit/136e685ed7d9a913d37bf6933a175de05f2c5792))
+
 ## [1.57.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.56.0...v1.57.0) (2026-05-18)
 
 
