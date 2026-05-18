@@ -50,7 +50,8 @@
     "createdGuideDeviceDesc": "រក្សាការចូលរួម និងចេញរួម នៅលើទូរស័ព្ទដូចគ្នា ដើម្បីកាត់បន្ថយការចូលរួមជំនួសគ្នា។",
     "createdGuideLinkAction": "ទៅការភ្ជាប់",
     "createdGuideCopyAction": "ចម្លងលេខសម្គាល់បុគ្គលិក",
-    "createdGuideAddAnother": "បន្ថែមបុគ្គលិកផ្សេងទៀត"
+    "createdGuideAddAnother": "បន្ថែមបុគ្គលិកផ្សេងទៀត",
+    "createdGuideReadFullGuide": "អានមគ្គុទ្ទេសក៍ដំឡើងម្ចាស់ពេញលេញ"
   },
   "workspace": {
     "label": "ការងារ",

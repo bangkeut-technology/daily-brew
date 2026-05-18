@@ -65,13 +65,16 @@ function OwnerNextStep({
   icon,
   title,
   children,
+  onClick,
 }: {
   icon: import('react').ReactNode;
   title: string;
   children: import('react').ReactNode;
+  onClick?: () => void;
 }) {
-  return (
-    <div className="flex gap-3 rounded-xl border border-cream-3/70 bg-glass-bg/70 p-4">
+  const interactive = typeof onClick === 'function';
+  const inner = (
+    <>
       <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-coffee/10 text-coffee">
         {icon}
       </div>
@@ -79,8 +82,35 @@ function OwnerNextStep({
         <p className="text-[14px] font-semibold text-text-primary">{title}</p>
         <p className="mt-1 text-[13px] leading-relaxed text-text-tertiary">{children}</p>
       </div>
+    </>
+  );
+  if (interactive) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className="group flex w-full gap-3 rounded-xl border border-cream-3/70 bg-glass-bg/70 p-4 text-left transition-colors hover:border-coffee/30 hover:bg-glass-bg cursor-pointer"
+      >
+        {inner}
+      </button>
+    );
+  }
+  return (
+    <div className="flex gap-3 rounded-xl border border-cream-3/70 bg-glass-bg/70 p-4">
+      {inner}
     </div>
   );
+}
+
+/** Smooth-scroll to an element by id and add a brief highlight pulse. */
+function focusSection(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  el.classList.add('ring-2', 'ring-coffee/40', 'ring-offset-2', 'ring-offset-cream-1', 'rounded-2xl');
+  window.setTimeout(() => {
+    el.classList.remove('ring-2', 'ring-coffee/40', 'ring-offset-2', 'ring-offset-cream-1', 'rounded-2xl');
+  }, 1800);
 }
 
 type EditEmployeeForm = z.infer<typeof editEmployeeSchema>;
@@ -323,6 +353,7 @@ function EmployeeDetailPage() {
               <OwnerNextStep
                 icon={<Link2 size={16} />}
                 title={t('employee.createdGuideLinkTitle', 'Link their account')}
+                onClick={() => focusSection('employee-linking')}
               >
                 {t(
                   'employee.createdGuideLinkDesc',
@@ -332,6 +363,7 @@ function EmployeeDetailPage() {
               <OwnerNextStep
                 icon={<QrCode size={16} />}
                 title={t('employee.createdGuideShareTitle', 'Share the employee ID or QR')}
+                onClick={() => focusSection('employee-qr')}
               >
                 {t(
                   'employee.createdGuideShareDesc',
@@ -341,6 +373,7 @@ function EmployeeDetailPage() {
               <OwnerNextStep
                 icon={<Clock size={16} />}
                 title={t('employee.createdGuideShiftTitle', 'Confirm the shift')}
+                onClick={() => focusSection('employee-shift')}
               >
                 {employee.shiftName
                   ? t('employee.createdGuideShiftAssigned', '{{name}} is assigned to {{shift}}.', {
@@ -452,6 +485,15 @@ function EmployeeDetailPage() {
                 <UserPlus size={13} />
                 {t('employee.createdGuideAddAnother', 'Add another employee')}
               </Link>
+              <a
+                href="/guides/owner"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-auto inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-[14px] font-medium text-coffee no-underline transition-colors hover:bg-coffee/8"
+              >
+                <Info size={13} />
+                {t('employee.createdGuideReadFullGuide', 'Read the full owner setup guide')}
+              </a>
             </div>
           </div>
         </GlassCard>
@@ -710,7 +752,7 @@ function EmployeeDetailPage() {
 
                 {/* Right: details grid */}
                 <div className="flex-1 grid grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3">
-                  <div>
+                  <div id="employee-shift" className="scroll-mt-6">
                     <span className="text-[13px] text-text-tertiary block">{t('employee.shift', 'Shift')}</span>
                     {employee.shiftName && employee.shiftPublicId ? (
                       <ShiftPopover
@@ -872,7 +914,7 @@ function EmployeeDetailPage() {
                     )}
                   </div>
 
-                  <div className="border-t border-cream-3/60 pt-4">
+                  <div id="employee-qr" className="border-t border-cream-3/60 pt-4 scroll-mt-6">
                     <p className="text-[14px] text-text-secondary mb-3">
                       {t(
                         'employee.linkUserDescription',

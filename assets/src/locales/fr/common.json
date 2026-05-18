@@ -104,7 +104,8 @@
     "createdGuideDeviceDesc": "Conserver le pointage d'entrée et de sortie sur le même téléphone pour limiter les fraudes au pointage.",
     "createdGuideLinkAction": "Aller à la liaison",
     "createdGuideCopyAction": "Copier l'identifiant d'employé",
-    "createdGuideAddAnother": "Ajouter un autre employé"
+    "createdGuideAddAnother": "Ajouter un autre employé",
+    "createdGuideReadFullGuide": "Lire le guide complet de configuration propriétaire"
   },
   "workspace": {
     "label": "Espace de travail",

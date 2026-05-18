@@ -141,7 +141,8 @@
     "createdGuideDeviceDesc": "Keep check-in and check-out on the same phone to reduce buddy punching.",
     "createdGuideLinkAction": "Go to linking",
     "createdGuideCopyAction": "Copy employee ID",
-    "createdGuideAddAnother": "Add another employee"
+    "createdGuideAddAnother": "Add another employee",
+    "createdGuideReadFullGuide": "Read the full owner setup guide"
   },
   "attendance": {
     "date": "Date",
