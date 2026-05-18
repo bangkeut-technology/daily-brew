@@ -60,6 +60,7 @@ export function EmployeeDashboard() {
   const fmtDate = useDateFormat();
   const { data: checkinData, isLoading: checkinLoading, refetch } = useCheckinStatus(workspaceQrToken);
   const checkinAction = useCheckinAction(workspaceQrToken);
+  const wsTz = useWorkspaceTimezone();
 
   const [actionError, setActionError] = useState<string | null>(null);
   const [locationDenied, setLocationDenied] = useState(false);
@@ -141,7 +142,6 @@ export function EmployeeDashboard() {
   const onLeave = (checkinData as { onLeave?: boolean })?.onLeave ?? false;
   const leaveIsFullDay = (checkinData as { leaveIsFullDay?: boolean })?.leaveIsFullDay ?? false;
 
-  const wsTz = useWorkspaceTimezone();
   const wsNow = nowInTimezone(wsTz.timezone);
   const todayStr = wsNow.toLocaleDateString(undefined, {
     weekday: 'long',
