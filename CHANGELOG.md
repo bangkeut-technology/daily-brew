@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.56.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.55.0...v1.56.0) (2026-05-18)
+
+
+### Features
+
+* **guides:** interconnect post-create guide tiles + sibling links on landing guides ([#105](https://github.com/bangkeut-technology/daily-brew/issues/105)) ([657b512](https://github.com/bangkeut-technology/daily-brew/commit/657b5122049fc0c6bf01a6a678bb10ddc25fe1e3))
+
 ## [1.55.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.54.0...v1.55.0) (2026-05-18)
 
 
