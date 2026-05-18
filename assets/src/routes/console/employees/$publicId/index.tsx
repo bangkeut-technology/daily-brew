@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { ArrowLeft, Copy, Pencil, X, Check, Link2, Mail, Unlink, Info, AtSign, ShieldCheck, ShieldOff } from 'lucide-react';
+import { ArrowLeft, Copy, Pencil, X, Check, Link2, Mail, Unlink, Info, AtSign, ShieldCheck, ShieldOff, UserPlus, QrCode, Clock, Globe, MapPin, Smartphone } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState, useMemo } from 'react';
 import * as Popover from '@radix-ui/react-popover';
@@ -14,7 +14,7 @@ import {
   useUpdateEmployee,
   useUpdateManagerPermissions,
 } from '@/hooks/queries/useEmployees';
-import type { ManagerPermission } from '@/types';
+import type { ManagerPermission, Shift } from '@/types';
 import { MANAGER_PERMISSIONS } from '@/types';
 import { useShifts } from '@/hooks/queries/useShifts';
 import { usePlan } from '@/hooks/queries/usePlan';
@@ -61,15 +61,42 @@ function SectionHeader({ children }: { children: import('react').ReactNode }) {
   );
 }
 
+function OwnerNextStep({
+  icon,
+  title,
+  children,
+}: {
+  icon: import('react').ReactNode;
+  title: string;
+  children: import('react').ReactNode;
+}) {
+  return (
+    <div className="flex gap-3 rounded-xl border border-cream-3/70 bg-glass-bg/70 p-4">
+      <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-coffee/10 text-coffee">
+        {icon}
+      </div>
+      <div>
+        <p className="text-[14px] font-semibold text-text-primary">{title}</p>
+        <p className="mt-1 text-[13px] leading-relaxed text-text-tertiary">{children}</p>
+      </div>
+    </div>
+  );
+}
+
 type EditEmployeeForm = z.infer<typeof editEmployeeSchema>;
 
 export const Route = createFileRoute('/console/employees/$publicId/')({
+  validateSearch: (search: Record<string, unknown>): { created?: boolean } => {
+    const created = search.created === true || search.created === 'true' || search.created === '1';
+    return created ? { created } : {};
+  },
   component: EmployeeDetailPage,
 });
 
 function EmployeeDetailPage() {
   const { t } = useTranslation();
   const { publicId } = Route.useParams();
+  const { created } = Route.useSearch();
   const workspaceId = getWorkspacePublicId() || '';
   const { data: employee, isLoading } = useEmployee(workspaceId, publicId);
   const fmtDate = useDateFormat();
@@ -90,6 +117,7 @@ function EmployeeDetailPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [linkUserId, setLinkUserId] = useState('');
   const [linkUserIdError, setLinkUserIdError] = useState<string | null>(null);
+  const [showCreatedGuide, setShowCreatedGuide] = useState(created);
   const [showUnlinkConfirm, setShowUnlinkConfirm] = useState(false);
   const wsTz = useWorkspaceTimezone();
   // Deactivation requires picking the last day worked so history stays accurate
@@ -104,6 +132,7 @@ function EmployeeDetailPage() {
     handleSubmit,
     reset,
     setValue,
+    getValues,
     watch,
     formState: { errors },
   } = useForm<EditEmployeeForm>({
@@ -261,6 +290,172 @@ function EmployeeDetailPage() {
           ) : undefined
         }
       />
+
+      {showCreatedGuide && !isEditing && (
+        <GlassCard hover={false} className="mb-6 border-coffee/20 bg-coffee/5">
+          <div className="p-5">
+            <div className="mb-4 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[12px] font-semibold uppercase tracking-[1.5px] text-coffee">
+                  {t('employee.createdGuideEyebrow', 'Employee created')}
+                </p>
+                <h2 className="mt-1 text-[20px] font-semibold text-text-primary">
+                  {t('employee.createdGuideTitle', 'Next, help this employee check in')}
+                </h2>
+                <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-text-secondary">
+                  {t(
+                    'employee.createdGuideDescription',
+                    'Finish the setup by linking their user account and sharing the check-in instructions before their first shift.',
+                  )}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCreatedGuide(false)}
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-cream-3 bg-glass-bg text-text-tertiary transition-colors hover:bg-cream-3 hover:text-text-primary"
+                aria-label={t('common.close', 'Close')}
+              >
+                <X size={14} />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+              <OwnerNextStep
+                icon={<Link2 size={16} />}
+                title={t('employee.createdGuideLinkTitle', 'Link their account')}
+              >
+                {t(
+                  'employee.createdGuideLinkDesc',
+                  'Ask the employee to sign in and send their user public ID, or share this employee ID so they can link during onboarding.',
+                )}
+              </OwnerNextStep>
+              <OwnerNextStep
+                icon={<QrCode size={16} />}
+                title={t('employee.createdGuideShareTitle', 'Share the employee ID or QR')}
+              >
+                {t(
+                  'employee.createdGuideShareDesc',
+                  'The QR code and employee ID below are what staff use to connect their account to this profile.',
+                )}
+              </OwnerNextStep>
+              <OwnerNextStep
+                icon={<Clock size={16} />}
+                title={t('employee.createdGuideShiftTitle', 'Confirm the shift')}
+              >
+                {employee.shiftName
+                  ? t('employee.createdGuideShiftAssigned', '{{name}} is assigned to {{shift}}.', {
+                      name: fullName,
+                      shift: employee.shiftName,
+                    })
+                  : t(
+                      'employee.createdGuideShiftMissing',
+                      'No shift is assigned yet. Add one so late, absent, and early-leave status can be calculated.',
+                    )}
+              </OwnerNextStep>
+            </div>
+
+            <div className="mt-5 rounded-xl border border-amber/20 bg-amber/8 p-4">
+              <div className="mb-3 flex items-start gap-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber/15 text-amber">
+                  <ShieldCheck size={16} />
+                </div>
+                <div>
+                  <p className="text-[14px] font-semibold text-text-primary">
+                    {t('employee.createdGuideAdvancedTitle', 'Turn on advanced check-in protection')}
+                  </p>
+                  <p className="mt-1 text-[13px] leading-relaxed text-text-tertiary">
+                    {t(
+                      'employee.createdGuideAdvancedDesc',
+                      'After staff profiles are ready, tighten check-in rules so attendance is recorded from the right place, network, and device.',
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
+                <Link
+                  to="/console/settings"
+                  hash="settings-ip-restriction"
+                  className="flex items-start gap-2 rounded-lg border border-cream-3/70 bg-glass-bg px-3 py-2.5 text-left no-underline transition-colors hover:bg-cream-3/60"
+                >
+                  <Globe size={15} className="mt-0.5 shrink-0 text-amber" />
+                  <span>
+                    <span className="block text-[13.5px] font-semibold text-text-primary">
+                      {t('employee.createdGuideIpTitle', 'IP restriction')}
+                    </span>
+                    <span className="mt-0.5 block text-[12.5px] leading-relaxed text-text-tertiary">
+                      {t('employee.createdGuideIpDesc', 'Only allow check-ins from your restaurant Wi-Fi or approved network.')}
+                    </span>
+                  </span>
+                </Link>
+                <Link
+                  to="/console/settings"
+                  hash="settings-geofencing"
+                  className="flex items-start gap-2 rounded-lg border border-cream-3/70 bg-glass-bg px-3 py-2.5 text-left no-underline transition-colors hover:bg-cream-3/60"
+                >
+                  <MapPin size={15} className="mt-0.5 shrink-0 text-amber" />
+                  <span>
+                    <span className="block text-[13.5px] font-semibold text-text-primary">
+                      {t('employee.createdGuideGeofencingTitle', 'Geofencing')}
+                    </span>
+                    <span className="mt-0.5 block text-[12.5px] leading-relaxed text-text-tertiary">
+                      {t('employee.createdGuideGeofencingDesc', 'Require staff to be near the restaurant before check-in is accepted.')}
+                    </span>
+                  </span>
+                </Link>
+                <Link
+                  to="/console/settings"
+                  hash="settings-device-verification"
+                  className="flex items-start gap-2 rounded-lg border border-cream-3/70 bg-glass-bg px-3 py-2.5 text-left no-underline transition-colors hover:bg-cream-3/60"
+                >
+                  <Smartphone size={15} className="mt-0.5 shrink-0 text-amber" />
+                  <span>
+                    <span className="block text-[13.5px] font-semibold text-text-primary">
+                      {t('employee.createdGuideDeviceTitle', 'Device verification')}
+                    </span>
+                    <span className="mt-0.5 block text-[12.5px] leading-relaxed text-text-tertiary">
+                      {t('employee.createdGuideDeviceDesc', 'Keep check-in and check-out on the same phone to reduce buddy punching.')}
+                    </span>
+                  </span>
+                </Link>
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => document.getElementById('employee-linking')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-coffee px-3 py-2 text-[14px] font-medium text-white transition-colors hover:bg-coffee-light"
+              >
+                <Link2 size={13} />
+                {t('employee.createdGuideLinkAction', 'Go to linking')}
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(employee.publicId);
+                    toast.success(t('common.copied', 'Copied to clipboard'));
+                  } catch {
+                    toast.error(t('common.copyFailed', 'Failed to copy'));
+                  }
+                }}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-cream-3 bg-glass-bg px-3 py-2 text-[14px] font-medium text-text-primary transition-colors hover:bg-cream-3"
+              >
+                <Copy size={13} />
+                {t('employee.createdGuideCopyAction', 'Copy employee ID')}
+              </button>
+              <Link
+                to="/console/employees/new"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-cream-3 bg-glass-bg px-3 py-2 text-[14px] font-medium text-text-primary no-underline transition-colors hover:bg-cream-3"
+              >
+                <UserPlus size={13} />
+                {t('employee.createdGuideAddAnother', 'Add another employee')}
+              </Link>
+            </div>
+          </div>
+        </GlassCard>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Info card — full width */}
@@ -444,7 +639,7 @@ function EmployeeDetailPage() {
                     if (!v) {
                       // Opening the deactivation flow — defer flipping `active`
                       // until the date is confirmed.
-                      setDeactivateDate(watch('leftAt') || wsTz.today());
+                      setDeactivateDate(getValues('leftAt') || wsTz.today());
                       setShowDeactivateModal(true);
                     } else {
                       setValue('active', true, { shouldDirty: true });
@@ -583,6 +778,7 @@ function EmployeeDetailPage() {
         </GlassCard>
 
         {/* Link user section */}
+        <div id="employee-linking" className="scroll-mt-6">
           <GlassCard hover={false}>
             <GlassCardHeader
               title={t('employee.linkUser', 'Link user account')}
@@ -721,6 +917,7 @@ function EmployeeDetailPage() {
               )}
             </div>
           </GlassCard>
+        </div>
 
         {/* Manager permissions — owner-only on the backend; rendered when this employee is a
             manager AND the viewer is the workspace owner. Hidden from managers viewing other
@@ -926,9 +1123,6 @@ function ManagerPermissionRow({
 }
 
 // ── Shift Popover ─────────────────────────────────────────────
-
-import type { Shift } from '@/types';
-import { Clock } from 'lucide-react';
 
 function ShiftPopover({
   shiftName,
