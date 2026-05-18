@@ -115,7 +115,11 @@ const playbooks = [
       },
       {
         title: 'Add your employees',
-        desc: 'Console → Employees → Add. Fill in name and assign a shift. Optionally link a user account so the employee can sign in.',
+        desc: 'Console → Employees → Add. Fill in name and assign a shift. Linking to a user account is optional now — you can do it later from the employee detail page.',
+      },
+      {
+        title: 'Link an employee to a user account',
+        desc: 'Open the employee → Link user card → paste the user\'s public ID (they can copy theirs from Console → Profile). Once linked, the user signs in to see their own attendance, submit leave, and check in via the app. Unlink anytime from the same card.',
       },
       {
         title: 'Display the workspace QR',
@@ -147,8 +151,8 @@ const playbooks = [
         desc: 'Use email, Google, or Apple — the same account works on every phone you sign in from.',
       },
       {
-        title: 'Get linked to your workspace',
-        desc: 'Your owner shares your employee ID, or you enter it during onboarding to connect to the right restaurant.',
+        title: 'Link to your employee record',
+        desc: 'Two ways: (a) your owner pastes your user public ID — find it on Console → Profile — into the Link user card on your employee page; or (b) you paste the employee public ID your owner shares into the onboarding wizard or Console → Profile → Link to a workspace. You can link to several workspaces if you work at more than one restaurant.',
       },
       {
         title: 'Scan the QR at the restaurant',
