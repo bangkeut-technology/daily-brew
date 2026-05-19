@@ -9,13 +9,14 @@ import {
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard } from '@/components/shared/GlassCard';
 import { CustomSelect } from '@/components/shared/CustomSelect';
+import { FeatureStageBadge } from '@/components/shared/FeatureStageBadge';
 import { cn } from '@/lib/utils';
 
 export const Route = createFileRoute('/admin/feature-flags/')({
   component: AdminFeatureFlagsPage,
 });
 
-const STAGE_TONE: Record<FeatureFlagStage, string> = {
+const STAGE_DESC_TONE: Record<FeatureFlagStage, string> = {
   dev: 'bg-text-tertiary/15 text-text-tertiary',
   alpha: 'bg-amber/15 text-amber',
   beta: 'bg-[#3B6FA0]/15 text-blue',
@@ -57,9 +58,13 @@ function AdminFeatureFlagsPage() {
                 <div className="flex items-center gap-2.5 mb-1.5">
                   <ToggleLeft size={16} className="text-coffee" />
                   <h3 className="text-[16px] font-semibold text-text-primary font-serif">{flag.label}</h3>
-                  <span className={cn('text-[11.5px] px-2 py-0.5 rounded-full font-medium uppercase tracking-wide', STAGE_TONE[flag.stage])}>
-                    {flag.stageLabel}
-                  </span>
+                  {flag.stage === 'release' ? (
+                    <span className="text-[11.5px] px-2 py-0.5 rounded-full font-medium uppercase tracking-wide bg-green/15 text-green">
+                      Released
+                    </span>
+                  ) : (
+                    <FeatureStageBadge stage={flag.stage} />
+                  )}
                 </div>
                 <p className="text-[13.5px] text-text-secondary leading-relaxed">
                   {flag.description}
@@ -87,7 +92,7 @@ function AdminFeatureFlagsPage() {
             {data.stages.map((stage) => (
               <div key={stage.value} className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className={cn('text-[11.5px] px-2 py-0.5 rounded-full font-medium uppercase tracking-wide', STAGE_TONE[stage.value])}>
+                  <span className={cn('text-[11.5px] px-2 py-0.5 rounded-full font-medium uppercase tracking-wide', STAGE_DESC_TONE[stage.value])}>
                     {stage.label}
                   </span>
                 </div>

@@ -73,6 +73,7 @@ export interface AdminWorkspaceRow {
   employeeCount: number;
   createdAt: string;
   deletedAt: string | null;
+  testingTrack: 'none' | 'alpha' | 'beta';
 }
 
 export interface AdminWorkspaceDetail {

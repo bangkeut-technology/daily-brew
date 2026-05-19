@@ -105,6 +105,7 @@ class AdminWorkspaceController extends AbstractController
                 'employeeCount' => $employeeCountByWorkspaceId[$w->getId()] ?? 0,
                 'createdAt' => $w->getCreatedAt()->format('c'),
                 'deletedAt' => $w->getDeletedAt()?->format('c'),
+                'testingTrack' => $w->getTestingTrack()->value,
             ];
         }, $workspaces);
 

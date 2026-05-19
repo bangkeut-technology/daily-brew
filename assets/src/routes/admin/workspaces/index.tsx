@@ -6,6 +6,7 @@ import { useAdminWorkspaces, useRestoreWorkspace } from '@/hooks/queries/useAdmi
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard } from '@/components/shared/GlassCard';
 import { Toggle } from '@/components/shared/Toggle';
+import { TestingTrackBadge } from '@/components/shared/TestingTrackBadge';
 import { cn } from '@/lib/utils';
 
 export const Route = createFileRoute('/admin/workspaces/')({
@@ -65,6 +66,7 @@ function AdminWorkspacesPage() {
                 <th className="text-left px-4 py-2.5 font-medium">Name</th>
                 <th className="text-left px-4 py-2.5 font-medium">Owner</th>
                 <th className="text-left px-4 py-2.5 font-medium">Plan</th>
+                <th className="text-left px-4 py-2.5 font-medium">Track</th>
                 <th className="text-left px-4 py-2.5 font-medium">Status</th>
                 <th className="text-right px-4 py-2.5 font-medium">Employees</th>
                 <th className="text-left px-4 py-2.5 font-medium">Created</th>
@@ -73,10 +75,10 @@ function AdminWorkspacesPage() {
             </thead>
             <tbody>
               {isLoading && (
-                <tr><td colSpan={7} className="px-4 py-6 text-center text-text-tertiary">Loading…</td></tr>
+                <tr><td colSpan={8} className="px-4 py-6 text-center text-text-tertiary">Loading…</td></tr>
               )}
               {!isLoading && data?.items.length === 0 && (
-                <tr><td colSpan={7} className="px-4 py-6 text-center text-text-tertiary">No workspaces found</td></tr>
+                <tr><td colSpan={8} className="px-4 py-6 text-center text-text-tertiary">No workspaces found</td></tr>
               )}
               {data?.items.map((w) => (
                 <tr key={w.publicId} className={cn('border-t border-cream-3/60 hover:bg-cream-3/20 transition-colors', w.deletedAt && 'opacity-60')}>
@@ -91,6 +93,9 @@ function AdminWorkspacesPage() {
                   </td>
                   <td className="px-4 py-2.5">
                     <PlanBadge plan={w.plan} />
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <TestingTrackBadge track={w.testingTrack} />
                   </td>
                   <td className="px-4 py-2.5 text-text-secondary text-[12.5px]">
                     {w.subscriptionStatus ?? '—'}{w.isTrialing ? ' (trial)' : ''}

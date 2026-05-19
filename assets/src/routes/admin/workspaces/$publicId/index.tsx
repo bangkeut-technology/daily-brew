@@ -13,6 +13,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { CustomSelect } from '@/components/shared/CustomSelect';
+import { TestingTrackBadge } from '@/components/shared/TestingTrackBadge';
 import { cn } from '@/lib/utils';
 
 export const Route = createFileRoute('/admin/workspaces/$publicId/')({
@@ -153,7 +154,10 @@ function AdminWorkspaceDetailPage() {
         </GlassCard>
 
         <GlassCard hover={false}>
-          <GlassCardHeader title="Testing track" />
+          <GlassCardHeader
+            title="Testing track"
+            action={<TestingTrackBadge track={ws.testingTrack} />}
+          />
           <div className="p-5 space-y-3">
             <p className="text-[13px] text-text-secondary leading-relaxed">
               Opts this workspace into early access for feature-flagged surfaces. Alpha sees every stage (dev when running locally + alpha + beta + release); beta sees beta + release; none sees release only.
