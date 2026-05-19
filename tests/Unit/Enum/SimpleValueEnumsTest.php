@@ -55,6 +55,7 @@ class SimpleValueEnumsTest extends TestCase
         $this->assertSame('user', AdminAuditTargetTypeEnum::User->value);
         $this->assertSame('workspace', AdminAuditTargetTypeEnum::Workspace->value);
         $this->assertSame('subscription', AdminAuditTargetTypeEnum::Subscription->value);
-        $this->assertCount(3, AdminAuditTargetTypeEnum::cases());
+        $this->assertSame('mobile_app_config', AdminAuditTargetTypeEnum::MobileAppConfig->value);
+        $this->assertCount(4, AdminAuditTargetTypeEnum::cases());
     }
 }

@@ -15,6 +15,7 @@ class AdminAuditActionEnumTest extends TestCase
         $this->assertSame('demote_user', AdminAuditActionEnum::DemoteUser->value);
         $this->assertSame('cancel_subscription', AdminAuditActionEnum::CancelSubscription->value);
         $this->assertSame('restore_workspace', AdminAuditActionEnum::RestoreWorkspace->value);
+        $this->assertSame('update_mobile_app_config', AdminAuditActionEnum::UpdateMobileAppConfig->value);
     }
 
     public function testLabels(): void
@@ -23,5 +24,6 @@ class AdminAuditActionEnumTest extends TestCase
         $this->assertSame('Demoted user', AdminAuditActionEnum::DemoteUser->label());
         $this->assertSame('Canceled subscription', AdminAuditActionEnum::CancelSubscription->label());
         $this->assertSame('Restored workspace', AdminAuditActionEnum::RestoreWorkspace->label());
+        $this->assertSame('Updated mobile app config', AdminAuditActionEnum::UpdateMobileAppConfig->label());
     }
 }
