@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.62.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.61.0...v1.62.0) (2026-05-19)
+
+
+### Features
+
+* **checkin:** gate NFC check-in behind nfc_checkin flag + dashboard link ([caa6574](https://github.com/bangkeut-technology/daily-brew/commit/caa65745d8815cc9028787de030f8360ac7ad92c))
+* **flags:** platform feature-flag system editable by super-admins ([2963f03](https://github.com/bangkeut-technology/daily-brew/commit/2963f0311b46b8a189c2db292cf62cc7bac97d25))
+
 ## [1.61.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.60.0...v1.61.0) (2026-05-19)
 
 
