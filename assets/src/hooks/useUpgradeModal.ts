@@ -6,7 +6,8 @@ export type EspressoFeature =
   | 'deviceVerification'
   | 'leaveRequests'
   | 'shiftTimeRules'
-  | 'telegramNotifications';
+  | 'telegramNotifications'
+  | 'tapCheckin';
 
 export function useUpgradeModal() {
   const [feature, setFeature] = useState<EspressoFeature | null>(null);

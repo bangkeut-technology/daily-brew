@@ -57,6 +57,9 @@ class WorkspaceSetting extends AbstractBaseEntity
     #[ORM\Column(length: 64, nullable: true)]
     private ?string $telegramChatId = null;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $tapCheckinEnabled = false;
+
     // ── Workspace ──────────────────────────────────────────────
 
     public function getWorkspace(): ?Workspace
@@ -198,6 +201,19 @@ class WorkspaceSetting extends AbstractBaseEntity
     public function setTelegramChatId(?string $telegramChatId): static
     {
         $this->telegramChatId = $telegramChatId;
+        return $this;
+    }
+
+    // ── Tap check-in ──────────────────────────────────────────
+
+    public function isTapCheckinEnabled(): bool
+    {
+        return $this->tapCheckinEnabled;
+    }
+
+    public function setTapCheckinEnabled(bool $tapCheckinEnabled): static
+    {
+        $this->tapCheckinEnabled = $tapCheckinEnabled;
         return $this;
     }
 }

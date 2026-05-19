@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import * as Dialog from '@radix-ui/react-dialog';
-import { Crown, Check, MapPin, Navigation, Smartphone, Building2, Users, Calendar, Plus, X, Copy, Pencil, Trash2, Send } from 'lucide-react';
+import { Crown, Check, MapPin, MousePointerClick, Navigation, Smartphone, Building2, Users, Calendar, Plus, X, Copy, Pencil, Trash2, Send } from 'lucide-react';
 import { useDateFormat } from '@/hooks/useDateFormat';
 import { usePaddle } from '@/hooks/usePaddle';
 import { useDevTogglePlan } from '@/hooks/useDevTogglePlan';
@@ -110,6 +110,9 @@ function SettingsPage() {
   // Device verification state
   const [deviceVerificationEnabled, setDeviceVerificationEnabled] = useState(false);
 
+  // Button check-in state
+  const [tapCheckinEnabled, setTapCheckinEnabled] = useState(false);
+
   // Telegram state
   const [telegramEnabled, setTelegramEnabled] = useState(false);
   const [telegramChatId, setTelegramChatId] = useState('');
@@ -131,6 +134,7 @@ function SettingsPage() {
       setTimezone(settings.timezone);
       setDateFormat(settings.dateFormat || 'DD/MM/YYYY');
       setDeviceVerificationEnabled(settings.deviceVerificationEnabled);
+      setTapCheckinEnabled(settings.tapCheckinEnabled);
       setTelegramEnabled(settings.telegramNotificationsEnabled);
       setTelegramChatId(settings.telegramChatId || '');
       setGeofencingEnabled(settings.geofencingEnabled);
@@ -157,6 +161,7 @@ function SettingsPage() {
         geofencingRadiusMeters: geofencingEnabled ? geofencingRadius : null,
         telegramNotificationsEnabled: telegramEnabled,
         telegramChatId: telegramEnabled ? (telegramChatId.trim() || null) : null,
+        tapCheckinEnabled,
       });
       toast.success('Settings saved');
     } catch {
@@ -948,6 +953,59 @@ function SettingsPage() {
               </p>
 
               {deviceVerificationEnabled && plan?.canUseDeviceVerification && (
+                <button
+                  onClick={handleSaveSettings}
+                  disabled={updateSettings.isPending}
+                  className="px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50"
+                >
+                  {updateSettings.isPending ? t('common.loading') : t('common.save')}
+                </button>
+              )}
+            </div>
+          </GlassCard>
+        )}
+
+        {/* Tap check-in settings */}
+        {currentWsId && (
+          <GlassCard hover={false} className="lg:col-span-2 scroll-mt-6" id="settings-tap-checkin">
+            <GlassCardHeader
+              title={t('settings.tapCheckin', 'Tap check-in')}
+              action={
+                <div className="flex items-center gap-2">
+                  <MousePointerClick size={14} className="text-amber" />
+                  {tapCheckinEnabled && plan?.canUseTapCheckin && (
+                    <StatusBadge label="Active" variant="green" />
+                  )}
+                </div>
+              }
+            />
+            <div className="p-5 space-y-4">
+              <div className="flex items-center gap-2">
+                <Toggle
+                  id="tap-checkin"
+                  checked={tapCheckinEnabled && (plan?.canUseTapCheckin ?? false)}
+                  onChange={(v) => {
+                    if (!plan?.canUseTapCheckin) { upgradeModal.openFor('tapCheckin'); return; }
+                    setTapCheckinEnabled(v);
+                  }}
+                />
+                <label htmlFor="tap-checkin" className="text-[15px] text-text-primary cursor-pointer">
+                  {t('settings.enableTapCheckin', 'Allow check-in without scanning')}
+                  {!plan?.canUseTapCheckin && (
+                    <span className="ml-1.5 text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
+                      Espresso
+                    </span>
+                  )}
+                </label>
+              </div>
+              <p className="text-[14px] text-text-tertiary leading-relaxed">
+                {t(
+                  'settings.tapCheckinDesc',
+                  'When enabled, employees can check in by tapping a button in the mobile app instead of scanning the workspace QR. IP, geofence, and device verification still apply, so rely on those to keep check-in tied to your location.',
+                )}
+              </p>
+
+              {tapCheckinEnabled && plan?.canUseTapCheckin && (
                 <button
                   onClick={handleSaveSettings}
                   disabled={updateSettings.isPending}

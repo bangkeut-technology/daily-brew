@@ -183,6 +183,7 @@ export interface WorkspaceSetting {
   geofencingRadiusMeters: number | null;
   telegramNotificationsEnabled: boolean;
   telegramChatId: string | null;
+  tapCheckinEnabled: boolean;
 }
 
 export interface ShiftTimeRule {
@@ -364,6 +365,7 @@ export interface PlanDetails {
   canUseDeviceVerification: boolean;
   canUseManagers: boolean;
   canUseTelegramNotifications: boolean;
+  canUseTapCheckin: boolean;
   canUseSubQrCodes: boolean;
   managerLimit: number | null;
   managerCount: number;

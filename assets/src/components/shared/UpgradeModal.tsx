@@ -7,6 +7,7 @@ import {
   Crown,
   Globe,
   MapPin,
+  MousePointerClick,
   Smartphone,
   FileText,
   Clock,
@@ -30,6 +31,7 @@ const featureConfig: Record<EspressoFeature, { icon: LucideIcon; titleKey: strin
   leaveRequests: { icon: FileText, titleKey: 'upgrade.leaveRequests.title', descKey: 'upgrade.leaveRequests.description' },
   shiftTimeRules: { icon: Clock, titleKey: 'upgrade.shiftTimeRules.title', descKey: 'upgrade.shiftTimeRules.description' },
   telegramNotifications: { icon: Send, titleKey: 'upgrade.telegramNotifications.title', descKey: 'upgrade.telegramNotifications.description' },
+  tapCheckin: { icon: MousePointerClick, titleKey: 'upgrade.tapCheckin.title', descKey: 'upgrade.tapCheckin.description' },
 };
 
 const espressoBenefits = [

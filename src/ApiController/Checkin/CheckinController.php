@@ -59,6 +59,7 @@ class CheckinController extends AbstractController
             'shiftEnd' => $shift?->getEndTime()?->format('H:i'),
             'onLeave' => $approvedLeave !== null,
             'leaveIsFullDay' => $approvedLeave?->isFullDay() ?? false,
+            'workspaceTapCheckinEnabled' => $workspace->getSetting()?->isTapCheckinEnabled() ?? false,
             'today' => [
                 'checkedIn' => $attendance?->getCheckInAt() !== null,
                 'checkedOut' => $attendance?->getCheckOutAt() !== null,

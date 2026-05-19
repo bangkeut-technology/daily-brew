@@ -121,6 +121,16 @@ class WorkspaceSettingController extends AbstractController
             $setting->setTelegramNotificationsEnabled(false);
         }
 
+        // Tap check-in (Espresso gated)
+        if (isset($data['tapCheckinEnabled']) && $data['tapCheckinEnabled']) {
+            if (!$planService->canUseTapCheckin($workspace)) {
+                return $this->jsonError('Tap check-in requires the Espresso plan', 402);
+            }
+            $setting->setTapCheckinEnabled(true);
+        } elseif (isset($data['tapCheckinEnabled'])) {
+            $setting->setTapCheckinEnabled(false);
+        }
+
         if (array_key_exists('telegramChatId', $data)) {
             $chatId = $data['telegramChatId'];
             $setting->setTelegramChatId(is_string($chatId) && $chatId !== '' ? $chatId : null);
@@ -238,6 +248,7 @@ class WorkspaceSettingController extends AbstractController
             'geofencingRadiusMeters' => $setting?->getGeofencingRadiusMeters() ?? 100,
             'telegramNotificationsEnabled' => $setting?->isTelegramNotificationsEnabled() ?? false,
             'telegramChatId' => $setting?->getTelegramChatId(),
+            'tapCheckinEnabled' => $setting?->isTapCheckinEnabled() ?? false,
         ];
     }
 }

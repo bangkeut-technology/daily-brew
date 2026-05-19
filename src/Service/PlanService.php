@@ -88,6 +88,11 @@ class PlanService
         return $this->isAtLeastEspresso($workspace);
     }
 
+    public function canUseTapCheckin(Workspace $workspace): bool
+    {
+        return $this->isAtLeastEspresso($workspace);
+    }
+
     public function canUseSubQrCodes(Workspace $workspace): bool
     {
         return $this->isDoubleEspresso($workspace);
@@ -163,6 +168,7 @@ class PlanService
             'canUseDeviceVerification' => $this->canUseDeviceVerification($workspace),
             'canUseManagers' => $this->canUseManagers($workspace),
             'canUseTelegramNotifications' => $this->canUseTelegramNotifications($workspace),
+            'canUseTapCheckin' => $this->canUseTapCheckin($workspace),
             'canUseSubQrCodes' => $this->canUseSubQrCodes($workspace),
             'managerLimit' => $this->getManagerLimit($workspace),
             'managerCount' => $this->employeeRepository->countManagersByWorkspace($workspace),
