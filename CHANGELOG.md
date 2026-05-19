@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.63.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.63.0...v1.63.1) (2026-05-19)
+
+
+### Bug Fixes
+
+* **deploy:** fail-fast on install errors and pin knp-time-bundle ([5a49d25](https://github.com/bangkeut-technology/daily-brew/commit/5a49d25d69159874f2c2ac2c987fb4a5dc8cb8b4))
+
 ## [1.63.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.62.0...v1.63.0) (2026-05-19)
 
 
