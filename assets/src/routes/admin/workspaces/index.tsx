@@ -7,6 +7,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard } from '@/components/shared/GlassCard';
 import { Toggle } from '@/components/shared/Toggle';
 import { TestingTrackBadge } from '@/components/shared/TestingTrackBadge';
+import { PlanBadge } from '@/components/shared/PlanBadge';
 import { cn } from '@/lib/utils';
 
 export const Route = createFileRoute('/admin/workspaces/')({
@@ -125,16 +126,6 @@ function AdminWorkspacesPage() {
       <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
     </div>
   );
-}
-
-function PlanBadge({ plan }: { plan: string }) {
-  const map: Record<string, { label: string; color: string }> = {
-    free: { label: 'Free', color: 'bg-cream-3 text-text-secondary' },
-    espresso: { label: 'Espresso', color: 'bg-amber/15 text-amber' },
-    double_espresso: { label: 'Double Espresso', color: 'bg-coffee/15 text-coffee' },
-  };
-  const m = map[plan] ?? { label: plan, color: 'bg-cream-3 text-text-secondary' };
-  return <span className={cn('text-[11.5px] px-2 py-0.5 rounded-full font-medium', m.color)}>{m.label}</span>;
 }
 
 export function Pagination({ page, totalPages, onPageChange }: { page: number; totalPages: number; onPageChange: (n: number) => void }) {

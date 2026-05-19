@@ -4,6 +4,7 @@ import { useAdminSubscriptions } from '@/hooks/queries/useAdmin';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard } from '@/components/shared/GlassCard';
 import { CustomSelect } from '@/components/shared/CustomSelect';
+import { PlanBadge } from '@/components/shared/PlanBadge';
 import { Pagination } from '@/routes/admin/workspaces/index';
 import { cn } from '@/lib/utils';
 
@@ -83,7 +84,7 @@ function AdminSubscriptionsPage() {
                     </Link>
                   </td>
                   <td className="px-4 py-2.5 text-text-secondary">{s.owner?.email ?? '—'}</td>
-                  <td className="px-4 py-2.5 text-text-secondary">{s.plan}</td>
+                  <td className="px-4 py-2.5"><PlanBadge plan={s.plan} /></td>
                   <td className="px-4 py-2.5 text-text-secondary text-[12.5px]">
                     {s.status}
                     {s.isTrialing && s.trialDaysRemaining != null && (
