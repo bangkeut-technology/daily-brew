@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.63.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.62.0...v1.63.0) (2026-05-19)
+
+
+### Features
+
+* **admin:** cron console — schedule and observe Symfony commands ([0aea911](https://github.com/bangkeut-technology/daily-brew/commit/0aea911f618aba7c7ae0b75826068c5eb05a4962))
+* **admin:** testing-track column + non-release stage badges ([522d7b9](https://github.com/bangkeut-technology/daily-brew/commit/522d7b95711d2b284eb91679524e7e93d0b02bd0))
+* **flags:** stage-based rollout (dev/alpha/beta/release) + workspace tester tracks ([69abf18](https://github.com/bangkeut-technology/daily-brew/commit/69abf189d2eb62a31149d361270ae594f9b45862))
+
 ## [1.62.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.61.0...v1.62.0) (2026-05-19)
 
 
