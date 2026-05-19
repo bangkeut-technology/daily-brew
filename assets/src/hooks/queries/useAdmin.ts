@@ -182,3 +182,34 @@ export function useUpdateAdminMobileAppConfig() {
     },
   });
 }
+
+export interface AdminFeatureFlagRow {
+  key: string;
+  label: string;
+  description: string;
+  enabled: boolean;
+}
+
+export function useAdminFeatureFlags() {
+  return useQuery({
+    queryKey: ['admin-feature-flags'],
+    queryFn: async () => {
+      const { data } = await apiAxios.get<{ items: AdminFeatureFlagRow[] }>('/admin/feature-flags');
+      return data.items;
+    },
+  });
+}
+
+export function useUpdateAdminFeatureFlag() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ key, enabled }: { key: string; enabled: boolean }) => {
+      const { data } = await apiAxios.put<AdminFeatureFlagRow>(`/admin/feature-flags/${key}`, { enabled });
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin-feature-flags'] });
+      qc.invalidateQueries({ queryKey: ['features'] });
+    },
+  });
+}

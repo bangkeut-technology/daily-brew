@@ -81,6 +81,8 @@ security:
           roles: IS_AUTHENTICATED_FULLY
         - path: '^/api/v1/[a-z]+/auth'
           roles: PUBLIC_ACCESS
+        - path: '^/api/v1/[a-z]+/features'
+          roles: PUBLIC_ACCESS
         - path: '^/api/v1/[a-z]+/admin'
           roles: ROLE_SUPER_ADMIN
         - path: '^/api'

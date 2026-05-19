@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, redirect, useLocation, useNavigate } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import { useAuthenticationState } from '@/hooks/use-authentication';
-import { LayoutDashboard, ShieldCheck, LogOut, Building2, UserCircle, CreditCard, ScrollText, Smartphone } from 'lucide-react';
+import { LayoutDashboard, ShieldCheck, LogOut, Building2, UserCircle, CreditCard, ScrollText, Smartphone, ToggleLeft } from 'lucide-react';
 import { LogoBrand } from '@/components/shared/Logo';
 import { cn } from '@/lib/utils';
 
@@ -21,6 +21,7 @@ const navItems = [
   { to: '/admin/users', icon: UserCircle, label: 'Users' },
   { to: '/admin/subscriptions', icon: CreditCard, label: 'Subscriptions' },
   { to: '/admin/mobile-app-config', icon: Smartphone, label: 'Mobile app' },
+  { to: '/admin/feature-flags', icon: ToggleLeft, label: 'Feature flags' },
   { to: '/admin/audit-log', icon: ScrollText, label: 'Audit log' },
 ];
 
