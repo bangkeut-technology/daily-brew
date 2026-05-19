@@ -29,7 +29,8 @@ class PlanServiceTest extends TestCase
         $this->employeeRepository = $this->createStub(EmployeeRepository::class);
         // Default: all flags enabled. Tests gating behavior should override.
         $this->featureFlagService = $this->createStub(FeatureFlagService::class);
-        $this->featureFlagService->method('isEnabled')->willReturn(true);
+        $this->featureFlagService->method('isEnabledForWorkspace')->willReturn(true);
+        $this->featureFlagService->method('isEnabledGlobally')->willReturn(true);
         $this->planService = new PlanService(
             $this->subscriptionRepository,
             $this->employeeRepository,

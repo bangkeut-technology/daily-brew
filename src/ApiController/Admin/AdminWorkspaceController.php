@@ -290,6 +290,50 @@ class AdminWorkspaceController extends AbstractController
                 'geofencingEnabled' => $workspace->getSetting()->isGeofencingEnabled(),
                 'deviceVerificationEnabled' => $workspace->getSetting()->isDeviceVerificationEnabled(),
             ] : null,
+            'testingTrack' => $workspace->getTestingTrack()->value,
+        ]);
+    }
+
+    #[Route('/{publicId}/testing-track', name: 'admin_workspaces_set_testing_track', methods: ['PUT'])]
+    public function setTestingTrack(
+        string $publicId,
+        Request $request,
+        WorkspaceRepository $workspaceRepository,
+        AdminAuditService $auditService,
+        #[CurrentUser] User $user,
+    ): JsonResponse {
+        $workspace = $workspaceRepository->findOneBy(['publicId' => $publicId]);
+        if (!$workspace instanceof Workspace) {
+            throw new NotFoundHttpException('Workspace not found');
+        }
+
+        $data = json_decode($request->getContent(), true) ?? [];
+        $trackRaw = $data['track'] ?? null;
+        $track = is_string($trackRaw)
+            ? \App\Enum\WorkspaceTestingTrackEnum::tryFrom($trackRaw)
+            : null;
+        if ($track === null) {
+            return $this->jsonError('Invalid track. Expected one of: none, alpha, beta.', 400);
+        }
+
+        $previous = $workspace->getTestingTrack();
+        $workspace->setTestingTrack($track);
+        $workspaceRepository->flush();
+
+        if ($previous !== $track) {
+            $auditService->record(
+                actor: $user,
+                action: \App\Enum\AdminAuditActionEnum::UpdateWorkspaceTestingTrack,
+                targetType: \App\Enum\AdminAuditTargetTypeEnum::Workspace,
+                targetPublicId: (string) $workspace->getPublicId(),
+                targetLabel: $workspace->getName(),
+                metadata: ['from' => $previous->value, 'to' => $track->value],
+            );
+        }
+
+        return $this->jsonSuccess([
+            'publicId' => (string) $workspace->getPublicId(),
+            'testingTrack' => $workspace->getTestingTrack()->value,
         ]);
     }
 }

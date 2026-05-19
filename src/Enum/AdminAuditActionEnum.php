@@ -11,6 +11,7 @@ enum AdminAuditActionEnum: string
     case CancelSubscription = 'cancel_subscription';
     case RestoreWorkspace = 'restore_workspace';
     case UpdateMobileAppConfig = 'update_mobile_app_config';
+    case UpdateWorkspaceTestingTrack = 'update_workspace_testing_track';
 
     public function label(): string
     {
@@ -20,6 +21,7 @@ enum AdminAuditActionEnum: string
             self::CancelSubscription => 'Canceled subscription',
             self::RestoreWorkspace => 'Restored workspace',
             self::UpdateMobileAppConfig => 'Updated mobile app config',
+            self::UpdateWorkspaceTestingTrack => 'Updated workspace testing track',
         };
     }
 }

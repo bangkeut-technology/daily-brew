@@ -64,7 +64,7 @@ class CheckinController extends AbstractController
             'leaveIsFullDay' => $approvedLeave?->isFullDay() ?? false,
             'workspaceTapCheckinEnabled' => $workspace->getSetting()?->isTapCheckinEnabled() ?? false,
             'workspaceNfcCheckinEnabled' => ($workspace->getSetting()?->isNfcCheckinEnabled() ?? false)
-                && $featureFlagService->isEnabled(FeatureFlagEnum::NfcCheckin),
+                && $featureFlagService->isEnabledForWorkspace(FeatureFlagEnum::NfcCheckin, $workspace),
             'today' => [
                 'checkedIn' => $attendance?->getCheckInAt() !== null,
                 'checkedOut' => $attendance?->getCheckOutAt() !== null,

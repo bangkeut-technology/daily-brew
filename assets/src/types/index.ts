@@ -101,6 +101,7 @@ export interface AdminWorkspaceDetail {
     geofencingEnabled: boolean;
     deviceVerificationEnabled: boolean;
   } | null;
+  testingTrack: 'none' | 'alpha' | 'beta';
 }
 
 export interface AdminUserRow {

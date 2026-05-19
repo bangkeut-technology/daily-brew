@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\WorkspaceTestingTrackEnum;
 use App\Repository\WorkspaceRepository;
 use App\Util\TokenGenerator;
 use DateTimeImmutable;
@@ -51,6 +52,13 @@ class Workspace extends AbstractBaseEntity
 
     #[ORM\Column(nullable: true)]
     private ?DateTimeImmutable $deletedAt = null;
+
+    /**
+     * Opt-in cohort for early access to feature-flagged surfaces. Set by
+     * super-admins from the admin workspace detail page.
+     */
+    #[ORM\Column(type: 'string', length: 16, enumType: WorkspaceTestingTrackEnum::class, options: ['default' => 'none'])]
+    private WorkspaceTestingTrackEnum $testingTrack = WorkspaceTestingTrackEnum::None;
 
     /** @var File|UploadedFile|null */
     #[Vich\UploadableField(
@@ -177,6 +185,17 @@ class Workspace extends AbstractBaseEntity
     public function setDeletedAt(?DateTimeImmutable $deletedAt): static
     {
         $this->deletedAt = $deletedAt;
+        return $this;
+    }
+
+    public function getTestingTrack(): WorkspaceTestingTrackEnum
+    {
+        return $this->testingTrack;
+    }
+
+    public function setTestingTrack(WorkspaceTestingTrackEnum $track): static
+    {
+        $this->testingTrack = $track;
         return $this;
     }
 

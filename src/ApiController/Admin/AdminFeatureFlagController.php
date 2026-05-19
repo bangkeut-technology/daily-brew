@@ -7,6 +7,7 @@ namespace App\ApiController\Admin;
 use App\ApiController\Trait\ApiResponseTrait;
 use App\Entity\FeatureFlag;
 use App\Enum\FeatureFlagEnum;
+use App\Enum\FeatureFlagStageEnum;
 use App\Repository\FeatureFlagRepository;
 use App\Service\FeatureFlagService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,17 +23,26 @@ class AdminFeatureFlagController extends AbstractController
     #[Route('', name: 'admin_feature_flags_list', methods: ['GET'])]
     public function list(FeatureFlagService $service): JsonResponse
     {
-        $states = $service->all();
-        $items = array_map(static function (FeatureFlagEnum $case) use ($states) {
+        $stages = $service->getAllStages();
+        $items = array_map(static function (FeatureFlagEnum $case) use ($stages) {
+            $stage = $stages[$case->value] ?? $case->defaultStage();
             return [
                 'key' => $case->value,
                 'label' => $case->label(),
                 'description' => $case->description(),
-                'enabled' => $states[$case->value] ?? false,
+                'stage' => $stage->value,
+                'stageLabel' => $stage->label(),
             ];
         }, FeatureFlagEnum::cases());
 
-        return $this->jsonSuccess(['items' => $items]);
+        return $this->jsonSuccess([
+            'items' => $items,
+            'stages' => array_map(static fn (FeatureFlagStageEnum $s) => [
+                'value' => $s->value,
+                'label' => $s->label(),
+                'description' => $s->description(),
+            ], FeatureFlagStageEnum::cases()),
+        ]);
     }
 
     #[Route('/{flagKey}', name: 'admin_feature_flags_update', methods: ['PUT'])]
@@ -48,14 +58,18 @@ class AdminFeatureFlagController extends AbstractController
         }
 
         $data = json_decode($request->getContent(), true) ?? [];
-        $enabled = (bool) ($data['enabled'] ?? false);
+        $stageRaw = $data['stage'] ?? null;
+        $stage = is_string($stageRaw) ? FeatureFlagStageEnum::tryFrom($stageRaw) : null;
+        if ($stage === null) {
+            return $this->jsonError('Invalid stage. Expected one of: dev, alpha, beta, release.', 400);
+        }
 
         $row = $repository->findByFlag($flag);
         if ($row === null) {
-            $row = new FeatureFlag($flag, $enabled);
+            $row = new FeatureFlag($flag, $stage);
             $repository->persist($row);
         } else {
-            $row->setEnabled($enabled);
+            $row->setStage($stage);
         }
         $repository->flush();
         $service->flushCache();
@@ -64,7 +78,8 @@ class AdminFeatureFlagController extends AbstractController
             'key' => $flag->value,
             'label' => $flag->label(),
             'description' => $flag->description(),
-            'enabled' => $row->isEnabled(),
+            'stage' => $row->getStage()->value,
+            'stageLabel' => $row->getStage()->label(),
         ]);
     }
 }

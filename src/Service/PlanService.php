@@ -97,7 +97,7 @@ class PlanService
 
     public function canUseNfcCheckin(Workspace $workspace): bool
     {
-        if (!$this->featureFlagService->isEnabled(FeatureFlagEnum::NfcCheckin)) {
+        if (!$this->featureFlagService->isEnabledForWorkspace(FeatureFlagEnum::NfcCheckin, $workspace)) {
             return false;
         }
         return $this->isAtLeastEspresso($workspace);

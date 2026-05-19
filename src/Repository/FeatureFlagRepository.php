@@ -6,6 +6,7 @@ namespace App\Repository;
 
 use App\Entity\FeatureFlag;
 use App\Enum\FeatureFlagEnum;
+use App\Enum\FeatureFlagStageEnum;
 use Doctrine\Persistence\ManagerRegistry;
 
 class FeatureFlagRepository extends AbstractRepository
@@ -21,22 +22,22 @@ class FeatureFlagRepository extends AbstractRepository
     }
 
     /**
-     * Returns a map of every flag in the catalog to its current state.
-     * Missing rows fall back to FeatureFlagEnum::defaultEnabled().
+     * Returns a map of every flag in the catalog to its current stage.
+     * Missing rows fall back to FeatureFlagEnum::defaultStage().
      *
-     * @return array<string, bool>
+     * @return array<string, FeatureFlagStageEnum>
      */
-    public function getAllStates(): array
+    public function getAllStages(): array
     {
         $rows = $this->findAll();
         $byKey = [];
         foreach ($rows as $row) {
-            $byKey[$row->getFlagKey()] = $row->isEnabled();
+            $byKey[$row->getFlagKey()] = $row->getStage();
         }
-        $states = [];
+        $stages = [];
         foreach (FeatureFlagEnum::cases() as $case) {
-            $states[$case->value] = $byKey[$case->value] ?? $case->defaultEnabled();
+            $stages[$case->value] = $byKey[$case->value] ?? $case->defaultStage();
         }
-        return $states;
+        return $stages;
     }
 }

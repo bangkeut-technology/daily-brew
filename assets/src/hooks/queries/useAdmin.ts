@@ -183,19 +183,31 @@ export function useUpdateAdminMobileAppConfig() {
   });
 }
 
+export type FeatureFlagStage = 'dev' | 'alpha' | 'beta' | 'release';
+
 export interface AdminFeatureFlagRow {
   key: string;
   label: string;
   description: string;
-  enabled: boolean;
+  stage: FeatureFlagStage;
+  stageLabel: string;
+}
+
+export interface AdminFeatureFlagStageOption {
+  value: FeatureFlagStage;
+  label: string;
+  description: string;
 }
 
 export function useAdminFeatureFlags() {
   return useQuery({
     queryKey: ['admin-feature-flags'],
     queryFn: async () => {
-      const { data } = await apiAxios.get<{ items: AdminFeatureFlagRow[] }>('/admin/feature-flags');
-      return data.items;
+      const { data } = await apiAxios.get<{
+        items: AdminFeatureFlagRow[];
+        stages: AdminFeatureFlagStageOption[];
+      }>('/admin/feature-flags');
+      return data;
     },
   });
 }
@@ -203,12 +215,33 @@ export function useAdminFeatureFlags() {
 export function useUpdateAdminFeatureFlag() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ key, enabled }: { key: string; enabled: boolean }) => {
-      const { data } = await apiAxios.put<AdminFeatureFlagRow>(`/admin/feature-flags/${key}`, { enabled });
+    mutationFn: async ({ key, stage }: { key: string; stage: FeatureFlagStage }) => {
+      const { data } = await apiAxios.put<AdminFeatureFlagRow>(`/admin/feature-flags/${key}`, { stage });
       return data;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin-feature-flags'] });
+      qc.invalidateQueries({ queryKey: ['features'] });
+    },
+  });
+}
+
+export type WorkspaceTestingTrack = 'none' | 'alpha' | 'beta';
+
+export function useUpdateAdminWorkspaceTestingTrack() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ publicId, track }: { publicId: string; track: WorkspaceTestingTrack }) => {
+      const { data } = await apiAxios.put<{ publicId: string; testingTrack: WorkspaceTestingTrack }>(
+        `/admin/workspaces/${publicId}/testing-track`,
+        { track },
+      );
+      return data;
+    },
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: ['admin-workspace', vars.publicId] });
+      qc.invalidateQueries({ queryKey: ['admin-workspaces'] });
+      qc.invalidateQueries({ queryKey: ['admin-audit-log'] });
       qc.invalidateQueries({ queryKey: ['features'] });
     },
   });

@@ -2,10 +2,17 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { ArrowLeft, Ban, RotateCcw } from 'lucide-react';
-import { useAdminWorkspace, useCancelWorkspaceSubscription, useRestoreWorkspace } from '@/hooks/queries/useAdmin';
+import {
+  useAdminWorkspace,
+  useCancelWorkspaceSubscription,
+  useRestoreWorkspace,
+  useUpdateAdminWorkspaceTestingTrack,
+  type WorkspaceTestingTrack,
+} from '@/hooks/queries/useAdmin';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
+import { CustomSelect } from '@/components/shared/CustomSelect';
 import { cn } from '@/lib/utils';
 
 export const Route = createFileRoute('/admin/workspaces/$publicId/')({
@@ -17,6 +24,7 @@ function AdminWorkspaceDetailPage() {
   const { data: ws, isLoading } = useAdminWorkspace(publicId);
   const cancelMutation = useCancelWorkspaceSubscription();
   const restoreMutation = useRestoreWorkspace();
+  const trackMutation = useUpdateAdminWorkspaceTestingTrack();
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [confirmRestore, setConfirmRestore] = useState(false);
 
@@ -142,6 +150,33 @@ function AdminWorkspaceDetailPage() {
               </>
             )}
           </dl>
+        </GlassCard>
+
+        <GlassCard hover={false}>
+          <GlassCardHeader title="Testing track" />
+          <div className="p-5 space-y-3">
+            <p className="text-[13px] text-text-secondary leading-relaxed">
+              Opts this workspace into early access for feature-flagged surfaces. Alpha sees every stage (dev when running locally + alpha + beta + release); beta sees beta + release; none sees release only.
+            </p>
+            <div className="w-48">
+              <CustomSelect
+                value={ws.testingTrack}
+                onChange={async (v) => {
+                  try {
+                    await trackMutation.mutateAsync({ publicId, track: v as WorkspaceTestingTrack });
+                    toast.success(`Testing track set to ${v}`);
+                  } catch {
+                    toast.error('Failed to update testing track');
+                  }
+                }}
+                options={[
+                  { value: 'none', label: 'No testing track' },
+                  { value: 'alpha', label: 'Alpha tester' },
+                  { value: 'beta', label: 'Beta tester' },
+                ]}
+              />
+            </div>
+          </div>
         </GlassCard>
       </div>
 
