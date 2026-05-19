@@ -9,4 +9,5 @@ enum AdminAuditTargetTypeEnum: string
     case User = 'user';
     case Workspace = 'workspace';
     case Subscription = 'subscription';
+    case MobileAppConfig = 'mobile_app_config';
 }

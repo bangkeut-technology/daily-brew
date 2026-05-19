@@ -10,6 +10,7 @@ enum AdminAuditActionEnum: string
     case DemoteUser = 'demote_user';
     case CancelSubscription = 'cancel_subscription';
     case RestoreWorkspace = 'restore_workspace';
+    case UpdateMobileAppConfig = 'update_mobile_app_config';
 
     public function label(): string
     {
@@ -18,6 +19,7 @@ enum AdminAuditActionEnum: string
             self::DemoteUser => 'Demoted user',
             self::CancelSubscription => 'Canceled subscription',
             self::RestoreWorkspace => 'Restored workspace',
+            self::UpdateMobileAppConfig => 'Updated mobile app config',
         };
     }
 }
