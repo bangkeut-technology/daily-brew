@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.61.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.60.0...v1.61.0) (2026-05-19)
+
+
+### Features
+
+* **admin:** mobile app config page to manage Universal Links / App Links ([626b116](https://github.com/bangkeut-technology/daily-brew/commit/626b1164288a252f89a03e827dc51d6ca99f6dbe))
+* **console:** show "Copy URL for NFC tag" row on QR displays ([09d3518](https://github.com/bangkeut-technology/daily-brew/commit/09d35181b8708c554ef0ecf31c8c728f6174c6d0))
+* **well-known:** serve iOS Universal Links + Android App Links manifests ([eaaa69b](https://github.com/bangkeut-technology/daily-brew/commit/eaaa69b219dd6a1aea8db79ec307e6bffd04b828))
+
 ## [1.60.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.59.0...v1.60.0) (2026-05-19)
 
 
