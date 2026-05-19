@@ -58,24 +58,71 @@ function formatDayLabel(dateStr: string): string {
   return `${weekday} ${day}`;
 }
 
-/** Letter code + color for the Gantt grid cell */
-function ganttCell(day: AttendanceDayStatus): { code: string; bg: string; text: string; title: string } {
+/** Visual instructions for a single Gantt cell. */
+type GanttCellSpec =
+  | { kind: 'dot-filled'; title: string }
+  | { kind: 'dot-open'; title: string }
+  | { kind: 'dot-muted'; title: string }
+  | { kind: 'badge'; code: string; bg: string; text: string; title: string };
+
+function ganttCell(day: AttendanceDayStatus, hasShift: boolean): GanttCellSpec {
   switch (day.status) {
     case 'present':
       if (day.isLate)
-        return { code: 'Lt', bg: 'bg-amber/15', text: 'text-amber', title: `Late \u2014 ${day.checkInAt || ''}` };
+        return { kind: 'badge', code: 'Lt', bg: 'bg-amber/15', text: 'text-amber', title: `Late \u2014 ${day.checkInAt || ''}` };
       if (day.leftEarly)
-        return { code: 'E', bg: 'bg-amber/15', text: 'text-amber', title: `Left early \u2014 ${day.checkOutAt || ''}` };
-      return { code: 'P', bg: 'bg-green/12', text: 'text-green', title: `Present \u2014 ${day.checkInAt || ''}${day.checkOutAt ? ` \u2192 ${day.checkOutAt}` : ''}` };
+        return { kind: 'badge', code: 'E', bg: 'bg-amber/15', text: 'text-amber', title: `Left early \u2014 ${day.checkOutAt || ''}` };
+      return { kind: 'dot-filled', title: `Present \u2014 ${day.checkInAt || ''}${day.checkOutAt ? ` \u2192 ${day.checkOutAt}` : ''}` };
     case 'absent':
-      return { code: 'A', bg: 'bg-red/12', text: 'text-red', title: 'Absent' };
+      return hasShift
+        ? { kind: 'dot-open', title: 'Absent' }
+        : { kind: 'dot-muted', title: 'Not tracked' };
     case 'leave':
-      return { code: 'Lv', bg: 'bg-[#3B6FA0]/12', text: 'text-blue', title: day.leaveType === 'paid' ? 'Paid leave' : 'Unpaid leave' };
+      return { kind: 'badge', code: 'Lv', bg: 'bg-[#3B6FA0]/12', text: 'text-blue', title: day.leaveType === 'paid' ? 'Paid leave' : 'Unpaid leave' };
     case 'closure':
-      return { code: 'C', bg: 'bg-[#AE9D95]/10', text: 'text-text-tertiary', title: 'Closed' };
+      return { kind: 'badge', code: 'C', bg: 'bg-[#AE9D95]/10', text: 'text-text-tertiary', title: 'Closed' };
     case 'upcoming':
-      return { code: '\u2013', bg: '', text: 'text-text-tertiary/40', title: 'Upcoming' };
+      return { kind: 'dot-muted', title: 'Upcoming' };
   }
+}
+
+function GanttCellGlyph({ spec }: { spec: GanttCellSpec }) {
+  if (spec.kind === 'badge') {
+    return (
+      <span
+        title={spec.title}
+        className={cn(
+          'inline-flex items-center justify-center w-[26px] h-[22px] rounded text-[11px] font-semibold font-mono cursor-default',
+          spec.bg,
+          spec.text,
+        )}
+      >
+        {spec.code}
+      </span>
+    );
+  }
+  if (spec.kind === 'dot-filled') {
+    return (
+      <span title={spec.title} className="inline-flex items-center justify-center w-[26px] h-[22px] cursor-default">
+        <span className="block w-[10px] h-[10px] rounded-full bg-green" />
+      </span>
+    );
+  }
+  if (spec.kind === 'dot-open') {
+    return (
+      <span title={spec.title} className="inline-flex items-center justify-center w-[26px] h-[22px] cursor-default">
+        <span className="block w-[10px] h-[10px] rounded-full border-[1.5px] border-red/55" />
+      </span>
+    );
+  }
+  return (
+    <span
+      title={spec.title}
+      className="inline-flex items-center justify-center w-[26px] h-[22px] text-text-tertiary/35 text-[12px] font-mono cursor-default"
+    >
+      \u2013
+    </span>
+  );
 }
 
 export const Route = createFileRoute('/console/attendance/')({
@@ -154,6 +201,7 @@ function AttendancePage() {
 
   // Extract day numbers from the first employee's days for the Gantt header
   const ganttDays = filteredSummary?.[0]?.days ?? [];
+  const todayStr = wsTz.today();
 
   if (roleLoading) {
     return (
@@ -232,13 +280,23 @@ function AttendancePage() {
 
       {/* ── Legend (shown for gantt and summary) ── */}
       {view !== 'log' && (
-        <div className="flex flex-wrap gap-3 mb-4 text-[12px] font-medium">
-          <span className="flex items-center gap-1"><span className="inline-block w-5 h-5 rounded bg-green/12 text-green text-center leading-5 font-mono text-[11px]">P</span> Present</span>
-          <span className="flex items-center gap-1"><span className="inline-block w-5 h-5 rounded bg-red/12 text-red text-center leading-5 font-mono text-[11px]">A</span> Absent</span>
-          <span className="flex items-center gap-1"><span className="inline-block w-5 h-5 rounded bg-amber/15 text-amber text-center leading-5 font-mono text-[11px]">Lt</span> Late</span>
-          <span className="flex items-center gap-1"><span className="inline-block w-5 h-5 rounded bg-amber/15 text-amber text-center leading-5 font-mono text-[11px]">E</span> Early leave</span>
-          <span className="flex items-center gap-1"><span className="inline-block w-5 h-5 rounded bg-[#3B6FA0]/12 text-blue text-center leading-5 font-mono text-[11px]">Lv</span> Leave</span>
-          <span className="flex items-center gap-1"><span className="inline-block w-5 h-5 rounded bg-[#AE9D95]/10 text-text-tertiary text-center leading-5 font-mono text-[11px]">C</span> Closed</span>
+        <div className="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-[12px] font-medium text-text-secondary">
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block w-[10px] h-[10px] rounded-full bg-green" />
+            {t('attendance.present', 'Present')}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block w-[10px] h-[10px] rounded-full border-[1.5px] border-red/55" />
+            {t('attendance.absent', 'Absent')}
+          </span>
+          <span className="flex items-center gap-1.5"><span className="inline-block w-5 h-5 rounded bg-amber/15 text-amber text-center leading-5 font-mono text-[11px]">Lt</span> {t('attendance.late', 'Late')}</span>
+          <span className="flex items-center gap-1.5"><span className="inline-block w-5 h-5 rounded bg-amber/15 text-amber text-center leading-5 font-mono text-[11px]">E</span> {t('attendance.earlyLeave', 'Early leave')}</span>
+          <span className="flex items-center gap-1.5"><span className="inline-block w-5 h-5 rounded bg-[#3B6FA0]/12 text-blue text-center leading-5 font-mono text-[11px]">Lv</span> {t('attendance.leave', 'Leave')}</span>
+          <span className="flex items-center gap-1.5"><span className="inline-block w-5 h-5 rounded bg-[#AE9D95]/10 text-text-tertiary text-center leading-5 font-mono text-[11px]">C</span> {t('attendance.closed', 'Closed')}</span>
+          <span className="flex items-center gap-1.5 text-text-tertiary/70">
+            <span className="inline-flex items-center justify-center w-5 h-5 text-text-tertiary/45 font-mono">–</span>
+            {t('attendance.notTracked', 'Not tracked')}
+          </span>
         </div>
       )}
 
@@ -256,73 +314,104 @@ function AttendancePage() {
               <table className="w-full border-collapse text-[12px]">
                 <thead>
                   <tr>
-                    <th className="sticky left-0 z-10 bg-glass-bg backdrop-blur-md text-left px-3 py-2.5 text-[13px] font-semibold text-text-primary border-b border-cream-3/60 min-w-[140px]">
+                    <th className="sticky left-0 z-10 bg-glass-bg backdrop-blur-md text-left px-3 py-2.5 text-[13px] font-semibold text-text-primary border-b border-cream-3/60 min-w-[200px]">
                       {t('attendance.employee', 'Employee')}
                     </th>
                     {ganttDays.map((day) => {
                       const d = parseDateAsUTC(day.date);
                       const dayNum = d.getUTCDate();
                       const weekday = d.toLocaleDateString('en', { weekday: 'narrow', timeZone: 'UTC' });
-                      const isWeekend = d.getUTCDay() === 0 || d.getUTCDay() === 6;
+                      const dow = d.getUTCDay();
+                      const isWeekend = dow === 0 || dow === 6;
+                      const isWeekEnd = dow === 0; // Sunday → draw divider on the right
+                      const isToday = day.date === todayStr;
                       return (
                         <th
                           key={day.date}
                           className={cn(
-                            'px-0.5 py-2 text-center font-medium border-b border-cream-3/60 min-w-[32px]',
-                            isWeekend ? 'text-text-tertiary/60' : 'text-text-secondary',
+                            'px-0.5 pt-1.5 pb-1 text-center font-medium border-b border-cream-3/60 min-w-[32px] relative',
+                            isWeekend && !isToday && 'bg-cream-3/30',
+                            isToday && 'bg-coffee/8',
+                            isWeekEnd && 'border-r border-cream-3/55',
+                            isWeekend ? 'text-text-tertiary/70' : 'text-text-secondary',
                           )}
                         >
+                          {isToday && (
+                            <span className="absolute -top-0.5 left-1/2 -translate-x-1/2 text-[8.5px] font-semibold uppercase tracking-wider text-coffee leading-none">
+                              ↓
+                            </span>
+                          )}
                           <div className="text-[10px] leading-tight">{weekday}</div>
-                          <div className="text-[12px] tabular-nums leading-tight">{dayNum}</div>
+                          <div
+                            className={cn(
+                              'text-[12px] tabular-nums leading-tight',
+                              isToday && 'text-coffee font-semibold',
+                            )}
+                          >
+                            {dayNum}
+                          </div>
                         </th>
                       );
                     })}
-                    <th className="px-3 py-2.5 text-center text-[11px] font-semibold text-text-secondary border-b border-cream-3/60 min-w-[32px]">P</th>
-                    <th className="px-3 py-2.5 text-center text-[11px] font-semibold text-red border-b border-cream-3/60 min-w-[32px]">A</th>
-                    <th className="px-3 py-2.5 text-center text-[11px] font-semibold text-amber border-b border-cream-3/60 min-w-[32px]">Lt</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredSummary.map((emp, empIdx) => {
+                    const hasShift = !!emp.shiftName;
                     const presentCount = emp.days.filter((d) => d.status === 'present').length;
                     const absentCount = emp.days.filter((d) => d.status === 'absent').length;
                     const lateCount = emp.days.filter((d) => d.status === 'present' && d.isLate).length;
+                    const leaveCount = emp.days.filter((d) => d.status === 'leave').length;
+                    const scheduledDays = emp.days.filter((d) => d.status !== 'closure' && d.status !== 'upcoming').length;
 
                     return (
                       <tr key={emp.employeePublicId} className="hover:bg-cream-3/25 transition-colors duration-[120ms]">
                         <td className="sticky left-0 z-10 bg-glass-bg backdrop-blur-md px-3 py-2 border-b border-cream-3/30">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2.5">
                             <Avatar name={emp.employeeName} index={empIdx} size={26} />
-                            <div>
-                              <div className="text-[13px] font-medium text-text-primary leading-tight truncate max-w-[120px]">
+                            <div className="min-w-0 flex-1">
+                              <div className="text-[13px] font-medium text-text-primary leading-tight truncate">
                                 {emp.employeeName}
                               </div>
-                              <div className="text-[10.5px] text-text-tertiary leading-tight">
-                                {emp.shiftName || 'No shift'}
+                              <div className="text-[10.5px] text-text-tertiary leading-tight mt-0.5">
+                                {emp.shiftName || t('attendance.noShift', 'No shift')}
                               </div>
+                              {hasShift ? (
+                                <div className="flex items-center gap-2 mt-1 text-[10.5px] font-medium tabular-nums">
+                                  <span className="text-green">{presentCount}/{scheduledDays}</span>
+                                  {absentCount > 0 && <span className="text-red">· {absentCount} abs</span>}
+                                  {lateCount > 0 && <span className="text-amber">· {lateCount} late</span>}
+                                  {leaveCount > 0 && <span className="text-blue">· {leaveCount} lv</span>}
+                                </div>
+                              ) : (
+                                <div className="text-[10.5px] text-text-tertiary/60 italic mt-1">
+                                  {t('attendance.noShiftHint', 'attendance not tracked')}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </td>
                         {emp.days.map((day) => {
-                          const cell = ganttCell(day);
+                          const cell = ganttCell(day, hasShift);
+                          const d = parseDateAsUTC(day.date);
+                          const dow = d.getUTCDay();
+                          const isWeekend = dow === 0 || dow === 6;
+                          const isWeekEnd = dow === 0;
+                          const isToday = day.date === todayStr;
                           return (
-                            <td key={day.date} className="px-0.5 py-1.5 text-center border-b border-cream-3/30">
-                              <span
-                                title={cell.title}
-                                className={cn(
-                                  'inline-flex items-center justify-center w-[28px] h-[24px] rounded text-[11px] font-semibold font-mono cursor-default',
-                                  cell.bg,
-                                  cell.text,
-                                )}
-                              >
-                                {cell.code}
-                              </span>
+                            <td
+                              key={day.date}
+                              className={cn(
+                                'px-0.5 py-1.5 text-center border-b border-cream-3/30',
+                                isWeekend && !isToday && 'bg-cream-3/20',
+                                isToday && 'bg-coffee/6',
+                                isWeekEnd && 'border-r border-cream-3/40',
+                              )}
+                            >
+                              <GanttCellGlyph spec={cell} />
                             </td>
                           );
                         })}
-                        <td className="px-3 py-2 text-center text-[12px] font-semibold text-green tabular-nums border-b border-cream-3/30">{presentCount}</td>
-                        <td className="px-3 py-2 text-center text-[12px] font-semibold text-red tabular-nums border-b border-cream-3/30">{absentCount}</td>
-                        <td className="px-3 py-2 text-center text-[12px] font-semibold text-amber tabular-nums border-b border-cream-3/30">{lateCount}</td>
                       </tr>
                     );
                   })}
