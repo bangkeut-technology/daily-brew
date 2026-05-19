@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.59.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.58.1...v1.59.0) (2026-05-19)
+
+
+### Features
+
+* **attendance:** redesign monthly gantt grid for scanability ([1534586](https://github.com/bangkeut-technology/daily-brew/commit/15345864b49347eed99d3a25a9b545503887394c))
+
 ## [1.58.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.58.0...v1.58.1) (2026-05-18)
 
 
