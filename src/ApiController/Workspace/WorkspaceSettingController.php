@@ -131,6 +131,16 @@ class WorkspaceSettingController extends AbstractController
             $setting->setTapCheckinEnabled(false);
         }
 
+        // NFC check-in (Espresso gated)
+        if (isset($data['nfcCheckinEnabled']) && $data['nfcCheckinEnabled']) {
+            if (!$planService->canUseNfcCheckin($workspace)) {
+                return $this->jsonError('NFC check-in requires the Espresso plan', 402);
+            }
+            $setting->setNfcCheckinEnabled(true);
+        } elseif (isset($data['nfcCheckinEnabled'])) {
+            $setting->setNfcCheckinEnabled(false);
+        }
+
         if (array_key_exists('telegramChatId', $data)) {
             $chatId = $data['telegramChatId'];
             $setting->setTelegramChatId(is_string($chatId) && $chatId !== '' ? $chatId : null);
@@ -249,6 +259,7 @@ class WorkspaceSettingController extends AbstractController
             'telegramNotificationsEnabled' => $setting?->isTelegramNotificationsEnabled() ?? false,
             'telegramChatId' => $setting?->getTelegramChatId(),
             'tapCheckinEnabled' => $setting?->isTapCheckinEnabled() ?? false,
+            'nfcCheckinEnabled' => $setting?->isNfcCheckinEnabled() ?? false,
         ];
     }
 }

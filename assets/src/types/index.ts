@@ -184,6 +184,7 @@ export interface WorkspaceSetting {
   telegramNotificationsEnabled: boolean;
   telegramChatId: string | null;
   tapCheckinEnabled: boolean;
+  nfcCheckinEnabled: boolean;
 }
 
 export interface ShiftTimeRule {
@@ -366,6 +367,7 @@ export interface PlanDetails {
   canUseManagers: boolean;
   canUseTelegramNotifications: boolean;
   canUseTapCheckin: boolean;
+  canUseNfcCheckin: boolean;
   canUseSubQrCodes: boolean;
   managerLimit: number | null;
   managerCount: number;

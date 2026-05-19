@@ -60,6 +60,7 @@ class CheckinController extends AbstractController
             'onLeave' => $approvedLeave !== null,
             'leaveIsFullDay' => $approvedLeave?->isFullDay() ?? false,
             'workspaceTapCheckinEnabled' => $workspace->getSetting()?->isTapCheckinEnabled() ?? false,
+            'workspaceNfcCheckinEnabled' => $workspace->getSetting()?->isNfcCheckinEnabled() ?? false,
             'today' => [
                 'checkedIn' => $attendance?->getCheckInAt() !== null,
                 'checkedOut' => $attendance?->getCheckOutAt() !== null,

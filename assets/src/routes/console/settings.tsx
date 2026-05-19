@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import * as Dialog from '@radix-ui/react-dialog';
-import { Crown, Check, MapPin, MousePointerClick, Navigation, Smartphone, Building2, Users, Calendar, Plus, X, Copy, Pencil, Trash2, Send } from 'lucide-react';
+import { Crown, Check, MapPin, MousePointerClick, Navigation, Nfc, Smartphone, Building2, Users, Calendar, Plus, X, Copy, Pencil, Trash2, Send } from 'lucide-react';
 import { useDateFormat } from '@/hooks/useDateFormat';
 import { usePaddle } from '@/hooks/usePaddle';
 import { useDevTogglePlan } from '@/hooks/useDevTogglePlan';
@@ -113,6 +113,9 @@ function SettingsPage() {
   // Button check-in state
   const [tapCheckinEnabled, setTapCheckinEnabled] = useState(false);
 
+  // NFC check-in state
+  const [nfcCheckinEnabled, setNfcCheckinEnabled] = useState(false);
+
   // Telegram state
   const [telegramEnabled, setTelegramEnabled] = useState(false);
   const [telegramChatId, setTelegramChatId] = useState('');
@@ -135,6 +138,7 @@ function SettingsPage() {
       setDateFormat(settings.dateFormat || 'DD/MM/YYYY');
       setDeviceVerificationEnabled(settings.deviceVerificationEnabled);
       setTapCheckinEnabled(settings.tapCheckinEnabled);
+      setNfcCheckinEnabled(settings.nfcCheckinEnabled);
       setTelegramEnabled(settings.telegramNotificationsEnabled);
       setTelegramChatId(settings.telegramChatId || '');
       setGeofencingEnabled(settings.geofencingEnabled);
@@ -162,6 +166,7 @@ function SettingsPage() {
         telegramNotificationsEnabled: telegramEnabled,
         telegramChatId: telegramEnabled ? (telegramChatId.trim() || null) : null,
         tapCheckinEnabled,
+        nfcCheckinEnabled,
       });
       toast.success('Settings saved');
     } catch {
@@ -1006,6 +1011,59 @@ function SettingsPage() {
               </p>
 
               {tapCheckinEnabled && plan?.canUseTapCheckin && (
+                <button
+                  onClick={handleSaveSettings}
+                  disabled={updateSettings.isPending}
+                  className="px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50"
+                >
+                  {updateSettings.isPending ? t('common.loading') : t('common.save')}
+                </button>
+              )}
+            </div>
+          </GlassCard>
+        )}
+
+        {/* NFC check-in settings */}
+        {currentWsId && (
+          <GlassCard hover={false} className="lg:col-span-2 scroll-mt-6" id="settings-nfc-checkin">
+            <GlassCardHeader
+              title={t('settings.nfcCheckin', 'NFC check-in')}
+              action={
+                <div className="flex items-center gap-2">
+                  <Nfc size={14} className="text-amber" />
+                  {nfcCheckinEnabled && plan?.canUseNfcCheckin && (
+                    <StatusBadge label="Active" variant="green" />
+                  )}
+                </div>
+              }
+            />
+            <div className="p-5 space-y-4">
+              <div className="flex items-center gap-2">
+                <Toggle
+                  id="nfc-checkin"
+                  checked={nfcCheckinEnabled && (plan?.canUseNfcCheckin ?? false)}
+                  onChange={(v) => {
+                    if (!plan?.canUseNfcCheckin) { upgradeModal.openFor('nfcCheckin'); return; }
+                    setNfcCheckinEnabled(v);
+                  }}
+                />
+                <label htmlFor="nfc-checkin" className="text-[15px] text-text-primary cursor-pointer">
+                  {t('settings.enableNfcCheckin', 'Allow check-in by tapping an NFC tag')}
+                  {!plan?.canUseNfcCheckin && (
+                    <span className="ml-1.5 text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
+                      Espresso
+                    </span>
+                  )}
+                </label>
+              </div>
+              <p className="text-[14px] text-text-tertiary leading-relaxed">
+                {t(
+                  'settings.nfcCheckinDesc',
+                  'When enabled, employees can check in by tapping their phone against an NFC tag (NTAG213 sticker, ~$1 each) placed at your workspace. Program the tag with your workspace QR token using a free tag-writing app like NFC Tools. IP, geofence, and device verification still apply.',
+                )}
+              </p>
+
+              {nfcCheckinEnabled && plan?.canUseNfcCheckin && (
                 <button
                   onClick={handleSaveSettings}
                   disabled={updateSettings.isPending}

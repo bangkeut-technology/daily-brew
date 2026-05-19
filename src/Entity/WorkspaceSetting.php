@@ -60,6 +60,9 @@ class WorkspaceSetting extends AbstractBaseEntity
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $tapCheckinEnabled = false;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $nfcCheckinEnabled = false;
+
     // ── Workspace ──────────────────────────────────────────────
 
     public function getWorkspace(): ?Workspace
@@ -214,6 +217,19 @@ class WorkspaceSetting extends AbstractBaseEntity
     public function setTapCheckinEnabled(bool $tapCheckinEnabled): static
     {
         $this->tapCheckinEnabled = $tapCheckinEnabled;
+        return $this;
+    }
+
+    // ── NFC check-in ──────────────────────────────────────────
+
+    public function isNfcCheckinEnabled(): bool
+    {
+        return $this->nfcCheckinEnabled;
+    }
+
+    public function setNfcCheckinEnabled(bool $nfcCheckinEnabled): static
+    {
+        $this->nfcCheckinEnabled = $nfcCheckinEnabled;
         return $this;
     }
 }

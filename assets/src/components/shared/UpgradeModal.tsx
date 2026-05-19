@@ -8,6 +8,7 @@ import {
   Globe,
   MapPin,
   MousePointerClick,
+  Nfc,
   Smartphone,
   FileText,
   Clock,
@@ -32,6 +33,7 @@ const featureConfig: Record<EspressoFeature, { icon: LucideIcon; titleKey: strin
   shiftTimeRules: { icon: Clock, titleKey: 'upgrade.shiftTimeRules.title', descKey: 'upgrade.shiftTimeRules.description' },
   telegramNotifications: { icon: Send, titleKey: 'upgrade.telegramNotifications.title', descKey: 'upgrade.telegramNotifications.description' },
   tapCheckin: { icon: MousePointerClick, titleKey: 'upgrade.tapCheckin.title', descKey: 'upgrade.tapCheckin.description' },
+  nfcCheckin: { icon: Nfc, titleKey: 'upgrade.nfcCheckin.title', descKey: 'upgrade.nfcCheckin.description' },
 };
 
 const espressoBenefits = [
