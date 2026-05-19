@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown, Check, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -18,11 +19,18 @@ interface CustomSelectProps {
   renderSelected?: (option: SelectOption) => React.ReactNode;
 }
 
+interface MenuPosition {
+  top: number;
+  left: number;
+  width: number;
+  dropUp: boolean;
+}
+
 export function CustomSelect({
   value,
   onChange,
   options,
-  placeholder = 'Select\u2026',
+  placeholder = 'Select…',
   className = '',
   searchable,
   renderOption,
@@ -33,7 +41,7 @@ export function CustomSelect({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
-  const [dropUp, setDropUp] = useState(false);
+  const [position, setPosition] = useState<MenuPosition | null>(null);
 
   const showSearch = searchable ?? options.length > 8;
 
@@ -52,11 +60,31 @@ export function CustomSelect({
     return () => document.removeEventListener('mousedown', handleClick);
   }, [open]);
 
-  // Determine drop direction
+  // Anchor the portaled menu to the trigger; recompute on scroll/resize so
+  // it tracks the trigger even when an ancestor scrolls.
   useLayoutEffect(() => {
-    if (!open || !triggerRef.current) return;
-    const rect = triggerRef.current.getBoundingClientRect();
-    setDropUp(window.innerHeight - rect.bottom < 260);
+    if (!open) return;
+    const update = () => {
+      const trigger = triggerRef.current;
+      if (!trigger) return;
+      const rect = trigger.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const dropUp = spaceBelow < 260;
+      setPosition({
+        top: dropUp ? rect.top : rect.bottom,
+        left: rect.left,
+        width: rect.width,
+        dropUp,
+      });
+    };
+    update();
+    // capture phase catches scroll on any ancestor, not just window
+    window.addEventListener('scroll', update, true);
+    window.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('scroll', update, true);
+      window.removeEventListener('resize', update);
+    };
   }, [open]);
 
   useEffect(() => {
@@ -72,7 +100,7 @@ export function CustomSelect({
     : options;
 
   return (
-    <div className={cn('relative', open && 'z-[100]', className)}>
+    <div className={cn('relative', className)}>
       <button
         ref={triggerRef}
         type="button"
@@ -88,11 +116,17 @@ export function CustomSelect({
         />
       </button>
 
-      {open && (
+      {open && position && createPortal(
         <div
           ref={dropdownRef}
-          className="absolute left-0 w-full rounded-xl bg-cream dark:bg-[#1E1916] border border-glass-border shadow-lg overflow-hidden z-[9999]"
-          style={dropUp ? { bottom: '100%', marginBottom: 4 } : { top: '100%', marginTop: 4 }}
+          className="fixed rounded-xl bg-cream dark:bg-[#1E1916] border border-glass-border shadow-lg overflow-hidden z-[9999]"
+          style={{
+            left: position.left,
+            width: position.width,
+            ...(position.dropUp
+              ? { bottom: window.innerHeight - position.top + 4 }
+              : { top: position.top + 4 }),
+          }}
         >
           {showSearch && (
             <div className="px-2 pt-2 pb-1">
@@ -103,7 +137,7 @@ export function CustomSelect({
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search\u2026"
+                  placeholder="Search…"
                   className="w-full pl-7 pr-3 py-1.5 rounded-lg text-[14.5px] bg-cream-3/30 border border-cream-3/60 text-text-primary outline-none focus:border-coffee transition-colors"
                 />
               </div>
@@ -137,7 +171,8 @@ export function CustomSelect({
               ))
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
