@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.63.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.63.1...v1.63.2) (2026-05-19)
+
+
+### Bug Fixes
+
+* **admin:** render subscriptions plan as a coloured badge ([062f0f5](https://github.com/bangkeut-technology/daily-brew/commit/062f0f5310df715662f83bf26f0e174bb0597aaf))
+* **ui:** portal CustomSelect menu to escape GlassCard overflow clipping ([2f78e69](https://github.com/bangkeut-technology/daily-brew/commit/2f78e69bf4da17d1963ea83d6e860382132bc38c))
+
 ## [1.63.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.63.0...v1.63.1) (2026-05-19)
 
 
