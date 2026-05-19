@@ -20,7 +20,7 @@ function GuidesIndexPage() {
       />
       <LandingNav />
 
-      <div className="pt-28 pb-20 px-6 md:px-8 max-w-4xl mx-auto page-enter">
+      <div className="pt-28 pb-20 px-6 md:px-8 max-w-6xl mx-auto page-enter">
         <motion.div
           className="text-center mb-14"
           initial={{ opacity: 0, y: 20 }}
@@ -40,7 +40,7 @@ function GuidesIndexPage() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {playbooks.map((pb, i) => {
             const Icon = pb.icon;
             return (

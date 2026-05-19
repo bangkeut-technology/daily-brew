@@ -2,6 +2,7 @@ import {
   Building2,
   Smartphone,
   Crown,
+  Nfc,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -22,7 +23,7 @@ export type PlaybookStep = {
 };
 
 export type Playbook = {
-  key: 'owner' | 'employee' | 'espresso';
+  key: 'owner' | 'employee' | 'espresso' | 'nfc';
   title: string;
   subtitle: string;
   /** Short one-line teaser used on hubs / persona cards */
@@ -30,7 +31,7 @@ export type Playbook = {
   icon: LucideIcon;
   accent: string;
   /** Route to the detailed playbook page */
-  to: '/guides/owner' | '/guides/employee' | '/guides/espresso';
+  to: '/guides/owner' | '/guides/employee' | '/guides/espresso' | '/guides/nfc';
   steps: PlaybookStep[];
 };
 
@@ -156,6 +157,11 @@ export const playbooks: Playbook[] = [
         link: { to: '/console/settings', hash: 'settings-device-verification', label: 'Open device verification' },
       },
       {
+        title: 'Try NFC check-in (optional)',
+        desc: 'Replace the QR scan with a one-second tap against an NFC sticker. NTAG213 tags cost about a dollar each and program in 30 seconds with a free app.',
+        link: { to: '/guides/nfc', label: 'Set up NFC check-in', requireAuth: false },
+      },
+      {
         title: 'Promote a manager',
         desc: 'Employee detail → set role to manager. Managers approve leave and see all attendance, up to 2 per workspace on Espresso.',
         link: { to: '/console/employees', label: 'Open Employees' },
@@ -163,6 +169,61 @@ export const playbooks: Playbook[] = [
       {
         title: 'Connect BasilBook',
         desc: 'Settings → API tokens → Generate. Copy the token once and paste it into BasilBook to sync attendance with your accounting.',
+      },
+    ],
+  },
+  {
+    key: 'nfc',
+    title: 'Set up NFC check-in',
+    subtitle: 'Replace the QR scan with a one-second tap against an NFC sticker.',
+    teaser: 'Buy stickers, program them with your workspace URL, place them at the counter — staff tap their phone and they\'re in.',
+    icon: Nfc,
+    accent: '#3B6FA0',
+    to: '/guides/nfc',
+    steps: [
+      {
+        title: 'Make sure you\'re on Espresso',
+        desc: 'NFC check-in is included in Espresso along with geofencing, device verification, and managers. Free plans see a "Espresso" badge next to the NFC toggle.',
+        link: { to: '/console/settings', label: 'Open Settings' },
+      },
+      {
+        title: 'Turn on NFC check-in',
+        desc: 'Console → Settings → "NFC check-in" card → flip the toggle, then Save. This unlocks the "Tap NFC tag" button on each employee\'s home screen in the mobile app.',
+        link: { to: '/console/settings', hash: 'settings-nfc-checkin', label: 'Open NFC check-in settings' },
+      },
+      {
+        title: 'Copy your check-in URL',
+        desc: 'Console → Dashboard → "Check-in QR code" card. Under the QR you\'ll see a "For NFC tags" row with the URL — click the copy icon. The URL looks like https://dailybrew.work/checkin/<your-token>. Each workspace has its own URL, so if you run multiple restaurants copy each one separately.',
+        link: { to: '/console/dashboard', label: 'Open Dashboard' },
+      },
+      {
+        title: 'Buy NTAG213 NFC stickers',
+        desc: 'NTAG213 holds 137 bytes — plenty for our URL — and runs about $0.50–$1 each. Search "NTAG213 sticker" on Amazon or Lazada. Get round stickers for the host stand, PVC cards for the till, or key fobs for managers. NTAG215 (504 bytes) works too if you want headroom.',
+      },
+      {
+        title: 'Install a free tag-writing app',
+        desc: 'On the phone you\'ll use to program the tags, install "NFC Tools" (wakdev, free on iOS and Android) or NXP "TagWriter" on Android. You only need this once.',
+      },
+      {
+        title: 'Write the URL onto a sticker',
+        desc: 'In NFC Tools: Write tab → Add a record → URL/URI → paste the URL you copied → OK → Write. Hold your phone against a blank sticker. You\'ll feel a buzz in 1–2 seconds when it\'s done. Repeat for each sticker.',
+      },
+      {
+        title: 'Lock the stickers (recommended)',
+        desc: 'In NFC Tools: Other → Lock tag. This makes the sticker read-only forever so a staff member can\'t accidentally — or intentionally — overwrite it. Skip if you might re-program later.',
+      },
+      {
+        title: 'Stick them where staff naturally pass',
+        desc: 'Front of the host stand, under the bar lip, beside the time-clock area. The phone needs to be within 1–4 cm of the sticker, so avoid putting it behind glass or thick wood. Adding a small "Tap to check in" label next to it removes confusion on day one.',
+      },
+      {
+        title: 'Test the tap',
+        desc: 'Lock your phone (or close the DailyBrew app). Tap the sticker. On iPhone XS or newer, a banner appears at the top — tap it. On older iPhones, open the app first then tap. Android handles both automatically. After Face ID or passcode, you\'ll see "Checked in".',
+      },
+      {
+        title: 'Pair with geofence / IP / device verification',
+        desc: 'NFC by itself only proves the phone touched the tag — pair it with your geofence radius, allowed IP list, or device verification (already in Settings) so a stolen tag image or a copied tag can\'t be used from off-site.',
+        link: { to: '/console/settings', hash: 'settings-geofencing', label: 'Open Geofencing' },
       },
     ],
   },
