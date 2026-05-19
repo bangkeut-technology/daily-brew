@@ -32,6 +32,7 @@ import { StatusBadge } from '@/components/shared/StatusBadge';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { Toggle } from '@/components/shared/Toggle';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
+import { CheckinUrlRow } from '@/components/shared/CheckinUrlRow';
 
 export const Route = createFileRoute('/console/settings')({
   component: SettingsPage,
@@ -614,6 +615,9 @@ function SettingsPage() {
                   <Copy size={12} />
                   Copy token
                 </button>
+                <div className="w-full mt-4 pt-4 border-t border-cream-3/60">
+                  <CheckinUrlRow qrToken={currentWs.qrToken} />
+                </div>
               </div>
             </GlassCard>
           );

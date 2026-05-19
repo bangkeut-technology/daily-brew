@@ -8,6 +8,7 @@ import { useDashboard } from '@/hooks/queries/useDashboard';
 import { useWorkspaces } from '@/hooks/queries/useWorkspaces';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { CheckinUrlRow } from '@/components/shared/CheckinUrlRow';
 import { StatCard } from '@/components/shared/StatCard';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { AttendanceRow } from '@/components/shared/AttendanceRow';
@@ -295,6 +296,7 @@ export function OwnerDashboard() {
                   <Copy size={12} />
                 </button>
               </div>
+              <CheckinUrlRow qrToken={currentWs.qrToken} />
             </div>
           </div>
         </GlassCard>

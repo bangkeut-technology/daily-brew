@@ -19,6 +19,7 @@ import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { Toggle } from '@/components/shared/Toggle';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
+import { CheckinUrlRow } from '@/components/shared/CheckinUrlRow';
 import type { WorkspaceQrCode, WorkspaceQrCodeInput } from '@/types';
 
 export const Route = createFileRoute('/console/qr-codes/$publicId/')({
@@ -235,6 +236,9 @@ function QrCodeDetailPage() {
                 <span className="truncate max-w-[200px]">{qrPayload}</span>
                 <Copy size={12} className="flex-shrink-0" />
               </button>
+            </div>
+            <div className="w-full pt-3 border-t border-cream-3/60">
+              <CheckinUrlRow qrToken={qrCode.qrToken} kind="wqr" />
             </div>
           </div>
         </GlassCard>
