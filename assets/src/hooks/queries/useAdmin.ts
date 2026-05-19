@@ -3,6 +3,8 @@ import { apiAxios } from '@/lib/apiAxios';
 import type {
   AdminAuditLogRow,
   AdminDashboardData,
+  AdminMobileAppConfig,
+  AdminMobileAppConfigInput,
   AdminPagedResponse,
   AdminSubscriptionRow,
   AdminUserDetail,
@@ -154,5 +156,29 @@ export function useAdminSubscriptions(params: ListParams & { status?: string; pl
       return data;
     },
     placeholderData: (prev) => prev,
+  });
+}
+
+export function useAdminMobileAppConfig() {
+  return useQuery({
+    queryKey: ['admin-mobile-app-config'],
+    queryFn: async () => {
+      const { data } = await apiAxios.get<AdminMobileAppConfig>('/admin/mobile-app-config');
+      return data;
+    },
+  });
+}
+
+export function useUpdateAdminMobileAppConfig() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: AdminMobileAppConfigInput) => {
+      const { data } = await apiAxios.put<AdminMobileAppConfig>('/admin/mobile-app-config', input);
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin-mobile-app-config'] });
+      qc.invalidateQueries({ queryKey: ['admin-audit-log'] });
+    },
   });
 }

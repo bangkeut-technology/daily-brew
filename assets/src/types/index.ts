@@ -159,6 +159,22 @@ export interface AdminSubscriptionRow {
   createdAt: string;
 }
 
+export interface AdminMobileAppConfig {
+  iosTeamId: string | null;
+  iosBundleId: string | null;
+  androidPackage: string | null;
+  androidSha256Fingerprints: string[];
+  iosConfigured: boolean;
+  androidConfigured: boolean;
+}
+
+export interface AdminMobileAppConfigInput {
+  iosTeamId?: string | null;
+  iosBundleId?: string | null;
+  androidPackage?: string | null;
+  androidSha256Fingerprints?: string[] | null;
+}
+
 export interface AuthResponse {
   token: string;
   user: User;
