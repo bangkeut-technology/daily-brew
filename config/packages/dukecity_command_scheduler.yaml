@@ -1,0 +1,22 @@
+# Configuration for dukecity/command-scheduler-bundle.
+#
+# We use this bundle as the schedule store + dispatcher only — the Twig admin
+# panel that ships with it is NOT exposed (its routes are deliberately not
+# imported in config/routes.yaml). The UI lives in the React admin console at
+# /admin/cron and hits our own /api/v1/{locale}/admin/cron/* endpoints.
+#
+# `scheduler:execute` is wired into the system crontab as the single master
+# entry that fires every minute and dispatches due schedules.
+dukecity_command_scheduler:
+    # Restrict the command picker to app:* and dailybrew:* commands. The
+    # admin API additionally validates against CronJobRegistry::JOBS for
+    # defence in depth, but narrowing here keeps the bundle's
+    # introspection clean.
+    included_command_namespaces:
+        - app
+        - dailybrew
+    log_path: '%kernel.logs_dir%'
+    # Prevent two concurrent runs of the same scheduled command. The bundle
+    # uses symfony/lock under the hood.
+    lock_timeout: 3600
+    # Ping-back / monitor-mail / send_ok left at defaults (off).
