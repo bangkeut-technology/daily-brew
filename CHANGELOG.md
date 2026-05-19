@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.60.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.59.0...v1.60.0) (2026-05-19)
+
+
+### Features
+
+* **checkin:** split NFC check-in into its own toggle ([8d8035b](https://github.com/bangkeut-technology/daily-brew/commit/8d8035b6ed20bdde3099f55329628226e1e61560))
+* **settings:** owner-controlled tap check-in toggle (Espresso) ([4701bf9](https://github.com/bangkeut-technology/daily-brew/commit/4701bf94e42d59c93af1e366b1696af49ac7065c))
+
 ## [1.59.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.58.1...v1.59.0) (2026-05-19)
 
 
