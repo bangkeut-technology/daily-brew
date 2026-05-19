@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "31fe2fd1a8a46030263faa2666c4fffe",
+    "content-hash": "3f55a46d90eed560274cd852c20d1798",
     "packages": [
         {
             "name": "bangkeut-technology/supportdock-sdk",

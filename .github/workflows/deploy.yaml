@@ -19,6 +19,7 @@ jobs:
                     port:            ${{ secrets.PORT }}
                     command_timeout: ${{ secrets.TIMEOUT }}
                     script:          |
+                                     set -euo pipefail
                                      cd ${{ secrets.PROJECT_FOLDER }}
                                      sudo touch public/.maintenance
                                      sudo git fetch --tags https://${{ secrets.ACCOUNT_GITHUB_USERNAME }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ secrets.ACCOUNT_GITHUB_USERNAME }}/daily-brew.git
