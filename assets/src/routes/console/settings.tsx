@@ -33,6 +33,7 @@ import { CustomSelect } from '@/components/shared/CustomSelect';
 import { Toggle } from '@/components/shared/Toggle';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { CheckinUrlRow } from '@/components/shared/CheckinUrlRow';
+import { useFeatureEnabled } from '@/hooks/queries/useFeatures';
 
 export const Route = createFileRoute('/console/settings')({
   component: SettingsPage,
@@ -94,6 +95,7 @@ function SettingsPage() {
   const { openCheckout } = usePaddle();
   const devToggle = useDevTogglePlan();
   const navigate = useNavigate();
+  const nfcEnabled = useFeatureEnabled('nfc_checkin');
   const isDev = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
   const paddlePortalDomain = window.__DAILYBREW__?.paddleEnvironment === 'sandbox' ? 'sandbox-customer-portal.paddle.com' : 'customer-portal.paddle.com';
   const [billing, setBilling] = useState<'monthly' | 'annual'>('annual');
@@ -615,9 +617,11 @@ function SettingsPage() {
                   <Copy size={12} />
                   Copy token
                 </button>
-                <div className="w-full mt-4 pt-4 border-t border-cream-3/60">
-                  <CheckinUrlRow qrToken={currentWs.qrToken} />
-                </div>
+                {nfcEnabled && (
+                  <div className="w-full mt-4 pt-4 border-t border-cream-3/60">
+                    <CheckinUrlRow qrToken={currentWs.qrToken} />
+                  </div>
+                )}
               </div>
             </GlassCard>
           );
@@ -1028,7 +1032,7 @@ function SettingsPage() {
         )}
 
         {/* NFC check-in settings */}
-        {currentWsId && (
+        {currentWsId && nfcEnabled && (
           <GlassCard hover={false} className="lg:col-span-2 scroll-mt-6" id="settings-nfc-checkin">
             <GlassCardHeader
               title={t('settings.nfcCheckin', 'NFC check-in')}

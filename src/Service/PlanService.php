@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\Workspace;
+use App\Enum\FeatureFlagEnum;
 use App\Enum\PlanEnum;
 use App\Repository\EmployeeRepository;
 use App\Repository\SubscriptionRepository;
@@ -18,6 +19,7 @@ class PlanService
     public function __construct(
         private readonly SubscriptionRepository $subscriptionRepository,
         private readonly EmployeeRepository     $employeeRepository,
+        private readonly FeatureFlagService     $featureFlagService,
     ) {}
 
     public function getPlan(Workspace $workspace): PlanEnum
@@ -95,6 +97,9 @@ class PlanService
 
     public function canUseNfcCheckin(Workspace $workspace): bool
     {
+        if (!$this->featureFlagService->isEnabled(FeatureFlagEnum::NfcCheckin)) {
+            return false;
+        }
         return $this->isAtLeastEspresso($workspace);
     }
 

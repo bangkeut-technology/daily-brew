@@ -9,6 +9,7 @@ import { useWorkspaces } from '@/hooks/queries/useWorkspaces';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { CheckinUrlRow } from '@/components/shared/CheckinUrlRow';
+import { useFeatureEnabled } from '@/hooks/queries/useFeatures';
 import { StatCard } from '@/components/shared/StatCard';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { AttendanceRow } from '@/components/shared/AttendanceRow';
@@ -33,6 +34,7 @@ export function OwnerDashboard() {
   const { data: plan } = usePlan(workspaceId);
   const { data: roleContext } = useRoleContext();
   const { data: workspace } = useWorkspace(workspaceId);
+  const nfcEnabled = useFeatureEnabled('nfc_checkin');
   const canUseLeave = plan?.canUseLeaveRequests ?? false;
   const isManagerView = !!roleContext?.isManager && !roleContext?.isOwner;
   const { data: leaveRequests } = useLeaveRequests(canUseLeave ? workspaceId : '');
@@ -296,7 +298,17 @@ export function OwnerDashboard() {
                   <Copy size={12} />
                 </button>
               </div>
-              <CheckinUrlRow qrToken={currentWs.qrToken} />
+              {nfcEnabled && (
+                <>
+                  <CheckinUrlRow qrToken={currentWs.qrToken} />
+                  <Link
+                    to="/guides/nfc"
+                    className="inline-flex items-center gap-1 mt-2 text-[12.5px] font-medium text-coffee hover:text-coffee-light no-underline"
+                  >
+                    Set up NFC check-in →
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </GlassCard>

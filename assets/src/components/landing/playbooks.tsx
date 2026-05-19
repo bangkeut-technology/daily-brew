@@ -10,6 +10,12 @@ export type PlaybookStep = {
   title: string;
   desc: string;
   /**
+   * Optional feature-flag key (matches FeatureFlagEnum on the server).
+   * When set, this step is hidden if the flag is off — useful for
+   * cross-linking to playbooks that aren't live yet.
+   */
+  feature?: 'nfc_checkin';
+  /**
    * Optional deep-link to a console page. Rendered as a small CTA under the
    * step description. By default the link is only shown to authenticated
    * users; set requireAuth: false for public destinations (sign up / sign in).
@@ -159,6 +165,7 @@ export const playbooks: Playbook[] = [
       {
         title: 'Try NFC check-in (optional)',
         desc: 'Replace the QR scan with a one-second tap against an NFC sticker. NTAG213 tags cost about a dollar each and program in 30 seconds with a free app.',
+        feature: 'nfc_checkin',
         link: { to: '/guides/nfc', label: 'Set up NFC check-in', requireAuth: false },
       },
       {

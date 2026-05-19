@@ -10,6 +10,7 @@ use App\Enum\PlanEnum;
 use App\Enum\SubscriptionStatusEnum;
 use App\Repository\EmployeeRepository;
 use App\Repository\SubscriptionRepository;
+use App\Service\FeatureFlagService;
 use App\Service\PlanService;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
@@ -18,6 +19,7 @@ class PlanServiceTest extends TestCase
 {
     private SubscriptionRepository&Stub $subscriptionRepository;
     private EmployeeRepository&Stub $employeeRepository;
+    private FeatureFlagService&Stub $featureFlagService;
     private PlanService $planService;
     private Workspace&Stub $workspace;
 
@@ -25,7 +27,14 @@ class PlanServiceTest extends TestCase
     {
         $this->subscriptionRepository = $this->createStub(SubscriptionRepository::class);
         $this->employeeRepository = $this->createStub(EmployeeRepository::class);
-        $this->planService = new PlanService($this->subscriptionRepository, $this->employeeRepository);
+        // Default: all flags enabled. Tests gating behavior should override.
+        $this->featureFlagService = $this->createStub(FeatureFlagService::class);
+        $this->featureFlagService->method('isEnabled')->willReturn(true);
+        $this->planService = new PlanService(
+            $this->subscriptionRepository,
+            $this->employeeRepository,
+            $this->featureFlagService,
+        );
         $this->workspace = $this->createStub(Workspace::class);
     }
 

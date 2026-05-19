@@ -12,8 +12,10 @@ use App\Repository\EmployeeRepository;
 use App\Repository\LeaveRequestRepository;
 use App\Repository\WorkspaceQrCodeRepository;
 use App\Repository\WorkspaceRepository;
+use App\Enum\FeatureFlagEnum;
 use App\Service\Checkin\EffectiveCheckinSettings;
 use App\Service\CheckinService;
+use App\Service\FeatureFlagService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,6 +36,7 @@ class CheckinController extends AbstractController
         EmployeeRepository $employeeRepository,
         CheckinService $checkinService,
         LeaveRequestRepository $leaveRequestRepository,
+        FeatureFlagService $featureFlagService,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByQrToken($workspaceQrToken);
         if ($workspace === null) {
@@ -60,7 +63,8 @@ class CheckinController extends AbstractController
             'onLeave' => $approvedLeave !== null,
             'leaveIsFullDay' => $approvedLeave?->isFullDay() ?? false,
             'workspaceTapCheckinEnabled' => $workspace->getSetting()?->isTapCheckinEnabled() ?? false,
-            'workspaceNfcCheckinEnabled' => $workspace->getSetting()?->isNfcCheckinEnabled() ?? false,
+            'workspaceNfcCheckinEnabled' => ($workspace->getSetting()?->isNfcCheckinEnabled() ?? false)
+                && $featureFlagService->isEnabled(FeatureFlagEnum::NfcCheckin),
             'today' => [
                 'checkedIn' => $attendance?->getCheckInAt() !== null,
                 'checkedOut' => $attendance?->getCheckOutAt() !== null,

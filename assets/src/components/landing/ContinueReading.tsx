@@ -1,15 +1,21 @@
 import { Link } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import { useFeatures } from '@/hooks/queries/useFeatures';
 import { playbooks, type Playbook } from './playbooks';
 
 type Props = {
   currentKey: Playbook['key'];
 };
 
-/** Shows the two non-current playbook cards as sibling links. */
+/** Shows the non-current playbook cards as sibling links. */
 export function ContinueReading({ currentKey }: Props) {
-  const siblings = playbooks.filter((p) => p.key !== currentKey);
+  const { data: features } = useFeatures();
+  const siblings = playbooks.filter((p) => {
+    if (p.key === currentKey) return false;
+    if (p.key === 'nfc') return features?.nfc_checkin === true;
+    return true;
+  });
   return (
     <section aria-labelledby="continue-reading-heading" className="mt-16">
       <div className="mb-5 flex items-end justify-between gap-4">

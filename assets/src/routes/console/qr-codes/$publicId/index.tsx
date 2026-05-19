@@ -20,6 +20,7 @@ import { Toggle } from '@/components/shared/Toggle';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { CheckinUrlRow } from '@/components/shared/CheckinUrlRow';
+import { useFeatureEnabled } from '@/hooks/queries/useFeatures';
 import type { WorkspaceQrCode, WorkspaceQrCodeInput } from '@/types';
 
 export const Route = createFileRoute('/console/qr-codes/$publicId/')({
@@ -38,6 +39,7 @@ function QrCodeDetailPage() {
   const { data: settings } = useWorkspaceSettings(workspaceId);
   const updateMutation = useUpdateWorkspaceQrCode(workspaceId);
   const deleteMutation = useDeleteWorkspaceQrCode(workspaceId);
+  const nfcEnabled = useFeatureEnabled('nfc_checkin');
 
   // Plan gate
   useEffect(() => {
@@ -237,9 +239,11 @@ function QrCodeDetailPage() {
                 <Copy size={12} className="flex-shrink-0" />
               </button>
             </div>
-            <div className="w-full pt-3 border-t border-cream-3/60">
-              <CheckinUrlRow qrToken={qrCode.qrToken} kind="wqr" />
-            </div>
+            {nfcEnabled && (
+              <div className="w-full pt-3 border-t border-cream-3/60">
+                <CheckinUrlRow qrToken={qrCode.qrToken} kind="wqr" />
+              </div>
+            )}
           </div>
         </GlassCard>
 

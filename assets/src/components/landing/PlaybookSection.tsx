@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useAuthenticationState } from '@/hooks/use-authentication';
+import { useFeatures } from '@/hooks/queries/useFeatures';
 import type { Playbook, PlaybookStep } from './playbooks';
 
 type Props = {
@@ -25,6 +26,11 @@ export function PlaybookSection({ playbook }: Props) {
   const Icon = playbook.icon;
   const auth = useAuthenticationState();
   const isAuthenticated = auth.status === 'authenticated';
+  const { data: features } = useFeatures();
+  const visibleSteps = playbook.steps.filter((step) => {
+    if (!step.feature) return true;
+    return features?.[step.feature] === true;
+  });
   return (
     <section
       aria-labelledby={`playbook-${playbook.key}`}
@@ -56,7 +62,7 @@ export function PlaybookSection({ playbook }: Props) {
       </header>
 
       <ol className="space-y-4">
-        {playbook.steps.map((step, stepIndex) => {
+        {visibleSteps.map((step, stepIndex) => {
           const showLink = step.link && (step.link.requireAuth === false || isAuthenticated);
           return (
             <motion.li

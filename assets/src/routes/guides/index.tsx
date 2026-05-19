@@ -5,12 +5,21 @@ import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { PageSeo } from '@/components/shared/PageSeo';
 import { playbooks } from '@/components/landing/playbooks';
+import { useFeatures } from '@/hooks/queries/useFeatures';
 
 export const Route = createFileRoute('/guides/')({
   component: GuidesIndexPage,
 });
 
 function GuidesIndexPage() {
+  const { data: features } = useFeatures();
+  // Filter out playbooks whose feature flag is off. The catalog still
+  // exports them so direct links keep working; this just hides them from
+  // the hub.
+  const visiblePlaybooks = playbooks.filter((pb) => {
+    if (pb.key === 'nfc') return features?.nfc_checkin === true;
+    return true;
+  });
   return (
     <div className="min-h-screen">
       <PageSeo
@@ -41,7 +50,7 @@ function GuidesIndexPage() {
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {playbooks.map((pb, i) => {
+          {visiblePlaybooks.map((pb, i) => {
             const Icon = pb.icon;
             return (
               <motion.div
