@@ -7,8 +7,11 @@ namespace App\ApiController\Admin;
 use App\ApiController\Trait\ApiResponseTrait;
 use App\Entity\User;
 use App\Entity\Workspace;
+use App\Entity\Subscription;
 use App\Enum\AdminAuditActionEnum;
 use App\Enum\AdminAuditTargetTypeEnum;
+use App\Enum\PlanEnum;
+use App\Enum\SubscriptionStatusEnum;
 use App\Repository\EmployeeRepository;
 use App\Repository\SubscriptionRepository;
 use App\Repository\WorkspaceQrCodeRepository;
@@ -335,6 +338,70 @@ class AdminWorkspaceController extends AbstractController
         return $this->jsonSuccess([
             'publicId' => (string) $workspace->getPublicId(),
             'testingTrack' => $workspace->getTestingTrack()->value,
+        ]);
+    }
+
+    /**
+     * Comp a workspace onto a paid plan (or back to Free) without going
+     * through Paddle. Refuses if a Paddle subscription is attached — billing
+     * source-of-truth stays in Paddle and we don't want webhooks fighting us.
+     * Creates a Subscription row if one doesn't exist yet.
+     */
+    #[Route('/{publicId}/plan', name: 'admin_workspaces_set_plan', methods: ['PUT'])]
+    public function setPlan(
+        string $publicId,
+        Request $request,
+        WorkspaceRepository $workspaceRepository,
+        SubscriptionRepository $subscriptionRepository,
+        AdminAuditService $auditService,
+        #[CurrentUser] User $user,
+    ): JsonResponse {
+        $workspace = $workspaceRepository->findByPublicId($publicId);
+        if (!$workspace instanceof Workspace) {
+            throw new NotFoundHttpException('Workspace not found');
+        }
+
+        $data = json_decode($request->getContent(), true) ?? [];
+        $planRaw = $data['plan'] ?? null;
+        $plan = is_string($planRaw) ? PlanEnum::tryFrom($planRaw) : null;
+        if ($plan === null) {
+            return $this->jsonError('Invalid plan. Expected one of: free, espresso, double_espresso.', 400);
+        }
+
+        $subscription = $subscriptionRepository->findByWorkspace($workspace);
+        if ($subscription !== null && $subscription->getPaddleSubscriptionId() !== null) {
+            return $this->jsonError(
+                'Workspace has a Paddle subscription — cancel it in Paddle before overriding the plan.',
+                409,
+            );
+        }
+
+        $previous = $subscription?->getPlan()->value ?? 'none';
+
+        if ($subscription === null) {
+            $subscription = new Subscription();
+            $subscription->setWorkspace($workspace);
+        }
+
+        $subscription->setPlan($plan);
+        $subscription->setStatus(SubscriptionStatusEnum::Active);
+        $subscription->setCanceledAt(null);
+        $subscriptionRepository->update($subscription);
+
+        if ($previous !== $plan->value) {
+            $auditService->record(
+                actor: $user,
+                action: AdminAuditActionEnum::UpdateWorkspacePlan,
+                targetType: AdminAuditTargetTypeEnum::Workspace,
+                targetPublicId: (string) $workspace->getPublicId(),
+                targetLabel: $workspace->getName(),
+                metadata: ['from' => $previous, 'to' => $plan->value],
+            );
+        }
+
+        return $this->jsonSuccess([
+            'publicId' => (string) $workspace->getPublicId(),
+            'plan' => $plan->value,
         ]);
     }
 }

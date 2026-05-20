@@ -246,3 +246,24 @@ export function useUpdateAdminWorkspaceTestingTrack() {
     },
   });
 }
+
+export type WorkspacePlan = 'free' | 'espresso' | 'double_espresso';
+
+export function useUpdateAdminWorkspacePlan() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ publicId, plan }: { publicId: string; plan: WorkspacePlan }) => {
+      const { data } = await apiAxios.put<{ publicId: string; plan: WorkspacePlan }>(
+        `/admin/workspaces/${publicId}/plan`,
+        { plan },
+      );
+      return data;
+    },
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: ['admin-workspace', vars.publicId] });
+      qc.invalidateQueries({ queryKey: ['admin-workspaces'] });
+      qc.invalidateQueries({ queryKey: ['admin-subscriptions'] });
+      qc.invalidateQueries({ queryKey: ['admin-audit-log'] });
+    },
+  });
+}

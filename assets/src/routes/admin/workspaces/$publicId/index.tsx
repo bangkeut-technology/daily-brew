@@ -7,13 +7,16 @@ import {
   useCancelWorkspaceSubscription,
   useRestoreWorkspace,
   useUpdateAdminWorkspaceTestingTrack,
+  useUpdateAdminWorkspacePlan,
   type WorkspaceTestingTrack,
+  type WorkspacePlan,
 } from '@/hooks/queries/useAdmin';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { TestingTrackBadge } from '@/components/shared/TestingTrackBadge';
+import { PlanBadge } from '@/components/shared/PlanBadge';
 import { cn } from '@/lib/utils';
 
 export const Route = createFileRoute('/admin/workspaces/$publicId/')({
@@ -26,6 +29,7 @@ function AdminWorkspaceDetailPage() {
   const cancelMutation = useCancelWorkspaceSubscription();
   const restoreMutation = useRestoreWorkspace();
   const trackMutation = useUpdateAdminWorkspaceTestingTrack();
+  const planMutation = useUpdateAdminWorkspacePlan();
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [confirmRestore, setConfirmRestore] = useState(false);
 
@@ -121,11 +125,13 @@ function AdminWorkspaceDetailPage() {
         </GlassCard>
 
         <GlassCard hover={false}>
-          <GlassCardHeader title="Subscription" />
+          <GlassCardHeader
+            title="Subscription"
+            action={ws.subscription ? <PlanBadge plan={ws.subscription.plan} /> : null}
+          />
           <dl className="p-5 grid grid-cols-[140px_1fr] gap-y-2 text-[13.5px]">
             {ws.subscription ? (
               <>
-                <Field label="Plan" value={ws.subscription.plan} />
                 <Field label="Status" value={ws.subscription.status + (ws.subscription.isActive ? ' (active)' : '')} />
                 <Field label="Period end" value={ws.subscription.currentPeriodEnd ? new Date(ws.subscription.currentPeriodEnd).toLocaleString() : '—'} />
                 <Field label="Trial end" value={ws.subscription.trialEndsAt ? new Date(ws.subscription.trialEndsAt).toLocaleString() : '—'} />
@@ -151,6 +157,41 @@ function AdminWorkspaceDetailPage() {
               </>
             )}
           </dl>
+        </GlassCard>
+
+        <GlassCard hover={false}>
+          <GlassCardHeader
+            title="Plan override"
+            action={ws.subscription ? <PlanBadge plan={ws.subscription.plan} /> : <PlanBadge plan="free" />}
+          />
+          <div className="p-5 space-y-3">
+            <p className="text-[13px] text-text-secondary leading-relaxed">
+              Comp a workspace onto a paid plan (or back to Free) without going through Paddle. Disabled if a Paddle subscription is attached — cancel it in Paddle first.
+            </p>
+            <div className="w-56">
+              <CustomSelect
+                value={ws.subscription?.plan ?? 'free'}
+                onChange={async (v) => {
+                  try {
+                    await planMutation.mutateAsync({ publicId, plan: v as WorkspacePlan });
+                    toast.success(`Plan set to ${v}`);
+                  } catch (e: any) {
+                    toast.error(e?.response?.data?.message ?? 'Failed to update plan');
+                  }
+                }}
+                options={[
+                  { value: 'free', label: 'Free' },
+                  { value: 'espresso', label: 'Espresso' },
+                  { value: 'double_espresso', label: 'Double Espresso' },
+                ]}
+              />
+            </div>
+            {ws.subscription?.paddleSubscriptionId && (
+              <p className="text-[12.5px] text-amber leading-relaxed">
+                Paddle subscription <span className="font-mono">{ws.subscription.paddleSubscriptionId}</span> is attached — admin override blocked.
+              </p>
+            )}
+          </div>
         </GlassCard>
 
         <GlassCard hover={false}>

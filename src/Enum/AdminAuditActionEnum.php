@@ -12,6 +12,7 @@ enum AdminAuditActionEnum: string
     case RestoreWorkspace = 'restore_workspace';
     case UpdateMobileAppConfig = 'update_mobile_app_config';
     case UpdateWorkspaceTestingTrack = 'update_workspace_testing_track';
+    case UpdateWorkspacePlan = 'update_workspace_plan';
 
     public function label(): string
     {
@@ -22,6 +23,7 @@ enum AdminAuditActionEnum: string
             self::RestoreWorkspace => 'Restored workspace',
             self::UpdateMobileAppConfig => 'Updated mobile app config',
             self::UpdateWorkspaceTestingTrack => 'Updated workspace testing track',
+            self::UpdateWorkspacePlan => 'Updated workspace plan',
         };
     }
 }
