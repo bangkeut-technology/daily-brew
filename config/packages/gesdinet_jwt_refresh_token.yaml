@@ -3,3 +3,12 @@ gesdinet_jwt_refresh_token:
     ttl: 2592000
     cookie:
         enabled: true
+        # Keep the refresh_token in the JSON response body. Mobile clients
+        # store tokens in SecureStore (no cookie jar) and the response
+        # interceptor reads `data.refresh_token` after /token/refresh. The
+        # bundle defaults this flag to true, which dropped the field from
+        # the body and silently broke refresh on mobile — the client threw
+        # "Malformed refresh response" and the catch wiped the session.
+        # Web clients keep getting the httpOnly cookie too, so leaving it
+        # in the body is purely additive for them.
+        remove_token_from_body: false
