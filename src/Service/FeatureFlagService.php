@@ -69,21 +69,30 @@ class FeatureFlagService
     }
 
     /**
-     * Resolves every flag to a boolean for the given workspace. Used by
-     * the GET /features endpoint so the frontend gets one map.
+     * Resolves every flag to a boolean for the given workspace, plus the
+     * current stage of each visible flag. Used by the GET /features
+     * endpoint — the frontend pairs each enabled flag with its stage to
+     * render a "Beta" / "Alpha" / "Dev" pill alongside testing-phase UI.
+     * Hidden flags are omitted from the stages map so we don't leak the
+     * existence of an in-progress feature.
      *
-     * @return array<string, bool>
+     * @return array{flags: array<string, bool>, stages: array<string, string>}
      */
     public function resolveAllForWorkspace(?Workspace $workspace): array
     {
         $stages = $this->getAllStages();
         $track = $workspace?->getTestingTrack() ?? WorkspaceTestingTrackEnum::None;
 
-        $out = [];
+        $flags = [];
+        $visibleStages = [];
         foreach ($stages as $key => $stage) {
-            $out[$key] = $this->canSeeStage($stage, $track);
+            $visible = $this->canSeeStage($stage, $track);
+            $flags[$key] = $visible;
+            if ($visible) {
+                $visibleStages[$key] = $stage->value;
+            }
         }
-        return $out;
+        return ['flags' => $flags, 'stages' => $visibleStages];
     }
 
     /** @return array<string, FeatureFlagStageEnum> */

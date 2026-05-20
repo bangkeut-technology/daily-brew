@@ -33,7 +33,8 @@ import { CustomSelect } from '@/components/shared/CustomSelect';
 import { Toggle } from '@/components/shared/Toggle';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { CheckinUrlRow } from '@/components/shared/CheckinUrlRow';
-import { useFeatureEnabled } from '@/hooks/queries/useFeatures';
+import { useFeatureEnabled, useFeatureStage } from '@/hooks/queries/useFeatures';
+import { FeatureStageBadge } from '@/components/shared/FeatureStageBadge';
 
 export const Route = createFileRoute('/console/settings')({
   component: SettingsPage,
@@ -96,6 +97,7 @@ function SettingsPage() {
   const devToggle = useDevTogglePlan();
   const navigate = useNavigate();
   const nfcEnabled = useFeatureEnabled('nfc_checkin');
+  const nfcStage = useFeatureStage('nfc_checkin');
   const isDev = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
   const paddlePortalDomain = window.__DAILYBREW__?.paddleEnvironment === 'sandbox' ? 'sandbox-customer-portal.paddle.com' : 'customer-portal.paddle.com';
   const [billing, setBilling] = useState<'monthly' | 'annual'>('annual');
@@ -1039,6 +1041,7 @@ function SettingsPage() {
               action={
                 <div className="flex items-center gap-2">
                   <Nfc size={14} className="text-amber" />
+                  {nfcStage && <FeatureStageBadge stage={nfcStage} />}
                   {nfcCheckinEnabled && plan?.canUseNfcCheckin && (
                     <StatusBadge label="Active" variant="green" />
                   )}

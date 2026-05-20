@@ -13,7 +13,7 @@ export function ContinueReading({ currentKey }: Props) {
   const { data: features } = useFeatures();
   const siblings = playbooks.filter((p) => {
     if (p.key === currentKey) return false;
-    if (p.key === 'nfc') return features?.nfc_checkin === true;
+    if (p.key === 'nfc') return features?.flags?.nfc_checkin === true;
     return true;
   });
   return (

@@ -17,7 +17,7 @@ function GuidesIndexPage() {
   // exports them so direct links keep working; this just hides them from
   // the hub.
   const visiblePlaybooks = playbooks.filter((pb) => {
-    if (pb.key === 'nfc') return features?.nfc_checkin === true;
+    if (pb.key === 'nfc') return features?.flags?.nfc_checkin === true;
     return true;
   });
   return (

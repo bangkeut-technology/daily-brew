@@ -29,7 +29,7 @@ export function PlaybookSection({ playbook }: Props) {
   const { data: features } = useFeatures();
   const visibleSteps = playbook.steps.filter((step) => {
     if (!step.feature) return true;
-    return features?.[step.feature] === true;
+    return features?.flags?.[step.feature] === true;
   });
   return (
     <section

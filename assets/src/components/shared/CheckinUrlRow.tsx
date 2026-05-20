@@ -1,6 +1,8 @@
 import { Copy, Nfc } from 'lucide-react';
 import { toast } from 'sonner';
 import { buildCheckinUrl } from '@/lib/checkinUrl';
+import { useFeatureStage } from '@/hooks/queries/useFeatures';
+import { FeatureStageBadge } from '@/components/shared/FeatureStageBadge';
 
 /**
  * Single-line row showing the universal-link URL for a workspace QR or sub-QR,
@@ -9,6 +11,7 @@ import { buildCheckinUrl } from '@/lib/checkinUrl';
  */
 export function CheckinUrlRow({ qrToken, kind = 'ws' }: { qrToken: string; kind?: 'ws' | 'wqr' }) {
   const url = buildCheckinUrl(qrToken, kind);
+  const nfcStage = useFeatureStage('nfc_checkin');
 
   const handleCopy = async () => {
     try {
@@ -27,6 +30,7 @@ export function CheckinUrlRow({ qrToken, kind = 'ws' }: { qrToken: string; kind?
           <code className="text-[12.5px] font-mono text-text-secondary bg-cream-3/30 px-2 py-1 rounded truncate flex-1 min-w-0">
             {url}
           </code>
+          {nfcStage && <FeatureStageBadge stage={nfcStage} />}
           <button
             type="button"
             onClick={handleCopy}
