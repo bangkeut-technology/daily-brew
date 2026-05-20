@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.66.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.65.1...v1.66.0) (2026-05-20)
+
+
+### Features
+
+* **workspace:** add regenerate workspace QR token endpoint + console button ([d89e9fe](https://github.com/bangkeut-technology/daily-brew/commit/d89e9fe4b89c8bf3ab37e21cd8b7bfea59d775b6))
+
 ## [1.65.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.65.0...v1.65.1) (2026-05-20)
 
 
