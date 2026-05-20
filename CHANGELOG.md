@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.64.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.63.2...v1.64.0) (2026-05-20)
+
+
+### Features
+
+* **admin:** override workspace plan from the platform-admin UI ([4ed0d4e](https://github.com/bangkeut-technology/daily-brew/commit/4ed0d4e7d7a24de4ea594320e4eb2caa03f768ee))
+
+
+### Bug Fixes
+
+* **auth:** mint OAUTH_LINK cookie so web OAuth linking survives Apple's POST ([e2f3edf](https://github.com/bangkeut-technology/daily-brew/commit/e2f3edf11e4caba15e610bad1fa3a4759a0dc351))
+
 ## [1.63.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.63.1...v1.63.2) (2026-05-19)
 
 
