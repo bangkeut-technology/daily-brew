@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 abstract class AbstractOAuthConnectController extends AbstractController
 {
     private const STATE_COOKIE = 'oauth_state';
+    private const LINK_COOKIE = 'OAUTH_LINK';
 
     public function __construct(
         protected readonly string                     $client,
@@ -31,6 +32,27 @@ abstract class AbstractOAuthConnectController extends AbstractController
         protected readonly UserRepository             $userRepository,
         protected readonly string                     $redirectRoute = '/console/profile',
     ) {}
+
+    /**
+     * SameSite=None + Secure so the cookie survives Apple's cross-site POST
+     * callback. Path /oauth/connect keeps it off the rest of the site.
+     */
+    private function setOAuthCookie(Response $response, string $name, string $value, int $maxAge): void
+    {
+        $response->headers->setCookie(
+            Cookie::create(
+                name:     $name,
+                value:    $value,
+                expire:   time() + $maxAge,
+                path:     '/oauth/connect',
+                domain:   null,
+                secure:   true,
+                httpOnly: true,
+                raw:      false,
+                sameSite: Cookie::SAMESITE_NONE,
+            ),
+        );
+    }
 
     protected function getClient(): OAuth2ClientInterface
     {
@@ -43,18 +65,23 @@ abstract class AbstractOAuthConnectController extends AbstractController
     }
 
     /**
-     * Initiate: redirect to OAuth provider for authorization.
+     * Initiate: redirect to OAuth provider for authorization. The frontend
+     * must have already called /users/me/oauth/link-token so the OAUTH_LINK
+     * cookie is present — that's what identifies the user across the
+     * cross-site round-trip back from Apple/Google.
      */
-    public function connect(): Response
+    public function connect(Request $request): Response
     {
+        if (!$this->resolveUserFromLinkToken($request)) {
+            return $this->redirect('/sign-in?error=' . urlencode('You must be signed in to connect an account'));
+        }
+
         $client = $this->getClient();
         $client->setAsStateless();
         $response = $client->redirect();
 
         $state = $client->getOAuth2Provider()->getState();
-        $response->headers->setCookie(
-            Cookie::create(self::STATE_COOKIE, $state, time() + 300, '/', null, false, true, false, Cookie::SAMESITE_LAX),
-        );
+        $this->setOAuthCookie($response, self::STATE_COOKIE, $state, 300);
 
         return $response;
     }
@@ -83,7 +110,7 @@ abstract class AbstractOAuthConnectController extends AbstractController
      */
     public function callback(Request $request): Response
     {
-        $user = $this->resolveUserFromJwt($request);
+        $user = $this->resolveUserFromLinkToken($request);
         if (!$user) {
             return $this->redirect('/sign-in?error=' . urlencode('You must be signed in to connect an account'));
         }
@@ -92,7 +119,9 @@ abstract class AbstractOAuthConnectController extends AbstractController
         $actualState = $request->query->get('state') ?? $request->request->get('state');
 
         if (!$actualState || !$expectedState || !hash_equals($expectedState, $actualState)) {
-            return $this->redirect(sprintf('%s?error=%s', $this->redirectRoute, urlencode('Invalid state')));
+            return $this->clearOAuthCookies($this->redirect(
+                sprintf('%s?error=%s', $this->redirectRoute, urlencode('Invalid state')),
+            ));
         }
 
         $client = $this->getClient();
@@ -106,13 +135,12 @@ abstract class AbstractOAuthConnectController extends AbstractController
                 user: $user,
             );
         } catch (\Exception $e) {
-            return $this->redirect(sprintf('%s?error=%s', $this->redirectRoute, urlencode($e->getMessage())));
+            return $this->clearOAuthCookies($this->redirect(
+                sprintf('%s?error=%s', $this->redirectRoute, urlencode($e->getMessage())),
+            ));
         }
 
-        $response = $this->getRedirectRoute();
-        $response->headers->clearCookie(self::STATE_COOKIE, '/');
-
-        return $response;
+        return $this->clearOAuthCookies($this->getRedirectRoute());
     }
 
     protected function resolveUserFromJwt(Request $request): ?User
@@ -132,5 +160,42 @@ abstract class AbstractOAuthConnectController extends AbstractController
         } catch (\Exception) {
             return null;
         }
+    }
+
+    /**
+     * Resolve user from the short-lived OAUTH_LINK cookie minted by
+     * /users/me/oauth/link-token. Returns null if the cookie is missing,
+     * expired, or doesn't match a known user.
+     */
+    protected function resolveUserFromLinkToken(Request $request): ?User
+    {
+        $token = $request->cookies->get(self::LINK_COOKIE);
+        if (!$token) {
+            return null;
+        }
+
+        try {
+            $payload = $this->jwtEncoder->decode($token);
+        } catch (\Exception) {
+            return null;
+        }
+
+        if (($payload['purpose'] ?? null) !== 'oauth_link') {
+            return null;
+        }
+
+        $publicId = $payload['sub'] ?? '';
+        if (!is_string($publicId) || $publicId === '') {
+            return null;
+        }
+
+        return $this->userRepository->findOneBy(['publicId' => $publicId]);
+    }
+
+    private function clearOAuthCookies(Response $response): Response
+    {
+        $response->headers->clearCookie(self::STATE_COOKIE, '/oauth/connect', null, true, true, Cookie::SAMESITE_NONE);
+        $response->headers->clearCookie(self::LINK_COOKIE, '/oauth/connect', null, true, true, Cookie::SAMESITE_NONE);
+        return $response;
     }
 }

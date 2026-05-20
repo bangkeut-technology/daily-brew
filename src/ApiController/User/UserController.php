@@ -13,7 +13,9 @@ use App\Repository\UserRepository;
 use App\Repository\WorkspaceRepository;
 use App\Service\AccountDeletionService;
 use App\Service\AuthService;
+use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -290,6 +292,43 @@ class UserController extends AbstractController
             'apple' => $user->hasOAuth(OAuthProviderEnum::APPLE),
             'hasPassword' => $user->hasPassword(),
         ]);
+    }
+
+    /**
+     * Mint a short-lived JWT identifying the current user and stash it in an
+     * OAUTH_LINK cookie scoped to /oauth/connect. The web OAuth flow uses this
+     * to know who is linking the provider — the regular BEARER cookie is
+     * scoped to /api/v1 (so it doesn't poison /api/token/refresh) and is
+     * SameSite=Lax (so it wouldn't survive Apple's cross-site POST callback
+     * anyway). Frontend must await this before redirecting to /oauth/connect.
+     */
+    #[Route('/me/oauth/link-token', name: 'users_me_oauth_link_token', methods: ['POST'])]
+    public function oauthLinkToken(
+        #[CurrentUser] User $user,
+        JWTEncoderInterface $jwtEncoder,
+    ): JsonResponse {
+        $ttlSeconds = 300;
+        $token = $jwtEncoder->encode([
+            'sub' => $user->getPublicId(),
+            'exp' => time() + $ttlSeconds,
+            'purpose' => 'oauth_link',
+        ]);
+
+        $response = $this->jsonSuccess(['ok' => true]);
+        $response->headers->setCookie(
+            Cookie::create(
+                name:     'OAUTH_LINK',
+                value:    $token,
+                expire:   time() + $ttlSeconds,
+                path:     '/oauth/connect',
+                domain:   null,
+                secure:   true,
+                httpOnly: true,
+                raw:      false,
+                sameSite: Cookie::SAMESITE_NONE,
+            ),
+        );
+        return $response;
     }
 
     #[Route('/me/oauth/{provider}', name: 'users_me_oauth_connect', methods: ['POST'])]

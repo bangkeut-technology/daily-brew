@@ -52,6 +52,21 @@ export function useConnectOAuth() {
   });
 }
 
+/**
+ * Mint a short-lived OAUTH_LINK cookie identifying the current user. Must be
+ * called immediately before redirecting to /oauth/connect/{provider} — the
+ * regular BEARER cookie is scoped to /api/v1 and wouldn't survive the
+ * cross-site POST callback from Apple anyway.
+ */
+export function useOAuthLinkToken() {
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await apiAxios.post('/users/me/oauth/link-token');
+      return data;
+    },
+  });
+}
+
 export function useDisconnectOAuth() {
   const queryClient = useQueryClient();
   return useMutation({

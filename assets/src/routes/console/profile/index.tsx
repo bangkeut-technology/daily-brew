@@ -7,6 +7,7 @@ import {
   useChangePassword,
   useOAuthConnections,
   useDisconnectOAuth,
+  useOAuthLinkToken,
   useDeleteAccount,
 } from '@/hooks/queries/useProfile';
 import { useRoleContext, useLinkEmployee, useUnlinkEmployee } from '@/hooks/queries/useRoleContext';
@@ -73,6 +74,7 @@ function ProfilePage() {
   const updateProfile = useUpdateProfile();
   const changePassword = useChangePassword();
   const disconnectOAuth = useDisconnectOAuth();
+  const oauthLinkToken = useOAuthLinkToken();
   const linkEmployee = useLinkEmployee();
   const unlinkEmployee = useUnlinkEmployee();
   const deleteAccount = useDeleteAccount();
@@ -509,18 +511,24 @@ function ProfilePage() {
                   provider="google"
                   icon={<GoogleIcon />}
                   connected={!!oauthData?.google}
-                  onConnect={() => { window.location.href = '/oauth/connect/google'; }}
+                  onConnect={async () => {
+                    await oauthLinkToken.mutateAsync();
+                    window.location.href = '/oauth/connect/google';
+                  }}
                   onDisconnect={() => handleDisconnect('google')}
-                  isPending={disconnectOAuth.isPending}
+                  isPending={disconnectOAuth.isPending || oauthLinkToken.isPending}
                   t={t}
                 />
                 <OAuthRow
                   provider="apple"
                   icon={<AppleIcon />}
                   connected={!!oauthData?.apple}
-                  onConnect={() => { window.location.href = '/oauth/connect/apple'; }}
+                  onConnect={async () => {
+                    await oauthLinkToken.mutateAsync();
+                    window.location.href = '/oauth/connect/apple';
+                  }}
                   onDisconnect={() => handleDisconnect('apple')}
-                  isPending={disconnectOAuth.isPending}
+                  isPending={disconnectOAuth.isPending || oauthLinkToken.isPending}
                   t={t}
                 />
                 {oauthData && !oauthData.hasPassword && [oauthData.google, oauthData.apple].filter(Boolean).length <= 1 && (

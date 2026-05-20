@@ -33,9 +33,9 @@ final class GoogleController extends AbstractOAuthConnectController
     }
 
     #[Route(name: 'connect', methods: ['GET'], priority: 1000)]
-    public function connect(): Response
+    public function connect(Request $request): Response
     {
-        return parent::connect();
+        return parent::connect($request);
     }
 
     #[Route(name: 'disconnect', methods: ['DELETE', 'GET'], priority: 1000)]
