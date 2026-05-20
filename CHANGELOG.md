@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.65.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.65.0...v1.65.1) (2026-05-20)
+
+
+### Bug Fixes
+
+* **auth:** keep refresh_token in /token/refresh body so mobile can read it ([2e65fcf](https://github.com/bangkeut-technology/daily-brew/commit/2e65fcf5ae8eb02addc52c8cca24bd68988660d4))
+
 ## [1.65.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.64.0...v1.65.0) (2026-05-20)
 
 
