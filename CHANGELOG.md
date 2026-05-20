@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.65.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.64.0...v1.65.0) (2026-05-20)
+
+
+### Features
+
+* **ui:** surface feature-flag stage badge on NFC check-in surfaces ([0459283](https://github.com/bangkeut-technology/daily-brew/commit/045928359f9b1bcc041a59dedb6732282b48a2ac))
+
 ## [1.64.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.63.2...v1.64.0) (2026-05-20)
 
 
