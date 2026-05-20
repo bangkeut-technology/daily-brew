@@ -67,6 +67,24 @@ export function useWorkspaceSettings(
   });
 }
 
+export function useRegenerateWorkspaceToken() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (publicId: string) => {
+      const { data } = await apiAxios.post<{ publicId: string; qrToken: string }>(
+        `/workspaces/${publicId}/regenerate-qr-token`,
+      );
+      return data;
+    },
+    onSuccess: () => {
+      // Refetch the workspace list so the QR card on /console/settings renders
+      // the new token. Sub-QR tokens are intentionally not affected — they live
+      // under a separate query key.
+      queryClient.invalidateQueries({ queryKey: ['workspaces'] });
+    },
+  });
+}
+
 export function useDeleteWorkspace() {
   const queryClient = useQueryClient();
   return useMutation({

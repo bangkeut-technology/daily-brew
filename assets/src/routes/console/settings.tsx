@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import * as Dialog from '@radix-ui/react-dialog';
-import { Crown, Check, MapPin, MousePointerClick, Navigation, Nfc, Smartphone, Building2, Users, Calendar, Plus, X, Copy, Pencil, Trash2, Send } from 'lucide-react';
+import { Crown, Check, MapPin, MousePointerClick, Navigation, Nfc, Smartphone, Building2, Users, Calendar, Plus, X, Copy, Pencil, Trash2, Send, RotateCcw } from 'lucide-react';
 import { useDateFormat } from '@/hooks/useDateFormat';
 import { usePaddle } from '@/hooks/usePaddle';
 import { useDevTogglePlan } from '@/hooks/useDevTogglePlan';
@@ -16,6 +16,7 @@ import {
   useCreateWorkspace,
   useUpdateWorkspace,
   useDeleteWorkspace,
+  useRegenerateWorkspaceToken,
   useWorkspaceSettings,
   useUpdateWorkspaceSettings,
   useTelegramLinkToken,
@@ -80,6 +81,8 @@ function SettingsPage() {
   const createWs = useCreateWorkspace();
   const updateWs = useUpdateWorkspace();
   const deleteWs = useDeleteWorkspace();
+  const regenerateToken = useRegenerateWorkspaceToken();
+  const [regenerateConfirmOpen, setRegenerateConfirmOpen] = useState(false);
   const [waitingForLink, setWaitingForLink] = useState(false);
   const linkPollEndsAtRef = useRef(0);
   const chatIdBeforeLinkRef = useRef<string | null>(null);
@@ -604,21 +607,32 @@ function SettingsPage() {
                 <p className="mt-3 text-[13px] text-text-tertiary font-mono text-center">
                   {qrData}
                 </p>
-                <button
-                  type="button"
-                  onClick={async () => {
-                    try {
-                      await navigator.clipboard.writeText(currentWs.qrToken);
-                      toast.success('Token copied');
-                    } catch {
-                      toast.error('Failed to copy');
-                    }
-                  }}
-                  className="mt-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[14px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3"
-                >
-                  <Copy size={12} />
-                  Copy token
-                </button>
+                <div className="mt-2 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(currentWs.qrToken);
+                        toast.success('Token copied');
+                      } catch {
+                        toast.error('Failed to copy');
+                      }
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[14px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3"
+                  >
+                    <Copy size={12} />
+                    Copy token
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRegenerateConfirmOpen(true)}
+                    disabled={regenerateToken.isPending}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[14px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3 disabled:opacity-50"
+                  >
+                    <RotateCcw size={12} />
+                    Regenerate
+                  </button>
+                </div>
                 {nfcEnabled && (
                   <div className="w-full mt-4 pt-4 border-t border-cream-3/60">
                     <CheckinUrlRow qrToken={currentWs.qrToken} />
@@ -1393,6 +1407,29 @@ function SettingsPage() {
           </div>
         </GlassCard>
       </div>
+
+      <ConfirmModal
+        open={regenerateConfirmOpen}
+        onOpenChange={setRegenerateConfirmOpen}
+        title="Regenerate workspace token"
+        description="This will replace the workspace QR code with a new one. Any printed QR codes, programmed NFC tags, or shared check-in URLs using the old token will stop working — you'll need to reprint or re-program them. Sub-QR codes are not affected."
+        confirmLabel="Regenerate token"
+        cancelLabel={t('common.cancel')}
+        variant="danger"
+        loading={regenerateToken.isPending}
+        onConfirm={() => {
+          if (!currentWsId) return;
+          regenerateToken.mutate(currentWsId, {
+            onSuccess: () => {
+              toast.success('Workspace token regenerated');
+              setRegenerateConfirmOpen(false);
+            },
+            onError: () => {
+              toast.error('Failed to regenerate token');
+            },
+          });
+        }}
+      />
 
       <ConfirmModal
         open={deleteConfirmOpen}

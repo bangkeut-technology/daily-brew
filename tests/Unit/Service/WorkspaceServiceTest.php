@@ -96,6 +96,18 @@ class WorkspaceServiceTest extends TestCase
         $this->assertSame('New', $ws->getName());
     }
 
+    public function testRegenerateQrTokenSwapsTokenAndFlushes(): void
+    {
+        $ws = new Workspace();
+        $previous = $ws->getQrToken();
+        $this->workspaceRepo->expects($this->once())->method('flush');
+
+        $this->svc->regenerateQrToken($ws);
+
+        $this->assertNotSame($previous, $ws->getQrToken());
+        $this->assertSame(20, strlen($ws->getQrToken()));
+    }
+
     public function testDeleteSoftDeletesWorkspaceAndAllEmployees(): void
     {
         $ws = new Workspace();

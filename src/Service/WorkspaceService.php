@@ -64,6 +64,22 @@ class WorkspaceService
         return $workspace;
     }
 
+    /**
+     * Rotates the workspace QR token, invalidating all existing QR codes
+     * and NFC tags printed/programmed with the old token. The new token
+     * is unique (Workspace.qrToken column) — collision risk is negligible
+     * with TokenGenerator's 20-char alphabet, but if it ever happened the
+     * unique constraint would surface as a DBAL error and the owner could
+     * retry. Sub-QR tokens (WorkspaceQrCode) are not touched here.
+     */
+    public function regenerateQrToken(Workspace $workspace): Workspace
+    {
+        $workspace->regenerateQrToken();
+        $this->workspaceRepository->flush();
+
+        return $workspace;
+    }
+
     public function delete(Workspace $workspace): void
     {
         $now = DateService::now();

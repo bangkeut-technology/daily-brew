@@ -114,6 +114,30 @@ class WorkspaceController extends AbstractController
         ]);
     }
 
+    #[Route('/{publicId}/regenerate-qr-token', name: 'workspaces_regenerate_qr_token', methods: ['POST'])]
+    public function regenerateQrToken(
+        string $publicId,
+        WorkspaceRepository $workspaceRepository,
+        WorkspaceService $workspaceService,
+    ): JsonResponse {
+        $workspace = $workspaceRepository->findByPublicId($publicId);
+        if ($workspace === null) {
+            throw new NotFoundHttpException('Workspace not found');
+        }
+
+        // EDIT on a Workspace subject is owner-only — managers can't rotate
+        // the token because doing so invalidates every printed QR / programmed
+        // NFC tag and the owner is the one who has to reprint/reprogram them.
+        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $workspace);
+
+        $workspace = $workspaceService->regenerateQrToken($workspace);
+
+        return $this->jsonSuccess([
+            'publicId' => (string) $workspace->getPublicId(),
+            'qrToken' => $workspace->getQrToken(),
+        ]);
+    }
+
     #[Route('/{publicId}', name: 'workspaces_delete', methods: ['DELETE'])]
     public function delete(
         string $publicId,

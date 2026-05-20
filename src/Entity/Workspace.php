@@ -130,6 +130,19 @@ class Workspace extends AbstractBaseEntity
         return $this->qrToken;
     }
 
+    /**
+     * Rotates the QR token to a fresh value. Used when the owner wants to
+     * invalidate previously printed QR codes or programmed NFC stickers
+     * (e.g., after losing a tag or removing a former employee with one).
+     * Sub-QR tokens are intentionally NOT touched — they're rotated
+     * individually from the QR codes page.
+     */
+    public function regenerateQrToken(): static
+    {
+        $this->qrToken = TokenGenerator::generatePublicId(20);
+        return $this;
+    }
+
     public function getName(): ?string
     {
         return $this->name;
