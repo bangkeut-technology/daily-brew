@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.67.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.67.0...v1.67.1) (2026-05-21)
+
+
+### Bug Fixes
+
+* **attendance:** expose edit affordance on Gantt + Summary views ([1d7d239](https://github.com/bangkeut-technology/daily-brew/commit/1d7d239648778c76a59c346db185bbc912472e17))
+
 ## [1.67.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.66.0...v1.67.0) (2026-05-21)
 
 
