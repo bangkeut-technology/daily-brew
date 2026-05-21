@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.68.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.68.0...v1.68.1) (2026-05-21)
+
+
+### Bug Fixes
+
+* **auth:** scope /token/refresh to its own firewall so JWT authenticator can't intercept ([#127](https://github.com/bangkeut-technology/daily-brew/issues/127)) ([3a82a88](https://github.com/bangkeut-technology/daily-brew/commit/3a82a8835e9adc54d3efbb990d565bb9adff7aad))
+
 ## [1.68.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.67.1...v1.68.0) (2026-05-21)
 
 
