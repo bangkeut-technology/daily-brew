@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.69.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.68.1...v1.69.0) (2026-05-21)
+
+
+### Features
+
+* **auth:** logout revokes refresh-token row + single_use rotation ([#129](https://github.com/bangkeut-technology/daily-brew/issues/129)) ([0574dc2](https://github.com/bangkeut-technology/daily-brew/commit/0574dc21140322d0e633d37e6dd627a14f27ac56))
+
 ## [1.68.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.68.0...v1.68.1) (2026-05-21)
 
 
