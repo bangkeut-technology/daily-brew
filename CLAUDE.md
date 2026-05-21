@@ -24,7 +24,7 @@ All entities carry `id`, `publicId` (UUID), `createdAt`, `updatedAt`.
 - **WorkspaceSetting** (1:1) — ipRestrictionEnabled+allowedIps, deviceVerificationEnabled, timezone (IANA, default `Asia/Phnom_Penh`), dateFormat, geofencing (enabled/lat/lng/radiusMeters)
 - **Shift / Closure** — workspace+name+start/end (time / date)
 - **Employee** — workspace, user (creator), linkedUser (nullable; unique with workspace), shift, firstName, lastName, username, phoneNumber, dob, joinedAt, role (employee/manager), status, attendanceTracking (`EmployeeAttendanceTrackingEnum`: `full` default | `none`), deletedAt
-- **Attendance** — employee, workspace, qrCode (nullable, ON DELETE SET NULL — null = main QR), date, checkInAt/checkOutAt, isLate, leftEarly, ipAddress, checkIn/OutDeviceId/Name. Unique (employee, date)
+- **Attendance** — employee, workspace, qrCode (nullable, ON DELETE SET NULL — null = main QR), date, checkInAt/checkOutAt, isLate, leftEarly, ipAddress, checkIn/OutDeviceId/Name. Unique (employee, date). **Manager-override audit** (populated only when an owner/manager edits the row): editedAt, editedBy (User, SET NULL), editedByEmail, editReason (255 chars), originalCheckInAt/originalCheckOutAt (snapshotted on first edit only — subsequent edits never overwrite).
 - **LeaveRequest** — employee, startDate, endDate, startTime/endTime (both null = full day), reason, type (paid/unpaid), status, reviewedAt
 - **WorkspaceQrCode** (Double Espresso) — workspace (CASCADE), qrToken (unique), name, manager (Employee, nullable, ON DELETE SET NULL, linked user required), assignedEmployees M:N. Inherit flags+overrides: `inheritIpSettings`, `inheritGeofencing`, `inheritDeviceVerification`. Timezone always inherited.
 - **DeviceToken** — Expo token (unique), platform (ios/android/web), user (CASCADE)
@@ -35,7 +35,9 @@ All entities carry `id`, `publicId` (UUID), `createdAt`, `updatedAt`.
 
 **Closures & leave.** Skip attendance on closure dates. `LeaveRequestService::create` enforces startDate ≤ endDate, no closure overlap (`ClosurePeriodRepository::findOverlappingClosure`), no duplicate pending/approved (`LeaveRequestRepository::findOverlappingForEmployee`). CREATE uses `WorkspaceVoter::VIEW` (backend enforces self-only); employees DELETE own pending; owners/managers cancel any. `CheckinService` blocks check-in on approved full-day leave; status returns `onLeave`+`leaveIsFullDay`.
 
-**Late/early.** Computed at check-in/out vs assigned Shift + grace minutes. No shift → always false. **`attendanceTracking=none` employees never get flagged regardless of shift** — `CheckinService` skips the late/leftEarly branches via `$employee->isAttendanceTracked()`. All comparisons in workspace TZ.
+**Late/early.** Computed at check-in/out vs assigned Shift + grace minutes. No shift → always false. **`attendanceTracking=none` employees never get flagged regardless of shift** — `AttendanceFlagCalculator` (shared by `CheckinService` and `AttendanceService::override`) short-circuits when `!$employee->isAttendanceTracked()`. All comparisons in workspace TZ.
+
+**Attendance override.** Owners and managers with `manage_attendance` can fix forgotten check-outs and typos via `PATCH /workspaces/{ws}/attendances/{publicId}` `{ checkInAt?, checkOutAt?, reason }`. `AttendanceService::override` validates (reason required, HH:MM format, checkout ≥ check-in, can't clear check-in while check-out is set), parses times in workspace TZ, snapshots originals **only on first edit**, stamps audit (editedAt, editedBy, editedByEmail, editReason), and recomputes late/leftEarly flags via `AttendanceFlagCalculator`. Voter gates via `WorkspaceVoter::EDIT` on the `Attendance` subject → resolves to `MANAGE_ATTENDANCE`. List + summary endpoints surface the audit fields so clients can render an "Edited" pill and "Originally HH:MM → HH:MM" sub-line.
 
 **Attendance tracking modes** (`Employee.attendanceTracking`):
 - `full` (default) — counted in `DashboardService` absent calc, late/leftEarly flags fire when shift assigned.
@@ -75,6 +77,10 @@ All entities carry `id`, `publicId` (UUID), `createdAt`, `updatedAt`.
 ## Architecture
 
 Auth: JWT (LexikJWT) — email+password, Google OAuth, Apple OAuth. BasilBook: `basilbook` firewall + `BasilBookApiKeyAuthenticator` (`X-Api-Key`).
+
+**Refresh-token firewall.** `^/api/token/refresh` lives in its own `token_refresh` firewall declared **before** the `api` firewall. Reason: iOS NSURLSession sends the `BEARER` cookie on the refresh URL despite the cookie's `path=/api/v1` (RFC 6265 path scoping is observed loosely on iOS). With both authenticators in one firewall, JWT runs first, validates the expired cookie, and returns "Expired JWT Token" 401 — clients classify that as a fatal refresh failure and wipe the session (the 1-hour silent-logout bug shipped in 1.68.1 fix). Splitting the firewall means only `refresh_jwt` ever sees the refresh path; the JWT cookie can't intercept.
+
+**Refresh-token hygiene.** `gesdinet_jwt_refresh_token.single_use: true` — every successful refresh deletes the consumed token and mints a new one (bundle's `AttachRefreshTokenOnSuccessListener` handles rotation). `/auth/logout` (`LogoutController`) reads `refresh_token` from cookie first, JSON body fallback (mobile), then calls `AuthService::revokeRefreshToken` which deletes the DB row via gesdinet's `RefreshTokenManagerInterface`. A leaked/captured token's useful life is now "until next refresh by the legitimate device" rather than the full 30-day TTL.
 
 Backend: Symfony 7 + Doctrine + LexikJWT + KnpPaginator. API `/api/v1/{_locale}` (en/fr/km), except checkin/device (no locale). Controller+Trait; logic in `src/Service/`. Multi-tenant: Workspace root, `WorkspaceVoter`.
 

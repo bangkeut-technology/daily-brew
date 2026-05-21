@@ -10,6 +10,8 @@ Authentication is JWT (issued at login or OAuth callback, sent as the `BEARER` c
 - `POST /api/v1/{locale}/auth/register`
 - `POST /api/v1/{locale}/auth/google`
 - `POST /api/v1/{locale}/auth/apple`
+- `POST /api/v1/{locale}/auth/logout` — invalidates the session, expires the `BEARER` + `refresh_token` cookies, **and deletes the refresh-token DB row** (read from cookie, falls back to JSON body `{ "refresh_token": "..." }` for mobile). Idempotent — no-op when the token is absent or already gone.
+- `POST /api/token/refresh` — **outside the `/v1` prefix**. Body: `{ "refresh_token": "..." }`. Returns `{ "token": "<new JWT>", "refresh_token": "<rotated token>" }`. `single_use: true` means every successful refresh deletes the consumed token and mints a new one; clients MUST persist the rotated `refresh_token` from the response. Scoped to its own `token_refresh` firewall (ahead of `^/api`) so the JWT cookie authenticator can't intercept — see CLAUDE.md "Refresh-token firewall" for the iOS-specific reason.
 
 ## Workspaces (authenticated)
 
@@ -28,7 +30,8 @@ Authentication is JWT (issued at login or OAuth callback, sent as the `BEARER` c
 - `GET/POST /api/v1/{locale}/workspaces/{publicId}/closures`
 - `GET/POST /api/v1/{locale}/workspaces/{publicId}/leave-requests`
 - `DELETE /api/v1/{locale}/workspaces/{publicId}/leave-requests/{publicId}` — cancel leave request (employee: own pending only; owner: any; manager with `manage_leave`: any; per-QR manager: any belonging to an assigned employee)
-- `GET /api/v1/{locale}/workspaces/{publicId}/attendances` — owner sees all; manager with `manage_attendance` sees all; otherwise the response is scoped to the caller's own attendance
+- `GET /api/v1/{locale}/workspaces/{publicId}/attendances` — owner sees all; manager with `manage_attendance` sees all; otherwise the response is scoped to the caller's own attendance. Present rows include manager-override audit fields (`editedAt`, `editedByEmail`, `editReason`, `originalCheckInAt`, `originalCheckOutAt`) when applicable.
+- `PATCH /api/v1/{locale}/workspaces/{publicId}/attendances/{attendancePublicId}` — owner or manager with `manage_attendance` override an existing attendance row. Body: `{ "checkInAt"?: "HH:MM" | null, "checkOutAt"?: "HH:MM" | null, "reason": string }`. Times are workspace-local; reason is required (max 255 chars). First edit snapshots originals (`originalCheckInAt`/`originalCheckOutAt`) so subsequent edits don't lose the raw scan. Late/leftEarly flags recompute via `AttendanceFlagCalculator`. Returns the updated `AttendanceDTO`.
 - `GET /api/v1/{locale}/workspaces/{publicId}/settings/my-ip` — returns client IP as seen by server
 
 ## API Tokens (authenticated, owner only)

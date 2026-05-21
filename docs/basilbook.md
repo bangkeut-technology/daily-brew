@@ -72,6 +72,7 @@ curl "https://dailybrew.work/api/v1/basilbook/attendances?from=2026-04-01&to=202
 - Only employees with a `username` are included
 - Days with no attendance are omitted — absence = missing date
 - `isLate` / `leftEarly` are always `false` if employee has no shift
+- If an owner/manager has manually overridden an attendance row, the returned `checkInAt`/`checkOutAt` reflect the **edited values**, not the original scan times (the override represents "what really happened"). Originals stay in the DB for audit but aren't exposed here.
 
 ## Errors
 
