@@ -293,16 +293,27 @@ export interface AttendanceRecord {
   isLate: boolean;
   leftEarly: boolean;
   status?: AttendanceStatus;
+  editedAt?: string | null;
+  editedByEmail?: string | null;
+  editReason?: string | null;
+  originalCheckInAt?: string | null;
+  originalCheckOutAt?: string | null;
 }
 
 export interface AttendanceDayStatus {
   date: string;
   status: 'present' | 'absent' | 'leave' | 'closure' | 'upcoming';
+  attendancePublicId?: string;
   checkInAt?: string | null;
   checkOutAt?: string | null;
   isLate?: boolean;
   leftEarly?: boolean;
   leaveType?: 'paid' | 'unpaid';
+  editedAt?: string | null;
+  editedByEmail?: string | null;
+  editReason?: string | null;
+  originalCheckInAt?: string | null;
+  originalCheckOutAt?: string | null;
 }
 
 export interface AttendanceSummaryEmployee {

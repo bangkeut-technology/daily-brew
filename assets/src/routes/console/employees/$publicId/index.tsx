@@ -29,6 +29,7 @@ import { CustomSelect } from '@/components/shared/CustomSelect';
 import { Toggle } from '@/components/shared/Toggle';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
+import { AttendanceEditModal } from '@/components/shared/AttendanceEditModal';
 import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
 import { JobTitleInput } from '@/components/shared/JobTitleInput';
 import { useDateFormat } from '@/hooks/useDateFormat';
@@ -144,6 +145,17 @@ function EmployeeDetailPage() {
   // (see WorkspaceVoter) — hide those affordances for managers so they don't
   // click buttons that 403.
   const isOwner = roleContext?.isOwner ?? false;
+  const canEditAttendance = isOwner
+    || (roleContext?.managerPermissions ?? []).includes('manage_attendance');
+  const [editAttendance, setEditAttendance] = useState<{
+    publicId: string;
+    employeeName?: string | null;
+    date: string;
+    checkInAt: string | null;
+    checkOutAt: string | null;
+    originalCheckInAt?: string | null;
+    originalCheckOutAt?: string | null;
+  } | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [linkUserId, setLinkUserId] = useState('');
   const [linkUserIdError, setLinkUserIdError] = useState<string | null>(null);
@@ -1037,14 +1049,22 @@ function EmployeeDetailPage() {
                   className="flex items-center justify-between px-5 py-2.5 border-b border-cream-3/50 last:border-0"
                 >
                   <div>
-                    <div className="text-[14.5px] font-mono tabular-nums text-text-primary">
+                    <div className="text-[14.5px] font-mono tabular-nums text-text-primary flex items-center gap-2">
                       {fmtDate(a.date)}
+                      {a.editedAt && (
+                        <span
+                          title={t('attendance.editedTooltip', 'Edited by a manager')}
+                          className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium uppercase tracking-wide bg-coffee/10 text-coffee"
+                        >
+                          {t('attendance.editedBadge', 'Edited')}
+                        </span>
+                      )}
                     </div>
                     <div className="text-[13px] text-text-tertiary">
                       {a.checkInAt || '--:--'} &rarr; {a.checkOutAt || '--:--'}
                     </div>
                   </div>
-                  <div className="flex gap-1">
+                  <div className="flex items-center gap-1">
                     {a.isLate && (
                       <StatusBadge label={t('attendance.late', 'Late')} variant="amber" />
                     )}
@@ -1053,6 +1073,24 @@ function EmployeeDetailPage() {
                     )}
                     {!a.isLate && !a.leftEarly && a.checkInAt && (
                       <StatusBadge label={t('attendance.onTime', 'On time')} variant="green" />
+                    )}
+                    {canEditAttendance && a.checkInAt && (
+                      <button
+                        type="button"
+                        onClick={() => setEditAttendance({
+                          publicId: a.publicId,
+                          employeeName: fullName,
+                          date: a.date,
+                          checkInAt: a.checkInAt,
+                          checkOutAt: a.checkOutAt,
+                          originalCheckInAt: a.originalCheckInAt ?? null,
+                          originalCheckOutAt: a.originalCheckOutAt ?? null,
+                        })}
+                        aria-label={t('attendance.editAria', 'Edit attendance')}
+                        className="w-7 h-7 rounded-lg flex items-center justify-center bg-transparent border-none text-text-tertiary hover:text-coffee hover:bg-cream-3/40 cursor-pointer transition-colors"
+                      >
+                        <Pencil size={13} />
+                      </button>
                     )}
                   </div>
                 </div>
@@ -1095,6 +1133,13 @@ function EmployeeDetailPage() {
           />
         </div>
       </ConfirmModal>
+
+      <AttendanceEditModal
+        open={!!editAttendance}
+        onOpenChange={(open) => { if (!open) setEditAttendance(null); }}
+        workspacePublicId={workspaceId}
+        attendance={editAttendance}
+      />
     </div>
   );
 }

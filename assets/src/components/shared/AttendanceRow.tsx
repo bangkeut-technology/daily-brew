@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
+import { Pencil } from 'lucide-react';
 import { Avatar } from './Avatar';
 import { StatusBadge } from './StatusBadge';
+import { cn } from '@/lib/utils';
 import type { AttendanceStatus } from '@/types';
 
 interface AttendanceRowProps {
@@ -13,6 +15,8 @@ interface AttendanceRowProps {
   index: number;
   status?: AttendanceStatus;
   date?: string;
+  edited?: boolean;
+  onEdit?: () => void;
 }
 
 export function AttendanceRow({
@@ -25,6 +29,8 @@ export function AttendanceRow({
   index,
   status: attendanceStatus,
   date,
+  edited,
+  onEdit,
 }: AttendanceRowProps) {
   const { t } = useTranslation();
 
@@ -41,12 +47,23 @@ export function AttendanceRow({
   };
 
   const badge = getStatusBadge();
+  const showEdit = !!onEdit && attendanceStatus !== 'absent' && attendanceStatus !== 'on_leave';
 
   return (
     <div className="flex items-center gap-3 px-5 py-2.5 transition-colors duration-[120ms] hover:bg-cream-3/35 cursor-default">
       <Avatar name={employee} index={index} size={32} />
       <div className="flex-1">
-        <div className="text-[15.5px] font-medium text-text-primary font-sans">{employee}</div>
+        <div className="text-[15.5px] font-medium text-text-primary font-sans flex items-center gap-2">
+          {employee}
+          {edited && (
+            <span
+              title={t('attendance.editedTooltip', 'Edited by a manager')}
+              className="inline-flex items-center px-1.5 py-0.5 rounded text-[10.5px] font-medium uppercase tracking-wide bg-coffee/10 text-coffee"
+            >
+              {t('attendance.editedBadge', 'Edited')}
+            </span>
+          )}
+        </div>
         <div className="text-[13px] text-text-tertiary font-sans">
           {shift || t('attendance.noShift', 'No shift')}
           {date ? ` · ${date}` : ''}
@@ -54,15 +71,27 @@ export function AttendanceRow({
       </div>
       <div className="text-[14.5px] text-text-secondary font-mono tabular-nums">
         {attendanceStatus === 'absent' || attendanceStatus === 'on_leave'
-          ? '\u2014'
+          ? '—'
           : (
             <>
               {time}
-              {checkOut ? ` \u2192 ${checkOut}` : ''}
+              {checkOut ? ` → ${checkOut}` : ''}
             </>
           )}
       </div>
       <StatusBadge label={badge.label} variant={badge.variant} />
+      {showEdit && (
+        <button
+          type="button"
+          onClick={onEdit}
+          aria-label={t('attendance.editAria', 'Edit attendance')}
+          className={cn(
+            'w-7 h-7 rounded-lg flex items-center justify-center bg-transparent border-none cursor-pointer transition-colors text-text-tertiary hover:text-coffee hover:bg-cream-3/40',
+          )}
+        >
+          <Pencil size={13} />
+        </button>
+      )}
     </div>
   );
 }

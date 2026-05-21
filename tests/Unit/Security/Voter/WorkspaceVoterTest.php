@@ -172,6 +172,44 @@ class WorkspaceVoterTest extends TestCase
         );
     }
 
+    public function testEditOnAttendanceResolvesToManageAttendance(): void
+    {
+        $user = $this->user(2);
+        $workspace = $this->workspaceOwnedBy(1);
+        $manager = $this->managerEmployee(
+            [ManagerPermissionEnum::MANAGE_ATTENDANCE],
+            $workspace,
+        );
+        $this->employeeRepository->method('findOneByLinkedUserAndWorkspace')->willReturn($manager);
+        $token = $this->tokenFor($user);
+
+        $attendanceOwner = (new Employee())->setWorkspace($workspace);
+        $attendance = (new Attendance())->setEmployee($attendanceOwner);
+
+        $this->assertSame(
+            VoterInterface::ACCESS_GRANTED,
+            $this->voter->vote($token, $attendance, [WorkspaceVoter::EDIT]),
+            'manage_attendance grants EDIT on Attendance',
+        );
+    }
+
+    public function testEditOnAttendanceDeniedWithoutManageAttendance(): void
+    {
+        $user = $this->user(2);
+        $workspace = $this->workspaceOwnedBy(1);
+        $manager = $this->managerEmployee([ManagerPermissionEnum::MANAGE_SHIFTS], $workspace);
+        $this->employeeRepository->method('findOneByLinkedUserAndWorkspace')->willReturn($manager);
+        $token = $this->tokenFor($user);
+
+        $attendanceOwner = (new Employee())->setWorkspace($workspace);
+        $attendance = (new Attendance())->setEmployee($attendanceOwner);
+
+        $this->assertSame(
+            VoterInterface::ACCESS_DENIED,
+            $this->voter->vote($token, $attendance, [WorkspaceVoter::EDIT]),
+        );
+    }
+
     public function testEditOnWorkspaceSubjectIsOwnerOnly(): void
     {
         $user = $this->user(2);

@@ -85,6 +85,31 @@ class Attendance extends AbstractBaseEntity
     #[Groups(['attendance:read'])]
     private ?WorkspaceQrCode $qrCode = null;
 
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    #[Groups(['attendance:read'])]
+    private ?DateTimeImmutable $editedAt = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?User $editedBy = null;
+
+    #[ORM\Column(length: 180, nullable: true)]
+    #[Groups(['attendance:read'])]
+    private ?string $editedByEmail = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['attendance:read'])]
+    private ?string $editReason = null;
+
+    /** Original scan time captured on first manager edit. Never overwritten on subsequent edits. */
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    #[Groups(['attendance:read'])]
+    private ?DateTimeImmutable $originalCheckInAt = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    #[Groups(['attendance:read'])]
+    private ?DateTimeImmutable $originalCheckOutAt = null;
+
     // ── Date ───────────────────────────────────────────────────
 
     public function getDate(): ?DateTimeImmutable
@@ -220,5 +245,30 @@ class Attendance extends AbstractBaseEntity
     {
         $this->qrCode = $qrCode;
         return $this;
+    }
+
+    // ── Edit audit ─────────────────────────────────────────────
+
+    public function getEditedAt(): ?DateTimeImmutable { return $this->editedAt; }
+    public function setEditedAt(?DateTimeImmutable $v): static { $this->editedAt = $v; return $this; }
+
+    public function getEditedBy(): ?User { return $this->editedBy; }
+    public function setEditedBy(?User $v): static { $this->editedBy = $v; return $this; }
+
+    public function getEditedByEmail(): ?string { return $this->editedByEmail; }
+    public function setEditedByEmail(?string $v): static { $this->editedByEmail = $v; return $this; }
+
+    public function getEditReason(): ?string { return $this->editReason; }
+    public function setEditReason(?string $v): static { $this->editReason = $v; return $this; }
+
+    public function getOriginalCheckInAt(): ?DateTimeImmutable { return $this->originalCheckInAt; }
+    public function setOriginalCheckInAt(?DateTimeImmutable $v): static { $this->originalCheckInAt = $v; return $this; }
+
+    public function getOriginalCheckOutAt(): ?DateTimeImmutable { return $this->originalCheckOutAt; }
+    public function setOriginalCheckOutAt(?DateTimeImmutable $v): static { $this->originalCheckOutAt = $v; return $this; }
+
+    public function isEdited(): bool
+    {
+        return $this->editedAt !== null;
     }
 }

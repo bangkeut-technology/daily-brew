@@ -7,12 +7,10 @@ namespace App\Service;
 use App\Entity\Attendance;
 use App\Entity\Employee;
 use App\Entity\WorkspaceQrCode;
-use App\Enum\DayOfWeekEnum;
 use App\Repository\AttendanceRepository;
 use App\Repository\ClosurePeriodRepository;
 use App\Repository\LeaveRequestRepository;
 use App\Service\Checkin\EffectiveCheckinSettings;
-use DateTimeImmutable;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -22,7 +20,7 @@ class CheckinService
         private AttendanceRepository $attendanceRepository,
         private ClosurePeriodRepository $closurePeriodRepository,
         private LeaveRequestRepository $leaveRequestRepository,
-        private PlanService $planService,
+        private AttendanceFlagCalculator $flagCalculator,
     ) {}
 
     public function checkin(
@@ -42,7 +40,6 @@ class CheckinService
 
         $wsTz = new \DateTimeZone($settings->timezone);
         $nowUtc = DateService::now();
-        $now = $nowUtc->setTimezone($wsTz); // for time comparisons (late/early)
         $today = DateService::today($wsTz);
 
         // IP restriction check
@@ -116,23 +113,7 @@ class CheckinService
             $attendance->setCheckInDeviceId($deviceId);
             $attendance->setCheckInDeviceName($deviceName);
 
-            // Late detection (ShiftTimeRule-aware)
-            // Shift times are stored as bare H:i values representing workspace-local time,
-            // so we compare them against $now which is already in the workspace timezone.
-            // Employees with attendanceTracking=None are excluded entirely — we record the
-            // time but never flag them as late, because the owner has opted them out of
-            // attendance discipline.
-            $shift = $employee->getShift();
-            if ($shift !== null && $employee->isAttendanceTracked()) {
-                $shiftStart = $this->resolveEffectiveStartTime($shift, $now);
-                if ($shiftStart !== null) {
-                    $grace = $shift->getGraceLateMinutes();
-                    $startMinutes = $this->timeToMinutes($shiftStart);
-                    $startMinutes += $grace;
-                    $checkInMinutes = (int) $now->format('G') * 60 + (int) $now->format('i');
-                    $attendance->setIsLate($checkInMinutes > $startMinutes);
-                }
-            }
+            $this->flagCalculator->recompute($attendance, $employee, $wsTz);
 
             $this->attendanceRepository->persist($attendance);
         } elseif ($attendance->getCheckOutAt() === null) {
@@ -154,19 +135,7 @@ class CheckinService
             $attendance->setCheckOutDeviceId($deviceId);
             $attendance->setCheckOutDeviceName($deviceName);
 
-            // Left early detection (ShiftTimeRule-aware)
-            // Same exclusion as late detection — None-tracked employees never get flagged.
-            $shift = $employee->getShift();
-            if ($shift !== null && $employee->isAttendanceTracked()) {
-                $shiftEnd = $this->resolveEffectiveEndTime($shift, $now);
-                if ($shiftEnd !== null) {
-                    $grace = $shift->getGraceEarlyMinutes();
-                    $endMinutes = $this->timeToMinutes($shiftEnd);
-                    $endMinutes -= $grace;
-                    $checkOutMinutes = (int) $now->format('G') * 60 + (int) $now->format('i');
-                    $attendance->setLeftEarly($checkOutMinutes < $endMinutes);
-                }
-            }
+            $this->flagCalculator->recompute($attendance, $employee, $wsTz);
         } else {
             throw new BadRequestHttpException('Already checked in and out for today');
         }
@@ -183,59 +152,6 @@ class CheckinService
             $employee,
             DateService::today($tz)
         );
-    }
-
-    /**
-     * Resolve effective start time for a shift on a given date.
-     * Checks ShiftTimeRule per-day override first (Espresso+ only), falls back to default.
-     */
-    private function resolveEffectiveStartTime(\App\Entity\Shift $shift, \DateTimeInterface $date): ?\DateTimeInterface
-    {
-        $workspace = $shift->getWorkspace();
-        if ($workspace !== null && $this->planService->canUseShiftTimeRules($workspace)) {
-            $dayOfWeek = DayOfWeekEnum::tryFrom((int) $date->format('N'));
-            if ($dayOfWeek !== null) {
-                foreach ($shift->getTimeRules() as $rule) {
-                    if ($rule->getDayOfWeek() === $dayOfWeek) {
-                        return DateService::createFromFormat('H:i', $rule->getStartTime()) ?: null;
-                    }
-                }
-            }
-        }
-        return $shift->getStartTime();
-    }
-
-    private function resolveEffectiveEndTime(\App\Entity\Shift $shift, \DateTimeInterface $date): ?\DateTimeInterface
-    {
-        $workspace = $shift->getWorkspace();
-        if ($workspace !== null && $this->planService->canUseShiftTimeRules($workspace)) {
-            $dayOfWeek = DayOfWeekEnum::tryFrom((int) $date->format('N'));
-            if ($dayOfWeek !== null) {
-                foreach ($shift->getTimeRules() as $rule) {
-                    if ($rule->getDayOfWeek() === $dayOfWeek) {
-                        return DateService::createFromFormat('H:i', $rule->getEndTime()) ?: null;
-                    }
-                }
-            }
-        }
-        return $shift->getEndTime();
-    }
-
-    /**
-     * Extract minutes-since-midnight from a time value.
-     *
-     * Shift times are conceptually "wall-clock" values (e.g. 08:00 means 8 AM
-     * in the workspace timezone) regardless of the DateTimeZone attached to the
-     * object.  Doctrine's `time` type hydrates with the server default TZ and
-     * DateService::createFromFormat uses UTC, but either way the H:i digits
-     * represent the intended local time.  We therefore read just the hour and
-     * minute digits — never converting to another timezone.
-     */
-    private function timeToMinutes(\DateTimeInterface $time): int
-    {
-        // format('G') gives 0-23 hour without leading zero; 'i' gives 00-59 minutes.
-        // These reflect the digits stored in the DB, not a TZ-converted wall-clock.
-        return (int) $time->format('G') * 60 + (int) $time->format('i');
     }
 
     /**

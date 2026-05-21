@@ -15,6 +15,11 @@ final readonly class AttendanceDTO
         public ?string $checkOutAt,
         public bool    $isLate,
         public bool    $leftEarly,
+        public ?string $editedAt = null,
+        public ?string $editedByEmail = null,
+        public ?string $editReason = null,
+        public ?string $originalCheckInAt = null,
+        public ?string $originalCheckOutAt = null,
         public ?string $employeePublicId = null,
         public ?string $employeeName = null,
         public ?string $shiftName = null,
@@ -30,6 +35,8 @@ final readonly class AttendanceDTO
             return $dt->format('H:i');
         };
 
+        $editedAt = $a->getEditedAt();
+
         return new self(
             publicId: (string) $a->getPublicId(),
             date: $a->getDate()->format('Y-m-d'),
@@ -37,6 +44,11 @@ final readonly class AttendanceDTO
             checkOutAt: $formatTime($a->getCheckOutAt()),
             isLate: $a->isLate(),
             leftEarly: $a->hasLeftEarly(),
+            editedAt: $editedAt?->format(\DateTimeInterface::ATOM),
+            editedByEmail: $a->getEditedByEmail(),
+            editReason: $a->getEditReason(),
+            originalCheckInAt: $formatTime($a->getOriginalCheckInAt()),
+            originalCheckOutAt: $formatTime($a->getOriginalCheckOutAt()),
             employeePublicId: $includeEmployee ? (string) $a->getEmployee()->getPublicId() : null,
             employeeName: $includeEmployee ? $a->getEmployee()->getName() : null,
             shiftName: $includeEmployee ? $a->getEmployee()->getShift()?->getName() : null,
@@ -52,6 +64,11 @@ final readonly class AttendanceDTO
             'checkOutAt' => $this->checkOutAt,
             'isLate' => $this->isLate,
             'leftEarly' => $this->leftEarly,
+            'editedAt' => $this->editedAt,
+            'editedByEmail' => $this->editedByEmail,
+            'editReason' => $this->editReason,
+            'originalCheckInAt' => $this->originalCheckInAt,
+            'originalCheckOutAt' => $this->originalCheckOutAt,
         ];
 
         if ($this->employeePublicId !== null) {

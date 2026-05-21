@@ -12,6 +12,7 @@ use App\Enum\EmployeeAttendanceTrackingEnum;
 use App\Repository\AttendanceRepository;
 use App\Repository\ClosurePeriodRepository;
 use App\Repository\LeaveRequestRepository;
+use App\Service\AttendanceFlagCalculator;
 use App\Service\Checkin\EffectiveCheckinSettings;
 use App\Service\CheckinService;
 use App\Service\DateService;
@@ -53,7 +54,7 @@ class CheckinServiceLateEarlyTest extends TestCase
             $this->attendanceRepo,
             $this->closureRepo,
             $this->leaveRepo,
-            $this->planService,
+            new AttendanceFlagCalculator($this->planService),
         );
     }
 

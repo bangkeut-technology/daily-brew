@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiAxios } from '@/lib/apiAxios';
 import type { AttendanceRecord } from '@/types';
 
@@ -17,5 +17,30 @@ export function useAttendance(
       return data;
     },
     enabled: !!workspacePublicId,
+  });
+}
+
+export interface AttendanceOverridePayload {
+  /** "HH:MM" workspace-local, null to clear, undefined to leave untouched */
+  checkInAt?: string | null;
+  checkOutAt?: string | null;
+  reason: string;
+}
+
+export function useOverrideAttendance(workspacePublicId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ publicId, payload }: { publicId: string; payload: AttendanceOverridePayload }) => {
+      const { data } = await apiAxios.patch<AttendanceRecord>(
+        `/workspaces/${workspacePublicId}/attendances/${publicId}`,
+        payload,
+      );
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['attendance', workspacePublicId] });
+      qc.invalidateQueries({ queryKey: ['attendance-summary', workspacePublicId] });
+      qc.invalidateQueries({ queryKey: ['employee-attendance'] });
+    },
   });
 }

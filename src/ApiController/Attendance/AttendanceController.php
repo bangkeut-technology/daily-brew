@@ -3,6 +3,7 @@
 namespace App\ApiController\Attendance;
 
 use App\ApiController\Trait\ApiResponseTrait;
+use App\DTO\AttendanceDTO;
 use App\Entity\User;
 use App\Enum\ManagerPermissionEnum;
 use App\Repository\AttendanceRepository;
@@ -11,6 +12,7 @@ use App\Repository\EmployeeRepository;
 use App\Repository\LeaveRequestRepository;
 use App\Repository\WorkspaceRepository;
 use App\Security\Voter\WorkspaceVoter;
+use App\Service\AttendanceService;
 use App\Service\DateService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -144,6 +146,11 @@ class AttendanceController extends AbstractController
                         'isLate' => $a->isLate(),
                         'leftEarly' => $a->hasLeftEarly(),
                         'status' => 'present',
+                        'editedAt' => $a->getEditedAt()?->format(\DateTimeInterface::ATOM),
+                        'editedByEmail' => $a->getEditedByEmail(),
+                        'editReason' => $a->getEditReason(),
+                        'originalCheckInAt' => $formatTime($a->getOriginalCheckInAt()),
+                        'originalCheckOutAt' => $formatTime($a->getOriginalCheckOutAt()),
                     ];
                 } elseif (!$isClosure && !$isFuture) {
                     // Check if on approved leave
@@ -318,10 +325,16 @@ class AttendanceController extends AbstractController
                         $days[] = [
                             'date' => $dateStr,
                             'status' => 'present',
+                            'attendancePublicId' => (string) $a->getPublicId(),
                             'checkInAt' => $formatTime($a->getCheckInAt()),
                             'checkOutAt' => $formatTime($a->getCheckOutAt()),
                             'isLate' => $a->isLate(),
                             'leftEarly' => $a->hasLeftEarly(),
+                            'editedAt' => $a->getEditedAt()?->format(\DateTimeInterface::ATOM),
+                            'editedByEmail' => $a->getEditedByEmail(),
+                            'editReason' => $a->getEditReason(),
+                            'originalCheckInAt' => $formatTime($a->getOriginalCheckInAt()),
+                            'originalCheckOutAt' => $formatTime($a->getOriginalCheckOutAt()),
                         ];
                         continue;
                     }
@@ -344,5 +357,64 @@ class AttendanceController extends AbstractController
         }
 
         return $this->jsonSuccess($result);
+    }
+
+    /**
+     * Manager/owner override for an existing attendance record. Used to close
+     * forgotten check-outs and fix typo'd scan times. Originals are snapshotted
+     * on first edit so the raw scan data is never lost.
+     */
+    #[Route('/{publicId}', name: 'attendances_update', methods: ['PATCH'])]
+    public function update(
+        string $workspacePublicId,
+        string $publicId,
+        Request $request,
+        #[CurrentUser] User $user,
+        WorkspaceRepository $workspaceRepository,
+        AttendanceRepository $attendanceRepository,
+        AttendanceService $attendanceService,
+    ): JsonResponse {
+        $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
+        if ($workspace === null) {
+            throw new NotFoundHttpException('Workspace not found');
+        }
+
+        $attendance = $attendanceRepository->findByPublicId($publicId);
+        if ($attendance === null || $attendance->getEmployee()?->getWorkspace()?->getId() !== $workspace->getId()) {
+            throw new NotFoundHttpException('Attendance not found');
+        }
+
+        $this->denyAccessUnlessGranted(WorkspaceVoter::EDIT, $attendance);
+
+        $data = json_decode($request->getContent(), true);
+        if (!is_array($data)) {
+            return $this->jsonError('Invalid JSON body');
+        }
+
+        $checkInProvided = array_key_exists('checkInAt', $data);
+        $checkOutProvided = array_key_exists('checkOutAt', $data);
+        $reason = is_string($data['reason'] ?? null) ? $data['reason'] : '';
+
+        $checkIn = $data['checkInAt'] ?? null;
+        $checkOut = $data['checkOutAt'] ?? null;
+        if ($checkIn !== null && !is_string($checkIn)) {
+            return $this->jsonError('checkInAt must be a HH:MM string or null');
+        }
+        if ($checkOut !== null && !is_string($checkOut)) {
+            return $this->jsonError('checkOutAt must be a HH:MM string or null');
+        }
+
+        $attendanceService->override(
+            attendance: $attendance,
+            actor: $user,
+            checkInAt: $checkIn,
+            checkOutAt: $checkOut,
+            checkInProvided: $checkInProvided,
+            checkOutProvided: $checkOutProvided,
+            reason: $reason,
+        );
+
+        $wsTz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
+        return $this->jsonSuccess(AttendanceDTO::fromEntity($attendance, includeEmployee: true, tz: $wsTz)->toArray());
     }
 }

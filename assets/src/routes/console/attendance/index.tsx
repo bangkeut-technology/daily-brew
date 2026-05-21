@@ -12,6 +12,7 @@ import { endOfMonthInTimezone, parseDateAsUTC } from '@/lib/timezone';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { AttendanceRow } from '@/components/shared/AttendanceRow';
+import { AttendanceEditModal } from '@/components/shared/AttendanceEditModal';
 import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { StatusBadge } from '@/components/shared/StatusBadge';
@@ -156,6 +157,18 @@ function AttendancePage() {
   const isManager = roleContext?.isManager ?? false;
   const isEmployee = !!roleContext && roleContext.isEmployee && !roleContext.isOwner && !isManager;
   const employeePublicId = roleContext?.employee?.publicId;
+  const canEditAttendance = !!roleContext
+    && (roleContext.isOwner || (roleContext.managerPermissions ?? []).includes('manage_attendance'));
+
+  const [editTarget, setEditTarget] = useState<{
+    publicId: string;
+    employeeName?: string | null;
+    date: string;
+    checkInAt: string | null;
+    checkOutAt: string | null;
+    originalCheckInAt?: string | null;
+    originalCheckOutAt?: string | null;
+  } | null>(null);
 
   const setFrom = (value: string) => {
     setFromState(value);
@@ -465,12 +478,31 @@ function AttendancePage() {
                   leftEarly={a.leftEarly}
                   status={a.status}
                   index={i}
+                  edited={!!a.editedAt}
+                  onEdit={canEditAttendance && a.status === 'present'
+                    ? () => setEditTarget({
+                        publicId: a.publicId,
+                        employeeName: a.employeeName,
+                        date: a.date,
+                        checkInAt: a.checkInAt,
+                        checkOutAt: a.checkOutAt,
+                        originalCheckInAt: a.originalCheckInAt ?? null,
+                        originalCheckOutAt: a.originalCheckOutAt ?? null,
+                      })
+                    : undefined}
                 />
               ))}
             </div>
           </GlassCard>
         )
       )}
+
+      <AttendanceEditModal
+        open={!!editTarget}
+        onOpenChange={(open) => { if (!open) setEditTarget(null); }}
+        workspacePublicId={workspaceId}
+        attendance={editTarget}
+      />
     </div>
   );
 }

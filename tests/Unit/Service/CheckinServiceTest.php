@@ -14,6 +14,7 @@ use App\Repository\ClosurePeriodRepository;
 use App\Repository\LeaveRequestRepository;
 use App\Service\Checkin\EffectiveCheckinSettings;
 use App\Service\CheckinService;
+use App\Service\AttendanceFlagCalculator;
 use App\Service\PlanService;
 use DateTimeImmutable;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -48,7 +49,7 @@ class CheckinServiceTest extends TestCase
             $this->attendanceRepo,
             $this->closureRepo,
             $this->leaveRepo,
-            $this->planService,
+            new AttendanceFlagCalculator($this->planService),
         );
     }
 
@@ -363,7 +364,7 @@ class CheckinServiceTest extends TestCase
             $this->attendanceRepo,
             $this->closureRepo,
             $this->leaveRepo,
-            $this->planService,
+            new AttendanceFlagCalculator($this->planService),
         );
     }
 }
