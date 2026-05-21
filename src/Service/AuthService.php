@@ -4,6 +4,8 @@ namespace App\Service;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenInterface;
+use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AuthService
@@ -11,7 +13,27 @@ class AuthService
     public function __construct(
         private UserRepository $userRepository,
         private UserPasswordHasherInterface $passwordHasher,
+        private RefreshTokenManagerInterface $refreshTokenManager,
     ) {}
+
+    /**
+     * Delete a refresh-token DB row by its plain-text value. No-op if the
+     * token isn't present (already revoked, never existed, malformed).
+     *
+     * Used by /auth/logout to invalidate the credential server-side instead
+     * of relying on cookie expiry — a stolen refresh token would otherwise
+     * survive the user's "Sign out" tap for the full 30-day TTL.
+     */
+    public function revokeRefreshToken(?string $refreshTokenString): void
+    {
+        if ($refreshTokenString === null || $refreshTokenString === '') {
+            return;
+        }
+        $rt = $this->refreshTokenManager->get($refreshTokenString);
+        if ($rt instanceof RefreshTokenInterface) {
+            $this->refreshTokenManager->delete($rt);
+        }
+    }
 
     public function register(string $email, string $password, ?string $firstName = null, ?string $lastName = null): User
     {

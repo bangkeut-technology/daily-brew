@@ -1,6 +1,14 @@
 gesdinet_jwt_refresh_token:
     refresh_token_class: App\Entity\RefreshToken
     ttl: 2592000
+    # Rotate the refresh token on every successful refresh. The bundle's
+    # AttachRefreshTokenOnSuccessListener deletes the consumed token and
+    # mints a fresh one (vendor listener lines 67-75). This shrinks the
+    # leak window: a token captured from a screenshot, log, or proxy stops
+    # working the next time the legitimate device refreshes. Mobile already
+    # persists the rotated token via setTokens(newAccess, newRefresh) in
+    # src/lib/api.ts; web stores it the same way via handleAuthResponse.
+    single_use: true
     cookie:
         enabled: true
         # Keep the refresh_token in the JSON response body. Mobile clients
