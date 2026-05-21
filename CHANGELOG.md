@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.67.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.66.0...v1.67.0) (2026-05-21)
+
+
+### Features
+
+* **attendance:** owner/manager override for forgotten check-outs ([1a8e84d](https://github.com/bangkeut-technology/daily-brew/commit/1a8e84d7ada1a572bb637c19c804f09951487d65))
+
 ## [1.66.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.65.1...v1.66.0) (2026-05-20)
 
 
