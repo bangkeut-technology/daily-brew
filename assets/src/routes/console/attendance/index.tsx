@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CalendarDays, ChevronDown, ClipboardList, GanttChart, LayoutGrid, List } from 'lucide-react';
+import { CalendarDays, ChevronDown, ClipboardList, GanttChart, LayoutGrid, List, Pencil } from 'lucide-react';
 import { useAttendance } from '@/hooks/queries/useAttendance';
 import { useAttendanceSummary } from '@/hooks/queries/useAttendanceSummary';
 import { useEmployees } from '@/hooks/queries/useEmployees';
@@ -87,13 +87,16 @@ function ganttCell(day: AttendanceDayStatus, hasShift: boolean): GanttCellSpec {
   }
 }
 
-function GanttCellGlyph({ spec }: { spec: GanttCellSpec }) {
+function GanttCellGlyph({ spec, onClick }: { spec: GanttCellSpec; onClick?: () => void }) {
+  const clickable = !!onClick;
+  const interactiveClass = clickable ? 'cursor-pointer hover:bg-cream-3/40 rounded-md' : 'cursor-default';
+
   if (spec.kind === 'badge') {
-    return (
+    const inner = (
       <span
         title={spec.title}
         className={cn(
-          'inline-flex items-center justify-center w-[26px] h-[22px] rounded text-[11px] font-semibold font-mono cursor-default',
+          'inline-flex items-center justify-center w-[26px] h-[22px] rounded text-[11px] font-semibold font-mono',
           spec.bg,
           spec.text,
         )}
@@ -101,11 +104,29 @@ function GanttCellGlyph({ spec }: { spec: GanttCellSpec }) {
         {spec.code}
       </span>
     );
+    return clickable ? (
+      <button type="button" onClick={onClick} className={cn('p-0 border-none bg-transparent', interactiveClass)} aria-label={spec.title}>
+        {inner}
+      </button>
+    ) : inner;
   }
   if (spec.kind === 'dot-filled') {
-    return (
+    const inner = (
+      <span className="block w-[10px] h-[10px] rounded-full bg-green" />
+    );
+    return clickable ? (
+      <button
+        type="button"
+        onClick={onClick}
+        title={spec.title}
+        aria-label={spec.title}
+        className={cn('inline-flex items-center justify-center w-[26px] h-[22px] p-0 border-none bg-transparent', interactiveClass)}
+      >
+        {inner}
+      </button>
+    ) : (
       <span title={spec.title} className="inline-flex items-center justify-center w-[26px] h-[22px] cursor-default">
-        <span className="block w-[10px] h-[10px] rounded-full bg-green" />
+        {inner}
       </span>
     );
   }
@@ -121,7 +142,7 @@ function GanttCellGlyph({ spec }: { spec: GanttCellSpec }) {
       title={spec.title}
       className="inline-flex items-center justify-center w-[26px] h-[22px] text-text-tertiary/35 text-[12px] font-mono cursor-default"
     >
-      \u2013
+      {'\u2013'}
     </span>
   );
 }
@@ -411,6 +432,9 @@ function AttendancePage() {
                           const isWeekend = dow === 0 || dow === 6;
                           const isWeekEnd = dow === 0;
                           const isToday = day.date === todayStr;
+                          const editable = canEditAttendance
+                            && day.status === 'present'
+                            && !!day.attendancePublicId;
                           return (
                             <td
                               key={day.date}
@@ -421,7 +445,20 @@ function AttendancePage() {
                                 isWeekEnd && 'border-r border-cream-3/40',
                               )}
                             >
-                              <GanttCellGlyph spec={cell} />
+                              <GanttCellGlyph
+                                spec={cell}
+                                onClick={editable
+                                  ? () => setEditTarget({
+                                      publicId: day.attendancePublicId!,
+                                      employeeName: emp.employeeName,
+                                      date: day.date,
+                                      checkInAt: day.checkInAt ?? null,
+                                      checkOutAt: day.checkOutAt ?? null,
+                                      originalCheckInAt: day.originalCheckInAt ?? null,
+                                      originalCheckOutAt: day.originalCheckOutAt ?? null,
+                                    })
+                                  : undefined}
+                              />
                             </td>
                           );
                         })}
@@ -445,6 +482,17 @@ function AttendancePage() {
                 emp={emp}
                 empIdx={empIdx}
                 t={t}
+                onEditDay={canEditAttendance
+                  ? (day) => setEditTarget({
+                      publicId: day.attendancePublicId!,
+                      employeeName: emp.employeeName,
+                      date: day.date,
+                      checkInAt: day.checkInAt ?? null,
+                      checkOutAt: day.checkOutAt ?? null,
+                      originalCheckInAt: day.originalCheckInAt ?? null,
+                      originalCheckOutAt: day.originalCheckOutAt ?? null,
+                    })
+                  : undefined}
               />
             ))}
           </div>
@@ -579,10 +627,12 @@ function SummaryCard({
   emp,
   empIdx,
   t,
+  onEditDay,
 }: {
   emp: import('@/types').AttendanceSummaryEmployee;
   empIdx: number;
   t: (key: string, fallback: string) => string;
+  onEditDay?: (day: AttendanceDayStatus) => void;
 }) {
   const [open, setOpen] = useState(false);
   const presentDays = emp.days.filter((d) => d.status === 'present').length;
@@ -640,25 +690,48 @@ function SummaryCard({
       >
         <div className="overflow-hidden">
           <div className="divide-y divide-cream-3/40 border-t border-cream-3/60">
-            {emp.days.map((day) => (
-              <div
-                key={day.date}
-                className="flex items-center gap-3 px-5 py-2 transition-colors duration-[120ms] hover:bg-cream-3/35 cursor-default"
-              >
-                <div className="w-[72px] text-[13.5px] text-text-secondary font-sans">
-                  {formatDayLabel(day.date)}
-                </div>
-                <div className="flex-1 text-[14px] font-mono tabular-nums text-text-secondary">
-                  {day.status === 'present' && (
-                    <>
-                      {day.checkInAt}
-                      {day.checkOutAt ? ` \u2192 ${day.checkOutAt}` : ''}
-                    </>
+            {emp.days.map((day) => {
+              const canEdit = !!onEditDay && day.status === 'present' && !!day.attendancePublicId;
+              return (
+                <div
+                  key={day.date}
+                  className="flex items-center gap-3 px-5 py-2 transition-colors duration-[120ms] hover:bg-cream-3/35 cursor-default"
+                >
+                  <div className="w-[72px] text-[13.5px] text-text-secondary font-sans">
+                    {formatDayLabel(day.date)}
+                  </div>
+                  <div className="flex-1 text-[14px] font-mono tabular-nums text-text-secondary flex items-center gap-2">
+                    {day.status === 'present' && (
+                      <>
+                        <span>
+                          {day.checkInAt}
+                          {day.checkOutAt ? ` \u2192 ${day.checkOutAt}` : ''}
+                        </span>
+                        {day.editedAt && (
+                          <span
+                            title={t('attendance.editedTooltip', 'Edited by a manager')}
+                            className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium uppercase tracking-wide bg-coffee/10 text-coffee"
+                          >
+                            {t('attendance.editedBadge', 'Edited')}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </div>
+                  {dayStatusBadge(day)}
+                  {canEdit && (
+                    <button
+                      type="button"
+                      onClick={() => onEditDay!(day)}
+                      aria-label={t('attendance.editAria', 'Edit attendance')}
+                      className="w-7 h-7 rounded-lg flex items-center justify-center bg-transparent border-none text-text-tertiary hover:text-coffee hover:bg-cream-3/40 cursor-pointer transition-colors"
+                    >
+                      <Pencil size={13} />
+                    </button>
                   )}
                 </div>
-                {dayStatusBadge(day)}
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
