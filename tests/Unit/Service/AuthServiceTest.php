@@ -7,6 +7,8 @@ namespace App\Tests\Unit\Service;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\AuthService;
+use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenInterface;
+use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenManagerInterface;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -21,13 +23,15 @@ class AuthServiceTest extends TestCase
 
     private UserRepository&MockObject $userRepo;
     private UserPasswordHasherInterface&MockObject $passwordHasher;
+    private RefreshTokenManagerInterface&MockObject $refreshTokenManager;
     private AuthService $svc;
 
     protected function setUp(): void
     {
         $this->userRepo = $this->createMock(UserRepository::class);
         $this->passwordHasher = $this->createMock(UserPasswordHasherInterface::class);
-        $this->svc = new AuthService($this->userRepo, $this->passwordHasher);
+        $this->refreshTokenManager = $this->createMock(RefreshTokenManagerInterface::class);
+        $this->svc = new AuthService($this->userRepo, $this->passwordHasher, $this->refreshTokenManager);
     }
 
     // ── Register ──────────────────────────────────────────────────────
@@ -248,5 +252,35 @@ class AuthServiceTest extends TestCase
         }
         $ref->getProperty('id')->setValue($user, $id);
         return $user;
+    }
+
+    // ── revokeRefreshToken ────────────────────────────────────────────
+
+    public function testRevokeRefreshTokenDeletesTheRowWhenPresent(): void
+    {
+        $token = $this->createMock(RefreshTokenInterface::class);
+        $this->refreshTokenManager->expects($this->once())->method('get')->with('valid-token')->willReturn($token);
+        $this->refreshTokenManager->expects($this->once())->method('delete')->with($token);
+
+        $this->svc->revokeRefreshToken('valid-token');
+    }
+
+    public function testRevokeRefreshTokenIsNoOpWhenTokenNotFound(): void
+    {
+        $this->refreshTokenManager->expects($this->once())->method('get')->with('stale-or-fake')->willReturn(null);
+        $this->refreshTokenManager->expects($this->never())->method('delete');
+
+        $this->svc->revokeRefreshToken('stale-or-fake');
+    }
+
+    public function testRevokeRefreshTokenIgnoresNullAndEmpty(): void
+    {
+        // Don't even hit the manager — avoids a DB round-trip for the common
+        // case of mobile sending logout with cleared SecureStore.
+        $this->refreshTokenManager->expects($this->never())->method('get');
+        $this->refreshTokenManager->expects($this->never())->method('delete');
+
+        $this->svc->revokeRefreshToken(null);
+        $this->svc->revokeRefreshToken('');
     }
 }

@@ -3,6 +3,7 @@
 namespace App\ApiController\Auth;
 
 use App\ApiController\Trait\ApiResponseTrait;
+use App\Service\AuthService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,12 +16,29 @@ class LogoutController extends AbstractController
     use ApiResponseTrait;
 
     #[Route('/auth/logout', name: 'auth_logout', methods: ['POST'])]
-    public function logout(Request $request): Response
-    {
+    public function logout(
+        Request $request,
+        AuthService $authService,
+    ): Response {
         // Invalidate the PHP session so the stored security token is cleared
         if ($request->hasSession()) {
             $request->getSession()->invalidate();
         }
+
+        // Delete the refresh-token DB row so the credential can't be reused
+        // after logout. Cookie expiry alone leaves a 30-day-valid row behind
+        // — useless to the legitimate user (their cookie's gone) but live for
+        // anyone who already captured the token via screenshot, log scraping,
+        // or a stale device. Mobile passes the token in the JSON body since
+        // bare axios.post doesn't always attach the OS cookie jar.
+        $refreshTokenString = $request->cookies->get('refresh_token');
+        if (!is_string($refreshTokenString) || $refreshTokenString === '') {
+            $body = json_decode($request->getContent() ?: '[]', true);
+            if (is_array($body) && isset($body['refresh_token']) && is_string($body['refresh_token'])) {
+                $refreshTokenString = $body['refresh_token'];
+            }
+        }
+        $authService->revokeRefreshToken(is_string($refreshTokenString) ? $refreshTokenString : null);
 
         $isXhr = $request->headers->has('X-Requested-With')
             || str_contains($request->headers->get('Accept', ''), 'application/json');
