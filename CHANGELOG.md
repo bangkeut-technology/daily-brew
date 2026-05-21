@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.68.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.67.1...v1.68.0) (2026-05-21)
+
+
+### Features
+
+* **flags:** add nfc_writer platform flag ([0f49bee](https://github.com/bangkeut-technology/daily-brew/commit/0f49bee1160b59062d2e1d12ba7e9f08d5c721c8))
+
 ## [1.67.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.67.0...v1.67.1) (2026-05-21)
 
 
