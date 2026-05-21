@@ -21,11 +21,13 @@ namespace App\Enum;
 enum FeatureFlagEnum: string
 {
     case NfcCheckin = 'nfc_checkin';
+    case NfcWriter = 'nfc_writer';
 
     public function label(): string
     {
         return match ($this) {
             self::NfcCheckin => 'NFC check-in',
+            self::NfcWriter => 'NFC tag writer (mobile)',
         };
     }
 
@@ -33,6 +35,7 @@ enum FeatureFlagEnum: string
     {
         return match ($this) {
             self::NfcCheckin => 'NFC tag check-in for employees on Espresso. When this flag is hidden, the workspace toggle, dashboard NFC card, copy-URL row, guides hub card, and mobile button all stay hidden.',
+            self::NfcWriter => 'In-app NFC tag writer on the owner dashboard (Android only). When hidden, owners continue to use a third-party tag-writing app. Independent of nfc_checkin — the read side keeps working regardless.',
         };
     }
 
