@@ -46,6 +46,31 @@ security:
                 - App\Security\BasilBookApiKeyAuthenticator
             provider: daily_brew_user_provider
 
+        # Dedicated firewall for the refresh endpoint. Must come BEFORE the
+        # `api` firewall so it matches first.
+        #
+        # Why a separate firewall: the `api` firewall has the JWT authenticator
+        # listed alongside refresh_jwt. iOS NSURLSession sends the BEARER
+        # cookie (containing the expired JWT) on /api/token/refresh despite
+        # the cookie's path=/api/v1 attribute — RFC 6265 path scoping is
+        # observed loosely on iOS. With both authenticators in the same
+        # firewall, JWT runs first, validates the expired cookie, returns
+        # "Expired JWT Token" 401, and refresh_jwt never gets a chance.
+        # The client classifies this 401 as a fatal refresh failure and wipes
+        # the session — the exact 1-hour silent logout we kept hitting.
+        #
+        # Scoping the refresh path to its own firewall with ONLY refresh_jwt
+        # means the JWT authenticator can't intercept regardless of which
+        # cookies iOS attaches. The body extractor still reads `refresh_token`
+        # from the JSON body as before; the response handler still attaches
+        # the new BEARER cookie via the AuthenticationSuccessEvent.
+        token_refresh:
+            pattern: ^/api/token/refresh
+            stateless: true
+            refresh_jwt:
+                check_path: gesdinet_jwt_refresh_token
+            provider: daily_brew_user_provider
+
         api:
             pattern: ^/api
             stateless: true
