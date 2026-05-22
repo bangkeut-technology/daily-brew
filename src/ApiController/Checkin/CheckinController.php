@@ -83,6 +83,7 @@ class CheckinController extends AbstractController
         WorkspaceRepository $workspaceRepository,
         EmployeeRepository $employeeRepository,
         CheckinService $checkinService,
+        FeatureFlagService $featureFlagService,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByQrToken($workspaceQrToken);
         if ($workspace === null) {
@@ -95,6 +96,7 @@ class CheckinController extends AbstractController
         }
 
         $data = json_decode($request->getContent(), true) ?? [];
+        $this->assertOriginAllowed($data, $workspace, $featureFlagService);
         $latitude = isset($data['latitude']) ? (float) $data['latitude'] : null;
         $longitude = isset($data['longitude']) ? (float) $data['longitude'] : null;
         $deviceId = isset($data['deviceId']) ? (string) $data['deviceId'] : null;
@@ -163,10 +165,12 @@ class CheckinController extends AbstractController
         WorkspaceQrCodeRepository $qrCodeRepository,
         EmployeeRepository $employeeRepository,
         CheckinService $checkinService,
+        FeatureFlagService $featureFlagService,
     ): JsonResponse {
         [$qrCode, $workspace, $employee] = $this->resolveQrContext($qrToken, $user, $qrCodeRepository, $employeeRepository);
 
         $data = json_decode($request->getContent(), true) ?? [];
+        $this->assertOriginAllowed($data, $workspace, $featureFlagService);
         $latitude = isset($data['latitude']) ? (float) $data['latitude'] : null;
         $longitude = isset($data['longitude']) ? (float) $data['longitude'] : null;
         $deviceId = isset($data['deviceId']) ? (string) $data['deviceId'] : null;
@@ -191,6 +195,30 @@ class CheckinController extends AbstractController
             'isLate' => $attendance->isLate(),
             'leftEarly' => $attendance->hasLeftEarly(),
         ]);
+    }
+
+    /**
+     * Block NFC-originated check-ins when the workspace has NFC check-in turned
+     * off (or the feature isn't available to it). The mobile deep-link / NFC
+     * flow tags its request `origin: "nfc"`; QR scans and the tap button send
+     * no origin, so they are unaffected. A raw URL with no origin bypasses this
+     * — it gates the sanctioned NFC path, not a hard security control.
+     */
+    private function assertOriginAllowed(
+        array $data,
+        Workspace $workspace,
+        FeatureFlagService $featureFlagService,
+    ): void {
+        $origin = is_string($data['origin'] ?? null) ? $data['origin'] : null;
+        if ($origin !== 'nfc') {
+            return;
+        }
+
+        $nfcEnabled = ($workspace->getSetting()?->isNfcCheckinEnabled() ?? false)
+            && $featureFlagService->isEnabledForWorkspace(FeatureFlagEnum::NfcCheckin, $workspace);
+        if (!$nfcEnabled) {
+            throw new AccessDeniedHttpException('NFC check-in is disabled for this workspace');
+        }
     }
 
     /**
