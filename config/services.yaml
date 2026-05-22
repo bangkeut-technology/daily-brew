@@ -28,7 +28,7 @@ parameters:
     supportdock_api_key:                     '%env(SUPPORTDOCK_API_KEY)%'
     mailgun_webhook_signing_key:             '%env(MAILGUN_WEBHOOK_SIGNING_KEY)%'
     telegram_bot_token:                      '%env(TELEGRAM_BOT_TOKEN)%'
-    telegram_webhook_secret:                 '%env(TELEGRAM_WEBHOOK_TOKEN)%'
+    telegram_webhook_secret:                 '%env(TELEGRAM_WEBHOOK_SECRET)%'
     telegram_bot_username:                   '%env(string:TELEGRAM_BOT_USERNAME)%'
     ga_measurement_id:                       '%env(string:GA_MEASUREMENT_ID)%'
 
