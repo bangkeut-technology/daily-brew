@@ -151,7 +151,24 @@
     "onTime": "On time",
     "late": "Late",
     "leftEarly": "Left early",
-    "absent": "Absent"
+    "absent": "Absent",
+    "verification": {
+      "title": "Check-in verification",
+      "atRestaurant": "At restaurant",
+      "atRestaurantHint": "Check-in is only allowed within the restaurant boundary",
+      "locationOff": "Location not verified",
+      "verifyLocation": "Verify location",
+      "sameDevice": "Same device",
+      "sameDeviceHint": "Same device for check-in and check-out, and not reused by another employee that day",
+      "deviceOff": "Device not verified",
+      "verifyDevice": "Verify device",
+      "restaurantNetwork": "Restaurant network",
+      "restaurantNetworkHint": "Check-in is only allowed from an approved network",
+      "networkOff": "Network not verified",
+      "restrictNetwork": "Verify network",
+      "upgradeHint": "Upgrade to Espresso to enforce this",
+      "upsell": "Upgrade to Espresso to verify where, on which device, and from which network staff check in."
+    }
   },
   "leave": {
     "pending": "Pending",

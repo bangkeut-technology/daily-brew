@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { X } from 'lucide-react';
 import { CustomTimePicker } from './CustomTimePicker';
 import { Toggle } from './Toggle';
+import { CheckinVerification } from './CheckinVerification';
 import { useOverrideAttendance } from '@/hooks/queries/useAttendance';
 
 interface AttendanceEditModalProps {
@@ -89,6 +90,8 @@ export function AttendanceEditModal({
             <Dialog.Description className="text-[14.5px] text-text-secondary leading-relaxed -mt-2">
               {attendance.employeeName ? `${attendance.employeeName} · ${attendance.date}` : attendance.date}
             </Dialog.Description>
+
+            <CheckinVerification workspacePublicId={workspacePublicId} />
 
             {originalText && (
               <div className="text-[13px] text-text-tertiary font-mono tabular-nums bg-cream-3/30 rounded-lg px-3 py-2">
