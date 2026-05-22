@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.70.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.69.0...v1.70.0) (2026-05-22)
+
+
+### Features
+
+* **checkin:** enforce workspace NFC toggle by rejecting nfc-origin check-ins ([#138](https://github.com/bangkeut-technology/daily-brew/issues/138)) ([3d6f4d6](https://github.com/bangkeut-technology/daily-brew/commit/3d6f4d677664923e500293239d473294ef742e2a))
+
 ## [1.69.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.68.1...v1.69.0) (2026-05-21)
 
 
