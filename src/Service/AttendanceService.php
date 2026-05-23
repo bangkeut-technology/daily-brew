@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\Attendance;
+use App\Entity\Employee;
 use App\Entity\User;
+use App\Entity\Workspace;
+use App\Exception\AttendanceAlreadyExistsException;
 use App\Repository\AttendanceRepository;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -91,6 +94,79 @@ class AttendanceService
         $attendance->setEditedByEmail($actor->getEmail());
         $attendance->setEditReason($reason);
 
+        $this->attendanceRepository->flush();
+
+        return $attendance;
+    }
+
+    /**
+     * Manually record an attendance row for a past/current day (e.g. backfill a
+     * day the employee forgot to scan, or correct for a broken QR). Times are
+     * workspace-local "HH:MM"; a check-in is required, check-out is optional.
+     * Throws AttendanceAlreadyExistsException if a row already exists for the
+     * (employee, date) pair so the caller can offer to edit it instead.
+     *
+     * @throws BadRequestHttpException on validation failure
+     * @throws AttendanceAlreadyExistsException if a row already exists for that day
+     */
+    public function create(
+        Workspace $workspace,
+        Employee $employee,
+        User $actor,
+        string $date,
+        ?string $checkInAt,
+        ?string $checkOutAt,
+        string $reason,
+    ): Attendance {
+        $reason = trim($reason);
+        if ($reason === '') {
+            throw new BadRequestHttpException('A reason is required for attendance edits.');
+        }
+        if (mb_strlen($reason) > 255) {
+            throw new BadRequestHttpException('Reason must be 255 characters or fewer.');
+        }
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            throw new BadRequestHttpException('date must be in YYYY-MM-DD format.');
+        }
+
+        $wsTz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
+        // "!" resets the time component to midnight so only the calendar date matters.
+        $dateImmutable = DateService::createFromFormat('!Y-m-d', $date, $wsTz);
+
+        if ($dateImmutable->format('Y-m-d') > DateService::today($wsTz)->format('Y-m-d')) {
+            throw new BadRequestHttpException('Cannot add attendance for a future date.');
+        }
+
+        $checkIn = $this->parseTimeOnDate($checkInAt, $dateImmutable, $wsTz, 'checkInAt');
+        if ($checkIn === null) {
+            throw new BadRequestHttpException('A check-in time is required.');
+        }
+        $checkOut = $this->parseTimeOnDate($checkOutAt, $dateImmutable, $wsTz, 'checkOutAt');
+        if ($checkOut !== null && $checkOut < $checkIn) {
+            throw new BadRequestHttpException('Check-out must be at or after check-in.');
+        }
+
+        $existing = $this->attendanceRepository->findByEmployeeAndDate($employee, $dateImmutable);
+        if ($existing !== null) {
+            throw new AttendanceAlreadyExistsException($existing);
+        }
+
+        $attendance = (new Attendance())
+            ->setEmployee($employee)
+            ->setWorkspace($workspace)
+            ->setDate($dateImmutable)
+            ->setCheckInAt($checkIn)
+            ->setCheckOutAt($checkOut);
+
+        $this->flagCalculator->recompute($attendance, $employee, $wsTz);
+
+        // A manual entry is an audited action — stamp who recorded it and why.
+        $attendance->setEditedAt(DateService::now());
+        $attendance->setEditedBy($actor);
+        $attendance->setEditedByEmail($actor->getEmail());
+        $attendance->setEditReason($reason);
+
+        $this->attendanceRepository->persist($attendance);
         $this->attendanceRepository->flush();
 
         return $attendance;
