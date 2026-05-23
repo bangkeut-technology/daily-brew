@@ -11,6 +11,7 @@ use App\Entity\User;
 use App\Entity\Workspace;
 use App\Entity\WorkspaceSetting;
 use App\Enum\EmployeeAttendanceTrackingEnum;
+use App\Exception\AttendanceAlreadyExistsException;
 use App\Repository\AttendanceRepository;
 use App\Service\AttendanceFlagCalculator;
 use App\Service\AttendanceService;
@@ -242,6 +243,212 @@ class AttendanceServiceTest extends TestCase
         $this->assertFalse($attendance->hasLeftEarly());
     }
 
+    // ── Manual create (backfill) ─────────────────────────────────────
+
+    public function testManualCreateRecordsCheckInWithAuditFields(): void
+    {
+        [$workspace, $employee] = $this->buildWorkspaceEmployee();
+        $actor = (new User())->setEmail('owner@example.com');
+
+        $this->attendanceRepo->expects($this->once())->method('persist');
+        $this->attendanceRepo->expects($this->once())->method('flush');
+
+        $attendance = $this->svc->create(
+            workspace: $workspace,
+            employee: $employee,
+            actor: $actor,
+            date: '2026-04-10',
+            checkInAt: '09:00',
+            checkOutAt: null,
+            reason: 'Backfill — QR was down',
+        );
+
+        $this->assertSame('2026-04-10', $attendance->getDate()?->format('Y-m-d'));
+        $this->assertSame('09:00', $attendance->getCheckInAt()?->setTimezone(new DateTimeZone('UTC'))->format('H:i'));
+        $this->assertNull($attendance->getCheckOutAt());
+        $this->assertSame($employee, $attendance->getEmployee());
+        $this->assertSame($workspace, $attendance->getWorkspace());
+        $this->assertTrue($attendance->isEdited());
+        $this->assertSame('owner@example.com', $attendance->getEditedByEmail());
+        $this->assertSame('Backfill — QR was down', $attendance->getEditReason());
+        $this->assertSame($actor, $attendance->getEditedBy());
+    }
+
+    public function testManualCreateWithCheckOutStoresBothTimes(): void
+    {
+        [$workspace, $employee] = $this->buildWorkspaceEmployee();
+
+        $attendance = $this->svc->create(
+            workspace: $workspace,
+            employee: $employee,
+            actor: $this->actor(),
+            date: '2026-04-10',
+            checkInAt: '09:00',
+            checkOutAt: '17:30',
+            reason: 'full day',
+        );
+
+        $this->assertSame('09:00', $attendance->getCheckInAt()?->setTimezone(new DateTimeZone('UTC'))->format('H:i'));
+        $this->assertSame('17:30', $attendance->getCheckOutAt()?->setTimezone(new DateTimeZone('UTC'))->format('H:i'));
+    }
+
+    public function testCreateRejectsMissingCheckIn(): void
+    {
+        [$workspace, $employee] = $this->buildWorkspaceEmployee();
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('check-in time is required');
+
+        $this->svc->create(
+            workspace: $workspace,
+            employee: $employee,
+            actor: $this->actor(),
+            date: '2026-04-10',
+            checkInAt: null,
+            checkOutAt: '17:00',
+            reason: 'x',
+        );
+    }
+
+    public function testCreateRejectsFutureDate(): void
+    {
+        [$workspace, $employee] = $this->buildWorkspaceEmployee();
+
+        // Clock is pinned to 2026-04-10, so the next day is in the future.
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('future date');
+
+        $this->svc->create(
+            workspace: $workspace,
+            employee: $employee,
+            actor: $this->actor(),
+            date: '2026-04-11',
+            checkInAt: '09:00',
+            checkOutAt: null,
+            reason: 'x',
+        );
+    }
+
+    public function testCreateRejectsCheckOutBeforeCheckIn(): void
+    {
+        [$workspace, $employee] = $this->buildWorkspaceEmployee();
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('Check-out must be at or after check-in');
+
+        $this->svc->create(
+            workspace: $workspace,
+            employee: $employee,
+            actor: $this->actor(),
+            date: '2026-04-10',
+            checkInAt: '09:00',
+            checkOutAt: '08:00',
+            reason: 'typo',
+        );
+    }
+
+    public function testCreateRejectsEmptyReason(): void
+    {
+        [$workspace, $employee] = $this->buildWorkspaceEmployee();
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('reason is required');
+
+        $this->svc->create(
+            workspace: $workspace,
+            employee: $employee,
+            actor: $this->actor(),
+            date: '2026-04-10',
+            checkInAt: '09:00',
+            checkOutAt: null,
+            reason: '   ',
+        );
+    }
+
+    public function testCreateRejectsMalformedDate(): void
+    {
+        [$workspace, $employee] = $this->buildWorkspaceEmployee();
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('YYYY-MM-DD format');
+
+        $this->svc->create(
+            workspace: $workspace,
+            employee: $employee,
+            actor: $this->actor(),
+            date: '10-04-2026',
+            checkInAt: '09:00',
+            checkOutAt: null,
+            reason: 'x',
+        );
+    }
+
+    public function testCreateThrowsWhenRecordAlreadyExists(): void
+    {
+        [$workspace, $employee] = $this->buildWorkspaceEmployee();
+        $existing = (new Attendance())
+            ->setEmployee($employee)
+            ->setWorkspace($workspace)
+            ->setDate(new DateTimeImmutable('2026-04-10'))
+            ->setCheckInAt(new DateTimeImmutable('2026-04-10 09:00:00'));
+
+        $this->attendanceRepo->method('findByEmployeeAndDate')->willReturn($existing);
+
+        try {
+            $this->svc->create(
+                workspace: $workspace,
+                employee: $employee,
+                actor: $this->actor(),
+                date: '2026-04-10',
+                checkInAt: '10:00',
+                checkOutAt: null,
+                reason: 'dup',
+            );
+            $this->fail('Expected AttendanceAlreadyExistsException');
+        } catch (AttendanceAlreadyExistsException $e) {
+            $this->assertSame($existing, $e->existing);
+        }
+    }
+
+    public function testCreateRecomputesLateFlag(): void
+    {
+        [$workspace, $employee] = $this->buildWorkspaceEmployee(shift: ['start' => '09:00:00', 'end' => '17:00:00']);
+
+        $attendance = $this->svc->create(
+            workspace: $workspace,
+            employee: $employee,
+            actor: $this->actor(),
+            date: '2026-04-10',
+            checkInAt: '10:00',
+            checkOutAt: null,
+            reason: 'late arrival',
+        );
+
+        $this->assertTrue($attendance->isLate());
+        $this->assertFalse($attendance->hasLeftEarly());
+    }
+
+    public function testCreateNeverFlagsNoneTrackedEmployee(): void
+    {
+        [$workspace, $employee] = $this->buildWorkspaceEmployee(
+            shift: ['start' => '09:00:00', 'end' => '17:00:00'],
+            tracking: EmployeeAttendanceTrackingEnum::None,
+        );
+
+        $attendance = $this->svc->create(
+            workspace: $workspace,
+            employee: $employee,
+            actor: $this->actor(),
+            date: '2026-04-10',
+            checkInAt: '11:00', // 2h late on paper
+            checkOutAt: '14:00', // 3h early on paper
+            reason: 'admin helper',
+        );
+
+        $this->assertFalse($attendance->isLate());
+        $this->assertFalse($attendance->hasLeftEarly());
+    }
+
     // ── Helpers ──────────────────────────────────────────────────────
 
     private function actor(): User
@@ -282,5 +489,32 @@ class AttendanceServiceTest extends TestCase
             $att->setCheckOutAt(new DateTimeImmutable($checkOut));
         }
         return $att;
+    }
+
+    /**
+     * @param array{start: string, end: string}|null $shift
+     *
+     * @return array{0: Workspace, 1: Employee}
+     */
+    private function buildWorkspaceEmployee(
+        ?array $shift = null,
+        EmployeeAttendanceTrackingEnum $tracking = EmployeeAttendanceTrackingEnum::Full,
+    ): array {
+        $workspace = new Workspace();
+        $setting = (new WorkspaceSetting())->setTimezone('UTC');
+        $workspace->setSetting($setting);
+
+        $emp = (new Employee())
+            ->setWorkspace($workspace)
+            ->setAttendanceTracking($tracking);
+
+        if ($shift !== null) {
+            $shiftEntity = (new Shift())
+                ->setStartTime(new DateTimeImmutable($shift['start']))
+                ->setEndTime(new DateTimeImmutable($shift['end']));
+            $emp->setShift($shiftEntity);
+        }
+
+        return [$workspace, $emp];
     }
 }

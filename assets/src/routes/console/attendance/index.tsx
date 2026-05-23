@@ -13,6 +13,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { AttendanceRow } from '@/components/shared/AttendanceRow';
 import { AttendanceEditModal } from '@/components/shared/AttendanceEditModal';
+import { AttendanceCreateModal } from '@/components/shared/AttendanceCreateModal';
 import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { StatusBadge } from '@/components/shared/StatusBadge';
@@ -190,6 +191,7 @@ function AttendancePage() {
     originalCheckInAt?: string | null;
     originalCheckOutAt?: string | null;
   } | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
 
   const setFrom = (value: string) => {
     setFromState(value);
@@ -255,6 +257,14 @@ function AttendancePage() {
         help={isEmployee
           ? { href: '/guides/employee#step-employee-5', label: 'How check-in works' }
           : { href: '/guides/owner#step-owner-7', label: 'How attendance tracking works' }}
+        action={canEditAttendance ? (
+          <button
+            onClick={() => setCreateOpen(true)}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light"
+          >
+            + {t('attendance.addAttendance', 'Add attendance')}
+          </button>
+        ) : undefined}
       />
 
       <p className="text-[15px] text-text-secondary mb-5 -mt-2 leading-relaxed">
@@ -551,6 +561,29 @@ function AttendancePage() {
         workspacePublicId={workspaceId}
         attendance={editTarget}
       />
+
+      {canEditAttendance && (
+        <AttendanceCreateModal
+          open={createOpen}
+          onOpenChange={setCreateOpen}
+          workspacePublicId={workspaceId}
+          employees={employees?.map((e) => ({ publicId: e.publicId, name: e.name })) ?? []}
+          todayStr={todayStr}
+          onConflict={(existing) => {
+            // Day already has a record — switch straight to editing it.
+            setCreateOpen(false);
+            setEditTarget({
+              publicId: existing.publicId,
+              employeeName: existing.employeeName ?? null,
+              date: existing.date,
+              checkInAt: existing.checkInAt,
+              checkOutAt: existing.checkOutAt,
+              originalCheckInAt: existing.originalCheckInAt ?? null,
+              originalCheckOutAt: existing.originalCheckOutAt ?? null,
+            });
+          }}
+        />
+      )}
     </div>
   );
 }

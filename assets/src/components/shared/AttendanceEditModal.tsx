@@ -47,9 +47,13 @@ export function AttendanceEditModal({
 
   if (!attendance) return null;
 
+  // Block wiping a real check-out: if the record already had one, the toggle
+  // can't be used to clear it (a typo is fixed by editing the time, not removing it).
+  const clearingExistingCheckOut = attendance.checkOutAt !== null && !hasCheckOut;
+
   const handleSubmit = async () => {
     const trimmed = reason.trim();
-    if (!trimmed) return;
+    if (!trimmed || clearingExistingCheckOut) return;
     try {
       await override.mutateAsync({
         publicId: attendance.publicId,
@@ -121,6 +125,15 @@ export function AttendanceEditModal({
               </label>
             </div>
 
+            {clearingExistingCheckOut && (
+              <p className="text-[13px] text-red leading-relaxed -mt-1">
+                {t(
+                  'attendance.cannotClearCheckOut',
+                  "This record has a check-out — turn the toggle back on. To fix a wrong time, edit it rather than removing it.",
+                )}
+              </p>
+            )}
+
             <div>
               <label htmlFor="att-edit-reason" className="block text-[13px] font-medium text-text-secondary mb-1">
                 {t('attendance.editReason', 'Reason')} <span className="text-red">*</span>
@@ -148,7 +161,7 @@ export function AttendanceEditModal({
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={!reason.trim() || override.isPending}
+                disabled={!reason.trim() || clearingExistingCheckOut || override.isPending}
                 className="px-4 py-2 rounded-lg text-[15px] font-medium text-white bg-coffee border-none cursor-pointer hover:bg-coffee-light transition-colors disabled:opacity-50"
               >
                 {override.isPending ? t('common.loading', 'Loading...') : t('common.save', 'Save')}

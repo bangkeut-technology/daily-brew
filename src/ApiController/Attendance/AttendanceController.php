@@ -4,8 +4,10 @@ namespace App\ApiController\Attendance;
 
 use App\ApiController\Trait\ApiResponseTrait;
 use App\DTO\AttendanceDTO;
+use App\Entity\Employee;
 use App\Entity\User;
 use App\Enum\ManagerPermissionEnum;
+use App\Exception\AttendanceAlreadyExistsException;
 use App\Repository\AttendanceRepository;
 use App\Repository\ClosurePeriodRepository;
 use App\Repository\EmployeeRepository;
@@ -416,5 +418,76 @@ class AttendanceController extends AbstractController
 
         $wsTz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
         return $this->jsonSuccess(AttendanceDTO::fromEntity($attendance, includeEmployee: true, tz: $wsTz)->toArray());
+    }
+
+    /**
+     * Manually record an attendance row (backfill a forgotten scan or a broken-QR
+     * day). Owner or a manager with `manage_attendance`. If a row already exists
+     * for that employee/date, returns 409 with the existing record so the client
+     * can switch to editing it.
+     */
+    #[Route('', name: 'attendances_create', methods: ['POST'])]
+    public function create(
+        string $workspacePublicId,
+        Request $request,
+        #[CurrentUser] User $user,
+        WorkspaceRepository $workspaceRepository,
+        EmployeeRepository $employeeRepository,
+        AttendanceService $attendanceService,
+    ): JsonResponse {
+        $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
+        if ($workspace === null) {
+            throw new NotFoundHttpException('Workspace not found');
+        }
+
+        $this->denyAccessUnlessGranted(WorkspaceVoter::MANAGE_ATTENDANCES, $workspace);
+
+        $data = json_decode($request->getContent(), true);
+        if (!is_array($data)) {
+            return $this->jsonError('Invalid JSON body');
+        }
+
+        $employeePublicId = is_string($data['employeePublicId'] ?? null) ? $data['employeePublicId'] : '';
+        $date = is_string($data['date'] ?? null) ? $data['date'] : '';
+        $reason = is_string($data['reason'] ?? null) ? $data['reason'] : '';
+
+        $checkIn = $data['checkInAt'] ?? null;
+        $checkOut = $data['checkOutAt'] ?? null;
+        if ($checkIn !== null && !is_string($checkIn)) {
+            return $this->jsonError('checkInAt must be a HH:MM string or null');
+        }
+        if ($checkOut !== null && !is_string($checkOut)) {
+            return $this->jsonError('checkOutAt must be a HH:MM string or null');
+        }
+
+        $employee = $employeeRepository->findByPublicId($employeePublicId);
+        if (!$employee instanceof Employee
+            || $employee->getWorkspace()?->getId() !== $workspace->getId()
+            || $employee->getDeletedAt() !== null) {
+            throw new NotFoundHttpException('Employee not found');
+        }
+
+        $wsTz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
+
+        try {
+            $attendance = $attendanceService->create(
+                workspace: $workspace,
+                employee: $employee,
+                actor: $user,
+                date: $date,
+                checkInAt: $checkIn,
+                checkOutAt: $checkOut,
+                reason: $reason,
+            );
+        } catch (AttendanceAlreadyExistsException $e) {
+            return new JsonResponse([
+                'error' => true,
+                'message' => $e->getMessage(),
+                'code' => 409,
+                'existing' => AttendanceDTO::fromEntity($e->existing, includeEmployee: true, tz: $wsTz)->toArray(),
+            ], 409);
+        }
+
+        return $this->jsonCreated(AttendanceDTO::fromEntity($attendance, includeEmployee: true, tz: $wsTz)->toArray());
     }
 }
