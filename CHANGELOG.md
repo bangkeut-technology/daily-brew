@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.72.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.71.0...v1.72.0) (2026-05-23)
+
+
+### Features
+
+* **attendance:** surface check-in verification pills on attendance detail ([#141](https://github.com/bangkeut-technology/daily-brew/issues/141)) ([4a07dbb](https://github.com/bangkeut-technology/daily-brew/commit/4a07dbb66d2ccb234306762ece255d8257481a87))
+
 ## [1.71.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.70.0...v1.71.0) (2026-05-23)
 
 
