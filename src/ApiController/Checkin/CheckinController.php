@@ -102,6 +102,8 @@ class CheckinController extends AbstractController
         $deviceId = isset($data['deviceId']) ? (string) $data['deviceId'] : null;
         $deviceName = isset($data['deviceName']) ? (string) $data['deviceName'] : null;
 
+        $settings = EffectiveCheckinSettings::fromWorkspace($workspace);
+
         $attendance = $checkinService->checkin(
             $employee,
             $request->getClientIp() ?? '',
@@ -109,6 +111,7 @@ class CheckinController extends AbstractController
             $longitude,
             $deviceId,
             $deviceName,
+            $settings,
         );
 
         $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
@@ -118,6 +121,7 @@ class CheckinController extends AbstractController
             'checkOutAt' => $attendance->getCheckOutAt() ? (clone $attendance->getCheckOutAt())->setTimezone($tz)->format('H:i') : null,
             'isLate' => $attendance->isLate(),
             'leftEarly' => $attendance->hasLeftEarly(),
+            'verification' => $this->verificationPayload($settings),
         ]);
     }
 
@@ -176,6 +180,8 @@ class CheckinController extends AbstractController
         $deviceId = isset($data['deviceId']) ? (string) $data['deviceId'] : null;
         $deviceName = isset($data['deviceName']) ? (string) $data['deviceName'] : null;
 
+        $settings = EffectiveCheckinSettings::fromQrCode($qrCode);
+
         $attendance = $checkinService->checkin(
             $employee,
             $request->getClientIp() ?? '',
@@ -183,7 +189,7 @@ class CheckinController extends AbstractController
             $longitude,
             $deviceId,
             $deviceName,
-            EffectiveCheckinSettings::fromQrCode($qrCode),
+            $settings,
             $qrCode,
         );
 
@@ -194,7 +200,26 @@ class CheckinController extends AbstractController
             'checkOutAt' => $attendance->getCheckOutAt() ? (clone $attendance->getCheckOutAt())->setTimezone($tz)->format('H:i') : null,
             'isLate' => $attendance->isLate(),
             'leftEarly' => $attendance->hasLeftEarly(),
+            'verification' => $this->verificationPayload($settings),
         ]);
+    }
+
+    /**
+     * Which check-in protections were enforced for this scan. Because the
+     * check-in succeeded, every enabled protection was satisfied — so the
+     * mobile client can show the employee a "verified at restaurant / on this
+     * device / on the restaurant network" confirmation. Surfaces only the
+     * outcome; never raw coordinates, IP, or device id.
+     *
+     * @return array{location: bool, device: bool, network: bool}
+     */
+    private function verificationPayload(EffectiveCheckinSettings $settings): array
+    {
+        return [
+            'location' => $settings->geofencingEnabled,
+            'device' => $settings->deviceVerificationEnabled,
+            'network' => $settings->ipRestrictionEnabled,
+        ];
     }
 
     /**
