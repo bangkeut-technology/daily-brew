@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.71.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.70.0...v1.71.0) (2026-05-23)
+
+
+### Features
+
+* **checkin:** return which protections verified the check-in ([#142](https://github.com/bangkeut-technology/daily-brew/issues/142)) ([96c3ec0](https://github.com/bangkeut-technology/daily-brew/commit/96c3ec0c885128a9aca189c799ff3808dcb4c77b))
+
 ## [1.70.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.69.0...v1.70.0) (2026-05-22)
 
 
