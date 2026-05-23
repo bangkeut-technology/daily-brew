@@ -13,6 +13,25 @@
     "help": "Aide",
     "signOut": "Déconnexion"
   },
+  "attendance": {
+    "verification": {
+      "title": "Vérification du pointage",
+      "atRestaurant": "Au restaurant",
+      "atRestaurantHint": "Le pointage n'est autorisé qu'à l'intérieur du périmètre du restaurant",
+      "locationOff": "Localisation non vérifiée",
+      "verifyLocation": "Vérifier la localisation",
+      "sameDevice": "Même appareil",
+      "sameDeviceHint": "Même appareil pour l'entrée et la sortie, et non réutilisé par un autre employé le même jour",
+      "deviceOff": "Appareil non vérifié",
+      "verifyDevice": "Vérifier l'appareil",
+      "restaurantNetwork": "Réseau du restaurant",
+      "restaurantNetworkHint": "Le pointage n'est autorisé que depuis un réseau approuvé",
+      "networkOff": "Réseau non vérifié",
+      "restrictNetwork": "Vérifier le réseau",
+      "upgradeHint": "Passez à Espresso pour appliquer cette règle",
+      "upsell": "Passez à Espresso pour vérifier où, sur quel appareil et depuis quel réseau votre personnel pointe."
+    }
+  },
   "auth": {
     "signIn": "Connexion",
     "signUp": "Inscription",
