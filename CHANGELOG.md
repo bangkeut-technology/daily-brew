@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.73.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.72.1...v1.73.0) (2026-05-23)
+
+
+### Features
+
+* **attendance:** manual entry + guard against clearing a real check-out ([#146](https://github.com/bangkeut-technology/daily-brew/issues/146)) ([e6caf79](https://github.com/bangkeut-technology/daily-brew/commit/e6caf79be01d562dee0e59a9aeb56e5cecdb1ea9))
+
 ## [1.72.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.72.0...v1.72.1) (2026-05-23)
 
 
