@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.72.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.72.0...v1.72.1) (2026-05-23)
+
+
+### Bug Fixes
+
+* **telegram:** read webhook secret from TELEGRAM_WEBHOOK_SECRET ([#140](https://github.com/bangkeut-technology/daily-brew/issues/140)) ([e934fbe](https://github.com/bangkeut-technology/daily-brew/commit/e934fbe104f5ecd09d40fbd1f2679edee0da9403))
+
 ## [1.72.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.71.0...v1.72.0) (2026-05-23)
 
 
