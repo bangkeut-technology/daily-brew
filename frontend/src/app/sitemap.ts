@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { PAGES, SITE_URL, type IndexablePath } from "@/lib/seo";
 import { getAllPosts } from "@/lib/blog";
 import { INDUSTRIES } from "@/lib/industries";
+import { COMPETITORS } from "@/lib/competitors";
 
 type Freq = MetadataRoute.Sitemap[number]["changeFrequency"];
 
@@ -51,5 +52,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...pages, ...industries, blogIndex, ...posts];
+  const competitors = COMPETITORS.map((competitor) => ({
+    url: `${SITE_URL}/${competitor.slug}`,
+    changeFrequency: "monthly" as Freq,
+    priority: 0.6,
+  }));
+
+  return [...pages, ...industries, ...competitors, blogIndex, ...posts];
 }
