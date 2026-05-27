@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { PAGES, SITE_URL, type IndexablePath } from "@/lib/seo";
 import { getAllPosts } from "@/lib/blog";
+import { INDUSTRIES } from "@/lib/industries";
 
 type Freq = MetadataRoute.Sitemap[number]["changeFrequency"];
 
@@ -44,5 +45,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  return [...pages, blogIndex, ...posts];
+  const industries = INDUSTRIES.map((industry) => ({
+    url: `${SITE_URL}/${industry.slug}`,
+    changeFrequency: "monthly" as Freq,
+    priority: 0.7,
+  }));
+
+  return [...pages, ...industries, blogIndex, ...posts];
 }
