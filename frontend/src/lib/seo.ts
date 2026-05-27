@@ -18,6 +18,16 @@ export const PAGES = {
     description:
       "QR check-in, shift tracking, and leave management for restaurants. Free for up to 10 employees. No hardware, no complexity — just scan and go.",
   },
+  "/three-factor-attendance": {
+    title: "Three-factor attendance",
+    description:
+      "Device + network + a physical tap. DailyBrew brings banking-app security to the time clock so buddy punching becomes mechanically impossible — no biometrics, no face scans.",
+  },
+  "/stop-buddy-punching": {
+    title: "How to stop buddy punching",
+    description:
+      "Buddy punching costs SMBs up to 2.2% of gross payroll. Stop it without spying on staff: bind every clock-in to a verified device and your shop's network — no PINs to share.",
+  },
   "/features": {
     title: "Features",
     description:
