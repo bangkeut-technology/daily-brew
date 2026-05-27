@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.73.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.73.0...v1.73.1) (2026-05-27)
+
+
+### Bug Fixes
+
+* **seo:** server-render per-page meta and 404 unknown paths ([#148](https://github.com/bangkeut-technology/daily-brew/issues/148)) ([5690ce0](https://github.com/bangkeut-technology/daily-brew/commit/5690ce04ba7f57ca37aec8dd67aae0d6f377160a))
+
 ## [1.73.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.72.1...v1.73.0) (2026-05-23)
 
 
