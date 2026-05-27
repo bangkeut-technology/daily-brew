@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.74.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.73.1...v1.74.0) (2026-05-27)
+
+
+### Features
+
+* **attendance:** alert owner when a check-in/out uses a new device ([#152](https://github.com/bangkeut-technology/daily-brew/issues/152)) ([4795d2d](https://github.com/bangkeut-technology/daily-brew/commit/4795d2d712bce9c597afa808a2741f459871ac0f))
+* **frontend:** app shell — API client, auth, console layout + guards ([#153](https://github.com/bangkeut-technology/daily-brew/issues/153)) ([52df05c](https://github.com/bangkeut-technology/daily-brew/commit/52df05c368bfd3e7232d3e8f36a3725f6b001598))
+* **frontend:** SEO foundation + MDX blog — migration phase 1 ([#151](https://github.com/bangkeut-technology/daily-brew/issues/151)) ([73af9eb](https://github.com/bangkeut-technology/daily-brew/commit/73af9eb7e7ac1a647f7b713bc0deb43a8ca59bdd))
+
 ## [1.73.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.73.0...v1.73.1) (2026-05-27)
 
 
