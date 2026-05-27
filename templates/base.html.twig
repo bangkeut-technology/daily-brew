@@ -3,22 +3,30 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5" />
-    <title>{% block title %}DailyBrew — Staff Attendance Tracking for Restaurants{% endblock %}</title>
-    <meta name="description" content="QR check-in, shift tracking, and leave management for restaurants. Free for up to 10 employees." />
-    <link rel="canonical" href="https://dailybrew.work/" />
+    {% set metaTitle = metaTitle|default('DailyBrew — Staff Attendance Tracking for Restaurants') %}
+    {% set metaDescription = metaDescription|default('QR check-in, shift tracking, and leave management for restaurants. Free for up to 10 employees.') %}
+    {% set ogUrl = ogUrl|default('https://dailybrew.work/') %}
+    <title>{{ metaTitle }}</title>
+    <meta name="description" content="{{ metaDescription }}" />
+    {% if robots is defined and robots %}
+        <meta name="robots" content="{{ robots }}" />
+    {% endif %}
+    {% if canonicalUrl is defined and canonicalUrl %}
+        <link rel="canonical" href="{{ canonicalUrl }}" />
+    {% endif %}
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="DailyBrew" />
-    <meta property="og:title" content="DailyBrew — Staff Attendance Tracking for Restaurants" />
-    <meta property="og:description" content="QR check-in, shift tracking, and leave management for restaurants. Free for up to 10 employees." />
-    <meta property="og:url" content="https://dailybrew.work/" />
+    <meta property="og:title" content="{{ metaTitle }}" />
+    <meta property="og:description" content="{{ metaDescription }}" />
+    <meta property="og:url" content="{{ ogUrl }}" />
     <meta property="og:image" content="https://dailybrew.work/android-chrome-512.png" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="DailyBrew — Staff Attendance Tracking for Restaurants" />
-    <meta name="twitter:description" content="QR check-in, shift tracking, and leave management for restaurants. Free for up to 10 employees." />
+    <meta name="twitter:title" content="{{ metaTitle }}" />
+    <meta name="twitter:description" content="{{ metaDescription }}" />
     <meta name="twitter:image" content="https://dailybrew.work/android-chrome-512.png" />
 
     {% if gaMeasurementId is defined and gaMeasurementId is not empty %}

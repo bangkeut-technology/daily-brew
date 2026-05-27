@@ -2,39 +2,32 @@ import { Helmet } from 'react-helmet-async';
 
 interface PageSeoProps {
   title: string;
-  description: string;
+  /** Retained for call-site compatibility; description is rendered server-side. */
+  description?: string;
   path: string;
+  /** Retained for call-site compatibility; OG image is rendered server-side. */
   ogImage?: string;
 }
 
-const BASE_URL = 'https://dailybrew.work';
-const DEFAULT_OG_IMAGE = `${BASE_URL}/android-chrome-512.png`;
 const SITE_NAME = 'DailyBrew';
 
-export function PageSeo({ title, description, path, ogImage }: PageSeoProps) {
-  const url = `${BASE_URL}${path}`;
-  const image = ogImage ?? DEFAULT_OG_IMAGE;
+/**
+ * Keeps the document <title> in sync during client-side navigation.
+ *
+ * Description, canonical, and Open Graph tags are rendered server-side
+ * (see App\Service\Seo\SeoMetaResolver + base.html.twig) so crawlers and
+ * link-preview scrapers — which don't execute our JS — get the correct
+ * per-page values, and we never emit a second canonical/OG tag on top of
+ * the server-rendered ones. The <title> is the only tag worth updating on
+ * SPA navigation, and Helmet overwrites the existing element rather than
+ * duplicating it.
+ */
+export function PageSeo({ title, path }: PageSeoProps) {
   const fullTitle = path === '/' ? title : `${title} — ${SITE_NAME}`;
 
   return (
     <Helmet>
       <title>{fullTitle}</title>
-      <meta name="description" content={description} />
-      <link rel="canonical" href={url} />
-
-      {/* Open Graph */}
-      <meta property="og:type" content="website" />
-      <meta property="og:site_name" content={SITE_NAME} />
-      <meta property="og:title" content={fullTitle} />
-      <meta property="og:description" content={description} />
-      <meta property="og:url" content={url} />
-      <meta property="og:image" content={image} />
-
-      {/* Twitter */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={fullTitle} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={image} />
     </Helmet>
   );
 }
