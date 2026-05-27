@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.75.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.74.0...v1.75.0) (2026-05-27)
+
+
+### Features
+
+* **frontend:** finish migration — more admin screens + sign-in smoke test ([#155](https://github.com/bangkeut-technology/daily-brew/issues/155)) ([b3f5e50](https://github.com/bangkeut-technology/daily-brew/commit/b3f5e507da57d4290f48d30b9d179a6876fd1791))
+
 ## [1.74.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.73.1...v1.74.0) (2026-05-27)
 
 
