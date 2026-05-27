@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import createMDX from "@next/mdx";
 
 /**
  * In production the reverse proxy routes /api, /oauth, and /.well-known to
@@ -12,6 +13,8 @@ const SYMFONY_ORIGIN = process.env.SYMFONY_ORIGIN ?? "http://127.0.0.1:8000";
 const nextConfig: NextConfig = {
   // Node server build for deployment behind the reverse proxy (not a static export).
   output: "standalone",
+  // Let .mdx files act as pages/routes (blog posts).
+  pageExtensions: ["ts", "tsx", "md", "mdx"],
   // Monorepo: pin the workspace root to this dir so Turbopack doesn't infer it
   // from the sibling Symfony lockfile at the repo root.
   turbopack: { root: import.meta.dirname },
@@ -27,4 +30,6 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+const withMDX = createMDX({});
+
+export default withMDX(nextConfig);
