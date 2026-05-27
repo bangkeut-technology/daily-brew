@@ -10,6 +10,7 @@ import {
   FileText,
   Clock,
   CalendarOff,
+  QrCode,
   Settings,
   LogOut,
   type LucideIcon,
@@ -36,6 +37,7 @@ function ownerNav(): NavItemDef[] {
     LEAVE,
     { to: "/console/shifts", icon: Clock, label: "nav.shifts" },
     { to: "/console/closures", icon: CalendarOff, label: "nav.closures" },
+    { to: "/console/qr-codes", icon: QrCode, label: "nav.qrCodes" },
     { to: "/console/settings", icon: Settings, label: "nav.settings" },
   ];
 }
