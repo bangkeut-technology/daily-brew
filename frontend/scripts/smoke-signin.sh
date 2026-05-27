@@ -8,7 +8,7 @@
 #
 # Usage:
 #   STAGING_URL=https://staging.dailybrew.work \
-#   TEST_EMAIL=you@example.com TEST_PASSWORD=secret \
+#   TEST_EMAIL=you@example.com TEST_PASSWORD='<your-password>' \
 #   [LOCALE=en] bash frontend/scripts/smoke-signin.sh
 set -uo pipefail
 
