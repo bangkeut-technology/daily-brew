@@ -72,3 +72,35 @@ export interface AdminAuditLogRow {
   metadata: Record<string, unknown> | null;
   createdAt: string;
 }
+
+export type FeatureFlagStage = "dev" | "alpha" | "beta" | "release";
+
+export interface AdminFeatureFlagRow {
+  key: string;
+  label: string;
+  description: string;
+  stage: FeatureFlagStage;
+  stageLabel: string;
+}
+
+export interface AdminFeatureFlagStageOption {
+  value: FeatureFlagStage;
+  label: string;
+  description: string;
+}
+
+export interface AdminMobileAppConfig {
+  iosTeamId: string | null;
+  iosBundleId: string | null;
+  androidPackage: string | null;
+  androidSha256Fingerprints: string[];
+  iosConfigured: boolean;
+  androidConfigured: boolean;
+}
+
+export interface AdminMobileAppConfigInput {
+  iosTeamId?: string | null;
+  iosBundleId?: string | null;
+  androidPackage?: string | null;
+  androidSha256Fingerprints?: string[] | null;
+}
