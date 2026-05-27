@@ -80,6 +80,11 @@ class PlanService
         return $this->isAtLeastEspresso($workspace);
     }
 
+    public function canUseAnomalyDetection(Workspace $workspace): bool
+    {
+        return $this->isAtLeastEspresso($workspace);
+    }
+
     public function canUseManagers(Workspace $workspace): bool
     {
         return $this->isAtLeastEspresso($workspace);

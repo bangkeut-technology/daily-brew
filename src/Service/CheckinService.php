@@ -21,6 +21,7 @@ class CheckinService
         private ClosurePeriodRepository $closurePeriodRepository,
         private LeaveRequestRepository $leaveRequestRepository,
         private AttendanceFlagCalculator $flagCalculator,
+        private ?AttendanceAnomalyDetector $anomalyDetector = null,
     ) {}
 
     public function checkin(
@@ -85,6 +86,7 @@ class CheckinService
 
         // Find or create attendance
         $attendance = $this->attendanceRepository->findByEmployeeAndDate($employee, $today);
+        $action = null;
 
         if ($attendance === null) {
             // Device double check-in prevention (Espresso feature)
@@ -116,6 +118,7 @@ class CheckinService
             $this->flagCalculator->recompute($attendance, $employee, $wsTz);
 
             $this->attendanceRepository->persist($attendance);
+            $action = 'in';
         } elseif ($attendance->getCheckOutAt() === null) {
             // Device verification check (Espresso feature)
             if (
@@ -136,11 +139,22 @@ class CheckinService
             $attendance->setCheckOutDeviceName($deviceName);
 
             $this->flagCalculator->recompute($attendance, $employee, $wsTz);
+            $action = 'out';
         } else {
             throw new BadRequestHttpException('Already checked in and out for today');
         }
 
         $this->attendanceRepository->flush();
+
+        // Alert the workspace if this punch came from a device the employee
+        // hasn't used before. Never let a notification failure break check-in.
+        if ($action !== null && $deviceId !== null && $this->anomalyDetector !== null) {
+            try {
+                $this->anomalyDetector->handle($attendance, $action, $deviceId);
+            } catch (\Throwable) {
+                // best-effort side effect
+            }
+        }
 
         return $attendance;
     }
