@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { getWorkspacePublicId } from "@/lib/api";
 import { useEmployees, useDeleteEmployee } from "@/hooks/useEmployees";
@@ -12,6 +12,7 @@ import { GlassCard } from "@/components/shared/GlassCard";
 import { Avatar } from "@/components/shared/Avatar";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";
+import { EmployeeFormModal } from "@/components/console/EmployeeFormModal";
 
 export default function EmployeesPage() {
   const { t } = useTranslation();
@@ -22,6 +23,17 @@ export default function EmployeesPage() {
   const { data: employees, isLoading, isError } = useEmployees(workspaceId ?? "");
   const deleteEmployee = useDeleteEmployee(workspaceId ?? "");
   const [target, setTarget] = useState<Employee | null>(null);
+  const [formOpen, setFormOpen] = useState(false);
+  const [editing, setEditing] = useState<Employee | null>(null);
+
+  const openCreate = () => {
+    setEditing(null);
+    setFormOpen(true);
+  };
+  const openEdit = (emp: Employee) => {
+    setEditing(emp);
+    setFormOpen(true);
+  };
 
   const handleDelete = () => {
     if (!target) return;
@@ -33,7 +45,19 @@ export default function EmployeesPage() {
 
   return (
     <div className="page-enter">
-      <PageHeader title={t("nav.employees", "Employees")} />
+      <PageHeader
+        title={t("nav.employees", "Employees")}
+        action={
+          <button
+            type="button"
+            onClick={openCreate}
+            className="flex items-center gap-2 rounded-xl bg-coffee px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+          >
+            <Plus size={16} />
+            Add employee
+          </button>
+        }
+      />
 
       {isLoading && <p className="text-text-secondary">Loading…</p>}
       {isError && <p className="text-red">Could not load employees.</p>}
@@ -64,6 +88,14 @@ export default function EmployeesPage() {
               </div>
               <button
                 type="button"
+                onClick={() => openEdit(emp)}
+                aria-label={`Edit ${emp.name}`}
+                className="rounded-lg p-2 text-text-tertiary transition-colors hover:bg-cream-3 hover:text-coffee"
+              >
+                <Pencil size={16} />
+              </button>
+              <button
+                type="button"
                 onClick={() => setTarget(emp)}
                 aria-label={`Remove ${emp.name}`}
                 className="rounded-lg p-2 text-text-tertiary transition-colors hover:bg-red/10 hover:text-red"
@@ -84,6 +116,13 @@ export default function EmployeesPage() {
         variant="danger"
         loading={deleteEmployee.isPending}
         onConfirm={handleDelete}
+      />
+
+      <EmployeeFormModal
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        workspaceId={workspaceId ?? ""}
+        employee={editing}
       />
     </div>
   );
