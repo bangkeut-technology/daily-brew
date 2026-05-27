@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, ShieldCheck, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { getWorkspacePublicId } from "@/lib/api";
 import { useEmployees, useDeleteEmployee } from "@/hooks/useEmployees";
+import { useRoleContext } from "@/hooks/useRoleContext";
 import type { Employee } from "@/types/employee";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { GlassCard } from "@/components/shared/GlassCard";
@@ -13,6 +14,7 @@ import { Avatar } from "@/components/shared/Avatar";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";
 import { EmployeeFormModal } from "@/components/console/EmployeeFormModal";
+import { ManagerPermissionsModal } from "@/components/console/ManagerPermissionsModal";
 
 export default function EmployeesPage() {
   const { t } = useTranslation();
@@ -21,10 +23,14 @@ export default function EmployeesPage() {
   const [workspaceId] = useState<string | null>(() => getWorkspacePublicId());
 
   const { data: employees, isLoading, isError } = useEmployees(workspaceId ?? "");
+  const { data: roleContext } = useRoleContext();
   const deleteEmployee = useDeleteEmployee(workspaceId ?? "");
   const [target, setTarget] = useState<Employee | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Employee | null>(null);
+  const [permTarget, setPermTarget] = useState<Employee | null>(null);
+
+  const isOwner = roleContext?.isOwner ?? false;
 
   const openCreate = () => {
     setEditing(null);
@@ -86,6 +92,16 @@ export default function EmployeesPage() {
                 )}
                 {!emp.active && <StatusBadge label="Inactive" variant="red" />}
               </div>
+              {isOwner && emp.role === "manager" && (
+                <button
+                  type="button"
+                  onClick={() => setPermTarget(emp)}
+                  aria-label={`Edit ${emp.name}'s permissions`}
+                  className="rounded-lg p-2 text-text-tertiary transition-colors hover:bg-cream-3 hover:text-coffee"
+                >
+                  <ShieldCheck size={16} />
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => openEdit(emp)}
@@ -123,6 +139,13 @@ export default function EmployeesPage() {
         onOpenChange={setFormOpen}
         workspaceId={workspaceId ?? ""}
         employee={editing}
+      />
+
+      <ManagerPermissionsModal
+        open={permTarget !== null}
+        onOpenChange={(open) => !open && setPermTarget(null)}
+        workspaceId={workspaceId ?? ""}
+        employee={permTarget}
       />
     </div>
   );

@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiAxios } from "@/lib/api";
 import type { Employee, EmployeeAttendanceTracking, EmployeeRole } from "@/types/employee";
+import type { ManagerPermission } from "@/types/auth";
 
 export interface EmployeeInput {
   firstName: string;
@@ -12,6 +13,9 @@ export interface EmployeeInput {
   jobTitle?: string | null;
   attendanceTracking?: EmployeeAttendanceTracking;
   role?: EmployeeRole;
+  dob?: string | null;
+  joinedAt?: string | null;
+  shiftPublicId?: string | null;
 }
 
 export function useEmployees(workspacePublicId: string) {
@@ -56,6 +60,20 @@ export function useUpdateEmployee(workspacePublicId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["employees", workspacePublicId] });
     },
+  });
+}
+
+export function useUpdateManagerPermissions(workspacePublicId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ publicId, permissions }: { publicId: string; permissions: ManagerPermission[] }) =>
+      (
+        await apiAxios.patch<Employee>(
+          `/workspaces/${workspacePublicId}/employees/${publicId}/manager-permissions`,
+          { permissions },
+        )
+      ).data,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["employees", workspacePublicId] }),
   });
 }
 

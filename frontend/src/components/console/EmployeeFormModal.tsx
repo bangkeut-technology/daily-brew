@@ -8,7 +8,9 @@ import { z } from "zod";
 import { X } from "lucide-react";
 import { toast } from "sonner";
 import { CustomSelect } from "@/components/shared/CustomSelect";
+import { CustomDatePicker } from "@/components/shared/CustomDatePicker";
 import { useCreateEmployee, useUpdateEmployee, type EmployeeInput } from "@/hooks/useEmployees";
+import { useShifts } from "@/hooks/useShifts";
 import type { Employee } from "@/types/employee";
 
 const schema = z.object({
@@ -19,6 +21,9 @@ const schema = z.object({
   jobTitle: z.string().trim().optional(),
   role: z.enum(["employee", "manager"]),
   attendanceTracking: z.enum(["full", "none"]),
+  dob: z.string().optional(),
+  joinedAt: z.string().optional(),
+  shiftPublicId: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -31,6 +36,9 @@ const EMPTY: FormValues = {
   jobTitle: "",
   role: "employee",
   attendanceTracking: "full",
+  dob: "",
+  joinedAt: "",
+  shiftPublicId: "",
 };
 
 const inputClass =
@@ -47,6 +55,11 @@ export function EmployeeFormModal({ open, onOpenChange, workspaceId, employee }:
   const isEdit = !!employee;
   const createEmployee = useCreateEmployee(workspaceId);
   const updateEmployee = useUpdateEmployee(workspaceId);
+  const { data: shifts } = useShifts(workspaceId);
+  const shiftOptions = [
+    { value: "", label: "No shift" },
+    ...(shifts ?? []).map((s) => ({ value: s.publicId, label: s.name })),
+  ];
 
   const {
     register,
@@ -68,6 +81,9 @@ export function EmployeeFormModal({ open, onOpenChange, workspaceId, employee }:
             jobTitle: employee.jobTitle ?? "",
             role: employee.role,
             attendanceTracking: employee.attendanceTracking,
+            dob: employee.dob ?? "",
+            joinedAt: employee.joinedAt ?? "",
+            shiftPublicId: employee.shiftPublicId ?? "",
           }
         : EMPTY,
     );
@@ -82,6 +98,9 @@ export function EmployeeFormModal({ open, onOpenChange, workspaceId, employee }:
       jobTitle: values.jobTitle || null,
       role: values.role,
       attendanceTracking: values.attendanceTracking,
+      dob: values.dob || null,
+      joinedAt: values.joinedAt || null,
+      shiftPublicId: values.shiftPublicId || null,
     };
 
     const onError = () => toast.error(`Could not ${isEdit ? "update" : "add"} employee`);
@@ -168,6 +187,38 @@ export function EmployeeFormModal({ open, onOpenChange, workspaceId, employee }:
                         { value: "none", label: "Not tracked" },
                       ]}
                     />
+                  )}
+                />
+              </Field>
+              <Field label="Shift" htmlFor="shiftPublicId">
+                <Controller
+                  control={control}
+                  name="shiftPublicId"
+                  render={({ field }) => (
+                    <CustomSelect
+                      id="shiftPublicId"
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                      options={shiftOptions}
+                    />
+                  )}
+                />
+              </Field>
+              <Field label="Date of birth" htmlFor="dob">
+                <Controller
+                  control={control}
+                  name="dob"
+                  render={({ field }) => (
+                    <CustomDatePicker id="dob" value={field.value ?? ""} onChange={field.onChange} />
+                  )}
+                />
+              </Field>
+              <Field label="Joined" htmlFor="joinedAt">
+                <Controller
+                  control={control}
+                  name="joinedAt"
+                  render={({ field }) => (
+                    <CustomDatePicker id="joinedAt" value={field.value ?? ""} onChange={field.onChange} />
                   )}
                 />
               </Field>

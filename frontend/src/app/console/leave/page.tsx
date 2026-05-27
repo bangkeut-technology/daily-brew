@@ -2,17 +2,19 @@
 
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Check, Trash2, X } from "lucide-react";
+import { Check, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { getWorkspacePublicId } from "@/lib/api";
 import { useLeaveRequests, useReviewLeaveRequest, useDeleteLeaveRequest } from "@/hooks/useLeaveRequests";
+import { useRoleContext } from "@/hooks/useRoleContext";
 import type { LeaveRequest, LeaveStatus } from "@/types/leave";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { Avatar } from "@/components/shared/Avatar";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";
+import { LeaveRequestModal } from "@/components/console/LeaveRequestModal";
 
 type Filter = "all" | LeaveStatus;
 const FILTERS: Filter[] = ["all", "pending", "approved", "rejected"];
@@ -41,11 +43,15 @@ export default function LeavePage() {
   const [workspaceId] = useState<string | null>(() => getWorkspacePublicId());
 
   const { data: requests, isLoading, isError } = useLeaveRequests(workspaceId ?? "");
+  const { data: roleContext } = useRoleContext();
   const review = useReviewLeaveRequest(workspaceId ?? "");
   const deleteRequest = useDeleteLeaveRequest(workspaceId ?? "");
 
   const [filter, setFilter] = useState<Filter>("all");
   const [target, setTarget] = useState<LeaveRequest | null>(null);
+  const [requestOpen, setRequestOpen] = useState(false);
+
+  const ownEmployeeId = roleContext?.employee?.publicId ?? null;
 
   const filtered = useMemo(
     () => (requests ?? []).filter((r) => filter === "all" || r.status === filter),
@@ -72,7 +78,21 @@ export default function LeavePage() {
 
   return (
     <div className="page-enter">
-      <PageHeader title={t("nav.leaveRequests", "Leave requests")} />
+      <PageHeader
+        title={t("nav.leaveRequests", "Leave requests")}
+        action={
+          ownEmployeeId ? (
+            <button
+              type="button"
+              onClick={() => setRequestOpen(true)}
+              className="flex items-center gap-2 rounded-xl bg-coffee px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+            >
+              <Plus size={16} />
+              Request leave
+            </button>
+          ) : undefined
+        }
+      />
 
       <div className="mb-5 flex gap-2">
         {FILTERS.map((f) => (
@@ -158,6 +178,15 @@ export default function LeavePage() {
         loading={deleteRequest.isPending}
         onConfirm={handleDelete}
       />
+
+      {ownEmployeeId && (
+        <LeaveRequestModal
+          open={requestOpen}
+          onOpenChange={setRequestOpen}
+          workspaceId={workspaceId ?? ""}
+          employeePublicId={ownEmployeeId}
+        />
+      )}
     </div>
   );
 }

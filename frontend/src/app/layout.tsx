@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 
 const SITE_NAME = "DailyBrew";
 const DESCRIPTION =
@@ -38,6 +39,10 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
 };
 
+export const viewport: Viewport = {
+  themeColor: "#6B4226",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -47,6 +52,7 @@ export default function RootLayout({
     <html lang="en" data-scroll-behavior="smooth" className="h-full">
       <body className="min-h-full">
         <div className="app-shell flex min-h-full flex-col">{children}</div>
+        <ServiceWorkerRegister />
       </body>
     </html>
   );
