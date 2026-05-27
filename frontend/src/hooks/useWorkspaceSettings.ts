@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiAxios, getWorkspacePublicId } from "@/lib/api";
 import { todayInTimezone, startOfMonthInTimezone } from "@/lib/timezone";
 import type { WorkspaceSetting } from "@/types/workspace";
@@ -16,6 +16,22 @@ export function useWorkspaceSettings(workspacePublicId: string) {
       return data;
     },
     enabled: !!workspacePublicId,
+  });
+}
+
+export function useUpdateWorkspaceSettings(workspacePublicId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (settings: Partial<WorkspaceSetting>) => {
+      const { data } = await apiAxios.put<WorkspaceSetting>(
+        `/workspaces/${workspacePublicId}/settings`,
+        settings,
+      );
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["workspaces", workspacePublicId, "settings"] });
+    },
   });
 }
 
