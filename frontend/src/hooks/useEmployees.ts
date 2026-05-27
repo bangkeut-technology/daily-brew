@@ -12,6 +12,9 @@ export interface EmployeeInput {
   jobTitle?: string | null;
   attendanceTracking?: EmployeeAttendanceTracking;
   role?: EmployeeRole;
+  dob?: string | null;
+  joinedAt?: string | null;
+  shiftPublicId?: string | null;
 }
 
 export function useEmployees(workspacePublicId: string) {

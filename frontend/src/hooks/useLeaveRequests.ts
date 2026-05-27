@@ -17,6 +17,25 @@ export function useLeaveRequests(workspacePublicId: string) {
   });
 }
 
+export interface LeaveRequestInput {
+  employeePublicId: string;
+  startDate: string;
+  endDate: string;
+  reason?: string;
+  startTime?: string;
+  endTime?: string;
+}
+
+export function useCreateLeaveRequest(workspacePublicId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: LeaveRequestInput) =>
+      (await apiAxios.post<LeaveRequest>(`/workspaces/${workspacePublicId}/leave-requests`, input))
+        .data,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["leaveRequests", workspacePublicId] }),
+  });
+}
+
 export function useReviewLeaveRequest(workspacePublicId: string) {
   const queryClient = useQueryClient();
   return useMutation({
