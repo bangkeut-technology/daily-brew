@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Entity\Attendance;
 use App\Entity\ClosurePeriod;
 use App\Entity\Employee;
 use App\Entity\LeaveRequest;
@@ -12,7 +13,7 @@ use App\Entity\Workspace;
 use App\Repository\DeviceTokenRepository;
 use App\Repository\EmployeeRepository;
 
-readonly class NotificationService
+class NotificationService
 {
     public function __construct(
         private ExpoPushService       $expoPushService,
@@ -274,6 +275,49 @@ readonly class NotificationService
             $dates,
         );
         $this->sendTelegram($leaveRequest->getWorkspace(), $tgText);
+    }
+
+    /**
+     * Alert the owner/workspace that an attendance punch came from a device
+     * the employee hasn't used before. $action is 'in' or 'out'.
+     */
+    public function notifyDeviceAnomaly(Attendance $attendance, string $action): void
+    {
+        $employee = $attendance->getEmployee();
+        $workspace = $attendance->getWorkspace();
+        if ($employee === null || $workspace === null) {
+            return;
+        }
+
+        $isOut = $action === 'out';
+        $verb = $isOut ? 'checked out' : 'checked in';
+        $deviceName = $isOut ? $attendance->getCheckOutDeviceName() : $attendance->getCheckInDeviceName();
+        $deviceId = $isOut ? $attendance->getCheckOutDeviceId() : $attendance->getCheckInDeviceId();
+        $deviceLabel = $deviceName
+            ?: ($deviceId !== null && $deviceId !== '' ? 'ID ' . substr($deviceId, 0, 8) : 'an unknown device');
+
+        $when = $isOut ? $attendance->getCheckOutAt() : $attendance->getCheckInAt();
+        $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
+        $timeStr = $when !== null ? $when->setTimezone($tz)->format('M j, H:i') : 'unknown time';
+
+        $owner = $workspace->getOwner();
+        if ($owner !== null) {
+            $this->expoPushService->send(
+                $this->getTokensForUser($owner),
+                'New device used',
+                sprintf('%s %s from a new device (%s)', $employee->getName(), $verb, $deviceLabel),
+                ['type' => 'attendance_anomaly', 'workspacePublicId' => $workspace->getPublicId()],
+            );
+        }
+
+        $tgText = sprintf(
+            "⚠️ <b>New device used</b>\n%s %s from a new device.\nDevice: %s\nTime: %s",
+            $employee->getName(),
+            $verb,
+            $deviceLabel,
+            $timeStr,
+        );
+        $this->sendTelegram($workspace, $tgText);
     }
 
     private function formatDateRange(\DateTimeInterface $start, \DateTimeInterface $end): string

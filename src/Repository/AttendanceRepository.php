@@ -115,4 +115,35 @@ class AttendanceRepository extends AbstractRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Distinct check-in and check-out device IDs ever recorded for an employee.
+     * Used to decide whether a clock-in device is new. Optionally excludes one
+     * attendance row (e.g. the record just created) so it isn't its own baseline.
+     *
+     * @return string[]
+     */
+    public function findKnownDeviceIds(Employee $employee, ?int $excludeAttendanceId = null): array
+    {
+        $qb = $this->createQueryBuilder('a')
+            ->select('a.checkInDeviceId AS ci', 'a.checkOutDeviceId AS co')
+            ->where('a.employee = :employee')
+            ->setParameter('employee', $employee);
+
+        if ($excludeAttendanceId !== null) {
+            $qb->andWhere('a.id != :excludeId')->setParameter('excludeId', $excludeAttendanceId);
+        }
+
+        $ids = [];
+        foreach ($qb->getQuery()->getScalarResult() as $row) {
+            if (!empty($row['ci'])) {
+                $ids[] = $row['ci'];
+            }
+            if (!empty($row['co'])) {
+                $ids[] = $row['co'];
+            }
+        }
+
+        return array_values(array_unique($ids));
+    }
 }
