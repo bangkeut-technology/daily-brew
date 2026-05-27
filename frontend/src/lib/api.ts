@@ -24,8 +24,9 @@ apiAxios.interceptors.request.use((config) => {
   return config;
 });
 
-// Bare client for version-only endpoints; refresh overrides baseURL to /api.
-const bareAxios = axios.create({
+// No-locale client for /api/v1 endpoints that aren't locale-scoped (check-in,
+// device); refresh overrides baseURL to /api.
+export const apiV1Axios = axios.create({
   baseURL: "/api/v1",
   withCredentials: true,
 });
@@ -61,7 +62,7 @@ apiAxios.interceptors.response.use(
       config.__isRetryRequest = true;
       try {
         if (!refreshPromise) {
-          refreshPromise = bareAxios
+          refreshPromise = apiV1Axios
             .post("/token/refresh", null, { baseURL: "/api" })
             .then(() => undefined)
             .finally(() => {
