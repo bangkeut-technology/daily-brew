@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 48" fill="none">
+  <g transform="translate(0, 0) scale(2)" stroke="#6B4226" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M10 2v2"/>
+    <path d="M14 2v2"/>
+    <path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"/>
+    <path d="M6 2v2"/>
+  </g>
+  <text x="60" y="34" font-family="'Palatino Linotype','Book Antiqua',Palatino,Georgia,serif" font-size="28" font-weight="700" fill="#2C2420" letter-spacing="0.5">Daily<tspan fill="#6B4226">Brew</tspan></text>
+</svg>
