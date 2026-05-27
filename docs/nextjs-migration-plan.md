@@ -81,6 +81,16 @@ Phases 0–5 are built on the `frontend/` branch and validated on **staging**; p
 - **Optional SEO upgrade:** localized routes (`/fr/...`, `/km/...`) + `hreflang`.
 - **Gate (staging):** marketing pages body-rendered HTML, Lighthouse SEO/LCP green, no canonical/meta regressions vs PR #148.
 
+#### Phase 1 expanded by the SEO strategy (`docs/seo-strategy.md`)
+The marketing surface grows well beyond the current ~23 pages. The engineering job is to make these **cheap to add** (data/MDX-driven), not to hand-write copy. Build order follows the strategy's P0→P3 / Day-30→90 roadmap:
+- **SEO foundation (engineering):** per-page `generateMetadata` helper, `sitemap.ts` (+ partitioned later), `robots.ts`, reusable **JSON-LD schema** (`SoftwareApplication`, `FAQPage`, `HowTo`, `BreadcrumbList`, `Article`), `hreflang`. _(done — this batch)_
+- **MDX blog** at `/blog` + `/blog/<slug>` (12 anchor posts, strategy §6). _(infra + 1st post done — this batch)_
+- **Programmatic, data-driven page templates:** industry (`/cafes`, `/restaurants`, …), competitor (`/vs-jibble`, …), country leave-laws + calculators (`/tools/annual-leave-calculator/<country>`), glossary. One data entry = one page.
+- **Free-tool calculators** (interactive client components): annual-leave, shift-schedule generator, time-card, buddy-punching cost.
+- **Narrative anchors:** `/three-factor-attendance`, `/stop-buddy-punching`, `/tap-to-clock-in` (NFC waitlist), `/ip-verification`.
+- **`noindex` separation:** marketing indexable; `/console`,`/admin`,`/checkin`,`/auth` `noindex` (already enforced via robots + per-route metadata).
+- Copy/keywords/positioning are owned by `docs/seo-strategy.md` — treat its §5, §6, §10, §12 as the content backlog.
+
 ### Phase 2 — Auth & entry flows
 - `/auth/callback`, `/onboarding`, `/forgot-password`, `/reset-password`.
 - Port the Axios client, auth provider, token refresh handling, `currentWorkspace` + device-id localStorage logic, role-context bootstrap.
