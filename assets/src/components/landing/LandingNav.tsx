@@ -2,20 +2,27 @@ import { Link } from '@tanstack/react-router';
 import { useState, useEffect, useCallback } from 'react';
 import { Menu, X, LayoutDashboard } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { LogoBrand } from '@/components/shared/Logo';
 import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
 import { useAuthenticationState } from '@/hooks/use-authentication';
 
-const navLinks = [
-  { label: 'Features', href: '/features' },
-  { label: 'How it works', href: '/how-it-works' },
-  { label: 'Pricing', href: '/pricing' },
-  { label: 'Support', href: '/support' },
-  { label: 'FAQ', href: '/faq' },
+/**
+ * Marketing nav links. The visible text comes from i18n (`marketing.nav.*`);
+ * the `href` and `key` are static. Sub-key naming kept stable so it survives
+ * label-only translation tweaks.
+ */
+const navLinks: { key: string; href: string }[] = [
+  { key: 'features',    href: '/features' },
+  { key: 'howItWorks',  href: '/how-it-works' },
+  { key: 'pricing',     href: '/pricing' },
+  { key: 'support',     href: '/support' },
+  { key: 'faq',         href: '/faq' },
 ];
 
 export function LandingNav() {
+  const { t } = useTranslation();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const auth = useAuthenticationState();
@@ -67,7 +74,7 @@ export function LandingNav() {
               to={link.href}
               className="text-[15px] font-medium text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
             >
-              {link.label}
+              {t(`marketing.nav.${link.key}`)}
             </Link>
           ))}
           <LanguageSwitcher />
@@ -78,7 +85,7 @@ export function LandingNav() {
               className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] no-underline"
             >
               <LayoutDashboard size={14} />
-              Console
+              {t('marketing.nav.console')}
             </Link>
           ) : (
             <>
@@ -86,13 +93,13 @@ export function LandingNav() {
                 to="/sign-in"
                 className="text-[15px] font-medium text-text-secondary hover:text-text-primary no-underline transition-colors duration-200"
               >
-                Sign in
+                {t('marketing.nav.signIn')}
               </Link>
               <Link
                 to="/sign-up"
                 className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] no-underline"
               >
-                Get started
+                {t('marketing.nav.getStarted')}
               </Link>
             </>
           )}
@@ -124,7 +131,7 @@ export function LandingNav() {
                 onClick={() => setMobileOpen(false)}
                 className="block text-[16px] font-medium text-text-secondary hover:text-coffee no-underline py-1 transition-colors"
               >
-                {link.label}
+                {t(`marketing.nav.${link.key}`)}
               </Link>
             ))}
             <div className="h-px bg-cream-3 my-2" />
@@ -137,7 +144,7 @@ export function LandingNav() {
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white no-underline"
               >
                 <LayoutDashboard size={14} />
-                Console
+                {t('marketing.nav.console')}
               </Link>
             ) : (
               <>
@@ -146,14 +153,14 @@ export function LandingNav() {
                   onClick={() => setMobileOpen(false)}
                   className="block text-[16px] font-medium text-text-secondary no-underline py-1"
                 >
-                  Sign in
+                  {t('marketing.nav.signIn')}
                 </Link>
                 <Link
                   to="/sign-up"
                   onClick={() => setMobileOpen(false)}
                   className="inline-flex items-center px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white no-underline"
                 >
-                  Get started
+                  {t('marketing.nav.getStarted')}
                 </Link>
               </>
             )}

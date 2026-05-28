@@ -435,5 +435,318 @@
         "howItWorks": "Voir comment ça marche"
       }
     }
+  },
+  "marketing": {
+    "nav": {
+      "features": "Fonctionnalités",
+      "howItWorks": "Comment ça marche",
+      "pricing": "Tarifs",
+      "support": "Support",
+      "faq": "FAQ",
+      "signIn": "Connexion",
+      "getStarted": "Commencer",
+      "console": "Console"
+    },
+    "footer": {
+      "brandTagline": "Suivi des présences et des congés du personnel pour restaurants. Simple, chaleureux, conçu pour les équipes qui avancent vite.",
+      "productHeader": "Produit",
+      "legalHeader": "Mentions légales",
+      "getStartedHeader": "Commencer",
+      "dashboardHeader": "Tableau de bord",
+      "productLinks": {
+        "features": "Fonctionnalités",
+        "howItWorks": "Comment ça marche",
+        "guides": "Guides",
+        "roles": "Rôles et permissions",
+        "demo": "Essayer la démo",
+        "pricing": "Tarifs",
+        "faq": "FAQ",
+        "support": "Support"
+      },
+      "legalLinks": {
+        "privacy": "Politique de confidentialité",
+        "terms": "Conditions d'utilisation",
+        "refund": "Politique de remboursement",
+        "deleteAccount": "Supprimer le compte"
+      },
+      "cta": {
+        "createAccount": "Créer un compte",
+        "signIn": "Connexion",
+        "console": "Console"
+      },
+      "copyright": "DailyBrew © {{year}}. Tous droits réservés.",
+      "madeWithPrefix": "Conçu avec",
+      "madeWithSuffix": "pour les restaurants du monde entier"
+    }
+  },
+  "homepage": {
+    "hero": {
+      "badge": "Gratuit jusqu'à 10 employés",
+      "titleLine1": "Présences du personnel,",
+      "titleLine2": "simplifiées.",
+      "subtitle": "Un code QR à votre restaurant. Le personnel le scanne pour pointer. Vous voyez qui est présent, qui est en retard et qui est en congé — en temps réel.",
+      "ctaPrimary": "Commencer gratuitement",
+      "ctaSecondary": "Essayer la démo",
+      "noCreditCard": "Aucune carte de crédit requise",
+      "fastSetup": "Configuration en moins de 5 minutes",
+      "trust": {
+        "qrCheckin": "Check-in par QR",
+        "shiftTracking": "Suivi des horaires",
+        "leaveManagement": "Gestion des congés",
+        "geofencing": "Géorepérage"
+      },
+      "preview": {
+        "notification": {
+          "title": "{{name}} a pointé",
+          "sub": "À l'instant — à l'heure"
+        },
+        "dashboardEyebrow": "Vue du jour",
+        "dashboardTitle": "Tableau de bord",
+        "liveBadge": "En direct",
+        "stats": {
+          "present": "Présent",
+          "late": "En retard",
+          "leave": "Congé",
+          "absent": "Absent"
+        },
+        "shifts": {
+          "morning": "Matin",
+          "evening": "Soir"
+        },
+        "statuses": {
+          "onTime": "À l'heure",
+          "late": "En retard",
+          "onLeave": "En congé"
+        },
+        "qrCheckin": "Check-in QR"
+      }
+    },
+    "howItWorks": {
+      "eyebrow": "Comment ça marche",
+      "title": "Opérationnel en quelques minutes",
+      "subtitle": "Quatre étapes de l'inscription au suivi des présences en direct. Aucun matériel requis.",
+      "learnMore": "En savoir plus sur le fonctionnement",
+      "steps": {
+        "create": {
+          "title": "Créez votre espace de travail",
+          "desc": "Inscrivez-vous, nommez votre restaurant, et un code QR unique est généré instantanément pour votre espace."
+        },
+        "addTeam": {
+          "title": "Ajoutez votre équipe",
+          "desc": "Créez les profils du personnel et assignez les horaires. Matin, soir ou personnalisé — vous définissez le planning."
+        },
+        "scan": {
+          "title": "Le personnel scanne pour pointer",
+          "desc": "Affichez le code QR à votre restaurant. Les employés le scannent pour pointer à l'arrivée et au départ — une touche à chaque fois."
+        },
+        "track": {
+          "title": "Suivez tout en direct",
+          "desc": "Voyez qui est présent, en retard, en congé ou absent. Les retards et départs anticipés sont signalés automatiquement."
+        }
+      }
+    },
+    "features": {
+      "eyebrow": "Fonctionnalités",
+      "title": "Tout ce dont votre restaurant a besoin",
+      "subtitle": "Conçu pour les propriétaires de restaurant qui veulent de la clarté sans complexité.",
+      "espressoBadge": "Forfait Espresso",
+      "seeAll": "Voir toutes les fonctionnalités en détail",
+      "core": {
+        "qrCheckin": {
+          "title": "Check-in par QR",
+          "desc": "Un code QR par espace de travail. Le personnel le scanne pour pointer à l'arrivée et au départ — rapide, sans contact, sans matériel supplémentaire."
+        },
+        "employeeManagement": {
+          "title": "Gestion des employés",
+          "desc": "Ajoutez le personnel, assignez les horaires et suivez l'historique des présences. Gérez les employés actifs et inactifs."
+        },
+        "shiftTracking": {
+          "title": "Suivi des horaires",
+          "desc": "Définissez des horaires du matin, du soir ou personnalisés. Les retards et départs anticipés sont signalés automatiquement."
+        },
+        "realtimeDashboard": {
+          "title": "Tableau de bord en temps réel",
+          "desc": "Voyez qui est présent, en retard, en congé ou absent. Statistiques en direct pour propriétaires et employés."
+        }
+      },
+      "espresso": {
+        "leaveRequests": {
+          "title": "Demandes de congé",
+          "desc": "Le personnel soumet ses congés depuis son téléphone. Les propriétaires approuvent ou refusent en une touche. Journée entière ou partielle."
+        },
+        "ipRestriction": {
+          "title": "Restriction IP",
+          "desc": "Limitez les check-ins au Wi-Fi de votre restaurant. Empêchez le pointage à distance."
+        },
+        "deviceVerification": {
+          "title": "Vérification d'appareil",
+          "desc": "Liez le pointage à un seul appareil par employé par jour. Empêche le pointage par collègue."
+        },
+        "geofencing": {
+          "title": "Géorepérage",
+          "desc": "Limitez les check-ins à un rayon GPS autour de votre restaurant."
+        },
+        "perDaySchedules": {
+          "title": "Horaires par jour",
+          "desc": "Définissez des heures différentes pour chaque jour de la semaine."
+        },
+        "managerRole": {
+          "title": "Rôle de manager",
+          "desc": "Promouvez du personnel de confiance et choisissez précisément quelles parties ils administrent — cinq permissions granulaires, configurables par manager."
+        },
+        "basilbookIntegration": {
+          "titleSuffix": " intégration",
+          "desc": "Synchronisez les présences avec votre système de comptabilité. Liez les employés par nom d'utilisateur et récupérez les données via API."
+        },
+        "notifications": {
+          "title": "Notifications",
+          "desc": "Alertes push et email pour les demandes de congé, changements d'horaire, fermetures et résumés quotidiens."
+        }
+      }
+    },
+    "builtFor": {
+      "eyebrow": "Conçu pour",
+      "title": "Toute équipe qui doit suivre les présences",
+      "subtitle": "Que vous gériez un seul café ou un restaurant animé avec 20 employés, DailyBrew s'adapte à votre flux de travail.",
+      "venues": {
+        "restaurants": "Restaurants",
+        "cafes": "Cafés",
+        "barsPubs": "Bars et pubs",
+        "foodCourts": "Aires de restauration",
+        "bakeries": "Boulangeries",
+        "smallTeams": "Petites équipes"
+      },
+      "highlights": {
+        "languages": {
+          "label": "Langues",
+          "sub": "EN, FR, KM"
+        },
+        "setupTime": {
+          "label": "Minutes",
+          "sub": "Pour s'installer"
+        },
+        "hardware": {
+          "label": "Matériel",
+          "sub": "Requis"
+        }
+      }
+    },
+    "integration": {
+      "eyebrow": "Intégration",
+      "titleParts": "Fonctionne avec <brand></brand>",
+      "subtitle": "Connectez les présences du personnel à la comptabilité de votre restaurant. Sachez qui a travaillé, quand il a travaillé, et comment cela se rattache à vos finances.",
+      "brand": {
+        "attendance": "Présences",
+        "accounting": "Comptabilité"
+      },
+      "benefits": {
+        "sync": {
+          "title": "Présences synchronisées avec la comptabilité",
+          "desc": "Récupère les données de présence via API — associez qui a travaillé à ce qui a été vendu."
+        },
+        "link": {
+          "title": "Liaison du personnel par nom d'utilisateur",
+          "desc": "Liez les employés entre les deux systèmes avec un nom d'utilisateur partagé. Une identité, deux produits."
+        },
+        "period": {
+          "title": "Récupération par période",
+          "desc": "Interrogez les présences par plage de dates — quotidienne, hebdomadaire ou mensuelle. Jusqu'à 93 jours par requête."
+        }
+      },
+      "howItWorks": {
+        "label": "Comment ça marche :",
+        "body": "Générez un jeton API dans les paramètres DailyBrew. <brand></brand> l'utilise pour récupérer les données de présence des employés ayant un nom d'utilisateur correspondant — heures de pointage, indicateurs de retard et informations sur les horaires."
+      },
+      "espressoPill": "Espresso",
+      "ctaPrimary": "Commencer avec Espresso",
+      "ctaSecondaryParts": "En savoir plus sur <brand></brand>"
+    },
+    "contact": {
+      "eyebrow": "Contact",
+      "title": "Prenez contact",
+      "subtitle": "Des questions ? Nous serions ravis d'avoir de vos nouvelles.",
+      "email": {
+        "title": "Écrivez-nous",
+        "sla": "Nous répondons généralement sous 24 heures"
+      },
+      "feedback": {
+        "title": "Commentaires",
+        "body": "Utilisez le widget de retour dans le coin inférieur droit pour signaler des bugs ou suggérer des fonctionnalités. Nous lisons chaque message."
+      }
+    }
+  },
+  "pricing": {
+    "eyebrow": "Tarifs",
+    "title": "Tarification simple et transparente",
+    "subtitle": "Commencez gratuitement. Évoluez quand vous en avez besoin.",
+    "period": {
+      "month": "/mois",
+      "year": "/an"
+    },
+    "toggle": {
+      "monthly": "Mensuel",
+      "yearly": "Annuel",
+      "yearlyBadge": "Économisez avec la facturation annuelle",
+      "switchHint": "Passez à l'annuel et économisez"
+    },
+    "free": {
+      "name": "Free",
+      "period": "pour toujours",
+      "subtitle": "Pour les petites équipes qui débutent",
+      "cta": "Commencer",
+      "features": {
+        "employees10": "Jusqu'à 10 employés",
+        "qrCheckIn": "Check-in par QR de l'espace",
+        "shifts": "Gestion des horaires",
+        "closures": "Périodes de fermeture",
+        "dashboard": "Tableau de bord propriétaire et employé",
+        "log": "Journal des présences",
+        "darkMode": "Mode sombre",
+        "multiLang": "Multilingue (EN/FR/KM)",
+        "leaveRequests": "Demandes de congé",
+        "ipRestriction": "Restriction IP",
+        "geofencing": "Géorepérage"
+      }
+    },
+    "espresso": {
+      "name": "Espresso",
+      "subtitle": "Pour les restaurants en croissance",
+      "cta": "Commencer avec Espresso",
+      "mostPopular": "Le plus populaire",
+      "perMonthHint": "Soit seulement {{price}}/mois",
+      "features": {
+        "employees20": "Jusqu'à 20 employés",
+        "everythingFree": "Tout ce qui est dans Free",
+        "leaveRequests": "Gestion des demandes de congé",
+        "ipRestriction": "Restriction IP au pointage entrée et sortie",
+        "deviceVerification": "Vérification d'appareil au pointage entrée et sortie",
+        "geofencing": "Géorepérage au pointage entrée et sortie",
+        "perDaySchedules": "Horaires par jour de la semaine",
+        "manager": "Rôle de manager avec permissions granulaires (jusqu'à 2)",
+        "basilbook": "<brand></brand> intégration + API",
+        "notifications": "Notifications push et email",
+        "dailySummary": "Résumé quotidien des présences",
+        "trial14": "Essai gratuit de 14 jours"
+      }
+    },
+    "doubleEspresso": {
+      "name": "Double Espresso",
+      "subtitle": "Pour les grandes opérations",
+      "comingSoon": "Bientôt disponible",
+      "roadmapBadge": "Feuille de route",
+      "perMonthHint": "Soit seulement {{price}}/mois",
+      "features": {
+        "unlimitedEmployees": "Employés illimités",
+        "everythingEspresso": "Tout ce qui est dans Espresso",
+        "unlimitedManagers": "Managers illimités",
+        "prioritySupport": "Support prioritaire",
+        "multipleQrStations": "Plusieurs stations QR",
+        "perQrGeofence": "Géorepérage et paramètres par QR",
+        "perQrAssignment": "Affectation des employés par QR",
+        "perQrManager": "Affectation de manager par QR",
+        "whiteLabel": "Image de marque blanche"
+      }
+    },
+    "footnote": "Aucune carte de crédit requise pour commencer. Évoluez à tout moment depuis votre tableau de bord."
   }
 }

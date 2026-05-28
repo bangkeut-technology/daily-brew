@@ -528,5 +528,318 @@
         "howItWorks": "See how it works"
       }
     }
+  },
+  "marketing": {
+    "nav": {
+      "features": "Features",
+      "howItWorks": "How it works",
+      "pricing": "Pricing",
+      "support": "Support",
+      "faq": "FAQ",
+      "signIn": "Sign in",
+      "getStarted": "Get started",
+      "console": "Console"
+    },
+    "footer": {
+      "brandTagline": "Staff attendance and leave tracking for restaurants. Simple, warm, and built for teams that move fast.",
+      "productHeader": "Product",
+      "legalHeader": "Legal",
+      "getStartedHeader": "Get started",
+      "dashboardHeader": "Dashboard",
+      "productLinks": {
+        "features": "Features",
+        "howItWorks": "How it works",
+        "guides": "Guides",
+        "roles": "Roles & permissions",
+        "demo": "Try demo",
+        "pricing": "Pricing",
+        "faq": "FAQ",
+        "support": "Support"
+      },
+      "legalLinks": {
+        "privacy": "Privacy policy",
+        "terms": "Terms of use",
+        "refund": "Refund policy",
+        "deleteAccount": "Delete account"
+      },
+      "cta": {
+        "createAccount": "Create account",
+        "signIn": "Sign in",
+        "console": "Console"
+      },
+      "copyright": "DailyBrew © {{year}}. All rights reserved.",
+      "madeWithPrefix": "Made with",
+      "madeWithSuffix": "for restaurants everywhere"
+    }
+  },
+  "homepage": {
+    "hero": {
+      "badge": "Free for up to 10 employees",
+      "titleLine1": "Staff attendance,",
+      "titleLine2": "brewed simply.",
+      "subtitle": "One QR code at your restaurant. Staff scan to check in. You see who's here, who's late, and who's on leave — all in real time.",
+      "ctaPrimary": "Get started free",
+      "ctaSecondary": "Try the demo",
+      "noCreditCard": "No credit card required",
+      "fastSetup": "Set up in under 5 minutes",
+      "trust": {
+        "qrCheckin": "QR check-in",
+        "shiftTracking": "Shift tracking",
+        "leaveManagement": "Leave management",
+        "geofencing": "Geofencing"
+      },
+      "preview": {
+        "notification": {
+          "title": "{{name}} checked in",
+          "sub": "Just now — on time"
+        },
+        "dashboardEyebrow": "Today's overview",
+        "dashboardTitle": "Dashboard",
+        "liveBadge": "Live",
+        "stats": {
+          "present": "Present",
+          "late": "Late",
+          "leave": "Leave",
+          "absent": "Absent"
+        },
+        "shifts": {
+          "morning": "Morning",
+          "evening": "Evening"
+        },
+        "statuses": {
+          "onTime": "On time",
+          "late": "Late",
+          "onLeave": "On leave"
+        },
+        "qrCheckin": "QR Check-in"
+      }
+    },
+    "howItWorks": {
+      "eyebrow": "How it works",
+      "title": "Up and running in minutes",
+      "subtitle": "Four steps from sign-up to live attendance tracking. No hardware needed.",
+      "learnMore": "Learn more about how it works",
+      "steps": {
+        "create": {
+          "title": "Create your workspace",
+          "desc": "Sign up, name your restaurant, and a unique QR code is generated for your workspace instantly."
+        },
+        "addTeam": {
+          "title": "Add your team",
+          "desc": "Create employee profiles and assign shifts. Morning, evening, or custom — you define the schedule."
+        },
+        "scan": {
+          "title": "Staff scan to check in",
+          "desc": "Display the QR code at your restaurant. Employees scan it to check in and out — one tap each way."
+        },
+        "track": {
+          "title": "Track everything live",
+          "desc": "See who is present, late, on leave, or absent. Late arrivals and early departures are flagged automatically."
+        }
+      }
+    },
+    "features": {
+      "eyebrow": "Features",
+      "title": "Everything your restaurant needs",
+      "subtitle": "Built for restaurant owners who want clarity without complexity.",
+      "espressoBadge": "Espresso plan",
+      "seeAll": "See all features in detail",
+      "core": {
+        "qrCheckin": {
+          "title": "QR check-in",
+          "desc": "One QR code per workspace. Staff scan it to check in and out — fast, contactless, no extra hardware."
+        },
+        "employeeManagement": {
+          "title": "Employee management",
+          "desc": "Add staff, assign shifts, and track attendance history. Manage active and inactive employees."
+        },
+        "shiftTracking": {
+          "title": "Shift tracking",
+          "desc": "Define morning, evening, or custom shifts. Late arrivals and early departures are flagged automatically."
+        },
+        "realtimeDashboard": {
+          "title": "Real-time dashboard",
+          "desc": "See who's present, late, on leave, or absent. Live stats for owners and employees."
+        }
+      },
+      "espresso": {
+        "leaveRequests": {
+          "title": "Leave requests",
+          "desc": "Staff submit leave from their phone. Owners approve or reject with one tap. Full or partial day."
+        },
+        "ipRestriction": {
+          "title": "IP restriction",
+          "desc": "Lock check-ins to your restaurant's WiFi. Prevent remote punching."
+        },
+        "deviceVerification": {
+          "title": "Device verification",
+          "desc": "Bind check-in/out to one device per employee per day. Prevents buddy punching."
+        },
+        "geofencing": {
+          "title": "Geofencing",
+          "desc": "Restrict check-ins to a GPS radius around your restaurant."
+        },
+        "perDaySchedules": {
+          "title": "Per-day schedules",
+          "desc": "Set different shift hours for each day of the week."
+        },
+        "managerRole": {
+          "title": "Manager role",
+          "desc": "Promote trusted staff and pick exactly which areas they administer — five granular permissions, configurable per manager."
+        },
+        "basilbookIntegration": {
+          "titleSuffix": " integration",
+          "desc": "Sync staff attendance to your accounting system. Link employees by username and pull data via API."
+        },
+        "notifications": {
+          "title": "Notifications",
+          "desc": "Push and email alerts for leave requests, shift changes, closures, and daily summaries."
+        }
+      }
+    },
+    "builtFor": {
+      "eyebrow": "Built for",
+      "title": "Any team that needs attendance tracking",
+      "subtitle": "Whether you run a single cafe or a busy restaurant with 20 staff, DailyBrew adapts to your workflow.",
+      "venues": {
+        "restaurants": "Restaurants",
+        "cafes": "Cafes",
+        "barsPubs": "Bars & pubs",
+        "foodCourts": "Food courts",
+        "bakeries": "Bakeries",
+        "smallTeams": "Small teams"
+      },
+      "highlights": {
+        "languages": {
+          "label": "Languages",
+          "sub": "EN, FR, KM"
+        },
+        "setupTime": {
+          "label": "Minutes",
+          "sub": "To set up"
+        },
+        "hardware": {
+          "label": "Hardware",
+          "sub": "Required"
+        }
+      }
+    },
+    "integration": {
+      "eyebrow": "Integration",
+      "titleParts": "Works with <brand></brand>",
+      "subtitle": "Connect staff attendance to your restaurant accounting. Know who worked, when they worked, and how it maps to your financials.",
+      "brand": {
+        "attendance": "Attendance",
+        "accounting": "Accounting"
+      },
+      "benefits": {
+        "sync": {
+          "title": "Attendance synced to accounting",
+          "desc": "Pulls attendance data via API — match who worked with what was sold."
+        },
+        "link": {
+          "title": "Username-based staff linking",
+          "desc": "Link employees across both systems with a shared username. One identity, two products."
+        },
+        "period": {
+          "title": "Period-based data retrieval",
+          "desc": "Query attendance by date range — daily, weekly, or monthly. Up to 93 days per request."
+        }
+      },
+      "howItWorks": {
+        "label": "How it works:",
+        "body": "Generate an API token in DailyBrew settings. <brand></brand> uses it to pull attendance data for employees with matching usernames — check-in times, late flags, and shift info."
+      },
+      "espressoPill": "Espresso",
+      "ctaPrimary": "Get started with Espresso",
+      "ctaSecondaryParts": "Learn about <brand></brand>"
+    },
+    "contact": {
+      "eyebrow": "Contact",
+      "title": "Get in touch",
+      "subtitle": "Have questions? We'd love to hear from you.",
+      "email": {
+        "title": "Email us",
+        "sla": "We typically respond within 24 hours"
+      },
+      "feedback": {
+        "title": "Feedback",
+        "body": "Use the feedback widget in the bottom-right corner to report bugs or suggest features. We read every message."
+      }
+    }
+  },
+  "pricing": {
+    "eyebrow": "Pricing",
+    "title": "Simple, transparent pricing",
+    "subtitle": "Start free. Upgrade when you need more.",
+    "period": {
+      "month": "/month",
+      "year": "/year"
+    },
+    "toggle": {
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "yearlyBadge": "Save with yearly billing",
+      "switchHint": "Switch to yearly and save"
+    },
+    "free": {
+      "name": "Free",
+      "period": "forever",
+      "subtitle": "For small teams getting started",
+      "cta": "Get started",
+      "features": {
+        "employees10": "Up to 10 employees",
+        "qrCheckIn": "Workspace QR code check-in",
+        "shifts": "Shift management",
+        "closures": "Closure periods",
+        "dashboard": "Owner & employee dashboard",
+        "log": "Attendance log",
+        "darkMode": "Dark mode",
+        "multiLang": "Multi-language (EN/FR/KM)",
+        "leaveRequests": "Leave requests",
+        "ipRestriction": "IP restriction",
+        "geofencing": "Geofencing"
+      }
+    },
+    "espresso": {
+      "name": "Espresso",
+      "subtitle": "For growing restaurants",
+      "cta": "Start with Espresso",
+      "mostPopular": "Most popular",
+      "perMonthHint": "That's just {{price}}/month",
+      "features": {
+        "employees20": "Up to 20 employees",
+        "everythingFree": "Everything in Free",
+        "leaveRequests": "Leave request management",
+        "ipRestriction": "IP restriction for check-in & out",
+        "deviceVerification": "Device verification for check-in & out",
+        "geofencing": "Geofencing for check-in & out",
+        "perDaySchedules": "Per-day shift schedules",
+        "manager": "Manager role with granular permissions (up to 2)",
+        "basilbook": "<brand></brand> integration + API",
+        "notifications": "Push & email notifications",
+        "dailySummary": "Daily attendance summary",
+        "trial14": "14-day free trial"
+      }
+    },
+    "doubleEspresso": {
+      "name": "Double Espresso",
+      "subtitle": "For large operations",
+      "comingSoon": "Coming soon",
+      "roadmapBadge": "Roadmap",
+      "perMonthHint": "That's just {{price}}/month",
+      "features": {
+        "unlimitedEmployees": "Unlimited employees",
+        "everythingEspresso": "Everything in Espresso",
+        "unlimitedManagers": "Unlimited managers",
+        "prioritySupport": "Priority support",
+        "multipleQrStations": "Multiple QR stations",
+        "perQrGeofence": "Per-QR geofence & settings",
+        "perQrAssignment": "Employee assignment per QR",
+        "perQrManager": "Per-QR manager assignment",
+        "whiteLabel": "White-label branding"
+      }
+    },
+    "footnote": "No credit card required to start. Upgrade anytime from your dashboard."
   }
 }

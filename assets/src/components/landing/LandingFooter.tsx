@@ -1,30 +1,36 @@
 import { Link } from '@tanstack/react-router';
 import { Coffee, LayoutDashboard } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useAuthenticationState } from '@/hooks/use-authentication';
 import { AppStoreBadge } from '@/components/shared/AppStoreBadge';
 import { PlayStoreBadge } from '@/components/shared/PlayStoreBadge';
 import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
 
-const productLinks = [
-  { label: 'Features', to: '/features' },
-  { label: 'How it works', to: '/how-it-works' },
-  { label: 'Guides', to: '/guides' },
-  { label: 'Roles & permissions', to: '/roles' },
-  { label: 'Try demo', to: '/demo' },
-  { label: 'Pricing', to: '/pricing' },
-  { label: 'FAQ', to: '/faq' },
-  { label: 'Support', to: '/support' },
+/**
+ * Footer link tables. Labels live in i18n (`marketing.footer.productLinks.*`
+ * and `marketing.footer.legalLinks.*`); the `to` and `key` are static.
+ */
+const productLinks: { key: string; to: string }[] = [
+  { key: 'features',    to: '/features' },
+  { key: 'howItWorks',  to: '/how-it-works' },
+  { key: 'guides',      to: '/guides' },
+  { key: 'roles',       to: '/roles' },
+  { key: 'demo',        to: '/demo' },
+  { key: 'pricing',     to: '/pricing' },
+  { key: 'faq',         to: '/faq' },
+  { key: 'support',     to: '/support' },
 ];
 
-const legalLinks = [
-  { label: 'Privacy policy', to: '/privacy' },
-  { label: 'Terms of use', to: '/terms' },
-  { label: 'Refund policy', to: '/refund' },
-  { label: 'Delete account', to: '/delete-account' },
+const legalLinks: { key: string; to: string }[] = [
+  { key: 'privacy',       to: '/privacy' },
+  { key: 'terms',         to: '/terms' },
+  { key: 'refund',        to: '/refund' },
+  { key: 'deleteAccount', to: '/delete-account' },
 ];
 
 export function LandingFooter() {
+  const { t } = useTranslation();
   const auth = useAuthenticationState();
   const isAuthenticated = auth.status === 'authenticated';
 
@@ -44,8 +50,7 @@ export function LandingFooter() {
               DailyBrew
             </h4>
             <p className="text-[14px] text-text-secondary leading-relaxed max-w-[220px]">
-              Staff attendance and leave tracking for restaurants. Simple, warm,
-              and built for teams that move fast.
+              {t('marketing.footer.brandTagline')}
             </p>
             <div className="flex flex-wrap items-center gap-3 mt-4">
               <AppStoreBadge className="inline-block opacity-80 hover:opacity-100 transition-opacity" />
@@ -61,7 +66,7 @@ export function LandingFooter() {
             transition={{ duration: 0.4, delay: 0.1 }}
           >
             <p className="text-[13px] uppercase tracking-[1.5px] font-medium text-text-tertiary mb-4">
-              Product
+              {t('marketing.footer.productHeader')}
             </p>
             <ul className="space-y-2.5">
               {productLinks.map((link) => (
@@ -70,7 +75,7 @@ export function LandingFooter() {
                     to={link.to}
                     className="text-[15px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
                   >
-                    {link.label}
+                    {t(`marketing.footer.productLinks.${link.key}`)}
                   </Link>
                 </li>
               ))}
@@ -85,7 +90,7 @@ export function LandingFooter() {
             transition={{ duration: 0.4, delay: 0.2 }}
           >
             <p className="text-[13px] uppercase tracking-[1.5px] font-medium text-text-tertiary mb-4">
-              Legal
+              {t('marketing.footer.legalHeader')}
             </p>
             <ul className="space-y-2.5">
               {legalLinks.map((link) => (
@@ -94,7 +99,7 @@ export function LandingFooter() {
                     to={link.to}
                     className="text-[15px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
                   >
-                    {link.label}
+                    {t(`marketing.footer.legalLinks.${link.key}`)}
                   </Link>
                 </li>
               ))}
@@ -109,7 +114,7 @@ export function LandingFooter() {
             transition={{ duration: 0.4, delay: 0.3 }}
           >
             <p className="text-[13px] uppercase tracking-[1.5px] font-medium text-text-tertiary mb-4">
-              {isAuthenticated ? 'Dashboard' : 'Get started'}
+              {isAuthenticated ? t('marketing.footer.dashboardHeader') : t('marketing.footer.getStartedHeader')}
             </p>
             <ul className="space-y-2.5">
               {isAuthenticated ? (
@@ -119,7 +124,7 @@ export function LandingFooter() {
                     className="inline-flex items-center gap-1.5 text-[15px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
                   >
                     <LayoutDashboard size={13} />
-                    Console
+                    {t('marketing.footer.cta.console')}
                   </Link>
                 </li>
               ) : (
@@ -129,7 +134,7 @@ export function LandingFooter() {
                       to="/sign-up"
                       className="text-[15px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
                     >
-                      Create account
+                      {t('marketing.footer.cta.createAccount')}
                     </Link>
                   </li>
                   <li>
@@ -137,7 +142,7 @@ export function LandingFooter() {
                       to="/sign-in"
                       className="text-[15px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
                     >
-                      Sign in
+                      {t('marketing.footer.cta.signIn')}
                     </Link>
                   </li>
                 </>
@@ -155,11 +160,15 @@ export function LandingFooter() {
           transition={{ duration: 0.4, delay: 0.3 }}
         >
           <p className="text-[13px] text-text-tertiary">
-            DailyBrew &copy; {new Date().getFullYear()}. All rights reserved.
+            {t('marketing.footer.copyright', { year: new Date().getFullYear() })}
           </p>
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <p className="text-[13px] text-text-tertiary">
-              <span className="inline-flex items-center gap-1">Made with <Coffee size={12} className="text-coffee" /> for restaurants everywhere</span>
+              <span className="inline-flex items-center gap-1">
+                {t('marketing.footer.madeWithPrefix')}
+                <Coffee size={12} className="text-coffee" />
+                {t('marketing.footer.madeWithSuffix')}
+              </span>
             </p>
             <LanguageSwitcher />
           </div>
