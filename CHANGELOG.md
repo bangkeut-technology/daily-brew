@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.77.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.76.0...v1.77.0) (2026-05-28)
+
+
+### Features
+
+* **i18n:** translate FAQ page prose to French and Khmer ([#182](https://github.com/bangkeut-technology/daily-brew/issues/182)) ([6c6c5ac](https://github.com/bangkeut-technology/daily-brew/commit/6c6c5ac16a657c99ae6deebdca5b783f4a2218ac))
+* **seo:** localized titles/descriptions + hreflang + JSON-LD + dynamic sitemap (Phase A) ([#181](https://github.com/bangkeut-technology/daily-brew/issues/181)) ([8be71be](https://github.com/bangkeut-technology/daily-brew/commit/8be71beaecd96fa2475f64ee04b9c91226843f22))
+
 ## [1.76.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.75.8...v1.76.0) (2026-05-28)
 
 
