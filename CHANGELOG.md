@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.75.6](https://github.com/bangkeut-technology/daily-brew/compare/v1.75.5...v1.75.6) (2026-05-28)
+
+
+### Bug Fixes
+
+* **sw:** skipWaiting + clients.claim so deployed JS fixes actually reach users ([#172](https://github.com/bangkeut-technology/daily-brew/issues/172)) ([827135e](https://github.com/bangkeut-technology/daily-brew/commit/827135e56b90f2206b8a20a060f1a13d6a9e3ff4))
+
 ## [1.75.5](https://github.com/bangkeut-technology/daily-brew/compare/v1.75.4...v1.75.5) (2026-05-28)
 
 
