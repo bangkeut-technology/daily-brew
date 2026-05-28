@@ -21,6 +21,7 @@ import { useAuthenticationState } from '@/hooks/use-authentication';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 import { LogoBrand } from '@/components/shared/Logo';
+import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
 import { useTheme } from 'next-themes';
 import { Sun, Moon } from 'lucide-react';
@@ -319,6 +320,9 @@ export function Sidebar() {
                             Admin panel
                         </Link>
                     )}
+                    <div className="px-2.5 pb-1">
+                        <LanguageSwitcher className="!w-full" />
+                    </div>
                     <ThemeToggle />
                     <button
                         onClick={signOut}

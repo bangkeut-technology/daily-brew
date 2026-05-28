@@ -4,6 +4,7 @@ import { Menu, X, LayoutDashboard } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { LogoBrand } from '@/components/shared/Logo';
+import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
 import { useAuthenticationState } from '@/hooks/use-authentication';
 
 const navLinks = [
@@ -69,6 +70,7 @@ export function LandingNav() {
               {link.label}
             </Link>
           ))}
+          <LanguageSwitcher />
           <div className="w-px h-4 bg-cream-3" />
           {isAuthenticated ? (
             <Link
@@ -125,6 +127,8 @@ export function LandingNav() {
                 {link.label}
               </Link>
             ))}
+            <div className="h-px bg-cream-3 my-2" />
+            <LanguageSwitcher className="!w-full" />
             <div className="h-px bg-cream-3 my-2" />
             {isAuthenticated ? (
               <Link

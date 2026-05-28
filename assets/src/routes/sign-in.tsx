@@ -12,6 +12,7 @@ import { LogoBrand } from '@/components/shared/Logo';
 import { PageSeo } from '@/components/shared/PageSeo';
 import { AppStoreBadge } from '@/components/shared/AppStoreBadge';
 import { PlayStoreBadge } from '@/components/shared/PlayStoreBadge';
+import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
 import { motion } from 'framer-motion';
 
 const signInSchema = z.object({
@@ -86,6 +87,10 @@ function SignInPage() {
         description="Sign in to DailyBrew to manage your restaurant staff attendance, shifts, and leave requests."
         path="/sign-in"
       />
+      {/* Floating language switcher — top-right, above the orbs */}
+      <div className="absolute top-4 right-4 z-20">
+        <LanguageSwitcher variant="floating" />
+      </div>
       {/* Background gradient orbs */}
       <div className="absolute inset-0 pointer-events-none">
         <motion.div

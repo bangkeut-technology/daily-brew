@@ -160,7 +160,10 @@
     "copied": "Copié dans le presse-papiers",
     "copyFailed": "Échec de la copie",
     "on": "activé",
-    "off": "désactivé"
+    "off": "désactivé",
+    "languageSwitcher": {
+      "ariaLabel": "Langue"
+    }
   },
   "qrCodes": {
     "new": "Nouveau code QR",
