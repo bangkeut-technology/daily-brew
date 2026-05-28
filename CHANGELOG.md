@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.75.5](https://github.com/bangkeut-technology/daily-brew/compare/v1.75.4...v1.75.5) (2026-05-28)
+
+
+### Bug Fixes
+
+* **deploy:** make Next standalone asset copy idempotent across re-deploys ([#170](https://github.com/bangkeut-technology/daily-brew/issues/170)) ([29a7598](https://github.com/bangkeut-technology/daily-brew/commit/29a7598334431fe7e5f0faed31b471e0cb7c5fde))
+
 ## [1.75.4](https://github.com/bangkeut-technology/daily-brew/compare/v1.75.3...v1.75.4) (2026-05-28)
 
 
