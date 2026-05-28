@@ -46,9 +46,11 @@
       color: #7C6860;
       margin: 0 0 16px 0;
     }
+    /* Outlook (desktop and iOS) strips display:flex + justify-content,
+       which collapsed our two <span>s into "Total employees2" with no gap.
+       Drop flex; rely on inline-block + margin on the label so the value
+       always sits a comfortable distance from it in every client. */
     .detail-row {
-      display: flex;
-      justify-content: space-between;
       padding: 10px 0;
       border-bottom: 1px solid #F3EDE3;
       font-size: 14px;
@@ -58,6 +60,8 @@
     }
     .detail-label {
       color: #AE9D95;
+      display: inline-block;
+      margin-right: 12px;
     }
     .detail-value {
       color: #2C2420;
