@@ -71,7 +71,7 @@ Payments are handled via **Paddle**.
 ### Notifications
 - Expo Push Notifications (mobile push)
 - Symfony Mailer + Mailgun (email)
-- Console command for daily summary (`app:send-daily-summary`)
+- Console command for daily summary (`dailybrew:send-daily-summary`)
 
 ## Getting Started
 

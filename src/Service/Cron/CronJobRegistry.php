@@ -27,7 +27,7 @@ final class CronJobRegistry
      * @var array<string, array{label: string, description: string, suggestedCron: string}>
      */
     public const JOBS = [
-        'app:send-daily-summary' => [
+        'dailybrew:send-daily-summary' => [
             'label' => 'Daily summary — owner push + email',
             'description' => 'Sends the end-of-day attendance summary to workspace owners (Espresso). Reads each workspace timezone so the digest reflects the local close.',
             'suggestedCron' => '0 18 * * *',
