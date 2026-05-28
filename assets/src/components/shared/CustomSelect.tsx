@@ -119,15 +119,6 @@ export function CustomSelect({
       {open && position && createPortal(
         <div
           ref={dropdownRef}
-          // The menu is portaled to document.body so `overflow:hidden` /
-          // `backdrop-filter` ancestors (e.g. GlassCard) don't clip it — but
-          // that puts it OUTSIDE any wrapping Radix Dialog's content tree, so
-          // Radix's outside-pointer detector classifies clicks here as "outside"
-          // and calls preventDefault on the pointer event, swallowing the
-          // option's `onClick`. Stopping propagation on the dropdown's own
-          // pointer/mouse events hides them from Radix entirely.
-          onPointerDownCapture={(e) => e.stopPropagation()}
-          onMouseDownCapture={(e) => e.stopPropagation()}
           className="fixed rounded-xl bg-cream dark:bg-[#1E1916] border border-glass-border shadow-lg overflow-hidden z-[9999]"
           style={{
             left: position.left,
@@ -160,6 +151,15 @@ export function CustomSelect({
                 <button
                   key={option.value}
                   type="button"
+                  // preventDefault on mousedown stops the option from taking
+                  // focus, which is what triggers Radix Dialog's FocusScope
+                  // (the menu is portaled to document.body, outside the
+                  // Dialog.Content DOM tree, so the focus-trap classifies
+                  // the option as "outside" and redirects focus away —
+                  // disrupting the mousedown→mouseup→click sequence the
+                  // browser uses to fire onClick). Click still fires
+                  // normally; focus stays on the trigger.
+                  onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
                     onChange(option.value);
                     setOpen(false);
