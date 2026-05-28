@@ -342,5 +342,64 @@
       "title": "Unlock Telegram notifications",
       "description": "Send real-time leave requests, shift changes, closures, and daily summaries to a Telegram chat or group."
     }
+  },
+  "faq": {
+    "eyebrow": "FAQ",
+    "title": "Frequently asked questions",
+    "subtitlePrefix": "Everything you need to know about DailyBrew. Can't find what you're looking for?",
+    "subtitleLink": "Contact us",
+    "sections": {
+      "general": "General",
+      "plansBilling": "Plans & billing",
+      "checkin": "Check-in & attendance",
+      "manager": "Manager role",
+      "account": "Account"
+    },
+    "q": {
+      "whatIsDailybrew": "What is DailyBrew?",
+      "whoIsItFor": "Who is DailyBrew for?",
+      "mobileApp": "Is there a mobile app?",
+      "freePlan": "What's included in the Free plan?",
+      "espressoPlan": "What's included in Espresso?",
+      "espressoCost": "How much does Espresso cost?",
+      "cancelAnytime": "Can I cancel anytime?",
+      "qrCheckin": "How does QR check-in work?",
+      "geofencing": "What is geofencing?",
+      "ipRestriction": "What is IP restriction?",
+      "closures": "What happens during closures?",
+      "managerRole": "What is the manager role?",
+      "managerDefaults": "What are the default manager permissions?",
+      "managerLimit": "How many managers can I have?",
+      "promoteManager": "How do I promote an employee to manager?",
+      "managerNotAllowed": "What can a manager NOT do?",
+      "signUp": "How do I sign up?",
+      "oauthSignIn": "Can I use Google or Apple to sign in?",
+      "resetPassword": "How do I reset my password?"
+    },
+    "a": {
+      "whatIsDailybrew": "DailyBrew is a staff attendance tracking platform built for restaurants. It provides QR code check-in, shift management, closure periods, and leave request handling, all in one simple dashboard.",
+      "whoIsItFor": "DailyBrew is designed for restaurant owners, managers, and staff. Owners manage the workspace, shifts, and employees. Managers receive only the permissions you grant them — for example leave approvals, attendance oversight, employee management, or any combination. Staff check in and out by scanning the workspace QR code.",
+      "mobileApp": "Staff check-in works entirely through the mobile web browser. When an employee scans their QR code, a mobile-optimized check-in page opens instantly. No app download is required.",
+      "freePlan": "The Free plan includes up to 10 employees, QR check-in, shift tracking, closure periods, and the attendance dashboard. It is free forever with no time limit.",
+      "espressoPlan": "Espresso supports up to 20 employees and adds leave request management, IP restriction, device verification, geofencing, per-day shift schedules, manager role with granular permissions (up to 2), push and email notifications, and daily attendance summaries.",
+      "espressoCost": "Espresso costs $14.99 per month, or $149 per year if you choose annual billing. The yearly plan saves you $30.88 compared to paying monthly.",
+      "cancelAnytime": "Yes, there are no contracts or lock-in periods. You can cancel your Espresso subscription at any time from your dashboard Settings. After cancellation, you will continue to have access until the end of your current billing period.",
+      "qrCheckin": "Each workspace has a unique QR code. Display it at your restaurant entrance. Staff open the DailyBrew app, scan the QR code, and tap the Check In button to record their arrival. They scan again and tap Check Out when they leave.",
+      "geofencing": "Geofencing restricts check-in to a specific geographic area. You set a center point and a radius, and staff must be physically within that area to check in. This ensures attendance is only recorded when employees are actually at the restaurant.",
+      "ipRestriction": "IP restriction only allows check-in from specific IP addresses, such as your restaurant WiFi network. When enabled, staff scanning the QR code from a different network will see a message explaining they need to be connected to the restaurant network.",
+      "closures": "When you define a closure period (for example, a holiday or renovation), no attendance is expected on those dates. The system skips those days entirely, so employees will not be marked as absent during closures.",
+      "managerRole": "The manager role lets you promote trusted employees and choose exactly which areas they can administer. Each manager has a per-permission toggle for: manage employees, manage shifts, manage closures, manage leave, and manage attendance. You can grant any combination — for example, a head waiter who only handles leave approvals, or a co-runner who manages everything except billing and settings.",
+      "managerDefaults": "Newly promoted managers start with \"manage leave\" and \"manage attendance\" enabled — meaning they can approve leave for any employee and view all attendance records. You can flip the other toggles on or off at any time from the employee detail page.",
+      "managerLimit": "On the Espresso plan, you can have up to 2 managers per workspace. The Double Espresso plan allows unlimited managers.",
+      "promoteManager": "Go to the employee detail page and click \"Promote to manager\". The employee must have a linked user account (they need to sign in to use manager features). Once promoted, a \"Manager permissions\" card appears below — toggle each capability on or off as needed. You can demote them back to a regular employee at any time.",
+      "managerNotAllowed": "No matter which permissions you grant, managers cannot rename or delete the workspace, edit workspace settings (IP / device / geofencing / timezone), manage billing, mint or edit sub-QR codes, or promote / demote other managers. These remain owner-only.",
+      "signUp": "Click the \"Get started\" button on the homepage. Create an account with your email and password, then set up your workspace by naming your restaurant. From there you can add employees and generate QR codes.",
+      "oauthSignIn": "Yes, DailyBrew supports both Google and Apple sign-in. You can link your account during registration or from your profile settings later.",
+      "resetPassword": "Click \"Forgot password\" on the sign-in page. Enter your email address and we will send you a password reset link. The link expires after 1 hour for security."
+    },
+    "cta": {
+      "text": "Still have questions? We are happy to help.",
+      "button": "Contact support"
+    }
   }
 }

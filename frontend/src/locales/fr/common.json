@@ -249,5 +249,64 @@
       "title": "Débloquer les notifications Telegram",
       "description": "Envoyez les demandes de congé, les changements d'équipe, les fermetures et les résumés quotidiens dans un chat ou groupe Telegram."
     }
+  },
+  "faq": {
+    "eyebrow": "FAQ",
+    "title": "Questions fréquentes",
+    "subtitlePrefix": "Tout ce qu'il faut savoir sur DailyBrew. Vous ne trouvez pas la réponse ?",
+    "subtitleLink": "Contactez-nous",
+    "sections": {
+      "general": "Général",
+      "plansBilling": "Forfaits & facturation",
+      "checkin": "Check-in & présences",
+      "manager": "Rôle de manager",
+      "account": "Compte"
+    },
+    "q": {
+      "whatIsDailybrew": "Qu'est-ce que DailyBrew ?",
+      "whoIsItFor": "À qui s'adresse DailyBrew ?",
+      "mobileApp": "Existe-t-il une application mobile ?",
+      "freePlan": "Que comprend le plan Gratuit ?",
+      "espressoPlan": "Que comprend Espresso ?",
+      "espressoCost": "Combien coûte Espresso ?",
+      "cancelAnytime": "Puis-je annuler à tout moment ?",
+      "qrCheckin": "Comment fonctionne le check-in par QR ?",
+      "geofencing": "Qu'est-ce que le géorepérage ?",
+      "ipRestriction": "Qu'est-ce que la restriction IP ?",
+      "closures": "Que se passe-t-il pendant les fermetures ?",
+      "managerRole": "Qu'est-ce que le rôle de manager ?",
+      "managerDefaults": "Quelles sont les permissions de manager par défaut ?",
+      "managerLimit": "Combien de managers puis-je avoir ?",
+      "promoteManager": "Comment promouvoir un employé au rang de manager ?",
+      "managerNotAllowed": "Que ne peut PAS faire un manager ?",
+      "signUp": "Comment m'inscrire ?",
+      "oauthSignIn": "Puis-je me connecter avec Google ou Apple ?",
+      "resetPassword": "Comment réinitialiser mon mot de passe ?"
+    },
+    "a": {
+      "whatIsDailybrew": "DailyBrew est une plateforme de suivi des présences du personnel conçue pour les restaurants. Elle propose le check-in par QR, la gestion des horaires, les périodes de fermeture et la gestion des demandes de congé, le tout dans un seul tableau de bord simple.",
+      "whoIsItFor": "DailyBrew est conçu pour les propriétaires de restaurant, les managers et le personnel. Les propriétaires gèrent l'espace de travail, les horaires et les employés. Les managers ne reçoivent que les permissions que vous leur accordez — par exemple les approbations de congés, la supervision des présences, la gestion des employés, ou toute combinaison. Le personnel pointe à l'arrivée et au départ en scannant le code QR de l'espace.",
+      "mobileApp": "Le check-in du personnel fonctionne entièrement via le navigateur web mobile. Quand un employé scanne le code QR, une page de check-in optimisée pour mobile s'ouvre instantanément. Aucun téléchargement d'application n'est requis.",
+      "freePlan": "Le plan Gratuit inclut jusqu'à 10 employés, le check-in par QR, le suivi des horaires, les périodes de fermeture et le tableau de bord des présences. Il est gratuit pour toujours, sans limite de temps.",
+      "espressoPlan": "Espresso prend en charge jusqu'à 20 employés et ajoute la gestion des demandes de congé, la restriction IP, la vérification d'appareil, le géorepérage, les horaires par jour, le rôle de manager avec permissions granulaires (jusqu'à 2), les notifications push et email, et les résumés de présence quotidiens.",
+      "espressoCost": "Espresso coûte 14,99 $ par mois, ou 149 $ par an si vous choisissez la facturation annuelle. Le plan annuel vous fait économiser 30,88 $ par rapport au paiement mensuel.",
+      "cancelAnytime": "Oui, il n'y a aucun contrat ni période d'engagement. Vous pouvez annuler votre abonnement Espresso à tout moment depuis les Paramètres de votre tableau de bord. Après l'annulation, vous continuerez à avoir accès jusqu'à la fin de votre période de facturation actuelle.",
+      "qrCheckin": "Chaque espace de travail dispose d'un code QR unique. Affichez-le à l'entrée de votre restaurant. Le personnel ouvre l'app DailyBrew, scanne le code QR, et appuie sur le bouton Check In pour enregistrer son arrivée. Il scanne à nouveau et appuie sur Check Out en partant.",
+      "geofencing": "Le géorepérage limite le check-in à une zone géographique spécifique. Vous définissez un point central et un rayon, et le personnel doit être physiquement dans cette zone pour pointer. Cela garantit que les présences ne sont enregistrées que lorsque les employés sont effectivement au restaurant.",
+      "ipRestriction": "La restriction IP n'autorise le check-in que depuis des adresses IP spécifiques, par exemple le réseau Wi-Fi de votre restaurant. Lorsqu'elle est activée, le personnel scannant le code QR depuis un autre réseau verra un message expliquant qu'il doit être connecté au réseau du restaurant.",
+      "closures": "Lorsque vous définissez une période de fermeture (par exemple, un jour férié ou une rénovation), aucune présence n'est attendue à ces dates. Le système ignore complètement ces jours, donc les employés ne seront pas marqués absents pendant les fermetures.",
+      "managerRole": "Le rôle de manager vous permet de promouvoir des employés de confiance et de choisir précisément quelles parties ils peuvent administrer. Chaque manager a un interrupteur par permission pour : gérer les employés, gérer les horaires, gérer les fermetures, gérer les congés et gérer les présences. Vous pouvez accorder n'importe quelle combinaison — par exemple, un chef de salle qui ne gère que les approbations de congés, ou un co-gérant qui gère tout sauf la facturation et les paramètres.",
+      "managerDefaults": "Les managers nouvellement promus commencent avec « gérer les congés » et « gérer les présences » activés — ce qui signifie qu'ils peuvent approuver les congés pour n'importe quel employé et voir tous les enregistrements de présence. Vous pouvez activer ou désactiver les autres interrupteurs à tout moment depuis la page de détail de l'employé.",
+      "managerLimit": "Avec le plan Espresso, vous pouvez avoir jusqu'à 2 managers par espace de travail. Le plan Double Espresso permet un nombre illimité de managers.",
+      "promoteManager": "Allez sur la page de détail de l'employé et cliquez sur « Promouvoir au rang de manager ». L'employé doit avoir un compte utilisateur lié (il doit se connecter pour utiliser les fonctionnalités de manager). Une fois promu, une carte « Permissions de manager » apparaît en dessous — activez ou désactivez chaque capacité selon vos besoins. Vous pouvez les rétrograder en employé régulier à tout moment.",
+      "managerNotAllowed": "Quelles que soient les permissions que vous accordez, les managers ne peuvent pas renommer ou supprimer l'espace de travail, modifier les paramètres de l'espace (IP / appareil / géorepérage / fuseau horaire), gérer la facturation, créer ou modifier les sous-QR codes, ni promouvoir / rétrograder d'autres managers. Ces actions restent réservées au propriétaire.",
+      "signUp": "Cliquez sur le bouton « Commencer » sur la page d'accueil. Créez un compte avec votre email et mot de passe, puis configurez votre espace de travail en nommant votre restaurant. À partir de là, vous pouvez ajouter des employés et générer des codes QR.",
+      "oauthSignIn": "Oui, DailyBrew prend en charge la connexion via Google et Apple. Vous pouvez lier votre compte lors de l'inscription ou depuis les paramètres de votre profil plus tard.",
+      "resetPassword": "Cliquez sur « Mot de passe oublié » sur la page de connexion. Entrez votre adresse email et nous vous enverrons un lien de réinitialisation. Le lien expire après 1 heure pour des raisons de sécurité."
+    },
+    "cta": {
+      "text": "Encore des questions ? Nous sommes là pour vous aider.",
+      "button": "Contacter le support"
+    }
   }
 }

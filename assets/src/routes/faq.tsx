@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { PageSeo } from '@/components/shared/PageSeo';
@@ -10,136 +11,46 @@ export const Route = createFileRoute('/faq')({
   component: FaqPage,
 });
 
-interface FaqEntry {
-  question: string;
-  answer: string;
+/**
+ * The FAQ content lives in the i18n bundle (common.json → faq.sections).
+ * This file only declares the *shape* (section keys + question keys per section);
+ * the actual question + answer strings come from `t('faq.q.<key>')` and
+ * `t('faq.a.<key>')`. Adding a question = add the key here AND the string in
+ * en/fr/km common.json — same shape across all three.
+ */
+interface SectionShape {
+  /** i18n key for the section title (e.g. 'faq.sections.general'). */
+  titleKey: string;
+  /** Stable identifiers used to look up the question + answer in i18n. */
+  itemKeys: string[];
 }
 
-interface FaqSection {
-  title: string;
-  items: FaqEntry[];
-}
-
-const faqSections: FaqSection[] = [
+const FAQ_SECTIONS: SectionShape[] = [
   {
-    title: 'General',
-    items: [
-      {
-        question: 'What is DailyBrew?',
-        answer:
-          'DailyBrew is a staff attendance tracking platform built for restaurants. It provides QR code check-in, shift management, closure periods, and leave request handling, all in one simple dashboard.',
-      },
-      {
-        question: 'Who is DailyBrew for?',
-        answer:
-          'DailyBrew is designed for restaurant owners, managers, and staff. Owners manage the workspace, shifts, and employees. Managers receive only the permissions you grant them — for example leave approvals, attendance oversight, employee management, or any combination. Staff check in and out by scanning the workspace QR code.',
-      },
-      {
-        question: 'Is there a mobile app?',
-        answer:
-          'Staff check-in works entirely through the mobile web browser. When an employee scans their QR code, a mobile-optimized check-in page opens instantly. No app download is required.',
-      },
+    titleKey: 'faq.sections.general',
+    itemKeys: ['whatIsDailybrew', 'whoIsItFor', 'mobileApp'],
+  },
+  {
+    titleKey: 'faq.sections.plansBilling',
+    itemKeys: ['freePlan', 'espressoPlan', 'espressoCost', 'cancelAnytime'],
+  },
+  {
+    titleKey: 'faq.sections.checkin',
+    itemKeys: ['qrCheckin', 'geofencing', 'ipRestriction', 'closures'],
+  },
+  {
+    titleKey: 'faq.sections.manager',
+    itemKeys: [
+      'managerRole',
+      'managerDefaults',
+      'managerLimit',
+      'promoteManager',
+      'managerNotAllowed',
     ],
   },
   {
-    title: 'Plans & billing',
-    items: [
-      {
-        question: "What's included in the Free plan?",
-        answer:
-          'The Free plan includes up to 10 employees, QR check-in, shift tracking, closure periods, and the attendance dashboard. It is free forever with no time limit.',
-      },
-      {
-        question: "What's included in Espresso?",
-        answer:
-          'Espresso supports up to 20 employees and adds leave request management, IP restriction, device verification, geofencing, per-day shift schedules, manager role with granular permissions (up to 2), push and email notifications, and daily attendance summaries.',
-      },
-      {
-        question: 'How much does Espresso cost?',
-        answer:
-          'Espresso costs $14.99 per month, or $149 per year if you choose annual billing. The yearly plan saves you $30.88 compared to paying monthly.',
-      },
-      {
-        question: 'Can I cancel anytime?',
-        answer:
-          'Yes, there are no contracts or lock-in periods. You can cancel your Espresso subscription at any time from your dashboard Settings. After cancellation, you will continue to have access until the end of your current billing period.',
-      },
-    ],
-  },
-  {
-    title: 'Check-in & attendance',
-    items: [
-      {
-        question: 'How does QR check-in work?',
-        answer:
-          'Each workspace has a unique QR code. Display it at your restaurant entrance. Staff open the DailyBrew app, scan the QR code, and tap the Check In button to record their arrival. They scan again and tap Check Out when they leave.',
-      },
-      {
-        question: 'What is geofencing?',
-        answer:
-          'Geofencing restricts check-in to a specific geographic area. You set a center point and a radius, and staff must be physically within that area to check in. This ensures attendance is only recorded when employees are actually at the restaurant.',
-      },
-      {
-        question: 'What is IP restriction?',
-        answer:
-          'IP restriction only allows check-in from specific IP addresses, such as your restaurant WiFi network. When enabled, staff scanning the QR code from a different network will see a message explaining they need to be connected to the restaurant network.',
-      },
-      {
-        question: 'What happens during closures?',
-        answer:
-          'When you define a closure period (for example, a holiday or renovation), no attendance is expected on those dates. The system skips those days entirely, so employees will not be marked as absent during closures.',
-      },
-    ],
-  },
-  {
-    title: 'Manager role',
-    items: [
-      {
-        question: 'What is the manager role?',
-        answer:
-          'The manager role lets you promote trusted employees and choose exactly which areas they can administer. Each manager has a per-permission toggle for: manage employees, manage shifts, manage closures, manage leave, and manage attendance. You can grant any combination — for example, a head waiter who only handles leave approvals, or a co-runner who manages everything except billing and settings.',
-      },
-      {
-        question: 'What are the default manager permissions?',
-        answer:
-          'Newly promoted managers start with "manage leave" and "manage attendance" enabled — meaning they can approve leave for any employee and view all attendance records. You can flip the other toggles on or off at any time from the employee detail page.',
-      },
-      {
-        question: 'How many managers can I have?',
-        answer:
-          'On the Espresso plan, you can have up to 2 managers per workspace. The Double Espresso plan allows unlimited managers.',
-      },
-      {
-        question: 'How do I promote an employee to manager?',
-        answer:
-          'Go to the employee detail page and click "Promote to manager". The employee must have a linked user account (they need to sign in to use manager features). Once promoted, a "Manager permissions" card appears below — toggle each capability on or off as needed. You can demote them back to a regular employee at any time.',
-      },
-      {
-        question: 'What can a manager NOT do?',
-        answer:
-          'No matter which permissions you grant, managers cannot rename or delete the workspace, edit workspace settings (IP / device / geofencing / timezone), manage billing, mint or edit sub-QR codes, or promote / demote other managers. These remain owner-only.',
-      },
-    ],
-  },
-  {
-    title: 'Account',
-    items: [
-      {
-        question: 'How do I sign up?',
-        answer:
-          'Click the "Get started" button on the homepage. Create an account with your email and password, then set up your workspace by naming your restaurant. From there you can add employees and generate QR codes.',
-      },
-      {
-        question: 'Can I use Google or Apple to sign in?',
-        answer:
-          'Yes, DailyBrew supports both Google and Apple sign-in. You can link your account during registration or from your profile settings later.',
-      },
-      {
-        question: 'How do I reset my password?',
-        answer:
-          'Click "Forgot password" on the sign-in page. Enter your email address and we will send you a password reset link. The link expires after 1 hour for security.',
-      },
-    ],
+    titleKey: 'faq.sections.account',
+    itemKeys: ['signUp', 'oauthSignIn', 'resetPassword'],
   },
 ];
 
@@ -199,8 +110,13 @@ function AccordionItem({
 }
 
 function FaqPage() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen flex flex-col">
+      {/* PageSeo title/description stay in English to match SeoMetaResolver's source-of-truth
+          for SEO meta. The server-rendered <title> + meta description are already
+          localized by SeoMetaResolver based on ?lang=. */}
       <PageSeo
         title="FAQ"
         description="Frequently asked questions about DailyBrew. Learn about QR check-in, shifts, leave requests, pricing, and how to get started with attendance tracking."
@@ -217,19 +133,18 @@ function FaqPage() {
             transition={{ duration: 0.5 }}
           >
             <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
-              FAQ
+              {t('faq.eyebrow')}
             </p>
             <h1 className="text-[34px] md:text-[42px] font-semibold text-text-primary font-serif leading-tight mb-4">
-              Frequently asked questions
+              {t('faq.title')}
             </h1>
             <p className="text-[16px] text-text-secondary max-w-md mx-auto">
-              Everything you need to know about DailyBrew. Can't find what you're
-              looking for?{' '}
+              {t('faq.subtitlePrefix')}{' '}
               <a
                 href="mailto:support@mail.dailybrew.work"
                 className="text-coffee font-medium no-underline hover:text-coffee-light transition-colors"
               >
-                Contact us
+                {t('faq.subtitleLink')}
               </a>
             </p>
           </motion.div>
@@ -237,23 +152,23 @@ function FaqPage() {
 
         {/* FAQ sections */}
         <section className="px-6 md:px-8 max-w-2xl mx-auto pb-20 space-y-10">
-          {faqSections.map((section, sectionIndex) => (
+          {FAQ_SECTIONS.map((section, sectionIndex) => (
             <motion.div
-              key={section.title}
+              key={section.titleKey}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: sectionIndex * 0.08 }}
             >
               <h2 className="text-[13px] uppercase tracking-[2px] font-medium text-text-tertiary mb-4 px-6">
-                {section.title}
+                {t(section.titleKey)}
               </h2>
               <div className="bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(107,66,38,0.05)]">
-                {section.items.map((item, itemIndex) => (
+                {section.itemKeys.map((key, itemIndex) => (
                   <AccordionItem
-                    key={item.question}
-                    question={item.question}
-                    answer={item.answer}
+                    key={key}
+                    question={t(`faq.q.${key}`)}
+                    answer={t(`faq.a.${key}`)}
                     index={itemIndex}
                   />
                 ))}
@@ -270,13 +185,13 @@ function FaqPage() {
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             <p className="text-[15px] text-text-secondary mb-4">
-              Still have questions? We are happy to help.
+              {t('faq.cta.text')}
             </p>
             <a
               href="mailto:support@mail.dailybrew.work"
               className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-[15px] font-medium bg-coffee text-white no-underline transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
             >
-              Contact support
+              {t('faq.cta.button')}
             </a>
           </motion.div>
         </section>
