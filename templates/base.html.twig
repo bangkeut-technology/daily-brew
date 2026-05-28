@@ -1,11 +1,14 @@
+{% set htmlLang = htmlLang|default('en') %}
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="{{ htmlLang|e('html_attr') }}" class="h-full">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5" />
     {% set metaTitle = metaTitle|default('DailyBrew — Staff Attendance Tracking for Restaurants') %}
     {% set metaDescription = metaDescription|default('QR check-in, shift tracking, and leave management for restaurants. Free for up to 10 employees.') %}
     {% set ogUrl = ogUrl|default('https://dailybrew.work/') %}
+    {# Map our two-letter UI locale to og:locale's IETF tag. Single-region only; expand if we add regional variants. #}
+    {% set ogLocale = {'en': 'en_US', 'fr': 'fr_FR', 'km': 'km_KH'}[htmlLang]|default('en_US') %}
     <title>{{ metaTitle }}</title>
     <meta name="description" content="{{ metaDescription }}" />
     {% if robots is defined and robots %}
@@ -15,9 +18,19 @@
         <link rel="canonical" href="{{ canonicalUrl }}" />
     {% endif %}
 
+    {# hreflang alternates — tells Google this URL is available in multiple languages.
+       We use ?lang= variants because the SPA serves all locales from the same path;
+       x-default points at the unparameterized URL (English). Empty for non-indexable pages. #}
+    {% if hreflangAlternates is defined and hreflangAlternates %}
+        {% for code, href in hreflangAlternates %}
+            <link rel="alternate" hreflang="{{ code|e('html_attr') }}" href="{{ href|e('html_attr') }}" />
+        {% endfor %}
+    {% endif %}
+
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="DailyBrew" />
+    <meta property="og:locale" content="{{ ogLocale }}" />
     <meta property="og:title" content="{{ metaTitle }}" />
     <meta property="og:description" content="{{ metaDescription }}" />
     <meta property="og:url" content="{{ ogUrl }}" />
@@ -28,6 +41,12 @@
     <meta name="twitter:title" content="{{ metaTitle }}" />
     <meta name="twitter:description" content="{{ metaDescription }}" />
     <meta name="twitter:image" content="https://dailybrew.work/android-chrome-512.png" />
+
+    {# Site-wide structured data (Organization + SoftwareApplication). Per-page schema
+       (FAQPage, Article, etc.) is appended by individual route templates if/when added. #}
+    {% if structuredData is defined and structuredData %}
+        <script type="application/ld+json">{{ structuredData|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_UNESCAPED_UNICODE'))|raw }}</script>
+    {% endif %}
 
     {% if gaMeasurementId is defined and gaMeasurementId is not empty %}
         <script async src="https://www.googletagmanager.com/gtag/js?id={{ gaMeasurementId|e('html_attr') }}"></script>
@@ -66,6 +85,11 @@
                 paddlePriceIdDoubleEspressoMonthly: '{{ paddlePriceIdDoubleEspressoMonthly|e('js') }}',
                 paddlePriceIdDoubleEspressoAnnual: '{{ paddlePriceIdDoubleEspressoAnnual|e('js') }}',
                 telegramBotUsername: '{{ telegramBotUsername|e('js') }}',
+                // Server-detected SEO/UI locale ('en' | 'fr' | 'km'). The SPA's
+                // i18next init reads this first so first paint matches what the
+                // server rendered in the <html lang> + meta tags. The language
+                // switcher still owns subsequent changes (sessionStorage + reload).
+                initialLocale: '{{ htmlLang|e('js') }}',
                 user: null
             };
         </script>

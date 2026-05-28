@@ -108,4 +108,93 @@ class SeoMetaResolverTest extends TestCase
         $this->assertSame(200, $meta->statusCode);
         $this->assertFalse($meta->index);
     }
+
+    public function testFrenchLocaleReturnsLocalizedTitleAndDescription(): void
+    {
+        $meta = $this->resolver->resolve('/pricing', 'fr');
+
+        $this->assertSame('Tarifs — DailyBrew', $meta->title);
+        $this->assertStringContainsString('plans DailyBrew commencent gratuitement', $meta->description);
+        $this->assertSame('fr', $meta->locale);
+        $this->assertSame('https://dailybrew.work/pricing', $meta->canonical);
+    }
+
+    public function testKhmerLocaleReturnsLocalizedTitleAndDescription(): void
+    {
+        $meta = $this->resolver->resolve('/features', 'km');
+
+        $this->assertStringStartsWith('លក្ខណៈពិសេស', $meta->title);
+        $this->assertStringContainsString('បុគ្គលិក', $meta->description);
+        $this->assertSame('km', $meta->locale);
+    }
+
+    public function testUnsupportedLocaleFallsBackToEnglish(): void
+    {
+        $meta = $this->resolver->resolve('/features', 'es');
+
+        $this->assertSame('Features — DailyBrew', $meta->title);
+        $this->assertSame('en', $meta->locale);
+    }
+
+    public function testBcp47LocaleTagIsNormalizedToPrimary(): void
+    {
+        $meta = $this->resolver->resolve('/pricing', 'fr-FR');
+
+        $this->assertSame('Tarifs — DailyBrew', $meta->title);
+        $this->assertSame('fr', $meta->locale);
+    }
+
+    public function testIndexablePageEmitsHreflangAlternates(): void
+    {
+        $meta = $this->resolver->resolve('/features', 'en');
+
+        $this->assertSame('https://dailybrew.work/features', $meta->alternates['en'] ?? null);
+        $this->assertSame('https://dailybrew.work/features?lang=fr', $meta->alternates['fr'] ?? null);
+        $this->assertSame('https://dailybrew.work/features?lang=km', $meta->alternates['km'] ?? null);
+        $this->assertSame('https://dailybrew.work/features', $meta->alternates['x-default'] ?? null);
+    }
+
+    public function testHomepageAlternatesPreserveRootSlash(): void
+    {
+        $meta = $this->resolver->resolve('/', 'fr');
+
+        $this->assertSame('https://dailybrew.work/', $meta->alternates['en'] ?? null);
+        $this->assertSame('https://dailybrew.work/?lang=fr', $meta->alternates['fr'] ?? null);
+    }
+
+    public function testPrivatePathHasNoAlternates(): void
+    {
+        $meta = $this->resolver->resolve('/console/dashboard', 'fr');
+
+        $this->assertSame([], $meta->alternates);
+    }
+
+    public function testNotFoundTitleIsLocalized(): void
+    {
+        $en = $this->resolver->resolve('/status', 'en');
+        $fr = $this->resolver->resolve('/status', 'fr');
+        $km = $this->resolver->resolve('/status', 'km');
+
+        $this->assertStringStartsWith('Page not found', $en->title);
+        $this->assertStringStartsWith('Page introuvable', $fr->title);
+        $this->assertStringStartsWith('រកមិនឃើញទំព័រ', $km->title);
+        $this->assertSame(404, $en->statusCode);
+        $this->assertSame(404, $fr->statusCode);
+        $this->assertSame(404, $km->statusCode);
+    }
+
+    public function testIndexablePathsReturnsCanonicalListWithoutLocaleParam(): void
+    {
+        $paths = $this->resolver->indexablePaths();
+
+        $this->assertContains('/', $paths);
+        $this->assertContains('/features', $paths);
+        $this->assertContains('/pricing', $paths);
+        $this->assertGreaterThan(20, count($paths));
+        // Sanity: no query strings, no duplicates.
+        $this->assertSame($paths, array_values(array_unique($paths)));
+        foreach ($paths as $p) {
+            $this->assertStringNotContainsString('?', $p);
+        }
+    }
 }
