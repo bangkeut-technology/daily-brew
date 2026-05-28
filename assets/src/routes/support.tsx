@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Mail,
   Send,
@@ -18,6 +18,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { PageSeo } from '@/components/shared/PageSeo';
@@ -28,21 +29,29 @@ export const Route = createFileRoute('/support')({
   component: SupportPage,
 });
 
-const feedbackSchema = z.object({
-  type: z.enum(['bug', 'feature', 'question', 'general']),
-  name: z.string().min(1, 'Please enter your name'),
-  email: z.string().email('Please enter a valid email'),
-  subject: z.string().min(1, 'Please enter a subject'),
-  message: z.string().min(10, 'Message must be at least 10 characters'),
-});
+/**
+ * The schema is built inside the component so validation messages can flow
+ * through i18n. Each `.refine`/`.email`/`.min` argument is the t() lookup of
+ * the matching error key — switching language re-builds the schema on the
+ * next render.
+ */
+function buildFeedbackSchema(t: ReturnType<typeof useTranslation>['t']) {
+  return z.object({
+    type: z.enum(['bug', 'feature', 'question', 'general']),
+    name: z.string().min(1, t('routes.support.form.errors.name')),
+    email: z.string().email(t('routes.support.form.errors.email')),
+    subject: z.string().min(1, t('routes.support.form.errors.subject')),
+    message: z.string().min(10, t('routes.support.form.errors.message')),
+  });
+}
 
-type FeedbackForm = z.infer<typeof feedbackSchema>;
+type FeedbackForm = z.infer<ReturnType<typeof buildFeedbackSchema>>;
 
-const feedbackTypes = [
-  { value: 'bug' as const, label: 'Bug report', icon: Bug, color: 'text-red' },
-  { value: 'feature' as const, label: 'Feature request', icon: Lightbulb, color: 'text-amber' },
-  { value: 'question' as const, label: 'Question', icon: HelpCircle, color: 'text-blue' },
-  { value: 'general' as const, label: 'General', icon: MessageSquare, color: 'text-coffee' },
+const feedbackTypes: { value: FeedbackForm['type']; key: string; icon: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>; color: string }[] = [
+  { value: 'bug',      key: 'bug',      icon: Bug,             color: 'text-red' },
+  { value: 'feature',  key: 'feature',  icon: Lightbulb,       color: 'text-amber' },
+  { value: 'question', key: 'question', icon: HelpCircle,      color: 'text-blue' },
+  { value: 'general',  key: 'general',  icon: MessageSquare,   color: 'text-coffee' },
 ];
 
 interface FaqItem {
@@ -112,11 +121,14 @@ function fileToDataUrl(file: File): Promise<string> {
 }
 
 function SupportPage() {
+  const { t } = useTranslation();
   const [submitted, setSubmitted] = useState(false);
   const [faqs, setFaqs] = useState<FaqItem[]>([]);
   const [faqsLoading, setFaqsLoading] = useState(true);
   const [images, setImages] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const schema = useMemo(() => buildFeedbackSchema(t), [t]);
 
   useEffect(() => {
     axios.get('/support/faqs')
@@ -133,7 +145,7 @@ function SupportPage() {
     reset,
     formState: { errors, isSubmitting },
   } = useForm<FeedbackForm>({
-    resolver: zodResolver(feedbackSchema),
+    resolver: zodResolver(schema),
     defaultValues: { type: 'general', name: '', email: '', subject: '', message: '' },
   });
 
@@ -143,19 +155,19 @@ function SupportPage() {
     if (!files) return;
     const remaining = MAX_IMAGES - images.length;
     if (remaining <= 0) {
-      toast.error(`Maximum ${MAX_IMAGES} images allowed`);
+      toast.error(t('routes.support.form.toasts.maxImages', { max: MAX_IMAGES }));
       return;
     }
     const selected = Array.from(files).slice(0, remaining);
     const invalid = selected.filter((f) => !ACCEPTED_TYPES.includes(f.type));
     if (invalid.length > 0) {
-      toast.error('Only PNG, JPEG, WebP, and GIF images are allowed');
+      toast.error(t('routes.support.form.toasts.invalidType'));
       return;
     }
     const dataUrls = await Promise.all(selected.map(fileToDataUrl));
     setImages((prev) => [...prev, ...dataUrls]);
     if (fileInputRef.current) fileInputRef.current.value = '';
-  }, [images.length]);
+  }, [images.length, t]);
 
   const removeImage = useCallback((index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
@@ -176,7 +188,7 @@ function SupportPage() {
       setImages([]);
       reset();
     } catch {
-      toast.error('Failed to send message. Please try again.');
+      toast.error(t('routes.support.form.toasts.sendFailed'));
     }
   };
 
@@ -199,13 +211,13 @@ function SupportPage() {
             transition={{ duration: 0.5 }}
           >
             <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
-              Support
+              {t('routes.support.eyebrow')}
             </p>
             <h1 className="text-[34px] md:text-[42px] font-semibold text-text-primary font-serif leading-tight mb-4">
-              How can we help?
+              {t('routes.support.title')}
             </h1>
             <p className="text-[16px] text-text-secondary max-w-md mx-auto">
-              Send us a message and we'll get back to you within 24 hours.
+              {t('routes.support.subtitle')}
             </p>
           </motion.div>
         </section>
@@ -224,25 +236,24 @@ function SupportPage() {
                   <CheckCircle2 size={28} className="text-green" />
                 </div>
                 <h3 className="text-[20px] font-semibold text-text-primary font-serif mb-2">
-                  Message sent
+                  {t('routes.support.form.success.title')}
                 </h3>
                 <p className="text-[15px] text-text-secondary mb-6">
-                  We'll get back to you within 24 hours.
+                  {t('routes.support.form.success.subtitle')}
                 </p>
                 <button
                   type="button"
                   onClick={() => setSubmitted(false)}
                   className="px-5 py-2.5 rounded-lg text-[14px] font-medium bg-glass-bg border border-cream-3 text-text-primary transition-all duration-150 hover:bg-cream-3/50 hover:-translate-y-px cursor-pointer"
                 >
-                  Send another message
+                  {t('routes.support.form.success.sendAnother')}
                 </button>
               </div>
             ) : (
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                {/* Type selector */}
                 <div>
                   <label className="block text-[13px] font-medium text-text-secondary mb-2.5">
-                    What can we help with?
+                    {t('routes.support.form.typeLabel')}
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                     {feedbackTypes.map((ft) => (
@@ -258,7 +269,7 @@ function SupportPage() {
                         )}
                       >
                         <ft.icon size={18} strokeWidth={1.8} className={selectedType === ft.value ? 'text-coffee' : ft.color} />
-                        {ft.label}
+                        {t(`routes.support.form.types.${ft.key}`)}
                       </button>
                     ))}
                   </div>
@@ -267,16 +278,15 @@ function SupportPage() {
                   )}
                 </div>
 
-                {/* Name */}
                 <div>
                   <label htmlFor="support-name" className="block text-[13px] font-medium text-text-secondary mb-1.5">
-                    Your name
+                    {t('routes.support.form.fields.name')}
                   </label>
                   <input
                     id="support-name"
                     type="text"
                     {...register('name')}
-                    placeholder="John Doe"
+                    placeholder={t('routes.support.form.placeholders.name')}
                     className={cn(
                       'w-full px-4 py-3 rounded-xl bg-glass-bg backdrop-blur-md border text-[15px] text-text-primary placeholder:text-text-tertiary outline-none transition-all duration-200',
                       errors.name
@@ -289,16 +299,15 @@ function SupportPage() {
                   )}
                 </div>
 
-                {/* Email */}
                 <div>
                   <label htmlFor="support-email" className="block text-[13px] font-medium text-text-secondary mb-1.5">
-                    Your email
+                    {t('routes.support.form.fields.email')}
                   </label>
                   <input
                     id="support-email"
                     type="email"
                     {...register('email')}
-                    placeholder="you@example.com"
+                    placeholder={t('routes.support.form.placeholders.email')}
                     className={cn(
                       'w-full px-4 py-3 rounded-xl bg-glass-bg backdrop-blur-md border text-[15px] text-text-primary placeholder:text-text-tertiary outline-none transition-all duration-200',
                       errors.email
@@ -311,16 +320,15 @@ function SupportPage() {
                   )}
                 </div>
 
-                {/* Subject */}
                 <div>
                   <label htmlFor="support-subject" className="block text-[13px] font-medium text-text-secondary mb-1.5">
-                    Subject
+                    {t('routes.support.form.fields.subject')}
                   </label>
                   <input
                     id="support-subject"
                     type="text"
                     {...register('subject')}
-                    placeholder="Brief summary of your request"
+                    placeholder={t('routes.support.form.placeholders.subject')}
                     className={cn(
                       'w-full px-4 py-3 rounded-xl bg-glass-bg backdrop-blur-md border text-[15px] text-text-primary placeholder:text-text-tertiary outline-none transition-all duration-200',
                       errors.subject
@@ -333,16 +341,15 @@ function SupportPage() {
                   )}
                 </div>
 
-                {/* Message */}
                 <div>
                   <label htmlFor="support-message" className="block text-[13px] font-medium text-text-secondary mb-1.5">
-                    Message
+                    {t('routes.support.form.fields.message')}
                   </label>
                   <textarea
                     id="support-message"
                     {...register('message')}
                     rows={5}
-                    placeholder="Describe your issue or question..."
+                    placeholder={t('routes.support.form.placeholders.message')}
                     className={cn(
                       'w-full px-4 py-3 rounded-xl bg-glass-bg backdrop-blur-md border text-[15px] text-text-primary placeholder:text-text-tertiary outline-none transition-all duration-200 resize-none',
                       errors.message
@@ -355,15 +362,14 @@ function SupportPage() {
                   )}
                 </div>
 
-                {/* Images */}
                 <div>
                   <label className="block text-[13px] font-medium text-text-secondary mb-1.5">
-                    Screenshots <span className="text-text-tertiary font-normal">(optional, max {MAX_IMAGES})</span>
+                    {t('routes.support.form.screenshots.label')} <span className="text-text-tertiary font-normal">{t('routes.support.form.screenshots.optional', { max: MAX_IMAGES })}</span>
                   </label>
                   <div className="flex flex-wrap gap-3">
                     {images.map((src, i) => (
                       <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden border border-glass-border group">
-                        <img src={src} alt={`Attachment ${i + 1}`} className="w-full h-full object-cover" />
+                        <img src={src} alt={t('routes.support.form.screenshots.attachmentAlt', { n: i + 1 })} className="w-full h-full object-cover" />
                         <button
                           type="button"
                           onClick={() => removeImage(i)}
@@ -380,7 +386,7 @@ function SupportPage() {
                         className="w-20 h-20 rounded-xl border-2 border-dashed border-cream-3 bg-glass-bg flex flex-col items-center justify-center gap-1 text-text-tertiary transition-all duration-150 hover:border-coffee/40 hover:text-coffee cursor-pointer"
                       >
                         <ImagePlus size={18} strokeWidth={1.5} />
-                        <span className="text-[10px] font-medium">Add</span>
+                        <span className="text-[10px] font-medium">{t('routes.support.form.screenshots.add')}</span>
                       </button>
                     )}
                   </div>
@@ -396,7 +402,6 @@ function SupportPage() {
                   />
                 </div>
 
-                {/* Submit */}
                 <button
                   type="submit"
                   disabled={isSubmitting}
@@ -407,7 +412,7 @@ function SupportPage() {
                   ) : (
                     <Send size={15} />
                   )}
-                  {isSubmitting ? 'Sending...' : 'Send message'}
+                  {isSubmitting ? t('routes.support.form.sending') : t('routes.support.form.send')}
                 </button>
               </form>
             )}
@@ -425,13 +430,13 @@ function SupportPage() {
               transition={{ duration: 0.5 }}
             >
               <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
-                FAQ
+                {t('routes.support.faq.eyebrow')}
               </p>
               <h2 className="text-[30px] md:text-[36px] font-semibold text-text-primary font-serif leading-tight">
-                Frequently asked questions
+                {t('routes.support.faq.title')}
               </h2>
               <p className="text-[16px] text-text-secondary mt-3 max-w-md mx-auto">
-                Quick answers to the most common questions.
+                {t('routes.support.faq.subtitle')}
               </p>
             </motion.div>
 
@@ -467,10 +472,10 @@ function SupportPage() {
               <Mail size={22} strokeWidth={1.8} />
             </div>
             <h3 className="text-[20px] font-semibold text-text-primary font-serif mb-2">
-              Prefer email?
+              {t('routes.support.emailFallback.title')}
             </h3>
             <p className="text-[15px] text-text-secondary leading-relaxed mb-5 max-w-sm mx-auto">
-              You can also reach us directly at the address below.
+              {t('routes.support.emailFallback.subtitle')}
             </p>
             <a
               href="mailto:support@mail.dailybrew.work"

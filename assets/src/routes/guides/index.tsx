@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
 import { ArrowRight, BookOpen } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { PageSeo } from '@/components/shared/PageSeo';
-import { playbooks } from '@/components/landing/playbooks';
+import { usePlaybooks } from '@/components/landing/playbooks';
 import { useFeatures } from '@/hooks/queries/useFeatures';
 
 export const Route = createFileRoute('/guides/')({
@@ -12,11 +13,13 @@ export const Route = createFileRoute('/guides/')({
 });
 
 function GuidesIndexPage() {
+  const { t } = useTranslation();
   const { data: features } = useFeatures();
+  const all = usePlaybooks();
   // Filter out playbooks whose feature flag is off. The catalog still
   // exports them so direct links keep working; this just hides them from
   // the hub.
-  const visiblePlaybooks = playbooks.filter((pb) => {
+  const visiblePlaybooks = all.filter((pb) => {
     if (pb.key === 'nfc') return features?.flags?.nfc_checkin === true;
     return true;
   });
@@ -38,14 +41,13 @@ function GuidesIndexPage() {
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber/10 text-amber text-[12px] font-semibold uppercase tracking-wider mb-4">
             <BookOpen size={14} />
-            Guides
+            {t('guides.index.badge')}
           </div>
           <h1 className="text-[34px] md:text-[44px] font-semibold text-text-primary font-serif leading-tight">
-            Pick your path
+            {t('guides.index.title')}
           </h1>
           <p className="text-[17px] text-text-secondary mt-4 max-w-xl mx-auto">
-            Short, focused playbooks for the three things people ask us about
-            most. Each one takes about five minutes to read.
+            {t('guides.index.subtitle')}
           </p>
         </motion.div>
 
@@ -81,7 +83,7 @@ function GuidesIndexPage() {
                     {pb.teaser}
                   </p>
                   <div className="flex items-center gap-1.5 text-[13px] font-semibold text-coffee">
-                    <span>{pb.steps.length} steps</span>
+                    <span>{t('playbooks.continueReading.stepsCount', { count: pb.steps.length })}</span>
                     <ArrowRight
                       size={14}
                       className="transition-transform group-hover:translate-x-0.5"
@@ -100,9 +102,9 @@ function GuidesIndexPage() {
           viewport={{ once: true }}
         >
           <p className="text-[14px] text-text-tertiary">
-            Looking for the big picture instead?{' '}
+            {t('guides.index.bigPicturePrefix')}{' '}
             <Link to="/how-it-works" className="text-coffee font-semibold no-underline hover:underline">
-              See how DailyBrew works
+              {t('guides.index.bigPictureLink')}
             </Link>
             .
           </p>

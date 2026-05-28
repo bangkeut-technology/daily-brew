@@ -15,91 +15,58 @@ import {
   CheckCircle,
   ArrowRight,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { PageSeo } from '@/components/shared/PageSeo';
-import { playbookByKey } from '@/components/landing/playbooks';
+import { usePlaybook } from '@/components/landing/playbooks';
 
 export const Route = createFileRoute('/how-it-works')({
   component: HowItWorksPage,
 });
 
-const steps = [
-  {
-    number: '01',
-    icon: <Building2 size={28} strokeWidth={1.6} />,
-    title: 'Create your workspace',
-    desc: 'Sign up and name your restaurant. DailyBrew generates a unique QR code for your workspace automatically — print it and display it at your entrance.',
-    details: [
-      'One workspace per restaurant location',
-      'QR code generated instantly',
-      'Invite your team in minutes',
-    ],
-    accent: '#6B4226',
-  },
-  {
-    number: '02',
-    icon: <UserPlus size={28} strokeWidth={1.6} />,
-    title: 'Add your employees',
-    desc: 'Create employee profiles with names and phone numbers. Assign each person to a shift so DailyBrew knows when to expect them.',
-    details: [
-      'Assign morning, evening, or custom shifts',
-      'Set shift start and end times',
-      'Optionally link employees to user accounts',
-    ],
-    accent: '#4A7C59',
-  },
-  {
-    number: '03',
-    icon: <QrCode size={28} strokeWidth={1.6} />,
-    title: 'Staff scan to check in',
-    desc: 'Employees open the DailyBrew app on their phone, scan the workspace QR code, and they are checked in. Same scan to check out at the end of their shift.',
-    details: [
-      'Works on any smartphone',
-      'One tap to check in, one tap to check out',
-      'Optional IP, device, and geofence verification',
-    ],
-    accent: '#C17F3B',
-  },
-  {
-    number: '04',
-    icon: <BarChart3 size={28} strokeWidth={1.6} />,
-    title: 'Track everything live',
-    desc: 'Your dashboard shows who is present, who is late, who is on leave, and who has not shown up — all in real time. Late arrivals and early departures are flagged automatically.',
-    details: [
-      'Real-time attendance overview',
-      'Late and early departure detection',
-      'Daily attendance summary notifications',
-    ],
-    accent: '#3B6FA0',
-  },
+interface StepShape {
+  number: string;
+  icon: React.ReactNode;
+  /** i18n key under `routes.howItWorks.steps.<key>.{title,desc,details[]}`. */
+  key: string;
+  /** Number of detail bullets — matches the array length in i18n. */
+  detailCount: number;
+  accent: string;
+}
+
+const steps: StepShape[] = [
+  { number: '01', icon: <Building2 size={28} strokeWidth={1.6} />, key: 'create',   detailCount: 3, accent: '#6B4226' },
+  { number: '02', icon: <UserPlus size={28} strokeWidth={1.6} />,  key: 'addTeam',  detailCount: 3, accent: '#4A7C59' },
+  { number: '03', icon: <QrCode size={28} strokeWidth={1.6} />,    key: 'scan',     detailCount: 3, accent: '#C17F3B' },
+  { number: '04', icon: <BarChart3 size={28} strokeWidth={1.6} />, key: 'track',    detailCount: 3, accent: '#3B6FA0' },
 ];
 
-const ownerFeatures = [
-  { icon: <BarChart3 size={18} />, label: 'Live dashboard with attendance stats' },
-  { icon: <UserPlus size={18} />, label: 'Add and manage employees' },
-  { icon: <Clock size={18} />, label: 'Define shifts and schedules' },
-  { icon: <CalendarOff size={18} />, label: 'Schedule closures and holidays' },
-  { icon: <CalendarDays size={18} />, label: 'Approve or reject leave requests' },
-  { icon: <Shield size={18} />, label: 'Configure IP, device, and geofence rules' },
-  { icon: <Bell size={18} />, label: 'Daily summary via push and email' },
+const ownerFeatures: { icon: React.ReactNode; key: string }[] = [
+  { icon: <BarChart3 size={18} />,    key: 'dashboard' },
+  { icon: <UserPlus size={18} />,     key: 'employees' },
+  { icon: <Clock size={18} />,        key: 'shifts' },
+  { icon: <CalendarOff size={18} />,  key: 'closures' },
+  { icon: <CalendarDays size={18} />, key: 'leave' },
+  { icon: <Shield size={18} />,       key: 'security' },
+  { icon: <Bell size={18} />,         key: 'notifications' },
 ];
 
-const employeeFeatures = [
-  { icon: <QrCode size={18} />, label: 'Scan QR to check in and out' },
-  { icon: <Smartphone size={18} />, label: 'Personal dashboard on mobile' },
-  { icon: <Clock size={18} />, label: 'View own shift and attendance history' },
-  { icon: <CalendarDays size={18} />, label: 'Submit leave requests' },
-  { icon: <Bell size={18} />, label: 'Get notified of shift changes and closures' },
-  { icon: <CheckCircle size={18} />, label: 'See approval status in real time' },
+const employeeFeatures: { icon: React.ReactNode; key: string }[] = [
+  { icon: <QrCode size={18} />,       key: 'qrScan' },
+  { icon: <Smartphone size={18} />,   key: 'mobileDashboard' },
+  { icon: <Clock size={18} />,        key: 'history' },
+  { icon: <CalendarDays size={18} />, key: 'leaveRequests' },
+  { icon: <Bell size={18} />,         key: 'shiftAlerts' },
+  { icon: <CheckCircle size={18} />,  key: 'approvalStatus' },
 ];
-
-const ownerPb = playbookByKey.owner;
-const employeePb = playbookByKey.employee;
-const espressoPb = playbookByKey.espresso;
-const EspressoIcon = espressoPb.icon;
 
 function HowItWorksPage() {
+  const { t } = useTranslation();
+  const ownerPb = usePlaybook('owner');
+  const employeePb = usePlaybook('employee');
+  const espressoPb = usePlaybook('espresso');
+  const EspressoIcon = espressoPb.icon;
   return (
     <div className="min-h-screen">
       <PageSeo
@@ -118,82 +85,83 @@ function HowItWorksPage() {
           transition={{ duration: 0.5 }}
         >
           <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
-            How it works
+            {t('routes.howItWorks.eyebrow')}
           </p>
           <h1 className="text-[34px] md:text-[44px] font-semibold text-text-primary font-serif leading-tight">
-            Up and running in minutes
+            {t('routes.howItWorks.title')}
           </h1>
           <p className="text-[17px] text-text-secondary mt-4 max-w-xl mx-auto">
-            Four simple steps from sign-up to live attendance tracking.
-            No hardware, no complex setup.
+            {t('routes.howItWorks.subtitle')}
           </p>
         </motion.div>
 
         {/* Steps */}
         <div className="space-y-6 mb-24">
-          {steps.map((step, i) => (
-            <motion.div
-              key={step.number}
-              className="group relative bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 md:p-8 overflow-hidden shadow-[0_2px_12px_rgba(107,66,38,0.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(107,66,38,0.10)]"
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: i * 0.1 }}
-            >
-              {/* Accent bar */}
-              <div
-                className="absolute top-0 left-0 right-0 h-[2px] opacity-50 group-hover:opacity-100 transition-opacity"
-                style={{ background: step.accent }}
-              />
+          {steps.map((step, i) => {
+            const details = t(`routes.howItWorks.steps.${step.key}.details`, {
+              returnObjects: true,
+            }) as string[];
+            return (
+              <motion.div
+                key={step.number}
+                className="group relative bg-glass-bg backdrop-blur-md border border-glass-border rounded-2xl p-6 md:p-8 overflow-hidden shadow-[0_2px_12px_rgba(107,66,38,0.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(107,66,38,0.10)]"
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+              >
+                <div
+                  className="absolute top-0 left-0 right-0 h-[2px] opacity-50 group-hover:opacity-100 transition-opacity"
+                  style={{ background: step.accent }}
+                />
 
-              <div className="flex flex-col md:flex-row md:items-center gap-6">
-                {/* Step number + icon */}
-                <div className="flex items-center gap-4 md:flex-col md:items-center md:min-w-[80px]">
-                  <div className="relative">
-                    <div
-                      className="w-16 h-16 rounded-2xl flex items-center justify-center"
-                      style={{ background: `${step.accent}12`, color: step.accent }}
-                    >
-                      {step.icon}
+                <div className="flex flex-col md:flex-row md:items-center gap-6">
+                  <div className="flex items-center gap-4 md:flex-col md:items-center md:min-w-[80px]">
+                    <div className="relative">
+                      <div
+                        className="w-16 h-16 rounded-2xl flex items-center justify-center"
+                        style={{ background: `${step.accent}12`, color: step.accent }}
+                      >
+                        {step.icon}
+                      </div>
+                      <span
+                        className="absolute -top-2 -right-2 w-7 h-7 rounded-full flex items-center justify-center text-[13px] font-bold text-white"
+                        style={{ background: step.accent }}
+                      >
+                        {step.number}
+                      </span>
                     </div>
-                    <span
-                      className="absolute -top-2 -right-2 w-7 h-7 rounded-full flex items-center justify-center text-[13px] font-bold text-white"
-                      style={{ background: step.accent }}
-                    >
-                      {step.number}
-                    </span>
+                  </div>
+
+                  <div className="flex-1">
+                    <h3 className="text-[20px] font-semibold text-text-primary font-serif mb-2">
+                      {t(`routes.howItWorks.steps.${step.key}.title`)}
+                    </h3>
+                    <p className="text-[15px] text-text-secondary leading-relaxed mb-4">
+                      {t(`routes.howItWorks.steps.${step.key}.desc`)}
+                    </p>
+                    <ul className="space-y-2">
+                      {details.map((detail, di) => (
+                        <li key={di} className="flex items-center gap-2.5">
+                          <CheckCircle
+                            size={14}
+                            className="flex-shrink-0"
+                            style={{ color: step.accent }}
+                          />
+                          <span className="text-[14px] text-text-secondary">
+                            {detail}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
-
-                {/* Content */}
-                <div className="flex-1">
-                  <h3 className="text-[20px] font-semibold text-text-primary font-serif mb-2">
-                    {step.title}
-                  </h3>
-                  <p className="text-[15px] text-text-secondary leading-relaxed mb-4">
-                    {step.desc}
-                  </p>
-                  <ul className="space-y-2">
-                    {step.details.map((detail) => (
-                      <li key={detail} className="flex items-center gap-2.5">
-                        <CheckCircle
-                          size={14}
-                          className="flex-shrink-0"
-                          style={{ color: step.accent }}
-                        />
-                        <span className="text-[14px] text-text-secondary">
-                          {detail}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </div>
 
-        {/* Owner vs Employee perspectives */}
+        {/* Two perspectives */}
         <motion.div
           className="text-center mb-12"
           initial={{ opacity: 0, y: 20 }}
@@ -202,14 +170,13 @@ function HowItWorksPage() {
           transition={{ duration: 0.5 }}
         >
           <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
-            Two perspectives
+            {t('routes.howItWorks.perspectives.eyebrow')}
           </p>
           <h2 className="text-[30px] md:text-[36px] font-semibold text-text-primary font-serif leading-tight">
-            Built for owners and employees
+            {t('routes.howItWorks.perspectives.title')}
           </h2>
           <p className="text-[16px] text-text-secondary mt-3 max-w-lg mx-auto">
-            Restaurant owners get a management dashboard. Employees get a simple
-            mobile experience.
+            {t('routes.howItWorks.perspectives.subtitle')}
           </p>
         </motion.div>
 
@@ -228,21 +195,21 @@ function HowItWorksPage() {
               </div>
               <div>
                 <h3 className="text-[17px] font-semibold text-text-primary">
-                  For owners
+                  {t('routes.howItWorks.ownerCard.title')}
                 </h3>
                 <p className="text-[13px] text-text-tertiary">
-                  Full control from your dashboard
+                  {t('routes.howItWorks.ownerCard.subtitle')}
                 </p>
               </div>
             </div>
             <ul className="space-y-3 mb-6">
               {ownerFeatures.map((f) => (
-                <li key={f.label} className="flex items-center gap-3">
+                <li key={f.key} className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-coffee/8 flex items-center justify-center text-coffee flex-shrink-0">
                     {f.icon}
                   </div>
                   <span className="text-[14.5px] text-text-secondary">
-                    {f.label}
+                    {t(`routes.howItWorks.ownerCard.features.${f.key}`)}
                   </span>
                 </li>
               ))}
@@ -251,7 +218,7 @@ function HowItWorksPage() {
               to={ownerPb.to}
               className="mt-auto inline-flex items-center justify-between gap-2 px-4 py-2.5 rounded-lg bg-coffee/8 hover:bg-coffee/12 text-coffee text-[14px] font-semibold no-underline transition-colors"
             >
-              <span>Read the owner setup guide</span>
+              <span>{t('routes.howItWorks.ownerCard.cta')}</span>
               <ArrowRight size={14} />
             </Link>
           </motion.div>
@@ -270,21 +237,21 @@ function HowItWorksPage() {
               </div>
               <div>
                 <h3 className="text-[17px] font-semibold text-text-primary">
-                  For employees
+                  {t('routes.howItWorks.employeeCard.title')}
                 </h3>
                 <p className="text-[13px] text-text-tertiary">
-                  Simple mobile experience
+                  {t('routes.howItWorks.employeeCard.subtitle')}
                 </p>
               </div>
             </div>
             <ul className="space-y-3 mb-6">
               {employeeFeatures.map((f) => (
-                <li key={f.label} className="flex items-center gap-3">
+                <li key={f.key} className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-green/8 flex items-center justify-center text-green flex-shrink-0">
                     {f.icon}
                   </div>
                   <span className="text-[14.5px] text-text-secondary">
-                    {f.label}
+                    {t(`routes.howItWorks.employeeCard.features.${f.key}`)}
                   </span>
                 </li>
               ))}
@@ -293,7 +260,7 @@ function HowItWorksPage() {
               to={employeePb.to}
               className="mt-auto inline-flex items-center justify-between gap-2 px-4 py-2.5 rounded-lg bg-green/8 hover:bg-green/12 text-green text-[14px] font-semibold no-underline transition-colors"
             >
-              <span>Read the employee guide</span>
+              <span>{t('routes.howItWorks.employeeCard.cta')}</span>
               <ArrowRight size={14} />
             </Link>
           </motion.div>
@@ -319,10 +286,10 @@ function HowItWorksPage() {
               </div>
               <div>
                 <p className="text-[13px] font-semibold uppercase tracking-wider text-amber mb-1">
-                  Espresso plan
+                  {t('routes.howItWorks.espressoTeaser.badge')}
                 </p>
                 <h3 className="text-[18px] font-semibold text-text-primary font-serif">
-                  Ready for geofencing, managers, and BasilBook?
+                  {t('routes.howItWorks.espressoTeaser.title')}
                 </h3>
                 <p className="text-[14px] text-text-secondary mt-1">
                   {espressoPb.teaser}
@@ -330,7 +297,7 @@ function HowItWorksPage() {
               </div>
             </div>
             <div className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-coffee md:flex-shrink-0">
-              <span>See the upgrade guide</span>
+              <span>{t('routes.howItWorks.espressoTeaser.cta')}</span>
               <ArrowRight
                 size={14}
                 className="transition-transform group-hover:translate-x-0.5"
@@ -347,24 +314,24 @@ function HowItWorksPage() {
           viewport={{ once: true }}
         >
           <h3 className="text-[24px] font-semibold text-text-primary font-serif mb-3">
-            Ready to simplify attendance?
+            {t('routes.howItWorks.cta.title')}
           </h3>
           <p className="text-[16px] text-text-secondary mb-6">
-            Free for up to 10 employees. No credit card required.
+            {t('routes.howItWorks.cta.subtitle')}
           </p>
           <div className="flex items-center justify-center gap-3">
             <Link
               to="/sign-up"
               className="btn-shimmer flex items-center gap-1.5 px-6 py-2.5 rounded-lg text-[15px] font-semibold text-white no-underline transition-all hover:-translate-y-px"
             >
-              Get started free
+              {t('routes.howItWorks.cta.getStartedFree')}
               <ChevronRight size={14} />
             </Link>
             <Link
               to="/features"
               className="px-6 py-2.5 rounded-lg text-[15px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 no-underline transition-all hover:bg-cream-3"
             >
-              View all features
+              {t('routes.howItWorks.cta.viewFeatures')}
             </Link>
           </div>
         </motion.div>

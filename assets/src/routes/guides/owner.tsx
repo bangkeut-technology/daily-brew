@@ -1,20 +1,21 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { PageSeo } from '@/components/shared/PageSeo';
 import { PlaybookSection } from '@/components/landing/PlaybookSection';
 import { ContinueReading } from '@/components/landing/ContinueReading';
-import { playbookByKey } from '@/components/landing/playbooks';
+import { usePlaybook } from '@/components/landing/playbooks';
 
 export const Route = createFileRoute('/guides/owner')({
   component: OwnerGuidePage,
 });
 
-const playbook = playbookByKey.owner;
-
 function OwnerGuidePage() {
+  const { t } = useTranslation();
+  const playbook = usePlaybook('owner');
   return (
     <div className="min-h-screen">
       <PageSeo
@@ -36,7 +37,7 @@ function OwnerGuidePage() {
             className="inline-flex items-center gap-1.5 text-[14px] font-medium text-text-tertiary hover:text-coffee no-underline transition-colors"
           >
             <ArrowLeft size={14} />
-            All guides
+            {t('playbooks.continueReading.allGuides')}
           </Link>
         </motion.div>
 
@@ -60,14 +61,14 @@ function OwnerGuidePage() {
             to="/sign-up"
             className="btn-shimmer flex items-center gap-1.5 px-6 py-2.5 rounded-lg text-[15px] font-semibold text-white no-underline transition-all hover:-translate-y-px"
           >
-            Get started free
+            {t('guides.cta.getStartedFree')}
             <ChevronRight size={14} />
           </Link>
           <Link
             to="/guides/espresso"
             className="px-6 py-2.5 rounded-lg text-[15px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 no-underline transition-all hover:bg-cream-3"
           >
-            Upgrade to Espresso
+            {t('guides.cta.upgradeEspresso')}
           </Link>
         </motion.div>
       </div>

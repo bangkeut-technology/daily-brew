@@ -748,5 +748,686 @@
       }
     },
     "footnote": "Aucune carte de crédit requise pour commencer. Évoluez à tout moment depuis votre tableau de bord."
+  },
+  "playbooks": {
+    "continueReading": {
+      "eyebrow": "Continuer la lecture",
+      "title": "Autres guides",
+      "allGuides": "Tous les guides",
+      "stepsCount": "{{count}} étapes"
+    },
+    "owner": {
+      "title": "Configuration propriétaire",
+      "subtitle": "De l'inscription aux présences en direct, en environ 10 minutes.",
+      "teaser": "Créez votre espace de travail, définissez les horaires, ajoutez le personnel et commencez à suivre.",
+      "steps": {
+        "createAccount": {
+          "title": "Créez votre compte",
+          "desc": "Inscrivez-vous avec email, Google ou Apple. Aucune carte de crédit requise.",
+          "linkLabel": "S'inscrire"
+        },
+        "nameRestaurant": {
+          "title": "Nommez votre restaurant",
+          "desc": "Dans l'assistant d'intégration, choisissez le rôle propriétaire et donnez un nom à votre espace de travail. Le fuseau horaire est détecté automatiquement depuis votre navigateur."
+        },
+        "defineShifts": {
+          "title": "Définissez vos horaires",
+          "desc": "Console → Horaires. Ajoutez Matin, Soir ou tout horaire personnalisé avec heures de début et de fin.",
+          "linkLabel": "Ouvrir les horaires"
+        },
+        "addEmployees": {
+          "title": "Ajoutez vos employés",
+          "desc": "Console → Employés → Ajouter. Remplissez le nom et assignez un horaire. La liaison à un compte utilisateur est optionnelle maintenant — vous pouvez le faire plus tard depuis la page de détail de l'employé.",
+          "linkLabel": "Ajouter un employé"
+        },
+        "linkUserAccount": {
+          "title": "Liez un employé à un compte utilisateur",
+          "desc": "Ouvrez l'employé → carte Lier utilisateur → collez l'ID public de l'utilisateur (il peut copier le sien depuis Console → Profil). Une fois lié, l'utilisateur se connecte pour voir ses présences, soumettre des congés et pointer via l'app. Déliez à tout moment depuis la même carte.",
+          "linkLabel": "Ouvrir Employés"
+        },
+        "displayQr": {
+          "title": "Affichez le QR de l'espace",
+          "desc": "Votre tableau de bord affiche le code QR. Imprimez-le et fixez-le à l'entrée du personnel — un seul QR pour tout le restaurant.",
+          "linkLabel": "Ouvrir le tableau de bord"
+        },
+        "watchLive": {
+          "title": "Suivez les présences en direct",
+          "desc": "Au fur et à mesure que le personnel pointe, votre tableau de bord se met à jour avec les comptes de présents, retards, congés et absences.",
+          "linkLabel": "Ouvrir Présences"
+        },
+        "approveLeaveClosures": {
+          "title": "Approuvez les congés et planifiez les fermetures",
+          "desc": "Examinez les demandes de congé dans l'onglet Congés. Ajoutez des fermetures pour les jours fériés afin que le personnel ne soit pas marqué absent.",
+          "linkLabel": "Examiner les demandes de congé"
+        }
+      }
+    },
+    "employee": {
+      "title": "Quotidien employé",
+      "subtitle": "Pointez à l'arrivée, au départ et demandez des congés depuis votre téléphone.",
+      "teaser": "Installez l'app, liez-vous à votre espace de travail et scannez le QR pour pointer.",
+      "steps": {
+        "installApp": {
+          "title": "Installez l'app DailyBrew",
+          "desc": "Disponible gratuitement sur l'App Store et Google Play."
+        },
+        "signIn": {
+          "title": "Connectez-vous",
+          "desc": "Utilisez email, Google ou Apple — le même compte fonctionne sur chaque téléphone depuis lequel vous vous connectez.",
+          "linkLabel": "Connexion"
+        },
+        "linkRecord": {
+          "title": "Liez-vous à votre fiche employé",
+          "desc": "Deux façons : (a) votre propriétaire colle votre ID public d'utilisateur — trouvez-le dans Console → Profil — dans la carte Lier utilisateur de votre page employé ; ou (b) vous collez l'ID public d'employé que votre propriétaire partage dans l'assistant d'intégration ou Console → Profil → Lier à un espace de travail. Vous pouvez vous lier à plusieurs espaces si vous travaillez dans plus d'un restaurant.",
+          "linkLabel": "Ouvrir le profil"
+        },
+        "scanQr": {
+          "title": "Scannez le QR au restaurant",
+          "desc": "Pointez l'app vers le QR sur le mur. L'écran de pointage s'ouvre automatiquement."
+        },
+        "tapCheckin": {
+          "title": "Appuyez sur Check in",
+          "desc": "Le statut À l'heure ou En retard apparaît immédiatement, basé sur votre horaire assigné."
+        },
+        "tapCheckout": {
+          "title": "Appuyez sur Check out à la fin de votre service",
+          "desc": "Scannez le même QR et appuyez sur Check out. Si la vérification d'appareil est activée, vous devez utiliser le même téléphone que pour le pointage d'entrée."
+        },
+        "submitLeave": {
+          "title": "Soumettez un congé depuis l'onglet Congés",
+          "desc": "Choisissez les dates et le type (payé ou non payé). Votre propriétaire est notifié et l'examine.",
+          "linkLabel": "Soumettre un congé"
+        }
+      }
+    },
+    "espresso": {
+      "title": "Passez à Espresso",
+      "subtitle": "Débloquez la gestion des congés, le géorepérage, les managers et l'intégration BasilBook.",
+      "teaser": "Verrouillez le pointage à votre restaurant, promouvez des managers et synchronisez avec BasilBook.",
+      "steps": {
+        "openSettings": {
+          "title": "Ouvrez Paramètres → Abonnement",
+          "desc": "Depuis votre tableau de bord, cliquez sur Paramètres puis sur Mettre à niveau dans la carte Abonnement.",
+          "linkLabel": "Ouvrir Paramètres"
+        },
+        "pickBilling": {
+          "title": "Choisissez mensuel ou annuel",
+          "desc": "Le mensuel coûte 14,99 $. L'annuel coûte 149 $ — environ 17 % moins cher. Un essai gratuit de 14 jours couvre votre première utilisation."
+        },
+        "lockCheckin": {
+          "title": "Verrouillez le pointage à votre restaurant",
+          "desc": "Paramètres → activez la restriction IP (utilisez le bouton « Utiliser mon IP actuelle ») ou définissez un géorepérage avec latitude, longitude et rayon (par défaut 100 m).",
+          "linkLabel": "Ouvrir IP / Géorepérage"
+        },
+        "enableDeviceVerification": {
+          "title": "Activez la vérification d'appareil",
+          "desc": "Force chaque employé à utiliser le même téléphone pour le pointage d'entrée et de sortie, empêchant le pointage par collègue.",
+          "linkLabel": "Ouvrir vérification d'appareil"
+        },
+        "tryNfc": {
+          "title": "Essayez le check-in NFC (optionnel)",
+          "desc": "Remplacez le scan QR par une tape d'une seconde contre un autocollant NFC. Les tags NTAG213 coûtent environ un dollar chacun et se programment en 30 secondes avec une app gratuite.",
+          "linkLabel": "Configurer le check-in NFC"
+        },
+        "promoteManager": {
+          "title": "Promouvez un manager",
+          "desc": "Détail employé → définissez le rôle sur manager. Les managers approuvent les congés et voient toutes les présences, jusqu'à 2 par espace de travail sur Espresso.",
+          "linkLabel": "Ouvrir Employés"
+        },
+        "connectBasilbook": {
+          "title": "Connectez BasilBook",
+          "desc": "Paramètres → jetons API → Générer. Copiez le jeton une fois et collez-le dans BasilBook pour synchroniser les présences avec votre comptabilité."
+        }
+      }
+    },
+    "nfc": {
+      "title": "Configurer le check-in NFC",
+      "subtitle": "Remplacez le scan QR par une tape d'une seconde contre un autocollant NFC.",
+      "teaser": "Achetez des autocollants, programmez-les avec l'URL de votre espace, placez-les au comptoir — le personnel tape son téléphone et il est entré.",
+      "steps": {
+        "checkEspresso": {
+          "title": "Assurez-vous d'être sur Espresso",
+          "desc": "Le check-in NFC est inclus dans Espresso avec le géorepérage, la vérification d'appareil et les managers. Les plans gratuits voient un badge « Espresso » à côté du toggle NFC.",
+          "linkLabel": "Ouvrir Paramètres"
+        },
+        "turnOnNfc": {
+          "title": "Activez le check-in NFC",
+          "desc": "Console → Paramètres → carte « Check-in NFC » → basculez l'interrupteur puis Enregistrer. Cela déverrouille le bouton « Taper le tag NFC » sur l'écran d'accueil de chaque employé dans l'app mobile.",
+          "linkLabel": "Ouvrir paramètres check-in NFC"
+        },
+        "copyUrl": {
+          "title": "Copiez votre URL de check-in",
+          "desc": "Console → Tableau de bord → carte « Code QR de check-in ». Sous le QR, vous verrez une ligne « Pour les tags NFC » avec l'URL — cliquez sur l'icône de copie. L'URL ressemble à https://dailybrew.work/checkin/<votre-token>. Chaque espace a sa propre URL, donc si vous gérez plusieurs restaurants, copiez chacune séparément.",
+          "linkLabel": "Ouvrir le tableau de bord"
+        },
+        "buyStickers": {
+          "title": "Achetez des autocollants NFC NTAG213",
+          "desc": "NTAG213 contient 137 octets — largement assez pour notre URL — et coûte environ 0,50–1 $ pièce. Cherchez « NTAG213 sticker » sur Amazon ou Lazada. Prenez des autocollants ronds pour le pupitre d'hôte, des cartes PVC pour la caisse, ou des porte-clés pour les managers. NTAG215 (504 octets) fonctionne aussi si vous voulez de la marge."
+        },
+        "installApp": {
+          "title": "Installez une app gratuite d'écriture de tag",
+          "desc": "Sur le téléphone que vous utiliserez pour programmer les tags, installez « NFC Tools » (wakdev, gratuit sur iOS et Android) ou NXP « TagWriter » sur Android. Vous n'avez besoin de ceci qu'une fois."
+        },
+        "writeUrl": {
+          "title": "Écrivez l'URL sur un autocollant",
+          "desc": "Dans NFC Tools : onglet Écrire → Ajouter un enregistrement → URL/URI → collez l'URL copiée → OK → Écrire. Tenez votre téléphone contre un autocollant vierge. Vous sentirez une vibration en 1–2 secondes quand c'est fait. Répétez pour chaque autocollant."
+        },
+        "lockStickers": {
+          "title": "Verrouillez les autocollants (recommandé)",
+          "desc": "Dans NFC Tools : Autre → Verrouiller le tag. Cela rend l'autocollant en lecture seule pour toujours, donc un membre du personnel ne peut pas — accidentellement ou intentionnellement — l'écraser. Passez si vous pourriez reprogrammer plus tard."
+        },
+        "placeStickers": {
+          "title": "Collez-les où le personnel passe naturellement",
+          "desc": "Devant le pupitre d'hôte, sous le rebord du bar, à côté de la zone d'horloge. Le téléphone doit être à 1–4 cm de l'autocollant, donc évitez de le mettre derrière du verre ou du bois épais. Ajouter une petite étiquette « Taper pour pointer » à côté élimine la confusion le premier jour."
+        },
+        "testTap": {
+          "title": "Testez la tape",
+          "desc": "Verrouillez votre téléphone (ou fermez l'app DailyBrew). Tapez l'autocollant. Sur iPhone XS ou plus récent, une bannière apparaît en haut — tapez-la. Sur les anciens iPhones, ouvrez l'app d'abord puis tapez. Android gère les deux automatiquement. Après Face ID ou code, vous verrez « Pointé »."
+        },
+        "pairSecurity": {
+          "title": "Associez avec géorepérage / IP / vérification d'appareil",
+          "desc": "NFC seul ne prouve que que le téléphone a touché le tag — associez-le à votre rayon de géorepérage, liste IP autorisée ou vérification d'appareil (déjà dans Paramètres) pour qu'une image de tag volée ou un tag copié ne puisse pas être utilisé hors site.",
+          "linkLabel": "Ouvrir Géorepérage"
+        }
+      }
+    }
+  },
+  "guides": {
+    "index": {
+      "badge": "Guides",
+      "title": "Choisissez votre parcours",
+      "subtitle": "Des playbooks courts et ciblés pour les trois choses qu'on nous demande le plus. Chacun prend environ cinq minutes à lire.",
+      "bigPicturePrefix": "Vous cherchez plutôt la vue d'ensemble ?",
+      "bigPictureLink": "Voir comment DailyBrew fonctionne"
+    },
+    "cta": {
+      "getStartedFree": "Commencer gratuitement",
+      "upgradeEspresso": "Passer à Espresso",
+      "createAccount": "Créer un compte",
+      "otherGuides": "Autres guides",
+      "startTrial": "Commencer l'essai 14 jours",
+      "seeAllFeatures": "Voir toutes les fonctionnalités",
+      "turnOnNfc": "Activer le check-in NFC",
+      "espressoDetails": "Détails du plan Espresso"
+    }
+  },
+  "routes": {
+    "howItWorks": {
+      "eyebrow": "Comment ça marche",
+      "title": "Opérationnel en quelques minutes",
+      "subtitle": "Quatre étapes simples de l'inscription au suivi des présences en direct. Aucun matériel, aucune configuration complexe.",
+      "steps": {
+        "create": {
+          "title": "Créez votre espace de travail",
+          "desc": "Inscrivez-vous et nommez votre restaurant. DailyBrew génère automatiquement un code QR unique pour votre espace — imprimez-le et affichez-le à votre entrée.",
+          "details": [
+            "Un espace par emplacement de restaurant",
+            "Code QR généré instantanément",
+            "Invitez votre équipe en quelques minutes"
+          ]
+        },
+        "addTeam": {
+          "title": "Ajoutez vos employés",
+          "desc": "Créez des profils d'employés avec noms et numéros de téléphone. Assignez chaque personne à un horaire pour que DailyBrew sache quand l'attendre.",
+          "details": [
+            "Assignez des horaires du matin, du soir ou personnalisés",
+            "Définissez les heures de début et de fin des horaires",
+            "Liez optionnellement les employés à des comptes utilisateurs"
+          ]
+        },
+        "scan": {
+          "title": "Le personnel scanne pour pointer",
+          "desc": "Les employés ouvrent l'app DailyBrew sur leur téléphone, scannent le code QR de l'espace et ils sont pointés. Le même scan pour pointer la sortie à la fin de leur service.",
+          "details": [
+            "Fonctionne sur n'importe quel smartphone",
+            "Une tape pour pointer l'entrée, une tape pour la sortie",
+            "Vérification IP, appareil et géorepérage optionnelles"
+          ]
+        },
+        "track": {
+          "title": "Suivez tout en direct",
+          "desc": "Votre tableau de bord affiche qui est présent, qui est en retard, qui est en congé et qui ne s'est pas présenté — tout en temps réel. Les retards et départs anticipés sont signalés automatiquement.",
+          "details": [
+            "Vue d'ensemble des présences en temps réel",
+            "Détection des retards et départs anticipés",
+            "Notifications de résumé quotidien des présences"
+          ]
+        }
+      },
+      "perspectives": {
+        "eyebrow": "Deux perspectives",
+        "title": "Conçu pour les propriétaires et les employés",
+        "subtitle": "Les propriétaires de restaurant obtiennent un tableau de bord de gestion. Les employés obtiennent une expérience mobile simple."
+      },
+      "ownerCard": {
+        "title": "Pour les propriétaires",
+        "subtitle": "Contrôle total depuis votre tableau de bord",
+        "features": {
+          "dashboard": "Tableau de bord en direct avec statistiques de présence",
+          "employees": "Ajoutez et gérez les employés",
+          "shifts": "Définissez les horaires et plannings",
+          "closures": "Planifiez fermetures et jours fériés",
+          "leave": "Approuvez ou refusez les demandes de congé",
+          "security": "Configurez les règles IP, appareil et géorepérage",
+          "notifications": "Résumé quotidien via push et email"
+        },
+        "cta": "Lire le guide de configuration propriétaire"
+      },
+      "employeeCard": {
+        "title": "Pour les employés",
+        "subtitle": "Expérience mobile simple",
+        "features": {
+          "qrScan": "Scannez le QR pour pointer entrée et sortie",
+          "mobileDashboard": "Tableau de bord personnel sur mobile",
+          "history": "Voyez votre horaire et historique de pointage",
+          "leaveRequests": "Soumettez des demandes de congé",
+          "shiftAlerts": "Soyez notifié des changements d'horaire et fermetures",
+          "approvalStatus": "Voyez le statut d'approbation en temps réel"
+        },
+        "cta": "Lire le guide employé"
+      },
+      "espressoTeaser": {
+        "badge": "Plan Espresso",
+        "title": "Prêt pour le géorepérage, les managers et BasilBook ?",
+        "cta": "Voir le guide de mise à niveau"
+      },
+      "cta": {
+        "title": "Prêt à simplifier les présences ?",
+        "subtitle": "Gratuit jusqu'à 10 employés. Aucune carte de crédit requise.",
+        "getStartedFree": "Commencer gratuitement",
+        "viewFeatures": "Voir toutes les fonctionnalités"
+      }
+    },
+    "pricing": {
+      "comparison": {
+        "eyebrow": "Comparer",
+        "title": "Comparaison des fonctionnalités",
+        "subtitle": "Voyez exactement ce que vous obtenez avec chaque forfait.",
+        "headers": {
+          "feature": "Fonctionnalité"
+        },
+        "sections": {
+          "core": "Cœur",
+          "espresso": "Fonctionnalités Espresso",
+          "doubleEspresso": "Fonctionnalités Double Espresso"
+        },
+        "rows": {
+          "employees": {
+            "label": "Employés"
+          },
+          "qrCheckin": {
+            "label": "Check-in par QR de l'espace"
+          },
+          "shifts": {
+            "label": "Gestion des horaires"
+          },
+          "closures": {
+            "label": "Périodes de fermeture"
+          },
+          "ownerDashboard": {
+            "label": "Tableau de bord et statistiques propriétaire"
+          },
+          "employeeDashboard": {
+            "label": "Tableau de bord employé"
+          },
+          "attendanceLog": {
+            "label": "Journal des présences"
+          },
+          "darkMode": {
+            "label": "Mode sombre"
+          },
+          "multiLang": {
+            "label": "Multilingue (EN/FR/KM)"
+          },
+          "leaveRequests": {
+            "label": "Gestion des demandes de congé"
+          },
+          "ipRestriction": {
+            "label": "Restriction IP pour pointage entrée et sortie"
+          },
+          "deviceVerification": {
+            "label": "Vérification d'appareil pour pointage entrée et sortie"
+          },
+          "geofencing": {
+            "label": "Géorepérage pour pointage entrée et sortie"
+          },
+          "perDaySchedules": {
+            "label": "Horaires par jour de la semaine"
+          },
+          "basilbook": {
+            "label": "<brand></brand> intégration + API"
+          },
+          "notifications": {
+            "label": "Notifications push et email"
+          },
+          "manager": {
+            "label": "Rôle de manager"
+          },
+          "dailySummary": {
+            "label": "Résumé quotidien des présences"
+          },
+          "trial14": {
+            "label": "Essai gratuit de 14 jours"
+          },
+          "unlimitedEmployees": {
+            "label": "Employés illimités"
+          },
+          "unlimitedManagers": {
+            "label": "Managers illimités"
+          },
+          "prioritySupport": {
+            "label": "Support prioritaire"
+          },
+          "multipleQrStations": {
+            "label": "Plusieurs stations QR (feuille de route)"
+          },
+          "perQrGeofence": {
+            "label": "Géorepérage et paramètres par QR (feuille de route)"
+          },
+          "perQrAssignment": {
+            "label": "Affectation d'employés par QR (feuille de route)"
+          },
+          "whiteLabel": {
+            "label": "Image de marque blanche (feuille de route)"
+          }
+        }
+      },
+      "faq": {
+        "eyebrow": "FAQ",
+        "title": "Questions de facturation",
+        "items": {
+          "switchPlans": {
+            "question": "Puis-je changer de forfait à tout moment ?",
+            "answer": "Oui, vous pouvez augmenter ou rétrograder votre forfait à tout moment depuis les Paramètres de votre tableau de bord. Les changements prennent effet immédiatement."
+          },
+          "paymentMethods": {
+            "question": "Quels moyens de paiement acceptez-vous ?",
+            "answer": "Nous utilisons Paddle comme fournisseur de paiement, qui prend en charge cartes de crédit, cartes de débit et PayPal."
+          },
+          "freeTrial": {
+            "question": "Y a-t-il un essai gratuit ?",
+            "answer": "Le plan Free est gratuit pour toujours, sans limite de temps. Si vous voulez essayer Espresso, vous obtenez un essai gratuit de 14 jours avec accès complet à toutes les fonctionnalités Espresso."
+          },
+          "cancelAnytime": {
+            "question": "Puis-je annuler à tout moment ?",
+            "answer": "Oui, il n'y a aucun contrat ni période d'engagement. Vous pouvez annuler votre abonnement Espresso à tout moment et continuer à utiliser le plan Free."
+          },
+          "basilbook": {
+            "question": "Comment fonctionne l'intégration BasilBook ?",
+            "answer": "Avec un plan Espresso ou Double Espresso, vous pouvez générer un jeton API depuis les paramètres de votre espace de travail. BasilBook utilise ce jeton pour récupérer les données de présence des employés qui partagent un nom d'utilisateur entre les deux systèmes. L'API renvoie les heures de pointage, indicateurs de retard/avance et informations sur les horaires pour toute plage de dates."
+          }
+        },
+        "stillHaveQuestions": "Encore des questions ?",
+        "reachOut": "Contactez-nous"
+      }
+    },
+    "support": {
+      "eyebrow": "Support",
+      "title": "Comment pouvons-nous aider ?",
+      "subtitle": "Envoyez-nous un message et nous vous répondrons sous 24 heures.",
+      "form": {
+        "typeLabel": "Sur quoi pouvons-nous aider ?",
+        "types": {
+          "bug": "Rapport de bug",
+          "feature": "Demande de fonctionnalité",
+          "question": "Question",
+          "general": "Général"
+        },
+        "fields": {
+          "name": "Votre nom",
+          "email": "Votre email",
+          "subject": "Objet",
+          "message": "Message"
+        },
+        "placeholders": {
+          "name": "Jean Dupont",
+          "email": "vous@exemple.com",
+          "subject": "Bref résumé de votre demande",
+          "message": "Décrivez votre problème ou question…"
+        },
+        "errors": {
+          "name": "Veuillez entrer votre nom",
+          "email": "Veuillez entrer un email valide",
+          "subject": "Veuillez entrer un objet",
+          "message": "Le message doit comporter au moins 10 caractères"
+        },
+        "screenshots": {
+          "label": "Captures d'écran",
+          "optional": "(optionnel, max {{max}})",
+          "attachmentAlt": "Pièce jointe {{n}}",
+          "add": "Ajouter"
+        },
+        "send": "Envoyer le message",
+        "sending": "Envoi…",
+        "success": {
+          "title": "Message envoyé",
+          "subtitle": "Nous vous répondrons sous 24 heures.",
+          "sendAnother": "Envoyer un autre message"
+        },
+        "toasts": {
+          "maxImages": "Maximum {{max}} images autorisées",
+          "invalidType": "Seules les images PNG, JPEG, WebP et GIF sont autorisées",
+          "sendFailed": "Échec de l'envoi du message. Veuillez réessayer."
+        }
+      },
+      "faq": {
+        "eyebrow": "FAQ",
+        "title": "Questions fréquentes",
+        "subtitle": "Réponses rapides aux questions les plus courantes."
+      },
+      "emailFallback": {
+        "title": "Vous préférez l'email ?",
+        "subtitle": "Vous pouvez aussi nous joindre directement à l'adresse ci-dessous."
+      }
+    },
+    "roles": {
+      "eyebrow": "Rôles et permissions",
+      "title": "Qui peut faire quoi",
+      "subtitle": "DailyBrew a trois rôles — propriétaire, manager et employé. Chacun avec des permissions claires et bien définies.",
+      "cards": {
+        "owner": {
+          "title": "Propriétaire",
+          "desc": "L'utilisateur qui a créé l'espace de travail. Contrôle total sur tout — employés, horaires, fermetures, paramètres, facturation et toutes les données de présence.",
+          "highlights": [
+            "Crée et gère l'espace de travail",
+            "Ajoute, modifie et supprime les employés",
+            "Configure tous les paramètres et règles de sécurité",
+            "Promeut les employés au rang de manager",
+            "Gère la facturation et l'abonnement"
+          ]
+        },
+        "manager": {
+          "title": "Manager",
+          "badge": "Espresso",
+          "desc": "Un employé de confiance promu par le propriétaire. Le propriétaire choisit exactement quelles parties le manager peut administrer — pas d'accès tout-ou-rien.",
+          "highlights": [
+            "Toggles de permission par manager pour employés, horaires, fermetures, congés et présences",
+            "Par défaut « gérer congés » + « gérer présences » à la promotion",
+            "Paramètres de l'espace, facturation, sous-QR et promotion de managers restent réservés au propriétaire",
+            "Pointe toujours entrée/sortie comme un employé régulier"
+          ]
+        },
+        "employee": {
+          "title": "Employé",
+          "desc": "Un membre du personnel lié à l'espace de travail. Peut pointer, consulter ses données personnelles et soumettre des demandes de congé.",
+          "highlights": [
+            "Pointe entrée et sortie en scannant le code QR",
+            "Consulte son propre historique de présence",
+            "Soumet des demandes de congé (journée entière ou partielle)",
+            "Annule ses propres demandes de congé en attente",
+            "Consulte son horaire et informations de fermeture"
+          ]
+        }
+      },
+      "matrix": {
+        "eyebrow": "Décomposition complète",
+        "title": "Matrice des permissions",
+        "subtitle": "Chaque action associée à chaque rôle. Aucune surprise.",
+        "legend": {
+          "allowed": "Toujours autorisé",
+          "configurable": "Configurable par manager",
+          "notAvailable": "Non disponible"
+        },
+        "headers": {
+          "action": "Action",
+          "employee": "Employé",
+          "manager": "Manager",
+          "owner": "Propriétaire"
+        },
+        "sections": {
+          "dashboard": "Tableau de bord",
+          "attendance": "Présences",
+          "leave": "Demandes de congé",
+          "employees": "Gestion des employés",
+          "shifts": "Horaires et fermetures",
+          "workspace": "Espace et paramètres",
+          "billing": "Facturation"
+        },
+        "actions": {
+          "viewPersonalDashboard": "Voir le tableau de bord personnel",
+          "viewFullDashboard": "Voir le tableau de bord complet des présences (tous les employés)",
+          "viewTodayStats": "Voir les statistiques de présence du jour",
+          "seePendingLeaveCount": "Voir le nombre de congés en attente",
+          "checkinOut": "Pointer entrée et sortie via QR",
+          "viewOwnAttendance": "Voir son propre historique de présence",
+          "viewAllAttendance": "Voir les présences de tous les employés",
+          "editAttendance": "Modifier / corriger les enregistrements de présence",
+          "submitOwnLeave": "Soumettre sa propre demande de congé",
+          "submitAnyLeave": "Soumettre un congé pour n'importe quel employé",
+          "viewOwnLeave": "Voir ses propres demandes de congé",
+          "viewAllLeave": "Voir toutes les demandes de congé",
+          "approveLeave": "Approuver ou refuser les demandes de congé",
+          "cancelOwnLeave": "Annuler ses propres congés en attente",
+          "cancelAnyLeave": "Annuler n'importe quelle demande de congé",
+          "addEmployees": "Ajouter de nouveaux employés",
+          "editEmployees": "Modifier les détails des employés",
+          "deleteEmployees": "Supprimer (en douceur) les employés",
+          "linkUsers": "Lier / délier les comptes utilisateurs",
+          "promoteManagers": "Promouvoir / rétrograder les managers",
+          "editManagerPermissions": "Modifier les permissions par manager",
+          "viewShifts": "Voir les horaires",
+          "editShifts": "Créer, modifier, supprimer les horaires",
+          "perDaySchedules": "Gérer les horaires par jour",
+          "viewClosures": "Voir les périodes de fermeture",
+          "editClosures": "Créer, modifier, supprimer les fermetures",
+          "viewWorkspace": "Voir les infos de l'espace de travail",
+          "renameWorkspace": "Renommer l'espace de travail",
+          "configureIp": "Configurer la restriction IP",
+          "configureDevice": "Configurer la vérification d'appareil",
+          "configureGeofence": "Configurer le géorepérage",
+          "subQrCodes": "Créer ou modifier les sous-codes QR",
+          "deleteWorkspace": "Supprimer l'espace de travail",
+          "viewPlan": "Voir le forfait actuel",
+          "changePlan": "Augmenter / rétrograder le forfait",
+          "paymentMethod": "Gérer le moyen de paiement"
+        },
+        "grantedVia": "Accordé via {{via}}"
+      },
+      "voter": {
+        "title": "Comment les permissions fonctionnent en coulisses",
+        "subtitle": "DailyBrew utilise quatre niveaux de permission. Chaque requête API est vérifiée par rapport à ceux-ci avant qu'aucune action ne soit prise.",
+        "levels": {
+          "view": {
+            "label": "VIEW",
+            "who": "Propriétaire, Manager, Employé",
+            "desc": "Accès en lecture seule aux ressources de l'espace de travail. Tous les utilisateurs liés obtiennent cela."
+          },
+          "capability": {
+            "label": "CAPABILITY",
+            "who": "Propriétaire + manager (par permission)",
+            "desc": "Attributs granulaires — manage_employees, manage_shifts, manage_closures, manage_leave, manage_attendance — accordés individuellement à chaque manager. Le propriétaire a toutes les capacités implicitement."
+          },
+          "editWorkspace": {
+            "label": "EDIT / DELETE on Workspace",
+            "who": "Propriétaire uniquement",
+            "desc": "Renommer ou supprimer l'espace de travail, modifier les paramètres, gérer la facturation, créer des sous-codes QR, promouvoir des managers."
+          },
+          "perQrManager": {
+            "label": "PER-QR MANAGER",
+            "who": "Manager assigné à un sous-QR",
+            "desc": "Ajoute l'autorité de présence + congé sur les employés assignés au QR, en plus de toute permission à l'échelle de l'espace de travail qu'ils détiennent."
+          }
+        },
+        "note": {
+          "label": "Note :",
+          "body": "Accorder une capacité est un choix délibéré par manager. Un manager avec uniquement manage_leave peut approuver les congés mais ne verra pas la liste des employés comme modifiable. Un manager avec tout sauf manage_attendance ne voit toujours que ses propres présences. Le voter applique cela uniformément sur chaque endpoint API."
+        }
+      },
+      "limits": {
+        "espressoLabel": "Espresso",
+        "espresso": "jusqu'à 2 managers",
+        "doubleEspressoLabel": "Double Espresso",
+        "doubleEspresso": "managers illimités",
+        "free": "Plan Free : propriétaire uniquement"
+      },
+      "cta": {
+        "title": "Prêt à configurer votre équipe ?",
+        "subtitle": "Créez votre espace de travail, ajoutez des employés et promouvez votre personnel de confiance.",
+        "getStartedFree": "Commencer gratuitement",
+        "viewFeatures": "Voir toutes les fonctionnalités"
+      }
+    },
+    "demo": {
+      "badge": "Démo plan Espresso",
+      "title": "Essayez DailyBrew",
+      "subtitle": "Connectez-vous avec n'importe lequel des trois comptes de démo ci-dessous pour explorer DailyBrew sous différentes perspectives.",
+      "password": {
+        "label": "Mot de passe pour tous les comptes",
+        "copy": "Copier",
+        "copied": "Copié"
+      },
+      "accounts": {
+        "owner": {
+          "role": "Propriétaire",
+          "desc": "Accès complet à tout — tableau de bord, employés, horaires, fermetures, paramètres, facturation et approbations de congé.",
+          "highlights": [
+            "Voir le tableau de bord complet des présences",
+            "Ajouter et gérer les employés",
+            "Configurer horaires, fermetures et paramètres",
+            "Approuver ou refuser les demandes de congé",
+            "Promouvoir les employés au rang de manager"
+          ],
+          "signInCta": "Se connecter en tant que propriétaire"
+        },
+        "manager": {
+          "role": "Manager",
+          "desc": "Un employé de confiance avec des permissions élevées — peut superviser les présences et gérer les demandes de congé.",
+          "highlights": [
+            "Voir le tableau de bord complet des présences",
+            "Approuver ou refuser les demandes de congé",
+            "Voir les présences de tous les employés",
+            "Pointer entrée et sortie comme un employé régulier",
+            "Aucun accès aux paramètres ou à la gestion des employés"
+          ],
+          "signInCta": "Se connecter en tant que manager"
+        },
+        "employee": {
+          "role": "Employé",
+          "desc": "Un membre du personnel — peut pointer, consulter ses propres présences et soumettre des demandes de congé.",
+          "highlights": [
+            "Tableau de bord personnel avec ses propres présences",
+            "Consulter son horaire et historique de pointage",
+            "Soumettre des demandes de congé (journée entière ou partielle)",
+            "Annuler ses propres demandes de congé en attente",
+            "Pointer entrée et sortie via le code QR"
+          ],
+          "signInCta": "Se connecter en tant qu'employé"
+        }
+      },
+      "emailLabel": "Email",
+      "workspaceStats": {
+        "title": "Ce qu'il y a dans l'espace de démo",
+        "labels": {
+          "plan": "Forfait",
+          "employees": "Employés",
+          "shifts": "Horaires",
+          "manager": "Manager",
+          "attendanceRecords": "Enregistrements de présence",
+          "leaveRequests": "Demandes de congé",
+          "closure": "Fermeture",
+          "userAccounts": "Comptes utilisateurs"
+        }
+      }
+    }
   }
 }
