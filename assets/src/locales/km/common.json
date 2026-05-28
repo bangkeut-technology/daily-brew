@@ -11,7 +11,9 @@
     "settings": "ការកំណត់",
     "profile": "ប្រវត្តិរូប",
     "help": "ជំនួយ",
-    "signOut": "ចាកចេញ"
+    "signOut": "ចាកចេញ",
+    "myAttendance": "វត្តមានរបស់ខ្ញុំ",
+    "myLeaveRequests": "សំណើឈប់របស់ខ្ញុំ"
   },
   "attendance": {
     "verification": {
@@ -30,13 +32,27 @@
       "restrictNetwork": "ផ្ទៀងផ្ទាត់បណ្តាញ",
       "upgradeHint": "ដំឡើងទៅ Espresso ដើម្បីអនុវត្ត",
       "upsell": "ដំឡើងទៅ Espresso ដើម្បីផ្ទៀងផ្ទាត់ទីកន្លែង ឧបករណ៍ និងបណ្តាញដែលបុគ្គលិកចូល។"
-    }
+    },
+    "absent": "អវត្តមាន",
+    "checkIn": "ចូល",
+    "checkOut": "ចេញ",
+    "date": "កាលបរិច្ឆេទ",
+    "late": "យឺត",
+    "leftEarly": "ចេញមុន",
+    "onTime": "ទាន់ពេល"
   },
   "auth": {
     "signIn": "ចូល",
     "signUp": "ចុះឈ្មោះ",
     "email": "អ៊ីមែល",
-    "password": "ពាក្យសម្ងាត់"
+    "password": "ពាក្យសម្ងាត់",
+    "apple": "Apple",
+    "confirmPassword": "បញ្ជាក់ពាក្យសម្ងាត់",
+    "forgotPassword": "ភ្លេចពាក្យសម្ងាត់?",
+    "google": "Google",
+    "hasAccount": "មានគណនីរួចហើយ?",
+    "noAccount": "មិនទាន់មានគណនី?",
+    "orContinueWith": "ឬបន្តជាមួយ"
   },
   "dashboard": {
     "emptyWelcome": "សូមស្វាគមន៍មកកាន់ការងាររបស់អ្នក!",
@@ -46,7 +62,22 @@
     "emptyCreateShift": "បង្កើតការប្រុស",
     "emptyCreateShiftDesc": "កំណត់ម៉ោងពេលព្រឹក ល្ងាច ឬផ្សេងទៀត",
     "emptyConfigure": "កំណត់ការកំណត់",
-    "emptyConfigureDesc": "តំបន់តំបន់ម៉ោង ការកំណត់ IP និងផ្សេងទៀត"
+    "emptyConfigureDesc": "តំបន់តំបន់ម៉ោង ការកំណត់ IP និងផ្សេងទៀត",
+    "absent": "អវត្តមាន",
+    "addEmployee": "បន្ថែមបុគ្គលិក",
+    "late": "មកយឺត",
+    "myLeaves": "សំណើឈប់របស់ខ្ញុំ",
+    "myShift": "ការប្រុសរបស់ខ្ញុំថ្ងៃនេះ",
+    "myStatus": "ស្ថានភាពរបស់ខ្ញុំ",
+    "notCheckedIn": "មិនទាន់បានចូល",
+    "ofEmployees": "ក្នុងចំណោមបុគ្គលិក {{count}} នាក់",
+    "onLeave": "កំពុងឈប់",
+    "present": "មានវត្តមានថ្ងៃនេះ",
+    "quickActions": "សកម្មភាពរហ័ស",
+    "recentAttendance": "ការចូលរួមថ្មីៗរបស់ខ្ញុំ",
+    "todayAttendance": "ការចូលរួមថ្ងៃនេះ",
+    "viewAll": "មើលទាំងអស់",
+    "viewAttendance": "មើលការចូលរួម"
   },
   "employee": {
     "createdGuideEyebrow": "បានបង្កើតបុគ្គលិក",
@@ -70,7 +101,49 @@
     "createdGuideLinkAction": "ទៅការភ្ជាប់",
     "createdGuideCopyAction": "ចម្លងលេខសម្គាល់បុគ្គលិក",
     "createdGuideAddAnother": "បន្ថែមបុគ្គលិកផ្សេងទៀត",
-    "createdGuideReadFullGuide": "អានមគ្គុទ្ទេសក៍ដំឡើងម្ចាស់ពេញលេញ"
+    "createdGuideReadFullGuide": "អានមគ្គុទ្ទេសក៍ដំឡើងម្ចាស់ពេញលេញ",
+    "active": "សកម្ម",
+    "add": "បន្ថែមបុគ្គលិក",
+    "attendanceHistory": "ប្រវត្តិការចូលរួម",
+    "attendanceTracking": "ការតាមដានវត្តមាន",
+    "attendanceTrackingFull": "តាមដាន (លំនាំដើម)",
+    "attendanceTrackingHint": "ជ្រើស «ដកចេញ» សម្រាប់បុគ្គលិកដែលជួយដំណើរការការងារ ប៉ុន្តែមិនធ្វើតាមការប្រុស (ឧ. អ្នកជំនួយរដ្ឋបាល)។ ពួកគេនៅតែអាចចូលរួមដើម្បីកត់ត្រាម៉ោង — គ្រាន់តែនឹងមិនរាប់ជាអវត្តមាន។",
+    "attendanceTrackingNone": "ដកចេញ — មិនរាប់ជាអវត្តមាន",
+    "firstName": "នាមខ្លួន",
+    "inactive": "មិនសកម្ម",
+    "jobTitle": "តួនាទីការងារ",
+    "jobTitlePlaceholder": "ឧ. អ្នកគិតលុយ, ចុងភៅ, អ្នកបម្រើ",
+    "lastName": "នាមត្រកូល",
+    "managerPermissionsDesc": "ជ្រើសរើសផ្នែកដែលប្រធាននេះអាចគ្រប់គ្រង។ ការកំណត់ការងារ ការទូទាត់ កូដ QR រង និងការតែងតាំងប្រធានផ្សេងទៀតគឺនៅជាមួយម្ចាស់។",
+    "managerPermissionsTitle": "សិទ្ធិប្រធាន",
+    "name": "ឈ្មោះ",
+    "noShift": "គ្មានការប្រុស",
+    "notTrackedBadge": "មិនតាមដាន",
+    "permAttendance": "គ្រប់គ្រងវត្តមាន",
+    "permAttendanceDesc": "មើលវត្តមានទាំងអស់ និងកែកំណត់ត្រានៅពេលត្រូវការកែតម្រូវ",
+    "permClosures": "គ្រប់គ្រងការបិទ",
+    "permClosuresDesc": "បង្កើត កែប្រែ និងលុបកាលបរិច្ឆេទបិទភោជនីយដ្ឋាន",
+    "permEmployees": "គ្រប់គ្រងបុគ្គលិក",
+    "permEmployeesDesc": "បង្កើត កែប្រែ និងលុបបុគ្គលិក (មិនអាចតែងតាំងប្រធាន)",
+    "permLeave": "គ្រប់គ្រងការឈប់",
+    "permLeaveDesc": "អនុម័ត បដិសេធ និងបោះបង់សំណើឈប់សម្រាប់បុគ្គលិកណាមួយ",
+    "permSaveError": "បរាជ័យក្នុងការធ្វើបច្ចុប្បន្នភាពសិទ្ធិ",
+    "permSaved": "សិទ្ធិត្រូវបានធ្វើបច្ចុប្បន្នភាព",
+    "permShifts": "គ្រប់គ្រងការប្រុស",
+    "permShiftsDesc": "បង្កើត កែប្រែ និងលុបការប្រុស និងការកំណត់ឡើងវិញតាមថ្ងៃ",
+    "phone": "ទូរស័ព្ទ",
+    "qrCode": "កូដ QR",
+    "role": "តួនាទី",
+    "roleEmployee": "បុគ្គលិក",
+    "roleManager": "ប្រធាន",
+    "roleManagerHint": "ប្រធានត្រូវការគណនីអ្នកប្រើដែលបានភ្ជាប់។ ភ្ជាប់មួយមុនរក្សាទុក។",
+    "sectionIdentity": "អត្តសញ្ញាណ",
+    "sectionLinking": "ភ្ជាប់គណនីអ្នកប្រើ",
+    "sectionRoleSchedule": "តួនាទី និងកាលវិភាគ",
+    "sectionSchedule": "កាលវិភាគ",
+    "sectionStatus": "ស្ថានភាព",
+    "shift": "ការប្រុស",
+    "status": "ស្ថានភាព"
   },
   "workspace": {
     "label": "ការងារ",
@@ -83,14 +156,37 @@
     "deviceVerification": "ការផ្ទៀងផ្ទាត់ឧបករណ៍",
     "enableDeviceVerification": "បើកការផ្ទៀងផ្ទាត់ឧបករណ៍",
     "deviceVerificationDesc": "តម្រូវឲ្យប្រើឧបករណ៍ដែលគ្នុងការចូលរួមចូល និងចេញរួម និងការបរើឧបករណ៍មួយចូលរួមបុគ្គលិកច្រើន",
-    "deviceVerificationEspresso": "ការផ្ទៀងផ្ទាត់ឧបករណ៍ត្រូវការ Espresso"
+    "deviceVerificationEspresso": "ការផ្ទៀងផ្ទាត់ឧបករណ៍ត្រូវការ Espresso",
+    "enableGeofencing": "បើក geofencing",
+    "geofencing": "Geofencing",
+    "geofencingDesc": "អនុញ្ញាតការចូលរួមតែក្នុងចម្ងាយកំណត់ពីភោជនីយដ្ឋានរបស់អ្នក",
+    "geofencingEspresso": "Geofencing តម្រូវឲ្យមាន Espresso",
+    "latitude": "រយៈ",
+    "longitude": "បណ្ដោយ",
+    "radius": "កាំ (ម៉ែត្រ)",
+    "useCurrentLocation": "ប្រើទីតាំងបច្ចុប្បន្ន"
   },
   "checkin": {
     "deviceMismatch": "ការចេញរួមត្រូវធ្វើឡើងពីឧបករណ៍ដែលគ្នុងការចូលរួម",
-    "deviceAlreadyUsed": "ឧបករណ៍នេះត្រូវបានប្រើដើម្បីចូលរួមបុគ្គលិកផ្សេងទៀតហើយថ្ងៃនេះ"
+    "deviceAlreadyUsed": "ឧបករណ៍នេះត្រូវបានប្រើដើម្បីចូលរួមបុគ្គលិកផ្សេងទៀតហើយថ្ងៃនេះ",
+    "checkIn": "ចូល",
+    "checkOut": "ចេញ",
+    "checkedInAt": "បានចូលនៅម៉ោង {{time}}",
+    "completed": "ការចូលរួមបានបញ្ចប់សម្រាប់ថ្ងៃនេះ",
+    "invalidToken": "តំណចូលរួមមិនត្រឹមត្រូវ",
+    "ipRestricted": "ការចូលរួមមិនត្រូវបានអនុញ្ញាតពីទីតាំងនេះ",
+    "locationDenied": "ការចូលប្រើទីតាំងត្រូវបានបដិសេធ។ ការចូលរួមអាចបរាជ័យបើ geofencing បានបើក។",
+    "locationRequired": "ត្រូវការទីតាំងសម្រាប់ការចូលរួម",
+    "outsideGeofence": "អ្នកនៅក្រៅតំបន់ដែលអនុញ្ញាតឲ្យចូលរួម"
   },
   "plan": {
-    "deviceVerification": "ការផ្ទៀងផ្ទាត់ឧបករណ៍សម្រាប់ការចូលរួម"
+    "deviceVerification": "ការផ្ទៀងផ្ទាត់ឧបករណ៍សម្រាប់ការចូលរួម",
+    "geofencing": "Geofencing សម្រាប់ការចូលរួម",
+    "ipRestriction": "ការដាក់កំហិត IP សម្រាប់ការចូលរួម",
+    "leaveRequests": "ការគ្រប់គ្រងសំណើឈប់",
+    "prioritySupport": "ការគាំទ្រអាទិភាព",
+    "shiftTimeRules": "កាលវិភាគប្រុសតាមថ្ងៃ",
+    "unlimitedEmployees": "បុគ្គលិកគ្មានកំណត់"
   },
   "common": {
     "save": "រក្សាទុក",
@@ -103,7 +199,11 @@
     "copied": "បានចម្លងទៅក្ដារតម្បៀតខ្ទាស់",
     "copyFailed": "បរាជ័យក្នុងការចម្លង",
     "on": "បើក",
-    "off": "បិទ"
+    "off": "បិទ",
+    "back": "ត្រឡប់",
+    "create": "បង្កើត",
+    "edit": "កែប្រែ",
+    "search": "ស្វែងរក"
   },
   "qrCodes": {
     "new": "កូដ QR ថ្មី",
@@ -161,7 +261,9 @@
     "payload": "ខ្លឹមសារដែលបានកំសាន្ត",
     "payloadCopied": "បានចម្លងទៅក្ដារតម្បៀតខ្ទាស់",
     "identity": "អត្តសញ្ញាណ",
-    "unsavedChanges": "អ្នកមានការផ្លាស់ប្ដូរដែលមិនបានរក្សាទុក"
+    "unsavedChanges": "អ្នកមានការផ្លាស់ប្ដូរដែលមិនបានរក្សាទុក",
+    "assignedCount_one": "បានចាត់តាំង {{count}} នាក់",
+    "assignedCount_other": "បានចាត់តាំង {{count}} នាក់"
   },
   "upgrade": {
     "espressoFeature": "មុខងារ Espresso",
@@ -192,5 +294,53 @@
       "title": "បើកដំណើរការការជូនដំណឹង Telegram",
       "description": "ផ្ញើសំណើសំរាក់ឈប់ ការផ្លាស់ការងារ ការបិទ និងសង្ខេបប្រចាំថ្ងៃទៅ Telegram។"
     }
+  },
+  "leave": {
+    "approve": "អនុម័ត",
+    "approved": "បានអនុម័ត",
+    "pending": "កំពុងរង់ចាំ",
+    "reason": "ហេតុផល",
+    "reject": "បដិសេធ",
+    "rejected": "បានបដិសេធ",
+    "submit": "ផ្ញើសំណើ"
+  },
+  "onboarding": {
+    "copyId": "ចម្លងលេខសម្គាល់",
+    "createWorkspace": "បង្កើតការងារ",
+    "dark": "ងងឹត",
+    "employee": "ខ្ញុំជាបុគ្គលិក",
+    "employeeDesc": "ភ្ជាប់ទៅកន្លែងធ្វើការរបស់អ្នក",
+    "employeePublicId": "លេខសម្គាល់សាធារណៈបុគ្គលិក",
+    "getStarted": "ចាប់ផ្តើម",
+    "idCopied": "បានចម្លង!",
+    "idExplain": "ចែករំលែកលេខសម្គាល់នេះជាមួយនិយោជករបស់អ្នក ដើម្បីឲ្យគាត់អាចបន្ថែមអ្នកជាបុគ្គលិក។",
+    "light": "ភ្លឺ",
+    "linkEmployee": "ភ្ជាប់ទៅបុគ្គលិក",
+    "linkExplain": "បញ្ចូលលេខសម្គាល់បុគ្គលិកដែលផ្តល់ដោយនិយោជករបស់អ្នក។",
+    "next": "បន្ទាប់",
+    "owner": "ខ្ញុំជាម្ចាស់ភោជនីយដ្ឋាន",
+    "ownerDesc": "បង្កើតការងារ និងគ្រប់គ្រងបុគ្គលិក",
+    "roleQuestion": "តើអ្នកនឹងប្រើ DailyBrew យ៉ាងណា?",
+    "skip": "រំលង",
+    "subtitle": "ការតាមដានវត្តមានបុគ្គលិក សាមញ្ញៗ",
+    "system": "ប្រព័ន្ធ",
+    "theme": "រូបរាង",
+    "welcome": "សូមស្វាគមន៍មកកាន់ DailyBrew",
+    "workspaceName": "ឈ្មោះភោជនីយដ្ឋាន",
+    "yourPublicId": "លេខសម្គាល់សាធារណៈរបស់អ្នក"
+  },
+  "shifts": {
+    "addRule": "បន្ថែមការកំណត់ឡើងវិញ",
+    "default": "លំនាំដើម",
+    "friday": "សុក្រ",
+    "monday": "ច័ន្ទ",
+    "override": "ការកំណត់ឡើងវិញ",
+    "saturday": "សៅរ៍",
+    "sunday": "អាទិត្យ",
+    "thursday": "ព្រហស្បតិ៍",
+    "timeRules": "កាលវិភាគតាមថ្ងៃ",
+    "timeRulesEspresso": "កាលវិភាគប្រុសតាមថ្ងៃត្រូវការ Espresso",
+    "tuesday": "អង្គារ",
+    "wednesday": "ពុធ"
   }
 }
