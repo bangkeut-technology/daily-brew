@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.75.8](https://github.com/bangkeut-technology/daily-brew/compare/v1.75.7...v1.75.8) (2026-05-28)
+
+
+### Bug Fixes
+
+* **emails:** make label/value rows readable in Outlook ([#176](https://github.com/bangkeut-technology/daily-brew/issues/176)) ([cadf6f7](https://github.com/bangkeut-technology/daily-brew/commit/cadf6f7d1d34cd08df185157aff551e74c954eca))
+
 ## [1.75.7](https://github.com/bangkeut-technology/daily-brew/compare/v1.75.6...v1.75.7) (2026-05-28)
 
 
