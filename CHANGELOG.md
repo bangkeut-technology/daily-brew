@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.76.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.75.8...v1.76.0) (2026-05-28)
+
+
+### Features
+
+* **i18n:** fill 144 missing Khmer translations ([#178](https://github.com/bangkeut-technology/daily-brew/issues/178)) ([d7fddda](https://github.com/bangkeut-technology/daily-brew/commit/d7fddda78baef60ffd946097ebd3eda06421cc6c))
+
 ## [1.75.8](https://github.com/bangkeut-technology/daily-brew/compare/v1.75.7...v1.75.8) (2026-05-28)
 
 
