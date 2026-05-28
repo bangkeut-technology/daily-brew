@@ -72,7 +72,7 @@ All entities carry `id`, `publicId` (UUID), `createdAt`, `updatedAt`.
 
 **Workspace deletion.** `WorkspaceService::delete()` cancels active Paddle sub via API (failure logged+swallowed) before soft-delete; sub marked Canceled locally regardless. Also clears `currentWorkspace` on the owner and on every linked user pointing at this workspace so the `role-context` endpoint doesn't drop them back on the deleted dashboard. `WorkspaceRepository::findByOwner()` filters `deletedAt IS NULL` — use `findAllByOwnerIncludingDeleted()` for admin views that need deletion history. `AccountDeletionService::softDelete()` delegates per owned WS.
 
-**Notifications (Espresso).** Push (Expo) + email (Mailgun) via `NotificationService` → `ExpoPushService`+`EmailService`. Events: leave submitted (→owner), approved/rejected (→employee), shift changed (→employee), closure (→linked employees), daily summary (→owner, cron `app:send-daily-summary`). Payloads include `type`+`workspacePublicId`.
+**Notifications (Espresso).** Push (Expo) + email (Mailgun) via `NotificationService` → `ExpoPushService`+`EmailService`. Events: leave submitted (→owner), approved/rejected (→employee), shift changed (→employee), closure (→linked employees), daily summary (→owner, cron `dailybrew:send-daily-summary`). Payloads include `type`+`workspacePublicId`.
 
 **Platform admin (`/admin/*`).** Gated by `ROLE_SUPER_ADMIN`. Bootstrap: idempotent CLI `dailybrew:admin:promote-user <email>` (only path without existing super-admin); then promote/demote in UI (`POST /admin/users/{publicId}/promote|demote`), self-demote rejected (400). `UserDTO.isSuperAdmin` exposed. `AdminAuditService::record()` is wrap-and-log — failures swallowed so audit can't roll back the already-flushed action. Endpoints under `/api/v1/{locale}/admin`: dashboard, workspaces (with restore), users, subscriptions, audit-log. `/admin/*` redirects to `/console/dashboard` if not super-admin.
 
@@ -103,6 +103,6 @@ Cross-product link via Employee `username` (Espresso). Tokens at `/api/v1/{local
 ```bash
 composer install && php bin/console doctrine:migrations:migrate && php bin/console lexik:jwt:generate-keypair
 npm ci && npm run router:generate && npm run dev
-php bin/console app:send-daily-summary             # cron daily ~18:00
+php bin/console dailybrew:send-daily-summary       # cron daily ~18:00
 php bin/console dailybrew:admin:promote-user <email>
 ```
