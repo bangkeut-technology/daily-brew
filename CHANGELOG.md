@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.75.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.75.0...v1.75.1) (2026-05-28)
+
+
+### Bug Fixes
+
+* **frontend:** port the real marketing pages from the SPA (homepage + 19) ([#157](https://github.com/bangkeut-technology/daily-brew/issues/157)) ([2ddfa96](https://github.com/bangkeut-technology/daily-brew/commit/2ddfa96807f1fa031f8d9aad5b7e77163a5a0943))
+
 ## [1.75.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.74.0...v1.75.0) (2026-05-27)
 
 
