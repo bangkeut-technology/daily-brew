@@ -120,6 +120,15 @@ export function CustomSelect({
         createPortal(
           <div
             ref={dropdownRef}
+            // The menu is portaled to document.body so `overflow:hidden` /
+            // `backdrop-filter` ancestors (e.g. GlassCard) don't clip it — but
+            // that puts it OUTSIDE any wrapping Radix Dialog's content tree, so
+            // Radix's outside-pointer detector classifies clicks here as
+            // "outside" and calls preventDefault on the pointer event,
+            // swallowing the option's onClick. Stopping propagation on the
+            // dropdown's own pointer/mouse events hides them from Radix.
+            onPointerDownCapture={(e) => e.stopPropagation()}
+            onMouseDownCapture={(e) => e.stopPropagation()}
             className="fixed z-[9999] overflow-hidden rounded-xl border border-glass-border bg-cream shadow-lg dark:bg-[#1E1916]"
             style={{
               left: position.left,
