@@ -251,7 +251,10 @@
     "copied": "Copied to clipboard",
     "copyFailed": "Failed to copy",
     "on": "on",
-    "off": "off"
+    "off": "off",
+    "languageSwitcher": {
+      "ariaLabel": "Language"
+    }
   },
   "qrCodes": {
     "new": "New QR code",

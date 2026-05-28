@@ -11,7 +11,11 @@ export function LanguageProvider({ children }: Props) {
     const { user } = useAuthentication();
 
     useEffect(() => {
-        const locale = user?.locale || sessionStorage.getItem('locale') || 'en';
+        // Explicit user choice (via the LanguageSwitcher → sessionStorage)
+        // wins over the profile-stored locale; otherwise switching language
+        // after sign-in would silently snap back to the profile default on
+        // the next provider render.
+        const locale = sessionStorage.getItem('locale') || user?.locale || 'en';
         if (i18n.language !== locale) {
             i18n.changeLanguage(locale);
         }

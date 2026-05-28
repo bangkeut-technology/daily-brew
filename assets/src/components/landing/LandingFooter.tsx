@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useAuthenticationState } from '@/hooks/use-authentication';
 import { AppStoreBadge } from '@/components/shared/AppStoreBadge';
 import { PlayStoreBadge } from '@/components/shared/PlayStoreBadge';
+import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
 
 const productLinks = [
   { label: 'Features', to: '/features' },
@@ -156,9 +157,12 @@ export function LandingFooter() {
           <p className="text-[13px] text-text-tertiary">
             DailyBrew &copy; {new Date().getFullYear()}. All rights reserved.
           </p>
-          <p className="text-[13px] text-text-tertiary">
-            <span className="inline-flex items-center gap-1">Made with <Coffee size={12} className="text-coffee" /> for restaurants everywhere</span>
-          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <p className="text-[13px] text-text-tertiary">
+              <span className="inline-flex items-center gap-1">Made with <Coffee size={12} className="text-coffee" /> for restaurants everywhere</span>
+            </p>
+            <LanguageSwitcher />
+          </div>
         </motion.div>
       </div>
     </footer>
