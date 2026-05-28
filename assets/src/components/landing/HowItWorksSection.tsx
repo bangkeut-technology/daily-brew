@@ -1,39 +1,28 @@
 import { Link } from '@tanstack/react-router';
 import { Building2, UserPlus, QrCode, BarChart3, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
-const steps = [
-  {
-    number: '01',
-    icon: <Building2 size={24} strokeWidth={1.6} />,
-    title: 'Create your workspace',
-    desc: 'Sign up, name your restaurant, and a unique QR code is generated for your workspace instantly.',
-    accent: '#6B4226',
-  },
-  {
-    number: '02',
-    icon: <UserPlus size={24} strokeWidth={1.6} />,
-    title: 'Add your team',
-    desc: 'Create employee profiles and assign shifts. Morning, evening, or custom — you define the schedule.',
-    accent: '#4A7C59',
-  },
-  {
-    number: '03',
-    icon: <QrCode size={24} strokeWidth={1.6} />,
-    title: 'Staff scan to check in',
-    desc: 'Display the QR code at your restaurant. Employees scan it to check in and out — one tap each way.',
-    accent: '#C17F3B',
-  },
-  {
-    number: '04',
-    icon: <BarChart3 size={24} strokeWidth={1.6} />,
-    title: 'Track everything live',
-    desc: 'See who is present, late, on leave, or absent. Late arrivals and early departures are flagged automatically.',
-    accent: '#3B6FA0',
-  },
+/**
+ * Step shape: icon + number + accent are design; `key` selects the i18n
+ * pair `homepage.howItWorks.steps.<key>.{title,desc}`.
+ */
+interface StepShape {
+  number: string;
+  icon: React.ReactNode;
+  key: string;
+  accent: string;
+}
+
+const steps: StepShape[] = [
+  { number: '01', icon: <Building2 size={24} strokeWidth={1.6} />, key: 'create',   accent: '#6B4226' },
+  { number: '02', icon: <UserPlus size={24} strokeWidth={1.6} />,  key: 'addTeam',  accent: '#4A7C59' },
+  { number: '03', icon: <QrCode size={24} strokeWidth={1.6} />,    key: 'scan',     accent: '#C17F3B' },
+  { number: '04', icon: <BarChart3 size={24} strokeWidth={1.6} />, key: 'track',    accent: '#3B6FA0' },
 ];
 
 export function HowItWorksSection() {
+  const { t } = useTranslation();
   return (
     <section className="py-24 px-6 md:px-8 max-w-5xl mx-auto">
       <motion.div
@@ -44,13 +33,13 @@ export function HowItWorksSection() {
         transition={{ duration: 0.5 }}
       >
         <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
-          How it works
+          {t('homepage.howItWorks.eyebrow')}
         </p>
         <h3 className="text-[30px] md:text-[36px] font-semibold text-text-primary font-serif leading-tight">
-          Up and running in minutes
+          {t('homepage.howItWorks.title')}
         </h3>
         <p className="text-[16px] text-text-secondary mt-3 max-w-md mx-auto">
-          Four steps from sign-up to live attendance tracking. No hardware needed.
+          {t('homepage.howItWorks.subtitle')}
         </p>
       </motion.div>
 
@@ -84,10 +73,10 @@ export function HowItWorksSection() {
             </div>
 
             <h4 className="text-[16px] font-semibold text-text-primary mb-2">
-              {step.title}
+              {t(`homepage.howItWorks.steps.${step.key}.title`)}
             </h4>
             <p className="text-[14.5px] text-text-secondary leading-relaxed max-w-[240px]">
-              {step.desc}
+              {t(`homepage.howItWorks.steps.${step.key}.desc`)}
             </p>
           </motion.div>
         ))}
@@ -104,7 +93,7 @@ export function HowItWorksSection() {
           to="/how-it-works"
           className="inline-flex items-center gap-1.5 text-[15px] font-medium text-coffee hover:text-coffee-light no-underline transition-colors"
         >
-          Learn more about how it works
+          {t('homepage.howItWorks.learnMore')}
           <ChevronRight size={14} />
         </Link>
       </motion.div>

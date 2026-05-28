@@ -2,72 +2,44 @@ import { Link } from '@tanstack/react-router';
 import { Check, X, Crown, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { BasilBookBrand } from '@/components/shared/BasilBookBrand';
 
+/**
+ * Plan tiers. Prices, currencies, and savings keep their numeric values
+ * inline (they read the same across all locales we ship). Plan names,
+ * feature lists, subtitles, and CTAs come from `pricing.*` so a single
+ * translation block powers both this homepage section and a future
+ * standalone /pricing page.
+ */
 const freePlan = {
-  name: 'Free',
   price: '$0',
-  period: 'forever',
-  subtitle: 'For small teams getting started',
-  features: [
-    { text: 'Up to 10 employees', included: true },
-    { text: 'Workspace QR code check-in', included: true },
-    { text: 'Shift management', included: true },
-    { text: 'Closure periods', included: true },
-    { text: 'Owner & employee dashboard', included: true },
-    { text: 'Attendance log', included: true },
-    { text: 'Dark mode', included: true },
-    { text: 'Multi-language (EN/FR/KM)', included: true },
-    { text: 'Leave requests', included: false },
-    { text: 'IP restriction', included: false },
-    { text: 'Geofencing', included: false },
-  ],
+  features: ['employees10', 'qrCheckIn', 'shifts', 'closures', 'dashboard', 'log', 'darkMode', 'multiLang', 'leaveRequests', 'ipRestriction', 'geofencing'] as const,
+  // Sub-set of features that are *included* in Free (rest get an X).
+  included: new Set(['employees10', 'qrCheckIn', 'shifts', 'closures', 'dashboard', 'log', 'darkMode', 'multiLang']),
 };
 
 const espressoPlan = {
-  name: 'Espresso',
-  monthly: { price: '$14.99', period: '/month' },
-  yearly: { price: '$149', period: '/year', savings: 'Save $30.88', monthly: '$12.42' },
-  subtitle: 'For growing restaurants',
-  features: [
-    { text: 'Up to 20 employees', included: true },
-    { text: 'Everything in Free', included: true },
-    { text: 'Leave request management', included: true },
-    { text: 'IP restriction for check-in & out', included: true },
-    { text: 'Device verification for check-in & out', included: true },
-    { text: 'Geofencing for check-in & out', included: true },
-    { text: 'Per-day shift schedules', included: true },
-    { text: 'Manager role with granular permissions (up to 2)', included: true },
-    { text: <><BasilBookBrand className="text-[15px]" /> integration + API</>, included: true },
-    { text: 'Push & email notifications', included: true },
-    { text: 'Daily attendance summary', included: true },
-    { text: '14-day free trial', included: true },
-  ],
+  monthly: { price: '$14.99' },
+  yearly: { price: '$149', monthlyEquivalent: '$12.42' },
+  features: ['employees20', 'everythingFree', 'leaveRequests', 'ipRestriction', 'deviceVerification', 'geofencing', 'perDaySchedules', 'manager', 'basilbook', 'notifications', 'dailySummary', 'trial14'] as const,
 };
 
 const doubleEspressoPlan = {
-  name: 'Double Espresso',
-  monthly: { price: '$39.99', period: '/month' },
-  yearly: { price: '$399', period: '/year', savings: 'Save $80.88', monthly: '$33.25' },
-  subtitle: 'For large operations',
-  features: [
-    { text: 'Unlimited employees', included: true },
-    { text: 'Everything in Espresso', included: true },
-    { text: 'Unlimited managers', included: true },
-    { text: 'Priority support', included: true },
-    { text: 'Multiple QR stations', included: true, roadmap: true },
-    { text: 'Per-QR geofence & settings', included: true, roadmap: true },
-    { text: 'Employee assignment per QR', included: true, roadmap: true },
-    { text: 'Per-QR manager assignment', included: true, roadmap: true },
-    { text: 'White-label branding', included: true, roadmap: true },
-  ],
+  monthly: { price: '$39.99' },
+  yearly: { price: '$399', monthlyEquivalent: '$33.25' },
+  features: ['unlimitedEmployees', 'everythingEspresso', 'unlimitedManagers', 'prioritySupport', 'multipleQrStations', 'perQrGeofence', 'perQrAssignment', 'perQrManager', 'whiteLabel'] as const,
+  // The roadmap-flagged sub-set so the UI renders the "Roadmap" pill.
+  roadmap: new Set(['multipleQrStations', 'perQrGeofence', 'perQrAssignment', 'perQrManager', 'whiteLabel']),
 };
 
 export function PricingSection() {
   const [yearly, setYearly] = useState(true);
+  const { t } = useTranslation();
   const espressoPricing = yearly ? espressoPlan.yearly : espressoPlan.monthly;
   const doublePricing = yearly ? doubleEspressoPlan.yearly : doubleEspressoPlan.monthly;
+  const period = yearly ? t('pricing.period.year') : t('pricing.period.month');
 
   return (
     <section id="pricing" className="py-24 px-6 md:px-8 max-w-5xl mx-auto">
@@ -79,13 +51,13 @@ export function PricingSection() {
         transition={{ duration: 0.5 }}
       >
         <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
-          Pricing
+          {t('pricing.eyebrow')}
         </p>
         <h3 className="text-[30px] md:text-[36px] font-semibold text-text-primary font-serif leading-tight">
-          Simple, transparent pricing
+          {t('pricing.title')}
         </h3>
         <p className="text-[16px] text-text-secondary mt-3 max-w-md mx-auto">
-          Start free. Upgrade when you need more.
+          {t('pricing.subtitle')}
         </p>
       </motion.div>
 
@@ -109,7 +81,7 @@ export function PricingSection() {
               !yearly ? 'text-white' : 'text-text-secondary'
             )}
           >
-            Monthly
+            {t('pricing.toggle.monthly')}
           </button>
           <button
             onClick={() => setYearly(true)}
@@ -118,7 +90,7 @@ export function PricingSection() {
               yearly ? 'text-white' : 'text-text-secondary'
             )}
           >
-            Yearly
+            {t('pricing.toggle.yearly')}
           </button>
         </div>
         {yearly ? (
@@ -127,7 +99,7 @@ export function PricingSection() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
           >
-            Save with yearly billing
+            {t('pricing.toggle.yearlyBadge')}
           </motion.span>
         ) : (
           <motion.button
@@ -136,7 +108,7 @@ export function PricingSection() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
-            Switch to yearly and save
+            {t('pricing.toggle.switchHint')}
           </motion.button>
         )}
       </motion.div>
@@ -151,42 +123,45 @@ export function PricingSection() {
           transition={{ duration: 0.5, delay: 0.1 }}
         >
           <p className="text-[16px] font-semibold text-text-primary mb-1">
-            {freePlan.name}
+            {t('pricing.free.name')}
           </p>
           <div className="flex items-baseline gap-1 mb-1">
             <span className="text-[42px] font-bold text-text-primary tracking-tight">
               {freePlan.price}
             </span>
             <span className="text-[15px] text-text-tertiary">
-              {freePlan.period}
+              {t('pricing.free.period')}
             </span>
           </div>
           <p className="text-[14.5px] text-text-secondary mb-7">
-            {freePlan.subtitle}
+            {t('pricing.free.subtitle')}
           </p>
 
           <ul className="space-y-3 mb-8 flex-1">
-            {freePlan.features.map((f) => (
-              <li key={f.text} className="flex items-center gap-2.5">
-                {f.included ? (
-                  <Check size={15} className="text-green shrink-0" strokeWidth={2.5} />
-                ) : (
-                  <X size={15} className="text-text-tertiary/50 shrink-0" strokeWidth={2} />
-                )}
-                <span
-                  className={cn('text-[15px]', f.included ? 'text-text-secondary' : 'text-text-tertiary')}
-                >
-                  {f.text}
-                </span>
-              </li>
-            ))}
+            {freePlan.features.map((key) => {
+              const included = freePlan.included.has(key);
+              return (
+                <li key={key} className="flex items-center gap-2.5">
+                  {included ? (
+                    <Check size={15} className="text-green shrink-0" strokeWidth={2.5} />
+                  ) : (
+                    <X size={15} className="text-text-tertiary/50 shrink-0" strokeWidth={2} />
+                  )}
+                  <span
+                    className={cn('text-[15px]', included ? 'text-text-secondary' : 'text-text-tertiary')}
+                  >
+                    {t(`pricing.free.features.${key}`)}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
 
           <Link
             to="/sign-up"
             className="flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-[15px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3 no-underline"
           >
-            Get started
+            {t('pricing.free.cta')}
           </Link>
         </motion.div>
 
@@ -201,7 +176,7 @@ export function PricingSection() {
           {/* Popular badge */}
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
             <span className="text-[12px] font-semibold uppercase tracking-wider px-3.5 py-1 rounded-full bg-amber text-white shadow-[0_2px_8px_rgba(193,127,59,0.3)]">
-              Most popular
+              {t('pricing.espresso.mostPopular')}
             </span>
           </div>
 
@@ -210,7 +185,7 @@ export function PricingSection() {
 
           <div className="relative flex items-center gap-2 mb-1">
             <p className="text-[16px] font-semibold text-text-primary">
-              {espressoPlan.name}
+              {t('pricing.espresso.name')}
             </p>
             <Crown size={14} className="text-amber" />
           </div>
@@ -219,23 +194,34 @@ export function PricingSection() {
               {espressoPricing.price}
             </span>
             <span className="text-[15px] text-text-tertiary">
-              {espressoPricing.period}
+              {period}
             </span>
           </div>
           {yearly && (
             <p className="relative text-[13.5px] text-green font-medium mb-3">
-              That's just {espressoPlan.yearly.monthly}/month
+              {t('pricing.espresso.perMonthHint', { price: espressoPlan.yearly.monthlyEquivalent })}
             </p>
           )}
           <p className="relative text-[14.5px] text-text-secondary mb-7">
-            {espressoPlan.subtitle}
+            {t('pricing.espresso.subtitle')}
           </p>
 
           <ul className="relative space-y-3 mb-8 flex-1">
-            {espressoPlan.features.map((f, i) => (
-              <li key={i} className="flex items-center gap-2.5">
+            {espressoPlan.features.map((key) => (
+              <li key={key} className="flex items-center gap-2.5">
                 <Check size={15} className="text-green shrink-0" strokeWidth={2.5} />
-                <span className="text-[15px] text-text-secondary">{f.text}</span>
+                <span className="text-[15px] text-text-secondary">
+                  {key === 'basilbook' ? (
+                    // "<brand /> integration + API" — brand is a wordmark,
+                    // the surrounding prose translates.
+                    <Trans
+                      i18nKey="pricing.espresso.features.basilbook"
+                      components={{ brand: <BasilBookBrand className="text-[15px]" /> }}
+                    />
+                  ) : (
+                    t(`pricing.espresso.features.${key}`)
+                  )}
+                </span>
               </li>
             ))}
           </ul>
@@ -244,7 +230,7 @@ export function PricingSection() {
             to="/sign-up"
             className="relative btn-shimmer flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-[15px] font-semibold text-white border-none cursor-pointer transition-all duration-150 hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] no-underline"
           >
-            Start with Espresso
+            {t('pricing.espresso.cta')}
             <ChevronRight size={14} />
           </Link>
         </motion.div>
@@ -260,7 +246,7 @@ export function PricingSection() {
           {/* Coming soon badge */}
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
             <span className="text-[12px] font-semibold uppercase tracking-wider px-3.5 py-1 rounded-full bg-text-tertiary text-white shadow-[0_2px_8px_rgba(174,157,149,0.3)]">
-              Coming soon
+              {t('pricing.doubleEspresso.comingSoon')}
             </span>
           </div>
 
@@ -269,7 +255,7 @@ export function PricingSection() {
 
           <div className="relative flex items-center gap-2 mb-1">
             <p className="text-[16px] font-semibold text-text-primary">
-              {doubleEspressoPlan.name}
+              {t('pricing.doubleEspresso.name')}
             </p>
             <Crown size={14} className="text-coffee" />
           </div>
@@ -278,39 +264,42 @@ export function PricingSection() {
               {doublePricing.price}
             </span>
             <span className="text-[15px] text-text-tertiary">
-              {doublePricing.period}
+              {period}
             </span>
           </div>
           {yearly && (
             <p className="relative text-[13.5px] text-green font-medium mb-3">
-              That's just {doubleEspressoPlan.yearly.monthly}/month
+              {t('pricing.doubleEspresso.perMonthHint', { price: doubleEspressoPlan.yearly.monthlyEquivalent })}
             </p>
           )}
           <p className="relative text-[14.5px] text-text-secondary mb-7">
-            {doubleEspressoPlan.subtitle}
+            {t('pricing.doubleEspresso.subtitle')}
           </p>
 
           <ul className="relative space-y-3 mb-8 flex-1">
-            {doubleEspressoPlan.features.map((f) => (
-              <li key={f.text} className="flex items-center gap-2.5">
-                <Check size={15} className={cn('shrink-0', f.roadmap ? 'text-text-tertiary' : 'text-green')} strokeWidth={2.5} />
-                <span className={cn('text-[15px]', f.roadmap ? 'text-text-tertiary' : 'text-text-secondary')}>
-                  {f.text}
-                  {f.roadmap && (
-                    <span className="ml-1.5 text-[11px] font-medium px-1.5 py-px rounded-full bg-cream-3/60 text-text-tertiary">
-                      Roadmap
-                    </span>
-                  )}
-                </span>
-              </li>
-            ))}
+            {doubleEspressoPlan.features.map((key) => {
+              const isRoadmap = doubleEspressoPlan.roadmap.has(key);
+              return (
+                <li key={key} className="flex items-center gap-2.5">
+                  <Check size={15} className={cn('shrink-0', isRoadmap ? 'text-text-tertiary' : 'text-green')} strokeWidth={2.5} />
+                  <span className={cn('text-[15px]', isRoadmap ? 'text-text-tertiary' : 'text-text-secondary')}>
+                    {t(`pricing.doubleEspresso.features.${key}`)}
+                    {isRoadmap && (
+                      <span className="ml-1.5 text-[11px] font-medium px-1.5 py-px rounded-full bg-cream-3/60 text-text-tertiary">
+                        {t('pricing.doubleEspresso.roadmapBadge')}
+                      </span>
+                    )}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
 
           <button
             disabled
             className="relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-[15px] font-medium bg-cream-3/60 text-text-tertiary border border-cream-3 cursor-not-allowed no-underline"
           >
-            Coming soon
+            {t('pricing.doubleEspresso.comingSoon')}
           </button>
         </motion.div>
       </div>
@@ -322,7 +311,7 @@ export function PricingSection() {
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay: 0.4 }}
       >
-        No credit card required to start. Upgrade anytime from your dashboard.
+        {t('pricing.footnote')}
       </motion.p>
     </section>
   );
