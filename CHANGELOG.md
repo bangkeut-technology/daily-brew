@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.79.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.78.0...v1.79.0) (2026-05-28)
+
+
+### Features
+
+* **i18n:** translate /features index page to French and Khmer ([#186](https://github.com/bangkeut-technology/daily-brew/issues/186)) ([5991d3b](https://github.com/bangkeut-technology/daily-brew/commit/5991d3b29799cbe9fd6d5bd7e3c0f0a232677807))
+
 ## [1.78.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.77.0...v1.78.0) (2026-05-28)
 
 
