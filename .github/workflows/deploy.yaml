@@ -46,6 +46,10 @@ jobs:
                                      # produces `.next/standalone/server.js`. Per Next docs the
                                      # static + public assets aren't auto-copied — do it here so
                                      # `node .next/standalone/server.js` runs self-contained.
+                                     # Clear stale copies from previous deploys first — `cp -R src dst`
+                                     # where `dst` exists nests the source inside it (would end up at
+                                     # `.next/standalone/.next/static/static/` on re-deploys).
+                                     sudo rm -rf .next/standalone/.next/static .next/standalone/public
                                      sudo cp -R .next/static .next/standalone/.next/static
                                      sudo cp -R public .next/standalone/public
                                      cd ..
