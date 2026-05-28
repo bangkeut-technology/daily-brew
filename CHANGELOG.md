@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.75.7](https://github.com/bangkeut-technology/daily-brew/compare/v1.75.6...v1.75.7) (2026-05-28)
+
+
+### Bug Fixes
+
+* **admin/cron:** prevent Radix Dialog from clobbering CustomSelect picks ([#174](https://github.com/bangkeut-technology/daily-brew/issues/174)) ([d582ddf](https://github.com/bangkeut-technology/daily-brew/commit/d582ddf0784684892f3793f1240487eb340f3688))
+
 ## [1.75.6](https://github.com/bangkeut-technology/daily-brew/compare/v1.75.5...v1.75.6) (2026-05-28)
 
 
