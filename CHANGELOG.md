@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.75.4](https://github.com/bangkeut-technology/daily-brew/compare/v1.75.3...v1.75.4) (2026-05-28)
+
+
+### Bug Fixes
+
+* **ui:** CustomSelect option click (revert capture stopProp, use mousedown preventDefault) ([#166](https://github.com/bangkeut-technology/daily-brew/issues/166)) ([662b0d2](https://github.com/bangkeut-technology/daily-brew/commit/662b0d2fed0c963e8b1f3098af728a5f4be942c4))
+
 ## [1.75.3](https://github.com/bangkeut-technology/daily-brew/compare/v1.75.2...v1.75.3) (2026-05-28)
 
 
