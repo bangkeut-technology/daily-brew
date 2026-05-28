@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.75.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.75.1...v1.75.2) (2026-05-28)
+
+
+### Bug Fixes
+
+* **cron:** rename daily-summary command in registry + migrate existing schedule rows ([#162](https://github.com/bangkeut-technology/daily-brew/issues/162)) ([57f7f89](https://github.com/bangkeut-technology/daily-brew/commit/57f7f89e51324772415a76395d79e5e003dd7114))
+
 ## [1.75.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.75.0...v1.75.1) (2026-05-28)
 
 
