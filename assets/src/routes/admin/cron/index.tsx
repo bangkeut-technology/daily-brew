@@ -456,7 +456,16 @@ function ScheduleFormDialog({
     <Dialog.Root open onOpenChange={(o) => !o && onClose()}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100%-2rem)] max-w-[460px] bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl shadow-[0_16px_50px_rgba(107,66,38,0.15)] outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95">
+        <Dialog.Content
+          // CustomSelect portals its menu to document.body (outside Dialog.Content's
+          // DOM tree). Radix interprets a click on that menu as an outside interaction
+          // and dismisses the dialog; the dismissal's onClose → setForm(null) clobbers
+          // the option click's setForm({...form, command}) in the same React batch.
+          // Net effect: dropdown closes, no value selected. Matches the pattern used
+          // by LeaveRequestModal / AttendanceEdit / AttendanceCreate.
+          onInteractOutside={(e) => e.preventDefault()}
+          className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100%-2rem)] max-w-[460px] bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl shadow-[0_16px_50px_rgba(107,66,38,0.15)] outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
+        >
           <div className="p-5 border-b border-cream-3/60 flex items-center justify-between">
             <div>
               <Dialog.Title className="text-[17px] font-semibold text-text-primary font-serif">
