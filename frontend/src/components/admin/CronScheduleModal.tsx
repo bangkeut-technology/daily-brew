@@ -88,7 +88,15 @@ export function CronScheduleModal({ open, onOpenChange, schedule }: Props) {
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px]" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-[440px] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-glass-border bg-glass-bg shadow-[0_16px_50px_rgba(107,66,38,0.15)] outline-none backdrop-blur-xl">
+        <Dialog.Content
+          // CustomSelect portals its menu to document.body (outside Dialog.Content's
+          // DOM tree). Radix interprets a click on that menu as an outside interaction
+          // and dismisses the dialog; the dismissal's onClose clobbers the option
+          // click's state update in the same React batch. Net effect: dropdown closes,
+          // no value selected. Mirrors the legacy SPA fix.
+          onInteractOutside={(e) => e.preventDefault()}
+          className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-[440px] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-glass-border bg-glass-bg shadow-[0_16px_50px_rgba(107,66,38,0.15)] outline-none backdrop-blur-xl"
+        >
           <form onSubmit={handleSubmit(onSubmit)} className="p-6">
             <Dialog.Title className="font-serif text-[20px] font-semibold text-text-primary">
               {isEdit ? "Edit schedule" : "New schedule"}
