@@ -1,0 +1,108 @@
+# dailybrew.conf.example — nginx config for the Phase 6 cutover
+#
+# Routes API/OAuth/well-known to PHP-FPM (Symfony), everything else to Next.js
+# on 127.0.0.1:3000 (dailybrew-next.service).
+#
+# This is a REFERENCE config. The operator must:
+#   1. Take the operative `server` block from /etc/nginx/sites-available/dailybrew.conf
+#      (TLS cert paths, server_name, ssl_*, log paths) and keep those intact.
+#   2. Replace the `location` blocks with the ones in this file.
+#   3. Test with `nginx -t`, then `systemctl reload nginx`.
+#
+# Rollback: keep a copy of the pre-cutover file
+#   sudo cp /etc/nginx/sites-available/dailybrew.conf{,.pre-cutover}
+# and restore it if anything misbehaves. The Next process can keep running; it
+# just won't receive traffic.
+
+upstream dailybrew_php {
+    # Match the existing site's fastcgi target.
+    # PHP 8.5 socket per CLAUDE.md / deploy.yaml.
+    server unix:/run/php/php8.5-fpm.sock;
+}
+
+upstream dailybrew_next {
+    server 127.0.0.1:3000;
+    # Keepalive matters at this hop: Next is on the same box.
+    keepalive 32;
+}
+
+server {
+    # ---- KEEP YOUR EXISTING LINES ----
+    # listen 443 ssl http2;
+    # server_name dailybrew.work www.dailybrew.work;
+    # ssl_certificate     /etc/letsencrypt/live/dailybrew.work/fullchain.pem;
+    # ssl_certificate_key /etc/letsencrypt/live/dailybrew.work/privkey.pem;
+    # include /etc/letsencrypt/options-ssl-nginx.conf;
+    # ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+    # access_log /var/log/nginx/dailybrew.access.log;
+    # error_log  /var/log/nginx/dailybrew.error.log;
+    # ---------------------------------
+
+    root  /var/www/dailybrew/public;
+    index index.php;
+
+    client_max_body_size 25M;
+
+    # Maintenance mode: deploy.yaml touches public/.maintenance at the start
+    # and removes it at the end. Serve a static page while it's present.
+    if (-f $document_root/.maintenance) {
+        return 503;
+    }
+    error_page 503 @maintenance;
+    location @maintenance {
+        rewrite ^(.*)$ /maintenance.html break;
+    }
+
+    # ---- API surface — straight to PHP-FPM, never through Next ----
+
+    location ~ ^/api(/|$) {
+        try_files $uri /index.php$is_args$args;
+    }
+    location ~ ^/oauth(/|$) {
+        try_files $uri /index.php$is_args$args;
+    }
+    location ~ ^/\.well-known(/|$) {
+        try_files $uri /index.php$is_args$args;
+    }
+
+    # PHP-FPM handler used by the three locations above.
+    location ~ ^/index\.php(/|$) {
+        fastcgi_pass dailybrew_php;
+        fastcgi_split_path_info ^(.+\.php)(/.*)$;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        fastcgi_param DOCUMENT_ROOT  $realpath_root;
+        internal;
+    }
+    # Block direct access to any other .php file.
+    location ~ \.php$ {
+        return 404;
+    }
+
+    # ---- Static assets Symfony still owns ----
+    # The legacy SPA bundle stays on disk during the bake period in case we
+    # need to roll back. Decommission PR (post-bake) deletes /public/build.
+    location ~ ^/(build|bundles|maintenance\.html|robots\.txt|favicon\.ico|apple-touch-icon\.png|sw\.js)(/|$) {
+        access_log off;
+        expires 7d;
+        add_header Cache-Control "public, max-age=604800, immutable";
+        try_files $uri =404;
+    }
+
+    # ---- Everything else → Next.js ----
+
+    location / {
+        proxy_pass http://dailybrew_next;
+        proxy_http_version 1.1;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host  $host;
+        # Required for upstream keepalive.
+        proxy_set_header Connection "";
+        # Next streams responses; let nginx flush them.
+        proxy_buffering off;
+        proxy_read_timeout 60s;
+    }
+}

@@ -106,3 +106,13 @@ npm ci && npm run router:generate && npm run dev
 php bin/console dailybrew:send-daily-summary       # cron daily ~18:00
 php bin/console dailybrew:admin:promote-user <email>
 ```
+
+## Phase 6 (Next.js cutover) — prep checked in, not applied
+
+Both frontends ship in every release: the legacy SPA stays the default until the prod nginx proxy is flipped. Infra for the flip lives at:
+
+- `deploy/systemd/dailybrew-next.service.example` — Node standalone server unit
+- `deploy/nginx/dailybrew.conf.example` — reverse-proxy site (PHP-FPM for `/api`+`/oauth`+`/.well-known`, Next on `127.0.0.1:3000` for everything else)
+- `deploy/CUTOVER.md` — pre-flight, cutover, rollback, bake, decommission
+
+`deploy.yaml` builds `frontend/.next/standalone/server.js` on every release and gracefully no-ops `systemctl restart dailybrew-next` when the unit isn't installed yet — so SPA serves until the operator runs the cutover steps on the host.
