@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.75.3](https://github.com/bangkeut-technology/daily-brew/compare/v1.75.2...v1.75.3) (2026-05-28)
+
+
+### Bug Fixes
+
+* **ui:** CustomSelect option click swallowed inside Radix Dialog ([#164](https://github.com/bangkeut-technology/daily-brew/issues/164)) ([39b7485](https://github.com/bangkeut-technology/daily-brew/commit/39b7485da5ab8960c79b0946607dde39e7f1c4bf))
+
 ## [1.75.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.75.1...v1.75.2) (2026-05-28)
 
 
