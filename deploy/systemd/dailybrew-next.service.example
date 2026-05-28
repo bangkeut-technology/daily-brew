@@ -1,0 +1,70 @@
+# dailybrew-next.service — systemd unit for the Next.js frontend
+#
+# Provisioning (one-time, manual, on the production host):
+#   sudo cp /var/www/dailybrew/deploy/systemd/dailybrew-next.service.example \
+#           /etc/systemd/system/dailybrew-next.service
+#   sudo $EDITOR /etc/systemd/system/dailybrew-next.service   # set the placeholders below
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now dailybrew-next
+#   systemctl status dailybrew-next
+#
+# Placeholders to set:
+#   WorkingDirectory       absolute path to .next/standalone (see below)
+#   NEXT_PUBLIC_*          must match the values baked into the legacy SPA today;
+#                          deploy.yaml currently exposes them via window.__DAILYBREW__
+#
+# The unit is intentionally NOT committed to /etc/systemd/system/ via deploy.yaml —
+# it's a host-level concern that should be provisioned once by the operator.
+# `deploy.yaml` already gracefully no-ops `systemctl restart dailybrew-next` if the
+# unit isn't installed, so the legacy SPA keeps serving until you flip the proxy.
+
+[Unit]
+Description=DailyBrew Next.js frontend (standalone)
+Documentation=file:///var/www/dailybrew/deploy/CUTOVER.md
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+
+# `next build` with `output: "standalone"` (set in frontend/next.config.ts)
+# produces `frontend/.next/standalone/server.js` plus the static + public assets
+# that deploy.yaml copies into place. Run server.js from inside that directory.
+WorkingDirectory=/var/www/dailybrew/frontend/.next/standalone
+ExecStart=/usr/bin/node server.js
+
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGINT
+TimeoutStopSec=30
+
+# Runtime environment
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=HOSTNAME=127.0.0.1
+
+# Internal Symfony origin. In prod nginx routes /api, /oauth, and
+# /.well-known directly to PHP-FPM, so Next never proxies through here
+# in serving paths. This stays set as a fallback for server-side code
+# that may explicitly call the Symfony origin.
+Environment=SYMFONY_ORIGIN=http://127.0.0.1:8000
+
+# Public client-side config — match what the legacy SPA exposes today
+# via window.__DAILYBREW__. NEXT_PUBLIC_* are baked at build time so
+# changing them here only takes effect after a re-deploy.
+Environment=NEXT_PUBLIC_APPLE_CLIENT_ID=
+Environment=NEXT_PUBLIC_CONTACT_EMAIL=support@mail.dailybrew.work
+Environment=NEXT_PUBLIC_GA_MEASUREMENT_ID=
+Environment=NEXT_PUBLIC_GOOGLE_CLIENT_ID=
+Environment=NEXT_PUBLIC_MAX_FREE_EMPLOYEES=10
+Environment=NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=
+
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

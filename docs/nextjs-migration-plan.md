@@ -113,6 +113,23 @@ The marketing surface grows well beyond the current ~23 pages. The engineering j
 - **Bake period:** keep the legacy SPA build deployable for ~1–2 weeks; watch auth (esp. iOS refresh), error rates, Search Console.
 - **Decommission (after bake):** delete `SpaController`, `templates/page` + SEO Twig, Encore config, `react-helmet-async`, TanStack Router, `routeTree.gen`, and the now-superseded `SeoMetaResolver`.
 
+**Phase 6 prep (2026-05-28):** infra files and the operator runbook are checked
+into the repo but **not applied to prod**. Cutover is a single nginx swap done
+on the host by the operator when ready — see [`deploy/CUTOVER.md`](../deploy/CUTOVER.md).
+
+What's in the repo now:
+- `deploy/systemd/dailybrew-next.service.example` — Node + standalone server, env vars, hardening flags
+- `deploy/nginx/dailybrew.conf.example` — `/api`+`/oauth`+`/.well-known` → PHP-FPM, everything else → `127.0.0.1:3000` (Next), maintenance-mode short-circuit included
+- `deploy/CUTOVER.md` — pre-flight, cutover, rollback, bake monitoring, decommission checklist
+
+What's still on the operator to do:
+1. Copy `dailybrew-next.service.example` into `/etc/systemd/system/` and edit env vars
+2. Reload + start the Next service (it's a dark canary until the proxy flips)
+3. Swap the nginx site config and `systemctl reload nginx` — that's the cutover
+
+`deploy.yaml` already builds Next on every release and gracefully no-ops the
+`systemctl restart dailybrew-next` when the unit isn't installed yet.
+
 ## 6. Cross-cutting risks & landmines
 
 - **Auth cookies (critical):** preserve same-origin or auth breaks. The `BEARER` cookie `path=/api/v1` + refresh firewall + iOS quirk must keep functioning. Test on real iOS Safari each auth-touching phase.
