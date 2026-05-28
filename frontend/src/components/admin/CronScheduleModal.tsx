@@ -20,7 +20,7 @@ const schema = z.object({
   name: z.string().trim().min(1, "Required"),
   cronExpression: z.string().trim().min(1, "e.g. 0 18 * * *"),
   arguments: z.string().optional(),
-  priority: z.coerce.number().int(),
+  priority: z.number().int(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -134,7 +134,7 @@ export function CronScheduleModal({ open, onOpenChange, schedule }: Props) {
                 </div>
                 <div>
                   <label htmlFor="priority" className="mb-1 block text-[13px] font-medium text-text-secondary">Priority</label>
-                  <input id="priority" type="number" className={inputClass} {...register("priority")} />
+                  <input id="priority" type="number" className={inputClass} {...register("priority", { valueAsNumber: true })} />
                 </div>
               </div>
               <div>
