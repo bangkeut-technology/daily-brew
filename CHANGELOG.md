@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.78.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.77.0...v1.78.0) (2026-05-28)
+
+
+### Features
+
+* **i18n:** add language switcher to nav, footer, sidebar, and auth screens ([#184](https://github.com/bangkeut-technology/daily-brew/issues/184)) ([e598c02](https://github.com/bangkeut-technology/daily-brew/commit/e598c02d602aa48f7bd5f6b990f7c96456c55fe1))
+
 ## [1.77.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.76.0...v1.77.0) (2026-05-28)
 
 
