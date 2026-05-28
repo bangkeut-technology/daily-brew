@@ -155,15 +155,21 @@ export function CustomSelect({
                   <button
                     key={option.value}
                     type="button"
-                    // preventDefault on mousedown stops the option from taking
-                    // focus, which is what triggers Radix Dialog's FocusScope
-                    // (the menu is portaled to document.body, outside the
-                    // Dialog.Content DOM tree, so the focus-trap classifies
-                    // the option as "outside" and redirects focus away —
-                    // disrupting the mousedown→mouseup→click sequence the
-                    // browser uses to fire onClick). Click still fires
-                    // normally; focus stays on the trigger.
-                    onMouseDown={(e) => e.preventDefault()}
+                    // Trigger selection directly on mousedown (after
+                    // preventDefault to keep focus on the trigger). Inside a
+                    // Radix Dialog with FocusScope active, the
+                    // mousedown→mouseup→click sequence is unreliable on
+                    // portaled options. Firing on mousedown bypasses
+                    // click-event generation entirely; setOpen(false)
+                    // unmounts the portal before a stray click can
+                    // double-fire. onClick stays as the keyboard
+                    // (Enter/Space) fallback.
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      onChange(option.value);
+                      setOpen(false);
+                      setSearch("");
+                    }}
                     onClick={() => {
                       onChange(option.value);
                       setOpen(false);
