@@ -33,6 +33,29 @@ jobs:
                                      sudo npm ci --legacy-peer-deps
                                      sudo npm run router:generate
                                      sudo npm run build
+                                     # ---- Next.js frontend (Phase 6 cutover prep) ----
+                                     # Build the Next app alongside the legacy SPA. The systemd unit
+                                     # `dailybrew-next.service` (provisioned manually on the host)
+                                     # serves traffic nginx routes to it. Until the proxy flip the
+                                     # SPA remains the default; this just keeps the build artifacts
+                                     # ready so the cutover is a single nginx change.
+                                     cd frontend
+                                     sudo npm ci
+                                     sudo npm run build
+                                     # `next.config.ts` sets `output: "standalone"`, so the build
+                                     # produces `.next/standalone/server.js`. Per Next docs the
+                                     # static + public assets aren't auto-copied — do it here so
+                                     # `node .next/standalone/server.js` runs self-contained.
+                                     sudo cp -R .next/static .next/standalone/.next/static
+                                     sudo cp -R public .next/standalone/public
+                                     cd ..
                                      sudo chown -R www-data:www-data ${{ secrets.PROJECT_FOLDER }}
                                      sudo rm -f public/.maintenance
                                      sudo systemctl restart php8.5-fpm
+                                     # Restart the Next process only if its unit has been
+                                     # provisioned. During the pre-cutover phase the unit may not
+                                     # exist; the build artifacts are still produced for when it
+                                     # does, and the deploy doesn't fail.
+                                     if systemctl list-unit-files dailybrew-next.service >/dev/null 2>&1; then
+                                       sudo systemctl restart dailybrew-next
+                                     fi
