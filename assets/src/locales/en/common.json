@@ -404,5 +404,129 @@
       "text": "Still have questions? We are happy to help.",
       "button": "Contact support"
     }
+  },
+  "features": {
+    "index": {
+      "eyebrow": "Features",
+      "title": "Everything you need to track attendance",
+      "subtitle": "From QR check-in to geofencing — simple tools that work for restaurants of any size.",
+      "learnMore": "Learn more",
+      "sections": {
+        "coreEyebrow": "Included in all plans",
+        "espressoBadge": "Espresso plan",
+        "espressoPill": "Espresso"
+      },
+      "core": {
+        "qrCheckin": {
+          "title": "QR code check-in",
+          "desc": "Display one QR code at your restaurant. Staff scan it from the DailyBrew app to check in and out — no extra hardware needed."
+        },
+        "employeeManagement": {
+          "title": "Employee management",
+          "desc": "Add staff, assign them to shifts, and track their attendance history. Manage active and inactive employees from one screen."
+        },
+        "shiftTracking": {
+          "title": "Shift tracking",
+          "desc": "Define morning, evening, or custom shifts with start and end times. Late arrivals and early departures are flagged automatically with configurable grace periods."
+        },
+        "closurePeriods": {
+          "title": "Closure periods",
+          "desc": "Mark holidays, renovations, or any days your restaurant is closed. Attendance is paused automatically — no false absences."
+        },
+        "realtimeDashboard": {
+          "title": "Real-time dashboard",
+          "desc": "See who is present, late, on leave, or absent at a glance. Owner and employee dashboards with live stats and recent history."
+        },
+        "multiLanguage": {
+          "title": "Multi-language",
+          "desc": "Available in English, French, and Khmer. Staff can use the app in the language they are most comfortable with."
+        }
+      },
+      "featured": {
+        "ipRestriction": {
+          "title": "IP restriction",
+          "tag": "Security",
+          "desc": "Lock check-ins to your restaurant's WiFi or network. If staff aren't on an approved IP, they can't clock in — no remote punching.",
+          "highlights": [
+            "Lock to restaurant WiFi",
+            "Block remote check-ins",
+            "\"Use my current IP\" auto-setup"
+          ]
+        },
+        "deviceVerification": {
+          "title": "Device verification",
+          "tag": "Anti-fraud",
+          "desc": "Each employee must check in and out from the same device per day. Stops buddy punching — a colleague can't clock out on someone else's phone.",
+          "highlights": [
+            "One device per employee per day",
+            "Prevents buddy punching",
+            "Zero setup for staff"
+          ]
+        },
+        "geofencing": {
+          "title": "Geofencing",
+          "tag": "Location",
+          "desc": "Draw a virtual perimeter around your restaurant. Staff must be physically within the GPS radius to check in — configurable from 50m to 5,000m.",
+          "highlights": [
+            "GPS location verification",
+            "Configurable radius (50–5,000m)",
+            "One-time browser prompt"
+          ]
+        },
+        "rolesPermissions": {
+          "title": "Roles and permissions",
+          "tag": "Delegation",
+          "desc": "Promote trusted staff to managers and choose exactly which areas they can administer — employees, shifts, closures, leave, attendance — toggle each one on or off per manager. Settings, billing and sub-QR codes always stay with the owner.",
+          "highlights": [
+            "Five granular permission toggles",
+            "Defaults to leave + attendance",
+            "Owner-only: settings & billing"
+          ]
+        },
+        "basilbookIntegration": {
+          "titleSuffix": " integration",
+          "tag": "Integration",
+          "desc": "Connect DailyBrew to your BasilBook accounting system. Link employees by username and let BasilBook pull attendance data via a secure API.",
+          "highlights": [
+            "Link staff by username",
+            "Secure API token authentication",
+            "Automatic data sync"
+          ]
+        }
+      },
+      "espresso": {
+        "perDayShifts": {
+          "title": "Per-day shift schedules",
+          "desc": "Different hours on different days? Override shift times per day of the week. Monday 7-3, Saturday 9-5 — all on the same shift."
+        },
+        "leaveRequests": {
+          "title": "Leave request management",
+          "desc": "Employees submit leave requests (paid or unpaid, full or partial day). Owners approve or reject with a note. Full history and status tracking."
+        },
+        "notifications": {
+          "title": "Push & email notifications",
+          "desc": "Real-time push notifications and email alerts for leave requests, approvals, shift changes, closures, and daily attendance summaries."
+        }
+      },
+      "why": {
+        "title": "Why restaurant teams choose DailyBrew",
+        "subtitle": "Built specifically for restaurants, cafes, and small teams.",
+        "reasons": {
+          "setupFast": "Set up in under 5 minutes",
+          "noHardware": "No hardware — just a printed QR code",
+          "anyPhone": "Works on any smartphone",
+          "darkMode": "Dark mode for late shifts",
+          "languages": "English, French, and Khmer",
+          "free": "Free for up to 10 employees"
+        }
+      },
+      "cta": {
+        "title": "Ready to get started?",
+        "subtitle": "Free for up to 10 employees. No credit card required.",
+        "startFree": "Start free",
+        "comparePlans": "Compare plans",
+        "howItWorks": "See how it works"
+      }
+    }
   }
 }

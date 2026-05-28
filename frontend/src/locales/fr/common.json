@@ -311,5 +311,129 @@
       "text": "Encore des questions ? Nous sommes là pour vous aider.",
       "button": "Contacter le support"
     }
+  },
+  "features": {
+    "index": {
+      "eyebrow": "Fonctionnalités",
+      "title": "Tout ce qu'il faut pour suivre les présences",
+      "subtitle": "Du check-in par QR au géorepérage — des outils simples qui fonctionnent pour les restaurants de toute taille.",
+      "learnMore": "En savoir plus",
+      "sections": {
+        "coreEyebrow": "Inclus dans tous les forfaits",
+        "espressoBadge": "Forfait Espresso",
+        "espressoPill": "Espresso"
+      },
+      "core": {
+        "qrCheckin": {
+          "title": "Check-in par QR code",
+          "desc": "Affichez un code QR à votre restaurant. Le personnel le scanne depuis l'app DailyBrew pour pointer à l'arrivée et au départ — sans matériel supplémentaire."
+        },
+        "employeeManagement": {
+          "title": "Gestion des employés",
+          "desc": "Ajoutez le personnel, assignez-le à des horaires et suivez son historique de présence. Gérez les employés actifs et inactifs depuis un seul écran."
+        },
+        "shiftTracking": {
+          "title": "Suivi des horaires",
+          "desc": "Définissez des horaires du matin, du soir ou personnalisés avec heures de début et de fin. Les retards et départs anticipés sont signalés automatiquement avec des périodes de tolérance configurables."
+        },
+        "closurePeriods": {
+          "title": "Périodes de fermeture",
+          "desc": "Marquez les jours fériés, les rénovations ou tout jour de fermeture de votre restaurant. Les présences sont automatiquement suspendues — aucune fausse absence."
+        },
+        "realtimeDashboard": {
+          "title": "Tableau de bord en temps réel",
+          "desc": "Voyez qui est présent, en retard, en congé ou absent en un coup d'œil. Tableaux de bord pour propriétaires et employés avec statistiques en direct et historique récent."
+        },
+        "multiLanguage": {
+          "title": "Multilingue",
+          "desc": "Disponible en anglais, français et khmer. Le personnel peut utiliser l'app dans la langue qu'il maîtrise le mieux."
+        }
+      },
+      "featured": {
+        "ipRestriction": {
+          "title": "Restriction IP",
+          "tag": "Sécurité",
+          "desc": "Limitez les check-ins au Wi-Fi ou au réseau de votre restaurant. Si le personnel n'est pas sur une IP approuvée, il ne peut pas pointer — aucun pointage à distance.",
+          "highlights": [
+            "Limiter au Wi-Fi du restaurant",
+            "Bloquer les check-ins distants",
+            "Configuration auto « Utiliser mon IP actuelle »"
+          ]
+        },
+        "deviceVerification": {
+          "title": "Vérification d'appareil",
+          "tag": "Anti-fraude",
+          "desc": "Chaque employé doit pointer à l'arrivée et au départ depuis le même appareil pour la journée. Empêche le pointage par collègue — un collaborateur ne peut pas pointer le départ d'un autre depuis son téléphone.",
+          "highlights": [
+            "Un appareil par employé par jour",
+            "Empêche le pointage par collègue",
+            "Aucune configuration pour le personnel"
+          ]
+        },
+        "geofencing": {
+          "title": "Géorepérage",
+          "tag": "Localisation",
+          "desc": "Tracez un périmètre virtuel autour de votre restaurant. Le personnel doit se trouver physiquement dans le rayon GPS pour pointer — configurable de 50 m à 5 000 m.",
+          "highlights": [
+            "Vérification de position GPS",
+            "Rayon configurable (50–5 000 m)",
+            "Invite navigateur unique"
+          ]
+        },
+        "rolesPermissions": {
+          "title": "Rôles et permissions",
+          "tag": "Délégation",
+          "desc": "Promouvez du personnel de confiance au rang de manager et choisissez exactement quelles parties ils peuvent administrer — employés, horaires, fermetures, congés, présences — activez ou désactivez chacune par manager. Paramètres, facturation et sous-codes QR restent toujours réservés au propriétaire.",
+          "highlights": [
+            "Cinq permissions granulaires",
+            "Par défaut : congés + présences",
+            "Réservé au propriétaire : paramètres et facturation"
+          ]
+        },
+        "basilbookIntegration": {
+          "titleSuffix": " intégration",
+          "tag": "Intégration",
+          "desc": "Connectez DailyBrew à votre système de comptabilité BasilBook. Liez les employés par nom d'utilisateur et laissez BasilBook récupérer les données de présence via une API sécurisée.",
+          "highlights": [
+            "Liez le personnel par nom d'utilisateur",
+            "Authentification par jeton API sécurisé",
+            "Synchronisation automatique des données"
+          ]
+        }
+      },
+      "espresso": {
+        "perDayShifts": {
+          "title": "Horaires par jour",
+          "desc": "Horaires différents selon les jours ? Modifiez les heures par jour de la semaine. Lundi 7h-15h, samedi 9h-17h — sur le même horaire."
+        },
+        "leaveRequests": {
+          "title": "Gestion des demandes de congé",
+          "desc": "Les employés soumettent des demandes de congé (payées ou non, journée entière ou partielle). Les propriétaires approuvent ou refusent avec une note. Historique complet et suivi de statut."
+        },
+        "notifications": {
+          "title": "Notifications push et email",
+          "desc": "Notifications push et alertes email en temps réel pour les demandes de congé, approbations, changements d'horaire, fermetures et résumés quotidiens de présence."
+        }
+      },
+      "why": {
+        "title": "Pourquoi les équipes de restaurant choisissent DailyBrew",
+        "subtitle": "Conçu spécialement pour les restaurants, cafés et petites équipes.",
+        "reasons": {
+          "setupFast": "Configuration en moins de 5 minutes",
+          "noHardware": "Sans matériel — juste un code QR imprimé",
+          "anyPhone": "Fonctionne sur n'importe quel smartphone",
+          "darkMode": "Mode sombre pour les services tardifs",
+          "languages": "Anglais, français et khmer",
+          "free": "Gratuit jusqu'à 10 employés"
+        }
+      },
+      "cta": {
+        "title": "Prêt à commencer ?",
+        "subtitle": "Gratuit jusqu'à 10 employés. Aucune carte de crédit requise.",
+        "startFree": "Commencer gratuitement",
+        "comparePlans": "Comparer les forfaits",
+        "howItWorks": "Voir comment ça marche"
+      }
+    }
   }
 }
