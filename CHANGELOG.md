@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.80.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.79.0...v1.80.0) (2026-05-28)
+
+
+### Features
+
+* **i18n:** translate homepage + shared marketing chrome to French and Khmer ([#188](https://github.com/bangkeut-technology/daily-brew/issues/188)) ([22c2ad9](https://github.com/bangkeut-technology/daily-brew/commit/22c2ad9262d0ac1d802ce0e16850ecaceef8f2ef))
+
 ## [1.79.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.78.0...v1.79.0) (2026-05-28)
 
 
