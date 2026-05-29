@@ -1,0 +1,25 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block title %}Missing check-out — {{ employeeName }}{% endblock %}
+
+{% block content %}
+  <h1>Missing check-out</h1>
+  <p>{{ employeeName }} has not checked out from their shift at {{ workspaceName }}.</p>
+
+  <div class="detail-row">
+    <span class="detail-label">Shift</span>
+    <span class="detail-value">{{ shiftName }}</span>
+  </div>
+  <div class="detail-row">
+    <span class="detail-label">Checked in at</span>
+    <span class="detail-value">{{ checkInTime }}</span>
+  </div>
+  <div class="detail-row">
+    <span class="detail-label">Shift ended at</span>
+    <span class="detail-value">{{ shiftEnd }}</span>
+  </div>
+  <div class="detail-row">
+    <span class="detail-label">Expected by</span>
+    <span class="detail-value">{{ expectedTime }}</span>
+  </div>
+{% endblock %}
