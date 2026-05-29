@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.92.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.91.0...v1.92.0) (2026-05-29)
+
+
+### Features
+
+* **hero:** savings + no-biometrics callout pill between subtitle and CTAs ([#225](https://github.com/bangkeut-technology/daily-brew/issues/225)) ([1e45fc2](https://github.com/bangkeut-technology/daily-brew/commit/1e45fc27e639d2281e7894d292ec8eb2c2c5f0e6))
+
 ## [1.91.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.90.0...v1.91.0) (2026-05-29)
 
 
