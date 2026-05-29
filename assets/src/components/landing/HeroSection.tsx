@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { ChevronRight, QrCode, CheckCircle, Clock, Users, Shield, Nfc, Smartphone } from 'lucide-react';
+import { ChevronRight, QrCode, CheckCircle, Clock, Users, Shield, Nfc, Smartphone, Coins } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
@@ -75,13 +75,31 @@ export function HeroSection() {
             </motion.h1>
 
             <motion.p
-              className="text-[18px] md:text-[19px] text-text-secondary mb-8 max-w-lg leading-relaxed"
+              className="text-[18px] md:text-[19px] text-text-secondary mb-6 max-w-lg leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
               {t('homepage.hero.subtitle')}
             </motion.p>
+
+            {/* Savings + no-biometrics callout. Single sentence so it sits
+                between the subtitle and the CTAs without crowding either.
+                The savings claim leans on Nucleus Research's 2.2% number
+                (the same figure cited on /stop-buddy-punching and the
+                buddy-punching blog post) so the marketing surface stays
+                internally consistent. */}
+            <motion.div
+              className="inline-flex items-start gap-2.5 mb-8 max-w-lg px-3.5 py-2.5 rounded-xl bg-coffee/[0.05] border border-coffee/15"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.25 }}
+            >
+              <Coins size={16} className="text-coffee mt-0.5 shrink-0" />
+              <p className="text-[14px] leading-relaxed text-text-primary">
+                {t('homepage.hero.savingsCallout')}
+              </p>
+            </motion.div>
 
             <motion.div
               className="flex flex-col sm:flex-row items-start gap-3"
