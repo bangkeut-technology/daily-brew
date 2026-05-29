@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.90.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.89.0...v1.90.0) (2026-05-29)
+
+
+### Features
+
+* **notifications,settings:** live Telegram check-in/out alerts (Espresso+, opt-in) + device-verification copy fix ([#221](https://github.com/bangkeut-technology/daily-brew/issues/221)) ([d834abe](https://github.com/bangkeut-technology/daily-brew/commit/d834abe9b6dfa8800d26df3d4935f0754ed71bf0))
+
 ## [1.89.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.88.0...v1.89.0) (2026-05-29)
 
 
