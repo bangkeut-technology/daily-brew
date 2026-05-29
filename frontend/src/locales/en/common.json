@@ -278,7 +278,7 @@
     "planLargeTeams": "For large teams",
     "planTrialLabel": "Trial",
     "planCurrentLabel": "Current",
-    "featureUpTo10": "Up to 10 employees",
+    "featureUpTo10": "Up to 10 active employees",
     "featureUpTo20": "Up to 20 employees",
     "featureUnlimited": "Unlimited employees",
     "featureQrCheckin": "QR code check-in",
@@ -555,7 +555,7 @@
       "whatIsDailybrew": "DailyBrew is a staff attendance tracking platform built for restaurants. It provides QR code check-in, shift management, closure periods, and leave request handling, all in one simple dashboard.",
       "whoIsItFor": "DailyBrew is designed for restaurant owners, managers, and staff. Owners manage the workspace, shifts, and employees. Managers receive only the permissions you grant them — for example leave approvals, attendance oversight, employee management, or any combination. Staff check in and out by scanning the workspace QR code.",
       "mobileApp": "Staff check-in works entirely through the mobile web browser. When an employee scans their QR code, a mobile-optimized check-in page opens instantly. No app download is required.",
-      "freePlan": "The Free plan includes up to 10 employees, QR check-in, shift tracking, closure periods, and the attendance dashboard. It is free forever with no time limit.",
+      "freePlan": "The Free plan includes up to 10 active employees, QR check-in, shift tracking, closure periods, and the attendance dashboard. It is free forever with no time limit.",
       "espressoPlan": "Espresso supports up to 20 employees and adds leave request management, IP restriction, device verification, geofencing, per-day shift schedules, manager role with granular permissions (up to 2), push and email notifications, and daily attendance summaries.",
       "espressoCost": "Espresso costs $14.99 per month, or $149 per year if you choose annual billing. The yearly plan saves you $30.88 compared to paying monthly.",
       "cancelAnytime": "Yes, there are no contracts or lock-in periods. You can cancel your Espresso subscription at any time from your dashboard Settings. After cancellation, you will continue to have access until the end of your current billing period.",
@@ -689,12 +689,12 @@
           "anyPhone": "Works on any smartphone",
           "darkMode": "Dark mode for late shifts",
           "languages": "English, French, and Khmer",
-          "free": "Free for up to 10 employees"
+          "free": "Free for up to 10 active employees"
         }
       },
       "cta": {
         "title": "Ready to get started?",
-        "subtitle": "Free for up to 10 employees. No credit card required.",
+        "subtitle": "Free for up to 10 active employees. No credit card required.",
         "startFree": "Start free",
         "comparePlans": "Compare plans",
         "howItWorks": "See how it works"
@@ -746,7 +746,7 @@
   },
   "homepage": {
     "hero": {
-      "badge": "Free for up to 10 employees",
+      "badge": "Free for up to 10 active employees",
       "titleLine1": "Staff attendance,",
       "titleLine2": "brewed simply.",
       "subtitle": "One QR code at your restaurant. Staff scan to check in. You see who's here, who's late, and who's on leave — all in real time.",
@@ -964,7 +964,7 @@
       "subtitle": "For small teams getting started",
       "cta": "Get started",
       "features": {
-        "employees10": "Up to 10 employees",
+        "employees10": "Up to 10 active employees",
         "qrCheckIn": "Workspace QR code check-in",
         "shifts": "Shift management",
         "closures": "Closure periods",
@@ -1302,7 +1302,7 @@
       },
       "cta": {
         "title": "Ready to simplify attendance?",
-        "subtitle": "Free for up to 10 employees. No credit card required.",
+        "subtitle": "Free for up to 10 active employees. No credit card required.",
         "getStartedFree": "Get started free",
         "viewFeatures": "View all features"
       }

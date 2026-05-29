@@ -17,16 +17,7 @@ export interface BlogPost {
  *
  * Roadmap (docs/nextjs-migration-plan.md → SEO strategy §6): 12 anchor posts.
  */
-export const POSTS: BlogPost[] = [
-  {
-    slug: "three-factor-attendance-banking-security",
-    title: "Three-factor attendance: how banking-app security came to the time clock",
-    description:
-      "Your bank doesn't trust your password alone. Here's why device, network, and a physical tap make buddy punching mechanically impossible — without a single biometric.",
-    date: "2026-05-27",
-    tags: ["three-factor", "buddy-punching", "narrative"],
-  },
-];
+export const POSTS: BlogPost[] = [];
 
 export function getAllPosts(): BlogPost[] {
   return [...POSTS].sort((a, b) => (a.date < b.date ? 1 : -1));

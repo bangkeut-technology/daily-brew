@@ -58,7 +58,7 @@ const FAQ = [
   {
     question: "Is NFC tap available now?",
     answer:
-      "NFC tap-to-clock-in is in beta. QR + device + IP verification is fully shipped and free for teams of 10 or fewer, and the NFC tap runs through the same verification stack.",
+      "NFC tap-to-clock-in is in beta. QR + device + IP verification is fully shipped and free for up to 10 active employees, and the NFC tap runs through the same verification stack.",
   },
 ];
 
@@ -135,7 +135,7 @@ export default function ThreeFactorAttendancePage() {
             Honest timesheets before the morning rush
           </h2>
           <p className="mx-auto mt-3 max-w-md text-text-secondary">
-            Free for teams of 10 or fewer. No credit card, no hardware to buy.
+            Free for up to 10 active employees. No credit card, no hardware to buy.
           </p>
           <Link
             href="/sign-up"
