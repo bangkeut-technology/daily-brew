@@ -1,17 +1,20 @@
 import { Link } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useFeatures } from '@/hooks/queries/useFeatures';
-import { playbooks, type Playbook } from './playbooks';
+import { usePlaybooks, type PlaybookKey } from './playbooks';
 
 type Props = {
-  currentKey: Playbook['key'];
+  currentKey: PlaybookKey;
 };
 
 /** Shows the non-current playbook cards as sibling links. */
 export function ContinueReading({ currentKey }: Props) {
+  const { t } = useTranslation();
   const { data: features } = useFeatures();
-  const siblings = playbooks.filter((p) => {
+  const all = usePlaybooks();
+  const siblings = all.filter((p) => {
     if (p.key === currentKey) return false;
     if (p.key === 'nfc') return features?.flags?.nfc_checkin === true;
     return true;
@@ -21,20 +24,20 @@ export function ContinueReading({ currentKey }: Props) {
       <div className="mb-5 flex items-end justify-between gap-4">
         <div>
           <p className="text-[12px] uppercase tracking-[2px] font-medium text-amber mb-1">
-            Continue reading
+            {t('playbooks.continueReading.eyebrow')}
           </p>
           <h2
             id="continue-reading-heading"
             className="text-[20px] font-semibold text-text-primary font-serif leading-tight"
           >
-            Other guides
+            {t('playbooks.continueReading.title')}
           </h2>
         </div>
         <Link
           to="/guides"
           className="hidden sm:inline-flex items-center gap-1.5 text-[14px] font-semibold text-coffee no-underline hover:underline"
         >
-          All guides
+          {t('playbooks.continueReading.allGuides')}
           <ArrowRight size={14} />
         </Link>
       </div>
@@ -72,7 +75,7 @@ export function ContinueReading({ currentKey }: Props) {
                       {pb.teaser}
                     </p>
                     <div className="mt-2 inline-flex items-center gap-1 text-[12.5px] font-semibold text-coffee">
-                      <span>{pb.steps.length} steps</span>
+                      <span>{t('playbooks.continueReading.stepsCount', { count: pb.steps.length })}</span>
                       <ArrowRight
                         size={12}
                         className="transition-transform group-hover:translate-x-0.5"

@@ -841,5 +841,686 @@
       }
     },
     "footnote": "No credit card required to start. Upgrade anytime from your dashboard."
+  },
+  "playbooks": {
+    "continueReading": {
+      "eyebrow": "Continue reading",
+      "title": "Other guides",
+      "allGuides": "All guides",
+      "stepsCount": "{{count}} steps"
+    },
+    "owner": {
+      "title": "Owner setup",
+      "subtitle": "From sign-up to live attendance, in about 10 minutes.",
+      "teaser": "Create your workspace, define shifts, add staff, and start tracking.",
+      "steps": {
+        "createAccount": {
+          "title": "Create your account",
+          "desc": "Sign up with email, Google, or Apple. No credit card needed.",
+          "linkLabel": "Sign up"
+        },
+        "nameRestaurant": {
+          "title": "Name your restaurant",
+          "desc": "In the onboarding wizard, pick the owner role and give your workspace a name. Timezone auto-detects from your browser."
+        },
+        "defineShifts": {
+          "title": "Define your shifts",
+          "desc": "Console → Shifts. Add Morning, Evening, or any custom shift with start and end times.",
+          "linkLabel": "Open Shifts"
+        },
+        "addEmployees": {
+          "title": "Add your employees",
+          "desc": "Console → Employees → Add. Fill in name and assign a shift. Linking to a user account is optional now — you can do it later from the employee detail page.",
+          "linkLabel": "Add an employee"
+        },
+        "linkUserAccount": {
+          "title": "Link an employee to a user account",
+          "desc": "Open the employee → Link user card → paste the user's public ID (they can copy theirs from Console → Profile). Once linked, the user signs in to see their own attendance, submit leave, and check in via the app. Unlink anytime from the same card.",
+          "linkLabel": "Open Employees"
+        },
+        "displayQr": {
+          "title": "Display the workspace QR",
+          "desc": "Your dashboard shows the QR code. Print it and pin it at the staff entrance — one QR for the whole restaurant.",
+          "linkLabel": "Open Dashboard"
+        },
+        "watchLive": {
+          "title": "Watch attendance live",
+          "desc": "As staff check in, your dashboard updates with present, late, on leave, and absent counts.",
+          "linkLabel": "Open Attendance"
+        },
+        "approveLeaveClosures": {
+          "title": "Approve leave and schedule closures",
+          "desc": "Review leave requests on the Leave tab. Add closures for holidays so staff are not marked absent.",
+          "linkLabel": "Review leave requests"
+        }
+      }
+    },
+    "employee": {
+      "title": "Employee day-to-day",
+      "subtitle": "Check in, check out, and request time off from your phone.",
+      "teaser": "Install the app, link to your workspace, and scan the QR to clock in.",
+      "steps": {
+        "installApp": {
+          "title": "Install the DailyBrew app",
+          "desc": "Available free on the App Store and Google Play."
+        },
+        "signIn": {
+          "title": "Sign in",
+          "desc": "Use email, Google, or Apple — the same account works on every phone you sign in from.",
+          "linkLabel": "Sign in"
+        },
+        "linkRecord": {
+          "title": "Link to your employee record",
+          "desc": "Two ways: (a) your owner pastes your user public ID — find it on Console → Profile — into the Link user card on your employee page; or (b) you paste the employee public ID your owner shares into the onboarding wizard or Console → Profile → Link to a workspace. You can link to several workspaces if you work at more than one restaurant.",
+          "linkLabel": "Open Profile"
+        },
+        "scanQr": {
+          "title": "Scan the QR at the restaurant",
+          "desc": "Point the app at the QR on the wall. The check-in screen opens automatically."
+        },
+        "tapCheckin": {
+          "title": "Tap Check in",
+          "desc": "On-time or Late status appears immediately, based on your assigned shift."
+        },
+        "tapCheckout": {
+          "title": "Tap Check out at the end of your shift",
+          "desc": "Scan the same QR and tap Check out. If device verification is on, you must use the same phone you checked in with."
+        },
+        "submitLeave": {
+          "title": "Submit leave from the Leave tab",
+          "desc": "Pick the dates and type (paid or unpaid). Your owner gets notified and reviews it.",
+          "linkLabel": "Submit leave"
+        }
+      }
+    },
+    "espresso": {
+      "title": "Upgrade to Espresso",
+      "subtitle": "Unlock leave management, geofencing, managers, and BasilBook integration.",
+      "teaser": "Lock check-in to your restaurant, promote managers, and sync with BasilBook.",
+      "steps": {
+        "openSettings": {
+          "title": "Open Settings → Subscription",
+          "desc": "From your dashboard, click Settings, then Upgrade in the Subscription card.",
+          "linkLabel": "Open Settings"
+        },
+        "pickBilling": {
+          "title": "Pick monthly or yearly",
+          "desc": "Monthly is $14.99. Yearly is $149 — about 17% cheaper. A 14-day free trial covers your first run."
+        },
+        "lockCheckin": {
+          "title": "Lock check-in to your restaurant",
+          "desc": "Settings → enable IP restriction (use the \"Use my current IP\" button) or set a geofence with latitude, longitude, and radius (default 100 m).",
+          "linkLabel": "Open IP / Geofence settings"
+        },
+        "enableDeviceVerification": {
+          "title": "Turn on device verification",
+          "desc": "Forces each employee to use the same phone for both check-in and check-out, preventing buddy punching.",
+          "linkLabel": "Open device verification"
+        },
+        "tryNfc": {
+          "title": "Try NFC check-in (optional)",
+          "desc": "Replace the QR scan with a one-second tap against an NFC sticker. NTAG213 tags cost about a dollar each and program in 30 seconds with a free app.",
+          "linkLabel": "Set up NFC check-in"
+        },
+        "promoteManager": {
+          "title": "Promote a manager",
+          "desc": "Employee detail → set role to manager. Managers approve leave and see all attendance, up to 2 per workspace on Espresso.",
+          "linkLabel": "Open Employees"
+        },
+        "connectBasilbook": {
+          "title": "Connect BasilBook",
+          "desc": "Settings → API tokens → Generate. Copy the token once and paste it into BasilBook to sync attendance with your accounting."
+        }
+      }
+    },
+    "nfc": {
+      "title": "Set up NFC check-in",
+      "subtitle": "Replace the QR scan with a one-second tap against an NFC sticker.",
+      "teaser": "Buy stickers, program them with your workspace URL, place them at the counter — staff tap their phone and they're in.",
+      "steps": {
+        "checkEspresso": {
+          "title": "Make sure you're on Espresso",
+          "desc": "NFC check-in is included in Espresso along with geofencing, device verification, and managers. Free plans see a \"Espresso\" badge next to the NFC toggle.",
+          "linkLabel": "Open Settings"
+        },
+        "turnOnNfc": {
+          "title": "Turn on NFC check-in",
+          "desc": "Console → Settings → \"NFC check-in\" card → flip the toggle, then Save. This unlocks the \"Tap NFC tag\" button on each employee's home screen in the mobile app.",
+          "linkLabel": "Open NFC check-in settings"
+        },
+        "copyUrl": {
+          "title": "Copy your check-in URL",
+          "desc": "Console → Dashboard → \"Check-in QR code\" card. Under the QR you'll see a \"For NFC tags\" row with the URL — click the copy icon. The URL looks like https://dailybrew.work/checkin/<your-token>. Each workspace has its own URL, so if you run multiple restaurants copy each one separately.",
+          "linkLabel": "Open Dashboard"
+        },
+        "buyStickers": {
+          "title": "Buy NTAG213 NFC stickers",
+          "desc": "NTAG213 holds 137 bytes — plenty for our URL — and runs about $0.50–$1 each. Search \"NTAG213 sticker\" on Amazon or Lazada. Get round stickers for the host stand, PVC cards for the till, or key fobs for managers. NTAG215 (504 bytes) works too if you want headroom."
+        },
+        "installApp": {
+          "title": "Install a free tag-writing app",
+          "desc": "On the phone you'll use to program the tags, install \"NFC Tools\" (wakdev, free on iOS and Android) or NXP \"TagWriter\" on Android. You only need this once."
+        },
+        "writeUrl": {
+          "title": "Write the URL onto a sticker",
+          "desc": "In NFC Tools: Write tab → Add a record → URL/URI → paste the URL you copied → OK → Write. Hold your phone against a blank sticker. You'll feel a buzz in 1–2 seconds when it's done. Repeat for each sticker."
+        },
+        "lockStickers": {
+          "title": "Lock the stickers (recommended)",
+          "desc": "In NFC Tools: Other → Lock tag. This makes the sticker read-only forever so a staff member can't accidentally — or intentionally — overwrite it. Skip if you might re-program later."
+        },
+        "placeStickers": {
+          "title": "Stick them where staff naturally pass",
+          "desc": "Front of the host stand, under the bar lip, beside the time-clock area. The phone needs to be within 1–4 cm of the sticker, so avoid putting it behind glass or thick wood. Adding a small \"Tap to check in\" label next to it removes confusion on day one."
+        },
+        "testTap": {
+          "title": "Test the tap",
+          "desc": "Lock your phone (or close the DailyBrew app). Tap the sticker. On iPhone XS or newer, a banner appears at the top — tap it. On older iPhones, open the app first then tap. Android handles both automatically. After Face ID or passcode, you'll see \"Checked in\"."
+        },
+        "pairSecurity": {
+          "title": "Pair with geofence / IP / device verification",
+          "desc": "NFC by itself only proves the phone touched the tag — pair it with your geofence radius, allowed IP list, or device verification (already in Settings) so a stolen tag image or a copied tag can't be used from off-site.",
+          "linkLabel": "Open Geofencing"
+        }
+      }
+    }
+  },
+  "guides": {
+    "index": {
+      "badge": "Guides",
+      "title": "Pick your path",
+      "subtitle": "Short, focused playbooks for the three things people ask us about most. Each one takes about five minutes to read.",
+      "bigPicturePrefix": "Looking for the big picture instead?",
+      "bigPictureLink": "See how DailyBrew works"
+    },
+    "cta": {
+      "getStartedFree": "Get started free",
+      "upgradeEspresso": "Upgrade to Espresso",
+      "createAccount": "Create an account",
+      "otherGuides": "Other guides",
+      "startTrial": "Start 14-day trial",
+      "seeAllFeatures": "See all features",
+      "turnOnNfc": "Turn on NFC check-in",
+      "espressoDetails": "Espresso plan details"
+    }
+  },
+  "routes": {
+    "howItWorks": {
+      "eyebrow": "How it works",
+      "title": "Up and running in minutes",
+      "subtitle": "Four simple steps from sign-up to live attendance tracking. No hardware, no complex setup.",
+      "steps": {
+        "create": {
+          "title": "Create your workspace",
+          "desc": "Sign up and name your restaurant. DailyBrew generates a unique QR code for your workspace automatically — print it and display it at your entrance.",
+          "details": [
+            "One workspace per restaurant location",
+            "QR code generated instantly",
+            "Invite your team in minutes"
+          ]
+        },
+        "addTeam": {
+          "title": "Add your employees",
+          "desc": "Create employee profiles with names and phone numbers. Assign each person to a shift so DailyBrew knows when to expect them.",
+          "details": [
+            "Assign morning, evening, or custom shifts",
+            "Set shift start and end times",
+            "Optionally link employees to user accounts"
+          ]
+        },
+        "scan": {
+          "title": "Staff scan to check in",
+          "desc": "Employees open the DailyBrew app on their phone, scan the workspace QR code, and they are checked in. Same scan to check out at the end of their shift.",
+          "details": [
+            "Works on any smartphone",
+            "One tap to check in, one tap to check out",
+            "Optional IP, device, and geofence verification"
+          ]
+        },
+        "track": {
+          "title": "Track everything live",
+          "desc": "Your dashboard shows who is present, who is late, who is on leave, and who has not shown up — all in real time. Late arrivals and early departures are flagged automatically.",
+          "details": [
+            "Real-time attendance overview",
+            "Late and early departure detection",
+            "Daily attendance summary notifications"
+          ]
+        }
+      },
+      "perspectives": {
+        "eyebrow": "Two perspectives",
+        "title": "Built for owners and employees",
+        "subtitle": "Restaurant owners get a management dashboard. Employees get a simple mobile experience."
+      },
+      "ownerCard": {
+        "title": "For owners",
+        "subtitle": "Full control from your dashboard",
+        "features": {
+          "dashboard": "Live dashboard with attendance stats",
+          "employees": "Add and manage employees",
+          "shifts": "Define shifts and schedules",
+          "closures": "Schedule closures and holidays",
+          "leave": "Approve or reject leave requests",
+          "security": "Configure IP, device, and geofence rules",
+          "notifications": "Daily summary via push and email"
+        },
+        "cta": "Read the owner setup guide"
+      },
+      "employeeCard": {
+        "title": "For employees",
+        "subtitle": "Simple mobile experience",
+        "features": {
+          "qrScan": "Scan QR to check in and out",
+          "mobileDashboard": "Personal dashboard on mobile",
+          "history": "View own shift and attendance history",
+          "leaveRequests": "Submit leave requests",
+          "shiftAlerts": "Get notified of shift changes and closures",
+          "approvalStatus": "See approval status in real time"
+        },
+        "cta": "Read the employee guide"
+      },
+      "espressoTeaser": {
+        "badge": "Espresso plan",
+        "title": "Ready for geofencing, managers, and BasilBook?",
+        "cta": "See the upgrade guide"
+      },
+      "cta": {
+        "title": "Ready to simplify attendance?",
+        "subtitle": "Free for up to 10 employees. No credit card required.",
+        "getStartedFree": "Get started free",
+        "viewFeatures": "View all features"
+      }
+    },
+    "pricing": {
+      "comparison": {
+        "eyebrow": "Compare",
+        "title": "Feature comparison",
+        "subtitle": "See exactly what you get with each plan.",
+        "headers": {
+          "feature": "Feature"
+        },
+        "sections": {
+          "core": "Core",
+          "espresso": "Espresso features",
+          "doubleEspresso": "Double Espresso features"
+        },
+        "rows": {
+          "employees": {
+            "label": "Employees"
+          },
+          "qrCheckin": {
+            "label": "Workspace QR code check-in"
+          },
+          "shifts": {
+            "label": "Shift management"
+          },
+          "closures": {
+            "label": "Closure periods"
+          },
+          "ownerDashboard": {
+            "label": "Owner dashboard & stats"
+          },
+          "employeeDashboard": {
+            "label": "Employee dashboard"
+          },
+          "attendanceLog": {
+            "label": "Attendance log"
+          },
+          "darkMode": {
+            "label": "Dark mode"
+          },
+          "multiLang": {
+            "label": "Multi-language (EN/FR/KM)"
+          },
+          "leaveRequests": {
+            "label": "Leave request management"
+          },
+          "ipRestriction": {
+            "label": "IP restriction for check-in & out"
+          },
+          "deviceVerification": {
+            "label": "Device verification for check-in & out"
+          },
+          "geofencing": {
+            "label": "Geofencing for check-in & out"
+          },
+          "perDaySchedules": {
+            "label": "Per-day shift schedules"
+          },
+          "basilbook": {
+            "label": "<brand></brand> integration + API"
+          },
+          "notifications": {
+            "label": "Push & email notifications"
+          },
+          "manager": {
+            "label": "Manager role"
+          },
+          "dailySummary": {
+            "label": "Daily attendance summary"
+          },
+          "trial14": {
+            "label": "14-day free trial"
+          },
+          "unlimitedEmployees": {
+            "label": "Unlimited employees"
+          },
+          "unlimitedManagers": {
+            "label": "Unlimited managers"
+          },
+          "prioritySupport": {
+            "label": "Priority support"
+          },
+          "multipleQrStations": {
+            "label": "Multiple QR stations (roadmap)"
+          },
+          "perQrGeofence": {
+            "label": "Per-QR geofence & settings (roadmap)"
+          },
+          "perQrAssignment": {
+            "label": "Employee assignment per QR (roadmap)"
+          },
+          "whiteLabel": {
+            "label": "White-label branding (roadmap)"
+          }
+        }
+      },
+      "faq": {
+        "eyebrow": "FAQ",
+        "title": "Billing questions",
+        "items": {
+          "switchPlans": {
+            "question": "Can I switch plans anytime?",
+            "answer": "Yes, you can upgrade or downgrade your plan at any time from your dashboard Settings. Changes take effect immediately."
+          },
+          "paymentMethods": {
+            "question": "What payment methods do you accept?",
+            "answer": "We use Paddle as our payment provider, which supports credit cards, debit cards, and PayPal."
+          },
+          "freeTrial": {
+            "question": "Is there a free trial?",
+            "answer": "The Free plan is free forever with no time limit. If you want to try Espresso, you get a 14-day free trial with full access to all Espresso features."
+          },
+          "cancelAnytime": {
+            "question": "Can I cancel anytime?",
+            "answer": "Yes, there are no contracts or lock-in periods. You can cancel your Espresso subscription at any time and continue using the Free plan."
+          },
+          "basilbook": {
+            "question": "How does the BasilBook integration work?",
+            "answer": "With an Espresso or Double Espresso plan, you can generate an API token from your workspace settings. BasilBook uses this token to pull attendance data for employees that share a username across both systems. The API returns check-in/out times, late/early flags, and shift info for any date range."
+          }
+        },
+        "stillHaveQuestions": "Still have questions?",
+        "reachOut": "Reach out to us"
+      }
+    },
+    "support": {
+      "eyebrow": "Support",
+      "title": "How can we help?",
+      "subtitle": "Send us a message and we'll get back to you within 24 hours.",
+      "form": {
+        "typeLabel": "What can we help with?",
+        "types": {
+          "bug": "Bug report",
+          "feature": "Feature request",
+          "question": "Question",
+          "general": "General"
+        },
+        "fields": {
+          "name": "Your name",
+          "email": "Your email",
+          "subject": "Subject",
+          "message": "Message"
+        },
+        "placeholders": {
+          "name": "John Doe",
+          "email": "you@example.com",
+          "subject": "Brief summary of your request",
+          "message": "Describe your issue or question..."
+        },
+        "errors": {
+          "name": "Please enter your name",
+          "email": "Please enter a valid email",
+          "subject": "Please enter a subject",
+          "message": "Message must be at least 10 characters"
+        },
+        "screenshots": {
+          "label": "Screenshots",
+          "optional": "(optional, max {{max}})",
+          "attachmentAlt": "Attachment {{n}}",
+          "add": "Add"
+        },
+        "send": "Send message",
+        "sending": "Sending...",
+        "success": {
+          "title": "Message sent",
+          "subtitle": "We'll get back to you within 24 hours.",
+          "sendAnother": "Send another message"
+        },
+        "toasts": {
+          "maxImages": "Maximum {{max}} images allowed",
+          "invalidType": "Only PNG, JPEG, WebP, and GIF images are allowed",
+          "sendFailed": "Failed to send message. Please try again."
+        }
+      },
+      "faq": {
+        "eyebrow": "FAQ",
+        "title": "Frequently asked questions",
+        "subtitle": "Quick answers to the most common questions."
+      },
+      "emailFallback": {
+        "title": "Prefer email?",
+        "subtitle": "You can also reach us directly at the address below."
+      }
+    },
+    "roles": {
+      "eyebrow": "Roles & permissions",
+      "title": "Who can do what",
+      "subtitle": "DailyBrew has three roles — owner, manager, and employee. Each with clear, well-defined permissions.",
+      "cards": {
+        "owner": {
+          "title": "Owner",
+          "desc": "The user who created the workspace. Full control over everything — employees, shifts, closures, settings, billing, and all attendance data.",
+          "highlights": [
+            "Creates and manages the workspace",
+            "Adds, edits, and removes employees",
+            "Configures all settings and security rules",
+            "Promotes employees to managers",
+            "Manages billing and subscription"
+          ]
+        },
+        "manager": {
+          "title": "Manager",
+          "badge": "Espresso",
+          "desc": "A trusted employee promoted by the owner. The owner picks exactly which areas the manager can administer — no all-or-nothing access.",
+          "highlights": [
+            "Per-manager permission toggles for employees, shifts, closures, leave, and attendance",
+            "Defaults to \"manage leave\" + \"manage attendance\" on promotion",
+            "Workspace settings, billing, sub-QRs, and promoting managers stay owner-only",
+            "Still checks in/out like a regular employee"
+          ]
+        },
+        "employee": {
+          "title": "Employee",
+          "desc": "A staff member linked to the workspace. Can check in, view personal data, and submit leave requests.",
+          "highlights": [
+            "Checks in and out by scanning the QR code",
+            "Views own attendance history",
+            "Submits leave requests (full or partial day)",
+            "Cancels own pending leave requests",
+            "Views own shift and closure info"
+          ]
+        }
+      },
+      "matrix": {
+        "eyebrow": "Full breakdown",
+        "title": "Permissions matrix",
+        "subtitle": "Every action mapped to every role. No surprises.",
+        "legend": {
+          "allowed": "Always allowed",
+          "configurable": "Configurable per manager",
+          "notAvailable": "Not available"
+        },
+        "headers": {
+          "action": "Action",
+          "employee": "Employee",
+          "manager": "Manager",
+          "owner": "Owner"
+        },
+        "sections": {
+          "dashboard": "Dashboard",
+          "attendance": "Attendance",
+          "leave": "Leave requests",
+          "employees": "Employee management",
+          "shifts": "Shifts & closures",
+          "workspace": "Workspace & settings",
+          "billing": "Billing"
+        },
+        "actions": {
+          "viewPersonalDashboard": "View personal dashboard",
+          "viewFullDashboard": "View full attendance dashboard (all employees)",
+          "viewTodayStats": "View today's attendance stats",
+          "seePendingLeaveCount": "See pending leave count",
+          "checkinOut": "Check in and check out via QR",
+          "viewOwnAttendance": "View own attendance history",
+          "viewAllAttendance": "View all employees' attendance",
+          "editAttendance": "Edit / correct attendance records",
+          "submitOwnLeave": "Submit own leave request",
+          "submitAnyLeave": "Submit leave for any employee",
+          "viewOwnLeave": "View own leave requests",
+          "viewAllLeave": "View all leave requests",
+          "approveLeave": "Approve or reject leave requests",
+          "cancelOwnLeave": "Cancel own pending leave",
+          "cancelAnyLeave": "Cancel any leave request",
+          "addEmployees": "Add new employees",
+          "editEmployees": "Edit employee details",
+          "deleteEmployees": "Delete (soft) employees",
+          "linkUsers": "Link / unlink user accounts",
+          "promoteManagers": "Promote / demote managers",
+          "editManagerPermissions": "Edit per-manager permissions",
+          "viewShifts": "View shifts",
+          "editShifts": "Create, edit, delete shifts",
+          "perDaySchedules": "Manage per-day shift schedules",
+          "viewClosures": "View closure periods",
+          "editClosures": "Create, edit, delete closures",
+          "viewWorkspace": "View workspace info",
+          "renameWorkspace": "Rename workspace",
+          "configureIp": "Configure IP restriction",
+          "configureDevice": "Configure device verification",
+          "configureGeofence": "Configure geofencing",
+          "subQrCodes": "Mint or edit sub-QR codes",
+          "deleteWorkspace": "Delete workspace",
+          "viewPlan": "View current plan",
+          "changePlan": "Upgrade / downgrade plan",
+          "paymentMethod": "Manage payment method"
+        },
+        "grantedVia": "Granted via {{via}}"
+      },
+      "voter": {
+        "title": "How permissions work under the hood",
+        "subtitle": "DailyBrew uses four permission levels. Every API request is checked against these before any action is taken.",
+        "levels": {
+          "view": {
+            "label": "VIEW",
+            "who": "Owner, Manager, Employee",
+            "desc": "Read-only access to workspace resources. All linked users get this."
+          },
+          "capability": {
+            "label": "CAPABILITY",
+            "who": "Owner + manager (per-permission)",
+            "desc": "Granular attributes — manage_employees, manage_shifts, manage_closures, manage_leave, manage_attendance — granted individually to each manager. The owner has every capability implicitly."
+          },
+          "editWorkspace": {
+            "label": "EDIT / DELETE on Workspace",
+            "who": "Owner only",
+            "desc": "Rename or delete the workspace, edit settings, manage billing, mint sub-QR codes, promote managers."
+          },
+          "perQrManager": {
+            "label": "PER-QR MANAGER",
+            "who": "Manager assigned to a sub-QR",
+            "desc": "Adds attendance + leave authority over the QR's assigned employees, on top of any workspace-wide permissions they hold."
+          }
+        },
+        "note": {
+          "label": "Note:",
+          "body": "Granting a capability is a deliberate choice per manager. A manager with manage_leave only can approve leave but won't see the employees list as editable. A manager with everything but manage_attendance still only sees their own attendance. The voter enforces this uniformly across every API endpoint."
+        }
+      },
+      "limits": {
+        "espressoLabel": "Espresso",
+        "espresso": "up to 2 managers",
+        "doubleEspressoLabel": "Double Espresso",
+        "doubleEspresso": "unlimited managers",
+        "free": "Free plan: owner only"
+      },
+      "cta": {
+        "title": "Ready to set up your team?",
+        "subtitle": "Create your workspace, add employees, and promote your trusted staff.",
+        "getStartedFree": "Get started free",
+        "viewFeatures": "View all features"
+      }
+    },
+    "demo": {
+      "badge": "Espresso plan demo",
+      "title": "Try DailyBrew",
+      "subtitle": "Sign in with any of the three demo accounts below to explore DailyBrew from different perspectives.",
+      "password": {
+        "label": "Password for all accounts",
+        "copy": "Copy",
+        "copied": "Copied"
+      },
+      "accounts": {
+        "owner": {
+          "role": "Owner",
+          "desc": "Full access to everything — dashboard, employees, shifts, closures, settings, billing, and leave approvals.",
+          "highlights": [
+            "View the full attendance dashboard",
+            "Add and manage employees",
+            "Configure shifts, closures, and settings",
+            "Approve or reject leave requests",
+            "Promote employees to managers"
+          ],
+          "signInCta": "Sign in as owner"
+        },
+        "manager": {
+          "role": "Manager",
+          "desc": "A trusted employee with elevated permissions — can oversee attendance and handle leave requests.",
+          "highlights": [
+            "View the full attendance dashboard",
+            "Approve or reject leave requests",
+            "See all employees' attendance",
+            "Check in and out like a regular employee",
+            "No access to settings or employee management"
+          ],
+          "signInCta": "Sign in as manager"
+        },
+        "employee": {
+          "role": "Employee",
+          "desc": "A staff member — can check in, view their own attendance, and submit leave requests.",
+          "highlights": [
+            "Personal dashboard with own attendance",
+            "View own shift and check-in history",
+            "Submit leave requests (full or partial day)",
+            "Cancel own pending leave requests",
+            "Check in and out via QR code"
+          ],
+          "signInCta": "Sign in as employee"
+        }
+      },
+      "emailLabel": "Email",
+      "workspaceStats": {
+        "title": "What's in the demo workspace",
+        "labels": {
+          "plan": "Plan",
+          "employees": "Employees",
+          "shifts": "Shifts",
+          "manager": "Manager",
+          "attendanceRecords": "Attendance records",
+          "leaveRequests": "Leave requests",
+          "closure": "Closure",
+          "userAccounts": "User accounts"
+        }
+      }
+    }
   }
 }
