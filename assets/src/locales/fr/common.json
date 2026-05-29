@@ -82,7 +82,10 @@
     "upcomingLeaves": "Congés à venir",
     "noUpcomingLeaves": "Aucun congé à venir dans les 2 prochaines semaines",
     "upcomingLeavesUpsell": "Voyez qui prend congé dans les 2 prochaines semaines. Passez à Espresso pour gérer les demandes de congé.",
-    "startTrial": "Commencer l'essai gratuit de 14 jours"
+    "startTrial": "Commencer l'essai gratuit de 14 jours",
+    "checkinQrTitle": "Code QR de pointage",
+    "checkinQrDesc": "Imprimez et affichez ceci à votre restaurant. Les employés le scannent avec l'app DailyBrew pour pointer leur arrivée et départ.",
+    "noAttendance": "Aucun enregistrement de présence aujourd'hui"
   },
   "employee": {
     "add": "Ajouter un employé",
@@ -1980,5 +1983,18 @@
   },
   "closure": {
     "empty": "Aucune période de fermeture définie"
+  },
+  "shift": {
+    "description": "Définissez les heures de travail de votre restaurant. Assignez les employés aux horaires pour que DailyBrew puisse suivre les retards et départs anticipés automatiquement.",
+    "perDaySchedules": "Horaires par jour",
+    "perDaySchedulesDesc": "Remplacez les heures d'horaire pour des jours spécifiques de la semaine. Disponible avec Espresso.",
+    "emptyTitle": "Aucun horaire créé pour l'instant",
+    "emptyHint": "Cliquez pour créer votre premier horaire",
+    "employeeCount_one": "{{count}} employé",
+    "employeeCount_other": "{{count}} employés",
+    "daySchedule": "Horaire du jour",
+    "dayDefault": "défaut",
+    "override": "Remplacer",
+    "assign": "Assigner"
   }
 }

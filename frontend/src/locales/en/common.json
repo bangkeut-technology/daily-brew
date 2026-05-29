@@ -98,7 +98,10 @@
     "upcomingLeaves": "Upcoming leaves",
     "noUpcomingLeaves": "No upcoming leaves in the next 2 weeks",
     "upcomingLeavesUpsell": "See who's taking time off in the next 2 weeks. Upgrade to Espresso to manage leave requests.",
-    "startTrial": "Start 14-day free trial"
+    "startTrial": "Start 14-day free trial",
+    "checkinQrTitle": "Check-in QR code",
+    "checkinQrDesc": "Print and display this at your restaurant. Employees scan it with the DailyBrew app to check in and out.",
+    "noAttendance": "No attendance records yet today"
   },
   "employee": {
     "add": "Add employee",
@@ -2071,5 +2074,18 @@
   },
   "closure": {
     "empty": "No closure periods defined"
+  },
+  "shift": {
+    "description": "Define your restaurant's working hours. Assign employees to shifts so DailyBrew can track late arrivals and early departures automatically.",
+    "perDaySchedules": "Per-day shift schedules",
+    "perDaySchedulesDesc": "Override shift hours for specific days of the week. Available with Espresso.",
+    "emptyTitle": "No shifts created yet",
+    "emptyHint": "Click to create your first shift",
+    "employeeCount_one": "{{count}} employee",
+    "employeeCount_other": "{{count}} employees",
+    "daySchedule": "Day schedule",
+    "dayDefault": "default",
+    "override": "Override",
+    "assign": "Assign"
   }
 }
