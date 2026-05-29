@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.85.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.85.1...v1.85.2) (2026-05-29)
+
+
+### Bug Fixes
+
+* clarify active-employees seat limit, rebrand three-factor blog, unblock cron picker ([#210](https://github.com/bangkeut-technology/daily-brew/issues/210)) ([58ccee8](https://github.com/bangkeut-technology/daily-brew/commit/58ccee8cbca6b0020ef66ebb8440de4b33145383))
+
 ## [1.85.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.85.0...v1.85.1) (2026-05-29)
 
 
