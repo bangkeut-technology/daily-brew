@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.91.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.90.0...v1.91.0) (2026-05-29)
+
+
+### Features
+
+* **blog,i18n:** translate all 4 blog posts into fr + km via new blog namespace ([#223](https://github.com/bangkeut-technology/daily-brew/issues/223)) ([86ca7c9](https://github.com/bangkeut-technology/daily-brew/commit/86ca7c95be9f77ec0622ae4b18370c6b026cb5cd))
+
 ## [1.90.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.89.0...v1.90.0) (2026-05-29)
 
 
