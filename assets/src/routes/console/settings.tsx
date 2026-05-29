@@ -80,9 +80,16 @@ const TIMEZONE_OPTIONS = buildTimezoneOptions();
  * explainer.
  */
 function SettingsHelpLink({ to, label }: { to: string; label: string }) {
+  // Preserve the user's active locale when opening the help page in a new tab.
+  // Without this the new tab loses the in-memory i18n state and the SPA shell
+  // may render in the cookie/Accept-Language fallback (often English), per
+  // user feedback that clicking Help redirected to a default-language page.
+  const { i18n } = useTranslation();
+  const base = (i18n.language ?? 'en').split('-')[0];
+  const href = base && base !== 'en' ? `${to}?lang=${base}` : to;
   return (
     <a
-      href={to}
+      href={href}
       target="_blank"
       rel="noopener noreferrer"
       title={label}
@@ -192,9 +199,9 @@ function SettingsPage() {
         nfcCheckinEnabled,
         nfcCheckinIntervalMinutes,
       });
-      toast.success('Settings saved');
+      toast.success(t('settings.savedToast', 'Settings saved'));
     } catch {
-      toast.error('Failed to save settings');
+      toast.error(t('settings.saveError', 'Failed to save settings'));
     }
   };
 
@@ -204,27 +211,27 @@ function SettingsPage() {
       const ws = await createWs.mutateAsync(newWsName);
       setWorkspacePublicId(ws.publicId);
       setNewWsName('');
-      toast.success('Workspace created');
+      toast.success(t('settings.workspaceCreated', 'Workspace created'));
       window.location.reload();
     } catch {
-      toast.error('Failed to create workspace');
+      toast.error(t('workspace.createFailed', 'Failed to create workspace'));
     }
   };
 
   const handleSendTelegramTest = async () => {
     try {
       await telegramTest.mutateAsync();
-      toast.success('Test message sent');
+      toast.success(t('settings.telegramTestSent', 'Test message sent'));
     } catch (err) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
-        ?? 'Test failed';
+        ?? t('settings.telegramTestFailed', 'Test failed');
       toast.error(msg);
     }
   };
 
   const handleUseCurrentLocation = () => {
     if (!navigator.geolocation) {
-      toast.error('Geolocation is not supported by your browser');
+      toast.error(t('settings.geoUnsupported', 'Geolocation is not supported by your browser'));
       return;
     }
     setLocatingPosition(true);
@@ -233,22 +240,22 @@ function SettingsPage() {
         setGeofencingLat(parseFloat(position.coords.latitude.toFixed(6)));
         setGeofencingLng(parseFloat(position.coords.longitude.toFixed(6)));
         setLocatingPosition(false);
-        toast.success('Location detected');
+        toast.success(t('settings.locationDetected', 'Location detected'));
       },
       (error) => {
         setLocatingPosition(false);
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            toast.error('Location permission denied');
+            toast.error(t('settings.locationPermissionDenied', 'Location permission denied'));
             break;
           case error.POSITION_UNAVAILABLE:
-            toast.error('Location information unavailable');
+            toast.error(t('settings.locationUnavailable', 'Location information unavailable'));
             break;
           case error.TIMEOUT:
-            toast.error('Location request timed out');
+            toast.error(t('settings.locationTimeout', 'Location request timed out'));
             break;
           default:
-            toast.error('Failed to get location');
+            toast.error(t('settings.locationError', 'Failed to get location'));
         }
       },
       { enableHighAccuracy: true, timeout: 10000 },
@@ -267,10 +274,10 @@ function SettingsPage() {
         {currentWsId && plan && (
           <GlassCard hover={false} className="lg:col-span-2">
             <GlassCardHeader
-              title="Plan"
+              title={t('settings.plan', 'Plan')}
               action={
                 <StatusBadge
-                  label={plan.isTrialing ? `Trial · ${plan.trialDaysRemaining}d left` : plan.planLabel}
+                  label={plan.isTrialing ? t('settings.trialBadge', 'Trial · {{count}}d left', { count: plan.trialDaysRemaining ?? 0 }) : plan.planLabel}
                   variant={plan.isTrialing ? 'amber' : plan.isEspresso ? 'green' : 'gray'}
                 />
               }
@@ -284,9 +291,10 @@ function SettingsPage() {
                     <button
                       key={p}
                       onClick={() => {
+                        const label = p === 'double_espresso' ? 'Double Espresso' : p.charAt(0).toUpperCase() + p.slice(1);
                         devToggle.mutate(p, {
-                          onSuccess: () => toast.success(`Switched to ${p === 'double_espresso' ? 'Double Espresso' : p.charAt(0).toUpperCase() + p.slice(1)}`),
-                          onError: () => toast.error('Failed to toggle plan'),
+                          onSuccess: () => toast.success(t('settings.devSwitched', 'Switched to {{plan}}', { plan: label })),
+                          onError: () => toast.error(t('settings.devToggleFailed', 'Failed to toggle plan')),
                         });
                       }}
                       disabled={devToggle.isPending}
@@ -311,15 +319,15 @@ function SettingsPage() {
                   </div>
                   <div className="flex-1">
                     <p className="text-[16px] font-semibold text-amber">
-                      Espresso trial — {plan.trialDaysRemaining} day{plan.trialDaysRemaining !== 1 ? 's' : ''} remaining
+                      {t('settings.trialBannerTitle', 'Espresso trial — {{count}} day remaining', { count: plan.trialDaysRemaining ?? 0 })}
                     </p>
                     <p className="text-[14px] text-text-secondary">
-                      You have full access to all Espresso features. Your first payment will be charged after the trial ends.
+                      {t('settings.trialBannerBody', 'You have full access to all Espresso features. Your first payment will be charged after the trial ends.')}
                     </p>
                   </div>
                   {plan.currentPeriodEnd && (
                     <p className="text-[13px] text-amber font-medium shrink-0">
-                      Ends {fmtDate(plan.currentPeriodEnd)}
+                      {t('settings.trialEnds', 'Ends {{date}}', { date: fmtDate(plan.currentPeriodEnd) })}
                     </p>
                   )}
                 </div>
@@ -335,9 +343,15 @@ function SettingsPage() {
                   )}
                 >
                   <h3 className="text-[17px] font-semibold text-text-primary mb-1">Free</h3>
-                  <p className="text-[14px] text-text-tertiary mb-4">Get started</p>
+                  <p className="text-[14px] text-text-tertiary mb-4">{t('settings.planGetStarted', 'Get started')}</p>
                   <ul className="space-y-2">
-                    {['Up to 10 employees', 'QR code check-in', 'Shift management', 'Closure management', 'Dashboard & attendance log'].map((f) => (
+                    {[
+                      t('settings.featureUpTo10', 'Up to 10 employees'),
+                      t('settings.featureQrCheckin', 'QR code check-in'),
+                      t('settings.featureShiftMgmt', 'Shift management'),
+                      t('settings.featureClosureMgmt', 'Closure management'),
+                      t('settings.featureDashboard', 'Dashboard & attendance log'),
+                    ].map((f) => (
                       <li key={f} className="flex items-center gap-2 text-[14.5px] text-text-secondary">
                         <Check size={14} className="text-green shrink-0" />
                         {f}
@@ -346,7 +360,7 @@ function SettingsPage() {
                   </ul>
                   {plan.plan === 'free' && plan.remainingEmployeeSlots !== null && (
                     <div className="mt-4 text-[13px] text-text-tertiary">
-                      {plan.remainingEmployeeSlots} employee slot{plan.remainingEmployeeSlots !== 1 ? 's' : ''} remaining
+                      {t('settings.employeeSlotsRemaining', '{{count}} employee slot remaining', { count: plan.remainingEmployeeSlots })}
                     </div>
                   )}
                 </div>
@@ -364,13 +378,21 @@ function SettingsPage() {
                     <h3 className="text-[20px] font-semibold text-text-primary">Espresso</h3>
                     {plan.isEspresso && (
                       <span className="text-[13px] font-semibold px-2 py-0.5 rounded-full bg-green/10 text-green">
-                        {plan.isTrialing ? 'Trial' : 'Current'}
+                        {plan.isTrialing ? t('settings.planTrialLabel', 'Trial') : t('settings.planCurrentLabel', 'Current')}
                       </span>
                     )}
                   </div>
-                  <p className="text-[16px] text-text-tertiary mb-4">For growing teams</p>
+                  <p className="text-[16px] text-text-tertiary mb-4">{t('settings.planGrowingTeams', 'For growing teams')}</p>
                   <ul className="space-y-2.5">
-                    {['Up to 20 employees', 'IP restriction for check-in & out', 'Device verification for check-in & out', 'Geofencing for check-in & out', 'Per-day schedules', 'Leave requests', 'BasilBook linking'].map((f) => (
+                    {[
+                      t('settings.featureUpTo20', 'Up to 20 employees'),
+                      t('settings.featureIpRestriction', 'IP restriction for check-in & out'),
+                      t('settings.featureDeviceVerification', 'Device verification for check-in & out'),
+                      t('settings.featureGeofencing', 'Geofencing for check-in & out'),
+                      t('settings.featurePerDaySchedules', 'Per-day schedules'),
+                      t('settings.featureLeaveRequests', 'Leave requests'),
+                      t('settings.featureBasilBook', 'BasilBook linking'),
+                    ].map((f) => (
                       <li key={f} className="flex items-center gap-2 text-[16px] text-text-secondary">
                         <Check size={16} className="text-amber shrink-0" />
                         {f}
@@ -390,7 +412,7 @@ function SettingsPage() {
                               billing === 'monthly' ? 'bg-coffee text-white' : 'bg-transparent text-text-secondary',
                             )}
                           >
-                            Monthly
+                            {t('settings.billingMonthly', 'Monthly')}
                           </button>
                           <button
                             onClick={() => setBilling('annual')}
@@ -399,21 +421,21 @@ function SettingsPage() {
                               billing === 'annual' ? 'bg-coffee text-white' : 'bg-transparent text-text-secondary',
                             )}
                           >
-                            Annual
+                            {t('settings.billingAnnual', 'Annual')}
                           </button>
                         </div>
                         <span className="text-[15px] font-semibold text-text-primary">
-                          {billing === 'annual' ? '$149/year' : '$14.99/month'}
+                          {billing === 'annual' ? t('settings.priceEspressoYear', '$149/year') : t('settings.priceEspressoMonth', '$14.99/month')}
                         </span>
                       </div>
                       {billing === 'annual' && (
-                        <p className="text-[12.5px] text-green font-medium">Save 17% vs monthly</p>
+                        <p className="text-[12.5px] text-green font-medium">{t('settings.save17', 'Save 17% vs monthly')}</p>
                       )}
                       <button
                         onClick={() => openCheckout(billing)}
                         className="w-full px-4 py-2.5 rounded-lg text-[15px] font-semibold bg-linear-to-r from-amber to-coffee text-white border-none cursor-pointer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(193,127,59,0.3)]"
                       >
-                        Start 14-day free trial
+                        {t('settings.startFreeTrial', 'Start 14-day free trial')}
                       </button>
                     </div>
                   )}
@@ -423,10 +445,14 @@ function SettingsPage() {
                     <div className="mt-4 space-y-3">
                       <div className="text-[13px] text-text-tertiary space-y-1">
                         {plan.remainingEmployeeSlots !== null && (
-                          <p>{plan.remainingEmployeeSlots} employee slot{plan.remainingEmployeeSlots !== 1 ? 's' : ''} remaining</p>
+                          <p>{t('settings.employeeSlotsRemaining', '{{count}} employee slot remaining', { count: plan.remainingEmployeeSlots })}</p>
                         )}
                         {plan.currentPeriodEnd && (
-                          <p>{plan.isTrialing ? 'Trial ends' : 'Renews'} {fmtDate(plan.currentPeriodEnd)}</p>
+                          <p>
+                            {plan.isTrialing
+                              ? t('settings.trialEndsDate', 'Trial ends {{date}}', { date: fmtDate(plan.currentPeriodEnd) })
+                              : t('settings.renewsDate', 'Renews {{date}}', { date: fmtDate(plan.currentPeriodEnd) })}
+                          </p>
                         )}
                       </div>
                       {plan.paddleSubscriptionId && (
@@ -437,7 +463,7 @@ function SettingsPage() {
                             }}
                             className="flex-1 px-3 py-2 rounded-lg text-[14px] font-medium bg-glass-bg text-text-primary border border-cream-3 cursor-pointer hover:bg-cream-3 transition-colors"
                           >
-                            Manage billing
+                            {t('settings.manageBilling', 'Manage billing')}
                           </button>
                           <button
                             onClick={() => {
@@ -445,7 +471,7 @@ function SettingsPage() {
                             }}
                             className="px-3 py-2 rounded-lg text-[14px] font-medium bg-transparent text-red border border-red/20 cursor-pointer hover:bg-red/5 transition-colors"
                           >
-                            Cancel
+                            {t('common.cancel', 'Cancel')}
                           </button>
                         </div>
                       )}
@@ -466,29 +492,29 @@ function SettingsPage() {
                     <h3 className="text-[17px] font-semibold text-text-primary">Double Espresso</h3>
                     {!window.__DAILYBREW__?.paddlePriceIdDoubleEspressoMonthly && (
                       <span className="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-coffee/10 text-coffee">
-                        Coming soon
+                        {t('settings.comingSoon', 'Coming soon')}
                       </span>
                     )}
                   </div>
-                  <p className="text-[14px] text-text-tertiary mb-1">$39.99/month</p>
-                  <p className="text-[14px] text-text-tertiary mb-4">For large teams</p>
+                  <p className="text-[14px] text-text-tertiary mb-1">{t('settings.priceDoubleMonth', '$39.99/month')}</p>
+                  <p className="text-[14px] text-text-tertiary mb-4">{t('settings.planLargeTeams', 'For large teams')}</p>
                   <ul className="space-y-2">
                     {[
-                      { text: 'Unlimited employees' },
-                      { text: 'Everything in Espresso' },
-                      { text: 'Priority support' },
-                      { text: 'Multiple QR stations', roadmap: true },
-                      { text: 'Per-QR geofence & settings', roadmap: true },
-                      { text: 'Employee assignment per QR', roadmap: true },
-                      { text: 'Manager role', roadmap: true },
-                      { text: 'White-label branding', roadmap: true },
+                      { text: t('settings.featureUnlimited', 'Unlimited employees') },
+                      { text: t('settings.featureEverythingEspresso', 'Everything in Espresso') },
+                      { text: t('settings.featurePrioritySupport', 'Priority support') },
+                      { text: t('settings.featureMultiQrStations', 'Multiple QR stations'), roadmap: true },
+                      { text: t('settings.featurePerQrSettings', 'Per-QR geofence & settings'), roadmap: true },
+                      { text: t('settings.featureEmployeeAssign', 'Employee assignment per QR'), roadmap: true },
+                      { text: t('settings.featureManagerRole', 'Manager role'), roadmap: true },
+                      { text: t('settings.featureWhiteLabel', 'White-label branding'), roadmap: true },
                     ].map((f) => (
                       <li key={f.text} className={cn('flex items-center gap-2 text-[14.5px]', f.roadmap ? 'text-text-tertiary' : 'text-text-secondary')}>
                         <Check size={14} className={cn('shrink-0', f.roadmap ? 'text-text-tertiary' : 'text-coffee')} />
                         {f.text}
                         {f.roadmap && (
                           <span className="text-[11px] font-medium px-1.5 py-px rounded-full bg-cream-3/60 text-text-tertiary">
-                            Roadmap
+                            {t('settings.roadmapBadge', 'Roadmap')}
                           </span>
                         )}
                       </li>
@@ -507,7 +533,7 @@ function SettingsPage() {
                                 billing === 'monthly' ? 'bg-coffee text-white' : 'bg-transparent text-text-secondary',
                               )}
                             >
-                              Monthly
+                              {t('settings.billingMonthly', 'Monthly')}
                             </button>
                             <button
                               type="button"
@@ -517,21 +543,21 @@ function SettingsPage() {
                                 billing === 'annual' ? 'bg-coffee text-white' : 'bg-transparent text-text-secondary',
                               )}
                             >
-                              Annual
+                              {t('settings.billingAnnual', 'Annual')}
                             </button>
                           </div>
                           <span className="text-[15px] font-semibold text-text-primary">
-                            {billing === 'annual' ? '$399/year' : '$39.99/month'}
+                            {billing === 'annual' ? t('settings.priceDoubleYear', '$399/year') : t('settings.priceDoubleMonth', '$39.99/month')}
                           </span>
                         </div>
                         {billing === 'annual' && (
-                          <p className="text-[12.5px] text-green font-medium">Save 17% vs monthly</p>
+                          <p className="text-[12.5px] text-green font-medium">{t('settings.save17', 'Save 17% vs monthly')}</p>
                         )}
                         <button
                           onClick={() => openCheckout(billing, 'double_espresso')}
                           className="w-full px-4 py-2.5 rounded-lg text-[15px] font-semibold bg-linear-to-r from-coffee to-amber text-white border-none cursor-pointer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,66,38,0.3)]"
                         >
-                          Upgrade to Double Espresso
+                          {t('settings.upgradeDouble', 'Upgrade to Double Espresso')}
                         </button>
                       </div>
                     ) : (
@@ -539,13 +565,13 @@ function SettingsPage() {
                         disabled
                         className="mt-4 w-full px-4 py-2.5 rounded-lg text-[15px] font-semibold bg-glass-bg text-text-secondary border border-cream-3 cursor-not-allowed opacity-70"
                       >
-                        Coming soon
+                        {t('settings.comingSoon', 'Coming soon')}
                       </button>
                     )
                   )}
                   {plan.plan === 'double_espresso' && plan.currentPeriodEnd && (
                     <div className="mt-4 text-[13px] text-text-tertiary">
-                      Renews {fmtDate(plan.currentPeriodEnd)}
+                      {t('settings.renewsDate', 'Renews {{date}}', { date: fmtDate(plan.currentPeriodEnd) })}
                     </div>
                   )}
                 </div>
@@ -561,10 +587,13 @@ function SettingsPage() {
           const qrData = `dailybrew:ws:${currentWs.qrToken}`;
           return (
             <GlassCard hover={false}>
-              <GlassCardHeader title="Check-in QR code" />
+              <GlassCardHeader title={t('settings.qrCardTitle', 'Check-in QR code')} />
               <div className="px-5 py-2">
                 <p className="text-[13.5px] text-text-tertiary leading-relaxed">
-                  Display this QR code at your restaurant. Employees open the DailyBrew app, scan this code, and check in instantly.
+                  {t(
+                    'settings.qrCardDesc',
+                    'Display this QR code at your restaurant. Employees open the DailyBrew app, scan this code, and check in instantly.',
+                  )}
                 </p>
               </div>
               <div className="p-6 pt-2 flex flex-col items-center">
@@ -592,15 +621,15 @@ function SettingsPage() {
                     onClick={async () => {
                       try {
                         await navigator.clipboard.writeText(currentWs.qrToken);
-                        toast.success('Token copied');
+                        toast.success(t('settings.tokenCopied', 'Token copied'));
                       } catch {
-                        toast.error('Failed to copy');
+                        toast.error(t('common.copyFailed', 'Failed to copy'));
                       }
                     }}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[14px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3"
                   >
                     <Copy size={12} />
-                    Copy token
+                    {t('settings.copyToken', 'Copy token')}
                   </button>
                   <button
                     type="button"
@@ -609,7 +638,7 @@ function SettingsPage() {
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[14px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3 disabled:opacity-50"
                   >
                     <RotateCcw size={12} />
-                    Regenerate
+                    {t('settings.regenerate', 'Regenerate')}
                   </button>
                 </div>
                 {nfcEnabled && (
@@ -670,10 +699,10 @@ function SettingsPage() {
                             if (!editWsName.trim()) return;
                             try {
                               await updateWs.mutateAsync({ publicId: ws.publicId, name: editWsName.trim() });
-                              toast.success('Workspace updated');
+                              toast.success(t('settings.workspaceUpdated', 'Workspace updated'));
                               setEditingWsId(null);
                             } catch {
-                              toast.error('Failed to update workspace');
+                              toast.error(t('settings.workspaceUpdateFailed', 'Failed to update workspace'));
                             }
                           }}
                           disabled={updateWs.isPending || !editWsName.trim()}
@@ -720,7 +749,7 @@ function SettingsPage() {
                             </span>
                             {isCurrent && (
                               <span className="text-[12px] font-medium px-1.5 py-px rounded-full bg-coffee/10 text-coffee shrink-0">
-                                Current
+                                {t('settings.planCurrentLabel', 'Current')}
                               </span>
                             )}
                           </div>
@@ -828,7 +857,7 @@ function SettingsPage() {
         {/* IP restriction + general settings */}
         {currentWsId && (
           <GlassCard hover={false} className="lg:col-span-2 scroll-mt-6" id="settings-ip-restriction">
-            <GlassCardHeader title="Workspace settings" />
+            <GlassCardHeader title={t('settings.workspaceSettings', 'Workspace settings')} />
             <div className="p-5 space-y-3">
               <div className="flex items-center gap-2">
                 <Toggle
@@ -840,7 +869,7 @@ function SettingsPage() {
                   }}
                 />
                 <label htmlFor="ip-restriction" className="text-[15px] text-text-primary cursor-pointer">
-                  Enable IP restriction
+                  {t('settings.enableIpRestriction', 'Enable IP restriction')}
                   {!plan?.canUseIpRestriction && (
                     <span className="ml-1.5 text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
                       Espresso
@@ -852,7 +881,7 @@ function SettingsPage() {
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label htmlFor="allowed-ips" className="text-[13px] font-medium text-text-secondary">
-                      Allowed IPs (one per line)
+                      {t('settings.allowedIps', 'Allowed IPs (one per line)')}
                     </label>
                     <button
                       type="button"
@@ -871,7 +900,7 @@ function SettingsPage() {
                       }}
                       className="text-[12.5px] font-medium text-amber cursor-pointer bg-transparent border-none hover:text-coffee transition-colors"
                     >
-                      + Use my current IP
+                      {t('settings.useMyCurrentIp', '+ Use my current IP')}
                     </button>
                   </div>
                   <textarea
@@ -886,21 +915,24 @@ function SettingsPage() {
               )}
               <div>
                 <label id="ws-timezone-label" className="block text-[13px] font-medium text-text-secondary mb-1">
-                  Timezone
+                  {t('settings.timezone', 'Timezone')}
                 </label>
                 <CustomSelect
                   value={timezone}
                   onChange={setTimezone}
                   options={TIMEZONE_OPTIONS}
-                  placeholder="Select timezone…"
+                  placeholder={t('settings.timezonePlaceholder', 'Select timezone…')}
                 />
                 <p className="text-[12.5px] text-text-tertiary mt-1">
-                  Used to calculate late arrivals and early departures relative to shift times.
+                  {t(
+                    'settings.timezoneHint',
+                    'Used to calculate late arrivals and early departures relative to shift times.',
+                  )}
                 </p>
               </div>
               <div>
                 <label id="ws-dateformat-label" className="block text-[13px] font-medium text-text-secondary mb-1">
-                  Date format
+                  {t('settings.dateFormat', 'Date format')}
                 </label>
                 <CustomSelect
                   value={dateFormat}
@@ -933,7 +965,7 @@ function SettingsPage() {
                   <SettingsHelpLink to="/features/device-verification" label={t('settings.learnMore', 'Learn more')} />
                   <Smartphone size={14} className="text-amber" />
                   {deviceVerificationEnabled && plan?.canUseDeviceVerification && (
-                    <StatusBadge label="Active" variant="green" />
+                    <StatusBadge label={t('settings.activeBadge', 'Active')} variant="green" />
                   )}
                 </div>
               }
@@ -984,7 +1016,7 @@ function SettingsPage() {
                   <SettingsHelpLink to="/features" label={t('settings.learnMore', 'Learn more')} />
                   <MousePointerClick size={14} className="text-amber" />
                   {tapCheckinEnabled && plan?.canUseTapCheckin && (
-                    <StatusBadge label="Active" variant="green" />
+                    <StatusBadge label={t('settings.activeBadge', 'Active')} variant="green" />
                   )}
                 </div>
               }
@@ -1038,7 +1070,7 @@ function SettingsPage() {
                   <Nfc size={14} className="text-amber" />
                   {nfcStage && <FeatureStageBadge stage={nfcStage} />}
                   {nfcCheckinEnabled && plan?.canUseNfcCheckin && (
-                    <StatusBadge label="Active" variant="green" />
+                    <StatusBadge label={t('settings.activeBadge', 'Active')} variant="green" />
                   )}
                 </div>
               }
@@ -1116,13 +1148,13 @@ function SettingsPage() {
         {currentWsId && (
           <GlassCard hover={false} className="lg:col-span-2 scroll-mt-6" id="settings-geofencing">
             <GlassCardHeader
-              title="Geofencing"
+              title={t('settings.geofencing', 'Geofencing')}
               action={
                 <div className="flex items-center gap-2">
                   <SettingsHelpLink to="/features/geofencing" label={t('settings.learnMore', 'Learn more')} />
                   <MapPin size={14} className="text-amber" />
                   {geofencingEnabled && plan?.canUseGeofencing && (
-                    <StatusBadge label="Active" variant="green" />
+                    <StatusBadge label={t('settings.activeBadge', 'Active')} variant="green" />
                   )}
                 </div>
               }
@@ -1138,7 +1170,7 @@ function SettingsPage() {
                   }}
                 />
                 <label htmlFor="geofencing" className="text-[15px] text-text-primary cursor-pointer">
-                  Enable geofencing for check-in
+                  {t('settings.enableGeofencingFull', 'Enable geofencing for check-in')}
                   {!plan?.canUseGeofencing && (
                     <span className="ml-1.5 text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
                       Espresso
@@ -1147,7 +1179,10 @@ function SettingsPage() {
                 </label>
               </div>
               <p className="text-[14px] text-text-tertiary leading-relaxed">
-                When enabled, staff can only check in when they are within a specified radius of your restaurant location.
+                {t(
+                  'settings.geofencingDescFull',
+                  'When enabled, staff can only check in when they are within a specified radius of your restaurant location.',
+                )}
               </p>
 
               {geofencingEnabled && plan?.canUseGeofencing && (
@@ -1160,13 +1195,13 @@ function SettingsPage() {
                     className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-[15px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3 disabled:opacity-50"
                   >
                     <Navigation size={14} className={locatingPosition ? 'animate-pulse text-amber' : 'text-coffee'} />
-                    {locatingPosition ? 'Detecting location...' : 'Use current location'}
+                    {locatingPosition ? t('settings.detectingLocation', 'Detecting location...') : t('settings.useCurrentLocation', 'Use current location')}
                   </button>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                       <label htmlFor="geo-lat" className="block text-[13px] font-medium text-text-secondary mb-1">
-                        Latitude
+                        {t('settings.latitude', 'Latitude')}
                       </label>
                       <input
                         id="geo-lat"
@@ -1183,7 +1218,7 @@ function SettingsPage() {
                     </div>
                     <div>
                       <label htmlFor="geo-lng" className="block text-[13px] font-medium text-text-secondary mb-1">
-                        Longitude
+                        {t('settings.longitude', 'Longitude')}
                       </label>
                       <input
                         id="geo-lng"
@@ -1200,7 +1235,7 @@ function SettingsPage() {
                     </div>
                     <div>
                       <label htmlFor="geo-radius" className="block text-[13px] font-medium text-text-secondary mb-1">
-                        Radius (meters)
+                        {t('settings.radius', 'Radius (meters)')}
                       </label>
                       <input
                         id="geo-radius"
@@ -1212,7 +1247,7 @@ function SettingsPage() {
                         onChange={(e) => setGeofencingRadius(e.target.value === '' ? 0 : parseInt(e.target.value, 10) || 0)}
                         onBlur={() => {
                           if (geofencingRadius > 0 && geofencingRadius < 50) {
-                            toast.error('Minimum radius is 50m due to GPS accuracy. Reset to 100m.');
+                            toast.error(t('settings.minRadiusToast', 'Minimum radius is 50m due to GPS accuracy. Reset to 100m.'));
                             setGeofencingRadius(100);
                           } else if (geofencingRadius === 0) {
                             setGeofencingRadius(100);
@@ -1221,15 +1256,13 @@ function SettingsPage() {
                         className="w-full px-3 py-2 rounded-lg text-[15px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono"
                       />
                       {geofencingRadius > 0 && geofencingRadius < 50 && (
-                        <p className="text-[13px] text-red mt-1">Minimum 50m — GPS is not accurate below this</p>
+                        <p className="text-[13px] text-red mt-1">{t('settings.minRadiusHint', 'Minimum 50m — GPS is not accurate below this')}</p>
                       )}
                     </div>
                   </div>
 
                   <p className="text-[14px] text-text-tertiary">
-                    Staff must be within{' '}
-                    <span className="font-medium text-text-secondary">{geofencingRadius || 100}m</span> of
-                    this location to check in.
+                    {t('settings.geofenceWithin', 'Staff must be within {{radius}}m of this location to check in.', { radius: geofencingRadius || 100 })}
                   </p>
 
                   {geofencingLat !== null && geofencingLng !== null && (
@@ -1257,12 +1290,12 @@ function SettingsPage() {
         {currentWsId && (
           <GlassCard hover={false} className="lg:col-span-2">
             <GlassCardHeader
-              title="Telegram notifications"
+              title={t('settings.telegramTitle', 'Telegram notifications')}
               action={
                 <div className="flex items-center gap-2">
                   <Send size={14} className="text-amber" />
                   {telegramEnabled && plan?.canUseTelegramNotifications && (
-                    <StatusBadge label="Active" variant="green" />
+                    <StatusBadge label={t('settings.activeBadge', 'Active')} variant="green" />
                   )}
                 </div>
               }
@@ -1278,7 +1311,7 @@ function SettingsPage() {
                   }}
                 />
                 <label htmlFor="telegram-notifications" className="text-[15px] text-text-primary cursor-pointer">
-                  Enable Telegram notifications
+                  {t('settings.enableTelegram', 'Enable Telegram notifications')}
                   {!plan?.canUseTelegramNotifications && (
                     <span className="ml-1.5 text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
                       Espresso
@@ -1287,7 +1320,10 @@ function SettingsPage() {
                 </label>
               </div>
               <p className="text-[14px] text-text-tertiary leading-relaxed">
-                Send leave requests, shift changes, closures, and daily summaries to a Telegram chat or group.
+                {t(
+                  'settings.telegramDesc',
+                  'Send leave requests, shift changes, closures, and daily summaries to a Telegram chat or group.',
+                )}
               </p>
 
               {telegramEnabled && plan?.canUseTelegramNotifications && (
@@ -1296,10 +1332,10 @@ function SettingsPage() {
                       lives on the Profile page; this card is workspace-wide
                       group-chat config only. */}
                   <div className="rounded-xl border border-cream-3 bg-glass-bg/50 p-4">
-                    <p className="text-[14px] font-medium text-text-primary mb-2">Group chat</p>
+                    <p className="text-[14px] font-medium text-text-primary mb-2">{t('settings.telegramGroupChat', 'Group chat')}</p>
                     <ol className="text-[13px] text-text-secondary leading-relaxed list-decimal pl-5 space-y-1">
                       <li>
-                        Add{' '}
+                        {t('settings.telegramStep1Prefix', 'Add ')}
                         {telegramBotUsername ? (
                           <a
                             href={`https://t.me/${telegramBotUsername}`}
@@ -1310,22 +1346,28 @@ function SettingsPage() {
                             @{telegramBotUsername}
                           </a>
                         ) : (
-                          <span className="font-mono">your DailyBrew bot</span>
-                        )}{' '}
-                        to your staff group.
+                          <span className="font-mono">{t('settings.telegramYourBot', 'your DailyBrew bot')}</span>
+                        )}
+                        {t('settings.telegramStep1Suffix', ' to your staff group.')}
                       </li>
                       <li>
-                        In the group, send <span className="font-mono text-text-primary">/chatid</span>.
+                        {t('settings.telegramStep2Prefix', 'In the group, send ')}
+                        <span className="font-mono text-text-primary">/chatid</span>
+                        {t('settings.telegramStep2Suffix', '.')}
                       </li>
-                      <li>The bot replies with the chat ID — paste it below.</li>
+                      <li>{t('settings.telegramStep3', 'The bot replies with the chat ID — paste it below.')}</li>
                     </ol>
                     <p className="text-[12px] text-text-tertiary mt-2">
-                      Group IDs start with <span className="font-mono">-</span> (e.g. <span className="font-mono">-1001234567890</span>) — paste it as-is.
+                      {t('settings.telegramGroupIdHintPrefix', 'Group IDs start with ')}
+                      <span className="font-mono">-</span>
+                      {t('settings.telegramGroupIdHintMid', ' (e.g. ')}
+                      <span className="font-mono">-1001234567890</span>
+                      {t('settings.telegramGroupIdHintSuffix', ') — paste it as-is.')}
                     </p>
                     <p className="text-[12px] text-text-tertiary mt-2">
-                      Want personal DM notifications instead? Connect your own Telegram from{' '}
+                      {t('settings.telegramPersonalPrefix', 'Want personal DM notifications instead? Connect your own Telegram from ')}
                       <a href="/console/profile" className="text-coffee hover:underline">
-                        your profile
+                        {t('settings.telegramPersonalLink', 'your profile')}
                       </a>
                       .
                     </p>
@@ -1334,7 +1376,7 @@ function SettingsPage() {
                   {/* Manual chat ID input + save */}
                   <div>
                     <label htmlFor="telegram-chat-id" className="block text-[13px] font-medium text-text-secondary mb-1">
-                      Chat ID
+                      {t('settings.telegramChatId', 'Chat ID')}
                     </label>
                     <input
                       id="telegram-chat-id"
@@ -1362,7 +1404,9 @@ function SettingsPage() {
                         disabled={telegramTest.isPending}
                         className="px-4 py-2 rounded-lg text-[15px] font-medium bg-glass-bg text-text-primary border border-cream-3 cursor-pointer hover:bg-cream-3 disabled:opacity-50"
                       >
-                        {telegramTest.isPending ? 'Sending…' : 'Send test message'}
+                        {telegramTest.isPending
+                          ? t('settings.telegramSending', 'Sending…')
+                          : t('settings.telegramSendTest', 'Send test message')}
                       </button>
                     )}
                   </div>
@@ -1376,15 +1420,18 @@ function SettingsPage() {
       {/* Danger zone */}
       <div className="mt-8">
         <GlassCard>
-          <GlassCardHeader title="Danger zone" />
+          <GlassCardHeader title={t('settings.dangerZone', 'Danger zone')} />
           <div className="px-6 pb-6">
             <div className="flex items-center justify-between gap-4 p-4 rounded-xl border border-red/20 bg-red/5">
               <div>
                 <p className="text-[15px] font-medium text-text-primary mb-0.5">
-                  Delete this workspace
+                  {t('settings.deleteThisWorkspace', 'Delete this workspace')}
                 </p>
                 <p className="text-[13px] text-text-secondary">
-                  Permanently delete this workspace and all its data. This action cannot be undone.
+                  {t(
+                    'settings.deleteWorkspaceDesc',
+                    'Permanently delete this workspace and all its data. This action cannot be undone.',
+                  )}
                 </p>
               </div>
               <button
@@ -1392,7 +1439,7 @@ function SettingsPage() {
                 className="shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-white bg-red border-none cursor-pointer transition-colors hover:bg-red/85"
               >
                 <Trash2 size={13} />
-                Delete workspace
+                {t('settings.deleteWorkspace', 'Delete workspace')}
               </button>
             </div>
           </div>
@@ -1402,9 +1449,12 @@ function SettingsPage() {
       <ConfirmModal
         open={regenerateConfirmOpen}
         onOpenChange={setRegenerateConfirmOpen}
-        title="Regenerate workspace token"
-        description="This will replace the workspace QR code with a new one. Any printed QR codes, programmed NFC tags, or shared check-in URLs using the old token will stop working — you'll need to reprint or re-program them. Sub-QR codes are not affected."
-        confirmLabel="Regenerate token"
+        title={t('settings.regenerateTokenTitle', 'Regenerate workspace token')}
+        description={t(
+          'settings.regenerateTokenDesc',
+          "This will replace the workspace QR code with a new one. Any printed QR codes, programmed NFC tags, or shared check-in URLs using the old token will stop working — you'll need to reprint or re-program them. Sub-QR codes are not affected.",
+        )}
+        confirmLabel={t('settings.regenerateTokenConfirm', 'Regenerate token')}
         cancelLabel={t('common.cancel')}
         variant="danger"
         loading={regenerateToken.isPending}
@@ -1412,11 +1462,11 @@ function SettingsPage() {
           if (!currentWsId) return;
           regenerateToken.mutate(currentWsId, {
             onSuccess: () => {
-              toast.success('Workspace token regenerated');
+              toast.success(t('settings.regenerateTokenSuccess', 'Workspace token regenerated'));
               setRegenerateConfirmOpen(false);
             },
             onError: () => {
-              toast.error('Failed to regenerate token');
+              toast.error(t('settings.regenerateTokenError', 'Failed to regenerate token'));
             },
           });
         }}
@@ -1425,9 +1475,13 @@ function SettingsPage() {
       <ConfirmModal
         open={deleteConfirmOpen}
         onOpenChange={setDeleteConfirmOpen}
-        title="Delete workspace"
-        description={`Are you sure you want to delete "${workspaces?.find((ws) => ws.publicId === currentWsId)?.name ?? 'this workspace'}"? All employees, attendance records, shifts, closures, and leave requests will be permanently deleted. Any active subscription will be canceled.`}
-        confirmLabel="Delete workspace"
+        title={t('settings.deleteWorkspace', 'Delete workspace')}
+        description={t(
+          'settings.deleteWorkspaceConfirm',
+          'Are you sure you want to delete "{{name}}"? All employees, attendance records, shifts, closures, and leave requests will be permanently deleted. Any active subscription will be canceled.',
+          { name: workspaces?.find((ws) => ws.publicId === currentWsId)?.name ?? t('settings.thisWorkspace', 'this workspace') },
+        )}
+        confirmLabel={t('settings.deleteWorkspace', 'Delete workspace')}
         cancelLabel={t('common.cancel')}
         variant="danger"
         loading={deleteWs.isPending}
@@ -1435,11 +1489,11 @@ function SettingsPage() {
           deleteWs.mutate(currentWsId, {
             onSuccess: () => {
               clearWorkspacePublicId();
-              toast.success('Workspace deleted');
+              toast.success(t('settings.workspaceDeleted', 'Workspace deleted'));
               navigate({ to: '/console/dashboard', replace: true });
             },
             onError: () => {
-              toast.error('Failed to delete workspace');
+              toast.error(t('settings.workspaceDeleteFailed', 'Failed to delete workspace'));
             },
           });
         }}

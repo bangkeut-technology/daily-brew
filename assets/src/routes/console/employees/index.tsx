@@ -97,7 +97,7 @@ function EmployeeListPage() {
               linkFilter === '' ? 'bg-coffee text-white' : 'bg-glass-bg text-text-secondary hover:bg-cream-3',
             )}
           >
-            All ({employees?.length ?? 0})
+            {t('employee.filterAll', 'All ({{count}})', { count: employees?.length ?? 0 })}
           </button>
           <button
             onClick={() => setLinkFilter(linkFilter === 'linked' ? '' : 'linked')}
@@ -107,7 +107,7 @@ function EmployeeListPage() {
             )}
           >
             <Link2 size={11} />
-            Linked ({linkedCount})
+            {t('employee.filterLinked', 'Linked ({{count}})', { count: linkedCount })}
           </button>
           <button
             onClick={() => setLinkFilter(linkFilter === 'unlinked' ? '' : 'unlinked')}
@@ -117,7 +117,7 @@ function EmployeeListPage() {
             )}
           >
             <Unlink size={11} />
-            Unlinked ({unlinkedCount})
+            {t('employee.filterUnlinked', 'Unlinked ({{count}})', { count: unlinkedCount })}
           </button>
         </div>
 
@@ -130,7 +130,7 @@ function EmployeeListPage() {
               statusFilter === 'active' ? 'bg-green/15 text-green' : 'bg-glass-bg text-text-secondary hover:bg-cream-3',
             )}
           >
-            Active ({activeCount})
+            {t('employee.filterActive', 'Active ({{count}})', { count: activeCount })}
           </button>
           <button
             onClick={() => setStatusFilter(statusFilter === 'inactive' ? '' : 'inactive')}
@@ -139,7 +139,7 @@ function EmployeeListPage() {
               statusFilter === 'inactive' ? 'bg-amber/15 text-amber' : 'bg-glass-bg text-text-secondary hover:bg-cream-3',
             )}
           >
-            Inactive ({inactiveCount})
+            {t('employee.filterInactive', 'Inactive ({{count}})', { count: inactiveCount })}
           </button>
         </div>
       </div>
@@ -186,14 +186,14 @@ function EmployeeListPage() {
                           onClick={() => setLinkFilter(linkFilter === 'linked' ? '' : 'linked')}
                           className="bg-transparent border-none cursor-pointer p-0"
                         >
-                          <StatusBadge label="Linked" variant="green" />
+                          <StatusBadge label={t('employee.linked', 'Linked')} variant="green" />
                         </button>
                       ) : (
                         <button
                           onClick={() => setLinkFilter(linkFilter === 'unlinked' ? '' : 'unlinked')}
                           className="bg-transparent border-none cursor-pointer p-0"
                         >
-                          <StatusBadge label="Unlinked" variant="red" />
+                          <StatusBadge label={t('employee.unlinked', 'Unlinked')} variant="red" />
                         </button>
                       )}
                       <button

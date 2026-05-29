@@ -114,7 +114,10 @@ function ClosuresPage() {
       />
 
       <p className="text-[15px] text-text-secondary mb-5 -mt-2 leading-relaxed">
-        Define dates when your restaurant is closed (holidays, renovations, etc.). No attendance is expected during closures — employees won't be marked absent.
+        {t(
+          'closure.description',
+          "Define dates when your restaurant is closed (holidays, renovations, etc.). No attendance is expected during closures — employees won't be marked absent.",
+        )}
       </p>
 
       {showForm && (
@@ -262,7 +265,11 @@ function ClosureCard({ closure, fmtDate, onDelete, onUpdate, deleting, updating 
   const isPast = today > end;
   const isUpcoming = today < start;
 
-  const statusLabel = isActive ? 'Active' : isPast ? 'Past' : 'Upcoming';
+  const statusLabel = isActive
+    ? t('closure.statusActive', 'Active')
+    : isPast
+      ? t('closure.statusPast', 'Past')
+      : t('closure.statusUpcoming', 'Upcoming');
   const statusVariant = isActive ? 'red' : isPast ? 'gray' : 'amber';
   const accentColor = isActive ? 'from-red to-red/70' : isPast ? 'from-text-tertiary to-text-tertiary/70' : 'from-amber to-amber-light';
 
@@ -291,20 +298,20 @@ function ClosureCard({ closure, fmtDate, onDelete, onUpdate, deleting, updating 
                 type="text"
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
-                placeholder="Closure name"
+                placeholder={t('closure.nameLabel', 'Closure name')}
                 className={inputClassName}
                 autoFocus
               />
               <div className="flex gap-3">
                 <div className="flex-1">
                   <label className="block text-[13px] font-medium text-text-secondary mb-1">
-                    Start date
+                    {t('closure.startDate', 'Start date')}
                   </label>
                   <CustomDatePicker value={editStart} onChange={setEditStart} />
                 </div>
                 <div className="flex-1">
                   <label className="block text-[13px] font-medium text-text-secondary mb-1">
-                    End date
+                    {t('closure.endDate', 'End date')}
                   </label>
                   <CustomDatePicker value={editEnd} onChange={setEditEnd} />
                 </div>
@@ -334,7 +341,7 @@ function ClosureCard({ closure, fmtDate, onDelete, onUpdate, deleting, updating 
                 <div className="flex items-center gap-2 mt-1.5">
                   <StatusBadge label={statusLabel} variant={statusVariant as 'red' | 'gray' | 'amber'} />
                   <span className="text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-cream-3/40 text-text-secondary">
-                    {days} day{days !== 1 ? 's' : ''}
+                    {t('closure.dayCount', '{{count}} day', { count: days })}
                   </span>
                 </div>
               </div>
@@ -372,7 +379,7 @@ function ClosureCard({ closure, fmtDate, onDelete, onUpdate, deleting, updating 
               <div className="flex items-center gap-2">
                 <Clock size={13} className="text-amber" />
                 <span className="text-[13.5px] text-text-tertiary">
-                  Starts in {daysUntil} day{daysUntil !== 1 ? 's' : ''}
+                  {t('closure.startsIn', 'Starts in {{count}} day', { count: daysUntil })}
                 </span>
               </div>
             );
@@ -383,7 +390,7 @@ function ClosureCard({ closure, fmtDate, onDelete, onUpdate, deleting, updating 
               <div className="flex items-center gap-2">
                 <Clock size={13} className="text-red" />
                 <span className="text-[13.5px] text-red">
-                  {daysLeft} day{daysLeft !== 1 ? 's' : ''} remaining
+                  {t('closure.daysRemaining', '{{count}} day remaining', { count: daysLeft })}
                 </span>
               </div>
             );

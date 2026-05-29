@@ -63,10 +63,10 @@ export function ManagerCheckinCard({ qrToken }: ManagerCheckinCardProps) {
           <div>
             <p className="text-[15px] font-medium text-text-primary">
               {completed
-                ? 'Shift complete'
+                ? t('checkin.completed', 'Attendance completed for today')
                 : checkedIn
-                  ? `Checked in at ${today?.checkInAt ?? '—'}`
-                  : 'Not checked in yet'}
+                  ? t('checkin.checkedInAt', 'Checked in at {{time}}', { time: today?.checkInAt ?? '—' })
+                  : t('dashboard.notCheckedIn', 'Not checked in yet')}
             </p>
             {data.shiftName && (
               <p className="text-[13px] text-text-tertiary">
@@ -87,8 +87,8 @@ export function ManagerCheckinCard({ qrToken }: ManagerCheckinCardProps) {
             {checkinAction.isPending
               ? '...'
               : checkedIn
-                ? 'Check out'
-                : 'Check in'}
+                ? t('checkin.checkOut', 'Check Out')
+                : t('checkin.checkIn', 'Check In')}
           </button>
         )}
       </div>
