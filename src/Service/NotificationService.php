@@ -239,120 +239,161 @@ class NotificationService
     }
 
     /**
-     * Alert the owner + every manager with `manage_attendance` that a tracked
-     * employee on a shift has no check-in row an hour after their shift started.
+     * Push + email + Telegram digest of a single shift edge — start or end —
+     * for everyone who manages attendance on this workspace.
+     *
+     * Expected summary shape (mirrors `ShiftSummaryService::scan()`):
+     *   - type: 'start' | 'end'
+     *   - shift: Shift
+     *   - dueAt: \DateTimeImmutable (UTC)
+     *   - total: int
+     *   - For 'start': onTime/late/missed lists of Employee
+     *   - For 'end':   completed/leftEarly/missed lists of Employee
+     *
+     * @param array<string, mixed> $summary
      */
-    public function notifyMissingCheckin(Employee $employee, Shift $shift, \DateTimeImmutable $expectedAt): void
+    public function notifyShiftSummary(Workspace $workspace, array $summary): void
     {
-        $workspace = $employee->getWorkspace();
-        if ($workspace === null) {
+        $type = $summary['type'] ?? null;
+        $shift = $summary['shift'] ?? null;
+        if (!$shift instanceof Shift || ($type !== 'start' && $type !== 'end')) {
             return;
         }
 
+        $isStart = $type === 'start';
         $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
-        $shiftStart = $shift->getStartTime()?->format('H:i') ?? '';
-        $expectedLocal = $expectedAt->setTimezone($tz)->format('H:i');
 
-        $title = 'Missing check-in';
-        $body = sprintf(
-            '%s has not checked in for the %s shift (started %s)',
-            $employee->getName(),
-            $shift->getName(),
-            $shiftStart !== '' ? $shiftStart : 'today',
-        );
+        $shiftStart = $shift->getStartTime()?->format('H:i') ?? '';
+        $shiftEnd = $shift->getEndTime()?->format('H:i') ?? '';
+        $edgeLocal = $isStart ? $shiftStart : $shiftEnd;
+
+        $total = (int) ($summary['total'] ?? 0);
+        $missed = $this->namesOf($summary['missed'] ?? []);
+        $late = $isStart ? $this->namesOf($summary['late'] ?? []) : [];
+        $leftEarly = $isStart ? [] : $this->namesOf($summary['leftEarly'] ?? []);
+        $onTimeCount = $isStart ? count($summary['onTime'] ?? []) : 0;
+        $completedCount = $isStart ? 0 : count($summary['completed'] ?? []);
+
+        if ($isStart) {
+            $title = sprintf('%s shift started', $shift->getName());
+            $body = sprintf(
+                '%d on time, %d late, %d missed (of %d)',
+                $onTimeCount,
+                count($late),
+                count($missed),
+                $total,
+            );
+            $payloadType = 'shift_start_summary';
+            $subject = sprintf('%s — %s shift summary', $workspace->getName(), $shift->getName());
+            $template = 'emails/shift_start_summary.html.twig';
+        } else {
+            $title = sprintf('%s shift ended', $shift->getName());
+            $body = sprintf(
+                '%d completed, %d left early, %d missed (of %d)',
+                $completedCount,
+                count($leftEarly),
+                count($missed),
+                $total,
+            );
+            $payloadType = 'shift_end_summary';
+            $subject = sprintf('%s — %s shift wrap-up', $workspace->getName(), $shift->getName());
+            $template = 'emails/shift_end_summary.html.twig';
+        }
 
         $payload = [
-            'type' => 'missing_checkin',
+            'type' => $payloadType,
             'workspacePublicId' => $workspace->getPublicId(),
-            'employeePublicId' => $employee->getPublicId(),
+            'shiftPublicId' => $shift->getPublicId(),
             'shiftName' => $shift->getName(),
+            'total' => $total,
+            'missedCount' => count($missed),
         ];
+        if ($isStart) {
+            $payload['onTimeCount'] = $onTimeCount;
+            $payload['lateCount'] = count($late);
+        } else {
+            $payload['completedCount'] = $completedCount;
+            $payload['leftEarlyCount'] = count($leftEarly);
+        }
 
         $recipients = $this->attendanceManagerRecipients($workspace);
+
         $this->expoPushService->send($recipients['tokens'], $title, $body, $payload);
+
         $this->emailService->sendToMany(
             $recipients['emails'],
-            sprintf('Missing check-in — %s', $employee->getName()),
-            'emails/missing_checkin.html.twig',
-            [
-                'workspaceName' => $workspace->getName(),
-                'employeeName' => $employee->getName(),
-                'shiftName' => $shift->getName(),
-                'shiftStart' => $shiftStart,
-                'expectedTime' => $expectedLocal,
-            ],
+            $subject,
+            $template,
+            $isStart
+                ? [
+                    'workspaceName' => $workspace->getName(),
+                    'shiftName' => $shift->getName(),
+                    'shiftStart' => $shiftStart,
+                    'shiftEnd' => $shiftEnd,
+                    'edgeTime' => $edgeLocal,
+                    'total' => $total,
+                    'onTimeCount' => $onTimeCount,
+                    'lateCount' => count($late),
+                    'missedCount' => count($missed),
+                    'lateNames' => $this->truncateNames($late, 5),
+                    'lateOverflow' => max(0, count($late) - 5),
+                    'missedNames' => $this->truncateNames($missed, 5),
+                    'missedOverflow' => max(0, count($missed) - 5),
+                ]
+                : [
+                    'workspaceName' => $workspace->getName(),
+                    'shiftName' => $shift->getName(),
+                    'shiftStart' => $shiftStart,
+                    'shiftEnd' => $shiftEnd,
+                    'edgeTime' => $edgeLocal,
+                    'total' => $total,
+                    'completedCount' => $completedCount,
+                    'leftEarlyCount' => count($leftEarly),
+                    'missedCount' => count($missed),
+                    'leftEarlyNames' => $this->truncateNames($leftEarly, 5),
+                    'leftEarlyOverflow' => max(0, count($leftEarly) - 5),
+                    'missedNames' => $this->truncateNames($missed, 5),
+                    'missedOverflow' => max(0, count($missed) - 5),
+                ],
         );
 
+        $tgEmoji = $isStart ? '☕️' : '🌙';
         $tgText = sprintf(
-            "⏰ <b>Missing check-in</b>\n%s has not checked in for the %s shift (started %s)",
-            $employee->getName(),
-            $shift->getName(),
-            $shiftStart !== '' ? $shiftStart : 'today',
+            "%s <b>%s</b>\n%s",
+            $tgEmoji,
+            $title,
+            $body,
         );
         $this->sendTelegram($workspace, $tgText);
     }
 
     /**
-     * Alert the owner + every manager with `manage_attendance` that an attendance
-     * row still has no check-out an hour after the shift ended (likely forgot to
-     * scan out).
+     * @param iterable<Employee> $employees
+     * @return list<string>
      */
-    public function notifyMissingCheckout(Attendance $attendance, Shift $shift, \DateTimeImmutable $expectedAt): void
+    private function namesOf(iterable $employees): array
     {
-        $employee = $attendance->getEmployee();
-        $workspace = $attendance->getWorkspace();
-        if ($employee === null || $workspace === null) {
-            return;
+        $names = [];
+        foreach ($employees as $employee) {
+            if ($employee instanceof Employee) {
+                $names[] = $employee->getName();
+            }
         }
+        return $names;
+    }
 
-        $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
-        $shiftEnd = $shift->getEndTime()?->format('H:i') ?? '';
-        $expectedLocal = $expectedAt->setTimezone($tz)->format('H:i');
-        $checkInLocal = $attendance->getCheckInAt()?->setTimezone($tz)->format('H:i') ?? '—';
-
-        $title = 'Missing check-out';
-        $body = sprintf(
-            '%s has not checked out from the %s shift (ended %s)',
-            $employee->getName(),
-            $shift->getName(),
-            $shiftEnd !== '' ? $shiftEnd : 'today',
-        );
-
-        $payload = [
-            'type' => 'missing_checkout',
-            'workspacePublicId' => $workspace->getPublicId(),
-            'employeePublicId' => $employee->getPublicId(),
-            'shiftName' => $shift->getName(),
-        ];
-
-        $recipients = $this->attendanceManagerRecipients($workspace);
-        $this->expoPushService->send($recipients['tokens'], $title, $body, $payload);
-        $this->emailService->sendToMany(
-            $recipients['emails'],
-            sprintf('Missing check-out — %s', $employee->getName()),
-            'emails/missing_checkout.html.twig',
-            [
-                'workspaceName' => $workspace->getName(),
-                'employeeName' => $employee->getName(),
-                'shiftName' => $shift->getName(),
-                'shiftEnd' => $shiftEnd,
-                'checkInTime' => $checkInLocal,
-                'expectedTime' => $expectedLocal,
-            ],
-        );
-
-        $tgText = sprintf(
-            "⏰ <b>Missing check-out</b>\n%s has not checked out from the %s shift (ended %s)",
-            $employee->getName(),
-            $shift->getName(),
-            $shiftEnd !== '' ? $shiftEnd : 'today',
-        );
-        $this->sendTelegram($workspace, $tgText);
+    /**
+     * @param list<string> $names
+     * @return list<string>
+     */
+    private function truncateNames(array $names, int $max): array
+    {
+        return array_slice($names, 0, $max);
     }
 
     /**
      * Collect push tokens + email addresses for everyone who should hear about a
-     * workspace-wide attendance anomaly: the owner plus every active manager
+     * workspace-wide attendance digest: the owner plus every active manager
      * (with a linked user) carrying the `manage_attendance` capability.
      *
      * @return array{tokens: list<string>, emails: list<string>}

@@ -32,9 +32,9 @@ final class CronJobRegistry
             'description' => 'Sends the end-of-day attendance summary to Espresso+ workspace owners. Run hourly; the command sends to each workspace exactly once when its local clock reaches the --hour value (default 18:00).',
             'suggestedCron' => '0 * * * *',
         ],
-        'dailybrew:scan-shift-anomalies' => [
-            'label' => 'Shift anomalies — missing check-in/out alerts',
-            'description' => 'Every 5 minutes, scans Espresso+ workspaces and fires push + email to the owner and managers (manage_attendance) when a tracked employee is an hour past their shift start with no check-in, or past their shift end with no check-out.',
+        'dailybrew:scan-shift-summaries' => [
+            'label' => 'Shift summaries — start & end digests',
+            'description' => 'Every 5 minutes, scans Espresso+ workspaces and fires a digest to the owner and managers (manage_attendance) 30 minutes after each shift start (on time / late / missed) and end (completed / left early / missed).',
             'suggestedCron' => '*/5 * * * *',
         ],
     ];
