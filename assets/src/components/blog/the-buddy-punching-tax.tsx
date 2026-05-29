@@ -6,21 +6,27 @@ import { Link } from '@tanstack/react-router';
  * 75% prevalence from APA, then why face/GPS aren't the right fix for
  * small cafés, then the three-layer solution. Cross-links back to
  * three-factor-attendance for the deeper conceptual piece.
+ *
+ * Absolute-dollar examples use Cambodian café reality (~$1,000/mo payroll
+ * for a 5-person shop) rather than US figures — DailyBrew's home market.
+ * The 2.2% percentage stays universal so the framing scales to any region.
  */
 export function TheBuddyPunchingTaxPost() {
   return (
     <div className="space-y-6 text-[16px] leading-relaxed text-text-secondary">
       <p>
-        A 5-person café paying $30,000 a month in wages loses roughly $660 every month to buddy
-        punching. That&apos;s not the price of one fancy espresso machine per year — it&apos;s two.
-        Over a decade, it pays for the build-out.
+        A 5-person café in Phnom Penh paying around $1,000 a month in wages loses roughly $22
+        every month to buddy punching. That sounds small — until you realize it&apos;s the cost
+        of a week of electricity, or two staff lunches. Over a year it&apos;s <strong>$264</strong>{' '}
+        — your espresso grinder, gone to hours nobody actually worked.
       </p>
       <p>
         The 2.2% number comes from Nucleus Research; the American Payroll Association estimates
-        roughly 75% of businesses are affected. On a small team the <em>percentage</em> is the
-        same as on a 200-person operation, but the <em>visibility</em> is worse: one staff member
-        covering for a chronically late friend over six months is the difference between a tight
-        budget and a bad month.
+        roughly 75% of businesses are affected. On a small Cambodian team the{' '}
+        <em>percentage</em> is the same as on a 200-person operation in the US, but the{' '}
+        <em>visibility</em> is worse: one staff member covering for a chronically late friend
+        over six months is the difference between a tight budget and a bad month — at a margin
+        where a bad month gets you behind on rent.
       </p>
 
       <h2 className="font-serif text-2xl font-semibold text-text-primary mt-10 mb-2">
