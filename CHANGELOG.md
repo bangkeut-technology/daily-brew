@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.85.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.85.0...v1.85.1) (2026-05-29)
+
+
+### Bug Fixes
+
+* **i18n,km,fr:** add Tap/NFC check-in settings + 48 profile page translations ([#207](https://github.com/bangkeut-technology/daily-brew/issues/207)) ([6c21123](https://github.com/bangkeut-technology/daily-brew/commit/6c211233931ef26a0dffe70d19bd760105a8d18e))
+
 ## [1.85.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.84.0...v1.85.0) (2026-05-29)
 
 
