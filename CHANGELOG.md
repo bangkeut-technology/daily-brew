@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.82.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.81.0...v1.82.0) (2026-05-29)
+
+
+### Features
+
+* **i18n:** translate /features/* sub-pages + add 'just a phone' messaging on homepage ([#192](https://github.com/bangkeut-technology/daily-brew/issues/192)) ([9ee10b8](https://github.com/bangkeut-technology/daily-brew/commit/9ee10b87d374c2bde13e3666f7c18720f7048486))
+
+
+### Bug Fixes
+
+* **i18n,km:** replace 'ការប្រុស' bug + add missing console UI translations ([#193](https://github.com/bangkeut-technology/daily-brew/issues/193)) ([b325746](https://github.com/bangkeut-technology/daily-brew/commit/b32574695ab04bb6215364d7295fb7f73d805b6b))
+
 ## [1.81.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.80.0...v1.81.0) (2026-05-29)
 
 
