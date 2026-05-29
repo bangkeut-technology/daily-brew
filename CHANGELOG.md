@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.81.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.80.0...v1.81.0) (2026-05-29)
+
+
+### Features
+
+* **i18n:** translate marketing batch — how-it-works, pricing, support, roles, demo, guides, playbooks ([#190](https://github.com/bangkeut-technology/daily-brew/issues/190)) ([6978053](https://github.com/bangkeut-technology/daily-brew/commit/697805314d865ee03233c8a3f80761da1cf396d3))
+
 ## [1.80.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.79.0...v1.80.0) (2026-05-28)
 
 
