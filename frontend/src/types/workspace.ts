@@ -12,4 +12,5 @@ export interface WorkspaceSetting {
   telegramChatId: string | null;
   tapCheckinEnabled: boolean;
   nfcCheckinEnabled: boolean;
+  nfcCheckinIntervalMinutes: number;
 }

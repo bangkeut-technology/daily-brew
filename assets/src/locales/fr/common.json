@@ -182,7 +182,9 @@
     "enableDeviceVerification": "Activer la vérification de l'appareil",
     "deviceVerificationDesc": "Exiger le même appareil pour le pointage d'entrée et de sortie, et empêcher un appareil de pointer pour plusieurs employés",
     "deviceVerificationEspresso": "La vérification de l'appareil nécessite Espresso",
-    "learnMore": "En savoir plus"
+    "learnMore": "En savoir plus",
+    "nfcCooldownLabel": "Délai entre scans (minutes)",
+    "nfcCooldownHint": "Empêche les doubles taps accidentels. Mettez 0 pour désactiver."
   },
   "checkin": {
     "deviceMismatch": "Le pointage de sortie doit être effectué depuis le même appareil que le pointage d'entrée",
@@ -1990,6 +1992,86 @@
           "title": "Prêt à connecter vos systèmes ?",
           "subtitle": "Commencez gratuitement, passez à Espresso quand vous aurez besoin de l'intégration."
         }
+      }
+    },
+    "threeFactorAttendance": {
+      "title": "Présence à trois facteurs",
+      "subtitle": "La configuration de check-in la plus solide de DailyBrew. Combinez restriction IP, vérification d'appareil et géorepérage — chaque couche couvre ce que les autres ne peuvent pas. Pour pointer, un employé doit être sur le bon réseau, sur le bon téléphone et physiquement au restaurant.",
+      "why": {
+        "title": "Pourquoi trois facteurs",
+        "items": {
+          "singleLayer": {
+            "title": "Aucune couche unique n'est infaillible",
+            "desc": "La restriction IP peut être contournée par un Wi-Fi d'immeuble partagé ou un hotspot mobile. La vérification d'appareil se casse si un employé efface ses données de navigateur. Le géorepérage peut dériver en intérieur. Chaque contrôle a un mode de défaillance connu — donc utilisé seul, il laisse une faille par laquelle un employé peut faire pointer un collègue."
+          },
+          "complementary": {
+            "title": "Les trois contrôles se complètent",
+            "desc": "L'IP confirme le réseau. La vérification d'appareil confirme l'identité du téléphone qui effectue le scan. Le géorepérage confirme la présence physique sur place. Pour contourner les trois à la fois, un employé devrait être sur le Wi-Fi du restaurant, avec son propre téléphone enregistré, à l'intérieur du périmètre — ce qui revient exactement à être au travail."
+          },
+          "auditable": {
+            "title": "Chaque couche laisse une piste d'audit",
+            "desc": "Chaque enregistrement de présence stocke l'IP, les deux identifiants d'appareil, les noms d'appareils et les coordonnées GPS utilisées pour le pointage d'entrée et de sortie. Si un litige survient, le propriétaire dispose des trois signaux pour comparer — pas d'un seul point de donnée flou."
+          }
+        }
+      },
+      "layers": {
+        "title": "Comment fonctionne chaque couche",
+        "readMore": "En savoir plus",
+        "items": {
+          "ipRestriction": {
+            "title": "Restriction IP — le facteur réseau",
+            "desc": "Verrouille les pointages aux adresses IP publiques du Wi-Fi ou du réseau filaire du restaurant. Tout scan effectué depuis l'extérieur de cette liste — domicile, bus, parking — est bloqué côté serveur avec un message clair. Utile pour les établissements avec un FAI stable et une empreinte réseau connue."
+          },
+          "deviceVerification": {
+            "title": "Vérification d'appareil — le facteur identité",
+            "desc": "Chaque téléphone reçoit silencieusement un identifiant unique la première fois que l'employé ouvre DailyBrew. Le check-in enregistre cet identifiant ; le check-out doit provenir du même appareil. Une seconde personne essayant de pointer sur un téléphone déjà utilisé ce jour-là est bloquée. Élimine la fraude au pointage à la source."
+          },
+          "geofencing": {
+            "title": "Géorepérage — le facteur localisation",
+            "desc": "Vous définissez les coordonnées GPS du restaurant et un rayon (50–5 000 m). Au check-in, le navigateur lit une fois la position de l'employé et le serveur vérifie qu'il est à l'intérieur du périmètre. Aucun suivi en arrière-plan — les coordonnées servent à comparer la distance puis sont oubliées."
+          }
+        }
+      },
+      "enable": {
+        "title": "Comment activer les trois",
+        "subtitle": "Mieux vaut le faire sur place au restaurant — la détection automatique de la position a besoin que vous soyez sur les lieux pour être précise.",
+        "steps": {
+          "openSettings": {
+            "title": "Ouvrez les paramètres de l'espace de travail",
+            "desc": "Connectez-vous à votre tableau de bord et cliquez sur Paramètres dans la barre latérale. Vous verrez trois cartes distinctes : Restriction IP, Vérification d'appareil et Géorepérage."
+          },
+          "enableThree": {
+            "title": "Activez les trois bascules",
+            "desc": "Dans Restriction IP, ajoutez les IP publiques du restaurant (utilisez le bouton « Utiliser mon IP actuelle » en étant sur le Wi-Fi du restaurant). Dans Vérification d'appareil, basculez l'interrupteur — aucune configuration n'est requise. Dans Géorepérage, utilisez « Utiliser ma position actuelle » pour définir le centre, puis choisissez un rayon (100 m convient à la plupart des restaurants)."
+          },
+          "saveTest": {
+            "title": "Enregistrez et faites un test de scan",
+            "desc": "Cliquez sur Enregistrer pour chaque carte. Effectuez un check-in test depuis l'intérieur du restaurant — il devrait réussir et afficher les trois badges de vérification (réseau, appareil, position). Essayez ensuite depuis l'autre côté de la rue : il devrait échouer avec un message clair indiquant quel contrôle l'a rejeté."
+          }
+        }
+      },
+      "fallback": {
+        "title": "Que se passe-t-il quand une couche échoue",
+        "intro": "Chaque couche est appliquée indépendamment. Si un seul contrôle échoue, tout le check-in est rejeté — il n'y a pas de succès partiel. C'est volontaire : la sécurité en couches signifie que chaque contrôle est une barrière franche, pas un score pondéré.",
+        "items": {
+          "ipDown": {
+            "label": "Le Wi-Fi du restaurant tombe",
+            "desc": "Les employés sur un hotspot mobile seront bloqués par la restriction IP même si leur appareil et le GPS sont corrects. Pour récupérer : ajoutez temporairement l'IP du hotspot à la liste autorisée, ou passez à la saisie manuelle des présences depuis le tableau de bord propriétaire pour la journée concernée."
+          },
+          "newDevice": {
+            "label": "Un employé change de téléphone",
+            "desc": "Le premier check-in sur le nouveau téléphone passera l'IP et le géofence, mais la vérification d'appareil le traitera comme un appareil neuf — il peut pointer en entrée mais pas en sortie depuis l'ancien. La liaison d'appareil se réinitialise chaque jour, donc tout se rétablit le lendemain sans intervention."
+          },
+          "gpsWeak": {
+            "label": "Le GPS dérive en intérieur",
+            "desc": "Si le GPS indique un écart de 30 m dans un bâtiment aux murs épais, le géorepérage peut rejeter avec un rayon de 100 m. Choisissez un rayon un peu plus large (150–200 m) pour absorber la dérive en intérieur, ou comptez sur IP + vérification d'appareil comme les deux couches appliquées pour cet espace."
+          }
+        },
+        "outro": "Les notifications se déclenchent au premier check-in sur un nouvel appareil (Espresso) afin que les propriétaires repèrent un changement d'appareil légitime avant qu'il ne sème la confusion."
+      },
+      "espressoCallout": "Les trois couches — restriction IP, vérification d'appareil et géorepérage — sont incluses dans le plan Espresso (14,99 $/mois ou 149 $/an) avec la gestion des congés, les rôles de manager et les alertes Telegram.",
+      "cta": {
+        "title": "Prêt à verrouiller vos check-ins ?"
       }
     }
   },

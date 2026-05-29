@@ -101,6 +101,7 @@ class CheckinController extends AbstractController
         $longitude = isset($data['longitude']) ? (float) $data['longitude'] : null;
         $deviceId = isset($data['deviceId']) ? (string) $data['deviceId'] : null;
         $deviceName = isset($data['deviceName']) ? (string) $data['deviceName'] : null;
+        $source = ($data['origin'] ?? null) === 'nfc' ? CheckinService::SOURCE_NFC : null;
 
         $settings = EffectiveCheckinSettings::fromWorkspace($workspace);
 
@@ -112,6 +113,8 @@ class CheckinController extends AbstractController
             $deviceId,
             $deviceName,
             $settings,
+            null,
+            $source,
         );
 
         $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
@@ -179,6 +182,7 @@ class CheckinController extends AbstractController
         $longitude = isset($data['longitude']) ? (float) $data['longitude'] : null;
         $deviceId = isset($data['deviceId']) ? (string) $data['deviceId'] : null;
         $deviceName = isset($data['deviceName']) ? (string) $data['deviceName'] : null;
+        $source = ($data['origin'] ?? null) === 'nfc' ? CheckinService::SOURCE_NFC : null;
 
         $settings = EffectiveCheckinSettings::fromQrCode($qrCode);
 
@@ -191,6 +195,7 @@ class CheckinController extends AbstractController
             $deviceName,
             $settings,
             $qrCode,
+            $source,
         );
 
         $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');

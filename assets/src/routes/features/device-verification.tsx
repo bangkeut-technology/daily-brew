@@ -40,7 +40,7 @@ const experienceKeys = ['normal', 'wrongDevice', 'alreadyUsed'] as const;
 
 const faqKeys = ['newPhone', 'clearedData', 'shared', 'whichDevice', 'noApp'] as const;
 
-function DeviceVerificationPage() {
+export function DeviceVerificationPage() {
   const { t } = useTranslation();
   const ns = 'routes.features.deviceVerification';
   return (

@@ -63,6 +63,15 @@ class WorkspaceSetting extends AbstractBaseEntity
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $nfcCheckinEnabled = false;
 
+    /**
+     * Minimum minutes between successive NFC scans by the same employee.
+     * 0 disables the cooldown entirely. Defaults to 15 — matches the typical
+     * "I tapped the tag and the phone vibrated, did it work?" panic window
+     * without blocking a real check-out at the end of a short shift.
+     */
+    #[ORM\Column(type: 'integer', options: ['default' => 15])]
+    private int $nfcCheckinIntervalMinutes = 15;
+
     // ── Workspace ──────────────────────────────────────────────
 
     public function getWorkspace(): ?Workspace
@@ -230,6 +239,24 @@ class WorkspaceSetting extends AbstractBaseEntity
     public function setNfcCheckinEnabled(bool $nfcCheckinEnabled): static
     {
         $this->nfcCheckinEnabled = $nfcCheckinEnabled;
+        return $this;
+    }
+
+    public function getNfcCheckinIntervalMinutes(): int
+    {
+        return $this->nfcCheckinIntervalMinutes;
+    }
+
+    /**
+     * Clamp to 0–120 minutes. 0 disables the cooldown; the upper bound keeps
+     * a typo from locking the team out for a whole day. Values outside the
+     * range are clamped rather than thrown — the settings UI is plain
+     * `<input type="number" min="0" max="120">` and we'd rather quietly
+     * accept the closest valid value than surface a 500.
+     */
+    public function setNfcCheckinIntervalMinutes(int $nfcCheckinIntervalMinutes): static
+    {
+        $this->nfcCheckinIntervalMinutes = max(0, min(120, $nfcCheckinIntervalMinutes));
         return $this;
     }
 }

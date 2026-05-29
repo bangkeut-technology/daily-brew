@@ -8,6 +8,7 @@ use App\Entity\Attendance;
 use App\Entity\Employee;
 use App\Entity\LeaveRequest;
 use App\Entity\Workspace;
+use App\Entity\WorkspaceSetting;
 use App\Entity\ClosurePeriod;
 use App\Repository\AttendanceRepository;
 use App\Repository\ClosurePeriodRepository;
@@ -15,12 +16,14 @@ use App\Repository\LeaveRequestRepository;
 use App\Service\Checkin\EffectiveCheckinSettings;
 use App\Service\CheckinService;
 use App\Service\AttendanceFlagCalculator;
+use App\Service\DateService;
 use App\Service\PlanService;
 use DateTimeImmutable;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -326,12 +329,160 @@ class CheckinServiceTest extends TestCase
         $this->assertNotNull($result->getCheckOutAt());
     }
 
+    // ── NFC cooldown ──────────────────────────────────────────────────
+
+    public function testNfcScanWithinCooldownReturnsExistingAttendanceUnchanged(): void
+    {
+        // Freeze "now" at 09:00:10 — 10 seconds after the original check-in.
+        // That's well inside the default 15-minute cooldown.
+        DateService::setClock(new MockClock(new DateTimeImmutable('2026-04-10 09:00:10', new \DateTimeZone('UTC'))));
+
+        $original = (new Attendance())
+            ->setCheckInAt(new DateTimeImmutable('2026-04-10 09:00:00', new \DateTimeZone('UTC')));
+
+        $employee = $this->employeeWithNfcCooldown(15);
+        $this->attendanceRepo = $this->createMock(AttendanceRepository::class);
+        $this->attendanceRepo->method('findByEmployeeAndDate')->willReturn($original);
+        $this->rebuildService();
+
+        // No INSERT, no UPDATE — the second NFC tap is silently dropped.
+        $this->attendanceRepo->expects($this->never())->method('persist');
+        $this->attendanceRepo->expects($this->never())->method('flush');
+
+        $result = $this->svc->checkin(
+            $employee,
+            clientIp: '203.0.113.5',
+            settings: $this->settings(),
+            source: CheckinService::SOURCE_NFC,
+        );
+
+        $this->assertSame($original, $result);
+        $this->assertNull($result->getCheckOutAt(), 'check-out should not have been flipped on');
+    }
+
+    public function testNfcScanAfterCooldownChecksOutAsNormal(): void
+    {
+        // 16 minutes after check-in — outside the 15-minute default cooldown.
+        DateService::setClock(new MockClock(new DateTimeImmutable('2026-04-10 09:16:00', new \DateTimeZone('UTC'))));
+
+        $existing = (new Attendance())
+            ->setCheckInAt(new DateTimeImmutable('2026-04-10 09:00:00', new \DateTimeZone('UTC')));
+
+        $employee = $this->employeeWithNfcCooldown(15);
+        $this->attendanceRepo = $this->createMock(AttendanceRepository::class);
+        $this->attendanceRepo->method('findByEmployeeAndDate')->willReturn($existing);
+        $this->rebuildService();
+
+        $this->attendanceRepo->expects($this->once())->method('flush');
+
+        $result = $this->svc->checkin(
+            $employee,
+            clientIp: '203.0.113.5',
+            settings: $this->settings(),
+            source: CheckinService::SOURCE_NFC,
+        );
+
+        $this->assertNotNull($result->getCheckOutAt(), 'second tap after cooldown should be the check-out');
+    }
+
+    public function testQrScanWithinCooldownWindowStillProcesses(): void
+    {
+        // Same 10-second-after window — but origin is a QR scan, not NFC.
+        // QR scans deliberately bypass the cooldown: a manager-initiated
+        // QR scan is a conscious act, not a phantom NFC tap.
+        DateService::setClock(new MockClock(new DateTimeImmutable('2026-04-10 09:00:10', new \DateTimeZone('UTC'))));
+
+        $existing = (new Attendance())
+            ->setCheckInAt(new DateTimeImmutable('2026-04-10 09:00:00', new \DateTimeZone('UTC')));
+
+        $employee = $this->employeeWithNfcCooldown(15);
+        $this->attendanceRepo = $this->createMock(AttendanceRepository::class);
+        $this->attendanceRepo->method('findByEmployeeAndDate')->willReturn($existing);
+        $this->rebuildService();
+
+        $this->attendanceRepo->expects($this->once())->method('flush');
+
+        $result = $this->svc->checkin(
+            $employee,
+            clientIp: '203.0.113.5',
+            settings: $this->settings(),
+            source: null, // QR / button — not NFC
+        );
+
+        $this->assertNotNull($result->getCheckOutAt(), 'QR scan should always process, cooldown is NFC-only');
+    }
+
+    public function testNfcCooldownDisabledWhenIntervalIsZero(): void
+    {
+        DateService::setClock(new MockClock(new DateTimeImmutable('2026-04-10 09:00:10', new \DateTimeZone('UTC'))));
+
+        $existing = (new Attendance())
+            ->setCheckInAt(new DateTimeImmutable('2026-04-10 09:00:00', new \DateTimeZone('UTC')));
+
+        // intervalMinutes = 0 → cooldown turned off entirely, even for NFC.
+        $employee = $this->employeeWithNfcCooldown(0);
+        $this->attendanceRepo = $this->createMock(AttendanceRepository::class);
+        $this->attendanceRepo->method('findByEmployeeAndDate')->willReturn($existing);
+        $this->rebuildService();
+
+        $this->attendanceRepo->expects($this->once())->method('flush');
+
+        $result = $this->svc->checkin(
+            $employee,
+            clientIp: '203.0.113.5',
+            settings: $this->settings(),
+            source: CheckinService::SOURCE_NFC,
+        );
+
+        $this->assertNotNull($result->getCheckOutAt());
+    }
+
+    public function testFirstNfcScanWithNoPriorAttendanceCreatesNormally(): void
+    {
+        DateService::setClock(new MockClock(new DateTimeImmutable('2026-04-10 09:00:00', new \DateTimeZone('UTC'))));
+
+        // findByEmployeeAndDate already returns null by default — fresh day.
+        $employee = $this->employeeWithNfcCooldown(15);
+        $this->attendanceRepo->expects($this->once())->method('persist');
+        $this->attendanceRepo->expects($this->once())->method('flush');
+
+        $result = $this->svc->checkin(
+            $employee,
+            clientIp: '203.0.113.5',
+            settings: $this->settings(),
+            source: CheckinService::SOURCE_NFC,
+        );
+
+        $this->assertNotNull($result->getCheckInAt());
+        $this->assertNull($result->getCheckOutAt());
+    }
+
+    protected function tearDown(): void
+    {
+        // Release the frozen clock so other tests run against real "now".
+        DateService::setClock(null);
+        parent::tearDown();
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────
 
     private function employee(): Employee
     {
         $emp = new Employee();
         $emp->setWorkspace(new Workspace());
+        return $emp;
+    }
+
+    private function employeeWithNfcCooldown(int $minutes): Employee
+    {
+        $workspace = new Workspace();
+        $setting = new WorkspaceSetting();
+        $setting->setWorkspace($workspace);
+        $setting->setNfcCheckinIntervalMinutes($minutes);
+        $workspace->setSetting($setting);
+
+        $emp = new Employee();
+        $emp->setWorkspace($workspace);
         return $emp;
     }
 

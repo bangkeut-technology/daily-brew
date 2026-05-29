@@ -251,7 +251,9 @@
     "enableDeviceVerification": "Enable device verification",
     "deviceVerificationDesc": "Require the same device for check-in and check-out, and prevent one device from checking in multiple employees",
     "deviceVerificationEspresso": "Device verification requires Espresso",
-    "learnMore": "Learn more"
+    "learnMore": "Learn more",
+    "nfcCooldownLabel": "Cooldown between scans (minutes)",
+    "nfcCooldownHint": "Prevents accidental double-taps. Set to 0 to disable."
   },
   "checkin": {
     "checkIn": "Check In",

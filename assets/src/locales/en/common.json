@@ -251,7 +251,9 @@
     "enableDeviceVerification": "Enable device verification",
     "deviceVerificationDesc": "Require the same device for check-in and check-out, and prevent one device from checking in multiple employees",
     "deviceVerificationEspresso": "Device verification requires Espresso",
-    "learnMore": "Learn more"
+    "learnMore": "Learn more",
+    "nfcCooldownLabel": "Cooldown between scans (minutes)",
+    "nfcCooldownHint": "Prevents accidental double-taps. Set to 0 to disable."
   },
   "checkin": {
     "checkIn": "Check In",
@@ -2084,6 +2086,86 @@
           "title": "Ready to connect your systems?",
           "subtitle": "Start free, upgrade to Espresso when you need the integration."
         }
+      }
+    },
+    "threeFactorAttendance": {
+      "title": "Three-factor attendance",
+      "subtitle": "The strongest check-in configuration in DailyBrew. Combine IP restriction, device verification, and geofencing — each layer covers a gap the others can't. To clock in, a staff member must be on the right network, on the right phone, and physically at the restaurant.",
+      "why": {
+        "title": "Why three factors",
+        "items": {
+          "singleLayer": {
+            "title": "No single layer is bulletproof",
+            "desc": "IP restriction can be sidestepped by a shared building WiFi or a mobile hotspot. Device verification breaks if an employee clears their browser data. Geofencing can drift indoors. Each control has a known failure mode — so any single one, used alone, leaves a gap an employee can drive a colleague's check-in through."
+          },
+          "complementary": {
+            "title": "The three controls complement each other",
+            "desc": "IP confirms the network. Device verification confirms the identity of the phone doing the scanning. Geofencing confirms the physical body in the building. To bypass all three at once an employee would have to be on the restaurant WiFi, using their own registered phone, standing inside the geofence — which is the same thing as actually being at work."
+          },
+          "auditable": {
+            "title": "Every layer leaves an audit trail",
+            "desc": "Each attendance record stores the IP, both device IDs, the device names, and the GPS coordinates used for the check-in and check-out. If a dispute ever surfaces, owners have all three signals to compare — not one fuzzy data point."
+          }
+        }
+      },
+      "layers": {
+        "title": "How each layer works",
+        "readMore": "Read more",
+        "items": {
+          "ipRestriction": {
+            "title": "IP restriction — the network factor",
+            "desc": "Lock check-ins to the public IP addresses of your restaurant's WiFi or wired network. Any scan from outside that list — home, the bus, a parking lot — is blocked at the server with a clear message. Useful for venues with a stable ISP and known network footprint."
+          },
+          "deviceVerification": {
+            "title": "Device verification — the identity factor",
+            "desc": "Each phone is silently assigned a unique ID the first time the employee opens DailyBrew. Check-in records that ID; check-out must come from the same device. A second person trying to clock in on a phone already used today is blocked. Eliminates buddy punching at the source."
+          },
+          "geofencing": {
+            "title": "Geofencing — the location factor",
+            "desc": "You set the GPS coordinates of the restaurant and a radius (50–5,000m). At check-in the browser reads the employee's location once and the server verifies they're inside the perimeter. No background tracking — the coordinates are used to compare distance and then forgotten."
+          }
+        }
+      },
+      "enable": {
+        "title": "How to enable all three",
+        "subtitle": "Best done while you're physically at the restaurant — the location auto-detect needs you on-site for accuracy.",
+        "steps": {
+          "openSettings": {
+            "title": "Open workspace settings",
+            "desc": "Sign in to your dashboard and click Settings in the sidebar. You'll see three separate cards: IP restriction, Device verification, and Geofencing."
+          },
+          "enableThree": {
+            "title": "Turn on all three toggles",
+            "desc": "In IP restriction, add the restaurant's public IPs (use the \"Use my current IP\" button while on the restaurant WiFi). In Device verification, flip the toggle — no configuration needed. In Geofencing, use \"Use my current location\" to set the center, then pick a radius (100m works for most restaurants)."
+          },
+          "saveTest": {
+            "title": "Save and run a test scan",
+            "desc": "Hit Save on each card. Do a test check-in from inside the restaurant — it should succeed and show all three verification badges (network, device, location). Then try a check-in from across the street: it should fail with a clear message naming which check rejected it."
+          }
+        }
+      },
+      "fallback": {
+        "title": "What happens when one layer fails",
+        "intro": "Each layer is enforced independently. If any single check fails, the whole check-in is rejected — there's no partial success. That's deliberate: layered security means each control is a hard gate, not a weighted score.",
+        "items": {
+          "ipDown": {
+            "label": "Restaurant WiFi goes down",
+            "desc": "Staff on a mobile hotspot will be blocked by IP restriction even if their device and GPS are fine. To recover: temporarily add the hotspot IP to the allow-list, or switch to manual attendance entry from the owner dashboard for the affected day."
+          },
+          "newDevice": {
+            "label": "Employee gets a new phone",
+            "desc": "First check-in on the new phone will pass IP and geofence but device verification will treat it as a fresh device — they can check in but not yet check out from the old one. Device binding resets daily, so it self-heals on day two with no action needed."
+          },
+          "gpsWeak": {
+            "label": "GPS drifts indoors",
+            "desc": "If GPS reads as 30m off inside a thick-walled building, geofencing may reject with a 100m radius. Pick a slightly wider radius (150–200m) to absorb indoor drift, or rely on IP + device verification as the two enforced layers for that workspace."
+          }
+        },
+        "outro": "Notifications fire on the first new-device check-in (Espresso) so owners catch a legitimate device change before it confuses anyone."
+      },
+      "espressoCallout": "All three layers — IP restriction, device verification, and geofencing — are included in the Espresso plan ($14.99/month or $149/year) alongside leave management, manager roles, and Telegram alerts.",
+      "cta": {
+        "title": "Ready to lock down your check-ins?"
       }
     }
   },

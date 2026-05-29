@@ -16,6 +16,9 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class CheckinService
 {
+    /** Source tag for an NFC tag tap. Distinguishes a tap from a QR scan / button press. */
+    public const SOURCE_NFC = 'nfc';
+
     public function __construct(
         private AttendanceRepository $attendanceRepository,
         private ClosurePeriodRepository $closurePeriodRepository,
@@ -33,6 +36,7 @@ class CheckinService
         ?string $deviceName = null,
         ?EffectiveCheckinSettings $settings = null,
         ?WorkspaceQrCode $qrCode = null,
+        ?string $source = null,
     ): Attendance {
         $workspace = $employee->getWorkspace();
         $settings ??= $workspace !== null
@@ -42,6 +46,28 @@ class CheckinService
         $wsTz = new \DateTimeZone($settings->timezone);
         $nowUtc = DateService::now();
         $today = DateService::today($wsTz);
+
+        // NFC double-tap guard: a single tap on an NTAG sticker can fire two
+        // browser navigations in rapid succession (the phone wakes the screen,
+        // the user reflexively taps again "in case it didn't work"). Without
+        // this, the second tap would flip a fresh check-in into a check-out.
+        // Idempotent: return the existing row unchanged — no new write, no
+        // exception, no flag recompute — so the mobile UI keeps showing the
+        // confirmation it already has. QR scans deliberately bypass this gate;
+        // the cooldown is for the eyes-off NFC flow only.
+        if ($source === self::SOURCE_NFC) {
+            $cooldownMinutes = $workspace?->getSetting()?->getNfcCheckinIntervalMinutes() ?? 0;
+            if ($cooldownMinutes > 0) {
+                $existing = $this->attendanceRepository->findByEmployeeAndDate($employee, $today);
+                if ($existing !== null && $existing->getCheckInAt() !== null) {
+                    $lastPunchAt = $existing->getCheckOutAt() ?? $existing->getCheckInAt();
+                    $diffSeconds = $nowUtc->getTimestamp() - $lastPunchAt->getTimestamp();
+                    if ($diffSeconds >= 0 && $diffSeconds < $cooldownMinutes * 60) {
+                        return $existing;
+                    }
+                }
+            }
+        }
 
         // IP restriction check
         if ($settings->ipRestrictionEnabled) {
