@@ -274,10 +274,10 @@ export function OwnerDashboard() {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <QrCode size={15} className="text-coffee" />
-                <h3 className="text-[16px] font-semibold text-text-primary">Check-in QR code</h3>
+                <h3 className="text-[16px] font-semibold text-text-primary">{t('dashboard.checkinQrTitle', 'Check-in QR code')}</h3>
               </div>
               <p className="text-[14px] text-text-secondary leading-relaxed mb-3">
-                Print and display this at your restaurant. Employees scan it with the DailyBrew app to check in and out.
+                {t('dashboard.checkinQrDesc', 'Print and display this at your restaurant. Employees scan it with the DailyBrew app to check in and out.')}
               </p>
               <div className="flex items-center gap-2">
                 <code className="text-[13px] font-mono text-text-tertiary bg-cream-3/30 px-2 py-1 rounded">

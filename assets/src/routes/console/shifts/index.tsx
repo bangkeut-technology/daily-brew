@@ -100,7 +100,7 @@ function ShiftsPage() {
       />
 
       <p className="text-[15px] text-text-secondary mb-5 -mt-2 leading-relaxed">
-        Define your restaurant's working hours. Assign employees to shifts so DailyBrew can track late arrivals and early departures automatically.
+        {t('shift.description', "Define your restaurant's working hours. Assign employees to shifts so DailyBrew can track late arrivals and early departures automatically.")}
       </p>
 
       {showForm && (
@@ -159,9 +159,9 @@ function ShiftsPage() {
                 <Crown size={16} className="text-amber" />
               </div>
               <div className="flex-1">
-                <p className="text-[15px] font-medium text-text-primary">Per-day shift schedules</p>
+                <p className="text-[15px] font-medium text-text-primary">{t('shift.perDaySchedules', 'Per-day shift schedules')}</p>
                 <p className="text-[13.5px] text-text-tertiary mt-0.5">
-                  Override shift hours for specific days of the week. Available with Espresso.
+                  {t('shift.perDaySchedulesDesc', 'Override shift hours for specific days of the week. Available with Espresso.')}
                 </p>
               </div>
               <span className="text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber shrink-0">
@@ -177,8 +177,8 @@ function ShiftsPage() {
       ) : shifts?.length === 0 ? (
         <div className="border-[1.5px] border-dashed border-cream-3 rounded-2xl bg-glass-bg backdrop-blur-md flex flex-col items-center justify-center min-h-50 cursor-pointer transition-colors hover:bg-cream-3/30" onClick={() => setShowForm(true)}>
           <Clock size={28} className="text-text-tertiary mb-2" />
-          <span className="text-[15px] text-text-tertiary">No shifts created yet</span>
-          <span className="text-[13px] text-text-tertiary mt-1">Click to create your first shift</span>
+          <span className="text-[15px] text-text-tertiary">{t('shift.emptyTitle', 'No shifts created yet')}</span>
+          <span className="text-[13px] text-text-tertiary mt-1">{t('shift.emptyHint', 'Click to create your first shift')}</span>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -407,7 +407,7 @@ function ShiftCard({
         <div className="flex items-center justify-between mb-2.5">
           <span className="flex items-center gap-1.5 text-[14px] font-medium text-text-secondary">
             <Users size={13} />
-            {assignedEmployees.length} {assignedEmployees.length === 1 ? 'employee' : 'employees'}
+            {t('shift.employeeCount', { count: assignedEmployees.length })}
           </span>
           <button
             onClick={() => setShowAssign(!showAssign)}
@@ -471,7 +471,7 @@ function ShiftCard({
           )}
         >
           <span className="flex items-center gap-1.5">
-            Day schedule
+            {t('shift.daySchedule', 'Day schedule')}
             {!canUseTimeRules && (
               <span className="text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
                 Espresso
@@ -562,6 +562,7 @@ function DayRow({
   workspaceId,
   shiftPublicId,
 }: DayRowProps) {
+  const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
   const [ruleStart, setRuleStart] = useState(existingRule?.startTime ?? shiftDefault.startTime);
   const [ruleEnd, setRuleEnd] = useState(existingRule?.endTime ?? shiftDefault.endTime);
@@ -684,13 +685,13 @@ function DayRow({
       <span className="text-[14px] font-mono text-text-tertiary tabular-nums">
         {shiftDefault.startTime} &ndash; {shiftDefault.endTime}
       </span>
-      <span className="text-[11.5px] text-text-tertiary ml-1">default</span>
+      <span className="text-[11.5px] text-text-tertiary ml-1">{t('shift.dayDefault', 'default')}</span>
       <button
         onClick={handleStartEdit}
         className="flex items-center gap-1 ml-auto text-[13px] font-medium px-2 py-0.5 rounded-md border-none cursor-pointer bg-transparent text-text-tertiary transition-colors hover:text-coffee"
       >
         <Plus size={10} />
-        Override
+        {t('shift.override', 'Override')}
       </button>
     </div>
   );

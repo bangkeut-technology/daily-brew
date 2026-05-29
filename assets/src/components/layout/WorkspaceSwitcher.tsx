@@ -75,7 +75,7 @@ export function WorkspaceSwitcher({ workspaces, planLabel, isEspresso }: Workspa
               </p>
               <div className="flex items-center gap-1.5 flex-wrap">
                 <p className="text-[12px] text-text-tertiary leading-tight shrink-0">
-                  {current?.role === 'manager' ? 'Manager' : current?.role === 'employee' ? 'Employee' : t('workspace.label')}
+                  {current?.role === 'manager' ? 'Manager' : current?.role === 'employee' ? 'Employee' : 'Owner'}
                 </p>
                 {planLabel && (
                   <span className={cn(
