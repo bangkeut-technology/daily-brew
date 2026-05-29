@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.88.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.87.0...v1.88.0) (2026-05-29)
+
+
+### Features
+
+* **notifications,blog:** add email channel to device-anomaly alert + companion blog post ([#216](https://github.com/bangkeut-technology/daily-brew/issues/216)) ([f65fd25](https://github.com/bangkeut-technology/daily-brew/commit/f65fd25117a4c23998b810f57df99cd72cd8436b))
+
 ## [1.87.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.86.0...v1.87.0) (2026-05-29)
 
 
