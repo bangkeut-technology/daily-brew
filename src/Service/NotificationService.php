@@ -535,6 +535,19 @@ class NotificationService
                 sprintf('%s %s from a new device (%s)', $employee->getName(), $verb, $deviceLabel),
                 ['type' => 'attendance_anomaly', 'workspacePublicId' => $workspace->getPublicId()],
             );
+
+            $this->emailService->send(
+                $owner->getEmail(),
+                sprintf('New device used — %s', $employee->getName()),
+                'emails/device_anomaly.html.twig',
+                [
+                    'workspaceName' => $workspace->getName(),
+                    'employeeName'  => $employee->getName(),
+                    'verb'          => $verb,
+                    'deviceLabel'   => $deviceLabel,
+                    'timeStr'       => $timeStr,
+                ],
+            );
         }
 
         $tgText = sprintf(

@@ -1,0 +1,31 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block title %}New device used at {{ workspaceName }}{% endblock %}
+
+{% block content %}
+  <h1>New device used</h1>
+  <p>{{ employeeName }} just {{ verb }} from a device they haven't used before. Push and Telegram alerts were sent in parallel — this email is the durable record so you can review later, even with the app closed and Telegram unread.</p>
+
+  <div class="detail-row">
+    <span class="detail-label">Employee</span>
+    <span class="detail-value">{{ employeeName }}</span>
+  </div>
+  <div class="detail-row">
+    <span class="detail-label">Action</span>
+    <span class="detail-value">{{ verb }}</span>
+  </div>
+  <div class="detail-row">
+    <span class="detail-label">Device</span>
+    <span class="detail-value">{{ deviceLabel }}</span>
+  </div>
+  <div class="detail-row">
+    <span class="detail-label">Time</span>
+    <span class="detail-value">{{ timeStr }}</span>
+  </div>
+  <div class="detail-row">
+    <span class="detail-label">Workspace</span>
+    <span class="detail-value">{{ workspaceName }}</span>
+  </div>
+
+  <p style="margin-top: 20px; font-size: 14px; color: #6b6258;">If this matches a recent phone upgrade or a staff transition, no action is needed — the new device becomes the employee's baseline going forward. If it looks like a shared phone or buddy-punching attempt, you can reset the employee's device binding from the Console.</p>
+{% endblock %}
