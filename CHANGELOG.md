@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.87.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.86.0...v1.87.0) (2026-05-29)
+
+
+### Features
+
+* **spa:** make /blog + /stop-buddy-punching discoverable and add buddy-punching blog post ([#214](https://github.com/bangkeut-technology/daily-brew/issues/214)) ([e0045e2](https://github.com/bangkeut-technology/daily-brew/commit/e0045e2bdd95afeac42b3c5198da9537b3552a2a))
+
 ## [1.86.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.85.2...v1.86.0) (2026-05-29)
 
 
