@@ -116,6 +116,10 @@ export function HeroSection() {
               <p className="text-[13.5px] text-text-tertiary">
                 {t('homepage.hero.fastSetup')}
               </p>
+              <span className="w-1 h-1 rounded-full bg-cream-3" />
+              <p className="text-[13.5px] text-text-tertiary">
+                {t('homepage.hero.noHardware')}
+              </p>
             </motion.div>
 
             <motion.div

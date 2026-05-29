@@ -519,7 +519,8 @@
           "onLeave": "En congé"
         },
         "qrCheckin": "Check-in QR"
-      }
+      },
+      "noHardware": "Aucun matériel — juste un téléphone"
     },
     "howItWorks": {
       "eyebrow": "Comment ça marche",
@@ -1426,6 +1427,520 @@
           "leaveRequests": "Demandes de congé",
           "closure": "Fermeture",
           "userAccounts": "Comptes utilisateurs"
+        }
+      }
+    },
+    "features": {
+      "common": {
+        "allFeatures": "Toutes les fonctionnalités",
+        "espressoBadge": "Espresso",
+        "problemHeading": "Le problème",
+        "howHeading": "Comment ça marche",
+        "benefitsHeading": "Avantages",
+        "setupHeading": "Comment le configurer",
+        "faqHeading": "Questions courantes",
+        "relatedHeading": "Fonctionnalités de sécurité associées",
+        "espressoCallout": {
+          "title": "Disponible sur le forfait Espresso"
+        },
+        "related": {
+          "ipRestriction": {
+            "title": "Restriction IP",
+            "desc": "Verrouillez les check-ins au Wi-Fi de votre restaurant. Empêchez le pointage à distance."
+          },
+          "deviceVerification": {
+            "title": "Vérification d'appareil",
+            "desc": "Liez le pointage à un seul appareil par employé par jour. Empêche le pointage par collègue."
+          },
+          "geofencing": {
+            "title": "Géorepérage",
+            "desc": "Limitez les check-ins à un rayon GPS autour de votre restaurant."
+          }
+        },
+        "cta": {
+          "subtitle": "Commencez gratuitement, passez à Espresso quand vous serez prêt.",
+          "startFree": "Commencer gratuitement",
+          "comparePlans": "Comparer les forfaits"
+        }
+      },
+      "deviceVerification": {
+        "tag": "Anti-fraude",
+        "title": "Vérification d'appareil",
+        "subtitle": "Chaque employé doit pointer à l'arrivée et au départ depuis le même appareil dans la même journée. Fini les collègues qui pointent les uns pour les autres — le système sait quel téléphone a fait le check-in.",
+        "problem": {
+          "lead": "Le « pointage par collègue » est l'un des problèmes de fraude d'assiduité les plus courants dans les restaurants.",
+          "p1": "L'employé A part tôt mais demande à l'employé B de pointer sa sortie en fin de service. Ou une personne utilise plusieurs téléphones pour pointer l'arrivée de collègues absents. Sans vérification d'appareil, impossible de dire qui scanne réellement le code QR — vous voyez juste une heure de pointage, pas l'appareil utilisé.",
+          "p2": "Dans un restaurant occupé, les propriétaires ne peuvent pas surveiller la porte toute la journée. La vérification d'appareil fait ce travail automatiquement."
+        },
+        "how": {
+          "uniqueId": {
+            "title": "Chaque appareil reçoit un identifiant unique",
+            "desc": "Quand un employé ouvre DailyBrew sur son téléphone pour la première fois, l'app génère un identifiant d'appareil unique et le stocke localement. Cet identifiant est invisible pour l'employé — il fonctionne silencieusement en arrière-plan, sans aucune configuration de sa part."
+          },
+          "lockDevice": {
+            "title": "Le check-in verrouille cet appareil",
+            "desc": "Quand un employé pointe son arrivée, DailyBrew enregistre quel appareil a été utilisé. L'identifiant d'appareil et le nom (analysé depuis le user agent du navigateur) sont stockés dans l'enregistrement de présence. C'est l'appareil qu'il devra utiliser pour pointer sa sortie plus tard."
+          },
+          "oneDevice": {
+            "title": "Un appareil par employé, un employé par appareil",
+            "desc": "Si un second employé essaie de pointer avec le même téléphone que quelqu'un d'autre a déjà utilisé aujourd'hui, le système le bloque. Et si un employé essaie de pointer sa sortie depuis un appareil différent de celui utilisé pour l'arrivée, c'est bloqué aussi."
+          },
+          "auditTrail": {
+            "title": "Piste d'audit complète sur chaque enregistrement",
+            "desc": "Chaque enregistrement de présence stocke les identifiants d'appareil de pointage d'entrée et de sortie, ainsi que les noms analysés (ex. : « iPhone 15 Pro, Safari 17 »). Les propriétaires voient exactement quel appareil a été utilisé pour chaque pointage."
+          }
+        },
+        "benefits": {
+          "eliminate": {
+            "title": "Éliminez le pointage par collègue",
+            "desc": "Un collègue ne peut pas pointer la sortie de quelqu'un qui est déjà parti. La sortie doit venir du même appareil que l'arrivée — sans exception."
+          },
+          "onePhone": {
+            "title": "Un téléphone, une personne",
+            "desc": "Un seul téléphone ne peut pas servir à pointer plusieurs employés dans la même journée. Chaque appareil est lié à un employé par jour."
+          },
+          "audit": {
+            "title": "Piste d'audit transparente",
+            "desc": "Chaque enregistrement de présence affiche l'identifiant et le nom de l'appareil pour l'entrée et la sortie. En cas de litige, vous avez les données."
+          },
+          "frictionless": {
+            "title": "Aucune friction pour les employés",
+            "desc": "Aucune app à installer, aucun code à entrer, aucune empreinte à scanner. L'identifiant d'appareil est généré automatiquement dans le navigateur. Les employés ne savent même pas qu'il existe."
+          }
+        },
+        "setup": {
+          "subtitle": "La fonctionnalité de sécurité la plus simple à activer — juste un interrupteur. Aucune configuration nécessaire sur les appareils des employés.",
+          "steps": {
+            "openSettings": {
+              "title": "Allez dans les paramètres de l'espace",
+              "desc": "Ouvrez votre tableau de bord et cliquez sur « Paramètres » dans la barre latérale. Vous verrez une section « Vérification d'appareil »."
+            },
+            "enable": {
+              "title": "Activez la vérification d'appareil",
+              "desc": "Activez l'interrupteur « Activer la vérification d'appareil ». Si vous êtes sur le plan gratuit, on vous demandera de passer à Espresso d'abord."
+            },
+            "save": {
+              "title": "Enregistrez — c'est tout",
+              "desc": "Cliquez sur Enregistrer. Le système commence immédiatement à appliquer la liaison d'appareil. La prochaine fois qu'un employé pointe, son identifiant d'appareil est enregistré et verrouillé pour la journée. Aucune action nécessaire de votre personnel."
+            }
+          }
+        },
+        "experience": {
+          "title": "Ce que vos employés vivent",
+          "items": {
+            "normal": {
+              "label": "Pointage normal :",
+              "desc": "rien ne change. Ils scannent le code QR sur leur propre téléphone et ça fonctionne exactement comme avant. La liaison d'appareil se fait de manière invisible."
+            },
+            "wrongDevice": {
+              "label": "Mauvais appareil au pointage de sortie :",
+              "desc": "s'ils essaient de pointer la sortie depuis un téléphone différent, ils voient un message clair : « Vous devez utiliser le même appareil que pour le pointage d'entrée ». Pas d'erreurs cryptiques."
+            },
+            "alreadyUsed": {
+              "label": "Appareil déjà utilisé :",
+              "desc": "si l'employé B essaie de pointer sur le téléphone de l'employé A (que A a déjà utilisé aujourd'hui), le système le bloque avec un message expliquant que l'appareil a déjà été utilisé par un autre employé."
+            }
+          }
+        },
+        "faq": {
+          "newPhone": {
+            "q": "Que se passe-t-il si un employé change de téléphone ?",
+            "a": "La liaison d'appareil est quotidienne. Quand il pointe sur un nouveau téléphone le lendemain, c'est son appareil pour cette journée. Pas d'inscription d'appareil à long terme — chaque jour est un nouveau départ."
+          },
+          "clearedData": {
+            "q": "Que se passe-t-il si un employé efface ses données de navigateur ?",
+            "a": "Effacer les données de navigateur supprime l'identifiant d'appareil stocké. Un nouvel identifiant sera généré la prochaine fois qu'il ouvrira l'app. Cela signifie que le pointage de sortie pourrait être bloqué ce jour-là si l'identifiant ne correspond pas à celui de l'entrée. En pratique, les employés effacent rarement leurs données en plein service."
+          },
+          "shared": {
+            "q": "Cela fonctionne-t-il sur des appareils partagés ou kiosque ?",
+            "a": "La vérification d'appareil est conçue pour les employés utilisant leur propre téléphone. Si plusieurs personnes partagent un appareil (ex. : une tablette à l'entrée), seule la première personne qui pointe peut l'utiliser ce jour-là. Pour les appareils partagés, vous pouvez désactiver cette fonctionnalité et utiliser la restriction IP ou le géorepérage à la place."
+          },
+          "whichDevice": {
+            "q": "Puis-je voir quel appareil un employé a utilisé ?",
+            "a": "Oui. Chaque enregistrement de présence inclut le nom de l'appareil (analysé depuis le user agent du navigateur) pour l'entrée et la sortie. Vous pouvez voir des entrées comme « iPhone 15 Pro, Safari 17 » ou « Samsung Galaxy S24, Chrome 126 » dans le détail de présence."
+          },
+          "noApp": {
+            "q": "Cela oblige-t-il les employés à installer une app ?",
+            "a": "Non. La vérification d'appareil fonctionne entièrement via le navigateur web. L'identifiant d'appareil est un UUID stocké dans localStorage — il est généré automatiquement la première fois qu'un employé ouvre DailyBrew. Pas d'installation d'app, pas de permissions, pas de configuration."
+          }
+        },
+        "espressoCallout": "La vérification d'appareil est incluse dans le forfait Espresso (14,99 $/mois ou 149 $/an). Combinez-la avec la restriction IP et le géorepérage pour une sécurité de check-in complète.",
+        "cta": {
+          "title": "Arrêtez le pointage par collègue dès aujourd'hui"
+        }
+      },
+      "geofencing": {
+        "tag": "Localisation",
+        "title": "Géorepérage",
+        "subtitle": "Tracez une frontière virtuelle autour de votre restaurant. Quand les employés essaient de pointer, DailyBrew vérifie leur position GPS — s'ils sont hors du rayon, le check-in est bloqué.",
+        "problem": {
+          "lead": "La restriction IP dépend du réseau — mais tous les restaurants n'ont pas une configuration Wi-Fi fiable et statique.",
+          "p1": "Certains restaurants partagent le Wi-Fi d'un immeuble. D'autres utilisent des points d'accès mobiles dont l'IP change. Et certains employés utilisent les données mobiles au lieu du Wi-Fi. Dans ces situations, la restriction IP seule ne suffit pas à vérifier que quelqu'un est réellement sur place.",
+          "p2": "Le géorepérage résout cela en utilisant la seule chose qui ne peut pas être facilement falsifiée : la position GPS physique de l'employé."
+        },
+        "how": {
+          "center": {
+            "title": "Vous définissez un point central",
+            "desc": "Dans les paramètres de votre espace, vous définissez les coordonnées GPS de votre restaurant. Le plus simple : cliquez sur « Utiliser ma position actuelle » en étant dans le restaurant, et DailyBrew détectera automatiquement votre latitude et longitude. Vous pouvez aussi entrer les coordonnées manuellement si vous préférez."
+          },
+          "radius": {
+            "title": "Vous choisissez un rayon",
+            "desc": "Définissez à quelle distance du point central les employés sont autorisés à être — en mètres. La valeur par défaut est 100 m, qui fonctionne pour la plupart des restaurants. Un petit café peut utiliser 50 m (le minimum). Un grand établissement ou une zone extérieure peut nécessiter 200–500 m. Le maximum est 5 000 m."
+          },
+          "sharesLocation": {
+            "title": "Le téléphone de l'employé partage sa position",
+            "desc": "Quand un employé appuie sur « Check in », son navigateur demande la permission de localisation (un prompt standard du navigateur). Les coordonnées GPS sont envoyées avec la requête de pointage. Cela se produit une fois par check-in — DailyBrew ne suit pas la position en continu."
+          },
+          "compares": {
+            "title": "DailyBrew compare la distance",
+            "desc": "Le serveur calcule la distance entre la position GPS de l'employé et le point central de votre restaurant. S'il est dans le rayon — le check-in réussit. S'il est en dehors — le check-in est bloqué avec un message d'erreur clair."
+          }
+        },
+        "benefits": {
+          "verifyPresence": {
+            "title": "Vérifiez la présence physique",
+            "desc": "La preuve la plus directe qu'un employé est au restaurant. Le GPS ne dépend pas du réseau Wi-Fi auquel il est connecté — il confirme sa position réelle."
+          },
+          "flexibleRadius": {
+            "title": "Rayon flexible",
+            "desc": "De 50 m pour un petit café à 5 000 m pour une grande propriété. Ajustez la frontière à la taille réelle de votre établissement, y compris les zones extérieures et le stationnement."
+          },
+          "layered": {
+            "title": "Combinez avec d'autres sécurités",
+            "desc": "Utilisez le géorepérage seul ou combinez-le avec la restriction IP et la vérification d'appareil. Quand les trois sont actifs, un employé doit être sur le bon réseau, utiliser son propre appareil et être physiquement au restaurant."
+          },
+          "onePrompt": {
+            "title": "Demande de position unique",
+            "desc": "Le navigateur ne demande la permission de localisation qu'une fois. Après ça, les check-ins sont fluides. DailyBrew ne suit jamais les employés entre les check-ins — la position est lue une fois, vérifiée et non stockée."
+          }
+        },
+        "radiusGuide": {
+          "title": "Choisir le bon rayon",
+          "intro": "La précision GPS varie selon l'appareil, la météo et la densité des bâtiments. À l'intérieur, le GPS peut dériver de 5 à 20 mètres. Choisissez un rayon qui couvre votre établissement avec une marge confortable :",
+          "tiers": {
+            "cafe": {
+              "venue": "Petit café ou kiosque",
+              "note": "Frontière serrée. Fonctionne bien pour les petits emplacements à un seul étage avec un bon signal GPS."
+            },
+            "standard": {
+              "venue": "Restaurant standard",
+              "note": "Recommandé pour la plupart des restaurants. Couvre les zones intérieures, la cuisine, les pièces de stockage et un petit patio."
+            },
+            "large": {
+              "venue": "Grand établissement ou zone extérieure",
+              "note": "Pour les restaurants avec grandes terrasses extérieures, zones sur toit, ou étendus sur un complexe."
+            },
+            "campus": {
+              "venue": "Campus, complexe ou propriété",
+              "note": "Pour les propriétés avec plusieurs bâtiments, grands terrains, ou emplacements où le personnel travaille sur une large zone."
+            }
+          }
+        },
+        "setup": {
+          "subtitle": "À faire de préférence en étant au restaurant, pour que la détection automatique capte les bonnes coordonnées.",
+          "steps": {
+            "openSettings": {
+              "title": "Allez dans les paramètres de l'espace",
+              "desc": "Ouvrez votre tableau de bord et cliquez sur « Paramètres » dans la barre latérale. Descendez à la section « Géorepérage »."
+            },
+            "enable": {
+              "title": "Activez le géorepérage",
+              "desc": "Activez l'interrupteur « Activer le géorepérage pour le check-in ». Si vous êtes sur le plan gratuit, on vous demandera de passer à Espresso d'abord."
+            },
+            "setLocation": {
+              "title": "Définissez la position de votre restaurant",
+              "desc": "Cliquez sur « Utiliser ma position actuelle ». Votre navigateur demandera la permission d'accéder à votre position — tapez Autoriser. DailyBrew lit vos coordonnées GPS et remplit automatiquement les champs latitude et longitude. Vous pouvez aussi entrer les coordonnées manuellement si vous les connaissez déjà."
+            },
+            "setRadius": {
+              "title": "Définissez le rayon",
+              "desc": "Entrez le rayon en mètres. La valeur par défaut est 100 m. Le minimum est 50 m (le GPS n'est pas assez précis en dessous). Pour la plupart des restaurants, 100–200 m fonctionne bien. Si vous avez une terrasse extérieure ou une grande propriété, élargissez."
+            },
+            "saveVerify": {
+              "title": "Enregistrez et vérifiez",
+              "desc": "Cliquez sur Enregistrer. Vous verrez une confirmation montrant vos coordonnées et le rayon actif. Essayez un check-in test depuis le restaurant pour vérifier que ça marche. Puis essayez depuis l'autre côté de la rue pour vérifier le blocage — vous verrez la frontière en action."
+            }
+          }
+        },
+        "faq": {
+          "trackAllDay": {
+            "q": "DailyBrew suit-il la position de mes employés toute la journée ?",
+            "a": "Non. DailyBrew lit la position GPS une seule fois — au moment du check-in (et à nouveau au check-out). Les coordonnées sont utilisées uniquement pour vérifier la distance du restaurant. DailyBrew ne stocke pas les données GPS des employés, ne suit pas les déplacements et ne tourne pas en arrière-plan."
+          },
+          "denied": {
+            "q": "Que se passe-t-il si l'employé refuse la permission de localisation ?",
+            "a": "Si l'employé bloque l'accès à la position dans son navigateur, la requête de check-in n'inclura pas de données GPS et la vérification de géorepérage échouera. Il verra un message lui demandant d'autoriser l'accès à la position. C'est une permission standard du navigateur — pas une app spécifique à DailyBrew."
+          },
+          "indoorAccuracy": {
+            "q": "Quelle est la précision du GPS à l'intérieur ?",
+            "a": "À l'intérieur, la précision GPS peut se dégrader à 10–20 mètres selon le bâtiment. C'est pourquoi le rayon minimum est 50 m — moins causerait trop de faux rejets. Si votre restaurant est dans un bâtiment avec un faible signal GPS (sous-sol, murs épais), envisagez un rayon légèrement plus large comme 150–200 m."
+          },
+          "movedRemodel": {
+            "q": "Que se passe-t-il si mon restaurant déménage ou que je rénove ?",
+            "a": "Mettez simplement à jour les coordonnées dans les paramètres. Cliquez sur « Utiliser ma position actuelle » depuis le nouvel endroit et enregistrez. Le changement prend effet immédiatement pour tous les futurs check-ins."
+          },
+          "fakeGps": {
+            "q": "Les employés peuvent-ils falsifier leur position GPS ?",
+            "a": "Il est techniquement possible de simuler le GPS sur un téléphone rooté/jailbreaké ou avec des outils de développeur. Cependant, cela nécessite un effort délibéré et des connaissances techniques. Pour la grande majorité du personnel de restauration, le géorepérage est un dissuasif efficace. Pour une sécurité maximale, combinez le géorepérage avec la restriction IP et la vérification d'appareil."
+          },
+          "iosAndroid": {
+            "q": "Cela fonctionne-t-il sur iOS et Android ?",
+            "a": "Oui. Le géorepérage utilise l'API standard de géolocalisation du navigateur, prise en charge sur tous les iPhones et téléphones Android modernes. Le navigateur gère la lecture GPS — DailyBrew reçoit juste les coordonnées."
+          }
+        },
+        "tip": {
+          "title": "Bonne pratique : combinez les trois",
+          "intro": "Chaque fonctionnalité de sécurité couvre un angle différent. Ensemble, elles rendent la fraude de check-in quasi impossible :",
+          "layers": {
+            "ipRestriction": {
+              "label": "Restriction IP",
+              "desc": "Vérifie le réseau — sont-ils sur le Wi-Fi du restaurant ?"
+            },
+            "deviceVerification": {
+              "label": "Vérification d'appareil",
+              "desc": "Vérifie l'appareil — est-ce leur propre téléphone ?"
+            },
+            "geofencing": {
+              "label": "Géorepérage",
+              "desc": "Vérifie la position — sont-ils physiquement ici ?"
+            }
+          }
+        },
+        "espressoCallout": "Le géorepérage est inclus dans le forfait Espresso (14,99 $/mois ou 149 $/an) avec la restriction IP, la vérification d'appareil, la gestion des congés, les rôles de manager et plus.",
+        "cta": {
+          "title": "Prêt à définir votre frontière ?"
+        }
+      },
+      "ipRestriction": {
+        "tag": "Sécurité",
+        "title": "Restriction IP",
+        "subtitle": "Assurez-vous que votre personnel est physiquement au restaurant quand il pointe. La restriction IP verrouille les présences au réseau de votre restaurant — s'ils ne sont pas sur votre Wi-Fi, ils ne peuvent pas pointer.",
+        "problem": {
+          "lead": "Sans restriction IP, tout employé ayant les données du code QR peut pointer depuis n'importe où.",
+          "p1": "Ils pourraient être à la maison, dans le bus, ou à un autre endroit complètement. Si quelqu'un partage la charge utile QR avec un collègue, cette personne peut pointer sans jamais mettre les pieds au restaurant. Vous ne le sauriez jamais à moins de surveiller la porte vous-même."
+        },
+        "how": {
+          "publicIp": {
+            "title": "Votre réseau a une adresse IP publique",
+            "desc": "Chaque connexion Internet a une adresse IP publique assignée par votre FAI. Quand votre personnel est connecté au Wi-Fi de votre restaurant, tout leur trafic passe par cette IP. DailyBrew voit cette IP à chaque requête de check-in."
+          },
+          "tellTrusted": {
+            "title": "Vous dites à DailyBrew quelles IP faire confiance",
+            "desc": "Dans les paramètres de votre espace, vous ajoutez une ou plusieurs adresses IP. Ce sont les seuls réseaux depuis lesquels votre personnel est autorisé à pointer. Toute tentative de pointage depuis une IP différente est bloquée avec un message d'erreur clair."
+          },
+          "invisibleValidation": {
+            "title": "Le personnel pointe normalement — la validation est invisible",
+            "desc": "Vos employés n'ont rien à faire différemment. Ils scannent le code QR de la même façon qu'avant. S'ils sont sur le bon réseau, ça fonctionne. Sinon, ils voient un message expliquant que le check-in est restreint au réseau du restaurant."
+          }
+        },
+        "benefits": {
+          "preventRemote": {
+            "title": "Empêchez les check-ins à distance",
+            "desc": "Les employés ne peuvent pas pointer depuis la maison, le parking ou ailleurs en dehors de votre restaurant. Ils doivent être connectés à un réseau approuvé."
+          },
+          "multipleNetworks": {
+            "title": "Prend en charge plusieurs réseaux",
+            "desc": "Vous avez un Wi-Fi principal et une connexion de secours ? Ajoutez les deux IP. Vous pouvez lister autant d'IP autorisées que nécessaire — Wi-Fi, ethernet, point d'accès mobile."
+          },
+          "failSafe": {
+            "title": "Sécurisé par conception",
+            "desc": "Si vous activez la restriction IP mais oubliez d'ajouter des IP, DailyBrew autorise tous les check-ins plutôt que de tout verrouiller. Pas de verrouillage accidentel."
+          },
+          "anySetup": {
+            "title": "Fonctionne avec n'importe quel réseau",
+            "desc": "IP statique, IP dynamique, VPN — si la requête arrive d'une IP dans votre liste, elle est acceptée. Fonctionne avec n'importe quel FAI ou configuration réseau."
+          }
+        },
+        "setup": {
+          "subtitle": "Moins d'une minute. Vous devez juste être au restaurant, connecté au Wi-Fi sur lequel vous voulez verrouiller les check-ins.",
+          "steps": {
+            "openSettings": {
+              "title": "Allez dans les paramètres de l'espace",
+              "desc": "Ouvrez votre tableau de bord, cliquez sur « Paramètres » dans la barre latérale. Descendez à la section « Paramètres de l'espace »."
+            },
+            "enable": {
+              "title": "Activez la restriction IP",
+              "desc": "Activez l'interrupteur « Activer la restriction IP ». Si vous êtes sur le plan gratuit, on vous demandera de passer à Espresso d'abord."
+            },
+            "addIp": {
+              "title": "Ajoutez l'IP de votre restaurant",
+              "desc": "Cliquez sur le bouton « Utiliser mon IP actuelle ». DailyBrew détectera votre adresse IP publique telle que vue par le serveur et l'ajoutera automatiquement à la liste. Vous pouvez aussi taper des IP manuellement — une par ligne — si vous avez des réseaux supplémentaires."
+            },
+            "save": {
+              "title": "Enregistrez vos paramètres",
+              "desc": "Cliquez sur « Enregistrer ». À partir de ce moment, chaque requête de check-in est validée contre votre liste d'IP. Les employés sur un réseau différent verront un message clair leur disant que le check-in est restreint."
+            }
+          }
+        },
+        "faq": {
+          "ipChanges": {
+            "q": "Que se passe-t-il si l'adresse IP de mon restaurant change ?",
+            "a": "Certains FAI assignent des IP dynamiques qui peuvent changer périodiquement. Si ça arrive, votre personnel sera bloqué jusqu'à ce que vous mettiez à jour l'IP. Allez juste dans Paramètres, cliquez sur « Utiliser mon IP actuelle » à nouveau, et enregistrez. Si votre IP change fréquemment, envisagez de demander à votre FAI une IP statique ou utilisez le géorepérage comme alternative."
+          },
+          "multipleIps": {
+            "q": "Puis-je autoriser plusieurs adresses IP ?",
+            "a": "Oui. Vous pouvez ajouter autant d'IP que nécessaire — une par ligne. C'est utile si vous avez plusieurs connexions réseau (Wi-Fi principal, ethernet de secours, point d'accès manager) ou plusieurs emplacements de restaurant sous un seul espace."
+          },
+          "blockedMessage": {
+            "q": "Que voit l'employé quand il est bloqué ?",
+            "a": "Il voit un message d'avertissement ambre chaleureux expliquant que le check-in est restreint au réseau du restaurant. Pas de codes d'erreur cryptiques — juste une explication claire qu'il doit être sur le bon Wi-Fi."
+          },
+          "combineSecurity": {
+            "q": "Puis-je utiliser la restriction IP avec le géorepérage et la vérification d'appareil ?",
+            "a": "Absolument. Les trois fonctionnalités de sécurité fonctionnent indépendamment et peuvent être combinées pour une protection en couches. Un employé devrait passer toutes les vérifications activées pour pointer avec succès."
+          },
+          "emptyList": {
+            "q": "Que se passe-t-il si j'active la restriction IP mais n'ajoute aucune IP ?",
+            "a": "DailyBrew traite une liste d'IP vide comme une mauvaise configuration et autorise tous les check-ins. C'est un filet de sécurité — vous ne verrouillerez pas accidentellement toute votre équipe."
+          }
+        },
+        "espressoCallout": "La restriction IP est incluse dans le forfait Espresso (14,99 $/mois ou 149 $/an). Inclut aussi la vérification d'appareil, le géorepérage, la gestion des congés, les rôles de manager et plus.",
+        "cta": {
+          "title": "Prêt à sécuriser vos check-ins ?"
+        }
+      },
+      "basilbookIntegration": {
+        "tag": "Intégration",
+        "titleParts": "<brand></brand> intégration",
+        "subtitle": "Connectez DailyBrew à votre système de comptabilité BasilBook. Liez les employés par nom d'utilisateur, générez une clé API sécurisée, et laissez BasilBook récupérer automatiquement les données de présence — heures de pointage, indicateurs de retard, infos d'horaire, tout en un seul appel.",
+        "problem": {
+          "lead": "Les données de présence vivent dans DailyBrew. Les données de comptabilité vivent dans BasilBook. Aucun ne parle à l'autre.",
+          "p1": "Sans intégration, il faudrait croiser manuellement qui était présent, qui était en retard et quels horaires ont été travaillés — puis entrer ça à la main dans votre système de comptabilité. C'est sujet aux erreurs, lent, et personne ne veut le faire.",
+          "p2": "L'intégration BasilBook comble le fossé. BasilBook peut récupérer les données de présence directement depuis DailyBrew via une API sécurisée, en faisant correspondre le personnel par nom d'utilisateur."
+        },
+        "how": {
+          "linkUsername": {
+            "title": "Liez les employés par nom d'utilisateur",
+            "desc": "Chaque employé dans DailyBrew peut avoir un nom d'utilisateur — c'est le même identifiant utilisé dans BasilBook pour ce membre du personnel. Quand BasilBook récupère les données de présence, il fait correspondre les enregistrements par ce nom d'utilisateur."
+          },
+          "generateToken": {
+            "title": "Générez un jeton API sécurisé",
+            "desc": "Dans les paramètres de votre espace, générez un jeton API. Le jeton complet est affiché une fois — copiez-le et stockez-le dans BasilBook. DailyBrew ne stocke qu'un hash, donc le jeton en clair ne peut jamais être récupéré à nouveau."
+          },
+          "callApi": {
+            "title": "BasilBook appelle l'API de présence",
+            "desc": "BasilBook envoie une requête GET avec la clé API dans l'en-tête X-Api-Key, en spécifiant une plage de dates (jusqu'à 93 jours). DailyBrew renvoie les enregistrements de présence pour tous les employés ayant un nom d'utilisateur — heures de pointage, indicateurs de retard, infos d'horaire, tout formaté dans le fuseau horaire de votre espace."
+          },
+          "flowsAuto": {
+            "title": "Les données circulent automatiquement",
+            "desc": "Une fois configuré, BasilBook peut récupérer les données de présence sur n'importe quel horaire — quotidien, hebdomadaire ou à la demande. Pas d'exports manuels, pas de fichiers CSV, pas de copier-coller. Les données sont toujours fraîches et formatées pour les besoins de BasilBook."
+          }
+        },
+        "apiReturns": {
+          "title": "Ce que renvoie l'API",
+          "intro": "Pour chaque employé ayant un nom d'utilisateur, l'API renvoie ses enregistrements de présence dans la plage de dates demandée :",
+          "footnote": "Les jours sans enregistrement de présence sont omis — l'absence est implicite par les dates manquantes. Plage de dates maximale par requête : 93 jours.",
+          "fields": {
+            "username": {
+              "label": "Nom d'utilisateur",
+              "desc": "La clé de liaison BasilBook"
+            },
+            "employeeName": {
+              "label": "Nom de l'employé",
+              "desc": "Nom complet pour affichage"
+            },
+            "shiftName": {
+              "label": "Nom de l'horaire",
+              "desc": "Horaire assigné, ou null"
+            },
+            "date": {
+              "label": "Date",
+              "desc": "Date calendaire (YYYY-MM-DD)"
+            },
+            "checkInTime": {
+              "label": "Heure de pointage d'entrée",
+              "desc": "HH:mm dans le fuseau horaire de l'espace"
+            },
+            "checkOutTime": {
+              "label": "Heure de pointage de sortie",
+              "desc": "HH:mm, ou null si encore au travail"
+            },
+            "lateFlag": {
+              "label": "Indicateur de retard",
+              "desc": "true si arrivé après le début de l'horaire"
+            },
+            "leftEarlyFlag": {
+              "label": "Indicateur de départ anticipé",
+              "desc": "true si parti avant la fin de l'horaire"
+            }
+          }
+        },
+        "benefits": {
+          "noManualEntry": {
+            "title": "Aucune saisie manuelle de données",
+            "desc": "Les données de présence circulent de DailyBrew à BasilBook automatiquement. Pas de tableurs, pas de copier-coller, pas d'erreurs de transcription manuelle."
+          },
+          "alwaysFresh": {
+            "title": "Toujours à jour",
+            "desc": "BasilBook récupère les données en direct depuis DailyBrew. Qu'il interroge quotidiennement ou hebdomadairement, les données reflètent les derniers check-ins, indicateurs de retard et affectations d'horaire."
+          },
+          "secure": {
+            "title": "Sécurisé par conception",
+            "desc": "Les jetons API sont hashés au stockage — le jeton en clair est affiché une fois et jamais stocké. Les jetons peuvent être révoqués instantanément. Chaque jeton est limité à un espace de travail."
+          },
+          "usernameMatching": {
+            "title": "Correspondance par nom d'utilisateur",
+            "desc": "Le personnel est lié par nom d'utilisateur entre les deux systèmes. Pas de correspondance email fragile ni de mappage d'ID manuel. Définissez le nom d'utilisateur une fois et le lien fonctionne automatiquement."
+          }
+        },
+        "setup": {
+          "subtitle": "Deux parties : liez vos employés par nom d'utilisateur, puis générez un jeton API pour BasilBook.",
+          "steps": {
+            "setUsernames": {
+              "title": "Définissez les noms d'utilisateur des employés",
+              "desc": "Allez à la page de détail de chaque employé et entrez son nom d'utilisateur BasilBook. Cela doit correspondre exactement au nom ou à l'ID du personnel utilisé dans votre système BasilBook."
+            },
+            "generateToken": {
+              "title": "Générez un jeton API",
+              "desc": "Allez dans Paramètres, descendez à « Jetons API » et cliquez sur « Générer un jeton ». Donnez-lui un nom (ex. : « BasilBook production »). Le jeton complet est affiché une fois — copiez-le immédiatement."
+            },
+            "configureBb": {
+              "title": "Configurez BasilBook",
+              "desc": "Dans BasilBook, entrez le jeton API dans les paramètres d'intégration DailyBrew. BasilBook l'utilisera dans l'en-tête X-Api-Key lors de la récupération des données de présence."
+            },
+            "testConnection": {
+              "title": "Testez la connexion",
+              "desc": "Déclenchez une récupération test depuis BasilBook. Vous devriez voir des enregistrements de présence pour tous les employés ayant un nom d'utilisateur. Si un employé manque, vérifiez que son nom d'utilisateur est défini dans DailyBrew."
+            }
+          }
+        },
+        "faq": {
+          "lostToken": {
+            "q": "Que se passe-t-il si je perds le jeton API ?",
+            "a": "Le jeton en clair n'est affiché qu'une fois à la création. Si vous le perdez, révoquez l'ancien jeton et générez-en un nouveau. Mettez à jour le nouveau jeton dans BasilBook."
+          },
+          "multipleTokens": {
+            "q": "Puis-je avoir plusieurs jetons API ?",
+            "a": "Oui. Vous pouvez générer plusieurs jetons — par exemple un pour la production et un pour les tests. Chaque jeton peut être révoqué indépendamment."
+          },
+          "noUsername": {
+            "q": "Que se passe-t-il si un employé n'a pas de nom d'utilisateur ?",
+            "a": "Il n'apparaîtra pas dans la réponse de l'API. Seuls les employés ayant un nom d'utilisateur défini sont inclus. C'est intentionnel — le nom d'utilisateur est la clé de liaison entre DailyBrew et BasilBook."
+          },
+          "maxRange": {
+            "q": "Quelle est la plage de dates maximale ?",
+            "a": "93 jours par requête. Pour des périodes plus longues, faites plusieurs requêtes avec des plages de dates consécutives."
+          },
+          "oneWay": {
+            "q": "BasilBook envoie-t-il des données vers DailyBrew ?",
+            "a": "Non. L'intégration est à sens unique : BasilBook récupère les données de présence depuis DailyBrew. DailyBrew ne reçoit ni ne modifie aucune donnée BasilBook."
+          },
+          "timezone": {
+            "q": "Dans quel fuseau horaire sont les heures ?",
+            "a": "Toutes les heures dans la réponse de l'API sont formatées dans le fuseau horaire de votre espace (ex. : Asia/Phnom_Penh). Le fuseau horaire est inclus dans la réponse pour que BasilBook puisse interpréter les heures correctement."
+          }
+        },
+        "espressoCallout": "L'intégration BasilBook et les jetons API sont inclus dans le forfait Espresso (14,99 $/mois ou 149 $/an). Les noms d'utilisateur d'employés pour la liaison inter-produits sont également exclusifs à Espresso.",
+        "relatedShort": {
+          "ipRestriction": "Verrouillez les check-ins au Wi-Fi de votre restaurant.",
+          "deviceVerification": "Empêchez le pointage par collègue avec la liaison d'appareil.",
+          "roles": {
+            "title": "Rôles et permissions",
+            "desc": "Déléguez la gestion des présences et des congés."
+          }
+        },
+        "cta": {
+          "title": "Prêt à connecter vos systèmes ?",
+          "subtitle": "Commencez gratuitement, passez à Espresso quand vous aurez besoin de l'intégration."
         }
       }
     }
