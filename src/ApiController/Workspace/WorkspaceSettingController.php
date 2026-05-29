@@ -141,6 +141,22 @@ class WorkspaceSettingController extends AbstractController
             $setting->setNfcCheckinEnabled(false);
         }
 
+        // NFC cooldown — only meaningful when NFC is enabled, but we accept it
+        // independently so the operator can pre-tune the value before flipping
+        // the toggle. Entity setter clamps to 0–120; we reject anything that
+        // can't be cast to an int outright so a typo doesn't quietly become 0.
+        if (array_key_exists('nfcCheckinIntervalMinutes', $data)) {
+            $raw = $data['nfcCheckinIntervalMinutes'];
+            if (!is_numeric($raw)) {
+                return $this->jsonError('nfcCheckinIntervalMinutes must be a number between 0 and 120', 400);
+            }
+            $minutes = (int) $raw;
+            if ($minutes < 0 || $minutes > 120) {
+                return $this->jsonError('nfcCheckinIntervalMinutes must be between 0 and 120', 400);
+            }
+            $setting->setNfcCheckinIntervalMinutes($minutes);
+        }
+
         if (array_key_exists('telegramChatId', $data)) {
             $chatId = $data['telegramChatId'];
             $setting->setTelegramChatId(is_string($chatId) && $chatId !== '' ? $chatId : null);
@@ -260,6 +276,7 @@ class WorkspaceSettingController extends AbstractController
             'telegramChatId' => $setting?->getTelegramChatId(),
             'tapCheckinEnabled' => $setting?->isTapCheckinEnabled() ?? false,
             'nfcCheckinEnabled' => $setting?->isNfcCheckinEnabled() ?? false,
+            'nfcCheckinIntervalMinutes' => $setting?->getNfcCheckinIntervalMinutes() ?? 15,
         ];
     }
 }

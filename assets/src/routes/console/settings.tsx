@@ -144,6 +144,7 @@ function SettingsPage() {
 
   // NFC check-in state
   const [nfcCheckinEnabled, setNfcCheckinEnabled] = useState(false);
+  const [nfcCheckinIntervalMinutes, setNfcCheckinIntervalMinutes] = useState<number>(15);
 
   // Telegram state
   const [telegramEnabled, setTelegramEnabled] = useState(false);
@@ -168,6 +169,7 @@ function SettingsPage() {
       setDeviceVerificationEnabled(settings.deviceVerificationEnabled);
       setTapCheckinEnabled(settings.tapCheckinEnabled);
       setNfcCheckinEnabled(settings.nfcCheckinEnabled);
+      setNfcCheckinIntervalMinutes(settings.nfcCheckinIntervalMinutes ?? 15);
       setTelegramEnabled(settings.telegramNotificationsEnabled);
       setTelegramChatId(settings.telegramChatId || '');
       setGeofencingEnabled(settings.geofencingEnabled);
@@ -196,6 +198,7 @@ function SettingsPage() {
         telegramChatId: telegramEnabled ? (telegramChatId.trim() || null) : null,
         tapCheckinEnabled,
         nfcCheckinEnabled,
+        nfcCheckinIntervalMinutes,
       });
       toast.success('Settings saved');
     } catch {
@@ -1112,13 +1115,43 @@ function SettingsPage() {
               </p>
 
               {nfcCheckinEnabled && plan?.canUseNfcCheckin && (
-                <button
-                  onClick={handleSaveSettings}
-                  disabled={updateSettings.isPending}
-                  className="px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50"
-                >
-                  {updateSettings.isPending ? t('common.loading') : t('common.save')}
-                </button>
+                <div className="pt-1 space-y-4">
+                  <div>
+                    <label htmlFor="nfc-cooldown" className="block text-[13px] font-medium text-text-secondary mb-1">
+                      {t('settings.nfcCooldownLabel', 'Cooldown between scans (minutes)')}
+                    </label>
+                    <input
+                      id="nfc-cooldown"
+                      name="nfcCheckinIntervalMinutes"
+                      type="number"
+                      min={0}
+                      max={120}
+                      value={nfcCheckinIntervalMinutes}
+                      onChange={(e) => {
+                        const raw = e.target.value;
+                        if (raw === '') { setNfcCheckinIntervalMinutes(0); return; }
+                        const parsed = parseInt(raw, 10);
+                        if (Number.isNaN(parsed)) return;
+                        setNfcCheckinIntervalMinutes(Math.max(0, Math.min(120, parsed)));
+                      }}
+                      className="w-32 px-3 py-2 rounded-lg text-[15px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee font-mono"
+                    />
+                    <p className="text-[13px] text-text-tertiary mt-1.5 leading-relaxed">
+                      {t(
+                        'settings.nfcCooldownHint',
+                        'Prevents accidental double-taps. Set to 0 to disable.',
+                      )}
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={handleSaveSettings}
+                    disabled={updateSettings.isPending}
+                    className="px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50"
+                  >
+                    {updateSettings.isPending ? t('common.loading') : t('common.save')}
+                  </button>
+                </div>
               )}
             </div>
           </GlassCard>

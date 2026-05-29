@@ -152,6 +152,38 @@ final class SeoMetaResolver
                 'ដាក់កំហិតការចូលរួមរបស់បុគ្គលិកទៅ Wi-Fi ឬបណ្តាញនៃភោជនីយដ្ឋានរបស់អ្នក។ ការពារការចូលរួមពីចម្ងាយ និងធានាថាបុគ្គលិកនៅទីកន្លែងពេលពួកគេចូលរួម។',
             ],
         ],
+        '/three-factor-attendance' => [
+            'en' => [
+                'Three-factor attendance',
+                "The strongest check-in configuration in DailyBrew: IP restriction, device verification, and geofencing enforced together. Each layer covers what the others can't.",
+            ],
+            'fr' => [
+                'Présence à trois facteurs',
+                "La configuration de check-in la plus solide de DailyBrew : restriction IP, vérification d'appareil et géorepérage appliqués ensemble. Chaque couche couvre ce que les autres ne peuvent pas.",
+            ],
+            'km' => [
+                'វត្តមានបីកត្តា',
+                'ការកំណត់ការចូលរួមដ៏រឹងមាំបំផុតរបស់ DailyBrew៖ ការដាក់កំហិត IP ការផ្ទៀងផ្ទាត់ឧបករណ៍ និង geofencing អនុវត្តរួមគ្នា។ ស្រទាប់នីមួយៗគ្របដណ្តប់នូវអ្វីដែលផ្សេងទៀតមិនអាចធ្វើបាន។',
+            ],
+        ],
+        // `/device-verified-attendance` is a public alias for `/features/device-verification`.
+        // The route is registered as indexable (so SpaController returns 200, not 404),
+        // but `resolve()` rewrites its canonical to the real feature page below so
+        // search engines collapse the two URLs into one and we don't bleed authority.
+        '/device-verified-attendance' => [
+            'en' => [
+                'Device Verification',
+                'Prevent buddy punching by binding check-in and check-out to a single device per employee per day. Full audit trail included.',
+            ],
+            'fr' => [
+                "Vérification d'appareil",
+                "Empêchez la fraude au pointage en liant le check-in et le check-out à un seul appareil par employé et par jour. Piste d'audit complète incluse.",
+            ],
+            'km' => [
+                'ការផ្ទៀងផ្ទាត់ឧបករណ៍',
+                'ការពារការចូលរួមជំនួសគ្នាដោយចងភ្ជាប់ការចូល និងការចេញទៅឧបករណ៍តែមួយក្នុងមួយបុគ្គលិកក្នុងមួយថ្ងៃ។ មានកំណត់ហេតុសវនកម្មពេញលេញ។',
+            ],
+        ],
         '/how-it-works' => [
             'en' => [
                 'How it works',
@@ -392,6 +424,21 @@ final class SeoMetaResolver
         ],
     ];
 
+    /**
+     * Alias path => canonical path. The SPA serves both URLs with the same UI,
+     * but search engines should treat the canonical as the indexable one and
+     * collapse the alias into it. The alias still appears in {@see INDEXABLE_PAGES}
+     * with its own title/description so SpaController returns 200 (not 404) and
+     * link-preview scrapers get sensible OG tags; only the canonical link rel
+     * differs from the requested URL.
+     *
+     * Alias paths are deliberately omitted from the dynamic sitemap (see
+     * {@see indexablePaths()}) so we don't advertise two URLs for one page.
+     */
+    private const CANONICAL_ALIASES = [
+        '/device-verified-attendance' => '/features/device-verification',
+    ];
+
     /** Valid SPA routes that must load (200) but must never be indexed. */
     private const PRIVATE_PREFIXES = ['/console', '/admin', '/checkin', '/auth'];
 
@@ -422,14 +469,20 @@ final class SeoMetaResolver
             // Fall back to EN if a translation is missing for a registered page.
             [$title, $description] = $entries[$locale] ?? $entries[self::DEFAULT_LOCALE];
 
+            // If this path is an alias of another canonical page, advertise the
+            // canonical URL so Google deduplicates. Alternates also fold to the
+            // canonical — emitting hreflang on the alias would tell Google the
+            // alias is the entry point for one of the languages, which it isn't.
+            $canonicalPath = self::CANONICAL_ALIASES[$path] ?? $path;
+
             return new SeoMeta(
                 title: $this->fullTitle($title, $path),
                 description: $description,
-                canonical: self::BASE_URL.($path === '/' ? '/' : $path),
+                canonical: self::BASE_URL.($canonicalPath === '/' ? '/' : $canonicalPath),
                 index: true,
                 statusCode: 200,
                 locale: $locale,
-                alternates: $this->alternatesFor($path),
+                alternates: $this->alternatesFor($canonicalPath),
             );
         }
 
@@ -490,12 +543,17 @@ final class SeoMetaResolver
 
     /**
      * Every indexable path in canonical (no-locale) form. Used by the dynamic sitemap.
+     * Alias paths are excluded so the sitemap never advertises a non-canonical URL —
+     * that would tell Google to crawl two pages for one piece of content.
      *
      * @return list<string>
      */
     public function indexablePaths(): array
     {
-        return array_keys(self::INDEXABLE_PAGES);
+        return array_values(array_filter(
+            array_keys(self::INDEXABLE_PAGES),
+            static fn(string $path): bool => !isset(self::CANONICAL_ALIASES[$path]),
+        ));
     }
 
     private function normalize(string $path): string

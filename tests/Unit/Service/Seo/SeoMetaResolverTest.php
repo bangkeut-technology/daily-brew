@@ -197,4 +197,40 @@ class SeoMetaResolverTest extends TestCase
             $this->assertStringNotContainsString('?', $p);
         }
     }
+
+    public function testThreeFactorAttendancePageIsIndexableAndSelfCanonical(): void
+    {
+        $meta = $this->resolver->resolve('/three-factor-attendance');
+
+        $this->assertSame('Three-factor attendance — DailyBrew', $meta->title);
+        $this->assertSame('https://dailybrew.work/three-factor-attendance', $meta->canonical);
+        $this->assertTrue($meta->index);
+        $this->assertSame(200, $meta->statusCode);
+        $this->assertContains('/three-factor-attendance', $this->resolver->indexablePaths());
+    }
+
+    public function testDeviceVerifiedAttendanceAliasResolvesToCanonicalFeaturePage(): void
+    {
+        // The alias still loads (200, indexable) — but its canonical points at
+        // the real page so Google collapses the two URLs into one entry.
+        $meta = $this->resolver->resolve('/device-verified-attendance');
+
+        $this->assertSame(200, $meta->statusCode);
+        $this->assertTrue($meta->index);
+        $this->assertSame('https://dailybrew.work/features/device-verification', $meta->canonical);
+        // Hreflang alternates also fold to the canonical, so the alias never
+        // appears as the entry point for one of the language variants.
+        $this->assertSame('https://dailybrew.work/features/device-verification', $meta->alternates['en'] ?? null);
+        $this->assertSame('https://dailybrew.work/features/device-verification?lang=fr', $meta->alternates['fr'] ?? null);
+    }
+
+    public function testAliasPathsAreExcludedFromSitemap(): void
+    {
+        // indexablePaths() drives the dynamic sitemap. Listing an alias there
+        // would advertise two URLs for the same content — defeats the canonical.
+        $paths = $this->resolver->indexablePaths();
+
+        $this->assertContains('/features/device-verification', $paths);
+        $this->assertNotContains('/device-verified-attendance', $paths);
+    }
 }
