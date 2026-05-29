@@ -346,7 +346,7 @@ function SettingsPage() {
                   <p className="text-[14px] text-text-tertiary mb-4">{t('settings.planGetStarted', 'Get started')}</p>
                   <ul className="space-y-2">
                     {[
-                      t('settings.featureUpTo10', 'Up to 10 employees'),
+                      t('settings.featureUpTo10', 'Up to 10 active employees'),
                       t('settings.featureQrCheckin', 'QR code check-in'),
                       t('settings.featureShiftMgmt', 'Shift management'),
                       t('settings.featureClosureMgmt', 'Closure management'),

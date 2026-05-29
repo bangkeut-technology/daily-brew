@@ -4,7 +4,7 @@ import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 
 const SITE_NAME = "DailyBrew";
 const DESCRIPTION =
-  "QR check-in, shift tracking, and leave management for restaurants. Free for up to 10 employees.";
+  "QR check-in, shift tracking, and leave management for restaurants. Free for up to 10 active employees.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://dailybrew.work"),

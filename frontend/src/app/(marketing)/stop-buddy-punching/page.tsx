@@ -104,7 +104,7 @@ export default function StopBuddyPunchingPage() {
             Stop paying for hours nobody worked
           </h2>
           <p className="mx-auto mt-3 max-w-md text-text-secondary">
-            Free for teams of 10 or fewer. Set it up before your next shift.
+            Free for up to 10 active employees. Set it up before your next shift.
           </p>
           <Link
             href="/sign-up"

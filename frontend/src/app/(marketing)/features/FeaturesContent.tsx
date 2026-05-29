@@ -151,7 +151,7 @@ const whyReasons = [
   { icon: <Smartphone size={18} />, text: 'Works on any smartphone' },
   { icon: <Moon size={18} />, text: 'Dark mode for late shifts' },
   { icon: <Globe size={18} />, text: 'English, French, and Khmer' },
-  { icon: <CheckCircle size={18} />, text: 'Free for up to 10 employees' },
+  { icon: <CheckCircle size={18} />, text: 'Free for up to 10 active employees' },
 ];
 
 export function FeaturesContent() {
@@ -279,7 +279,7 @@ export function FeaturesContent() {
           Ready to get started?
         </h3>
         <p className="text-[16px] text-text-secondary mb-6">
-          Free for up to 10 employees. No credit card required.
+          Free for up to 10 active employees. No credit card required.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link

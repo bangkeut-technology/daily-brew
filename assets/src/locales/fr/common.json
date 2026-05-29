@@ -257,7 +257,7 @@
     "planLargeTeams": "Pour les grandes équipes",
     "planTrialLabel": "Essai",
     "planCurrentLabel": "Actuel",
-    "featureUpTo10": "Jusqu'à 10 employés",
+    "featureUpTo10": "Jusqu'à 10 employés actifs",
     "featureUpTo20": "Jusqu'à 20 employés",
     "featureUnlimited": "Employés illimités",
     "featureQrCheckin": "Pointage par code QR",
@@ -520,7 +520,7 @@
       "whatIsDailybrew": "DailyBrew est une plateforme de suivi des présences du personnel conçue pour les restaurants. Elle propose le check-in par QR, la gestion des horaires, les périodes de fermeture et la gestion des demandes de congé, le tout dans un seul tableau de bord simple.",
       "whoIsItFor": "DailyBrew est conçu pour les propriétaires de restaurant, les managers et le personnel. Les propriétaires gèrent l'espace de travail, les horaires et les employés. Les managers ne reçoivent que les permissions que vous leur accordez — par exemple les approbations de congés, la supervision des présences, la gestion des employés, ou toute combinaison. Le personnel pointe à l'arrivée et au départ en scannant le code QR de l'espace.",
       "mobileApp": "Le check-in du personnel fonctionne entièrement via le navigateur web mobile. Quand un employé scanne le code QR, une page de check-in optimisée pour mobile s'ouvre instantanément. Aucun téléchargement d'application n'est requis.",
-      "freePlan": "Le plan Gratuit inclut jusqu'à 10 employés, le check-in par QR, le suivi des horaires, les périodes de fermeture et le tableau de bord des présences. Il est gratuit pour toujours, sans limite de temps.",
+      "freePlan": "Le plan Gratuit inclut jusqu'à 10 employés actifs, le check-in par QR, le suivi des horaires, les périodes de fermeture et le tableau de bord des présences. Il est gratuit pour toujours, sans limite de temps.",
       "espressoPlan": "Espresso prend en charge jusqu'à 20 employés et ajoute la gestion des demandes de congé, la restriction IP, la vérification d'appareil, le géorepérage, les horaires par jour, le rôle de manager avec permissions granulaires (jusqu'à 2), les notifications push et email, et les résumés de présence quotidiens.",
       "espressoCost": "Espresso coûte 14,99 $ par mois, ou 149 $ par an si vous choisissez la facturation annuelle. Le plan annuel vous fait économiser 30,88 $ par rapport au paiement mensuel.",
       "cancelAnytime": "Oui, il n'y a aucun contrat ni période d'engagement. Vous pouvez annuler votre abonnement Espresso à tout moment depuis les Paramètres de votre tableau de bord. Après l'annulation, vous continuerez à avoir accès jusqu'à la fin de votre période de facturation actuelle.",
@@ -654,12 +654,12 @@
           "anyPhone": "Fonctionne sur n'importe quel smartphone",
           "darkMode": "Mode sombre pour les services tardifs",
           "languages": "Anglais, français et khmer",
-          "free": "Gratuit jusqu'à 10 employés"
+          "free": "Gratuit jusqu'à 10 employés actifs"
         }
       },
       "cta": {
         "title": "Prêt à commencer ?",
-        "subtitle": "Gratuit jusqu'à 10 employés. Aucune carte de crédit requise.",
+        "subtitle": "Gratuit jusqu'à 10 employés actifs. Aucune carte de crédit requise.",
         "startFree": "Commencer gratuitement",
         "comparePlans": "Comparer les forfaits",
         "howItWorks": "Voir comment ça marche"
@@ -711,7 +711,7 @@
   },
   "homepage": {
     "hero": {
-      "badge": "Gratuit jusqu'à 10 employés",
+      "badge": "Gratuit jusqu'à 10 employés actifs",
       "titleLine1": "Présences du personnel,",
       "titleLine2": "simplifiées.",
       "subtitle": "Un code QR à votre restaurant. Le personnel le scanne pour pointer. Vous voyez qui est présent, qui est en retard et qui est en congé — en temps réel.",
@@ -929,7 +929,7 @@
       "subtitle": "Pour les petites équipes qui débutent",
       "cta": "Commencer",
       "features": {
-        "employees10": "Jusqu'à 10 employés",
+        "employees10": "Jusqu'à 10 employés actifs",
         "qrCheckIn": "Check-in par QR de l'espace",
         "shifts": "Gestion des horaires",
         "closures": "Périodes de fermeture",
@@ -1267,7 +1267,7 @@
       },
       "cta": {
         "title": "Prêt à simplifier les présences ?",
-        "subtitle": "Gratuit jusqu'à 10 employés. Aucune carte de crédit requise.",
+        "subtitle": "Gratuit jusqu'à 10 employés actifs. Aucune carte de crédit requise.",
         "getStartedFree": "Commencer gratuitement",
         "viewFeatures": "Voir toutes les fonctionnalités"
       }

@@ -19,10 +19,10 @@ export interface BlogPost {
  */
 export const POSTS: BlogPost[] = [
   {
-    slug: "three-factor-attendance-banking-security",
-    title: "Three-factor attendance: how banking-app security came to the time clock",
+    slug: "three-factor-attendance",
+    title: "Three-factor attendance: how modern login security came to the time clock",
     description:
-      "Your bank doesn't trust your password alone. Here's why device, network, and a physical tap make buddy punching mechanically impossible — without a single biometric.",
+      "Your email doesn't trust your password alone. Here's why device, network, and a physical tap make buddy punching mechanically impossible — without a single biometric.",
     date: "2026-05-27",
     tags: ["three-factor", "buddy-punching", "narrative"],
   },

@@ -14,7 +14,7 @@ const freePlan = {
   period: "forever",
   subtitle: "For small teams getting started",
   features: [
-    { text: "Up to 10 employees", included: true },
+    { text: "Up to 10 active employees", included: true },
     { text: "Workspace QR code check-in", included: true },
     { text: "Shift management", included: true },
     { text: "Closure periods", included: true },

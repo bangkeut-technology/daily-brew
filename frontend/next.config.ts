@@ -28,6 +28,15 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: "/blog/three-factor-attendance-banking-security",
+        destination: "/blog/three-factor-attendance",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 const withMDX = createMDX({});

@@ -120,7 +120,7 @@ export function CustomSelect({
         createPortal(
           <div
             ref={dropdownRef}
-            className="fixed z-[9999] overflow-hidden rounded-xl border border-glass-border bg-cream shadow-lg dark:bg-[#1E1916]"
+            className="pointer-events-auto fixed z-[9999] overflow-hidden rounded-xl border border-glass-border bg-cream shadow-lg dark:bg-[#1E1916]"
             style={{
               left: position.left,
               width: position.width,

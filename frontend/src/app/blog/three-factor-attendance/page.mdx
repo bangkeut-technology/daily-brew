@@ -2,14 +2,14 @@ import { JsonLd } from "@/components/JsonLd";
 import { articleSchema } from "@/lib/schema";
 
 export const metadata = {
-  title: "Three-factor attendance: how banking-app security came to the time clock",
+  title: "Three-factor attendance: how modern login security came to the time clock",
   description:
-    "Your bank doesn't trust your password alone. Here's why device, network, and a physical tap make buddy punching mechanically impossible — without a single biometric.",
-  alternates: { canonical: "/blog/three-factor-attendance-banking-security" },
+    "Your email doesn't trust your password alone. Here's why device, network, and a physical tap make buddy punching mechanically impossible — without a single biometric.",
+  alternates: { canonical: "/blog/three-factor-attendance" },
   openGraph: {
     type: "article",
-    url: "/blog/three-factor-attendance-banking-security",
-    title: "Three-factor attendance: how banking-app security came to the time clock",
+    url: "/blog/three-factor-attendance",
+    title: "Three-factor attendance: how modern login security came to the time clock",
     description:
       "Why device, network, and a physical tap make buddy punching mechanically impossible — without a single biometric.",
   },
@@ -17,21 +17,21 @@ export const metadata = {
 
 <JsonLd
   data={articleSchema({
-    title: "Three-factor attendance: how banking-app security came to the time clock",
+    title: "Three-factor attendance: how modern login security came to the time clock",
     description:
       "Why device, network, and a physical tap make buddy punching mechanically impossible — without a single biometric.",
-    url: "https://dailybrew.work/blog/three-factor-attendance-banking-security",
+    url: "https://dailybrew.work/blog/three-factor-attendance",
     datePublished: "2026-05-27",
   })}
 />
 
-# Three-factor attendance: how banking-app security came to the time clock
+# Three-factor attendance: how modern login security came to the time clock
 
-Your bank doesn't trust your password alone. It asks for your phone too — a one-time code, a tap to approve, a fingerprint on a device it already knows. That's two-factor authentication, and it's the reason stolen passwords rarely drain accounts anymore.
+Your email, your work account, your phone itself — they all stopped trusting passwords alone years ago. A password plus a one-time code, a tap to approve, a fingerprint on a device the system already knows. That's two-factor authentication, and it's why stolen passwords rarely take over accounts anymore.
 
 Time clocks never got the memo. Most still trust a single factor: a PIN anyone can shout across a stockroom, a QR code anyone can photograph, or a face scan that hauls your staff's biometrics into someone's cloud. Each one is a single point of failure — and buddy punching is what failure looks like on a timesheet.
 
-DailyBrew brings the banking-app idea to the café: **three factors, not one.**
+DailyBrew brings the same idea to the café: **three factors, not one.**
 
 ## The three factors
 
@@ -63,6 +63,6 @@ Every override is in the audit trail. Flexibility, without a PIN to share.
 
 ## Start with what's shipped
 
-QR + device + IP verification is live today and free for teams of 10 or fewer. NFC tap-to-clock-in is in beta — same verification stack, just a faster gesture.
+QR + device + IP verification is live today and free for up to 10 active employees. NFC tap-to-clock-in is in beta — same verification stack, just a faster gesture.
 
 See the [verification features](/features), check [pricing](/pricing), or [start free](/sign-up) and have honest timesheets running before the morning rush.
