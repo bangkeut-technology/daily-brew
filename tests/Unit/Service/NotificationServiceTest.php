@@ -603,6 +603,35 @@ class NotificationServiceTest extends TestCase
         $this->svc->notifyDeviceAnomaly($attendance, 'in');
     }
 
+    public function testNotifyDeviceAnomalyAlsoEmailsOwner(): void
+    {
+        $owner = (new User())->setEmail('owner@x.com');
+        $workspace = $this->workspace($owner, telegramEnabled: false);
+
+        $emp = (new Employee())->setFirstName('Lyhour')->setLastName('Huy');
+        $emp->setWorkspace($workspace);
+
+        $attendance = new \App\Entity\Attendance();
+        $attendance->setEmployee($emp);
+        $attendance->setWorkspace($workspace);
+        $attendance->setCheckInAt(new DateTimeImmutable('2026-04-10T09:00:00+00:00'));
+        $attendance->setCheckInDeviceName('iPhone 17 Pro');
+        $attendance->setCheckInDeviceId('device-abc');
+
+        $this->email->expects($this->once())
+            ->method('send')
+            ->with(
+                'owner@x.com',
+                $this->stringContains('New device used'),
+                'emails/device_anomaly.html.twig',
+                $this->callback(static fn(array $vars): bool => $vars['employeeName'] === 'Lyhour Huy'
+                    && $vars['verb'] === 'checked in'
+                    && $vars['deviceLabel'] === 'iPhone 17 Pro'),
+            );
+
+        $this->svc->notifyDeviceAnomaly($attendance, 'in');
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────
 
     private function workspace(
