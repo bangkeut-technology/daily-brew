@@ -166,6 +166,20 @@ final class SeoMetaResolver
                 'ការកំណត់ការចូលរួមដ៏រឹងមាំបំផុតរបស់ DailyBrew៖ ការដាក់កំហិត IP ការផ្ទៀងផ្ទាត់ឧបករណ៍ និង geofencing អនុវត្តរួមគ្នា។ ស្រទាប់នីមួយៗគ្របដណ្តប់នូវអ្វីដែលផ្សេងទៀតមិនអាចធ្វើបាន។',
             ],
         ],
+        '/stop-buddy-punching' => [
+            'en' => [
+                'How to stop buddy punching',
+                "Buddy punching costs SMBs up to 2.2% of gross payroll. Stop it without spying on staff: bind every clock-in to a verified device and your shop's network — no PINs to share.",
+            ],
+            'fr' => [
+                'Comment arrêter le pointage par procuration',
+                "Le pointage par procuration coûte aux PME jusqu'à 2,2 % de la masse salariale brute. Arrêtez-le sans surveiller le personnel : liez chaque pointage à un appareil vérifié et au réseau de votre boutique — pas de codes PIN à partager.",
+            ],
+            'km' => [
+                'របៀបបញ្ឈប់ការចូលរួមជំនួសគ្នា',
+                'ការចូលរួមជំនួសគ្នាអាចចំណាយរហូតដល់ ២,២% នៃប្រាក់បៀវត្សរ៍សរុបរបស់អាជីវកម្មតូច។ បញ្ឈប់វាដោយចងភ្ជាប់ការចូលរួមនីមួយៗទៅឧបករណ៍ដែលបានផ្ទៀងផ្ទាត់ និងបណ្តាញហាងរបស់អ្នក — គ្មាន PIN ត្រូវចែករំលែកទេ។',
+            ],
+        ],
         // `/device-verified-attendance` is a public alias for `/features/device-verification`.
         // The route is registered as indexable (so SpaController returns 200, not 404),
         // but `resolve()` rewrites its canonical to the real feature page below so
@@ -420,6 +434,34 @@ final class SeoMetaResolver
             'km' => [
                 'លុបគណនីរបស់អ្នក',
                 'ស្នើសុំការលុបគណនី DailyBrew របស់អ្នក និងទិន្នន័យពាក់ព័ន្ធទាំងអស់ រួមមានកំណត់ត្រាវត្តមាន ការងារ និងប្រវត្តិរូបបុគ្គលិក។',
+            ],
+        ],
+        '/blog' => [
+            'en' => [
+                'Blog',
+                'Notes on attendance, time clocks, and small-team operations. New posts as we ship.',
+            ],
+            'fr' => [
+                'Blog',
+                'Notes sur la présence, les pointeuses et les opérations des petites équipes. De nouveaux articles au fil des sorties.',
+            ],
+            'km' => [
+                'ប្លុក',
+                'កំណត់ត្រាស្ដីពីវត្តមាន ការតាមដានពេលវេលា និងប្រតិបត្តិការក្រុមតូច។ មានអត្ថបទថ្មីៗតាមដែលយើងចេញ។',
+            ],
+        ],
+        '/blog/three-factor-attendance' => [
+            'en' => [
+                'Three-factor attendance: how modern login security came to the time clock',
+                "Your email doesn't trust your password alone. Here's why device, network, and a physical tap make buddy punching mechanically impossible — without a single biometric.",
+            ],
+            'fr' => [
+                'Présence à trois facteurs : la sécurité moderne des connexions appliquée à la pointeuse',
+                "Votre messagerie ne fait pas confiance à votre mot de passe seul. Voici pourquoi l'appareil, le réseau et un toucher physique rendent le pointage par procuration mécaniquement impossible — sans aucune donnée biométrique.",
+            ],
+            'km' => [
+                'វត្តមានបីកត្តា៖ សុវត្ថិភាពចូលគណនីបែបទំនើបបានមកដល់ការតាមដានពេលវេលា',
+                'អ៊ីមែលរបស់អ្នកមិនទុកចិត្តតែលើពាក្យសម្ងាត់ទេ។ នេះជាមូលហេតុដែលឧបករណ៍ បណ្តាញ និងការប៉ះរូបវ័ន្តធ្វើឱ្យការចូលរួមជំនួសគ្នាមិនអាចទៅរួចតាមមេកានិច — ដោយគ្មានទិន្នន័យជីវមាត្រ។',
             ],
         ],
     ];
