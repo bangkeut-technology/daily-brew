@@ -13,7 +13,8 @@
     "settings": "Settings",
     "profile": "Profile",
     "help": "Help",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "adminPanel": "Admin panel"
   },
   "auth": {
     "signIn": "Sign in",
@@ -76,7 +77,28 @@
     "emptyCreateShift": "Create a shift",
     "emptyCreateShiftDesc": "Define morning, evening, or custom hours",
     "emptyConfigure": "Configure settings",
-    "emptyConfigureDesc": "Set timezone, IP restriction, and more"
+    "emptyConfigureDesc": "Set timezone, IP restriction, and more",
+    "summaryEmpty": "Get started by adding your first employee and creating a shift.",
+    "summaryAllPresent_one": "All 1 employee is present today. Great job!",
+    "summaryAllPresent_other": "All {{count}} employees are present today. Great job!",
+    "summaryNonePresent_one": "None of your 1 employee has checked in yet today.",
+    "summaryNonePresent_other": "None of your {{count}} employees have checked in yet today.",
+    "summarySome": "{{present}} of {{total}} employees checked in today.",
+    "summaryLate_one": "{{count}} arrived late.",
+    "summaryLate_other": "{{count}} arrived late.",
+    "summaryAbsent_one": "{{count}} absent.",
+    "summaryAbsent_other": "{{count}} absent.",
+    "attendanceRate": "Attendance rate",
+    "attendanceRateSubtitle": "{{present}} present out of {{total}} employees",
+    "onTimeRate": "On-time rate",
+    "onTimeRateSubtitle": "{{onTime}} on time, {{late}} late today",
+    "leaveAbsent": "Leave & absent",
+    "leaveAbsentSubtitle": "{{onLeave}} on leave, {{absent}} absent",
+    "leaveAbsentSubtitleWithPending": "{{onLeave}} on leave, {{absent}} absent, {{pending}} pending",
+    "upcomingLeaves": "Upcoming leaves",
+    "noUpcomingLeaves": "No upcoming leaves in the next 2 weeks",
+    "upcomingLeavesUpsell": "See who's taking time off in the next 2 weeks. Upgrade to Espresso to manage leave requests.",
+    "startTrial": "Start 14-day free trial"
   },
   "employee": {
     "add": "Add employee",
@@ -177,7 +199,8 @@
     "approve": "Approve",
     "reject": "Reject",
     "reason": "Reason",
-    "submit": "Submit request"
+    "submit": "Submit request",
+    "noRequests": "No leave requests found"
   },
   "shifts": {
     "timeRules": "Day-of-week schedule",
@@ -1522,5 +1545,12 @@
         }
       }
     }
+  },
+  "theme": {
+    "dark": "Dark mode",
+    "light": "Light mode"
+  },
+  "closure": {
+    "empty": "No closure periods defined"
   }
 }

@@ -317,7 +317,7 @@ export function Sidebar() {
                             className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer w-full font-sans text-[15.5px] text-coffee hover:bg-coffee/8 transition-all duration-180 no-underline"
                         >
                             <ShieldCheck size={16} />
-                            Admin panel
+                            {t('nav.adminPanel', 'Admin panel')}
                         </Link>
                     )}
                     <div className="px-2.5 pb-1">
@@ -353,6 +353,7 @@ function HelpLink() {
 }
 
 function ThemeToggle() {
+    const { t } = useTranslation();
     const { theme, setTheme } = useTheme();
     const isDark = theme === 'dark';
 
@@ -362,7 +363,7 @@ function ThemeToggle() {
             className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer w-full font-sans text-[15.5px] text-text-secondary hover:bg-cream-3 hover:text-text-primary transition-all duration-180 border-none bg-transparent"
         >
             {isDark ? <Sun size={16} /> : <Moon size={16} />}
-            {isDark ? 'Light mode' : 'Dark mode'}
+            {isDark ? t('theme.light', 'Light mode') : t('theme.dark', 'Dark mode')}
         </button>
     );
 }

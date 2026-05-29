@@ -248,12 +248,12 @@ export function OwnerDashboard() {
       <div className="mb-6">
         <p className="text-[15.5px] text-text-secondary leading-relaxed">
           {data.totalEmployees === 0
-            ? 'Get started by adding your first employee and creating a shift.'
+            ? t('dashboard.summaryEmpty')
             : data.present === data.totalEmployees
-              ? `All ${data.totalEmployees} employees are present today. Great job!`
+              ? t('dashboard.summaryAllPresent', { count: data.totalEmployees })
               : data.present === 0
-                ? `None of your ${data.totalEmployees} employees have checked in yet today.`
-                : `${data.present} of ${data.totalEmployees} employees checked in today.${data.late > 0 ? ` ${data.late} arrived late.` : ''}${data.absent > 0 ? ` ${data.absent} absent.` : ''}`
+                ? t('dashboard.summaryNonePresent', { count: data.totalEmployees })
+                : `${t('dashboard.summarySome', { present: data.present, total: data.totalEmployees })}${data.late > 0 ? ' ' + t('dashboard.summaryLate', { count: data.late }) : ''}${data.absent > 0 ? ' ' + t('dashboard.summaryAbsent', { count: data.absent }) : ''}`
           }
         </p>
       </div>
@@ -351,34 +351,36 @@ export function OwnerDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <GlassCard hover={false}>
             <div className="p-4">
-              <p className="text-[13px] text-text-tertiary uppercase tracking-[1px] mb-1">Attendance rate</p>
+              <p className="text-[13px] text-text-tertiary uppercase tracking-[1px] mb-1">{t('dashboard.attendanceRate')}</p>
               <p className="text-[30px] font-bold text-coffee tabular-nums">
                 {data.totalEmployees > 0 ? Math.round((data.present / data.totalEmployees) * 100) : 0}%
               </p>
               <p className="text-[13px] text-text-tertiary mt-1">
-                {data.present} present out of {data.totalEmployees} employees
+                {t('dashboard.attendanceRateSubtitle', { present: data.present, total: data.totalEmployees })}
               </p>
             </div>
           </GlassCard>
           <GlassCard hover={false}>
             <div className="p-4">
-              <p className="text-[13px] text-text-tertiary uppercase tracking-[1px] mb-1">On-time rate</p>
+              <p className="text-[13px] text-text-tertiary uppercase tracking-[1px] mb-1">{t('dashboard.onTimeRate')}</p>
               <p className="text-[30px] font-bold text-green tabular-nums">
                 {data.present > 0 ? Math.round(((data.present - data.late) / data.present) * 100) : 0}%
               </p>
               <p className="text-[13px] text-text-tertiary mt-1">
-                {data.present - data.late} on time, {data.late} late today
+                {t('dashboard.onTimeRateSubtitle', { onTime: data.present - data.late, late: data.late })}
               </p>
             </div>
           </GlassCard>
           <GlassCard hover={false}>
             <div className="p-4">
-              <p className="text-[13px] text-text-tertiary uppercase tracking-[1px] mb-1">Leave & absent</p>
+              <p className="text-[13px] text-text-tertiary uppercase tracking-[1px] mb-1">{t('dashboard.leaveAbsent')}</p>
               <p className="text-[30px] font-bold text-amber tabular-nums">
                 {data.onLeave + data.absent}
               </p>
               <p className="text-[13px] text-text-tertiary mt-1">
-                {data.onLeave} on leave, {data.absent} absent{data.pendingLeaves > 0 ? `, ${data.pendingLeaves} pending` : ''}
+                {data.pendingLeaves > 0
+                  ? t('dashboard.leaveAbsentSubtitleWithPending', { onLeave: data.onLeave, absent: data.absent, pending: data.pendingLeaves })
+                  : t('dashboard.leaveAbsentSubtitle', { onLeave: data.onLeave, absent: data.absent })}
               </p>
             </div>
           </GlassCard>
@@ -478,25 +480,25 @@ export function OwnerDashboard() {
         {!canUseLeave && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-cream/80 dark:bg-cream/60 backdrop-blur-sm">
             <Crown size={24} className="text-amber mb-2" />
-            <p className="text-[16px] font-semibold text-text-primary mb-1">Upcoming leaves</p>
+            <p className="text-[16px] font-semibold text-text-primary mb-1">{t('dashboard.upcomingLeaves')}</p>
             <p className="text-[14px] text-text-secondary mb-3 text-center max-w-xs">
-              See who's taking time off in the next 2 weeks. Upgrade to Espresso to manage leave requests.
+              {t('dashboard.upcomingLeavesUpsell')}
             </p>
             <button
               onClick={() => openCheckout('annual')}
               className="px-5 py-2 rounded-xl text-[15px] font-medium text-white border-none cursor-pointer btn-shimmer transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,66,38,0.30)]"
             >
-              Start 14-day free trial
+              {t('dashboard.startTrial')}
             </button>
           </div>
         )}
         <GlassCard hover={false}>
           <GlassCardHeader
-            title="Upcoming leaves"
+            title={t('dashboard.upcomingLeaves')}
             action={
               canUseLeave ? (
                 <Link to="/console/leave" className="text-xs text-amber font-medium cursor-pointer no-underline">
-                  View all &rarr;
+                  {t('dashboard.viewAll', 'View all')} &rarr;
                 </Link>
               ) : (
                 <StatusBadge label="Espresso" variant="amber" />
@@ -506,7 +508,7 @@ export function OwnerDashboard() {
           <div className={!canUseLeave ? 'blur-[2px] select-none pointer-events-none' : ''}>
             {canUseLeave && upcomingLeaves.length === 0 ? (
               <p className="px-5 py-6 text-center text-[15px] text-text-tertiary">
-                No upcoming leaves in the next 2 weeks
+                {t('dashboard.noUpcomingLeaves')}
               </p>
             ) : (
               <div>
