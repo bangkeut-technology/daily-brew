@@ -16,6 +16,25 @@
     "signOut": "Sign out",
     "adminPanel": "Admin panel"
   },
+  "profile": {
+    "telegram": {
+      "title": "Telegram notifications",
+      "description": "Get leave decisions, shift assignments, and daily summaries delivered to your personal Telegram chat. This is separate from any workspace group chat your owner sets up.",
+      "connectButton": "Connect personal Telegram",
+      "connectedSubtitle": "Receiving personal notifications",
+      "botUsername": "Connect via @{{name}}",
+      "notConfigured": "Bot is not configured on the server",
+      "notConfiguredHint": "Ask your administrator to set TELEGRAM_BOT_USERNAME.",
+      "waiting": "Waiting for Telegram...",
+      "waitingHint": "After you tap Start in Telegram, we'll detect the connection automatically.",
+      "generating": "Generating link...",
+      "connected": "Telegram connected",
+      "linkError": "Could not generate Telegram link",
+      "disconnectSuccess": "Telegram disconnected",
+      "disconnectError": "Failed to disconnect Telegram",
+      "timeout": "Timed out waiting for Telegram. Try again."
+    }
+  },
   "auth": {
     "signIn": "Sign in",
     "signUp": "Sign up",

@@ -14,6 +14,25 @@
     "signOut": "Déconnexion",
     "adminPanel": "Panneau d'administration"
   },
+  "profile": {
+    "telegram": {
+      "title": "Notifications Telegram",
+      "description": "Recevez les décisions de congé, les attributions de service et les résumés quotidiens directement dans votre chat Telegram personnel. Indépendant de tout chat de groupe configuré par le propriétaire du restaurant.",
+      "connectButton": "Connecter Telegram personnel",
+      "connectedSubtitle": "Notifications personnelles activées",
+      "botUsername": "Connecter via @{{name}}",
+      "notConfigured": "Le bot n'est pas configuré sur le serveur",
+      "notConfiguredHint": "Demandez à votre administrateur de configurer TELEGRAM_BOT_USERNAME.",
+      "waiting": "En attente de Telegram...",
+      "waitingHint": "Dès que vous appuyez sur Start dans Telegram, nous détectons la connexion automatiquement.",
+      "generating": "Génération du lien...",
+      "connected": "Telegram connecté",
+      "linkError": "Impossible de générer le lien Telegram",
+      "disconnectSuccess": "Telegram déconnecté",
+      "disconnectError": "Échec de la déconnexion de Telegram",
+      "timeout": "Délai dépassé pour Telegram. Réessayez."
+    }
+  },
   "attendance": {
     "verification": {
       "title": "Vérification du pointage",

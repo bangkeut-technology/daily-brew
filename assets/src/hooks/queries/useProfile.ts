@@ -106,3 +106,47 @@ export function useDeleteAccount() {
     },
   });
 }
+
+// ── Personal Telegram connection ────────────────────────────────
+
+/**
+ * Status query for the profile page. While the user is mid-link (waiting for
+ * them to tap Start in Telegram) the caller bumps refetchInterval so we
+ * detect the chat-ID flip without a page reload.
+ */
+export function useTelegramConnectionStatus(options?: { refetchInterval?: number | false }) {
+  return useQuery({
+    queryKey: ['user-telegram'],
+    queryFn: async () => {
+      const { data } = await apiAxios.get<{ connected: boolean }>('/users/me/telegram');
+      return data;
+    },
+    refetchInterval: options?.refetchInterval ?? false,
+  });
+}
+
+export function useTelegramLinkToken() {
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await apiAxios.post<{
+        token: string;
+        deepLink: string;
+        expiresInSeconds: number;
+      }>('/users/me/telegram/link-token');
+      return data;
+    },
+  });
+}
+
+export function useDisconnectTelegram() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await apiAxios.delete<{ disconnected: boolean }>('/users/me/telegram');
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-telegram'] });
+    },
+  });
+}

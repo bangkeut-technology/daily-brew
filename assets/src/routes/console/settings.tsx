@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { cn } from '@/lib/utils';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -19,7 +19,6 @@ import {
   useRegenerateWorkspaceToken,
   useWorkspaceSettings,
   useUpdateWorkspaceSettings,
-  useTelegramLinkToken,
   useTelegramTest,
 } from '@/hooks/queries/useWorkspaces';
 import { usePlan } from '@/hooks/queries/usePlan';
@@ -104,13 +103,7 @@ function SettingsPage() {
   const deleteWs = useDeleteWorkspace();
   const regenerateToken = useRegenerateWorkspaceToken();
   const [regenerateConfirmOpen, setRegenerateConfirmOpen] = useState(false);
-  const [waitingForLink, setWaitingForLink] = useState(false);
-  const linkPollEndsAtRef = useRef(0);
-  const chatIdBeforeLinkRef = useRef<string | null>(null);
-  const { data: settings } = useWorkspaceSettings(
-    currentWsId,
-    { refetchInterval: waitingForLink ? 2000 : false },
-  );
+  const { data: settings } = useWorkspaceSettings(currentWsId);
   const updateSettings = useUpdateWorkspaceSettings(currentWsId);
   const { data: plan } = usePlan(currentWsId);
   const { data: employees } = useEmployees(currentWsId);
@@ -145,10 +138,9 @@ function SettingsPage() {
   // NFC check-in state
   const [nfcCheckinEnabled, setNfcCheckinEnabled] = useState(false);
 
-  // Telegram state
+  // Telegram state — workspace group chat only; personal connection lives on /console/profile.
   const [telegramEnabled, setTelegramEnabled] = useState(false);
   const [telegramChatId, setTelegramChatId] = useState('');
-  const linkToken = useTelegramLinkToken(currentWsId);
   const telegramTest = useTelegramTest(currentWsId);
   const telegramBotUsername = window.__DAILYBREW__?.telegramBotUsername || '';
 
@@ -213,43 +205,6 @@ function SettingsPage() {
       window.location.reload();
     } catch {
       toast.error('Failed to create workspace');
-    }
-  };
-
-  // The Telegram bot writes the chat ID server-side after the user hits
-  // Start in Telegram. The browser has no push channel for that event, so
-  // useWorkspaceSettings polls (via refetchInterval) while waitingForLink
-  // is true and we react here when the chat ID flips from its pre-link
-  // snapshot. A 30s watchdog covers the case where the user never finishes
-  // in Telegram.
-  useEffect(() => {
-    if (!waitingForLink) return;
-    const current = settings?.telegramChatId ?? null;
-    if (current && current !== chatIdBeforeLinkRef.current) {
-      setWaitingForLink(false);
-      toast.success('Telegram connected');
-    }
-  }, [waitingForLink, settings?.telegramChatId]);
-
-  useEffect(() => {
-    if (!waitingForLink) return;
-    const remaining = Math.max(0, linkPollEndsAtRef.current - Date.now());
-    const timeout = window.setTimeout(() => {
-      setWaitingForLink(false);
-      toast.error('Timed out waiting for Telegram. Try again.');
-    }, remaining);
-    return () => window.clearTimeout(timeout);
-  }, [waitingForLink]);
-
-  const handleConnectPersonalTelegram = async () => {
-    try {
-      const { deepLink, expiresInSeconds } = await linkToken.mutateAsync();
-      chatIdBeforeLinkRef.current = settings?.telegramChatId ?? null;
-      linkPollEndsAtRef.current = Date.now() + Math.min(expiresInSeconds, 30) * 1000;
-      setWaitingForLink(true);
-      window.open(deepLink, '_blank', 'noopener,noreferrer');
-    } catch {
-      toast.error('Could not generate Telegram link');
     }
   };
 
@@ -1304,37 +1259,9 @@ function SettingsPage() {
 
               {telegramEnabled && plan?.canUseTelegramNotifications && (
                 <div className="space-y-5">
-                  {/* Personal connect — one-click via /start <token> deep link */}
-                  <div className="rounded-xl border border-cream-3 bg-glass-bg/50 p-4">
-                    <div className="flex items-start justify-between gap-3 mb-2">
-                      <div>
-                        <p className="text-[14px] font-medium text-text-primary">Personal chat</p>
-                        <p className="text-[12.5px] text-text-tertiary mt-0.5">
-                          One-click setup: open Telegram, hit Start, you're connected.
-                        </p>
-                      </div>
-                      <button
-                        onClick={handleConnectPersonalTelegram}
-                        disabled={!telegramBotUsername || linkToken.isPending || waitingForLink}
-                        className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[13.5px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50"
-                      >
-                        <Send size={13} />
-                        {waitingForLink ? 'Waiting for Telegram…' : linkToken.isPending ? 'Generating link…' : 'Connect personal Telegram'}
-                      </button>
-                    </div>
-                    {!telegramBotUsername && (
-                      <p className="text-[12.5px] text-red mt-1">
-                        Bot username is not configured on the server (TELEGRAM_BOT_USERNAME).
-                      </p>
-                    )}
-                    {waitingForLink && (
-                      <p className="text-[12.5px] text-amber mt-1">
-                        After you tap Start in Telegram, we'll detect the connection automatically.
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Group setup — manual flow */}
+                  {/* Group setup — manual flow. Personal/per-user Telegram now
+                      lives on the Profile page; this card is workspace-wide
+                      group-chat config only. */}
                   <div className="rounded-xl border border-cream-3 bg-glass-bg/50 p-4">
                     <p className="text-[14px] font-medium text-text-primary mb-2">Group chat</p>
                     <ol className="text-[13px] text-text-secondary leading-relaxed list-decimal pl-5 space-y-1">
@@ -1361,6 +1288,13 @@ function SettingsPage() {
                     </ol>
                     <p className="text-[12px] text-text-tertiary mt-2">
                       Group IDs start with <span className="font-mono">-</span> (e.g. <span className="font-mono">-1001234567890</span>) — paste it as-is.
+                    </p>
+                    <p className="text-[12px] text-text-tertiary mt-2">
+                      Want personal DM notifications instead? Connect your own Telegram from{' '}
+                      <a href="/console/profile" className="text-coffee hover:underline">
+                        your profile
+                      </a>
+                      .
                     </p>
                   </div>
 

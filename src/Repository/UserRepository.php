@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\User;
@@ -33,5 +35,15 @@ class UserRepository extends AbstractRepository
             \App\Enum\OAuthProviderEnum::GOOGLE => $this->findByGoogleId($providerId),
             \App\Enum\OAuthProviderEnum::APPLE => $this->findByAppleId($providerId),
         };
+    }
+
+    /**
+     * Look up a non-soft-deleted user by their Telegram chat ID. Useful for
+     * inbound webhook flows that need to identify who is messaging the bot.
+     * Returns null if the chat isn't linked or the user has been soft-deleted.
+     */
+    public function findOneByTelegramChatId(string $chatId): ?User
+    {
+        return $this->findOneBy(['telegramChatId' => $chatId, 'deletedAt' => null]);
     }
 }

@@ -113,19 +113,6 @@ export function useUpdateWorkspaceSettings(workspacePublicId: string) {
   });
 }
 
-export function useTelegramLinkToken(workspacePublicId: string) {
-  return useMutation({
-    mutationFn: async () => {
-      const { data } = await apiAxios.post<{
-        token: string;
-        deepLink: string;
-        expiresInSeconds: number;
-      }>(`/workspaces/${workspacePublicId}/settings/telegram-link-token`);
-      return data;
-    },
-  });
-}
-
 export function useTelegramTest(workspacePublicId: string) {
   return useMutation({
     mutationFn: async () => {

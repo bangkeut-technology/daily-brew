@@ -16,6 +16,25 @@
     "myLeaveRequests": "សំណើឈប់របស់ខ្ញុំ",
     "adminPanel": "ផ្ទាំងគ្រប់គ្រងអ្នកគ្រប់គ្រង"
   },
+  "profile": {
+    "telegram": {
+      "title": "ការជូនដំណឹង Telegram",
+      "description": "ទទួលការសម្រេចលើការឈប់សម្រាក ការកំណត់វេន និងសេចក្តីសង្ខេបប្រចាំថ្ងៃតាមរយៈ Telegram ផ្ទាល់ខ្លួនរបស់អ្នក។ ដាច់ដោយឡែកពីការជូនដំណឹងក្រុមរបស់ហាង។",
+      "connectButton": "ភ្ជាប់ Telegram ផ្ទាល់ខ្លួន",
+      "connectedSubtitle": "កំពុងទទួលការជូនដំណឹងផ្ទាល់ខ្លួន",
+      "botUsername": "ភ្ជាប់តាមរយៈ @{{name}}",
+      "notConfigured": "Bot មិនត្រូវបានកំណត់នៅលើម៉ាស៊ីនមេទេ",
+      "notConfiguredHint": "សូមស្នើសុំអ្នកគ្រប់គ្រងរបស់អ្នកដើម្បីកំណត់ TELEGRAM_BOT_USERNAME ។",
+      "waiting": "កំពុងរង់ចាំ Telegram...",
+      "waitingHint": "បន្ទាប់ពីអ្នកចុច Start នៅក្នុង Telegram យើងនឹងស្គាល់ការតភ្ជាប់ដោយស្វ័យប្រវត្តិ។",
+      "generating": "កំពុងបង្កើតតំណ...",
+      "connected": "Telegram បានភ្ជាប់",
+      "linkError": "មិនអាចបង្កើតតំណ Telegram បានទេ",
+      "disconnectSuccess": "Telegram បានផ្តាច់",
+      "disconnectError": "បរាជ័យក្នុងការផ្តាច់ Telegram",
+      "timeout": "អស់ពេលរង់ចាំ Telegram។ សូមព្យាយាមម្តងទៀត។"
+    }
+  },
   "attendance": {
     "verification": {
       "title": "ការផ្ទៀងផ្ទាត់ការចូល",
