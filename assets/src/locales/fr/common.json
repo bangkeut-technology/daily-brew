@@ -337,6 +337,8 @@
     "telegramTitle": "Notifications Telegram",
     "enableTelegram": "Activer les notifications Telegram",
     "telegramDesc": "Envoyez les demandes de congé, les changements d'horaire, les fermetures et les résumés quotidiens vers un chat ou un groupe Telegram.",
+    "telegramCheckinAlertsLabel": "Alertes de pointage en direct",
+    "telegramCheckinAlertsDesc": "Recevez un ping Telegram dès qu'un membre du personnel pointe à l'arrivée ou au départ. Envoyé au groupe de l'espace de travail (s'il est configuré) et à votre Telegram personnel. Fréquence élevée — un café de 5 personnes recevra plus de 10 pings par jour.",
     "telegramGroupChat": "Chat de groupe",
     "telegramStep1Prefix": "Ajoutez ",
     "telegramYourBot": "votre bot DailyBrew",

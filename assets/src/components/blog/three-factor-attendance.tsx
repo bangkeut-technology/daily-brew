@@ -29,9 +29,12 @@ export function ThreeFactorAttendancePost() {
       </h2>
       <ul className="space-y-3 list-disc pl-6">
         <li>
-          <strong>Something you have — the verified device.</strong> The first time a staff member
-          clocks in, their phone is registered and bound to them. Later punches from a different
-          phone simply don&apos;t count for that person.
+          <strong>Something you have — the verified device.</strong> Within a single day, only
+          one device per employee can clock in, and the check-out has to come from the same
+          device as the check-in. No other employee can use that device that day either. The
+          next day, they can use a different phone — the constraint is per-shift, not
+          per-lifetime — so an upgraded phone or a borrowed device on a fresh day doesn&apos;t
+          break anything.
         </li>
         <li>
           <strong>Somewhere you are — the verified network.</strong> Every clock-in records the IP.

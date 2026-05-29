@@ -149,6 +149,10 @@ function SettingsPage() {
   // Telegram state — workspace group chat only; personal connection lives on /console/profile.
   const [telegramEnabled, setTelegramEnabled] = useState(false);
   const [telegramChatId, setTelegramChatId] = useState('');
+  // Per-check-in alerts: a separate opt-in inside the Telegram card. Off by default
+  // because a 5-person café would otherwise get 10+ pings/day; only turn it on if
+  // the owner explicitly wants live check-in noise.
+  const [telegramCheckinAlertsEnabled, setTelegramCheckinAlertsEnabled] = useState(false);
   const telegramTest = useTelegramTest(currentWsId);
   const telegramBotUsername = window.__DAILYBREW__?.telegramBotUsername || '';
 
@@ -171,6 +175,7 @@ function SettingsPage() {
       setNfcCheckinIntervalMinutes(settings.nfcCheckinIntervalMinutes ?? 15);
       setTelegramEnabled(settings.telegramNotificationsEnabled);
       setTelegramChatId(settings.telegramChatId || '');
+      setTelegramCheckinAlertsEnabled(settings.telegramCheckinAlertsEnabled ?? false);
       setGeofencingEnabled(settings.geofencingEnabled);
       setGeofencingLat(settings.geofencingLatitude);
       setGeofencingLng(settings.geofencingLongitude);
@@ -195,6 +200,8 @@ function SettingsPage() {
         geofencingRadiusMeters: geofencingEnabled ? geofencingRadius : null,
         telegramNotificationsEnabled: telegramEnabled,
         telegramChatId: telegramEnabled ? (telegramChatId.trim() || null) : null,
+        // Master Telegram toggle off => alerts also off, regardless of local state.
+        telegramCheckinAlertsEnabled: telegramEnabled && telegramCheckinAlertsEnabled,
         tapCheckinEnabled,
         nfcCheckinEnabled,
         nfcCheckinIntervalMinutes,
@@ -1370,6 +1377,30 @@ function SettingsPage() {
                         {t('settings.telegramPersonalLink', 'your profile')}
                       </a>
                       .
+                    </p>
+                  </div>
+
+                  {/* Live check-in/out alerts — high-frequency opt-in. Off by default
+                      so an existing Telegram user doesn't suddenly get 10+ pings/day. */}
+                  <div className="rounded-xl border border-cream-3 bg-glass-bg/50 p-4">
+                    <div className="flex items-center gap-2">
+                      <Toggle
+                        id="telegram-checkin-alerts"
+                        checked={telegramCheckinAlertsEnabled}
+                        onChange={setTelegramCheckinAlertsEnabled}
+                      />
+                      <label
+                        htmlFor="telegram-checkin-alerts"
+                        className="text-[15px] font-medium text-text-primary cursor-pointer"
+                      >
+                        {t('settings.telegramCheckinAlertsLabel', 'Live check-in/out alerts')}
+                      </label>
+                    </div>
+                    <p className="text-[13px] text-text-tertiary leading-relaxed mt-2">
+                      {t(
+                        'settings.telegramCheckinAlertsDesc',
+                        "Get a Telegram ping the moment any staff member clocks in or out. Sent to the workspace group (if configured) and your personal Telegram. High-frequency — a 5-person café will see 10+ pings a day.",
+                      )}
                     </p>
                   </div>
 

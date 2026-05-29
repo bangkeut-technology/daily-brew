@@ -40,7 +40,7 @@ const FAQ = [
   {
     question: 'Can I stop it without face scans or GPS tracking?',
     answer:
-      "Yes — that's the point. DailyBrew binds clock-ins to a verified device and your shop's network. No biometrics are collected, and you don't need always-on GPS draining staff phones.",
+      "Yes — that's the point. DailyBrew enforces same-day device consistency (only one device per employee per day, and the check-out has to come from the same device as the check-in) and locks check-ins to your shop's network. No biometrics, no always-on GPS — buddy-punching attempts using a co-worker's phone, or off-network mobile data, simply can't complete.",
   },
   {
     question: "Won't this annoy honest staff?",

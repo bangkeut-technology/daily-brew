@@ -30,10 +30,32 @@ export function TheNewDeviceAlertPost() {
         it&apos;s clocking in for</em>.
       </p>
       <p>
-        The device binding does. The first phone a staff member uses becomes their baseline. Every
-        later punch from the same phone is silently approved. A new phone is the only thing that
-        surfaces — and that surface is small enough to look at calmly, instead of drowning you in
-        low-signal noise.
+        DailyBrew runs two device mechanisms in parallel. <strong>Device verification</strong>{' '}
+        is the active one: within a single day, only one device per employee, and the check-out
+        device has to match the check-in device. That blocks live buddy-punching attempts.
+        <strong> The new-device alert</strong> — what this post is about — is the passive
+        companion. It looks across the employee&apos;s full history of phones they&apos;ve ever
+        clocked in with, and pings you when one shows up that isn&apos;t in that history. It
+        doesn&apos;t block; it just surfaces. That separation matters: the active check stops
+        same-day fraud, the history check catches the slow drift (the staff member who quietly
+        started using a different phone three weeks ago).
+      </p>
+      <p>
+        One thing the alert is <em>not</em>: a ping every time someone clocks in. Subsequent
+        uses of a phone we&apos;ve already seen for that employee are silent — the message
+        isn&apos;t &quot;Lyhour clocked in&quot;, it&apos;s &quot;Lyhour clocked in{' '}
+        <em>on a phone we&apos;ve never seen before for her</em>.&quot; If she upgrades her
+        iPhone tomorrow, you get one alert; then the new iPhone joins her known-devices list
+        and the next 200 punches from it are quiet. If you want every clock-in to ping you,
+        that&apos;s a different feature —{' '}
+        <Link
+          to="/blog/$slug"
+          params={{ slug: 'live-checkin-alerts-on-telegram' }}
+          className="text-coffee no-underline hover:underline"
+        >
+          live check-in alerts
+        </Link>{' '}
+        — controlled by its own toggle.
       </p>
 
       <h2 className="font-serif text-2xl font-semibold text-text-primary mt-10 mb-2">

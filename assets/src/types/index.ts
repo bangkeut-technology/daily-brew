@@ -201,6 +201,7 @@ export interface WorkspaceSetting {
   geofencingRadiusMeters: number | null;
   telegramNotificationsEnabled: boolean;
   telegramChatId: string | null;
+  telegramCheckinAlertsEnabled: boolean;
   tapCheckinEnabled: boolean;
   nfcCheckinEnabled: boolean;
   nfcCheckinIntervalMinutes: number;

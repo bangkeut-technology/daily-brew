@@ -18,6 +18,14 @@ export interface BlogPost {
 
 export const BLOG_POSTS: BlogPost[] = [
   {
+    slug: 'live-checkin-alerts-on-telegram',
+    title: 'Live check-in alerts: a Telegram toggle for owners who want every clock-in',
+    description:
+      "Turn on a single setting and DailyBrew sends a Telegram ping the moment any staff member clocks in or out. Espresso+ feature, off by default — the noise profile is intentional.",
+    date: '2026-05-29',
+    tags: ['telegram', 'notifications', 'feature'],
+  },
+  {
     slug: 'the-new-device-alert',
     title: 'The new-device alert: when a check-in looks fine but isn\'t',
     description:
