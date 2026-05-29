@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.85.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.84.0...v1.85.0) (2026-05-29)
+
+
+### Features
+
+* NFC double-tap cooldown + /three-factor-attendance page + /device-verified-attendance alias ([#202](https://github.com/bangkeut-technology/daily-brew/issues/202)) ([e71f73c](https://github.com/bangkeut-technology/daily-brew/commit/e71f73c888ce35b953b0788a45e241426d9f7e62))
+* **telegram:** per-user Telegram link + remove misleading 'Personal chat' from workspace settings ([#200](https://github.com/bangkeut-technology/daily-brew/issues/200)) ([d86be70](https://github.com/bangkeut-technology/daily-brew/commit/d86be7061c8d3eb40396e25fcb76a3c25b386576))
+
+
+### Bug Fixes
+
+* **i18n,km:** more console translation gaps + Owner role label bug in workspace switcher ([#201](https://github.com/bangkeut-technology/daily-brew/issues/201)) ([c46e4ac](https://github.com/bangkeut-technology/daily-brew/commit/c46e4ac387e3de79576b439b1baf45626923a3d0))
+
 ## [1.84.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.83.0...v1.84.0) (2026-05-29)
 
 
