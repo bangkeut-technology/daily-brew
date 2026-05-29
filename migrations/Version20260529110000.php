@@ -20,7 +20,7 @@ use Doctrine\Migrations\AbstractMigration;
  * short enough that a 30-minute coffee-shop shift can still check out.
  * Range 0–120 enforced in the entity setter (0 disables the cooldown).
  */
-final class Version20260529100000 extends AbstractMigration
+final class Version20260529110000 extends AbstractMigration
 {
     public function getDescription(): string
     {
