@@ -22,7 +22,7 @@ jobs:
                                      set -euo pipefail
                                      cd ${{ secrets.PROJECT_FOLDER }}
                                      sudo touch public/.maintenance
-                                     sudo git fetch --tags https://${{ secrets.ACCOUNT_GITHUB_USERNAME }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ secrets.ACCOUNT_GITHUB_USERNAME }}/daily-brew.git
+                                     sudo git fetch --tags --force https://${{ secrets.ACCOUNT_GITHUB_USERNAME }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ secrets.ACCOUNT_GITHUB_USERNAME }}/daily-brew.git
                                      sudo git checkout ${{ github.event.release.tag_name }}
                                      sudo chown -R $(whoami) ${{ secrets.PROJECT_FOLDER }}
                                      composer install --no-dev --optimize-autoloader
