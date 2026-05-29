@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { ChevronRight, QrCode, CheckCircle, Clock, Users, Shield } from 'lucide-react';
+import { ChevronRight, QrCode, CheckCircle, Clock, Users, Shield, Nfc, Smartphone } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
@@ -17,10 +17,11 @@ const floatingCardVariants = {
 };
 
 const trustItems: { icon: React.ReactNode; key: string }[] = [
-  { icon: <QrCode size={14} />, key: 'qrCheckin' },
-  { icon: <Clock size={14} />,  key: 'shiftTracking' },
-  { icon: <Users size={14} />,  key: 'leaveManagement' },
-  { icon: <Shield size={14} />, key: 'geofencing' },
+  { icon: <QrCode size={14} />,    key: 'qrCheckin' },
+  { icon: <Nfc size={14} />,       key: 'nfcTap' },
+  { icon: <Clock size={14} />,     key: 'shiftTracking' },
+  { icon: <Users size={14} />,     key: 'leaveManagement' },
+  { icon: <Shield size={14} />,    key: 'geofencing' },
 ];
 
 export function HeroSection() {
@@ -256,46 +257,96 @@ export function HeroSection() {
               </div>
             </motion.div>
 
-            {/* QR card — below dashboard */}
-            <motion.div
-              className="self-start bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl p-4 shadow-[0_4px_20px_rgba(107,66,38,0.08)] w-[150px]"
-              custom={2}
-              variants={floatingCardVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-6 h-6 rounded-lg bg-coffee/10 flex items-center justify-center">
-                  <QrCode size={13} className="text-coffee" />
+            {/* QR + NFC mini-cards row */}
+            <div className="self-start flex items-start gap-3">
+              {/* QR card */}
+              <motion.div
+                className="bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl p-4 shadow-[0_4px_20px_rgba(107,66,38,0.08)] w-[150px]"
+                custom={2}
+                variants={floatingCardVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-6 h-6 rounded-lg bg-coffee/10 flex items-center justify-center">
+                    <QrCode size={13} className="text-coffee" />
+                  </div>
+                  <p className="text-[12px] font-medium text-text-primary">{t('homepage.hero.preview.qrCheckin')}</p>
                 </div>
-                <p className="text-[12px] font-medium text-text-primary">{t('homepage.hero.preview.qrCheckin')}</p>
-              </div>
-              <div className="w-full aspect-square rounded-xl bg-cream-3/40 dark:bg-cream-3/10 flex items-center justify-center p-3">
-                <svg viewBox="0 0 21 21" className="w-full h-full" shapeRendering="crispEdges">
-                  <rect x="0" y="0" width="7" height="7" fill="currentColor" className="text-coffee" />
-                  <rect x="1" y="1" width="5" height="5" fill="currentColor" className="text-cream-3/60" />
-                  <rect x="2" y="2" width="3" height="3" fill="currentColor" className="text-coffee" />
-                  <rect x="14" y="0" width="7" height="7" fill="currentColor" className="text-coffee" />
-                  <rect x="15" y="1" width="5" height="5" fill="currentColor" className="text-cream-3/60" />
-                  <rect x="16" y="2" width="3" height="3" fill="currentColor" className="text-coffee" />
-                  <rect x="0" y="14" width="7" height="7" fill="currentColor" className="text-coffee" />
-                  <rect x="1" y="15" width="5" height="5" fill="currentColor" className="text-cream-3/60" />
-                  <rect x="2" y="16" width="3" height="3" fill="currentColor" className="text-coffee" />
-                  {[
-                    [8,0],[10,0],[8,2],[9,2],[10,3],[8,4],[10,4],
-                    [0,8],[2,8],[4,8],[6,8],[8,8],[10,8],[12,8],[14,8],[16,8],[18,8],[20,8],
-                    [8,10],[9,9],[11,9],[13,10],[15,10],[17,9],[19,10],
-                    [9,11],[11,11],[14,12],[16,12],[18,11],[20,12],
-                    [8,13],[10,13],[12,14],[14,14],[16,14],[19,13],
-                    [9,15],[11,16],[13,15],[15,16],[17,15],[19,16],
-                    [8,17],[10,18],[12,17],[14,18],[16,17],[18,18],[20,17],
-                    [8,20],[10,19],[12,20],[15,19],[17,20],[19,19],[20,20],
-                  ].map(([x, y], i) => (
-                    <rect key={i} x={x} y={y} width="1" height="1" fill="currentColor" className="text-coffee" />
+                <div className="w-full aspect-square rounded-xl bg-cream-3/40 dark:bg-cream-3/10 flex items-center justify-center p-3">
+                  <svg viewBox="0 0 21 21" className="w-full h-full" shapeRendering="crispEdges">
+                    <rect x="0" y="0" width="7" height="7" fill="currentColor" className="text-coffee" />
+                    <rect x="1" y="1" width="5" height="5" fill="currentColor" className="text-cream-3/60" />
+                    <rect x="2" y="2" width="3" height="3" fill="currentColor" className="text-coffee" />
+                    <rect x="14" y="0" width="7" height="7" fill="currentColor" className="text-coffee" />
+                    <rect x="15" y="1" width="5" height="5" fill="currentColor" className="text-cream-3/60" />
+                    <rect x="16" y="2" width="3" height="3" fill="currentColor" className="text-coffee" />
+                    <rect x="0" y="14" width="7" height="7" fill="currentColor" className="text-coffee" />
+                    <rect x="1" y="15" width="5" height="5" fill="currentColor" className="text-cream-3/60" />
+                    <rect x="2" y="16" width="3" height="3" fill="currentColor" className="text-coffee" />
+                    {[
+                      [8,0],[10,0],[8,2],[9,2],[10,3],[8,4],[10,4],
+                      [0,8],[2,8],[4,8],[6,8],[8,8],[10,8],[12,8],[14,8],[16,8],[18,8],[20,8],
+                      [8,10],[9,9],[11,9],[13,10],[15,10],[17,9],[19,10],
+                      [9,11],[11,11],[14,12],[16,12],[18,11],[20,12],
+                      [8,13],[10,13],[12,14],[14,14],[16,14],[19,13],
+                      [9,15],[11,16],[13,15],[15,16],[17,15],[19,16],
+                      [8,17],[10,18],[12,17],[14,18],[16,17],[18,18],[20,17],
+                      [8,20],[10,19],[12,20],[15,19],[17,20],[19,19],[20,20],
+                    ].map(([x, y], i) => (
+                      <rect key={i} x={x} y={y} width="1" height="1" fill="currentColor" className="text-coffee" />
+                    ))}
+                  </svg>
+                </div>
+              </motion.div>
+
+              {/* NFC tap-in card — represents an NFC tag with an animated tap-radio
+                  wave. Sized to match the QR card. */}
+              <motion.div
+                className="bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl p-4 shadow-[0_4px_20px_rgba(107,66,38,0.08)] w-[150px]"
+                custom={4}
+                variants={floatingCardVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-6 h-6 rounded-lg bg-amber/10 flex items-center justify-center">
+                    <Nfc size={13} className="text-amber" />
+                  </div>
+                  <p className="text-[12px] font-medium text-text-primary">{t('homepage.hero.preview.nfcTap')}</p>
+                </div>
+                <div className="relative w-full aspect-square rounded-xl bg-cream-3/40 dark:bg-cream-3/10 flex items-center justify-center overflow-hidden">
+                  {/* Concentric tap-radio waves */}
+                  {[0, 1, 2].map((i) => (
+                    <motion.span
+                      key={i}
+                      className="absolute rounded-full border-2 border-amber/60"
+                      style={{ width: 28, height: 28 }}
+                      initial={{ scale: 1, opacity: 0.7 }}
+                      animate={{ scale: [1, 2.6, 2.6], opacity: [0.7, 0, 0] }}
+                      transition={{
+                        duration: 2.4,
+                        repeat: Infinity,
+                        delay: i * 0.8,
+                        ease: 'easeOut',
+                      }}
+                    />
                   ))}
-                </svg>
-              </div>
-            </motion.div>
+                  {/* Phone + NFC tag depiction: small phone outline tapping a tag */}
+                  <div className="relative z-10 flex items-center gap-1.5">
+                    <div className="w-6 h-9 rounded-md bg-coffee/85 flex items-center justify-center shadow-sm">
+                      <Smartphone size={10} className="text-cream" />
+                    </div>
+                    <div className="w-6 h-6 rounded-full bg-amber flex items-center justify-center shadow-sm">
+                      <Nfc size={12} className="text-white" />
+                    </div>
+                  </div>
+                </div>
+                <p className="text-[10.5px] text-text-tertiary mt-2 text-center leading-tight">
+                  {t('homepage.hero.preview.nfcTapHint')}
+                </p>
+              </motion.div>
+            </div>
           </div>
         </div>
       </div>

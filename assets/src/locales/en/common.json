@@ -610,7 +610,8 @@
         "qrCheckin": "QR check-in",
         "shiftTracking": "Shift tracking",
         "leaveManagement": "Leave management",
-        "geofencing": "Geofencing"
+        "geofencing": "Geofencing",
+        "nfcTap": "NFC tap-in"
       },
       "preview": {
         "notification": {
@@ -635,7 +636,9 @@
           "late": "Late",
           "onLeave": "On leave"
         },
-        "qrCheckin": "QR Check-in"
+        "qrCheckin": "QR Check-in",
+        "nfcTap": "NFC tap-in",
+        "nfcTapHint": "Tap phone to NFC tag"
       },
       "noHardware": "No hardware — just a phone"
     },
