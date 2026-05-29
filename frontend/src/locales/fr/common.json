@@ -516,7 +516,8 @@
         "qrCheckin": "Check-in par QR",
         "shiftTracking": "Suivi des horaires",
         "leaveManagement": "Gestion des congés",
-        "geofencing": "Géorepérage"
+        "geofencing": "Géorepérage",
+        "nfcTap": "Pointage NFC"
       },
       "preview": {
         "notification": {
@@ -541,7 +542,9 @@
           "late": "En retard",
           "onLeave": "En congé"
         },
-        "qrCheckin": "Check-in QR"
+        "qrCheckin": "Check-in QR",
+        "nfcTap": "Pointage NFC",
+        "nfcTapHint": "Tapez le téléphone sur le tag NFC"
       },
       "noHardware": "Aucun matériel — juste un téléphone"
     },

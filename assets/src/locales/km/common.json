@@ -610,7 +610,8 @@
         "qrCheckin": "ការចូលរួម QR",
         "shiftTracking": "ការតាមដានវេន",
         "leaveManagement": "ការគ្រប់គ្រងការឈប់",
-        "geofencing": "Geofencing"
+        "geofencing": "Geofencing",
+        "nfcTap": "ការចូលរួម NFC"
       },
       "preview": {
         "notification": {
@@ -635,7 +636,9 @@
           "late": "យឺត",
           "onLeave": "កំពុងឈប់"
         },
-        "qrCheckin": "ការចូលរួម QR"
+        "qrCheckin": "ការចូលរួម QR",
+        "nfcTap": "ការចូលរួម NFC",
+        "nfcTapHint": "ចុចទូរស័ព្ទលើស្លាក NFC"
       },
       "noHardware": "មិនត្រូវការឧបករណ៍ — គ្រាន់តែទូរស័ព្ទ"
     },
