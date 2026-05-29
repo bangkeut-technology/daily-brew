@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.84.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.83.0...v1.84.0) (2026-05-29)
+
+
+### Features
+
+* **hero:** add NFC tap-in to trust pills + animated NFC tap card in hero preview ([#198](https://github.com/bangkeut-technology/daily-brew/issues/198)) ([471edb4](https://github.com/bangkeut-technology/daily-brew/commit/471edb4650b9ae768c7e488381d8403d8c6a1ee4))
+* **notifications:** replace per-incident anomaly cron with per-shift start+end summaries ([#197](https://github.com/bangkeut-technology/daily-brew/issues/197)) ([0c32ea4](https://github.com/bangkeut-technology/daily-brew/commit/0c32ea469fd4df1d9cb3c6229a3be54a3859c15d))
+
 ## [1.83.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.82.0...v1.83.0) (2026-05-29)
 
 
