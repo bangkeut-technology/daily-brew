@@ -612,7 +612,8 @@
           "onLeave": "On leave"
         },
         "qrCheckin": "QR Check-in"
-      }
+      },
+      "noHardware": "No hardware — just a phone"
     },
     "howItWorks": {
       "eyebrow": "How it works",
@@ -1519,6 +1520,520 @@
           "leaveRequests": "Leave requests",
           "closure": "Closure",
           "userAccounts": "User accounts"
+        }
+      }
+    },
+    "features": {
+      "common": {
+        "allFeatures": "All features",
+        "espressoBadge": "Espresso",
+        "problemHeading": "The problem",
+        "howHeading": "How it works",
+        "benefitsHeading": "Benefits",
+        "setupHeading": "How to set it up",
+        "faqHeading": "Common questions",
+        "relatedHeading": "Related security features",
+        "espressoCallout": {
+          "title": "Available on the Espresso plan"
+        },
+        "related": {
+          "ipRestriction": {
+            "title": "IP restriction",
+            "desc": "Lock check-ins to your restaurant's WiFi. Prevent remote punching."
+          },
+          "deviceVerification": {
+            "title": "Device verification",
+            "desc": "Bind check-in/out to one device per employee per day. Prevents buddy punching."
+          },
+          "geofencing": {
+            "title": "Geofencing",
+            "desc": "Restrict check-ins to a GPS radius around your restaurant."
+          }
+        },
+        "cta": {
+          "subtitle": "Start free, upgrade to Espresso when you're ready.",
+          "startFree": "Start free",
+          "comparePlans": "Compare plans"
+        }
+      },
+      "deviceVerification": {
+        "tag": "Anti-fraud",
+        "title": "Device verification",
+        "subtitle": "Each employee must check in and check out from the same device on the same day. No more colleagues clocking out for each other — the system knows which phone checked in.",
+        "problem": {
+          "lead": "\"Buddy punching\" is one of the most common attendance fraud issues in restaurants.",
+          "p1": "Employee A leaves early but asks Employee B to check them out at the end of the shift. Or one person uses multiple phones to check in for absent colleagues. Without device verification, there's no way to tell who is actually scanning the QR code — you just see a check-in time, not which device was used.",
+          "p2": "In a busy restaurant, owners can't watch the door all day. Device verification does that job automatically."
+        },
+        "how": {
+          "uniqueId": {
+            "title": "Every device gets a unique ID",
+            "desc": "When an employee opens DailyBrew on their phone for the first time, the app generates a unique device ID and stores it locally. This ID is invisible to the employee — it works silently in the background, no setup required on their end."
+          },
+          "lockDevice": {
+            "title": "Check-in locks to that device",
+            "desc": "When an employee checks in, DailyBrew records which device was used. The device ID and device name (parsed from the browser user agent) are stored on the attendance record. This is the device they must use to check out later."
+          },
+          "oneDevice": {
+            "title": "One device per employee, one employee per device",
+            "desc": "If a second employee tries to check in using the same phone that someone else already used today, the system blocks it. And if an employee tries to check out from a different device than the one they checked in with, that's blocked too."
+          },
+          "auditTrail": {
+            "title": "Full audit trail on every record",
+            "desc": "Each attendance record stores both the check-in and check-out device IDs along with the parsed device names (e.g., \"iPhone 15 Pro, Safari 17\"). Owners can see exactly which device was used for each clock event."
+          }
+        },
+        "benefits": {
+          "eliminate": {
+            "title": "Eliminate buddy punching",
+            "desc": "A colleague can't check out for someone who already left. The check-out must come from the same device that checked in — no exceptions."
+          },
+          "onePhone": {
+            "title": "One phone, one person",
+            "desc": "A single phone can't be used to check in multiple employees on the same day. Each device is bound to one employee per day."
+          },
+          "audit": {
+            "title": "Transparent audit trail",
+            "desc": "Every attendance record shows the device ID and name for both check-in and check-out. If there's ever a dispute, you have the data."
+          },
+          "frictionless": {
+            "title": "Zero friction for employees",
+            "desc": "No apps to install, no codes to enter, no fingerprints to scan. The device ID is generated automatically in the browser. Employees don't even know it's there."
+          }
+        },
+        "setup": {
+          "subtitle": "The simplest security feature to enable — just one toggle. No configuration needed on employee devices.",
+          "steps": {
+            "openSettings": {
+              "title": "Go to workspace settings",
+              "desc": "Open your dashboard and click \"Settings\" in the sidebar. You'll see a \"Device verification\" section."
+            },
+            "enable": {
+              "title": "Enable device verification",
+              "desc": "Toggle on \"Enable device verification\". If you're on the free plan, you'll be prompted to upgrade to Espresso first."
+            },
+            "save": {
+              "title": "Save — that's it",
+              "desc": "Hit save. The system immediately starts enforcing device binding. The next time any employee checks in, their device ID is recorded and locked for the day. No action needed from your staff."
+            }
+          }
+        },
+        "experience": {
+          "title": "What your employees experience",
+          "items": {
+            "normal": {
+              "label": "Normal check-in:",
+              "desc": "nothing changes. They scan the QR code on their own phone and it works exactly as before. The device binding happens invisibly."
+            },
+            "wrongDevice": {
+              "label": "Wrong device on check-out:",
+              "desc": "if they try to check out from a different phone, they see a clear message: \"You must use the same device you checked in with.\" No cryptic errors."
+            },
+            "alreadyUsed": {
+              "label": "Device already used:",
+              "desc": "if Employee B tries to check in on Employee A's phone (which A already used today), the system blocks it with a message explaining the device has already been used by another employee."
+            }
+          }
+        },
+        "faq": {
+          "newPhone": {
+            "q": "What if an employee gets a new phone?",
+            "a": "Device binding is per day. When they check in on a new phone the next day, it becomes their device for that day. There's no long-term device registration — each day is a fresh start."
+          },
+          "clearedData": {
+            "q": "What if an employee clears their browser data?",
+            "a": "Clearing browser data removes the stored device ID. A new ID will be generated next time they open the app. This means check-out could be blocked that day if the ID doesn't match the one from check-in. In practice, employees rarely clear browser data mid-shift."
+          },
+          "shared": {
+            "q": "Does this work on shared or kiosk devices?",
+            "a": "Device verification is designed for employees using their own phones. If multiple people share one device (e.g., a tablet at the entrance), only the first person who checks in can use it that day. For shared devices, you may want to disable this feature and use IP restriction or geofencing instead."
+          },
+          "whichDevice": {
+            "q": "Can I see which device an employee used?",
+            "a": "Yes. Each attendance record includes the device name (parsed from the browser user agent) for both check-in and check-out. You can see entries like \"iPhone 15 Pro, Safari 17\" or \"Samsung Galaxy S24, Chrome 126\" in the attendance detail."
+          },
+          "noApp": {
+            "q": "Does this require employees to install an app?",
+            "a": "No. Device verification works entirely through the web browser. The device ID is a UUID stored in localStorage — it's generated automatically the first time an employee opens DailyBrew. No app install, no permissions, no setup."
+          }
+        },
+        "espressoCallout": "Device verification is included in the Espresso plan ($14.99/month or $149/year). Combine it with IP restriction and geofencing for complete check-in security.",
+        "cta": {
+          "title": "Stop buddy punching today"
+        }
+      },
+      "geofencing": {
+        "tag": "Location",
+        "title": "Geofencing",
+        "subtitle": "Draw a virtual boundary around your restaurant. When employees try to check in, DailyBrew verifies their GPS location — if they're outside the radius, the check-in is blocked.",
+        "problem": {
+          "lead": "IP restriction depends on network — but not every restaurant has a reliable, static WiFi setup.",
+          "p1": "Some restaurants share a building's WiFi. Some use mobile hotspots that change IPs. And some staff use mobile data instead of WiFi. In these situations, IP restriction alone isn't enough to verify someone is actually on-site.",
+          "p2": "Geofencing solves this by using the one thing that can't be faked easily: the employee's physical GPS location."
+        },
+        "how": {
+          "center": {
+            "title": "You set a center point",
+            "desc": "In your workspace settings, you define the GPS coordinates of your restaurant. The easiest way: click \"Use my current location\" while standing in the restaurant, and DailyBrew will auto-detect your latitude and longitude. You can also enter coordinates manually if you prefer."
+          },
+          "radius": {
+            "title": "You choose a radius",
+            "desc": "Set how far from the center point employees are allowed to be — in meters. The default is 100m, which works for most restaurants. A small cafe might use 50m (the minimum). A large venue or outdoor seating area might need 200–500m. Maximum is 5,000m."
+          },
+          "sharesLocation": {
+            "title": "Employee's phone shares its location",
+            "desc": "When an employee taps \"Check in\", their browser asks for location permission (a standard browser prompt). The GPS coordinates are sent with the check-in request. This happens once per check-in — DailyBrew does not track location continuously."
+          },
+          "compares": {
+            "title": "DailyBrew compares distance",
+            "desc": "The server calculates the distance between the employee's GPS position and your restaurant's center point. If they're within the radius — check-in succeeds. If they're outside — the check-in is blocked with a clear error message."
+          }
+        },
+        "benefits": {
+          "verifyPresence": {
+            "title": "Verify physical presence",
+            "desc": "The most direct proof that an employee is at the restaurant. GPS doesn't depend on which WiFi network they're on — it confirms their actual location."
+          },
+          "flexibleRadius": {
+            "title": "Flexible radius",
+            "desc": "From 50m for a small cafe to 5,000m for a large property. Adjust the boundary to match your actual venue size, including outdoor areas and parking."
+          },
+          "layered": {
+            "title": "Layer with other security",
+            "desc": "Use geofencing alone or combine it with IP restriction and device verification. When all three are active, an employee must be on the right network, using their own device, and physically at the restaurant."
+          },
+          "onePrompt": {
+            "title": "One-time location prompt",
+            "desc": "The browser only asks for location permission once. After that, check-ins are seamless. DailyBrew never tracks employees between check-ins — location is read once, verified, and not stored."
+          }
+        },
+        "radiusGuide": {
+          "title": "Choosing the right radius",
+          "intro": "GPS accuracy varies by device, weather, and building density. Indoors, GPS can drift 5–20 meters. Choose a radius that covers your venue with a comfortable margin:",
+          "tiers": {
+            "cafe": {
+              "venue": "Small cafe or kiosk",
+              "note": "Tight boundary. Works well for small, single-floor locations with good GPS signal."
+            },
+            "standard": {
+              "venue": "Standard restaurant",
+              "note": "Recommended for most restaurants. Covers indoor areas, kitchen, storage rooms, and a small patio."
+            },
+            "large": {
+              "venue": "Large venue or outdoor area",
+              "note": "For restaurants with large outdoor seating, rooftop areas, or spread across a compound."
+            },
+            "campus": {
+              "venue": "Campus, resort, or compound",
+              "note": "For properties with multiple buildings, large grounds, or locations where staff work across a wide area."
+            }
+          }
+        },
+        "setup": {
+          "subtitle": "Best done while you're at the restaurant, so the auto-detect picks up the right coordinates.",
+          "steps": {
+            "openSettings": {
+              "title": "Go to workspace settings",
+              "desc": "Open your dashboard and click \"Settings\" in the sidebar. Scroll down to the \"Geofencing\" section."
+            },
+            "enable": {
+              "title": "Enable geofencing",
+              "desc": "Toggle on \"Enable geofencing for check-in\". If you're on the free plan, you'll be prompted to upgrade to Espresso first."
+            },
+            "setLocation": {
+              "title": "Set your restaurant's location",
+              "desc": "Click \"Use my current location\". Your browser will ask for permission to access your location — tap Allow. DailyBrew reads your GPS coordinates and fills in the latitude and longitude fields automatically. You can also enter coordinates manually if you already know them."
+            },
+            "setRadius": {
+              "title": "Set the radius",
+              "desc": "Enter the radius in meters. Default is 100m. The minimum is 50m (GPS isn't accurate enough below this). For most restaurants, 100–200m works well. If you have outdoor seating or a large property, go wider."
+            },
+            "saveVerify": {
+              "title": "Save and verify",
+              "desc": "Hit save. You'll see a confirmation showing your coordinates and the active radius. Try a test check-in from the restaurant to make sure it works. Then try from across the street to verify it blocks — you'll see the boundary in action."
+            }
+          }
+        },
+        "faq": {
+          "trackAllDay": {
+            "q": "Does DailyBrew track my employees' location all day?",
+            "a": "No. DailyBrew reads the GPS location once — at the moment of check-in (and again at check-out). The coordinates are used only to verify distance from the restaurant. DailyBrew does not store employee GPS data, does not track movement, and does not run in the background."
+          },
+          "denied": {
+            "q": "What if the employee denies the location permission?",
+            "a": "If the employee blocks location access in their browser, the check-in request won't include GPS data and the geofence check will fail. They'll see a message asking them to allow location access. This is a standard browser permission — not a DailyBrew-specific app."
+          },
+          "indoorAccuracy": {
+            "q": "How accurate is GPS indoors?",
+            "a": "Indoors, GPS accuracy can degrade to 10–20 meters depending on the building. That's why the minimum radius is 50m — anything smaller would cause too many false rejections. If your restaurant is in a building with weak GPS signal (basement, thick walls), consider using a slightly larger radius like 150–200m."
+          },
+          "movedRemodel": {
+            "q": "What if my restaurant moves or I remodel?",
+            "a": "Just update the coordinates in settings. Click \"Use my current location\" from the new spot and save. The change takes effect immediately for all future check-ins."
+          },
+          "fakeGps": {
+            "q": "Can employees fake their GPS location?",
+            "a": "It's technically possible to spoof GPS on a rooted/jailbroken phone or with developer tools. However, this requires deliberate effort and technical knowledge. For the vast majority of restaurant staff, geofencing is an effective deterrent. For maximum security, combine geofencing with IP restriction and device verification."
+          },
+          "iosAndroid": {
+            "q": "Does this work on both iOS and Android?",
+            "a": "Yes. Geofencing uses the standard browser Geolocation API, which is supported on all modern iPhones and Android phones. The browser handles the GPS reading — DailyBrew just receives the coordinates."
+          }
+        },
+        "tip": {
+          "title": "Best practice: layer all three",
+          "intro": "Each security feature covers a different angle. Together, they make check-in fraud nearly impossible:",
+          "layers": {
+            "ipRestriction": {
+              "label": "IP restriction",
+              "desc": "Verifies the network — are they on restaurant WiFi?"
+            },
+            "deviceVerification": {
+              "label": "Device verification",
+              "desc": "Verifies the device — is this their own phone?"
+            },
+            "geofencing": {
+              "label": "Geofencing",
+              "desc": "Verifies the location — are they physically here?"
+            }
+          }
+        },
+        "espressoCallout": "Geofencing is included in the Espresso plan ($14.99/month or $149/year) alongside IP restriction, device verification, leave management, manager roles, and more.",
+        "cta": {
+          "title": "Ready to set your boundary?"
+        }
+      },
+      "ipRestriction": {
+        "tag": "Security",
+        "title": "IP restriction",
+        "subtitle": "Make sure your staff are physically at the restaurant when they check in. IP restriction locks attendance to your restaurant's network — if they're not on your WiFi, they can't clock in.",
+        "problem": {
+          "lead": "Without IP restriction, any employee with the QR code data can check in from anywhere.",
+          "p1": "They could be at home, on the bus, or at another location entirely. If someone shares the QR payload with a colleague, that person can check in without ever stepping foot in the restaurant. You'd never know unless you were watching the door yourself."
+        },
+        "how": {
+          "publicIp": {
+            "title": "Your network has a public IP address",
+            "desc": "Every internet connection has a public IP address assigned by your ISP. When your staff are connected to your restaurant's WiFi, all their traffic goes through that IP. DailyBrew sees this IP on every check-in request."
+          },
+          "tellTrusted": {
+            "title": "You tell DailyBrew which IPs to trust",
+            "desc": "In your workspace settings, you add one or more IP addresses. These are the only networks your staff are allowed to check in from. Any check-in attempt from a different IP is blocked with a clear error message."
+          },
+          "invisibleValidation": {
+            "title": "Staff check in as normal — the validation is invisible",
+            "desc": "Your employees don't need to do anything differently. They scan the QR code the same way they always do. If they're on the right network, it works. If not, they see a message explaining that check-in is restricted to the restaurant network."
+          }
+        },
+        "benefits": {
+          "preventRemote": {
+            "title": "Prevent remote check-ins",
+            "desc": "Employees can't check in from home, the parking lot, or anywhere outside your restaurant. They must be connected to an approved network."
+          },
+          "multipleNetworks": {
+            "title": "Support multiple networks",
+            "desc": "Have a main WiFi and a backup connection? Add both IPs. You can list as many allowed IPs as you need — WiFi, ethernet, mobile hotspot."
+          },
+          "failSafe": {
+            "title": "Fail-safe by design",
+            "desc": "If you enable IP restriction but forget to add any IPs, DailyBrew allows all check-ins instead of locking everyone out. No accidental lockouts."
+          },
+          "anySetup": {
+            "title": "Works with any network setup",
+            "desc": "Static IP, dynamic IP, VPN — if the request arrives from an IP on your list, it's accepted. Works with any ISP or network configuration."
+          }
+        },
+        "setup": {
+          "subtitle": "Takes less than a minute. You just need to be at the restaurant, connected to the WiFi you want to lock check-ins to.",
+          "steps": {
+            "openSettings": {
+              "title": "Go to workspace settings",
+              "desc": "Open your dashboard, click \"Settings\" in the sidebar. Scroll to the \"Workspace settings\" section."
+            },
+            "enable": {
+              "title": "Enable IP restriction",
+              "desc": "Toggle on \"Enable IP restriction\". If you're on the free plan, you'll be prompted to upgrade to Espresso first."
+            },
+            "addIp": {
+              "title": "Add your restaurant's IP",
+              "desc": "Click the \"Use my current IP\" button. DailyBrew will detect your public IP address as seen by the server and add it to the list automatically. You can also type IPs manually — one per line — if you have additional networks."
+            },
+            "save": {
+              "title": "Save your settings",
+              "desc": "Hit \"Save\". From this moment, every check-in request is validated against your IP list. Employees on a different network will see a clear message telling them check-in is restricted."
+            }
+          }
+        },
+        "faq": {
+          "ipChanges": {
+            "q": "What if my restaurant's IP address changes?",
+            "a": "Some ISPs assign dynamic IPs that can change periodically. If that happens, your staff will be blocked until you update the IP. Just go to Settings, click \"Use my current IP\" again, and save. If your IP changes frequently, consider asking your ISP for a static IP or using geofencing as an alternative."
+          },
+          "multipleIps": {
+            "q": "Can I allow multiple IP addresses?",
+            "a": "Yes. You can add as many IPs as you need — one per line. This is useful if you have multiple network connections (main WiFi, backup ethernet, manager hotspot) or multiple restaurant locations under one workspace."
+          },
+          "blockedMessage": {
+            "q": "What does the employee see when they're blocked?",
+            "a": "They see a warm amber warning message explaining that check-in is restricted to the restaurant network. No cryptic error codes — just a clear explanation that they need to be on the right WiFi."
+          },
+          "combineSecurity": {
+            "q": "Can I use IP restriction together with geofencing and device verification?",
+            "a": "Absolutely. All three security features work independently and can be combined for layered protection. An employee would need to pass all enabled checks to successfully check in."
+          },
+          "emptyList": {
+            "q": "What happens if I enable IP restriction but don't add any IPs?",
+            "a": "DailyBrew treats an empty IP list as a misconfiguration and allows all check-ins. This is a safety net — you won't accidentally lock out your entire team."
+          }
+        },
+        "espressoCallout": "IP restriction is included in the Espresso plan ($14.99/month or $149/year). It also includes device verification, geofencing, leave management, manager roles, and more.",
+        "cta": {
+          "title": "Ready to secure your check-ins?"
+        }
+      },
+      "basilbookIntegration": {
+        "tag": "Integration",
+        "titleParts": "<brand></brand> integration",
+        "subtitle": "Connect DailyBrew to your BasilBook accounting system. Link employees by username, generate a secure API key, and let BasilBook pull attendance data automatically — check-in times, late flags, shift info, all in one call.",
+        "problem": {
+          "lead": "Attendance data lives in DailyBrew. Accounting data lives in BasilBook. Neither talks to the other.",
+          "p1": "Without integration, you'd have to manually cross-reference who was present, who was late, and what shifts were worked — then enter that into your accounting system by hand. That's error-prone, slow, and nobody wants to do it.",
+          "p2": "The BasilBook integration bridges the gap. BasilBook can pull attendance data directly from DailyBrew via a secure API, matching staff by username."
+        },
+        "how": {
+          "linkUsername": {
+            "title": "Link employees by username",
+            "desc": "Each employee in DailyBrew can have a username — this is the same identifier used in BasilBook for that staff member. When BasilBook pulls attendance data, it matches records by this username."
+          },
+          "generateToken": {
+            "title": "Generate a secure API token",
+            "desc": "In your workspace settings, generate an API token. The full token is shown once — copy it and store it in BasilBook. DailyBrew only stores a hash, so the plain token can never be retrieved again."
+          },
+          "callApi": {
+            "title": "BasilBook calls the attendance API",
+            "desc": "BasilBook sends a GET request with the API key in the X-Api-Key header, specifying a date range (up to 93 days). DailyBrew returns attendance records for all employees with a username — check-in/out times, late flags, shift info, all formatted in your workspace timezone."
+          },
+          "flowsAuto": {
+            "title": "Data flows automatically",
+            "desc": "Once configured, BasilBook can pull attendance data on any schedule — daily, weekly, or on demand. No manual exports, no CSV files, no copy-pasting. The data is always fresh and formatted for BasilBook's needs."
+          }
+        },
+        "apiReturns": {
+          "title": "What the API returns",
+          "intro": "For each employee with a username, the API returns their attendance records within the requested date range:",
+          "footnote": "Days with no attendance record are omitted — absence is implied by missing dates. Maximum date range per request: 93 days.",
+          "fields": {
+            "username": {
+              "label": "Username",
+              "desc": "The BasilBook linking key"
+            },
+            "employeeName": {
+              "label": "Employee name",
+              "desc": "Full name for display"
+            },
+            "shiftName": {
+              "label": "Shift name",
+              "desc": "Assigned shift, or null"
+            },
+            "date": {
+              "label": "Date",
+              "desc": "Calendar date (YYYY-MM-DD)"
+            },
+            "checkInTime": {
+              "label": "Check-in time",
+              "desc": "HH:mm in workspace timezone"
+            },
+            "checkOutTime": {
+              "label": "Check-out time",
+              "desc": "HH:mm, or null if still working"
+            },
+            "lateFlag": {
+              "label": "Late flag",
+              "desc": "true if arrived after shift start"
+            },
+            "leftEarlyFlag": {
+              "label": "Left early flag",
+              "desc": "true if left before shift end"
+            }
+          }
+        },
+        "benefits": {
+          "noManualEntry": {
+            "title": "No manual data entry",
+            "desc": "Attendance data flows from DailyBrew to BasilBook automatically. No spreadsheets, no copy-pasting, no errors from manual transcription."
+          },
+          "alwaysFresh": {
+            "title": "Always up to date",
+            "desc": "BasilBook pulls live data from DailyBrew. Whether it queries daily or weekly, the data reflects the latest check-ins, late flags, and shift assignments."
+          },
+          "secure": {
+            "title": "Secure by design",
+            "desc": "API tokens are hashed on storage — the plain token is shown once and never stored. Tokens can be revoked instantly. Each token is scoped to one workspace."
+          },
+          "usernameMatching": {
+            "title": "Username-based matching",
+            "desc": "Staff are linked by username across both systems. No fragile email matching or manual ID mapping. Set the username once and the link works automatically."
+          }
+        },
+        "setup": {
+          "subtitle": "Two parts: link your employees by username, then generate an API token for BasilBook.",
+          "steps": {
+            "setUsernames": {
+              "title": "Set employee usernames",
+              "desc": "Go to each employee's detail page and enter their BasilBook username. This must match the staff name or ID used in your BasilBook system exactly."
+            },
+            "generateToken": {
+              "title": "Generate an API token",
+              "desc": "Go to Settings, scroll to \"API tokens\", and click \"Generate token\". Give it a name (e.g., \"BasilBook production\"). The full token is shown once — copy it immediately."
+            },
+            "configureBb": {
+              "title": "Configure BasilBook",
+              "desc": "In BasilBook, enter the API token in the DailyBrew integration settings. BasilBook will use it in the X-Api-Key header when pulling attendance data."
+            },
+            "testConnection": {
+              "title": "Test the connection",
+              "desc": "Trigger a test pull from BasilBook. You should see attendance records for all employees with a username. If an employee is missing, check that their username is set in DailyBrew."
+            }
+          }
+        },
+        "faq": {
+          "lostToken": {
+            "q": "What if I lose the API token?",
+            "a": "The plain token is only shown once at creation. If you lose it, revoke the old token and generate a new one. Update the new token in BasilBook."
+          },
+          "multipleTokens": {
+            "q": "Can I have multiple API tokens?",
+            "a": "Yes. You can generate multiple tokens — for example, one for production and one for testing. Each token can be revoked independently."
+          },
+          "noUsername": {
+            "q": "What if an employee doesn't have a username?",
+            "a": "They won't appear in the API response. Only employees with a username set are included. This is intentional — the username is the linking key between DailyBrew and BasilBook."
+          },
+          "maxRange": {
+            "q": "What's the maximum date range?",
+            "a": "93 days per request. For longer periods, make multiple requests with consecutive date ranges."
+          },
+          "oneWay": {
+            "q": "Does BasilBook push data to DailyBrew?",
+            "a": "No. The integration is one-way: BasilBook pulls attendance data from DailyBrew. DailyBrew does not receive or modify any BasilBook data."
+          },
+          "timezone": {
+            "q": "What timezone are the times in?",
+            "a": "All times in the API response are formatted in your workspace timezone (e.g., Asia/Phnom_Penh). The timezone is included in the response so BasilBook can interpret the times correctly."
+          }
+        },
+        "espressoCallout": "BasilBook integration and API tokens are included in the Espresso plan ($14.99/month or $149/year). Employee usernames for cross-product linking are also Espresso-only.",
+        "relatedShort": {
+          "ipRestriction": "Lock check-ins to your restaurant's WiFi.",
+          "deviceVerification": "Prevent buddy punching with device binding.",
+          "roles": {
+            "title": "Roles and permissions",
+            "desc": "Delegate attendance and leave management."
+          }
+        },
+        "cta": {
+          "title": "Ready to connect your systems?",
+          "subtitle": "Start free, upgrade to Espresso when you need the integration."
         }
       }
     }
