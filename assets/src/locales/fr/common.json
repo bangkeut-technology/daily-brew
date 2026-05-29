@@ -11,7 +11,8 @@
     "settings": "Paramètres",
     "profile": "Profil",
     "help": "Aide",
-    "signOut": "Déconnexion"
+    "signOut": "Déconnexion",
+    "adminPanel": "Panneau d'administration"
   },
   "attendance": {
     "verification": {
@@ -60,7 +61,28 @@
     "emptyCreateShift": "Créer un horaire",
     "emptyCreateShiftDesc": "Définissez les heures du matin, du soir ou personnalisées",
     "emptyConfigure": "Configurer les paramètres",
-    "emptyConfigureDesc": "Fuseau horaire, restriction IP et plus"
+    "emptyConfigureDesc": "Fuseau horaire, restriction IP et plus",
+    "summaryEmpty": "Commencez par ajouter votre premier employé et créer un horaire.",
+    "summaryAllPresent_one": "L'employé est présent aujourd'hui. Bravo !",
+    "summaryAllPresent_other": "Les {{count}} employés sont présents aujourd'hui. Bravo !",
+    "summaryNonePresent_one": "Aucun de votre employé n'a encore pointé aujourd'hui.",
+    "summaryNonePresent_other": "Aucun de vos {{count}} employés n'a encore pointé aujourd'hui.",
+    "summarySome": "{{present}} de {{total}} employés ont pointé aujourd'hui.",
+    "summaryLate_one": "{{count}} est arrivé en retard.",
+    "summaryLate_other": "{{count}} sont arrivés en retard.",
+    "summaryAbsent_one": "{{count}} absent.",
+    "summaryAbsent_other": "{{count}} absents.",
+    "attendanceRate": "Taux de présence",
+    "attendanceRateSubtitle": "{{present}} présents sur {{total}} employés",
+    "onTimeRate": "Taux de ponctualité",
+    "onTimeRateSubtitle": "{{onTime}} à l'heure, {{late}} en retard aujourd'hui",
+    "leaveAbsent": "Congés et absents",
+    "leaveAbsentSubtitle": "{{onLeave}} en congé, {{absent}} absents",
+    "leaveAbsentSubtitleWithPending": "{{onLeave}} en congé, {{absent}} absents, {{pending}} en attente",
+    "upcomingLeaves": "Congés à venir",
+    "noUpcomingLeaves": "Aucun congé à venir dans les 2 prochaines semaines",
+    "upcomingLeavesUpsell": "Voyez qui prend congé dans les 2 prochaines semaines. Passez à Espresso pour gérer les demandes de congé.",
+    "startTrial": "Commencer l'essai gratuit de 14 jours"
   },
   "employee": {
     "add": "Ajouter un employé",
@@ -137,7 +159,8 @@
     "deviceVerification": "Vérification de l'appareil",
     "enableDeviceVerification": "Activer la vérification de l'appareil",
     "deviceVerificationDesc": "Exiger le même appareil pour le pointage d'entrée et de sortie, et empêcher un appareil de pointer pour plusieurs employés",
-    "deviceVerificationEspresso": "La vérification de l'appareil nécessite Espresso"
+    "deviceVerificationEspresso": "La vérification de l'appareil nécessite Espresso",
+    "learnMore": "En savoir plus"
   },
   "checkin": {
     "deviceMismatch": "Le pointage de sortie doit être effectué depuis le même appareil que le pointage d'entrée",
@@ -1944,5 +1967,15 @@
         }
       }
     }
+  },
+  "theme": {
+    "dark": "Mode sombre",
+    "light": "Mode clair"
+  },
+  "leave": {
+    "noRequests": "Aucune demande de congé trouvée"
+  },
+  "closure": {
+    "empty": "Aucune période de fermeture définie"
   }
 }
