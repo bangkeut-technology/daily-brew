@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import * as Dialog from '@radix-ui/react-dialog';
-import { Crown, Check, MapPin, MousePointerClick, Navigation, Nfc, Smartphone, Building2, Users, Calendar, Plus, X, Copy, Pencil, Trash2, Send, RotateCcw } from 'lucide-react';
+import { Crown, Check, MapPin, MousePointerClick, Navigation, Nfc, Smartphone, Building2, Users, Calendar, Plus, X, Copy, Pencil, Trash2, Send, RotateCcw, HelpCircle } from 'lucide-react';
 import { useDateFormat } from '@/hooks/useDateFormat';
 import { usePaddle } from '@/hooks/usePaddle';
 import { useDevTogglePlan } from '@/hooks/useDevTogglePlan';
@@ -73,6 +73,27 @@ function buildTimezoneOptions(): { value: string; label: string }[] {
 }
 
 const TIMEZONE_OPTIONS = buildTimezoneOptions();
+
+/**
+ * Small inline help icon rendered next to a settings-section header.
+ * Opens the corresponding /features/* (or /guides/*) page in a new tab
+ * so the user doesn't lose their unsaved settings while reading the
+ * explainer.
+ */
+function SettingsHelpLink({ to, label }: { to: string; label: string }) {
+  return (
+    <a
+      href={to}
+      target="_blank"
+      rel="noopener noreferrer"
+      title={label}
+      aria-label={label}
+      className="inline-flex items-center justify-center w-6 h-6 rounded-md text-text-tertiary hover:text-coffee hover:bg-cream-3/50 transition-colors no-underline"
+    >
+      <HelpCircle size={14} />
+    </a>
+  );
+}
 
 function SettingsPage() {
   const { t } = useTranslation();
@@ -951,6 +972,7 @@ function SettingsPage() {
               title={t('settings.deviceVerification')}
               action={
                 <div className="flex items-center gap-2">
+                  <SettingsHelpLink to="/features/device-verification" label={t('settings.learnMore', 'Learn more')} />
                   <Smartphone size={14} className="text-amber" />
                   {deviceVerificationEnabled && plan?.canUseDeviceVerification && (
                     <StatusBadge label="Active" variant="green" />
@@ -1001,6 +1023,7 @@ function SettingsPage() {
               title={t('settings.tapCheckin', 'Tap check-in')}
               action={
                 <div className="flex items-center gap-2">
+                  <SettingsHelpLink to="/features" label={t('settings.learnMore', 'Learn more')} />
                   <MousePointerClick size={14} className="text-amber" />
                   {tapCheckinEnabled && plan?.canUseTapCheckin && (
                     <StatusBadge label="Active" variant="green" />
@@ -1108,6 +1131,7 @@ function SettingsPage() {
               title="Geofencing"
               action={
                 <div className="flex items-center gap-2">
+                  <SettingsHelpLink to="/features/geofencing" label={t('settings.learnMore', 'Learn more')} />
                   <MapPin size={14} className="text-amber" />
                   {geofencingEnabled && plan?.canUseGeofencing && (
                     <StatusBadge label="Active" variant="green" />

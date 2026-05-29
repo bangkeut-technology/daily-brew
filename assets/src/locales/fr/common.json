@@ -159,7 +159,8 @@
     "deviceVerification": "Vérification de l'appareil",
     "enableDeviceVerification": "Activer la vérification de l'appareil",
     "deviceVerificationDesc": "Exiger le même appareil pour le pointage d'entrée et de sortie, et empêcher un appareil de pointer pour plusieurs employés",
-    "deviceVerificationEspresso": "La vérification de l'appareil nécessite Espresso"
+    "deviceVerificationEspresso": "La vérification de l'appareil nécessite Espresso",
+    "learnMore": "En savoir plus"
   },
   "checkin": {
     "deviceMismatch": "Le pointage de sortie doit être effectué depuis le même appareil que le pointage d'entrée",
