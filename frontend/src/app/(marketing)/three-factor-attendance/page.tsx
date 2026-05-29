@@ -78,8 +78,8 @@ export default function ThreeFactorAttendancePage() {
           Three-factor attendance
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-text-secondary">
-          Your bank doesn&apos;t trust your password alone — it asks for your phone too. We do the
-          same for clock-ins: the verified <strong>device</strong>, the verified{" "}
+          Your email doesn&apos;t trust your password alone — it asks for your phone too. We do
+          the same for clock-ins: the verified <strong>device</strong>, the verified{" "}
           <strong>network</strong>, and a physical <strong>tap</strong>. Buddy punching becomes
           mechanically impossible — without a single biometric.
         </p>

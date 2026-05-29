@@ -16,12 +16,12 @@ export const PAGES = {
   "/": {
     title: DEFAULT_TITLE,
     description:
-      "QR check-in, shift tracking, and leave management for restaurants. Free for up to 10 employees. No hardware, no complexity — just scan and go.",
+      "QR check-in, shift tracking, and leave management for restaurants. Free for up to 10 active employees. No hardware, no complexity — just scan and go.",
   },
   "/three-factor-attendance": {
     title: "Three-factor attendance",
     description:
-      "Device + network + a physical tap. DailyBrew brings banking-app security to the time clock so buddy punching becomes mechanically impossible — no biometrics, no face scans.",
+      "Device + network + a physical tap. DailyBrew brings modern login security to the time clock so buddy punching becomes mechanically impossible — no biometrics, no face scans.",
   },
   "/stop-buddy-punching": {
     title: "How to stop buddy punching",
@@ -71,7 +71,7 @@ export const PAGES = {
   "/pricing": {
     title: "Pricing",
     description:
-      "DailyBrew plans start free for up to 10 employees. Espresso at $14.99/month adds geofencing, device verification, and leave management. Double Espresso for unlimited staff.",
+      "DailyBrew plans start free for up to 10 active employees. Espresso at $14.99/month adds geofencing, device verification, and leave management. Double Espresso for unlimited staff.",
   },
   "/faq": {
     title: "FAQ",

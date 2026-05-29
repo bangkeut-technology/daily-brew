@@ -45,7 +45,7 @@ export function SignUpForm() {
   return (
     <AuthShell
       title="Create your account"
-      subtitle="Free for up to 10 employees. No credit card required."
+      subtitle="Free for up to 10 active employees. No credit card required."
       footer={
         <>
           Already have an account?{" "}

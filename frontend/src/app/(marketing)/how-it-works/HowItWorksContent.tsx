@@ -337,7 +337,7 @@ export function HowItWorksContent() {
           Ready to simplify attendance?
         </h3>
         <p className="text-[16px] text-text-secondary mb-6">
-          Free for up to 10 employees. No credit card required.
+          Free for up to 10 active employees. No credit card required.
         </p>
         <div className="flex items-center justify-center gap-3">
           <Link

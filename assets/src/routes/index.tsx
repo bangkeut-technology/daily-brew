@@ -19,7 +19,7 @@ function LandingPage() {
     <div className="min-h-screen flex flex-col">
       <PageSeo
         title="DailyBrew — Staff Attendance Tracking for Restaurants"
-        description="QR check-in, shift tracking, and leave management for restaurants. Free for up to 10 employees. No hardware, no complexity — just scan and go."
+        description="QR check-in, shift tracking, and leave management for restaurants. Free for up to 10 active employees. No hardware, no complexity — just scan and go."
         path="/"
       />
       <LandingNav />
