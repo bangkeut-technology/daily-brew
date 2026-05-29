@@ -401,6 +401,8 @@
     "telegramTitle": "Telegram notifications",
     "enableTelegram": "Enable Telegram notifications",
     "telegramDesc": "Send leave requests, shift changes, closures, and daily summaries to a Telegram chat or group.",
+    "telegramCheckinAlertsLabel": "Live check-in/out alerts",
+    "telegramCheckinAlertsDesc": "Get a Telegram ping the moment any staff member clocks in or out. Sent to the workspace group (if configured) and your personal Telegram. High-frequency — a 5-person café will see 10+ pings a day.",
     "telegramGroupChat": "Group chat",
     "telegramStep1Prefix": "Add ",
     "telegramYourBot": "your DailyBrew bot",

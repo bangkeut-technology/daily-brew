@@ -30,10 +30,15 @@ export function TheNewDeviceAlertPost() {
         it&apos;s clocking in for</em>.
       </p>
       <p>
-        The device binding does. The first phone a staff member uses becomes their baseline. Every
-        later punch from the same phone is silently approved. A new phone is the only thing that
-        surfaces — and that surface is small enough to look at calmly, instead of drowning you in
-        low-signal noise.
+        DailyBrew runs two device mechanisms in parallel. <strong>Device verification</strong>{' '}
+        is the active one: within a single day, only one device per employee, and the check-out
+        device has to match the check-in device. That blocks live buddy-punching attempts.
+        <strong> The new-device alert</strong> — what this post is about — is the passive
+        companion. It looks across the employee&apos;s full history of phones they&apos;ve ever
+        clocked in with, and pings you when one shows up that isn&apos;t in that history. It
+        doesn&apos;t block; it just surfaces. That separation matters: the active check stops
+        same-day fraud, the history check catches the slow drift (the staff member who quietly
+        started using a different phone three weeks ago).
       </p>
 
       <h2 className="font-serif text-2xl font-semibold text-text-primary mt-10 mb-2">

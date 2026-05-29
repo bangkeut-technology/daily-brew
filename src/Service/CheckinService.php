@@ -25,6 +25,7 @@ class CheckinService
         private LeaveRequestRepository $leaveRequestRepository,
         private AttendanceFlagCalculator $flagCalculator,
         private ?AttendanceAnomalyDetector $anomalyDetector = null,
+        private ?NotificationService $notificationService = null,
     ) {}
 
     public function checkin(
@@ -177,6 +178,18 @@ class CheckinService
         if ($action !== null && $deviceId !== null && $this->anomalyDetector !== null) {
             try {
                 $this->anomalyDetector->handle($attendance, $action, $deviceId);
+            } catch (\Throwable) {
+                // best-effort side effect
+            }
+        }
+
+        // Live Telegram ping to the owner if they've opted in (Espresso+,
+        // off by default). Internal gate on the workspace setting flag, so
+        // the call here doesn't need a plan check. Wrap in try/catch for
+        // the same reason as the anomaly detector — best-effort side effect.
+        if ($action !== null && $this->notificationService !== null) {
+            try {
+                $this->notificationService->notifyEmployeeCheckin($attendance, $action);
             } catch (\Throwable) {
                 // best-effort side effect
             }

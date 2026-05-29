@@ -359,6 +359,8 @@
     "telegramTitle": "ការជូនដំណឹង Telegram",
     "enableTelegram": "បើកការជូនដំណឹង Telegram",
     "telegramDesc": "ផ្ញើសំណើឈប់ ការផ្លាស់ប្ដូរវេន ការបិទ និងសេចក្តីសង្ខេបប្រចាំថ្ងៃទៅកាន់ការសន្ទនា ឬក្រុម Telegram។",
+    "telegramCheckinAlertsLabel": "ការជូនដំណឹងចូល/ចេញផ្ទាល់",
+    "telegramCheckinAlertsDesc": "ទទួលការជូនដំណឹង Telegram ភ្លាមៗនៅពេលបុគ្គលិកណាមួយចូលរួម ឬចេញ។ ផ្ញើទៅក្រុមការងារ (ប្រសិនបើបានកំណត់រចនាសម្ព័ន្ធ) និង Telegram ផ្ទាល់ខ្លួនរបស់អ្នក។ ប្រេកង់ខ្ពស់ — ហាងកាហ្វេ៥នាក់នឹងឃើញការជូនដំណឹង ១០+ ក្នុងមួយថ្ងៃ។",
     "telegramGroupChat": "ក្រុមសន្ទនា",
     "telegramStep1Prefix": "បន្ថែម ",
     "telegramYourBot": "bot DailyBrew របស់អ្នក",

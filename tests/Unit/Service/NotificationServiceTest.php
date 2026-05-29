@@ -603,6 +603,62 @@ class NotificationServiceTest extends TestCase
         $this->svc->notifyDeviceAnomaly($attendance, 'in');
     }
 
+    // ── Per-check-in Telegram alerts ──────────────────────────────────
+
+    public function testNotifyEmployeeCheckinNoOpWhenSettingDisabled(): void
+    {
+        $owner = (new User())->setEmail('owner@x.com')->setTelegramChatId('@owner');
+        $workspace = $this->workspace($owner, telegramEnabled: true, telegramChatId: '-100');
+        // workspace() builds a setting with telegramCheckinAlertsEnabled=false by default
+
+        $emp = (new Employee())->setFirstName('Sokha')->setLastName('Sun');
+        $emp->setWorkspace($workspace);
+
+        $attendance = new \App\Entity\Attendance();
+        $attendance->setEmployee($emp);
+        $attendance->setWorkspace($workspace);
+        $attendance->setCheckInAt(new DateTimeImmutable('2026-04-10T09:00:00+00:00'));
+
+        // Should never send when the opt-in toggle is off, even if the master
+        // Telegram switch is on and a chat ID is configured.
+        $this->telegram->expects($this->never())->method('send');
+
+        $this->svc->notifyEmployeeCheckin($attendance, 'in');
+    }
+
+    public function testNotifyEmployeeCheckinSendsToWorkspaceAndOwnerWhenEnabled(): void
+    {
+        $owner = (new User())->setEmail('owner@x.com')->setTelegramChatId('@owner');
+        $workspace = $this->workspace(
+            $owner,
+            telegramEnabled: true,
+            telegramChatId: '-100',
+            telegramCheckinAlertsEnabled: true,
+        );
+
+        $emp = (new Employee())->setFirstName('Sokha')->setLastName('Sun');
+        $emp->setWorkspace($workspace);
+
+        $attendance = new \App\Entity\Attendance();
+        $attendance->setEmployee($emp);
+        $attendance->setWorkspace($workspace);
+        $attendance->setCheckInAt(new DateTimeImmutable('2026-04-10T09:00:00+00:00'));
+
+        // Two sends: workspace group + owner DM
+        $sentChatIds = [];
+        $this->telegram->expects($this->exactly(2))
+            ->method('send')
+            ->willReturnCallback(function (string $chatId, string $text) use (&$sentChatIds): void {
+                $this->assertStringContainsString('Sokha Sun', $text);
+                $this->assertStringContainsString('checked in', $text);
+                $sentChatIds[] = $chatId;
+            });
+
+        $this->svc->notifyEmployeeCheckin($attendance, 'in');
+
+        $this->assertEqualsCanonicalizing(['-100', '@owner'], $sentChatIds);
+    }
+
     public function testNotifyDeviceAnomalyAlsoEmailsOwner(): void
     {
         $owner = (new User())->setEmail('owner@x.com');
@@ -638,6 +694,7 @@ class NotificationServiceTest extends TestCase
         ?User $owner,
         bool $telegramEnabled = false,
         ?string $telegramChatId = null,
+        bool $telegramCheckinAlertsEnabled = false,
     ): Workspace {
         $ws = new Workspace();
         $ws->setName('Test Workspace');
@@ -649,6 +706,7 @@ class NotificationServiceTest extends TestCase
         if ($telegramChatId !== null) {
             $setting->setTelegramChatId($telegramChatId);
         }
+        $setting->setTelegramCheckinAlertsEnabled($telegramCheckinAlertsEnabled);
         $ws->setSetting($setting);
         return $ws;
     }

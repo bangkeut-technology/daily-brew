@@ -557,6 +557,20 @@ final class SeoMetaResolver
                 'អ៊ីមែលរបស់អ្នកមិនទុកចិត្តតែលើពាក្យសម្ងាត់ទេ។ នេះជាមូលហេតុដែលឧបករណ៍ បណ្តាញ និងការប៉ះរូបវ័ន្តធ្វើឱ្យការចូលរួមជំនួសគ្នាមិនអាចទៅរួចតាមមេកានិច — ដោយគ្មានទិន្នន័យជីវមាត្រ។',
             ],
         ],
+        '/blog/live-checkin-alerts-on-telegram' => [
+            'en' => [
+                'Live check-in alerts: a Telegram toggle for owners who want every clock-in',
+                "Turn on a single setting and DailyBrew sends a Telegram ping the moment any staff member clocks in or out. Espresso+ feature, off by default — the noise profile is intentional.",
+            ],
+            'fr' => [
+                'Alertes de pointage en direct : un commutateur Telegram pour les propriétaires qui veulent chaque pointage',
+                "Activez un seul paramètre et DailyBrew envoie un ping Telegram dès qu'un membre du personnel pointe à l'arrivée ou au départ. Fonctionnalité Espresso+, désactivée par défaut — la fréquence est intentionnelle.",
+            ],
+            'km' => [
+                'ការជូនដំណឹងចូល/ចេញផ្ទាល់៖ ការកំណត់ Telegram សម្រាប់ម្ចាស់ដែលចង់ដឹងគ្រប់ការចូលរួម',
+                'បើកការកំណត់តែមួយ ហើយ DailyBrew នឹងផ្ញើការជូនដំណឹង Telegram ភ្លាមៗនៅពេលបុគ្គលិកចូលរួម ឬចេញ។ លក្ខណៈពិសេស Espresso+ បិទតាមលំនាំដើម — ប្រេកង់ខ្ពស់គឺមានចេតនា។',
+            ],
+        ],
         '/blog/the-new-device-alert' => [
             'en' => [
                 "The new-device alert: when a check-in looks fine but isn't",

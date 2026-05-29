@@ -563,6 +563,55 @@ class NotificationService
         }
     }
 
+    /**
+     * Live ping to the owner the moment an employee clocks in or out. Off by
+     * default — gated on the workspace's `telegramCheckinAlertsEnabled` flag
+     * so a Telegram-enabled workspace doesn't get flooded with one message
+     * per punch unless the owner explicitly opts in. Plan gating happens
+     * upstream in CheckinService where this is called.
+     *
+     * @param string $action 'in' for a check-in, 'out' for a check-out
+     */
+    public function notifyEmployeeCheckin(Attendance $attendance, string $action): void
+    {
+        $employee = $attendance->getEmployee();
+        $workspace = $attendance->getWorkspace();
+        if ($employee === null || $workspace === null) {
+            return;
+        }
+
+        $setting = $workspace->getSetting();
+        if ($setting === null || !$setting->isTelegramCheckinAlertsEnabled()) {
+            return;
+        }
+
+        $isOut = $action === 'out';
+        $verb = $isOut ? 'checked out' : 'checked in';
+        $when = $isOut ? $attendance->getCheckOutAt() : $attendance->getCheckInAt();
+        $tz = new \DateTimeZone($setting->getTimezone());
+        $timeStr = $when !== null ? $when->setTimezone($tz)->format('H:i') : '—';
+
+        $emoji = $isOut ? '🟠' : '🟢';
+        $tgText = sprintf(
+            "%s <b>%s %s</b> at %s",
+            $emoji,
+            htmlspecialchars($employee->getName(), ENT_HTML5 | ENT_QUOTES, 'UTF-8'),
+            $verb,
+            $timeStr,
+        );
+
+        // Workspace group chat — sendTelegram is already gated internally on
+        // isTelegramNotificationsEnabled + telegramChatId being set, so this
+        // is a no-op when the workspace hasn't configured group notifications.
+        $this->sendTelegram($workspace, $tgText);
+
+        // Owner DM — linking personal Telegram is itself the opt-in (no gate).
+        $owner = $workspace->getOwner();
+        if ($owner !== null) {
+            $this->sendTelegramToUser($owner, $tgText);
+        }
+    }
+
     private function formatDateRange(\DateTimeInterface $start, \DateTimeInterface $end): string
     {
         $dates = $start->format('M j');

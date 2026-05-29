@@ -57,6 +57,17 @@ class WorkspaceSetting extends AbstractBaseEntity
     #[ORM\Column(length: 64, nullable: true)]
     private ?string $telegramChatId = null;
 
+    /**
+     * Per-check-in Telegram alert toggle. Off by default — even with Telegram
+     * enabled, owners shouldn't get a ping for every staff punch unless they
+     * explicitly opt in (a 5-person café = 10+ pings/day). When on, every
+     * employee check-in/out fires a Telegram message to the owner's personal
+     * chat and the workspace group (if configured). Espresso+ feature, gated
+     * server-side via PlanService::canUseTelegramNotifications.
+     */
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $telegramCheckinAlertsEnabled = false;
+
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $tapCheckinEnabled = false;
 
@@ -213,6 +224,17 @@ class WorkspaceSetting extends AbstractBaseEntity
     public function setTelegramChatId(?string $telegramChatId): static
     {
         $this->telegramChatId = $telegramChatId;
+        return $this;
+    }
+
+    public function isTelegramCheckinAlertsEnabled(): bool
+    {
+        return $this->telegramCheckinAlertsEnabled;
+    }
+
+    public function setTelegramCheckinAlertsEnabled(bool $telegramCheckinAlertsEnabled): static
+    {
+        $this->telegramCheckinAlertsEnabled = $telegramCheckinAlertsEnabled;
         return $this;
     }
 
