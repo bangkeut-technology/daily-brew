@@ -4,9 +4,11 @@ import { LandingFooter } from '@/components/landing/LandingFooter';
 import { PageSeo } from '@/components/shared/PageSeo';
 import { BLOG_POSTS } from '@/lib/blog';
 import { ThreeFactorAttendancePost } from '@/components/blog/three-factor-attendance';
+import { TheBuddyPunchingTaxPost } from '@/components/blog/the-buddy-punching-tax';
 
 const POST_COMPONENTS: Record<string, () => React.ReactElement> = {
   'three-factor-attendance': ThreeFactorAttendancePost,
+  'the-buddy-punching-tax': TheBuddyPunchingTaxPost,
 };
 
 export const Route = createFileRoute('/blog/$slug')({

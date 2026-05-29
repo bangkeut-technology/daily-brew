@@ -12,14 +12,16 @@ import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
  * and `marketing.footer.legalLinks.*`); the `to` and `key` are static.
  */
 const productLinks: { key: string; to: string }[] = [
-  { key: 'features',    to: '/features' },
-  { key: 'howItWorks',  to: '/how-it-works' },
-  { key: 'guides',      to: '/guides' },
-  { key: 'roles',       to: '/roles' },
-  { key: 'demo',        to: '/demo' },
-  { key: 'pricing',     to: '/pricing' },
-  { key: 'faq',         to: '/faq' },
-  { key: 'support',     to: '/support' },
+  { key: 'features',          to: '/features' },
+  { key: 'howItWorks',        to: '/how-it-works' },
+  { key: 'guides',            to: '/guides' },
+  { key: 'roles',             to: '/roles' },
+  { key: 'stopBuddyPunching', to: '/stop-buddy-punching' },
+  { key: 'demo',              to: '/demo' },
+  { key: 'pricing',           to: '/pricing' },
+  { key: 'blog',              to: '/blog' },
+  { key: 'faq',               to: '/faq' },
+  { key: 'support',           to: '/support' },
 ];
 
 const legalLinks: { key: string; to: string }[] = [

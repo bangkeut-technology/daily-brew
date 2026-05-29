@@ -18,6 +18,14 @@ export interface BlogPost {
 
 export const BLOG_POSTS: BlogPost[] = [
   {
+    slug: 'the-buddy-punching-tax',
+    title: 'The buddy punching tax: what time theft really costs a small café',
+    description:
+      "Nucleus Research pegs buddy punching at 2.2% of payroll, and 75% of businesses are affected. Here's what that looks like on a 5-person café budget — and why face recognition and GPS aren't the right fix.",
+    date: '2026-05-29',
+    tags: ['buddy-punching', 'cost', 'small-business'],
+  },
+  {
     slug: 'three-factor-attendance',
     title: 'Three-factor attendance: how modern login security came to the time clock',
     description:
