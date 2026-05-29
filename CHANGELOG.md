@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.86.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.85.2...v1.86.0) (2026-05-29)
+
+
+### Features
+
+* **spa:** port /stop-buddy-punching + /blog/three-factor-attendance from Next.js so they're live before Phase 6 cutover ([#212](https://github.com/bangkeut-technology/daily-brew/issues/212)) ([b96e80f](https://github.com/bangkeut-technology/daily-brew/commit/b96e80f14d300f81dd842c72b8121913712c54bc))
+
 ## [1.85.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.85.1...v1.85.2) (2026-05-29)
 
 
