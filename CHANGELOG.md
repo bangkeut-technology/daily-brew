@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.89.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.88.0...v1.89.0) (2026-05-29)
+
+
+### Features
+
+* **spa,seo:** port 14 industry + competitor landing pages from Next.js into SPA + extend sitemap ([#218](https://github.com/bangkeut-technology/daily-brew/issues/218)) ([cadbe10](https://github.com/bangkeut-technology/daily-brew/commit/cadbe101fa564442298fc9ae7bedde0c0a01bf78))
+
 ## [1.88.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.87.0...v1.88.0) (2026-05-29)
 
 
