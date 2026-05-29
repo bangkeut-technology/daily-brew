@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.83.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.82.0...v1.83.0) (2026-05-29)
+
+
+### Features
+
+* **notifications:** add per-shift anomaly cron + fix daily-summary TZ bug ([#195](https://github.com/bangkeut-technology/daily-brew/issues/195)) ([abb4916](https://github.com/bangkeut-technology/daily-brew/commit/abb4916878f00a059efe258f6cb55d8b7f9e7c40))
+
 ## [1.82.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.81.0...v1.82.0) (2026-05-29)
 
 
