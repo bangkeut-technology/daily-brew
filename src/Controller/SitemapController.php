@@ -44,6 +44,23 @@ class SitemapController extends AbstractController
         '/stop-buddy-punching'       => ['priority' => '0.9', 'changefreq' => 'monthly'],
         '/features'                  => ['priority' => '0.9', 'changefreq' => 'monthly'],
         '/pricing'                   => ['priority' => '0.9', 'changefreq' => 'monthly'],
+        // Industry landing pages — programmatic SEO surfaces. Each targets a
+        // specific F&B/retail vertical with copy from assets/src/lib/industries.ts.
+        '/cafes'                     => ['priority' => '0.7', 'changefreq' => 'monthly'],
+        '/coffee-shops'              => ['priority' => '0.7', 'changefreq' => 'monthly'],
+        '/restaurants'               => ['priority' => '0.7', 'changefreq' => 'monthly'],
+        '/bars'                      => ['priority' => '0.7', 'changefreq' => 'monthly'],
+        '/bakeries'                  => ['priority' => '0.7', 'changefreq' => 'monthly'],
+        '/food-trucks'               => ['priority' => '0.7', 'changefreq' => 'monthly'],
+        '/retail'                    => ['priority' => '0.7', 'changefreq' => 'monthly'],
+        '/small-shops'               => ['priority' => '0.7', 'changefreq' => 'monthly'],
+        // Competitor /vs-* pages — direct conversion-intent traffic.
+        '/vs-jibble'                 => ['priority' => '0.7', 'changefreq' => 'monthly'],
+        '/vs-homebase'               => ['priority' => '0.7', 'changefreq' => 'monthly'],
+        '/vs-connecteam'             => ['priority' => '0.7', 'changefreq' => 'monthly'],
+        '/vs-clockify'               => ['priority' => '0.7', 'changefreq' => 'monthly'],
+        '/vs-buddy-punch'            => ['priority' => '0.7', 'changefreq' => 'monthly'],
+        '/vs-7shifts'                => ['priority' => '0.7', 'changefreq' => 'monthly'],
         '/how-it-works'              => ['priority' => '0.8', 'changefreq' => 'monthly'],
         '/faq'                       => ['priority' => '0.8', 'changefreq' => 'monthly'],
         '/roles'                     => ['priority' => '0.6', 'changefreq' => 'monthly'],

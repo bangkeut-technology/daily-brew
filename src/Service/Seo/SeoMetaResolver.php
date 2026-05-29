@@ -166,6 +166,99 @@ final class SeoMetaResolver
                 'ការកំណត់ការចូលរួមដ៏រឹងមាំបំផុតរបស់ DailyBrew៖ ការដាក់កំហិត IP ការផ្ទៀងផ្ទាត់ឧបករណ៍ និង geofencing អនុវត្តរួមគ្នា។ ស្រទាប់នីមួយៗគ្របដណ្តប់នូវអ្វីដែលផ្សេងទៀតមិនអាចធ្វើបាន។',
             ],
         ],
+        // ── Industry landing pages ────────────────────────────────────
+        // Programmatic SEO surfaces (one entry per vertical). EN-only entries
+        // for now; fr/km fall back to EN via resolve() until a translation
+        // pass is scheduled. The pages themselves render English copy from
+        // assets/src/lib/industries.ts → IndustryView (see
+        // [[feedback-nextjs]] / "fast English-only port" pattern).
+        '/cafes' => [
+            'en' => [
+                'Attendance app for cafés',
+                "Free staff attendance for cafés. Baristas scan a QR or tap to clock in — each punch bound to their device and your shop's WiFi. No biometrics, no buddy punching.",
+            ],
+        ],
+        '/coffee-shops' => [
+            'en' => [
+                'Coffee shop employee time tracking',
+                "Time tracking for coffee shop staff. QR clock-in bound to each barista's device and your network — no PINs to share, no biometrics, free for up to 10 active employees.",
+            ],
+        ],
+        '/restaurants' => [
+            'en' => [
+                'Staff attendance app for restaurants',
+                'Restaurant staff attendance and time clock. Front- and back-of-house clock in by QR, bound to device + network. Leave management and late flags. Free up to 10 active employees.',
+            ],
+        ],
+        '/bars' => [
+            'en' => [
+                'Bar staff attendance app',
+                'Attendance for bar and pub staff. Late-night, high-turnover teams clock in by QR bound to device + network — no biometrics, no buddy punching. Free up to 10 active employees.',
+            ],
+        ],
+        '/bakeries' => [
+            'en' => [
+                'Attendance app for bakeries',
+                'Staff attendance for bakeries. Early-morning bakers clock in by QR bound to device + network. Track hours and late flags without biometrics. Free up to 10 active employees.',
+            ],
+        ],
+        '/food-trucks' => [
+            'en' => [
+                'Food truck employee time tracking',
+                "Time tracking for food truck crews. Clock in by QR from the truck, bound to each crew member's device. No fixed hardware, no biometrics. Free up to 10 active employees.",
+            ],
+        ],
+        '/retail' => [
+            'en' => [
+                'Retail staff attendance app',
+                "Attendance for retail staff. Sales associates clock in by QR bound to device + the shop's network. No biometrics, no GPS tracking. Free for up to 10 active employees.",
+            ],
+        ],
+        '/small-shops' => [
+            'en' => [
+                'Attendance app for small shops',
+                'Simple staff attendance for small shops. Your team clocks in by QR bound to their device and your network. No biometrics, no contracts. Free for up to 10 active employees.',
+            ],
+        ],
+        // ── Competitor comparison pages ───────────────────────────────
+        // Same EN-only deferral note as industries above. Trademark disclaimer
+        // is rendered in CompetitorView itself.
+        '/vs-jibble' => [
+            'en' => [
+                'DailyBrew vs Jibble',
+                "DailyBrew vs Jibble for cafés: device + network verification with no biometrics, versus Jibble's face-recognition clock-in. Free up to 10 active employees.",
+            ],
+        ],
+        '/vs-homebase' => [
+            'en' => [
+                'DailyBrew vs Homebase',
+                "DailyBrew vs Homebase: device + network verified clock-ins with no shared PINs, versus Homebase's PIN + GPS model. Free up to 10 active employees, no US-only limits.",
+            ],
+        ],
+        '/vs-connecteam' => [
+            'en' => [
+                'DailyBrew vs Connecteam',
+                "DailyBrew vs Connecteam: a café-first three-factor clock-in (device + IP + NFC beta) versus Connecteam's deskless HR suite with NFC and selfie verification.",
+            ],
+        ],
+        '/vs-clockify' => [
+            'en' => [
+                'DailyBrew vs Clockify',
+                "DailyBrew vs Clockify: per-punch device + network verification versus Clockify's shareable kiosk PIN. Stop buddy punching that PIN-based clocks can't.",
+            ],
+        ],
+        '/vs-buddy-punch' => [
+            'en' => [
+                'DailyBrew vs Buddy Punch',
+                'DailyBrew vs Buddy Punch: device + IP verification as the primary defense, no photo-on-punch. A café-first alternative with a free tier for up to 10 active employees.',
+            ],
+        ],
+        '/vs-7shifts' => [
+            'en' => [
+                'DailyBrew vs 7shifts',
+                "DailyBrew vs 7shifts: a free, device-verified time clock for small teams versus 7shifts' restaurant scheduling suite with photo + geofencing punch.",
+            ],
+        ],
         '/stop-buddy-punching' => [
             'en' => [
                 'How to stop buddy punching',
