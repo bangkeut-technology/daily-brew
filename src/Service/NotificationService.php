@@ -62,7 +62,7 @@ class NotificationService
             ],
         );
 
-        // Telegram
+        // Telegram — workspace group chat + owner's personal Telegram (if linked)
         $reason = $leaveRequest->getReason();
         $tgText = sprintf(
             "📋 <b>New leave request</b>\n%s requested leave for %s%s",
@@ -71,6 +71,7 @@ class NotificationService
             $reason ? "\nReason: " . $reason : '',
         );
         $this->sendTelegram($workspace, $tgText);
+        $this->sendTelegramToUser($owner, $tgText);
     }
 
     public function notifyLeaveRequestApproved(LeaveRequest $leaveRequest): void
@@ -119,7 +120,7 @@ class NotificationService
             ],
         );
 
-        // Telegram
+        // Telegram — workspace group chat + the assigned employee's personal Telegram
         $tgText = sprintf(
             "🔔 <b>Shift assigned</b>\n%s → %s (%s – %s)",
             $employee->getName(),
@@ -128,6 +129,7 @@ class NotificationService
             $shiftEnd,
         );
         $this->sendTelegram($employee->getWorkspace(), $tgText);
+        $this->sendTelegramToUser($linkedUser, $tgText);
     }
 
     public function notifyClosureCreated(ClosurePeriod $closure): void
@@ -138,11 +140,13 @@ class NotificationService
 
         $tokens = [];
         $emails = [];
+        $linkedUsers = [];
         foreach ($employees as $employee) {
             $linkedUser = $employee->getLinkedUser();
             if ($linkedUser !== null) {
                 $tokens = array_merge($tokens, $this->getTokensForUser($linkedUser));
                 $emails[] = $linkedUser->getEmail();
+                $linkedUsers[] = $linkedUser;
             }
         }
 
@@ -166,13 +170,14 @@ class NotificationService
             ],
         );
 
-        // Telegram
+        // Telegram — workspace group chat + every linked employee's personal Telegram
         $tgText = sprintf(
             "🚫 <b>Closure announced</b>\n%s: %s",
             $closure->getName(),
             $dates,
         );
         $this->sendTelegram($workspace, $tgText);
+        $this->sendTelegramToUsers($linkedUsers, $tgText);
     }
 
     /**
@@ -226,7 +231,7 @@ class NotificationService
             ],
         );
 
-        // Telegram
+        // Telegram — workspace group chat + owner + every manage-attendance manager personally
         $tgText = sprintf(
             "📊 <b>%s</b>\n✅ %d present · ⏰ %d late · 🏖 %d on leave · ❌ %d absent",
             $subject,
@@ -236,6 +241,8 @@ class NotificationService
             $absentCount,
         );
         $this->sendTelegram($workspace, $tgText);
+        $recipients = $this->attendanceManagerRecipients($workspace);
+        $this->sendTelegramToUsers($recipients['users'], $tgText);
     }
 
     /**
@@ -365,6 +372,9 @@ class NotificationService
             $body,
         );
         $this->sendTelegram($workspace, $tgText);
+        // Personal Telegram for owner + every manage-attendance manager (reuses
+        // the same recipient set as the push/email fan-out above).
+        $this->sendTelegramToUsers($recipients['users'], $tgText);
     }
 
     /**
@@ -392,22 +402,28 @@ class NotificationService
     }
 
     /**
-     * Collect push tokens + email addresses for everyone who should hear about a
-     * workspace-wide attendance digest: the owner plus every active manager
-     * (with a linked user) carrying the `manage_attendance` capability.
+     * Collect push tokens + email addresses + raw User entities for everyone
+     * who should hear about a workspace-wide attendance digest: the owner plus
+     * every active manager (with a linked user) carrying the
+     * `manage_attendance` capability.
      *
-     * @return array{tokens: list<string>, emails: list<string>}
+     * Users are surfaced separately so callers can fan out personal Telegram
+     * notifications (User.telegramChatId) to the same recipient set.
+     *
+     * @return array{tokens: list<string>, emails: list<string>, users: list<User>}
      */
     private function attendanceManagerRecipients(Workspace $workspace): array
     {
         $tokens = [];
         $emails = [];
+        $users = [];
         $seenUsers = [];
 
         $owner = $workspace->getOwner();
         if ($owner !== null) {
             $tokens = array_merge($tokens, $this->getTokensForUser($owner));
             $emails[] = $owner->getEmail();
+            $users[] = $owner;
             $seenUsers[spl_object_id($owner)] = true;
         }
 
@@ -435,11 +451,13 @@ class NotificationService
 
             $tokens = array_merge($tokens, $this->getTokensForUser($linkedUser));
             $emails[] = $linkedUser->getEmail();
+            $users[] = $linkedUser;
         }
 
         return [
             'tokens' => array_values(array_unique($tokens)),
             'emails' => array_values(array_unique(array_filter($emails))),
+            'users' => $users,
         ];
     }
 
@@ -473,7 +491,7 @@ class NotificationService
             ],
         );
 
-        // Telegram
+        // Telegram — workspace group chat + the leave-requester's personal Telegram
         $icon = $decision === 'approved' ? '✅' : '❌';
         $tgText = sprintf(
             "%s <b>Leave request %s</b>\n%s — %s",
@@ -483,6 +501,7 @@ class NotificationService
             $dates,
         );
         $this->sendTelegram($leaveRequest->getWorkspace(), $tgText);
+        $this->sendTelegramToUser($linkedUser, $tgText);
     }
 
     /**
@@ -526,6 +545,9 @@ class NotificationService
             $timeStr,
         );
         $this->sendTelegram($workspace, $tgText);
+        if ($owner !== null) {
+            $this->sendTelegramToUser($owner, $tgText);
+        }
     }
 
     private function formatDateRange(\DateTimeInterface $start, \DateTimeInterface $end): string
@@ -554,6 +576,45 @@ class NotificationService
         }
 
         $this->telegramService->send($chatId, $text);
+    }
+
+    /**
+     * Send a Telegram message to a user's personal chat. No-op if the user
+     * hasn't connected Telegram on the profile page. Unlike the workspace
+     * variant this isn't gated by an "enabled" toggle — connecting personal
+     * Telegram is itself the opt-in.
+     */
+    public function sendTelegramToUser(User $user, string $text): void
+    {
+        $chatId = $user->getTelegramChatId();
+        if ($chatId === null || $chatId === '') {
+            return;
+        }
+
+        $this->telegramService->send($chatId, $text);
+    }
+
+    /**
+     * Fan a Telegram message out to several users, deduping by chat ID so the
+     * owner and a manager who happen to share a chat (rare, but possible when
+     * the owner also linked themselves as an employee) only get one copy.
+     *
+     * @param iterable<User> $users
+     */
+    public function sendTelegramToUsers(iterable $users, string $text): void
+    {
+        $seenChatIds = [];
+        foreach ($users as $user) {
+            $chatId = $user->getTelegramChatId();
+            if ($chatId === null || $chatId === '') {
+                continue;
+            }
+            if (isset($seenChatIds[$chatId])) {
+                continue;
+            }
+            $seenChatIds[$chatId] = true;
+            $this->telegramService->send($chatId, $text);
+        }
     }
 
     /**

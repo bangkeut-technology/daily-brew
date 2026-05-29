@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuthentication } from '@/hooks/use-authentication';
 import {
@@ -9,6 +9,9 @@ import {
   useDisconnectOAuth,
   useOAuthLinkToken,
   useDeleteAccount,
+  useTelegramConnectionStatus,
+  useTelegramLinkToken,
+  useDisconnectTelegram,
 } from '@/hooks/queries/useProfile';
 import { useRoleContext, useLinkEmployee, useUnlinkEmployee } from '@/hooks/queries/useRoleContext';
 import { useTheme } from 'next-themes';
@@ -32,6 +35,7 @@ import {
   Trash2,
   AlertTriangle,
   Unlink,
+  Send,
 } from 'lucide-react';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
@@ -82,6 +86,53 @@ function ProfilePage() {
 
   // OAuth connections query
   const { data: oauthData, isLoading: oauthLoading } = useOAuthConnections();
+
+  // Personal Telegram connection — poll while waiting for the user to tap
+  // Start in Telegram, then revert to no polling once we detect the flip.
+  const [waitingForTelegram, setWaitingForTelegram] = useState(false);
+  const telegramTimeoutEndsAtRef = useRef(0);
+  const telegramBotUsername = window.__DAILYBREW__?.telegramBotUsername || '';
+  const { data: telegramStatus } = useTelegramConnectionStatus({
+    refetchInterval: waitingForTelegram ? 2000 : false,
+  });
+  const telegramLinkToken = useTelegramLinkToken();
+  const disconnectTelegram = useDisconnectTelegram();
+
+  useEffect(() => {
+    if (!waitingForTelegram) return;
+    if (telegramStatus?.connected) {
+      setWaitingForTelegram(false);
+      toast.success(t('profile.telegram.connected', 'Telegram connected'));
+    }
+  }, [waitingForTelegram, telegramStatus?.connected, t]);
+
+  useEffect(() => {
+    if (!waitingForTelegram) return;
+    const remaining = Math.max(0, telegramTimeoutEndsAtRef.current - Date.now());
+    const timeout = window.setTimeout(() => {
+      setWaitingForTelegram(false);
+      toast.error(t('profile.telegram.timeout', 'Timed out waiting for Telegram. Try again.'));
+    }, remaining);
+    return () => window.clearTimeout(timeout);
+  }, [waitingForTelegram, t]);
+
+  const handleConnectTelegram = async () => {
+    try {
+      const { deepLink, expiresInSeconds } = await telegramLinkToken.mutateAsync();
+      telegramTimeoutEndsAtRef.current = Date.now() + Math.min(expiresInSeconds, 30) * 1000;
+      setWaitingForTelegram(true);
+      window.open(deepLink, '_blank', 'noopener,noreferrer');
+    } catch {
+      toast.error(t('profile.telegram.linkError', 'Could not generate Telegram link'));
+    }
+  };
+
+  const handleDisconnectTelegram = () => {
+    disconnectTelegram.mutate(undefined, {
+      onSuccess: () => toast.success(t('profile.telegram.disconnectSuccess', 'Telegram disconnected')),
+      onError: () => toast.error(t('profile.telegram.disconnectError', 'Failed to disconnect Telegram')),
+    });
+  };
 
   // Sync form when user changes
   useEffect(() => {
@@ -543,6 +594,82 @@ function ProfilePage() {
           </div>
         </GlassCard>
 
+        {/* Personal Telegram notifications. Per-user, scoped across every
+            workspace the user touches (owner, manager, or employee). Distinct
+            from the workspace-wide group chat configured in Settings. */}
+        <GlassCard hover={false}>
+          <GlassCardHeader title={t('profile.telegram.title', 'Telegram notifications')} />
+          <div className="p-6 space-y-3">
+            <p className="text-[14.5px] text-text-secondary leading-relaxed">
+              {t(
+                'profile.telegram.description',
+                'Get leave decisions, shift assignments, and daily summaries delivered to your personal Telegram chat. This is separate from any workspace group chat your owner sets up.',
+              )}
+            </p>
+
+            <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-glass-bg border border-cream-3/60">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-glass-bg border border-cream-3 flex items-center justify-center">
+                  <TelegramIcon />
+                </div>
+                <div>
+                  <p className="text-[15.5px] font-medium text-text-primary">Telegram</p>
+                  <p className="text-[13px] text-text-tertiary mt-0.5">
+                    {telegramStatus?.connected
+                      ? t('profile.telegram.connectedSubtitle', 'Receiving personal notifications')
+                      : telegramBotUsername
+                        ? t('profile.telegram.botUsername', 'Connect via @{{name}}', { name: telegramBotUsername })
+                        : t('profile.telegram.notConfigured', 'Bot is not configured on the server')}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2.5">
+                {telegramStatus?.connected && (
+                  <StatusBadge label={t('profile.connected', 'Connected')} variant="green" />
+                )}
+                {telegramStatus?.connected ? (
+                  <button
+                    type="button"
+                    onClick={handleDisconnectTelegram}
+                    disabled={disconnectTelegram.isPending}
+                    className="text-[13.5px] font-medium px-3 py-1 rounded-md border-none cursor-pointer bg-red/10 text-red transition-colors hover:bg-red/18 disabled:opacity-50"
+                  >
+                    {t('profile.disconnect', 'Disconnect')}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleConnectTelegram}
+                    disabled={!telegramBotUsername || telegramLinkToken.isPending || waitingForTelegram}
+                    className="inline-flex items-center gap-1.5 text-[13.5px] font-medium px-3 py-1.5 rounded-md border-none cursor-pointer bg-coffee text-white transition-colors hover:bg-coffee-light disabled:opacity-50"
+                  >
+                    <Send size={12} />
+                    {waitingForTelegram
+                      ? t('profile.telegram.waiting', 'Waiting for Telegram...')
+                      : telegramLinkToken.isPending
+                        ? t('profile.telegram.generating', 'Generating link...')
+                        : t('profile.telegram.connectButton', 'Connect personal Telegram')}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {!telegramBotUsername && (
+              <p className="text-[12.5px] text-red">
+                {t('profile.telegram.notConfiguredHint', 'Ask your administrator to set TELEGRAM_BOT_USERNAME.')}
+              </p>
+            )}
+            {waitingForTelegram && (
+              <p className="text-[12.5px] text-amber">
+                {t(
+                  'profile.telegram.waitingHint',
+                  "After you tap Start in Telegram, we'll detect the connection automatically.",
+                )}
+              </p>
+            )}
+          </div>
+        </GlassCard>
+
         {/* Theme preference */}
         <GlassCard hover={false}>
           <GlassCardHeader title={t('profile.themePreference', 'Theme preference')} />
@@ -773,6 +900,17 @@ function AppleIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-text-primary">
       <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+    </svg>
+  );
+}
+
+function TelegramIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M22 4.5L2 12l5.5 2L19 7l-9.5 8.5L15 19l7-14.5z"
+        fill="#229ED9"
+      />
     </svg>
   );
 }

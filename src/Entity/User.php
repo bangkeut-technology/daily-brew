@@ -134,6 +134,14 @@ class User extends AbstractBaseEntity implements UserInterface, PasswordAuthenti
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?DateTimeImmutable $passwordResetExpiresAt = null;
 
+    /**
+     * Telegram chat ID for direct/personal notifications. Populated by the
+     * /start <token> webhook flow after the user clicks "Connect personal
+     * Telegram" on the profile page. Null = not connected.
+     */
+    #[ORM\Column(name: 'telegram_chat_id', length: 64, nullable: true)]
+    private ?string $telegramChatId = null;
+
     // ── Identity ───────────────────────────────────────────────
 
     public function getSecret(): ?string
@@ -515,6 +523,24 @@ class User extends AbstractBaseEntity implements UserInterface, PasswordAuthenti
             OAuthProviderEnum::APPLE => $this->setAppleId(null),
             OAuthProviderEnum::GOOGLE => $this->setGoogleId(null),
         };
+    }
+
+    // ── Telegram ───────────────────────────────────────────────
+
+    public function getTelegramChatId(): ?string
+    {
+        return $this->telegramChatId;
+    }
+
+    public function setTelegramChatId(?string $telegramChatId): static
+    {
+        $this->telegramChatId = $telegramChatId;
+        return $this;
+    }
+
+    public function hasTelegramConnected(): bool
+    {
+        return $this->telegramChatId !== null && $this->telegramChatId !== '';
     }
 
     // ── Serialization ──────────────────────────────────────────

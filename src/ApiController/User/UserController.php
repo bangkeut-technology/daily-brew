@@ -13,6 +13,7 @@ use App\Repository\UserRepository;
 use App\Repository\WorkspaceRepository;
 use App\Service\AccountDeletionService;
 use App\Service\AuthService;
+use App\Service\TelegramLinkTokenService;
 use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -387,6 +388,59 @@ class UserController extends AbstractController
         } catch (\InvalidArgumentException $e) {
             return $this->jsonError($e->getMessage(), 400);
         }
+
+        return $this->jsonSuccess(['disconnected' => true]);
+    }
+
+    // ── Personal Telegram connection ──────────────────────────
+
+    /**
+     * Connection status for the profile page. The Telegram chat ID itself is
+     * intentionally not exposed — clients only need the boolean to render the
+     * "Connected / Not connected" pill, and leaking the chat ID would let a
+     * compromised session enumerate someone's personal Telegram chat.
+     */
+    #[Route('/me/telegram', name: 'users_me_telegram_status', methods: ['GET'])]
+    public function telegramStatus(
+        #[CurrentUser] User $user,
+    ): JsonResponse {
+        return $this->jsonSuccess([
+            'connected' => $user->hasTelegramConnected(),
+        ]);
+    }
+
+    /**
+     * Mint a short-lived signed token identifying the current user and return
+     * the bot deep link the frontend opens in a new tab. The bot's /start
+     * <token> handler verifies, then writes the chat ID into User.telegramChatId
+     * — the browser polls GET /users/me/telegram to detect the flip.
+     */
+    #[Route('/me/telegram/link-token', name: 'users_me_telegram_link_token', methods: ['POST'])]
+    public function telegramLinkToken(
+        #[CurrentUser] User $user,
+        TelegramLinkTokenService $tokenService,
+        string $telegramBotUsername,
+    ): JsonResponse {
+        if ($telegramBotUsername === '') {
+            return $this->jsonError('Telegram bot is not configured on the server', 503);
+        }
+
+        $token = $tokenService->issueForUser((string) $user->getPublicId());
+
+        return $this->jsonSuccess([
+            'token' => $token,
+            'deepLink' => sprintf('https://t.me/%s?start=%s', $telegramBotUsername, $token),
+            'expiresInSeconds' => TelegramLinkTokenService::DEFAULT_TTL_SECONDS,
+        ]);
+    }
+
+    #[Route('/me/telegram', name: 'users_me_telegram_disconnect', methods: ['DELETE'])]
+    public function telegramDisconnect(
+        #[CurrentUser] User $user,
+        UserRepository $userRepository,
+    ): JsonResponse {
+        $user->setTelegramChatId(null);
+        $userRepository->flush();
 
         return $this->jsonSuccess(['disconnected' => true]);
     }

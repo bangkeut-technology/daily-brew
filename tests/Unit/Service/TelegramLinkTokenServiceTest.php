@@ -18,6 +18,8 @@ class TelegramLinkTokenServiceTest extends TestCase
         $this->svc = new TelegramLinkTokenService(self::SECRET);
     }
 
+    // ── Workspace tokens ──────────────────────────────────────
+
     public function testIssueAndVerifyRoundTripsWorkspacePublicId(): void
     {
         $publicId = 'ws-abc-123';
@@ -79,5 +81,71 @@ class TelegramLinkTokenServiceTest extends TestCase
         // They might differ by 1 second if the clock ticks; assert at least both verify.
         $this->assertSame('ws-abc-123', $this->svc->verify($a));
         $this->assertSame('ws-abc-123', $this->svc->verify($b));
+    }
+
+    // ── User tokens ───────────────────────────────────────────
+
+    public function testIssueForUserAndVerifyForUserRoundTripsUserPublicId(): void
+    {
+        $publicId = 'user-xyz-999';
+        $token = $this->svc->issueForUser($publicId);
+
+        $this->assertSame($publicId, $this->svc->verifyForUser($token));
+    }
+
+    public function testIssueForUserProducesBase64UrlSafeToken(): void
+    {
+        $token = $this->svc->issueForUser('user-xyz-999');
+
+        $this->assertMatchesRegularExpression('/^[A-Za-z0-9_-]+$/', $token);
+    }
+
+    public function testVerifyForUserRejectsExpiredToken(): void
+    {
+        $token = $this->svc->issueForUser('user-xyz-999', ttlSeconds: -10);
+
+        $this->assertNull($this->svc->verifyForUser($token));
+    }
+
+    public function testVerifyForUserRejectsTokenSignedWithDifferentSecret(): void
+    {
+        $other = new TelegramLinkTokenService('other-secret');
+        $token = $other->issueForUser('user-xyz-999');
+
+        $this->assertNull($this->svc->verifyForUser($token));
+    }
+
+    public function testVerifyForUserRejectsTamperedToken(): void
+    {
+        $token = $this->svc->issueForUser('user-xyz-999');
+
+        $this->assertNull($this->svc->verifyForUser($token . 'X'));
+    }
+
+    // ── Prefix collision: workspace ↔ user tokens never cross-verify ──
+
+    public function testWorkspaceTokenDoesNotVerifyAsUserToken(): void
+    {
+        $token = $this->svc->issue('ws-abc-123');
+
+        $this->assertNull($this->svc->verifyForUser($token));
+    }
+
+    public function testUserTokenDoesNotVerifyAsWorkspaceToken(): void
+    {
+        $token = $this->svc->issueForUser('user-xyz-999');
+
+        $this->assertNull($this->svc->verify($token));
+    }
+
+    public function testWorkspacePublicIdHappeningToStartWithUserPrefixIsRejectedByVerify(): void
+    {
+        // Defensive: if somehow a workspace publicId literally starts with
+        // `user:` (it can't with our generator, but assert the boundary), we
+        // refuse to return it from `verify()` so the webhook handler doesn't
+        // mistake it for a user link.
+        $token = $this->svc->issue('user:looks-like-a-user-token');
+
+        $this->assertNull($this->svc->verify($token));
     }
 }

@@ -356,6 +356,253 @@ class NotificationServiceTest extends TestCase
         $this->svc->notifyLeaveRequestSubmitted($req);
     }
 
+    // ── Personal Telegram fan-out ─────────────────────────────────────
+
+    public function testSendTelegramToUserNoOpWhenChatIdIsNull(): void
+    {
+        $this->telegram->expects($this->never())->method('send');
+
+        $this->svc->sendTelegramToUser(new User(), 'hello');
+    }
+
+    public function testSendTelegramToUserNoOpWhenChatIdIsEmptyString(): void
+    {
+        $user = (new User())->setTelegramChatId('');
+        $this->telegram->expects($this->never())->method('send');
+
+        $this->svc->sendTelegramToUser($user, 'hello');
+    }
+
+    public function testSendTelegramToUserSendsWhenChatIdPresent(): void
+    {
+        $user = (new User())->setTelegramChatId('123456789');
+        $this->telegram->expects($this->once())
+            ->method('send')
+            ->with('123456789', 'hello');
+
+        $this->svc->sendTelegramToUser($user, 'hello');
+    }
+
+    public function testSendTelegramToUsersDedupesByChatId(): void
+    {
+        $alice = (new User())->setTelegramChatId('@alice');
+        $bob = (new User())->setTelegramChatId('@bob');
+        $aliceClone = (new User())->setTelegramChatId('@alice'); // same chat
+        $unlinked = new User();
+
+        $this->telegram->expects($this->exactly(2))
+            ->method('send')
+            ->willReturnCallback(function (string $chatId, string $text): void {
+                $this->assertContains($chatId, ['@alice', '@bob']);
+                $this->assertSame('msg', $text);
+            });
+
+        $this->svc->sendTelegramToUsers([$alice, $bob, $aliceClone, $unlinked], 'msg');
+    }
+
+    public function testNotifyLeaveSubmittedAlsoSendsPersonalTelegramToOwner(): void
+    {
+        $owner = (new User())->setEmail('owner@x.com')->setTelegramChatId('@owner');
+        $workspace = $this->workspace($owner, telegramEnabled: true, telegramChatId: '@group');
+        $req = $this->leaveRequest($workspace, 'Lyhour Huy');
+
+        // Group + owner-personal = 2 sends, both with the same text.
+        $this->telegram->expects($this->exactly(2))
+            ->method('send')
+            ->willReturnCallback(function (string $chatId, string $text) {
+                $this->assertContains($chatId, ['@group', '@owner']);
+                $this->assertStringContainsString('New leave request', $text);
+            });
+
+        $this->svc->notifyLeaveRequestSubmitted($req);
+    }
+
+    public function testNotifyLeaveApprovedAlsoSendsPersonalTelegramToLinkedUser(): void
+    {
+        $linkedUser = (new User())->setEmail('emp@x.com')->setTelegramChatId('@emp');
+        $workspace = $this->workspace(new User(), telegramEnabled: false);
+        $req = $this->leaveRequest($workspace, 'Lyhour Huy', linkedUser: $linkedUser);
+
+        // Group is disabled, so only the personal send fires.
+        $this->telegram->expects($this->once())
+            ->method('send')
+            ->with('@emp', $this->stringContains('approved'));
+
+        $this->svc->notifyLeaveRequestApproved($req);
+    }
+
+    public function testNotifyShiftAssignedAlsoSendsPersonalTelegramToLinkedUser(): void
+    {
+        $linkedUser = (new User())->setEmail('emp@x.com')->setTelegramChatId('@emp');
+        $workspace = $this->workspace(new User(), telegramEnabled: false);
+        $shift = (new Shift())
+            ->setName('Morning')
+            ->setStartTime(new DateTimeImmutable('09:00:00'))
+            ->setEndTime(new DateTimeImmutable('17:00:00'));
+        $emp = (new Employee())
+            ->setFirstName('Lyhour')
+            ->setLastName('Huy')
+            ->setShift($shift)
+            ->setLinkedUser($linkedUser);
+        $emp->setWorkspace($workspace);
+
+        $this->telegram->expects($this->once())
+            ->method('send')
+            ->with('@emp', $this->stringContains('Shift assigned'));
+
+        $this->svc->notifyShiftAssigned($emp);
+    }
+
+    public function testNotifyClosureCreatedAlsoSendsPersonalTelegramToLinkedEmployees(): void
+    {
+        $workspace = $this->workspace(new User(), telegramEnabled: false);
+        $closure = (new ClosurePeriod())
+            ->setName('Khmer New Year')
+            ->setStartDate(new DateTimeImmutable('2026-04-14'))
+            ->setEndDate(new DateTimeImmutable('2026-04-16'))
+            ->setWorkspace($workspace);
+
+        $alice = (new User())->setEmail('a@x.com')->setTelegramChatId('@alice');
+        $bob = (new User())->setEmail('b@x.com')->setTelegramChatId('@bob');
+        $unlinkedEmp = new Employee();
+        $linkedNoTg = (new Employee())->setLinkedUser((new User())->setEmail('c@x.com'));
+        $linked1 = (new Employee())->setLinkedUser($alice);
+        $linked2 = (new Employee())->setLinkedUser($bob);
+        $this->employeeRepo->method('findByWorkspace')
+            ->willReturn([$linked1, $linked2, $unlinkedEmp, $linkedNoTg]);
+
+        $sentChatIds = [];
+        $this->telegram->expects($this->exactly(2))
+            ->method('send')
+            ->willReturnCallback(function (string $chatId) use (&$sentChatIds): void {
+                $sentChatIds[] = $chatId;
+            });
+
+        $this->svc->notifyClosureCreated($closure);
+
+        $this->assertEqualsCanonicalizing(['@alice', '@bob'], $sentChatIds);
+    }
+
+    public function testNotifyShiftSummaryFansOutPersonalTelegramToOwnerAndManageAttendanceManagers(): void
+    {
+        $owner = (new User())->setEmail('owner@x.com')->setTelegramChatId('@owner');
+        $workspace = $this->workspace($owner, telegramEnabled: false);
+        $workspace->setName('Daily Grind');
+
+        $shift = (new Shift())
+            ->setName('Morning')
+            ->setStartTime(new DateTimeImmutable('09:00:00'))
+            ->setEndTime(new DateTimeImmutable('17:00:00'));
+
+        // Workspace has 3 employees: a manager with manage_attendance + linked
+        // user + Telegram (should receive); a manager without the permission
+        // (should NOT); a regular employee (should NOT, even with Telegram).
+        $managerUser = (new User())->setEmail('mgr@x.com')->setTelegramChatId('@mgr');
+        $manager = (new Employee())
+            ->setFirstName('Bopha')
+            ->setLastName('Sok')
+            ->setLinkedUser($managerUser)
+            ->setRole(\App\Enum\EmployeeRoleEnum::MANAGER)
+            ->setStatus(\App\Enum\EmployeeStatusEnum::ACTIVE)
+            ->setManagerPermissions([\App\Enum\ManagerPermissionEnum::MANAGE_ATTENDANCE]);
+        $manager->setWorkspace($workspace);
+
+        $otherManagerUser = (new User())->setEmail('mgr2@x.com')->setTelegramChatId('@mgr2');
+        $otherManager = (new Employee())
+            ->setFirstName('Ratha')
+            ->setLastName('Pich')
+            ->setLinkedUser($otherManagerUser)
+            ->setRole(\App\Enum\EmployeeRoleEnum::MANAGER)
+            ->setStatus(\App\Enum\EmployeeStatusEnum::ACTIVE)
+            ->setManagerPermissions([\App\Enum\ManagerPermissionEnum::MANAGE_LEAVE]);
+        $otherManager->setWorkspace($workspace);
+
+        $regularUser = (new User())->setEmail('emp@x.com')->setTelegramChatId('@emp');
+        $regular = (new Employee())
+            ->setFirstName('Sokha')
+            ->setLastName('Nuon')
+            ->setLinkedUser($regularUser)
+            ->setStatus(\App\Enum\EmployeeStatusEnum::ACTIVE);
+        $regular->setWorkspace($workspace);
+
+        $workspace->getEmployees()->add($manager);
+        $workspace->getEmployees()->add($otherManager);
+        $workspace->getEmployees()->add($regular);
+
+        $summary = [
+            'type' => 'start',
+            'shift' => $shift,
+            'dueAt' => new DateTimeImmutable('2026-04-10T09:00:00+00:00'),
+            'total' => 3,
+            'onTime' => [$regular],
+            'late' => [],
+            'missed' => [],
+        ];
+
+        $sentChatIds = [];
+        $this->telegram->expects($this->exactly(2))
+            ->method('send')
+            ->willReturnCallback(function (string $chatId) use (&$sentChatIds): void {
+                $sentChatIds[] = $chatId;
+            });
+
+        $this->svc->notifyShiftSummary($workspace, $summary);
+
+        // Owner + manage-attendance manager only; the manage-leave manager and
+        // the regular employee must NOT receive a personal summary.
+        $this->assertEqualsCanonicalizing(['@owner', '@mgr'], $sentChatIds);
+    }
+
+    public function testNotifyDailySummaryFansOutPersonalTelegramToOwnerAndManageAttendanceManagers(): void
+    {
+        $owner = (new User())->setEmail('owner@x.com')->setTelegramChatId('@owner');
+        $workspace = $this->workspace($owner, telegramEnabled: false);
+
+        $managerUser = (new User())->setEmail('mgr@x.com')->setTelegramChatId('@mgr');
+        $manager = (new Employee())
+            ->setFirstName('Bopha')
+            ->setLastName('Sok')
+            ->setLinkedUser($managerUser)
+            ->setRole(\App\Enum\EmployeeRoleEnum::MANAGER)
+            ->setStatus(\App\Enum\EmployeeStatusEnum::ACTIVE)
+            ->setManagerPermissions([\App\Enum\ManagerPermissionEnum::MANAGE_ATTENDANCE]);
+        $manager->setWorkspace($workspace);
+        $workspace->getEmployees()->add($manager);
+
+        $sentChatIds = [];
+        $this->telegram->expects($this->exactly(2))
+            ->method('send')
+            ->willReturnCallback(function (string $chatId) use (&$sentChatIds): void {
+                $sentChatIds[] = $chatId;
+            });
+
+        $this->svc->notifyDailySummary($workspace, 10, 7, 1, 2);
+
+        $this->assertEqualsCanonicalizing(['@owner', '@mgr'], $sentChatIds);
+    }
+
+    public function testNotifyDeviceAnomalyAlsoSendsPersonalTelegramToOwner(): void
+    {
+        $owner = (new User())->setEmail('owner@x.com')->setTelegramChatId('@owner');
+        $workspace = $this->workspace($owner, telegramEnabled: false);
+
+        $emp = (new Employee())->setFirstName('Lyhour')->setLastName('Huy');
+        $emp->setWorkspace($workspace);
+
+        $attendance = new \App\Entity\Attendance();
+        $attendance->setEmployee($emp);
+        $attendance->setWorkspace($workspace);
+        $attendance->setCheckInAt(new DateTimeImmutable('2026-04-10T09:00:00+00:00'));
+        $attendance->setCheckInDeviceName('iPhone 17 Pro');
+        $attendance->setCheckInDeviceId('device-abc');
+
+        $this->telegram->expects($this->once())
+            ->method('send')
+            ->with('@owner', $this->stringContains('New device used'));
+
+        $this->svc->notifyDeviceAnomaly($attendance, 'in');
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────
 
     private function workspace(
