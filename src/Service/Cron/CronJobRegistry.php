@@ -29,8 +29,13 @@ final class CronJobRegistry
     public const JOBS = [
         'dailybrew:send-daily-summary' => [
             'label' => 'Daily summary — owner push + email',
-            'description' => 'Sends the end-of-day attendance summary to workspace owners (Espresso). Reads each workspace timezone so the digest reflects the local close.',
-            'suggestedCron' => '0 18 * * *',
+            'description' => 'Sends the end-of-day attendance summary to Espresso+ workspace owners. Run hourly; the command sends to each workspace exactly once when its local clock reaches the --hour value (default 18:00).',
+            'suggestedCron' => '0 * * * *',
+        ],
+        'dailybrew:scan-shift-summaries' => [
+            'label' => 'Shift summaries — start & end digests',
+            'description' => 'Every 5 minutes, scans Espresso+ workspaces and fires a digest to the owner and managers (manage_attendance) 30 minutes after each shift start (on time / late / missed) and end (completed / left early / missed).',
+            'suggestedCron' => '*/5 * * * *',
         ],
     ];
 

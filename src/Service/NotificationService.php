@@ -8,8 +8,11 @@ use App\Entity\Attendance;
 use App\Entity\ClosurePeriod;
 use App\Entity\Employee;
 use App\Entity\LeaveRequest;
+use App\Entity\Shift;
 use App\Entity\User;
 use App\Entity\Workspace;
+use App\Enum\EmployeeStatusEnum;
+use App\Enum\ManagerPermissionEnum;
 use App\Repository\DeviceTokenRepository;
 use App\Repository\EmployeeRepository;
 
@@ -233,6 +236,211 @@ class NotificationService
             $absentCount,
         );
         $this->sendTelegram($workspace, $tgText);
+    }
+
+    /**
+     * Push + email + Telegram digest of a single shift edge — start or end —
+     * for everyone who manages attendance on this workspace.
+     *
+     * Expected summary shape (mirrors `ShiftSummaryService::scan()`):
+     *   - type: 'start' | 'end'
+     *   - shift: Shift
+     *   - dueAt: \DateTimeImmutable (UTC)
+     *   - total: int
+     *   - For 'start': onTime/late/missed lists of Employee
+     *   - For 'end':   completed/leftEarly/missed lists of Employee
+     *
+     * @param array<string, mixed> $summary
+     */
+    public function notifyShiftSummary(Workspace $workspace, array $summary): void
+    {
+        $type = $summary['type'] ?? null;
+        $shift = $summary['shift'] ?? null;
+        if (!$shift instanceof Shift || ($type !== 'start' && $type !== 'end')) {
+            return;
+        }
+
+        $isStart = $type === 'start';
+        $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
+
+        $shiftStart = $shift->getStartTime()?->format('H:i') ?? '';
+        $shiftEnd = $shift->getEndTime()?->format('H:i') ?? '';
+        $edgeLocal = $isStart ? $shiftStart : $shiftEnd;
+
+        $total = (int) ($summary['total'] ?? 0);
+        $missed = $this->namesOf($summary['missed'] ?? []);
+        $late = $isStart ? $this->namesOf($summary['late'] ?? []) : [];
+        $leftEarly = $isStart ? [] : $this->namesOf($summary['leftEarly'] ?? []);
+        $onTimeCount = $isStart ? count($summary['onTime'] ?? []) : 0;
+        $completedCount = $isStart ? 0 : count($summary['completed'] ?? []);
+
+        if ($isStart) {
+            $title = sprintf('%s shift started', $shift->getName());
+            $body = sprintf(
+                '%d on time, %d late, %d missed (of %d)',
+                $onTimeCount,
+                count($late),
+                count($missed),
+                $total,
+            );
+            $payloadType = 'shift_start_summary';
+            $subject = sprintf('%s — %s shift summary', $workspace->getName(), $shift->getName());
+            $template = 'emails/shift_start_summary.html.twig';
+        } else {
+            $title = sprintf('%s shift ended', $shift->getName());
+            $body = sprintf(
+                '%d completed, %d left early, %d missed (of %d)',
+                $completedCount,
+                count($leftEarly),
+                count($missed),
+                $total,
+            );
+            $payloadType = 'shift_end_summary';
+            $subject = sprintf('%s — %s shift wrap-up', $workspace->getName(), $shift->getName());
+            $template = 'emails/shift_end_summary.html.twig';
+        }
+
+        $payload = [
+            'type' => $payloadType,
+            'workspacePublicId' => $workspace->getPublicId(),
+            'shiftPublicId' => $shift->getPublicId(),
+            'shiftName' => $shift->getName(),
+            'total' => $total,
+            'missedCount' => count($missed),
+        ];
+        if ($isStart) {
+            $payload['onTimeCount'] = $onTimeCount;
+            $payload['lateCount'] = count($late);
+        } else {
+            $payload['completedCount'] = $completedCount;
+            $payload['leftEarlyCount'] = count($leftEarly);
+        }
+
+        $recipients = $this->attendanceManagerRecipients($workspace);
+
+        $this->expoPushService->send($recipients['tokens'], $title, $body, $payload);
+
+        $this->emailService->sendToMany(
+            $recipients['emails'],
+            $subject,
+            $template,
+            $isStart
+                ? [
+                    'workspaceName' => $workspace->getName(),
+                    'shiftName' => $shift->getName(),
+                    'shiftStart' => $shiftStart,
+                    'shiftEnd' => $shiftEnd,
+                    'edgeTime' => $edgeLocal,
+                    'total' => $total,
+                    'onTimeCount' => $onTimeCount,
+                    'lateCount' => count($late),
+                    'missedCount' => count($missed),
+                    'lateNames' => $this->truncateNames($late, 5),
+                    'lateOverflow' => max(0, count($late) - 5),
+                    'missedNames' => $this->truncateNames($missed, 5),
+                    'missedOverflow' => max(0, count($missed) - 5),
+                ]
+                : [
+                    'workspaceName' => $workspace->getName(),
+                    'shiftName' => $shift->getName(),
+                    'shiftStart' => $shiftStart,
+                    'shiftEnd' => $shiftEnd,
+                    'edgeTime' => $edgeLocal,
+                    'total' => $total,
+                    'completedCount' => $completedCount,
+                    'leftEarlyCount' => count($leftEarly),
+                    'missedCount' => count($missed),
+                    'leftEarlyNames' => $this->truncateNames($leftEarly, 5),
+                    'leftEarlyOverflow' => max(0, count($leftEarly) - 5),
+                    'missedNames' => $this->truncateNames($missed, 5),
+                    'missedOverflow' => max(0, count($missed) - 5),
+                ],
+        );
+
+        $tgEmoji = $isStart ? '☕️' : '🌙';
+        $tgText = sprintf(
+            "%s <b>%s</b>\n%s",
+            $tgEmoji,
+            $title,
+            $body,
+        );
+        $this->sendTelegram($workspace, $tgText);
+    }
+
+    /**
+     * @param iterable<Employee> $employees
+     * @return list<string>
+     */
+    private function namesOf(iterable $employees): array
+    {
+        $names = [];
+        foreach ($employees as $employee) {
+            if ($employee instanceof Employee) {
+                $names[] = $employee->getName();
+            }
+        }
+        return $names;
+    }
+
+    /**
+     * @param list<string> $names
+     * @return list<string>
+     */
+    private function truncateNames(array $names, int $max): array
+    {
+        return array_slice($names, 0, $max);
+    }
+
+    /**
+     * Collect push tokens + email addresses for everyone who should hear about a
+     * workspace-wide attendance digest: the owner plus every active manager
+     * (with a linked user) carrying the `manage_attendance` capability.
+     *
+     * @return array{tokens: list<string>, emails: list<string>}
+     */
+    private function attendanceManagerRecipients(Workspace $workspace): array
+    {
+        $tokens = [];
+        $emails = [];
+        $seenUsers = [];
+
+        $owner = $workspace->getOwner();
+        if ($owner !== null) {
+            $tokens = array_merge($tokens, $this->getTokensForUser($owner));
+            $emails[] = $owner->getEmail();
+            $seenUsers[spl_object_id($owner)] = true;
+        }
+
+        foreach ($workspace->getEmployees() as $employee) {
+            if ($employee->getDeletedAt() !== null) {
+                continue;
+            }
+            if ($employee->getStatus() !== EmployeeStatusEnum::ACTIVE) {
+                continue;
+            }
+            if (!$employee->hasManagerPermission(ManagerPermissionEnum::MANAGE_ATTENDANCE)) {
+                continue;
+            }
+
+            $linkedUser = $employee->getLinkedUser();
+            if ($linkedUser === null) {
+                continue;
+            }
+
+            $key = spl_object_id($linkedUser);
+            if (isset($seenUsers[$key])) {
+                continue;
+            }
+            $seenUsers[$key] = true;
+
+            $tokens = array_merge($tokens, $this->getTokensForUser($linkedUser));
+            $emails[] = $linkedUser->getEmail();
+        }
+
+        return [
+            'tokens' => array_values(array_unique($tokens)),
+            'emails' => array_values(array_unique(array_filter($emails))),
+        ];
     }
 
     private function notifyLeaveRequestDecision(LeaveRequest $leaveRequest, string $decision): void

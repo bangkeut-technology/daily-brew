@@ -1,0 +1,50 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block title %}{{ shiftName }} shift wrap-up — {{ workspaceName }}{% endblock %}
+
+{% block content %}
+  <h1>{{ shiftName }} shift wrap-up</h1>
+  <p>{{ edgeTime }} close-out for {{ workspaceName }}.</p>
+
+  <div class="stats-grid">
+    <div class="stat-box">
+      <span class="stat-number">{{ completedCount }}</span>
+      <span class="stat-label">Completed</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-number">{{ leftEarlyCount }}</span>
+      <span class="stat-label">Left early</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-number">{{ missedCount }}</span>
+      <span class="stat-label">Missed</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-number">{{ total }}</span>
+      <span class="stat-label">Total</span>
+    </div>
+  </div>
+
+  <div class="detail-row">
+    <span class="detail-label">Shift</span>
+    <span class="detail-value">{{ shiftName }}{% if shiftStart and shiftEnd %} ({{ shiftStart }} – {{ shiftEnd }}){% endif %}</span>
+  </div>
+
+  {% if leftEarlyNames|length > 0 %}
+    <div class="detail-row">
+      <span class="detail-label">Left early</span>
+      <span class="detail-value">
+        {{ leftEarlyNames|join(', ') }}{% if leftEarlyOverflow > 0 %} +{{ leftEarlyOverflow }} more{% endif %}
+      </span>
+    </div>
+  {% endif %}
+
+  {% if missedNames|length > 0 %}
+    <div class="detail-row">
+      <span class="detail-label">Missed</span>
+      <span class="detail-value">
+        {{ missedNames|join(', ') }}{% if missedOverflow > 0 %} +{{ missedOverflow }} more{% endif %}
+      </span>
+    </div>
+  {% endif %}
+{% endblock %}

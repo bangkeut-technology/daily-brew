@@ -1,0 +1,50 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block title %}{{ shiftName }} shift started — {{ workspaceName }}{% endblock %}
+
+{% block content %}
+  <h1>{{ shiftName }} shift started</h1>
+  <p>{{ edgeTime }} roll call for {{ workspaceName }}.</p>
+
+  <div class="stats-grid">
+    <div class="stat-box">
+      <span class="stat-number">{{ onTimeCount }}</span>
+      <span class="stat-label">On time</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-number">{{ lateCount }}</span>
+      <span class="stat-label">Late</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-number">{{ missedCount }}</span>
+      <span class="stat-label">Missed</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-number">{{ total }}</span>
+      <span class="stat-label">Total</span>
+    </div>
+  </div>
+
+  <div class="detail-row">
+    <span class="detail-label">Shift</span>
+    <span class="detail-value">{{ shiftName }}{% if shiftStart and shiftEnd %} ({{ shiftStart }} – {{ shiftEnd }}){% endif %}</span>
+  </div>
+
+  {% if lateNames|length > 0 %}
+    <div class="detail-row">
+      <span class="detail-label">Late</span>
+      <span class="detail-value">
+        {{ lateNames|join(', ') }}{% if lateOverflow > 0 %} +{{ lateOverflow }} more{% endif %}
+      </span>
+    </div>
+  {% endif %}
+
+  {% if missedNames|length > 0 %}
+    <div class="detail-row">
+      <span class="detail-label">Missed</span>
+      <span class="detail-value">
+        {{ missedNames|join(', ') }}{% if missedOverflow > 0 %} +{{ missedOverflow }} more{% endif %}
+      </span>
+    </div>
+  {% endif %}
+{% endblock %}
