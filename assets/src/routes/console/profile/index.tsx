@@ -207,8 +207,9 @@ function ProfilePage() {
       toast.error(t('profile.cannotDisconnect', 'You need at least one login method.'));
       return;
     }
+    const providerLabel = provider.charAt(0).toUpperCase() + provider.slice(1);
     disconnectOAuth.mutate(provider, {
-      onSuccess: () => toast.success(`${provider.charAt(0).toUpperCase() + provider.slice(1)} disconnected`),
+      onSuccess: () => toast.success(t('profile.oauthDisconnected', '{{provider}} disconnected', { provider: providerLabel })),
       onError: () => toast.error(t('profile.oauthDisconnectError', 'Failed to disconnect')),
     });
   };
@@ -374,13 +375,16 @@ function ProfilePage() {
               title={t('profile.linkedWorkspaces', 'Linked workspaces')}
               action={
                 <span className="text-[13px] text-text-tertiary">
-                  {roleContext.linkedWorkspaces.length} workspace{roleContext.linkedWorkspaces.length !== 1 ? 's' : ''}
+                  {t('profile.workspaceCount', '{{count}} workspace', { count: roleContext.linkedWorkspaces.length })}
                 </span>
               }
             />
             <div className="p-5 space-y-3">
               <p className="text-[13.5px] text-text-tertiary leading-relaxed">
-                You are linked as an employee in these workspaces. You can check in, view your attendance, and submit leave requests.
+                {t(
+                  'profile.linkedWorkspacesDesc',
+                  'You are linked as an employee in these workspaces. You can check in, view your attendance, and submit leave requests.',
+                )}
               </p>
               {roleContext.linkedWorkspaces.map((lw) => (
                 <div
@@ -408,7 +412,7 @@ function ProfilePage() {
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium text-red bg-red/8 border-none cursor-pointer transition-colors hover:bg-red/15"
                   >
                     <Unlink size={11} />
-                    Unlink
+                    {t('profile.unlink', 'Unlink')}
                   </button>
                 </div>
               ))}

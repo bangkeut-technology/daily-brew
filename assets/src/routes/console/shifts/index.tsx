@@ -30,7 +30,13 @@ export const Route = createFileRoute('/console/shifts/')({
   component: ShiftsPage,
 });
 
-const DAY_LABELS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+/**
+ * Stable keys for the 7 days of the week. The full label + 3-letter
+ * abbreviation are looked up via `t('shift.day.<key>')` and
+ * `t('shift.dayShort.<key>')` so each locale can render natural
+ * abbreviations (KM and FR don't always cleanly truncate from English).
+ */
+const DAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const;
 
 function ShiftsPage() {
   const { t } = useTranslation();
@@ -515,6 +521,7 @@ interface DaySchedulePanelProps {
 }
 
 function DaySchedulePanel({ shift, workspaceId }: DaySchedulePanelProps) {
+  const { t } = useTranslation();
   // Build a map of dayOfWeek => rule for quick lookup
   const rulesByDay: Record<number, ShiftTimeRule> = {};
   for (const rule of shift.timeRules) {
@@ -523,14 +530,15 @@ function DaySchedulePanel({ shift, workspaceId }: DaySchedulePanelProps) {
 
   return (
     <div className="px-5 pb-4 space-y-1">
-      {DAY_LABELS.map((dayLabel, index) => {
+      {DAY_KEYS.map((dayKey, index) => {
         const dayOfWeek = index + 1; // 1=Monday ... 7=Sunday
         const existingRule = rulesByDay[dayOfWeek];
 
         return (
           <DayRow
             key={dayOfWeek}
-            dayLabel={dayLabel}
+            dayLabel={t(`shift.day.${dayKey}`)}
+            dayLabelShort={t(`shift.dayShort.${dayKey}`)}
             dayOfWeek={dayOfWeek}
             existingRule={existingRule ?? null}
             shiftDefault={{ startTime: shift.startTime, endTime: shift.endTime }}
@@ -547,6 +555,8 @@ function DaySchedulePanel({ shift, workspaceId }: DaySchedulePanelProps) {
 
 interface DayRowProps {
   dayLabel: string;
+  /** Pre-translated 3-letter abbreviation (Mon / Lun / ច័ន្ទ). */
+  dayLabelShort: string;
   dayOfWeek: number;
   existingRule: ShiftTimeRule | null;
   shiftDefault: { startTime: string; endTime: string };
@@ -556,6 +566,7 @@ interface DayRowProps {
 
 function DayRow({
   dayLabel,
+  dayLabelShort,
   dayOfWeek,
   existingRule,
   shiftDefault,
@@ -620,7 +631,7 @@ function DayRow({
     return (
       <div className="flex items-center gap-2 py-2 px-3 rounded-lg bg-cream-3/30">
         <span className="text-[13.5px] font-medium text-text-primary w-16 shrink-0">
-          {dayLabel.slice(0, 3)}
+          {dayLabelShort}
         </span>
         <CustomTimePicker value={ruleStart} onChange={setRuleStart} className="w-25" />
         <span className="text-[13px] text-text-tertiary">&ndash;</span>
@@ -649,7 +660,7 @@ function DayRow({
     return (
       <div className="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-cream-3/30 transition-colors group">
         <span className="text-[13.5px] font-medium text-text-primary w-16 shrink-0">
-          {dayLabel.slice(0, 3)}
+          {dayLabelShort}
         </span>
         <span className="text-[14px] font-mono text-text-secondary tabular-nums">
           {existingRule.startTime} &ndash; {existingRule.endTime}
@@ -680,7 +691,7 @@ function DayRow({
   return (
     <div className="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-cream-3/30 transition-colors group">
       <span className="text-[13.5px] font-medium text-text-tertiary w-16 shrink-0">
-        {dayLabel.slice(0, 3)}
+        {dayLabelShort}
       </span>
       <span className="text-[14px] font-mono text-text-tertiary tabular-nums">
         {shiftDefault.startTime} &ndash; {shiftDefault.endTime}
