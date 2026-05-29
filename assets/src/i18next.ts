@@ -4,13 +4,16 @@ import { initReactI18next } from 'react-i18next';
 import commonEn from '@/locales/en/common.json';
 import commonFr from '@/locales/fr/common.json';
 import commonKm from '@/locales/km/common.json';
+import blogEn from '@/locales/en/blog.json';
+import blogFr from '@/locales/fr/blog.json';
+import blogKm from '@/locales/km/blog.json';
 
 export const defaultNS = 'common';
 
 export const resources = {
-    en: { common: commonEn },
-    fr: { common: commonFr },
-    km: { common: commonKm },
+    en: { common: commonEn, blog: blogEn },
+    fr: { common: commonFr, blog: blogFr },
+    km: { common: commonKm, blog: blogKm },
 };
 
 /**
@@ -58,7 +61,7 @@ i18next
         lng: resolveInitialLocale(),
         fallbackLng: 'en',
         supportedLngs: ['en', 'fr', 'km'],
-        ns: ['common'],
+        ns: ['common', 'blog'],
         interpolation: {
             escapeValue: false,
         },
