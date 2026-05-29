@@ -8,8 +8,11 @@ use App\Entity\Attendance;
 use App\Entity\ClosurePeriod;
 use App\Entity\Employee;
 use App\Entity\LeaveRequest;
+use App\Entity\Shift;
 use App\Entity\User;
 use App\Entity\Workspace;
+use App\Enum\EmployeeStatusEnum;
+use App\Enum\ManagerPermissionEnum;
 use App\Repository\DeviceTokenRepository;
 use App\Repository\EmployeeRepository;
 
@@ -233,6 +236,170 @@ class NotificationService
             $absentCount,
         );
         $this->sendTelegram($workspace, $tgText);
+    }
+
+    /**
+     * Alert the owner + every manager with `manage_attendance` that a tracked
+     * employee on a shift has no check-in row an hour after their shift started.
+     */
+    public function notifyMissingCheckin(Employee $employee, Shift $shift, \DateTimeImmutable $expectedAt): void
+    {
+        $workspace = $employee->getWorkspace();
+        if ($workspace === null) {
+            return;
+        }
+
+        $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
+        $shiftStart = $shift->getStartTime()?->format('H:i') ?? '';
+        $expectedLocal = $expectedAt->setTimezone($tz)->format('H:i');
+
+        $title = 'Missing check-in';
+        $body = sprintf(
+            '%s has not checked in for the %s shift (started %s)',
+            $employee->getName(),
+            $shift->getName(),
+            $shiftStart !== '' ? $shiftStart : 'today',
+        );
+
+        $payload = [
+            'type' => 'missing_checkin',
+            'workspacePublicId' => $workspace->getPublicId(),
+            'employeePublicId' => $employee->getPublicId(),
+            'shiftName' => $shift->getName(),
+        ];
+
+        $recipients = $this->attendanceManagerRecipients($workspace);
+        $this->expoPushService->send($recipients['tokens'], $title, $body, $payload);
+        $this->emailService->sendToMany(
+            $recipients['emails'],
+            sprintf('Missing check-in — %s', $employee->getName()),
+            'emails/missing_checkin.html.twig',
+            [
+                'workspaceName' => $workspace->getName(),
+                'employeeName' => $employee->getName(),
+                'shiftName' => $shift->getName(),
+                'shiftStart' => $shiftStart,
+                'expectedTime' => $expectedLocal,
+            ],
+        );
+
+        $tgText = sprintf(
+            "⏰ <b>Missing check-in</b>\n%s has not checked in for the %s shift (started %s)",
+            $employee->getName(),
+            $shift->getName(),
+            $shiftStart !== '' ? $shiftStart : 'today',
+        );
+        $this->sendTelegram($workspace, $tgText);
+    }
+
+    /**
+     * Alert the owner + every manager with `manage_attendance` that an attendance
+     * row still has no check-out an hour after the shift ended (likely forgot to
+     * scan out).
+     */
+    public function notifyMissingCheckout(Attendance $attendance, Shift $shift, \DateTimeImmutable $expectedAt): void
+    {
+        $employee = $attendance->getEmployee();
+        $workspace = $attendance->getWorkspace();
+        if ($employee === null || $workspace === null) {
+            return;
+        }
+
+        $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
+        $shiftEnd = $shift->getEndTime()?->format('H:i') ?? '';
+        $expectedLocal = $expectedAt->setTimezone($tz)->format('H:i');
+        $checkInLocal = $attendance->getCheckInAt()?->setTimezone($tz)->format('H:i') ?? '—';
+
+        $title = 'Missing check-out';
+        $body = sprintf(
+            '%s has not checked out from the %s shift (ended %s)',
+            $employee->getName(),
+            $shift->getName(),
+            $shiftEnd !== '' ? $shiftEnd : 'today',
+        );
+
+        $payload = [
+            'type' => 'missing_checkout',
+            'workspacePublicId' => $workspace->getPublicId(),
+            'employeePublicId' => $employee->getPublicId(),
+            'shiftName' => $shift->getName(),
+        ];
+
+        $recipients = $this->attendanceManagerRecipients($workspace);
+        $this->expoPushService->send($recipients['tokens'], $title, $body, $payload);
+        $this->emailService->sendToMany(
+            $recipients['emails'],
+            sprintf('Missing check-out — %s', $employee->getName()),
+            'emails/missing_checkout.html.twig',
+            [
+                'workspaceName' => $workspace->getName(),
+                'employeeName' => $employee->getName(),
+                'shiftName' => $shift->getName(),
+                'shiftEnd' => $shiftEnd,
+                'checkInTime' => $checkInLocal,
+                'expectedTime' => $expectedLocal,
+            ],
+        );
+
+        $tgText = sprintf(
+            "⏰ <b>Missing check-out</b>\n%s has not checked out from the %s shift (ended %s)",
+            $employee->getName(),
+            $shift->getName(),
+            $shiftEnd !== '' ? $shiftEnd : 'today',
+        );
+        $this->sendTelegram($workspace, $tgText);
+    }
+
+    /**
+     * Collect push tokens + email addresses for everyone who should hear about a
+     * workspace-wide attendance anomaly: the owner plus every active manager
+     * (with a linked user) carrying the `manage_attendance` capability.
+     *
+     * @return array{tokens: list<string>, emails: list<string>}
+     */
+    private function attendanceManagerRecipients(Workspace $workspace): array
+    {
+        $tokens = [];
+        $emails = [];
+        $seenUsers = [];
+
+        $owner = $workspace->getOwner();
+        if ($owner !== null) {
+            $tokens = array_merge($tokens, $this->getTokensForUser($owner));
+            $emails[] = $owner->getEmail();
+            $seenUsers[spl_object_id($owner)] = true;
+        }
+
+        foreach ($workspace->getEmployees() as $employee) {
+            if ($employee->getDeletedAt() !== null) {
+                continue;
+            }
+            if ($employee->getStatus() !== EmployeeStatusEnum::ACTIVE) {
+                continue;
+            }
+            if (!$employee->hasManagerPermission(ManagerPermissionEnum::MANAGE_ATTENDANCE)) {
+                continue;
+            }
+
+            $linkedUser = $employee->getLinkedUser();
+            if ($linkedUser === null) {
+                continue;
+            }
+
+            $key = spl_object_id($linkedUser);
+            if (isset($seenUsers[$key])) {
+                continue;
+            }
+            $seenUsers[$key] = true;
+
+            $tokens = array_merge($tokens, $this->getTokensForUser($linkedUser));
+            $emails[] = $linkedUser->getEmail();
+        }
+
+        return [
+            'tokens' => array_values(array_unique($tokens)),
+            'emails' => array_values(array_unique(array_filter($emails))),
+        ];
     }
 
     private function notifyLeaveRequestDecision(LeaveRequest $leaveRequest, string $decision): void
