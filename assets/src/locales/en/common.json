@@ -760,6 +760,7 @@
       "features": "Features",
       "howItWorks": "How it works",
       "pricing": "Pricing",
+      "blog": "Blog",
       "support": "Support",
       "faq": "FAQ",
       "signIn": "Sign in",
@@ -777,8 +778,10 @@
         "howItWorks": "How it works",
         "guides": "Guides",
         "roles": "Roles & permissions",
+        "stopBuddyPunching": "Stop buddy punching",
         "demo": "Try demo",
         "pricing": "Pricing",
+        "blog": "Blog",
         "faq": "FAQ",
         "support": "Support"
       },

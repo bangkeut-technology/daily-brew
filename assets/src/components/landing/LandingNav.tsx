@@ -17,7 +17,7 @@ const navLinks: { key: string; href: string }[] = [
   { key: 'features',    href: '/features' },
   { key: 'howItWorks',  href: '/how-it-works' },
   { key: 'pricing',     href: '/pricing' },
-  { key: 'support',     href: '/support' },
+  { key: 'blog',        href: '/blog' },
   { key: 'faq',         href: '/faq' },
 ];
 

@@ -671,6 +671,7 @@
       "features": "Fonctionnalités",
       "howItWorks": "Comment ça marche",
       "pricing": "Tarifs",
+      "blog": "Blog",
       "support": "Support",
       "faq": "FAQ",
       "signIn": "Connexion",
@@ -688,8 +689,10 @@
         "howItWorks": "Comment ça marche",
         "guides": "Guides",
         "roles": "Rôles et permissions",
+        "stopBuddyPunching": "Arrêter le pointage par procuration",
         "demo": "Essayer la démo",
         "pricing": "Tarifs",
+        "blog": "Blog",
         "faq": "FAQ",
         "support": "Support"
       },
