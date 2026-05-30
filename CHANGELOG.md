@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.94.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.93.2...v1.94.0) (2026-05-30)
+
+
+### Features
+
+* **i18n:** full fr/km translation for 404, blog index, blog $slug, stop-buddy-punching + landed shared template strings for IndustryView/CompetitorView (data still EN) ([#233](https://github.com/bangkeut-technology/daily-brew/issues/233)) ([c878c2e](https://github.com/bangkeut-technology/daily-brew/commit/c878c2ede76303d585313ad21acd2883261021bd))
+
 ## [1.93.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.93.1...v1.93.2) (2026-05-30)
 
 
