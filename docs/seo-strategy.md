@@ -127,7 +127,7 @@ They have IP Address Lock — the right idea, bolted onto a generic time clock w
 - **No SMB-tier competitor combines Device + IP + NFC.** Connecteam has NFC (beta), Buddy Punch has IP, OpenTimeClock has BSSID — but none stack all three with a café voice.
 - **The biometric vs GPS war is the category default.** Every major incumbent leans on one or the other. The "no biometric, no GPS" positioning is genuinely uncontested at the homepage level.
 - **Free tiers are common but constrained.** Homebase caps at 1 location, Connecteam at 10 users, Jibble is unlimited but upsells aggressively. DailyBrew's "free up to 10" is competitive — match it on copy ("free forever for teams of 10 or fewer").
-- **Pricing has room above and below.** 7shifts at $44.99–$149.99/loc/mo is the ceiling; Clockify free is the floor. DailyBrew's $12.99 / $39.99 lands in a clean middle.
+- **Pricing has room above and below.** 7shifts at $44.99–$149.99/loc/mo is the ceiling; Clockify free is the floor. DailyBrew's $19.99 / $39.99 lands in a clean middle.
 
 ---
 
