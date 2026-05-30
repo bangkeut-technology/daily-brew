@@ -30,8 +30,13 @@ const doubleEspressoPlan = {
   monthly: { price: '$39.99' },
   yearly: { price: '$399', monthlyEquivalent: '$33.25' },
   features: ['unlimitedEmployees', 'everythingEspresso', 'unlimitedManagers', 'prioritySupport', 'multipleQrStations', 'perQrGeofence', 'perQrAssignment', 'perQrManager', 'whiteLabel'] as const,
-  // The roadmap-flagged sub-set so the UI renders the "Roadmap" pill.
-  roadmap: new Set(['multipleQrStations', 'perQrGeofence', 'perQrAssignment', 'perQrManager', 'whiteLabel']),
+  // The roadmap-flagged sub-set so the UI renders the "Roadmap" pill. The
+  // multi-QR family (multipleQrStations, perQrGeofence, perQrAssignment,
+  // perQrManager) all shipped — they're the WorkspaceQrCode entity surface
+  // that's been live since the sub-QR rollout (see CLAUDE.md "WorkspaceQrCode
+  // (Double Espresso)" + project_multi_qr memory). Only white-label is
+  // genuinely not built yet.
+  roadmap: new Set(['whiteLabel']),
 };
 
 export function PricingSection() {
