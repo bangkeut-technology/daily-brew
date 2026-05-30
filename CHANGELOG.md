@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.96.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.96.1...v1.96.2) (2026-05-30)
+
+
+### Bug Fixes
+
+* **pricing:** drop white-label branding from Double Espresso surface (never built, no scoped plan) ([#249](https://github.com/bangkeut-technology/daily-brew/issues/249)) ([ffcfd70](https://github.com/bangkeut-technology/daily-brew/commit/ffcfd70950c24ad02ddc3b9929459582d4552fa8))
+
 ## [1.96.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.96.0...v1.96.1) (2026-05-30)
 
 
