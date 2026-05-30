@@ -172,7 +172,18 @@
     "startTrial": "Start 14-day free trial",
     "checkinQrTitle": "Check-in QR code",
     "checkinQrDesc": "Print and display this at your restaurant. Employees scan it with the DailyBrew app to check in and out.",
-    "noAttendance": "No attendance records yet today"
+    "noAttendance": "No attendance records yet today",
+    "linkToEmployee": "Link to your employee profile",
+    "linkToEmployeeDesc2": "Scan the QR your employer is showing you, or paste your public ID. Either one links you to your employee profile.",
+    "linkScanTab": "Scan QR",
+    "linkPasteTab": "Paste ID",
+    "linkScanHint": "Aim at the QR code your employer is showing you.",
+    "linkScanDenied": "Camera permission denied. Use Paste ID instead.",
+    "linkScanUnsupported": "Camera not available in this browser. Use Paste ID instead.",
+    "linkScanStarting": "Starting camera…",
+    "linkInvalidQr": "That QR isn't a DailyBrew employee code. Try again.",
+    "linkHelpTitle": "Where do I find my ID?",
+    "linkHelpBody": "Ask your employer to open DailyBrew → Employees → your name → Share. They'll see a QR you can scan, plus the ID you can paste here."
   },
   "employee": {
     "add": "Add employee",
