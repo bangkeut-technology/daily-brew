@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { PageSeo } from '@/components/shared/PageSeo';
@@ -10,6 +11,7 @@ export const Route = createFileRoute('/blog/')({
 });
 
 function BlogIndexPage() {
+  const { t } = useTranslation();
   const posts = [...BLOG_POSTS].sort((a, b) => (a.date < b.date ? 1 : -1));
 
   return (
@@ -23,12 +25,12 @@ function BlogIndexPage() {
 
       <main className="page-enter pt-20">
         <section className="mx-auto max-w-3xl px-6 pt-20 pb-10 text-center">
-          <p className="text-sm font-medium uppercase tracking-widest text-amber">Reads</p>
+          <p className="text-sm font-medium uppercase tracking-widest text-amber">{t('routes.blogIndex.eyebrow')}</p>
           <h1 className="mt-3 font-serif text-4xl font-semibold text-text-primary sm:text-5xl">
-            DailyBrew blog
+            {t('routes.blogIndex.title')}
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-text-secondary">
-            Notes on attendance, time clocks, and the small-team operations behind them.
+            {t('routes.blogIndex.subtitle')}
           </p>
         </section>
 
@@ -60,7 +62,7 @@ function BlogIndexPage() {
                     {post.description}
                   </p>
                   <span className="mt-4 inline-block text-[14px] font-medium text-coffee">
-                    Read post →
+                    {t('routes.blogIndex.readPost')}
                   </span>
                 </Link>
               </motion.article>

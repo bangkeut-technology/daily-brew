@@ -2351,6 +2351,94 @@
       "cta": {
         "title": "Ready to lock down your check-ins?"
       }
+    },
+    "notFound": {
+      "title": "Page not found",
+      "desc": "The page you're looking for doesn't exist or may have moved.",
+      "backHome": "Back to home"
+    },
+    "blogIndex": {
+      "eyebrow": "Reads",
+      "title": "DailyBrew blog",
+      "subtitle": "Notes on attendance, time clocks, and the small-team operations behind them.",
+      "readPost": "Read post →",
+      "backToPosts": "← All posts"
+    },
+    "stopBuddyPunching": {
+      "eyebrow": "Time theft, solved",
+      "title": "How to stop buddy punching",
+      "subtitleHtml": "Buddy punching costs small businesses up to <strong>2.2% of gross payroll</strong>. You can stop it without spying on your staff — bind every clock-in to a verified device and your shop's network. No PINs to share, no face scans, no GPS.",
+      "ctaStartFree": "Start free",
+      "ctaSeeVerification": "See how verification works",
+      "stepsTitle": "Three layers that make it mechanically impossible",
+      "step1Title": "Bind each phone to one person",
+      "step1Body": "The first clock-in registers a staff member's device. A punch from anyone else's phone won't count for them — so covering for a late colleague stops working.",
+      "step2Title": "Lock punches to your network",
+      "step2Body": "Each clock-in records the IP. Off-network punches (mobile data from home or the parking lot) are blocked or flagged, so 'I clocked you in' over text fails.",
+      "step3Title": "Add a physical tap (beta)",
+      "step3Body": "An NFC tag by the espresso machine means the phone must be physically at the shop. QR is the fallback today and runs through the same checks.",
+      "faqTitle": "Frequently asked",
+      "faq": {
+        "cost": {
+          "q": "What does buddy punching cost a small shop?",
+          "a": "Research from the American Payroll Association has found roughly 75% of businesses are affected by time theft, and Nucleus Research estimates buddy punching costs employers around 2.2% of gross payroll. On a small team that's real money every month."
+        },
+        "privacy": {
+          "q": "Can I stop it without face scans or GPS tracking?",
+          "a": "Yes — that's the point. DailyBrew enforces same-day device consistency (only one device per employee per day, and the check-out has to come from the same device as the check-in) and locks check-ins to your shop's network. No biometrics, no always-on GPS — buddy-punching attempts using a co-worker's phone, or off-network mobile data, simply can't complete."
+        },
+        "staff": {
+          "q": "Won't this annoy honest staff?",
+          "a": "No. For staff on their own phone, on the shop WiFi, clocking in is a single scan or tap. The verification is invisible unless someone tries to punch for a colleague."
+        },
+        "forgotten": {
+          "q": "What about forgotten phones or new devices?",
+          "a": "Managers can clock someone in manually (logged as an audited override) and reset a device binding in two taps when a staff member gets a new phone."
+        }
+      },
+      "ctaCardTitle": "Stop paying for hours nobody worked",
+      "ctaCardSubtitle": "Free for up to 10 active employees. Set it up before your next shift.",
+      "ctaCardButton": "Create your free account"
+    },
+    "industryView": {
+      "ctaStartFree": "Start free",
+      "ctaSeeVerification": "How verification works",
+      "verifiedClockinsTitle": "Verified clock-ins, built for {{name}}",
+      "verifiedClockinsBodyHtml": "Every punch is bound to a verified device and your shop's network — the same three-factor stack behind <stopBuddyLink>stopping buddy punching</stopBuddyLink>. No biometrics, no face scans. Add <featuresLink>shifts, leave, and notifications</featuresLink> when you need them.",
+      "faqTitle": "Frequently asked",
+      "faq": {
+        "free": {
+          "q": "Is it really free?",
+          "a": "Yes — free forever for up to 10 active employees, with no credit card required. Paid plans add device verification, IP restriction, leave management, and more."
+        },
+        "app": {
+          "q": "Do staff need to install an app?",
+          "a": "No. Staff scan a QR code with their phone's camera and check in from the web — nothing to download. NFC tap-to-clock-in is in beta."
+        },
+        "buddyPunching": {
+          "q": "How does it stop buddy punching?",
+          "a": "Each clock-in is bound to a verified device and your shop's network. A punch from someone else's phone, or from off your network, won't count — no biometrics needed."
+        },
+        "forgottenPhone": {
+          "q": "What if someone forgets their phone?",
+          "a": "A manager clocks them in from the dashboard. It's recorded as an override with the manager's name, time, and reason in the audit trail."
+        }
+      },
+      "ctaCardTitle": "Honest timesheets for {{name}}",
+      "ctaCardSubtitle": "Free for up to 10 active employees. No hardware, no biometrics, no contract.",
+      "ctaCardButton": "Create your free account"
+    },
+    "competitorView": {
+      "comparisonEyebrow": "Comparison",
+      "comparisonTitle": "DailyBrew vs {{name}}",
+      "tableDailybrewHeader": "DailyBrew",
+      "tableThemHeader": "{{name}}",
+      "tableDisclaimer": "Comparison based on publicly available product information and may change as products evolve. Names and trademarks belong to their respective owners.",
+      "whichTitle": "Which should you choose?",
+      "linksHtml": "See how DailyBrew's <threeFactorLink>three-factor verification</threeFactorLink> works, or <stopBuddyLink>how it stops buddy punching</stopBuddyLink>.",
+      "ctaCardTitle": "Try the no-biometric alternative",
+      "ctaCardSubtitle": "Free for up to 10 active employees. No face scans, no GPS, no contract.",
+      "ctaCardButton": "Create your free account"
     }
   },
   "theme": {

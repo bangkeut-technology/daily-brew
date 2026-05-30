@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { PageSeo } from '@/components/shared/PageSeo';
@@ -27,6 +28,7 @@ export const Route = createFileRoute('/blog/$slug')({
 });
 
 function BlogPostPage() {
+  const { t } = useTranslation();
   const { post } = Route.useLoaderData();
   const PostBody = POST_COMPONENTS[post.slug];
 
@@ -42,7 +44,7 @@ function BlogPostPage() {
               to="/blog"
               className="text-[14px] font-medium text-text-tertiary hover:text-coffee no-underline transition-colors"
             >
-              ← All posts
+              {t('routes.blogIndex.backToPosts')}
             </Link>
           </div>
 
