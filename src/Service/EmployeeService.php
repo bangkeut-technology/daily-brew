@@ -10,12 +10,15 @@ use App\Entity\User;
 use App\Entity\Workspace;
 use App\Enum\EmployeeStatusEnum;
 use App\Repository\EmployeeRepository;
+use App\Service\Image\AvatarImageProcessor;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class EmployeeService
 {
     public function __construct(
         private EmployeeRepository $employeeRepository,
         private NotificationService $notificationService,
+        private AvatarImageProcessor $imageProcessor,
     ) {}
 
     public function create(
@@ -94,6 +97,36 @@ class EmployeeService
         $this->employeeRepository->flush();
 
         return $employee;
+    }
+
+    /**
+     * Stores a square 512×512 JPEG headshot via Vich's "employees" mapping.
+     *
+     * @throws \InvalidArgumentException when the upload fails validation
+     *         (see {@see \App\Service\Image\AvatarImageProcessor}).
+     */
+    public function uploadPhoto(Employee $employee, UploadedFile $file): Employee
+    {
+        $processed = $this->imageProcessor->process($file);
+        $employee->setImageFile($processed);
+        $this->employeeRepository->flush();
+
+        return $employee;
+    }
+
+    public function removePhoto(Employee $employee): void
+    {
+        if ($employee->getImageName() === null) {
+            return;
+        }
+
+        $employee->setImageFile(null);
+        $employee->setImageName(null);
+        $employee->setFileSize(null);
+        $employee->setOriginalName(null);
+        $employee->setMimeType(null);
+        $employee->setDimensions(null);
+        $this->employeeRepository->flush();
     }
 
     public function delete(Employee $employee): void

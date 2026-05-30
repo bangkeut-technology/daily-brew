@@ -31,7 +31,11 @@ class EmployeeServiceTest extends TestCase
     {
         $this->repo = $this->createMock(EmployeeRepository::class);
         $this->notifications = $this->createMock(NotificationService::class);
-        $this->svc = new EmployeeService($this->repo, $this->notifications);
+        $this->svc = new EmployeeService(
+            $this->repo,
+            $this->notifications,
+            new \App\Service\Image\AvatarImageProcessor(),
+        );
     }
 
     protected function tearDown(): void

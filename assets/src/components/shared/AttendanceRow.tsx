@@ -17,6 +17,7 @@ interface AttendanceRowProps {
   date?: string;
   edited?: boolean;
   onEdit?: () => void;
+  employeePhotoUrl?: string | null;
 }
 
 export function AttendanceRow({
@@ -31,6 +32,7 @@ export function AttendanceRow({
   date,
   edited,
   onEdit,
+  employeePhotoUrl,
 }: AttendanceRowProps) {
   const { t } = useTranslation();
 
@@ -51,7 +53,7 @@ export function AttendanceRow({
 
   return (
     <div className="flex items-center gap-3 px-5 py-2.5 transition-colors duration-[120ms] hover:bg-cream-3/35 cursor-default">
-      <Avatar name={employee} index={index} size={32} />
+      <Avatar name={employee} imageUrl={employeePhotoUrl} index={index} size={32} />
       <div className="flex-1">
         <div className="text-[15.5px] font-medium text-text-primary font-sans flex items-center gap-2">
           {employee}

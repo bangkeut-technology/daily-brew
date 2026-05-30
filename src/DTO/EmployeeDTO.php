@@ -29,9 +29,14 @@ final readonly class EmployeeDTO
         /** @var list<string> */
         public array   $managerPermissions,
         public string  $attendanceTracking,
+        public ?string $photoUrl = null,
     ) {}
 
-    public static function fromEntity(Employee $e): self
+    /**
+     * $photoUrl comes from Vich's UploaderHelper — see UserDTO for the same
+     * pattern. Callers that should expose the headshot pass it in.
+     */
+    public static function fromEntity(Employee $e, ?string $photoUrl = null): self
     {
         return new self(
             publicId: (string) $e->getPublicId(),
@@ -53,6 +58,7 @@ final readonly class EmployeeDTO
             createdAt: $e->getCreatedAt()->format('c'),
             managerPermissions: $e->getManagerPermissionValues(),
             attendanceTracking: $e->getAttendanceTracking()->value,
+            photoUrl: $photoUrl,
         );
     }
 
@@ -78,6 +84,7 @@ final readonly class EmployeeDTO
             'createdAt' => $this->createdAt,
             'managerPermissions' => $this->managerPermissions,
             'attendanceTracking' => $this->attendanceTracking,
+            'photoUrl' => $this->photoUrl,
         ];
     }
 }

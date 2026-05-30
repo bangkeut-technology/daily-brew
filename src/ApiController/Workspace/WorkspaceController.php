@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 
 #[Route('/workspaces')]
 class WorkspaceController extends AbstractController
@@ -23,6 +24,7 @@ class WorkspaceController extends AbstractController
     public function list(
         #[CurrentUser] User $user,
         WorkspaceRepository $workspaceRepository,
+        UploaderHelper $uploaderHelper,
     ): JsonResponse {
         $workspaces = $workspaceRepository->findByOwner($user);
 
@@ -30,6 +32,7 @@ class WorkspaceController extends AbstractController
             'publicId' => (string) $w->getPublicId(),
             'name' => $w->getName(),
             'qrToken' => $w->getQrToken(),
+            'logoUrl' => $uploaderHelper->asset($w, 'imageFile'),
             'createdAt' => $w->getCreatedAt()->format('c'),
         ], $workspaces));
     }
@@ -62,6 +65,7 @@ class WorkspaceController extends AbstractController
     public function show(
         string $publicId,
         WorkspaceRepository $workspaceRepository,
+        UploaderHelper $uploaderHelper,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByPublicId($publicId);
         if ($workspace === null) {
@@ -76,6 +80,7 @@ class WorkspaceController extends AbstractController
             'publicId' => (string) $workspace->getPublicId(),
             'name' => $workspace->getName(),
             'qrToken' => $workspace->getQrToken(),
+            'logoUrl' => $uploaderHelper->asset($workspace, 'imageFile'),
             'createdAt' => $workspace->getCreatedAt()->format('c'),
             'setting' => $setting ? [
                 'ipRestrictionEnabled' => $setting->isIpRestrictionEnabled(),

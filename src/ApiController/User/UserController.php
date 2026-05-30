@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 
 #[Route('/users')]
 class UserController extends AbstractController
@@ -31,8 +32,11 @@ class UserController extends AbstractController
     #[Route('/me', name: 'users_me', methods: ['GET'])]
     public function me(
         #[CurrentUser] User $user,
+        UploaderHelper $uploaderHelper,
     ): JsonResponse {
-        return $this->jsonSuccess(UserDTO::fromEntity($user)->toArray());
+        return $this->jsonSuccess(
+            UserDTO::fromEntity($user, $uploaderHelper->asset($user, 'imageFile'))->toArray(),
+        );
     }
 
     #[Route('/me/current-workspace', name: 'users_me_current_workspace', methods: ['GET'])]
@@ -85,6 +89,7 @@ class UserController extends AbstractController
         Request $request,
         WorkspaceRepository $workspaceRepository,
         EmployeeRepository $employeeRepository,
+        UploaderHelper $uploaderHelper,
     ): JsonResponse {
         $ownedWorkspaces = $workspaceRepository->findByOwner($user);
         $linkedEmployees = $employeeRepository->findByLinkedUser($user);
@@ -122,6 +127,7 @@ class UserController extends AbstractController
             'employee' => $currentEmployee ? [
                 'publicId' => (string) $currentEmployee->getPublicId(),
                 'name' => $currentEmployee->getName(),
+                'photoUrl' => $uploaderHelper->asset($currentEmployee, 'imageFile'),
                 'workspacePublicId' => $currentEmployee->getWorkspace() ? (string) $currentEmployee->getWorkspace()->getPublicId() : null,
                 'workspaceName' => $currentEmployee->getWorkspace()?->getName(),
             ] : null,
@@ -232,6 +238,7 @@ class UserController extends AbstractController
         #[CurrentUser] User $user,
         Request $request,
         UserRepository $userRepository,
+        UploaderHelper $uploaderHelper,
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
@@ -247,7 +254,9 @@ class UserController extends AbstractController
 
         $userRepository->flush();
 
-        return $this->jsonSuccess(UserDTO::fromEntity($user)->toArray());
+        return $this->jsonSuccess(
+            UserDTO::fromEntity($user, $uploaderHelper->asset($user, 'imageFile'))->toArray(),
+        );
     }
 
     #[Route('/me/change-password', name: 'users_me_change_password', methods: ['POST'])]

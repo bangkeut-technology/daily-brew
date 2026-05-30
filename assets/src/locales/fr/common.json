@@ -2508,5 +2508,19 @@
     "timeRulesEspresso": "Les horaires par jour nécessitent Espresso",
     "tuesday": "Mardi",
     "wednesday": "Mercredi"
+  },
+  "avatar": {
+    "upload": "Téléverser une photo",
+    "remove": "Supprimer la photo",
+    "uploaded": "Photo mise à jour",
+    "removed": "Photo supprimée",
+    "uploadError": "Impossible de téléverser la photo",
+    "removeError": "Impossible de supprimer la photo",
+    "logoTitle": "Logo de l'espace de travail",
+    "logoDesc": "JPEG, PNG ou WebP carré jusqu'à 5 Mo. Affiché sur l'en-tête du tableau de bord et le sélecteur d'espace de travail.",
+    "errors": {
+      "tooLarge": "L'image doit faire 5 Mo ou moins",
+      "invalidType": "L'image doit être au format JPEG, PNG ou WebP"
+    }
   }
 }

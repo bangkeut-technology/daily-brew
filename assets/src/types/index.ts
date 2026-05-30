@@ -7,6 +7,7 @@ export interface User {
   locale: string;
   onboardingCompleted: boolean;
   isSuperAdmin?: boolean;
+  avatarUrl?: string | null;
 }
 
 export interface AdminDashboardData {
@@ -187,6 +188,7 @@ export interface Workspace {
   name: string;
   qrToken: string;
   createdAt?: string;
+  logoUrl?: string | null;
 }
 
 export interface WorkspaceSetting {
@@ -280,6 +282,7 @@ export interface Employee {
   managerPermissions: ManagerPermission[];
   attendanceTracking: EmployeeAttendanceTracking;
   attendance?: AttendanceRecord[];
+  photoUrl?: string | null;
 }
 
 export type AttendanceStatus = 'present' | 'absent' | 'on_leave';
@@ -458,6 +461,7 @@ export interface RoleContext {
   employee: {
     publicId: string;
     name: string;
+    photoUrl: string | null;
     workspacePublicId: string | null;
     workspaceName: string | null;
   } | null;

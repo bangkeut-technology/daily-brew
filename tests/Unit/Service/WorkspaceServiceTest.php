@@ -43,6 +43,7 @@ class WorkspaceServiceTest extends TestCase
             $this->workspaceRepo,
             $this->settingRepo,
             $this->subscriptionRepo,
+            new \App\Service\Image\AvatarImageProcessor(),
             $this->httpClient,
             $this->logger,
             paddleApiKey: 'paddle-test-key',

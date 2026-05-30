@@ -8,9 +8,11 @@ export interface User {
   onboardingCompleted?: boolean;
   currentWorkspacePublicId?: string | null;
   isSuperAdmin?: boolean;
+  avatarUrl?: string | null;
 }
 
 export interface Workspace {
   publicId: string;
   name: string;
+  logoUrl?: string | null;
 }

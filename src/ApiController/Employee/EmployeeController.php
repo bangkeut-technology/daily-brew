@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 
 #[Route('/workspaces/{workspacePublicId}/employees')]
 class EmployeeController extends AbstractController
@@ -35,6 +36,7 @@ class EmployeeController extends AbstractController
         string $workspacePublicId,
         WorkspaceRepository $workspaceRepository,
         EmployeeRepository $employeeRepository,
+        UploaderHelper $uploaderHelper,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
         if ($workspace === null) {
@@ -45,7 +47,10 @@ class EmployeeController extends AbstractController
 
         $employees = $employeeRepository->findByWorkspace($workspace);
 
-        return $this->jsonSuccess(array_map(fn ($e) => EmployeeDTO::fromEntity($e)->toArray(), $employees));
+        return $this->jsonSuccess(array_map(
+            fn ($e) => EmployeeDTO::fromEntity($e, $uploaderHelper->asset($e, 'imageFile'))->toArray(),
+            $employees,
+        ));
     }
 
     #[Route('', name: 'employees_create', methods: ['POST'])]
@@ -58,6 +63,7 @@ class EmployeeController extends AbstractController
         UserRepository $userRepository,
         EmployeeService $employeeService,
         PlanService $planService,
+        UploaderHelper $uploaderHelper,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
         if ($workspace === null) {
@@ -156,7 +162,9 @@ class EmployeeController extends AbstractController
 
         $employeeRepository->flush();
 
-        return $this->jsonCreated(EmployeeDTO::fromEntity($employee)->toArray());
+        return $this->jsonCreated(
+            EmployeeDTO::fromEntity($employee, $uploaderHelper->asset($employee, 'imageFile'))->toArray(),
+        );
     }
 
     #[Route('/{publicId}', name: 'employees_show', methods: ['GET'])]
@@ -166,6 +174,7 @@ class EmployeeController extends AbstractController
         WorkspaceRepository $workspaceRepository,
         EmployeeRepository $employeeRepository,
         AttendanceRepository $attendanceRepository,
+        UploaderHelper $uploaderHelper,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
         if ($workspace === null) {
@@ -182,7 +191,7 @@ class EmployeeController extends AbstractController
         $recentAttendance = $attendanceRepository->findByEmployee($employee, 30);
         $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
 
-        $data = EmployeeDTO::fromEntity($employee)->toArray();
+        $data = EmployeeDTO::fromEntity($employee, $uploaderHelper->asset($employee, 'imageFile'))->toArray();
         $data['attendance'] = array_map(
             fn ($a) => AttendanceDTO::fromEntity($a, tz: $tz)->toArray(),
             $recentAttendance,
@@ -202,6 +211,7 @@ class EmployeeController extends AbstractController
         UserRepository $userRepository,
         EmployeeService $employeeService,
         PlanService $planService,
+        UploaderHelper $uploaderHelper,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
         if ($workspace === null) {
@@ -309,7 +319,9 @@ class EmployeeController extends AbstractController
 
         $employeeRepository->flush();
 
-        return $this->jsonSuccess(EmployeeDTO::fromEntity($employee)->toArray());
+        return $this->jsonSuccess(
+            EmployeeDTO::fromEntity($employee, $uploaderHelper->asset($employee, 'imageFile'))->toArray(),
+        );
     }
 
     #[Route('/{publicId}/manager-permissions', name: 'employees_update_manager_permissions', methods: ['PATCH'])]
@@ -319,6 +331,7 @@ class EmployeeController extends AbstractController
         Request $request,
         WorkspaceRepository $workspaceRepository,
         EmployeeRepository $employeeRepository,
+        UploaderHelper $uploaderHelper,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
         if ($workspace === null) {
@@ -353,7 +366,9 @@ class EmployeeController extends AbstractController
         $employee->setManagerPermissions($raw);
         $employeeRepository->flush();
 
-        return $this->jsonSuccess(EmployeeDTO::fromEntity($employee)->toArray());
+        return $this->jsonSuccess(
+            EmployeeDTO::fromEntity($employee, $uploaderHelper->asset($employee, 'imageFile'))->toArray(),
+        );
     }
 
     #[Route('/{publicId}', name: 'employees_delete', methods: ['DELETE'])]

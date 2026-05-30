@@ -2508,5 +2508,19 @@
       "saturday": "Sat",
       "sunday": "Sun"
     }
+  },
+  "avatar": {
+    "upload": "Upload photo",
+    "remove": "Remove photo",
+    "uploaded": "Photo updated",
+    "removed": "Photo removed",
+    "uploadError": "Could not upload photo",
+    "removeError": "Could not remove photo",
+    "logoTitle": "Workspace logo",
+    "logoDesc": "Square JPEG, PNG, or WebP up to 5 MB. Shown on your dashboard header and workspace switcher.",
+    "errors": {
+      "tooLarge": "Image must be 5 MB or smaller",
+      "invalidType": "Image must be JPEG, PNG or WebP"
+    }
   }
 }

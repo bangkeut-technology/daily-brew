@@ -29,6 +29,9 @@ import { apiAxios } from '@/lib/apiAxios';
 import { getWorkspacePublicId, setWorkspacePublicId, clearWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
+import { Avatar } from '@/components/shared/Avatar';
+import { AvatarUploader } from '@/components/shared/AvatarUploader';
+import { useUploadWorkspaceLogo, useRemoveWorkspaceLogo } from '@/hooks/queries/useWorkspaceLogo';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { Toggle } from '@/components/shared/Toggle';
@@ -108,6 +111,8 @@ function SettingsPage() {
   const { data: workspaces } = useWorkspaces();
   const createWs = useCreateWorkspace();
   const updateWs = useUpdateWorkspace();
+  const uploadLogo = useUploadWorkspaceLogo(currentWsId);
+  const removeLogo = useRemoveWorkspaceLogo(currentWsId);
   const deleteWs = useDeleteWorkspace();
   const regenerateToken = useRegenerateWorkspaceToken();
   const [regenerateConfirmOpen, setRegenerateConfirmOpen] = useState(false);
@@ -705,6 +710,49 @@ function SettingsPage() {
           );
         })()}
 
+        {/* Workspace logo */}
+        {currentWsId && (() => {
+          const currentWs = workspaces?.find((ws) => ws.publicId === currentWsId);
+          if (!currentWs) return null;
+          return (
+            <GlassCard hover={false}>
+              <GlassCardHeader title={t('avatar.logoTitle', 'Workspace logo')} />
+              <div className="p-6 flex items-center gap-5">
+                <AvatarUploader
+                  name={currentWs.name}
+                  imageUrl={currentWs.logoUrl}
+                  size={96}
+                  radius="20px"
+                  uploading={uploadLogo.isPending || removeLogo.isPending}
+                  onUpload={(file) =>
+                    uploadLogo.mutate(file, {
+                      onSuccess: () => toast.success(t('avatar.uploaded', 'Photo updated')),
+                      onError: () => toast.error(t('avatar.uploadError', 'Could not upload photo')),
+                    })
+                  }
+                  onRemove={() =>
+                    removeLogo.mutate(undefined, {
+                      onSuccess: () => toast.success(t('avatar.removed', 'Photo removed')),
+                      onError: () => toast.error(t('avatar.removeError', 'Could not remove photo')),
+                    })
+                  }
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="text-[15px] font-medium text-text-primary">
+                    {currentWs.name}
+                  </p>
+                  <p className="text-[13.5px] text-text-tertiary mt-1 leading-relaxed">
+                    {t(
+                      'avatar.logoDesc',
+                      'Square JPEG, PNG, or WebP up to 5 MB. Shown on your dashboard header and workspace switcher.',
+                    )}
+                  </p>
+                </div>
+              </div>
+            </GlassCard>
+          );
+        })()}
+
         {/* Workspace selector */}
         <GlassCard hover={false}>
           <GlassCardHeader
@@ -782,11 +830,9 @@ function SettingsPage() {
                               window.location.reload();
                             }
                           }}
-                          className={cn('w-9 h-9 rounded-lg bg-coffee/10 flex items-center justify-center shrink-0', !isCurrent && 'cursor-pointer')}
+                          className={cn('shrink-0', !isCurrent && 'cursor-pointer')}
                         >
-                          <span className="text-[15px] font-semibold text-coffee">
-                            {ws.name.charAt(0).toUpperCase()}
-                          </span>
+                          <Avatar name={ws.name} imageUrl={ws.logoUrl} size={36} radius="10px" />
                         </div>
                         <div
                           className={cn('flex-1 min-w-0', !isCurrent && 'cursor-pointer')}

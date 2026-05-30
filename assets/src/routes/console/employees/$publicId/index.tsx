@@ -25,6 +25,8 @@ import { cn } from '@/lib/utils';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { Avatar } from '@/components/shared/Avatar';
+import { AvatarUploader } from '@/components/shared/AvatarUploader';
+import { useUploadEmployeePhoto, useRemoveEmployeePhoto } from '@/hooks/queries/useEmployeePhoto';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { Toggle } from '@/components/shared/Toggle';
 import { StatusBadge } from '@/components/shared/StatusBadge';
@@ -140,6 +142,8 @@ function EmployeeDetailPage() {
     .filter((v): v is string => !!v);
   const updateEmployee = useUpdateEmployee(workspaceId);
   const updatePermissions = useUpdateManagerPermissions(workspaceId);
+  const uploadPhoto = useUploadEmployeePhoto(workspaceId);
+  const removePhoto = useRemoveEmployeePhoto(workspaceId);
   const { data: roleContext } = useRoleContext();
   // Promote/demote and edit-manager-permissions are owner-only on the backend
   // (see WorkspaceVoter) — hide those affordances for managers so they don't
@@ -735,7 +739,28 @@ function EmployeeDetailPage() {
               <div className="flex items-start gap-6">
                 {/* Left: avatar + name */}
                 <div className="flex items-center gap-4 flex-shrink-0">
-                  <Avatar name={fullName} index={0} size={64} radius="20px" />
+                  <AvatarUploader
+                    name={fullName}
+                    imageUrl={employee.photoUrl}
+                    size={64}
+                    radius="20px"
+                    uploading={uploadPhoto.isPending || removePhoto.isPending}
+                    onUpload={(file) =>
+                      uploadPhoto.mutate(
+                        { publicId: employee.publicId, file },
+                        {
+                          onSuccess: () => toast.success(t('avatar.uploaded', 'Photo updated')),
+                          onError: () => toast.error(t('avatar.uploadError', 'Could not upload photo')),
+                        },
+                      )
+                    }
+                    onRemove={() =>
+                      removePhoto.mutate(employee.publicId, {
+                        onSuccess: () => toast.success(t('avatar.removed', 'Photo removed')),
+                        onError: () => toast.error(t('avatar.removeError', 'Could not remove photo')),
+                      })
+                    }
+                  />
                   <div>
                     <h2 className="text-[18px] font-semibold text-text-primary">{fullName}</h2>
                     {employee.jobTitle && (

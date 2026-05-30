@@ -166,7 +166,7 @@ function EmployeeListPage() {
                       params={{ publicId: employee.publicId }}
                       className="flex items-center gap-3 flex-1 min-w-0 no-underline"
                     >
-                      <Avatar name={fullName} index={i} size={42} radius="12px" />
+                      <Avatar name={fullName} imageUrl={employee.photoUrl} index={i} size={42} radius="12px" />
                       <div className="flex-1 min-w-0">
                         <div className="text-[15.5px] font-medium text-text-primary truncate">
                           {fullName}

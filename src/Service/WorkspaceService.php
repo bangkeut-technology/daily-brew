@@ -12,7 +12,9 @@ use App\Enum\SubscriptionStatusEnum;
 use App\Repository\SubscriptionRepository;
 use App\Repository\WorkspaceRepository;
 use App\Repository\WorkspaceSettingRepository;
+use App\Service\Image\AvatarImageProcessor;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class WorkspaceService
@@ -21,6 +23,7 @@ class WorkspaceService
         private WorkspaceRepository $workspaceRepository,
         private WorkspaceSettingRepository $workspaceSettingRepository,
         private SubscriptionRepository $subscriptionRepository,
+        private AvatarImageProcessor $imageProcessor,
         private HttpClientInterface $httpClient,
         private LoggerInterface $logger,
         private string $paddleApiKey,
@@ -78,6 +81,38 @@ class WorkspaceService
         $this->workspaceRepository->flush();
 
         return $workspace;
+    }
+
+    /**
+     * Stores the workspace logo on disk via Vich's "workspaces" mapping and
+     * persists the resulting filename. The processor squares and crops the
+     * upload so every logo on the dashboard renders consistently.
+     *
+     * @throws \InvalidArgumentException when the upload fails validation
+     *         (see {@see \App\Service\Image\AvatarImageProcessor}).
+     */
+    public function uploadLogo(Workspace $workspace, UploadedFile $file): Workspace
+    {
+        $processed = $this->imageProcessor->process($file);
+        $workspace->setImageFile($processed);
+        $this->workspaceRepository->flush();
+
+        return $workspace;
+    }
+
+    public function removeLogo(Workspace $workspace): void
+    {
+        if ($workspace->getImageName() === null) {
+            return;
+        }
+
+        $workspace->setImageFile(null);
+        $workspace->setImageName(null);
+        $workspace->setFileSize(null);
+        $workspace->setOriginalName(null);
+        $workspace->setMimeType(null);
+        $workspace->setDimensions(null);
+        $this->workspaceRepository->flush();
     }
 
     public function delete(Workspace $workspace): void

@@ -117,7 +117,7 @@ export function EmployeeDashboard() {
     <div className="page-enter">
       {/* Header with avatar and name */}
       <div className="flex items-center gap-4 mb-2">
-        <Avatar name={employee.name} index={0} size={48} radius="14px" />
+        <Avatar name={employee.name} imageUrl={employee.photoUrl} index={0} size={48} radius="14px" />
         <div>
           <h1 className="text-[26px] font-semibold text-text-primary leading-tight font-serif">
             {t('dashboard.welcomeBack', 'Welcome back')}, {employee.name.split(' ')[0]}

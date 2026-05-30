@@ -449,7 +449,7 @@ function ShiftCard({
                 key={emp.publicId}
                 className="flex items-center gap-2.5 py-1.5 px-2 rounded-lg hover:bg-cream-3/30 transition-colors group"
               >
-                <Avatar name={emp.name} index={i} size={24} />
+                <Avatar name={emp.name} imageUrl={emp.photoUrl} index={i} size={24} />
                 <span className="text-[14.5px] text-text-primary flex-1 truncate">
                   {emp.name}
                 </span>

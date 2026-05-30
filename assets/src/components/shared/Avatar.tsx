@@ -12,15 +12,35 @@ interface AvatarProps {
   index?: number;
   size?: number;
   radius?: string;
+  /** When provided, renders the image at the same size + radius and falls
+   *  back to initials on load error. */
+  imageUrl?: string | null;
 }
 
-export function Avatar({ name, index = 0, size = 32, radius = '50%' }: AvatarProps) {
+export function Avatar({ name, index = 0, size = 32, radius = '50%', imageUrl }: AvatarProps) {
   const initials = name
     .split(' ')
     .map((n) => n[0])
     .join('')
     .slice(0, 2)
     .toUpperCase();
+
+  if (imageUrl) {
+    return (
+      <img
+        src={imageUrl}
+        alt={name}
+        style={{
+          width: size,
+          height: size,
+          borderRadius: radius,
+          objectFit: 'cover',
+          flexShrink: 0,
+          display: 'block',
+        }}
+      />
+    );
+  }
 
   return (
     <div

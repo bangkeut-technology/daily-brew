@@ -17,7 +17,8 @@ import { useRoleContext, useLinkEmployee, useUnlinkEmployee } from '@/hooks/quer
 import { useTheme } from 'next-themes';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
-import { Avatar } from '@/components/shared/Avatar';
+import { AvatarUploader } from '@/components/shared/AvatarUploader';
+import { useUploadUserAvatar, useRemoveUserAvatar } from '@/hooks/queries/useUserAvatar';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { toast } from 'sonner';
 import {
@@ -77,6 +78,8 @@ function ProfilePage() {
   // Mutations
   const updateProfile = useUpdateProfile();
   const changePassword = useChangePassword();
+  const uploadAvatar = useUploadUserAvatar();
+  const removeAvatar = useRemoveUserAvatar();
   const disconnectOAuth = useDisconnectOAuth();
   const oauthLinkToken = useOAuthLinkToken();
   const linkEmployee = useLinkEmployee();
@@ -268,7 +271,25 @@ function ProfilePage() {
         <GlassCard hover={false}>
           <div className="p-6">
             <div className="flex items-start gap-5">
-              <Avatar name={displayName} index={0} size={64} radius="20px" />
+              <AvatarUploader
+                name={displayName}
+                imageUrl={user?.avatarUrl}
+                size={64}
+                radius="20px"
+                uploading={uploadAvatar.isPending || removeAvatar.isPending}
+                onUpload={(file) =>
+                  uploadAvatar.mutate(file, {
+                    onSuccess: () => toast.success(t('avatar.uploaded', 'Photo updated')),
+                    onError: () => toast.error(t('avatar.uploadError', 'Could not upload photo')),
+                  })
+                }
+                onRemove={() =>
+                  removeAvatar.mutate(undefined, {
+                    onSuccess: () => toast.success(t('avatar.removed', 'Photo removed')),
+                    onError: () => toast.error(t('avatar.removeError', 'Could not remove photo')),
+                  })
+                }
+              />
               <div className="flex-1 min-w-0">
                 <h2
                   className="text-[22px] font-semibold text-text-primary leading-tight"

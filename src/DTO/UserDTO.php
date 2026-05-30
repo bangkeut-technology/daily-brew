@@ -19,9 +19,16 @@ final readonly class UserDTO
         public bool    $onboardingCompleted,
         public ?string $currentWorkspacePublicId,
         public bool    $isSuperAdmin,
+        public ?string $avatarUrl = null,
     ) {}
 
-    public static function fromEntity(User $u): self
+    /**
+     * $avatarUrl is resolved by the caller via Vich's UploaderHelper — the DTO
+     * has no DI and we don't want to inject Symfony services into a static
+     * factory. Controllers that should surface the avatar pass it in; tests
+     * and any pre-Vich call site can simply omit the argument.
+     */
+    public static function fromEntity(User $u, ?string $avatarUrl = null): self
     {
         return new self(
             publicId: (string) $u->getPublicId(),
@@ -33,6 +40,7 @@ final readonly class UserDTO
             onboardingCompleted: $u->isOnboardingCompleted(),
             currentWorkspacePublicId: $u->getCurrentWorkspace() ? (string) $u->getCurrentWorkspace()->getPublicId() : null,
             isSuperAdmin: $u->hasRole(UserRoleEnum::SUPER_ADMIN->value),
+            avatarUrl: $avatarUrl,
         );
     }
 
@@ -48,6 +56,7 @@ final readonly class UserDTO
             'onboardingCompleted' => $this->onboardingCompleted,
             'currentWorkspacePublicId' => $this->currentWorkspacePublicId,
             'isSuperAdmin' => $this->isSuperAdmin,
+            'avatarUrl' => $this->avatarUrl,
         ];
     }
 }
