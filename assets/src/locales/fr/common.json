@@ -12,7 +12,9 @@
     "profile": "Profil",
     "help": "Aide",
     "signOut": "Déconnexion",
-    "adminPanel": "Panneau d'administration"
+    "adminPanel": "Panneau d'administration",
+    "myAttendance": "Ma présence",
+    "myLeaveRequests": "Mes demandes de congé"
   },
   "profile": {
     "workspaceCount_one": "{{count}} espace",
@@ -102,7 +104,14 @@
       "restrictNetwork": "Vérifier le réseau",
       "upgradeHint": "Passez à Espresso pour appliquer cette règle",
       "upsell": "Passez à Espresso pour vérifier où, sur quel appareil et depuis quel réseau votre personnel pointe."
-    }
+    },
+    "absent": "Absent",
+    "checkIn": "Pointer à l'arrivée",
+    "checkOut": "Pointer la sortie",
+    "date": "Date",
+    "late": "En retard",
+    "leftEarly": "Parti tôt",
+    "onTime": "À l'heure"
   },
   "auth": {
     "signIn": "Connexion",
@@ -156,7 +165,15 @@
     "startTrial": "Commencer l'essai gratuit de 14 jours",
     "checkinQrTitle": "Code QR de pointage",
     "checkinQrDesc": "Imprimez et affichez ceci à votre restaurant. Les employés le scannent avec l'app DailyBrew pour pointer leur arrivée et départ.",
-    "noAttendance": "Aucun enregistrement de présence aujourd'hui"
+    "noAttendance": "Aucun enregistrement de présence aujourd'hui",
+    "addEmployee": "Ajouter un employé",
+    "myLeaves": "Mes demandes de congé",
+    "myShift": "Mon horaire aujourd'hui",
+    "myStatus": "Mon statut",
+    "notCheckedIn": "Pas encore pointé",
+    "quickActions": "Actions rapides",
+    "recentAttendance": "Ma présence récente",
+    "viewAttendance": "Voir la présence"
   },
   "employee": {
     "add": "Ajouter un employé",
@@ -227,7 +244,9 @@
     "createdGuideLinkAction": "Aller à la liaison",
     "createdGuideCopyAction": "Copier l'identifiant d'employé",
     "createdGuideAddAnother": "Ajouter un autre employé",
-    "createdGuideReadFullGuide": "Lire le guide complet de configuration propriétaire"
+    "createdGuideReadFullGuide": "Lire le guide complet de configuration propriétaire",
+    "firstName": "Prénom",
+    "lastName": "Nom de famille"
   },
   "workspace": {
     "label": "Espace de travail",
@@ -369,14 +388,32 @@
     "tapCheckinDesc": "Lorsqu'il est activé, les employés peuvent pointer en appuyant sur un bouton dans l'app mobile au lieu de scanner le code QR de l'espace. La restriction IP, le géorepérage et la vérification d'appareil s'appliquent toujours — comptez sur eux pour garder le pointage lié à votre emplacement.",
     "nfcCheckin": "Pointage NFC",
     "enableNfcCheckin": "Autoriser le pointage en tapant un tag NFC",
-    "nfcCheckinDesc": "Lorsqu'il est activé, les employés peuvent pointer en tapant leur téléphone contre un tag NFC (autocollant NTAG213, environ 1 $ pièce) placé à votre espace. Programmez le tag avec le jeton QR de votre espace via une app gratuite d'écriture de tag comme NFC Tools. La restriction IP, le géorepérage et la vérification d'appareil s'appliquent toujours."
+    "nfcCheckinDesc": "Lorsqu'il est activé, les employés peuvent pointer en tapant leur téléphone contre un tag NFC (autocollant NTAG213, environ 1 $ pièce) placé à votre espace. Programmez le tag avec le jeton QR de votre espace via une app gratuite d'écriture de tag comme NFC Tools. La restriction IP, le géorepérage et la vérification d'appareil s'appliquent toujours.",
+    "enableGeofencing": "Activer le géorepérage",
+    "geofencingDesc": "N'autoriser les pointages que dans un rayon défini autour de votre restaurant",
+    "geofencingEspresso": "Le géorepérage nécessite Espresso"
   },
   "checkin": {
     "deviceMismatch": "Le pointage de sortie doit être effectué depuis le même appareil que le pointage d'entrée",
-    "deviceAlreadyUsed": "Cet appareil a déjà été utilisé pour pointer un autre employé aujourd'hui"
+    "deviceAlreadyUsed": "Cet appareil a déjà été utilisé pour pointer un autre employé aujourd'hui",
+    "checkIn": "Pointer",
+    "checkOut": "Pointer la sortie",
+    "checkedInAt": "Pointé à {{time}}",
+    "completed": "Présence enregistrée pour aujourd'hui",
+    "invalidToken": "Lien de pointage invalide",
+    "ipRestricted": "Pointage non autorisé depuis cet emplacement",
+    "locationDenied": "Accès à la position refusé. Le pointage peut échouer si le géorepérage est activé.",
+    "locationRequired": "La position est requise pour le pointage",
+    "outsideGeofence": "Vous êtes en dehors de la zone de pointage autorisée"
   },
   "plan": {
-    "deviceVerification": "Vérification de l'appareil pour le pointage"
+    "deviceVerification": "Vérification de l'appareil pour le pointage",
+    "geofencing": "Géorepérage pour le pointage",
+    "ipRestriction": "Restriction IP pour le pointage",
+    "leaveRequests": "Gestion des demandes de congé",
+    "prioritySupport": "Support prioritaire",
+    "shiftTimeRules": "Horaires de quart par jour",
+    "unlimitedEmployees": "Employés illimités"
   },
   "common": {
     "save": "Enregistrer",
@@ -395,7 +432,8 @@
     "off": "désactivé",
     "languageSwitcher": {
       "ariaLabel": "Langue"
-    }
+    },
+    "back": "Retour"
   },
   "qrCodes": {
     "new": "Nouveau code QR",
@@ -453,7 +491,9 @@
     "payload": "Contenu encodé",
     "payloadCopied": "Copié dans le presse-papier",
     "identity": "Identité",
-    "unsavedChanges": "Vous avez des modifications non enregistrées"
+    "unsavedChanges": "Vous avez des modifications non enregistrées",
+    "assignedCount_one": "{{count}} assigné",
+    "assignedCount_other": "{{count}} assignés"
   },
   "upgrade": {
     "espressoFeature": "Fonctionnalité Espresso",
@@ -2269,7 +2309,14 @@
     "light": "Mode clair"
   },
   "leave": {
-    "noRequests": "Aucune demande de congé trouvée"
+    "noRequests": "Aucune demande de congé trouvée",
+    "approve": "Approuver",
+    "approved": "Approuvé",
+    "pending": "En attente",
+    "reason": "Raison",
+    "reject": "Rejeter",
+    "rejected": "Rejeté",
+    "submit": "Soumettre la demande"
   },
   "closure": {
     "empty": "Aucune période de fermeture définie",
@@ -2316,5 +2363,44 @@
       "saturday": "Sam",
       "sunday": "Dim"
     }
+  },
+  "onboarding": {
+    "copyId": "Copier l'ID",
+    "createWorkspace": "Créer un espace de travail",
+    "dark": "Sombre",
+    "employee": "Je suis membre du personnel",
+    "employeeDesc": "Liez-vous à votre lieu de travail",
+    "employeePublicId": "ID public de l'employé",
+    "getStarted": "Commencer",
+    "idCopied": "Copié !",
+    "idExplain": "Partagez cet ID avec votre employeur pour qu'il puisse vous ajouter comme employé.",
+    "light": "Clair",
+    "linkEmployee": "Lier à l'employé",
+    "linkExplain": "Entrez l'ID de l'employé fourni par votre employeur.",
+    "next": "Suivant",
+    "owner": "Je possède un restaurant",
+    "ownerDesc": "Créez votre espace de travail et gérez le personnel",
+    "roleQuestion": "Comment utiliserez-vous DailyBrew ?",
+    "skip": "Passer",
+    "subtitle": "Présence du personnel, simplement préparée",
+    "system": "Système",
+    "theme": "Thème",
+    "welcome": "Bienvenue chez DailyBrew",
+    "workspaceName": "Nom du restaurant",
+    "yourPublicId": "Votre ID public"
+  },
+  "shifts": {
+    "addRule": "Ajouter une dérogation",
+    "default": "Par défaut",
+    "friday": "Vendredi",
+    "monday": "Lundi",
+    "override": "Dérogation",
+    "saturday": "Samedi",
+    "sunday": "Dimanche",
+    "thursday": "Jeudi",
+    "timeRules": "Horaire par jour de la semaine",
+    "timeRulesEspresso": "Les horaires par jour nécessitent Espresso",
+    "tuesday": "Mardi",
+    "wednesday": "Mercredi"
   }
 }
