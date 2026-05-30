@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.94.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.94.1...v1.94.2) (2026-05-30)
+
+
+### Bug Fixes
+
+* **pricing:** Espresso plan moves to \$19.99/mo + \$199/yr (was \$14.99/\$149) ([#236](https://github.com/bangkeut-technology/daily-brew/issues/236)) ([dbac75c](https://github.com/bangkeut-technology/daily-brew/commit/dbac75c17dd8c72ff7ca9310040c77753ed63c09))
+
 ## [1.94.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.94.0...v1.94.1) (2026-05-30)
 
 
