@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.95.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.94.2...v1.95.0) (2026-05-30)
+
+
+### Features
+
+* **dashboard:** camera QR scan for "I'm a staff member" linking + help disclosure ([#242](https://github.com/bangkeut-technology/daily-brew/issues/242)) ([8e7917b](https://github.com/bangkeut-technology/daily-brew/commit/8e7917b99144591206b228a301f8c789ba0d5ca9))
+* **footer,faq:** split Product column into Product + Resources, rewrite "Is there a mobile app?" answer ([#243](https://github.com/bangkeut-technology/daily-brew/issues/243)) ([99352d0](https://github.com/bangkeut-technology/daily-brew/commit/99352d0216168015d78857afa65d0530d8bc1ecd))
+* **pricing:** activate Double Espresso CTA on the public pricing card ([#241](https://github.com/bangkeut-technology/daily-brew/issues/241)) ([6df1cc4](https://github.com/bangkeut-technology/daily-brew/commit/6df1cc4fbb7e721b530da1ae8488c099ec0c5c05))
+
 ## [1.94.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.94.1...v1.94.2) (2026-05-30)
 
 
