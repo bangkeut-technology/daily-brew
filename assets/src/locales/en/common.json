@@ -610,7 +610,7 @@
     "a": {
       "whatIsDailybrew": "DailyBrew is a staff attendance tracking platform built for restaurants. It provides QR code check-in, shift management, closure periods, and leave request handling, all in one simple dashboard.",
       "whoIsItFor": "DailyBrew is designed for restaurant owners, managers, and staff. Owners manage the workspace, shifts, and employees. Managers receive only the permissions you grant them — for example leave approvals, attendance oversight, employee management, or any combination. Staff check in and out by scanning the workspace QR code.",
-      "mobileApp": "Staff check-in works entirely through the mobile web browser. When an employee scans their QR code, a mobile-optimized check-in page opens instantly. No app download is required.",
+      "mobileApp": "Yes — DailyBrew is on the App Store and Play Store for owners and managers. Staff don't need it: any phone with a camera can scan the workspace QR and check in from the mobile web. The app adds push notifications, NFC tap-to-check-in, and offline tolerance for managers running a floor.",
       "freePlan": "The Free plan includes up to 10 active employees, QR check-in, shift tracking, closure periods, and the attendance dashboard. It is free forever with no time limit.",
       "espressoPlan": "Espresso supports up to 20 employees and adds leave request management, IP restriction, device verification, geofencing, per-day shift schedules, manager role with granular permissions (up to 2), push and email notifications, and daily attendance summaries.",
       "espressoCost": "Espresso costs $19.99 per month, or $199 per year if you choose annual billing. The yearly plan saves you $40.88 compared to paying monthly.",
@@ -772,19 +772,22 @@
     "footer": {
       "brandTagline": "Staff attendance and leave tracking for restaurants. Simple, warm, and built for teams that move fast.",
       "productHeader": "Product",
+      "resourcesHeader": "Resources",
       "legalHeader": "Legal",
       "getStartedHeader": "Get started",
       "dashboardHeader": "Dashboard",
       "productLinks": {
         "features": "Features",
         "howItWorks": "How it works",
-        "guides": "Guides",
-        "roles": "Roles & permissions",
-        "stopBuddyPunching": "Stop buddy punching",
-        "demo": "Try demo",
         "pricing": "Pricing",
+        "stopBuddyPunching": "Stop buddy punching"
+      },
+      "resourcesLinks": {
+        "guides": "Guides",
         "blog": "Blog",
         "faq": "FAQ",
+        "roles": "Roles & permissions",
+        "demo": "Try demo",
         "support": "Support"
       },
       "legalLinks": {

@@ -11,17 +11,23 @@ import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
  * Footer link tables. Labels live in i18n (`marketing.footer.productLinks.*`
  * and `marketing.footer.legalLinks.*`); the `to` and `key` are static.
  */
+// Product = the conversion-path surfaces (sell the thing). Resources = learn-and-
+// discover (explain it, support it). Split out of one 10-item column because
+// that column was scanning long enough to be hostile on a 1280px viewport.
 const productLinks: { key: string; to: string }[] = [
   { key: 'features',          to: '/features' },
   { key: 'howItWorks',        to: '/how-it-works' },
-  { key: 'guides',            to: '/guides' },
-  { key: 'roles',             to: '/roles' },
-  { key: 'stopBuddyPunching', to: '/stop-buddy-punching' },
-  { key: 'demo',              to: '/demo' },
   { key: 'pricing',           to: '/pricing' },
-  { key: 'blog',              to: '/blog' },
-  { key: 'faq',               to: '/faq' },
-  { key: 'support',           to: '/support' },
+  { key: 'stopBuddyPunching', to: '/stop-buddy-punching' },
+];
+
+const resourcesLinks: { key: string; to: string }[] = [
+  { key: 'guides',  to: '/guides' },
+  { key: 'blog',    to: '/blog' },
+  { key: 'faq',     to: '/faq' },
+  { key: 'roles',   to: '/roles' },
+  { key: 'demo',    to: '/demo' },
+  { key: 'support', to: '/support' },
 ];
 
 const legalLinks: { key: string; to: string }[] = [
@@ -39,7 +45,7 @@ export function LandingFooter() {
   return (
     <footer className="relative bg-cream-2/50 backdrop-blur-sm border-t border-cream-3/50 mt-10">
       <div className="max-w-5xl mx-auto px-6 md:px-8 py-14">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-10">
           {/* Brand */}
           <motion.div
             className="col-span-2 md:col-span-1"
@@ -78,6 +84,30 @@ export function LandingFooter() {
                     className="text-[15px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
                   >
                     {t(`marketing.footer.productLinks.${link.key}`)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Resources */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.15 }}
+          >
+            <p className="text-[13px] uppercase tracking-[1.5px] font-medium text-text-tertiary mb-4">
+              {t('marketing.footer.resourcesHeader')}
+            </p>
+            <ul className="space-y-2.5">
+              {resourcesLinks.map((link) => (
+                <li key={link.to}>
+                  <Link
+                    to={link.to}
+                    className="text-[15px] text-text-secondary hover:text-coffee no-underline transition-colors duration-200"
+                  >
+                    {t(`marketing.footer.resourcesLinks.${link.key}`)}
                   </Link>
                 </li>
               ))}
