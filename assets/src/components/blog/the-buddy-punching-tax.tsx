@@ -14,7 +14,9 @@ export function TheBuddyPunchingTaxPost() {
   const { t } = useTranslation('blog');
   return (
     <div className="space-y-6 text-[16px] leading-relaxed text-text-secondary">
-      <p>{t('buddyPunchingTax.lead1')}</p>
+      <p>
+        <Trans i18nKey="buddyPunchingTax.lead1" ns="blog" components={{ strong: <strong /> }} />
+      </p>
       <p>
         <Trans i18nKey="buddyPunchingTax.lead2" ns="blog" components={{ em: <em /> }} />
       </p>
