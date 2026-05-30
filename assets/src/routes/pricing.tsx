@@ -58,7 +58,6 @@ const comparisonRows: ComparisonRow[] = [
   { key: 'multipleQrStations',    free: false, espresso: false, double: true },
   { key: 'perQrGeofence',         free: false, espresso: false, double: true },
   { key: 'perQrAssignment',       free: false, espresso: false, double: true },
-  { key: 'whiteLabel',            free: false, espresso: false, double: true },
 ];
 
 const faqKeys = ['switchPlans', 'paymentMethods', 'freeTrial', 'cancelAnytime', 'basilbook'];

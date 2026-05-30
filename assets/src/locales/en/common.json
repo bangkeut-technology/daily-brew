@@ -356,7 +356,6 @@
     "featurePerQrSettings": "Per-QR geofence & settings",
     "featureEmployeeAssign": "Employee assignment per QR",
     "featureManagerRole": "Manager role",
-    "featureWhiteLabel": "White-label branding",
     "roadmapBadge": "Roadmap",
     "comingSoon": "Coming soon",
     "billingMonthly": "Monthly",
@@ -1095,8 +1094,7 @@
         "multipleQrStations": "Multiple QR stations",
         "perQrGeofence": "Per-QR geofence & settings",
         "perQrAssignment": "Employee assignment per QR",
-        "perQrManager": "Per-QR manager assignment",
-        "whiteLabel": "White-label branding"
+        "perQrManager": "Per-QR manager assignment"
       }
     },
     "footnote": "No credit card required to start. Upgrade anytime from your dashboard."
@@ -1478,9 +1476,6 @@
           },
           "perQrAssignment": {
             "label": "Employee assignment per QR (roadmap)"
-          },
-          "whiteLabel": {
-            "label": "White-label branding (roadmap)"
           }
         }
       },
