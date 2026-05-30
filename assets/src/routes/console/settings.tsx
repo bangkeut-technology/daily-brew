@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -20,6 +20,7 @@ import {
   useWorkspaceSettings,
   useUpdateWorkspaceSettings,
   useTelegramTest,
+  useWorkspaceTelegramLinkToken,
 } from '@/hooks/queries/useWorkspaces';
 import { usePlan } from '@/hooks/queries/usePlan';
 import { useEmployees } from '@/hooks/queries/useEmployees';
@@ -110,8 +111,18 @@ function SettingsPage() {
   const deleteWs = useDeleteWorkspace();
   const regenerateToken = useRegenerateWorkspaceToken();
   const [regenerateConfirmOpen, setRegenerateConfirmOpen] = useState(false);
-  const { data: settings } = useWorkspaceSettings(currentWsId);
+  // Workspace Telegram link flow: when the owner taps "Add bot to your group"
+  // we mint a deep-link token, open t.me/<bot>?startgroup=<token>, and poll
+  // the settings until the bot has joined the group + /start fired + the
+  // webhook stored the chat ID. Mirrors the user-profile flow in
+  // routes/console/profile/index.tsx — same pattern, workspace-scoped.
+  const [waitingForTelegramGroup, setWaitingForTelegramGroup] = useState(false);
+  const telegramGroupTimeoutRef = useRef(0);
+  const { data: settings } = useWorkspaceSettings(currentWsId, {
+    refetchInterval: waitingForTelegramGroup ? 2000 : false,
+  });
   const updateSettings = useUpdateWorkspaceSettings(currentWsId);
+  const workspaceTelegramLinkToken = useWorkspaceTelegramLinkToken(currentWsId);
   const { data: plan } = usePlan(currentWsId);
   const { data: employees } = useEmployees(currentWsId);
   const { data: shifts } = useShifts(currentWsId);
@@ -154,6 +165,43 @@ function SettingsPage() {
   // the owner explicitly wants live check-in noise.
   const [telegramCheckinAlertsEnabled, setTelegramCheckinAlertsEnabled] = useState(false);
   const telegramTest = useTelegramTest(currentWsId);
+
+  // Stop polling the moment the chat ID flips in the response (the webhook
+  // stored it after the group's /start fired). Toast keeps the success
+  // explicit instead of relying on the UI silently updating.
+  useEffect(() => {
+    if (!waitingForTelegramGroup) return;
+    if (settings?.telegramChatId) {
+      setWaitingForTelegramGroup(false);
+      toast.success(t('settings.telegramGroupLinked', 'Group linked'));
+    }
+  }, [waitingForTelegramGroup, settings?.telegramChatId, t]);
+
+  // If the user closes the Telegram tab without picking a group (or the
+  // token's 10-min TTL elapses), don't poll forever.
+  useEffect(() => {
+    if (!waitingForTelegramGroup) return;
+    const remaining = Math.max(0, telegramGroupTimeoutRef.current - Date.now());
+    const timeout = window.setTimeout(() => {
+      setWaitingForTelegramGroup(false);
+      toast.error(t('settings.telegramGroupTimeout', 'Timed out waiting for Telegram. Try again.'));
+    }, remaining);
+    return () => window.clearTimeout(timeout);
+  }, [waitingForTelegramGroup, t]);
+
+  const handleConnectTelegramGroup = async () => {
+    try {
+      const { deepLink, expiresInSeconds } = await workspaceTelegramLinkToken.mutateAsync();
+      // Cap the local timeout at 60s so a tab left open all afternoon
+      // doesn't keep polling forever. The token itself is still good for
+      // the full TTL — if they tap the link again later it just works.
+      telegramGroupTimeoutRef.current = Date.now() + Math.min(expiresInSeconds, 60) * 1000;
+      setWaitingForTelegramGroup(true);
+      window.open(deepLink, '_blank', 'noopener,noreferrer');
+    } catch {
+      toast.error(t('settings.telegramGroupLinkError', 'Could not generate Telegram link'));
+    }
+  };
   const telegramBotUsername = window.__DAILYBREW__?.telegramBotUsername || '';
 
   // Geofencing state
@@ -1335,43 +1383,90 @@ function SettingsPage() {
 
               {telegramEnabled && plan?.canUseTelegramNotifications && (
                 <div className="space-y-5">
-                  {/* Group setup — manual flow. Personal/per-user Telegram now
-                      lives on the Profile page; this card is workspace-wide
-                      group-chat config only. */}
+                  {/* Group setup — deep-link flow. One button opens
+                      t.me/<bot>?startgroup=<token> so the owner picks a group,
+                      the bot joins, and /start fires server-side to store the
+                      chat id + flip the master toggle. The legacy manual
+                      /chatid copy-paste workflow is preserved behind an "Add
+                      it manually" disclosure for edge cases (bot already in
+                      multiple groups, restricted group, etc.). */}
                   <div className="rounded-xl border border-cream-3 bg-glass-bg/50 p-4">
-                    <p className="text-[14px] font-medium text-text-primary mb-2">{t('settings.telegramGroupChat', 'Group chat')}</p>
-                    <ol className="text-[13px] text-text-secondary leading-relaxed list-decimal pl-5 space-y-1">
-                      <li>
-                        {t('settings.telegramStep1Prefix', 'Add ')}
-                        {telegramBotUsername ? (
-                          <a
-                            href={`https://t.me/${telegramBotUsername}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="font-mono text-coffee hover:underline"
-                          >
-                            @{telegramBotUsername}
-                          </a>
-                        ) : (
-                          <span className="font-mono">{t('settings.telegramYourBot', 'your DailyBrew bot')}</span>
-                        )}
-                        {t('settings.telegramStep1Suffix', ' to your staff group.')}
-                      </li>
-                      <li>
-                        {t('settings.telegramStep2Prefix', 'In the group, send ')}
-                        <span className="font-mono text-text-primary">/chatid</span>
-                        {t('settings.telegramStep2Suffix', '.')}
-                      </li>
-                      <li>{t('settings.telegramStep3', 'The bot replies with the chat ID — paste it below.')}</li>
-                    </ol>
-                    <p className="text-[12px] text-text-tertiary mt-2">
-                      {t('settings.telegramGroupIdHintPrefix', 'Group IDs start with ')}
-                      <span className="font-mono">-</span>
-                      {t('settings.telegramGroupIdHintMid', ' (e.g. ')}
-                      <span className="font-mono">-1001234567890</span>
-                      {t('settings.telegramGroupIdHintSuffix', ') — paste it as-is.')}
+                    <p className="text-[14px] font-medium text-text-primary mb-3">
+                      {t('settings.telegramGroupChat', 'Group chat')}
                     </p>
-                    <p className="text-[12px] text-text-tertiary mt-2">
+
+                    {settings?.telegramChatId ? (
+                      <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-green/8 border border-green/15">
+                        <Check size={14} className="text-green shrink-0" />
+                        <p className="text-[13.5px] text-text-primary">
+                          {t('settings.telegramGroupLinkedHint', 'Linked to a Telegram group.')}{' '}
+                          <span className="font-mono text-text-tertiary">{settings.telegramChatId}</span>
+                        </p>
+                      </div>
+                    ) : waitingForTelegramGroup ? (
+                      <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber/8 border border-amber/15">
+                        <div className="w-3.5 h-3.5 border-2 border-amber border-t-transparent rounded-full animate-spin shrink-0" />
+                        <p className="text-[13.5px] text-text-primary">
+                          {t(
+                            'settings.telegramGroupWaiting',
+                            'Waiting for Telegram… pick your staff group and tap Start.',
+                          )}
+                        </p>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleConnectTelegramGroup}
+                        disabled={!telegramBotUsername || workspaceTelegramLinkToken.isPending}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[14px] font-medium bg-coffee text-white border-none cursor-pointer transition-all hover:bg-coffee-light disabled:opacity-50"
+                      >
+                        <Send size={14} />
+                        {workspaceTelegramLinkToken.isPending
+                          ? t('settings.telegramGroupGenerating', 'Generating link…')
+                          : t('settings.telegramGroupConnect', 'Add bot to your group')}
+                      </button>
+                    )}
+
+                    <details className="mt-3 group">
+                      <summary className="text-[12.5px] text-text-tertiary cursor-pointer list-none hover:text-coffee transition-colors">
+                        {t('settings.telegramGroupManualDisclosure', 'Add it manually instead')}
+                      </summary>
+                      <div className="mt-2 pl-3 border-l border-cream-3">
+                        <ol className="text-[12.5px] text-text-secondary leading-relaxed list-decimal pl-4 space-y-1">
+                          <li>
+                            {t('settings.telegramStep1Prefix', 'Add ')}
+                            {telegramBotUsername ? (
+                              <a
+                                href={`https://t.me/${telegramBotUsername}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-mono text-coffee hover:underline"
+                              >
+                                @{telegramBotUsername}
+                              </a>
+                            ) : (
+                              <span className="font-mono">{t('settings.telegramYourBot', 'your DailyBrew bot')}</span>
+                            )}
+                            {t('settings.telegramStep1Suffix', ' to your staff group.')}
+                          </li>
+                          <li>
+                            {t('settings.telegramStep2Prefix', 'In the group, send ')}
+                            <span className="font-mono text-text-primary">/chatid</span>
+                            {t('settings.telegramStep2Suffix', '.')}
+                          </li>
+                          <li>{t('settings.telegramStep3', 'The bot replies with the chat ID — paste it below.')}</li>
+                        </ol>
+                        <p className="text-[11.5px] text-text-tertiary mt-2">
+                          {t('settings.telegramGroupIdHintPrefix', 'Group IDs start with ')}
+                          <span className="font-mono">-</span>
+                          {t('settings.telegramGroupIdHintMid', ' (e.g. ')}
+                          <span className="font-mono">-1001234567890</span>
+                          {t('settings.telegramGroupIdHintSuffix', ') — paste it as-is.')}
+                        </p>
+                      </div>
+                    </details>
+
+                    <p className="text-[12px] text-text-tertiary mt-3">
                       {t('settings.telegramPersonalPrefix', 'Want personal DM notifications instead? Connect your own Telegram from ')}
                       <a href="/console/profile" className="text-coffee hover:underline">
                         {t('settings.telegramPersonalLink', 'your profile')}

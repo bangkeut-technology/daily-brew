@@ -113,6 +113,27 @@ export function useUpdateWorkspaceSettings(workspacePublicId: string) {
   });
 }
 
+/**
+ * Mint a short-lived workspace-scope Telegram link token. Used by the
+ * settings page to open `t.me/<bot>?startgroup=<token>` so the owner can
+ * pick a group, the bot joins it, and /start <token> fires server-side
+ * to store the group's chat ID + flip telegramNotificationsEnabled.
+ *
+ * Mirrors useTelegramLinkToken() (user-scope) in useProfile.ts.
+ */
+export function useWorkspaceTelegramLinkToken(workspacePublicId: string) {
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await apiAxios.post<{
+        token: string;
+        deepLink: string;
+        expiresInSeconds: number;
+      }>(`/workspaces/${workspacePublicId}/settings/telegram-link-token`);
+      return data;
+    },
+  });
+}
+
 export function useTelegramTest(workspacePublicId: string) {
   return useMutation({
     mutationFn: async () => {
