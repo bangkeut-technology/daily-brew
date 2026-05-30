@@ -384,6 +384,14 @@
     "telegramChatId": "ID du chat",
     "telegramSending": "Envoi…",
     "telegramSendTest": "Envoyer un message test",
+    "telegramGroupConnect": "Ajouter le bot à votre groupe",
+    "telegramGroupGenerating": "Génération du lien…",
+    "telegramGroupWaiting": "En attente de Telegram… choisissez votre groupe et appuyez sur Démarrer.",
+    "telegramGroupLinked": "Groupe lié",
+    "telegramGroupLinkedHint": "Lié à un groupe Telegram.",
+    "telegramGroupTimeout": "Délai dépassé en attendant Telegram. Réessayez.",
+    "telegramGroupLinkError": "Impossible de générer le lien Telegram",
+    "telegramGroupManualDisclosure": "L'ajouter manuellement à la place",
     "telegramTestSent": "Message test envoyé",
     "telegramTestFailed": "Échec du test",
     "dangerZone": "Zone dangereuse",
@@ -574,7 +582,7 @@
       "whoIsItFor": "DailyBrew est conçu pour les propriétaires de restaurant, les managers et le personnel. Les propriétaires gèrent l'espace de travail, les horaires et les employés. Les managers ne reçoivent que les permissions que vous leur accordez — par exemple les approbations de congés, la supervision des présences, la gestion des employés, ou toute combinaison. Le personnel pointe à l'arrivée et au départ en scannant le code QR de l'espace.",
       "mobileApp": "Oui — DailyBrew est disponible sur l'App Store et le Play Store pour les propriétaires et les managers. Le personnel n'en a pas besoin : n'importe quel téléphone avec une caméra peut scanner le QR de l'espace de travail et pointer depuis le mobile web. L'application ajoute les notifications push, le pointage par toucher NFC, et la tolérance hors ligne pour les managers qui gèrent la salle.",
       "freePlan": "Le plan Gratuit inclut jusqu'à 10 employés actifs, le check-in par QR, le suivi des horaires, les périodes de fermeture et le tableau de bord des présences. Il est gratuit pour toujours, sans limite de temps.",
-      "espressoPlan": "Espresso prend en charge jusqu'à 20 employés et ajoute la gestion des demandes de congé, la restriction IP, la vérification d'appareil, le géorepérage, les horaires par jour, le rôle de manager avec permissions granulaires (jusqu'à 2), les notifications push et email, et les résumés de présence quotidiens.",
+      "espressoPlan": "Espresso prend en charge jusqu'à 20 employés et ajoute la gestion des demandes de congé, la restriction IP, la vérification d'appareil, le géorepérage, les horaires par jour, le rôle de manager avec permissions granulaires (jusqu'à 2), les notifications push, email et Telegram, et les résumés de présence quotidiens.",
       "espressoCost": "Espresso coûte 19,99 $ par mois, ou 199 $ par an si vous choisissez la facturation annuelle. Le plan annuel vous fait économiser 40,88 $ par rapport au paiement mensuel.",
       "cancelAnytime": "Oui, il n'y a aucun contrat ni période d'engagement. Vous pouvez annuler votre abonnement Espresso à tout moment depuis les Paramètres de votre tableau de bord. Après l'annulation, vous continuerez à avoir accès jusqu'à la fin de votre période de facturation actuelle.",
       "qrCheckin": "Chaque espace de travail dispose d'un code QR unique. Affichez-le à l'entrée de votre restaurant. Le personnel ouvre l'app DailyBrew, scanne le code QR, et appuie sur le bouton Check In pour enregistrer son arrivée. Il scanne à nouveau et appuie sur Check Out en partant.",
@@ -694,8 +702,8 @@
           "desc": "Les employés soumettent des demandes de congé (payées ou non, journée entière ou partielle). Les propriétaires approuvent ou refusent avec une note. Historique complet et suivi de statut."
         },
         "notifications": {
-          "title": "Notifications push et email",
-          "desc": "Notifications push et alertes email en temps réel pour les demandes de congé, approbations, changements d'horaire, fermetures et résumés quotidiens de présence."
+          "title": "Notifications push, email et Telegram",
+          "desc": "Notifications push, alertes email et messages Telegram en temps réel pour les demandes de congé, approbations, changements d'horaire, fermetures et résumés quotidiens de présence."
         }
       },
       "why": {
@@ -894,7 +902,7 @@
         },
         "notifications": {
           "title": "Notifications",
-          "desc": "Alertes push et email pour les demandes de congé, changements d'horaire, fermetures et résumés quotidiens."
+          "desc": "Alertes push, email et Telegram pour les demandes de congé, changements d'horaire, fermetures et résumés quotidiens."
         }
       }
     },
@@ -1018,7 +1026,7 @@
         "perDaySchedules": "Horaires par jour de la semaine",
         "manager": "Rôle de manager avec permissions granulaires (jusqu'à 2)",
         "basilbook": "<brand></brand> intégration + API",
-        "notifications": "Notifications push et email",
+        "notifications": "Notifications push, email et Telegram",
         "dailySummary": "Résumé quotidien des présences",
         "trial14": "Essai gratuit de 14 jours"
       }
@@ -1393,7 +1401,7 @@
             "label": "<brand></brand> intégration + API"
           },
           "notifications": {
-            "label": "Notifications push et email"
+            "label": "Notifications push, email et Telegram"
           },
           "manager": {
             "label": "Rôle de manager"

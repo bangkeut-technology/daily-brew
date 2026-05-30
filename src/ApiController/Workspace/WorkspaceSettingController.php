@@ -229,9 +229,15 @@ class WorkspaceSettingController extends AbstractController
 
         $token = $tokenService->issue((string) $workspace->getPublicId());
 
+        // Workspace-scope tokens are meant to land in a group chat — the owner
+        // taps the deep-link, Telegram shows them a group picker, picks their
+        // staff group, the bot joins, and /start <token> fires from the group
+        // context. So `startgroup` (not `start`) is what we need here; `start`
+        // would open the bot in a private chat and the link would never reach
+        // the group.
         return $this->jsonSuccess([
             'token' => $token,
-            'deepLink' => sprintf('https://t.me/%s?start=%s', $telegramBotUsername, $token),
+            'deepLink' => sprintf('https://t.me/%s?startgroup=%s', $telegramBotUsername, $token),
             'expiresInSeconds' => 600,
         ]);
     }
