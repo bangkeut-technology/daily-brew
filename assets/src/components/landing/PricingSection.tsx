@@ -21,8 +21,8 @@ const freePlan = {
 };
 
 const espressoPlan = {
-  monthly: { price: '$14.99' },
-  yearly: { price: '$149', monthlyEquivalent: '$12.42' },
+  monthly: { price: '$19.99' },
+  yearly: { price: '$199', monthlyEquivalent: '$16.58' },
   features: ['employees20', 'everythingFree', 'leaveRequests', 'ipRestriction', 'deviceVerification', 'geofencing', 'perDaySchedules', 'manager', 'basilbook', 'notifications', 'dailySummary', 'trial14'] as const,
 };
 

@@ -432,7 +432,7 @@ function SettingsPage() {
                           </button>
                         </div>
                         <span className="text-[15px] font-semibold text-text-primary">
-                          {billing === 'annual' ? t('settings.priceEspressoYear', '$149/year') : t('settings.priceEspressoMonth', '$14.99/month')}
+                          {billing === 'annual' ? t('settings.priceEspressoYear', '$199/year') : t('settings.priceEspressoMonth', '$19.99/month')}
                         </span>
                       </div>
                       {billing === 'annual' && (
