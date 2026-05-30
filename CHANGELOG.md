@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.94.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.94.0...v1.94.1) (2026-05-30)
+
+
+### Bug Fixes
+
+* **dashboard:** remove web check-in/out buttons so every punch goes through verification ([#235](https://github.com/bangkeut-technology/daily-brew/issues/235)) ([e5d4856](https://github.com/bangkeut-technology/daily-brew/commit/e5d4856f56d9f1f8034465d8955ec79ee607cda1))
+
 ## [1.94.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.93.2...v1.94.0) (2026-05-30)
 
 
