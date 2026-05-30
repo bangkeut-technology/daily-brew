@@ -173,7 +173,18 @@
     "notCheckedIn": "Pas encore pointé",
     "quickActions": "Actions rapides",
     "recentAttendance": "Ma présence récente",
-    "viewAttendance": "Voir la présence"
+    "viewAttendance": "Voir la présence",
+    "linkToEmployee": "Liez-vous à votre profil d'employé",
+    "linkToEmployeeDesc2": "Scannez le QR que votre employeur vous montre, ou collez votre ID public. L'un ou l'autre vous lie à votre profil d'employé.",
+    "linkScanTab": "Scanner le QR",
+    "linkPasteTab": "Coller l'ID",
+    "linkScanHint": "Visez le code QR que votre employeur vous montre.",
+    "linkScanDenied": "Permission caméra refusée. Utilisez Coller l'ID à la place.",
+    "linkScanUnsupported": "Caméra non disponible dans ce navigateur. Utilisez Coller l'ID à la place.",
+    "linkScanStarting": "Démarrage de la caméra…",
+    "linkInvalidQr": "Ce QR n'est pas un code employé DailyBrew. Réessayez.",
+    "linkHelpTitle": "Où trouver mon ID ?",
+    "linkHelpBody": "Demandez à votre employeur d'ouvrir DailyBrew → Employés → votre nom → Partager. Il verra un QR à scanner et l'ID à coller ici."
   },
   "employee": {
     "add": "Ajouter un employé",

@@ -1,15 +1,24 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getWorkspacePublicId, setWorkspacePublicId } from '@/lib/auth';
 import { useRoleContext, useLinkEmployee } from '@/hooks/queries/useRoleContext';
 import { useCreateWorkspace } from '@/hooks/queries/useWorkspaces';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard } from '@/components/shared/GlassCard';
+import { QrScanner } from '@/components/shared/QrScanner';
 import { OwnerDashboard } from '@/components/dashboard/OwnerDashboard';
 import { EmployeeDashboard } from '@/components/dashboard/EmployeeDashboard';
-import { Building2, UserCheck, Coffee } from 'lucide-react';
+import { Building2, UserCheck, Coffee, QrCode, KeyRound, HelpCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+
+/**
+ * Personal employee QR codes are encoded as `dailybrew:emp:{publicId}` —
+ * mirrors the workspace `dailybrew:ws:{token}` / sub-QR `dailybrew:wqr:{token}`
+ * convention. Strip the prefix to get the bare ID we send to the link API.
+ */
+const EMPLOYEE_QR_PREFIX = 'dailybrew:emp:';
 
 export const Route = createFileRoute('/console/dashboard')({
   component: DashboardPage,
@@ -46,8 +55,11 @@ function DashboardPage() {
 function NoWorkspaceView() {
   const { t } = useTranslation();
   const [mode, setMode] = useState<null | 'owner' | 'employee'>(null);
+  const [linkMode, setLinkMode] = useState<'scan' | 'paste'>('scan');
   const [workspaceName, setWorkspaceName] = useState('');
   const [employeeId, setEmployeeId] = useState('');
+  const [scanError, setScanError] = useState<string | null>(null);
+  const [scanKey, setScanKey] = useState(0);
   const createWorkspace = useCreateWorkspace();
   const linkEmployee = useLinkEmployee();
 
@@ -64,18 +76,46 @@ function NoWorkspaceView() {
     }
   };
 
+  const linkById = useCallback(
+    async (id: string) => {
+      try {
+        await linkEmployee.mutateAsync(id);
+        toast.success(t('profile.employeeLinked', 'Employee linked successfully'));
+        window.location.reload();
+      } catch {
+        toast.error(t('profile.employeeLinkError', 'Failed to link. Check the ID and try again.'));
+      }
+    },
+    [linkEmployee, t],
+  );
+
   const handleLinkEmployee = async (e: React.FormEvent) => {
     e.preventDefault();
     const id = employeeId.trim();
     if (!id) return;
-    try {
-      await linkEmployee.mutateAsync(id);
-      toast.success(t('profile.employeeLinked', 'Employee linked successfully'));
-      window.location.reload();
-    } catch {
-      toast.error(t('profile.employeeLinkError', 'Failed to link. Check the ID and try again.'));
-    }
+    await linkById(id);
   };
+
+  const handleScanDecode = useCallback(
+    async (raw: string) => {
+      const text = raw.trim();
+      if (!text.startsWith(EMPLOYEE_QR_PREFIX)) {
+        // Tell the user the scan landed on the wrong kind of code and let
+        // them try again — rotating scanKey unmounts/remounts QrScanner,
+        // which is the cleanest way to release + restart the camera + jsQR
+        // decode latch without keeping internal "have we already decoded"
+        // state on the parent.
+        setScanError(
+          t('dashboard.linkInvalidQr', "That QR isn't a DailyBrew employee code. Try again."),
+        );
+        setScanKey((k) => k + 1);
+        return;
+      }
+      setScanError(null);
+      await linkById(text.slice(EMPLOYEE_QR_PREFIX.length));
+    },
+    [linkById, t],
+  );
 
   return (
     <div className="page-enter">
@@ -175,42 +215,115 @@ function NoWorkspaceView() {
           </GlassCard>
         )}
 
-        {/* Employee form */}
+        {/* Employee form — Scan QR (default) or Paste ID, plus a help disclosure */}
         {mode === 'employee' && (
           <GlassCard hover={false}>
-            <form onSubmit={handleLinkEmployee} className="p-6">
+            <div className="p-6">
               <p className="text-[16px] font-semibold text-text-primary mb-1">
                 {t('dashboard.linkToEmployee', 'Link to your employee profile')}
               </p>
               <p className="text-[14.5px] text-text-secondary mb-5">
-                {t('dashboard.linkToEmployeeDesc', 'Ask your employer for your employee public ID and enter it below.')}
+                {t(
+                  'dashboard.linkToEmployeeDesc2',
+                  "Scan the QR your employer is showing you, or paste your public ID. Either one links you to your employee profile.",
+                )}
               </p>
-              <div className="flex gap-3">
-                <input
-                  type="text"
-                  value={employeeId}
-                  onChange={(e) => setEmployeeId(e.target.value)}
-                  placeholder={t('onboarding.employeePublicId', 'Employee public ID')}
-                  autoFocus
-                  className="flex-1 px-3 py-2.5 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all font-mono"
-                />
-                <button
-                  type="submit"
-                  disabled={linkEmployee.isPending || !employeeId.trim()}
-                  className="flex items-center gap-1.5 px-5 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all hover:bg-coffee-light disabled:opacity-50"
-                >
-                  <UserCheck size={14} />
-                  {t('profile.link', 'Link')}
-                </button>
+
+              {/* Segmented tab control — Scan QR is the default since most
+                  employees are guided by their employer holding a screen up
+                  to them. Paste ID is the fallback for shared text. */}
+              <div
+                role="tablist"
+                className="flex gap-1 p-1 rounded-lg bg-cream-3/40 mb-5"
+              >
+                {(['scan', 'paste'] as const).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    role="tab"
+                    aria-selected={linkMode === m}
+                    onClick={() => {
+                      setLinkMode(m);
+                      setScanError(null);
+                    }}
+                    className={cn(
+                      'flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-[14px] font-medium border-none cursor-pointer transition-all',
+                      linkMode === m
+                        ? 'bg-glass-bg text-text-primary shadow-sm'
+                        : 'bg-transparent text-text-tertiary hover:text-text-secondary',
+                    )}
+                  >
+                    {m === 'scan' ? <QrCode size={14} /> : <KeyRound size={14} />}
+                    {m === 'scan'
+                      ? t('dashboard.linkScanTab', 'Scan QR')
+                      : t('dashboard.linkPasteTab', 'Paste ID')}
+                  </button>
+                ))}
               </div>
+
+              {linkMode === 'scan' ? (
+                <div className="space-y-3">
+                  <QrScanner key={scanKey} onDecode={handleScanDecode} />
+                  <p className="text-[13.5px] text-text-tertiary text-center">
+                    {t(
+                      'dashboard.linkScanHint',
+                      'Aim at the QR code your employer is showing you.',
+                    )}
+                  </p>
+                  {scanError && (
+                    <div className="px-3 py-2 rounded-lg bg-red/8 border border-red/15 text-[13.5px] text-red">
+                      {scanError}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <form onSubmit={handleLinkEmployee}>
+                  <div className="flex gap-3">
+                    <input
+                      type="text"
+                      id="employee-id"
+                      name="employeeId"
+                      value={employeeId}
+                      onChange={(e) => setEmployeeId(e.target.value)}
+                      placeholder={t('onboarding.employeePublicId', 'Employee public ID')}
+                      autoFocus
+                      className="flex-1 px-3 py-2.5 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all font-mono"
+                    />
+                    <button
+                      type="submit"
+                      disabled={linkEmployee.isPending || !employeeId.trim()}
+                      className="flex items-center gap-1.5 px-5 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all hover:bg-coffee-light disabled:opacity-50"
+                    >
+                      <UserCheck size={14} />
+                      {t('profile.link', 'Link')}
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* Help disclosure — uses <details> so we get
+                  open/close + keyboard a11y for free without an extra state. */}
+              <details className="mt-5 group">
+                <summary className="flex items-center gap-1.5 text-[13.5px] font-medium text-text-secondary cursor-pointer list-none hover:text-coffee transition-colors">
+                  <HelpCircle size={14} />
+                  {t('dashboard.linkHelpTitle', 'Where do I find my ID?')}
+                </summary>
+                <p className="mt-2 pl-5 text-[13.5px] text-text-tertiary leading-relaxed">
+                  {t(
+                    'dashboard.linkHelpBody',
+                    "Ask your employer to open DailyBrew → Employees → your name → Share. They'll see a QR you can scan, plus the ID you can paste here.",
+                  )}
+                </p>
+              </details>
+
               <button
                 type="button"
                 onClick={() => setMode(null)}
-                className="mt-4 text-[14px] text-text-tertiary bg-transparent border-none cursor-pointer hover:text-text-secondary transition-colors"
+                className="mt-5 text-[14px] text-text-tertiary bg-transparent border-none cursor-pointer hover:text-text-secondary transition-colors"
               >
                 &larr; {t('common.back')}
               </button>
-            </form>
+            </div>
           </GlassCard>
         )}
       </div>
