@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.96.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.96.0...v1.96.1) (2026-05-30)
+
+
+### Bug Fixes
+
+* **pricing:** clear stale Roadmap pills on multi-QR features that already shipped ([#247](https://github.com/bangkeut-technology/daily-brew/issues/247)) ([6a7eaad](https://github.com/bangkeut-technology/daily-brew/commit/6a7eaad971a7ebae00289600808351c5be4bb3b2))
+
 ## [1.96.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.95.0...v1.96.0) (2026-05-30)
 
 
