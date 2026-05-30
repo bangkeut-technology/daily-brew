@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.97.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.96.2...v1.97.0) (2026-05-30)
+
+
+### Features
+
+* **upload:** add image upload for user avatars, employee photos, and workspace logos ([12508f6](https://github.com/bangkeut-technology/daily-brew/commit/12508f6c803b2b79ea05b0ccabbf8f5125da5a0f))
+
 ## [1.96.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.96.1...v1.96.2) (2026-05-30)
 
 
