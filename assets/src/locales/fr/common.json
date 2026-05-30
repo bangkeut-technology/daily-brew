@@ -306,7 +306,6 @@
     "featurePerQrSettings": "Géolocalisation et paramètres par QR",
     "featureEmployeeAssign": "Affectation des employés par QR",
     "featureManagerRole": "Rôle de manager",
-    "featureWhiteLabel": "Marque blanche",
     "roadmapBadge": "Feuille de route",
     "comingSoon": "Bientôt disponible",
     "billingMonthly": "Mensuel",
@@ -1046,8 +1045,7 @@
         "multipleQrStations": "Plusieurs stations QR",
         "perQrGeofence": "Géorepérage et paramètres par QR",
         "perQrAssignment": "Affectation des employés par QR",
-        "perQrManager": "Affectation de manager par QR",
-        "whiteLabel": "Image de marque blanche"
+        "perQrManager": "Affectation de manager par QR"
       }
     },
     "footnote": "Aucune carte de crédit requise pour commencer. Évoluez à tout moment depuis votre tableau de bord."
@@ -1429,9 +1427,6 @@
           },
           "perQrAssignment": {
             "label": "Affectation d'employés par QR (feuille de route)"
-          },
-          "whiteLabel": {
-            "label": "Image de marque blanche (feuille de route)"
           }
         }
       },

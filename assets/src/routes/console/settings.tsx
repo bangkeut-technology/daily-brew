@@ -562,7 +562,6 @@ function SettingsPage() {
                       { text: t('settings.featurePerQrSettings', 'Per-QR geofence & settings'), roadmap: true },
                       { text: t('settings.featureEmployeeAssign', 'Employee assignment per QR'), roadmap: true },
                       { text: t('settings.featureManagerRole', 'Manager role'), roadmap: true },
-                      { text: t('settings.featureWhiteLabel', 'White-label branding'), roadmap: true },
                     ].map((f) => (
                       <li key={f.text} className={cn('flex items-center gap-2 text-[14.5px]', f.roadmap ? 'text-text-tertiary' : 'text-text-secondary')}>
                         <Check size={14} className={cn('shrink-0', f.roadmap ? 'text-text-tertiary' : 'text-coffee')} />

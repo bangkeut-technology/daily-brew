@@ -314,7 +314,6 @@
     "featurePerQrSettings": "Geofence និងការកំណត់តាម QR នីមួយៗ",
     "featureEmployeeAssign": "ការចាត់តាំងបុគ្គលិកតាម QR",
     "featureManagerRole": "តួនាទីប្រធាន",
-    "featureWhiteLabel": "ម៉ាកស៊ីភ្នាក់ងារ",
     "roadmapBadge": "ផែនទីបង្ហាញ",
     "comingSoon": "នឹងមកដល់ឆាប់ៗ",
     "billingMonthly": "ប្រចាំខែ",
@@ -1095,8 +1094,7 @@
         "multipleQrStations": "ស្ថានីយ QR ច្រើន",
         "perQrGeofence": "Geofence និងការកំណត់តាម QR",
         "perQrAssignment": "ការកំណត់បុគ្គលិកតាម QR",
-        "perQrManager": "ការកំណត់ប្រធានតាម QR",
-        "whiteLabel": "ការដាក់ស្លាកសុទ្ធ"
+        "perQrManager": "ការកំណត់ប្រធានតាម QR"
       }
     },
     "footnote": "មិនត្រូវការកាតឥណទានដើម្បីចាប់ផ្តើម។ ដំឡើងនៅពេលណាក៏បានពីផ្ទាំងគ្រប់គ្រងរបស់អ្នក។"
@@ -1478,9 +1476,6 @@
           },
           "perQrAssignment": {
             "label": "ការកំណត់បុគ្គលិកតាម QR (ផែនទីផ្លូវ)"
-          },
-          "whiteLabel": {
-            "label": "ការដាក់ស្លាកសុទ្ធ (ផែនទីផ្លូវ)"
           }
         }
       },

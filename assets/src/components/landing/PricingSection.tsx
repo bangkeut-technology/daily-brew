@@ -29,14 +29,11 @@ const espressoPlan = {
 const doubleEspressoPlan = {
   monthly: { price: '$39.99' },
   yearly: { price: '$399', monthlyEquivalent: '$33.25' },
-  features: ['unlimitedEmployees', 'everythingEspresso', 'unlimitedManagers', 'prioritySupport', 'multipleQrStations', 'perQrGeofence', 'perQrAssignment', 'perQrManager', 'whiteLabel'] as const,
-  // The roadmap-flagged sub-set so the UI renders the "Roadmap" pill. The
-  // multi-QR family (multipleQrStations, perQrGeofence, perQrAssignment,
-  // perQrManager) all shipped — they're the WorkspaceQrCode entity surface
-  // that's been live since the sub-QR rollout (see CLAUDE.md "WorkspaceQrCode
-  // (Double Espresso)" + project_multi_qr memory). Only white-label is
-  // genuinely not built yet.
-  roadmap: new Set(['whiteLabel']),
+  features: ['unlimitedEmployees', 'everythingEspresso', 'unlimitedManagers', 'prioritySupport', 'multipleQrStations', 'perQrGeofence', 'perQrAssignment', 'perQrManager'] as const,
+  // No roadmap-flagged items right now — every listed feature is live.
+  // whiteLabel was dropped from the pitch in #248 (never built, no scoped
+  // plan). If it ever lands, add it back here without the roadmap pill.
+  roadmap: new Set<string>(),
 };
 
 export function PricingSection() {
