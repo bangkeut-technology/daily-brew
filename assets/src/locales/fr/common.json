@@ -2302,6 +2302,94 @@
       "cta": {
         "title": "Prêt à verrouiller vos check-ins ?"
       }
+    },
+    "notFound": {
+      "title": "Page introuvable",
+      "desc": "La page que vous cherchez n'existe pas ou a peut-être été déplacée.",
+      "backHome": "Retour à l'accueil"
+    },
+    "blogIndex": {
+      "eyebrow": "Lectures",
+      "title": "Blog DailyBrew",
+      "subtitle": "Notes sur la présence, les pointeuses et les opérations des petites équipes derrière elles.",
+      "readPost": "Lire l'article →",
+      "backToPosts": "← Tous les articles"
+    },
+    "stopBuddyPunching": {
+      "eyebrow": "Vol de temps, résolu",
+      "title": "Comment arrêter le pointage par procuration",
+      "subtitleHtml": "Le pointage par procuration coûte aux petites entreprises jusqu'à <strong>2,2 % de la masse salariale brute</strong>. Vous pouvez l'arrêter sans surveiller votre personnel — liez chaque pointage à un appareil vérifié et au réseau de votre boutique. Pas de PIN à partager, pas de scan facial, pas de GPS.",
+      "ctaStartFree": "Commencer gratuitement",
+      "ctaSeeVerification": "Voir comment la vérification fonctionne",
+      "stepsTitle": "Trois couches qui rendent cela mécaniquement impossible",
+      "step1Title": "Liez chaque téléphone à une personne",
+      "step1Body": "Le premier pointage enregistre l'appareil d'un membre du personnel. Un pointage depuis le téléphone de quelqu'un d'autre ne comptera pas pour eux — donc couvrir un collègue en retard cesse de fonctionner.",
+      "step2Title": "Verrouillez les pointages à votre réseau",
+      "step2Body": "Chaque pointage enregistre l'IP. Les pointages hors réseau (données mobiles depuis chez soi ou le parking) sont bloqués ou signalés, donc le \"je t'ai pointé\" par SMS échoue.",
+      "step3Title": "Ajoutez un toucher physique (bêta)",
+      "step3Body": "Une étiquette NFC près de la machine à expresso signifie que le téléphone doit être physiquement à la boutique. Le QR est le repli aujourd'hui et passe par les mêmes vérifications.",
+      "faqTitle": "Questions fréquentes",
+      "faq": {
+        "cost": {
+          "q": "Combien coûte le pointage par procuration à une petite boutique ?",
+          "a": "Une étude de l'American Payroll Association a constaté qu'environ 75 % des entreprises sont concernées par le vol de temps, et Nucleus Research estime que le pointage par procuration coûte aux employeurs environ 2,2 % de la masse salariale brute. Sur une petite équipe, c'est de l'argent réel chaque mois."
+        },
+        "privacy": {
+          "q": "Puis-je l'arrêter sans scan facial ni traçage GPS ?",
+          "a": "Oui — c'est tout l'intérêt. DailyBrew applique la cohérence d'appareil sur une journée (un seul appareil par employé par jour, et la sortie doit venir du même appareil que l'entrée) et verrouille les pointages au réseau de votre boutique. Pas de biométrie, pas de GPS permanent — les tentatives de pointage par procuration utilisant le téléphone d'un collègue, ou les données mobiles hors réseau, ne peuvent simplement pas aboutir."
+        },
+        "staff": {
+          "q": "Cela ne va-t-il pas agacer le personnel honnête ?",
+          "a": "Non. Pour le personnel sur son propre téléphone, sur le Wi-Fi de la boutique, pointer est un seul scan ou toucher. La vérification est invisible sauf si quelqu'un essaie de pointer pour un collègue."
+        },
+        "forgotten": {
+          "q": "Et les téléphones oubliés ou les nouveaux appareils ?",
+          "a": "Les managers peuvent pointer quelqu'un manuellement (enregistré comme dérogation auditée) et réinitialiser la liaison d'appareil en deux touchers quand un membre du personnel obtient un nouveau téléphone."
+        }
+      },
+      "ctaCardTitle": "Arrêtez de payer pour des heures que personne n'a travaillées",
+      "ctaCardSubtitle": "Gratuit jusqu'à 10 employés actifs. Configurez-le avant votre prochain service.",
+      "ctaCardButton": "Créer votre compte gratuit"
+    },
+    "industryView": {
+      "ctaStartFree": "Commencer gratuitement",
+      "ctaSeeVerification": "Comment la vérification fonctionne",
+      "verifiedClockinsTitle": "Pointages vérifiés, conçus pour {{name}}",
+      "verifiedClockinsBodyHtml": "Chaque pointage est lié à un appareil vérifié et au réseau de votre boutique — la même pile à trois facteurs derrière <stopBuddyLink>l'arrêt du pointage par procuration</stopBuddyLink>. Sans biométrie, sans scan facial. Ajoutez <featuresLink>les horaires, les congés et les notifications</featuresLink> quand vous en avez besoin.",
+      "faqTitle": "Questions fréquentes",
+      "faq": {
+        "free": {
+          "q": "Est-ce vraiment gratuit ?",
+          "a": "Oui — gratuit pour toujours pour jusqu'à 10 employés actifs, sans carte de crédit requise. Les forfaits payants ajoutent la vérification d'appareil, la restriction IP, la gestion des congés, et plus."
+        },
+        "app": {
+          "q": "Le personnel doit-il installer une application ?",
+          "a": "Non. Le personnel scanne un code QR avec la caméra de son téléphone et pointe depuis le web — rien à télécharger. Le pointage par toucher NFC est en bêta."
+        },
+        "buddyPunching": {
+          "q": "Comment cela arrête-t-il le pointage par procuration ?",
+          "a": "Chaque pointage est lié à un appareil vérifié et au réseau de votre boutique. Un pointage depuis le téléphone de quelqu'un d'autre, ou hors de votre réseau, ne compte pas — sans biométrie."
+        },
+        "forgottenPhone": {
+          "q": "Et si quelqu'un oublie son téléphone ?",
+          "a": "Un manager le pointe depuis le tableau de bord. C'est enregistré comme une dérogation avec le nom du manager, l'heure et la raison dans la piste d'audit."
+        }
+      },
+      "ctaCardTitle": "Feuilles de temps honnêtes pour {{name}}",
+      "ctaCardSubtitle": "Gratuit jusqu'à 10 employés actifs. Pas de matériel, pas de biométrie, pas de contrat.",
+      "ctaCardButton": "Créer votre compte gratuit"
+    },
+    "competitorView": {
+      "comparisonEyebrow": "Comparaison",
+      "comparisonTitle": "DailyBrew vs {{name}}",
+      "tableDailybrewHeader": "DailyBrew",
+      "tableThemHeader": "{{name}}",
+      "tableDisclaimer": "Comparaison basée sur les informations produit publiquement disponibles et susceptible de changer à mesure que les produits évoluent. Les noms et marques appartiennent à leurs propriétaires respectifs.",
+      "whichTitle": "Lequel devriez-vous choisir ?",
+      "linksHtml": "Voyez comment fonctionne la <threeFactorLink>vérification à trois facteurs</threeFactorLink> de DailyBrew, ou <stopBuddyLink>comment elle arrête le pointage par procuration</stopBuddyLink>.",
+      "ctaCardTitle": "Essayez l'alternative sans biométrie",
+      "ctaCardSubtitle": "Gratuit jusqu'à 10 employés actifs. Pas de scan facial, pas de GPS, pas de contrat.",
+      "ctaCardButton": "Créer votre compte gratuit"
     }
   },
   "theme": {
