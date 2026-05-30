@@ -167,15 +167,23 @@ final class SeoMetaResolver
             ],
         ],
         // ── Industry landing pages ────────────────────────────────────
-        // Programmatic SEO surfaces (one entry per vertical). EN-only entries
-        // for now; fr/km fall back to EN via resolve() until a translation
-        // pass is scheduled. The pages themselves render English copy from
-        // assets/src/lib/industries.ts → IndustryView (see
-        // [[feedback-nextjs]] / "fast English-only port" pattern).
+        // Programmatic SEO surfaces (one entry per vertical). en/fr/km all
+        // provided for proper hreflang variants and share-preview locales;
+        // page bodies still render English copy from assets/src/lib/
+        // industries.ts → IndustryView until the IndustryView body itself
+        // is translated (separate follow-up).
         '/cafes' => [
             'en' => [
                 'Attendance app for cafés',
                 "Free staff attendance for cafés. Baristas scan a QR or tap to clock in — each punch bound to their device and your shop's WiFi. No biometrics, no buddy punching.",
+            ],
+            'fr' => [
+                'Application de présence pour cafés',
+                "Gestion des présences gratuite pour cafés. Les baristas scannent un QR ou tapent pour pointer — chaque pointage lié à leur appareil et au Wi-Fi de la boutique. Sans biométrie, sans pointage par procuration.",
+            ],
+            'km' => [
+                'កម្មវិធីវត្តមានសម្រាប់ហាងកាហ្វេ',
+                'ការតាមដានវត្តមានឥតគិតថ្លៃសម្រាប់ហាងកាហ្វេ។ Barista ស្កែន QR ឬប៉ះដើម្បីចូលរួម — រាល់ការចូលរួមភ្ជាប់ទៅឧបករណ៍ និង WiFi ហាង។ គ្មានជីវមាត្រ គ្មានការចូលរួមជំនួសគ្នា។',
             ],
         ],
         '/coffee-shops' => [
@@ -183,11 +191,27 @@ final class SeoMetaResolver
                 'Coffee shop employee time tracking',
                 "Time tracking for coffee shop staff. QR clock-in bound to each barista's device and your network — no PINs to share, no biometrics, free for up to 10 active employees.",
             ],
+            'fr' => [
+                'Suivi du temps de travail pour coffee shops',
+                "Suivi du temps pour le personnel de coffee shop. Pointage QR lié à l'appareil de chaque barista et à votre réseau — sans PIN à partager, sans biométrie, gratuit jusqu'à 10 employés actifs.",
+            ],
+            'km' => [
+                'ការតាមដានម៉ោងបុគ្គលិកសម្រាប់ Coffee Shop',
+                'ការតាមដានម៉ោងសម្រាប់បុគ្គលិក Coffee Shop។ ការចូលរួម QR ភ្ជាប់ទៅឧបករណ៍ Barista និងបណ្តាញរបស់អ្នក — គ្មាន PIN ត្រូវចែករំលែក គ្មានជីវមាត្រ ឥតគិតថ្លៃរហូតដល់បុគ្គលិកសកម្ម ១០ នាក់។',
+            ],
         ],
         '/restaurants' => [
             'en' => [
                 'Staff attendance app for restaurants',
                 'Restaurant staff attendance and time clock. Front- and back-of-house clock in by QR, bound to device + network. Leave management and late flags. Free up to 10 active employees.',
+            ],
+            'fr' => [
+                'Application de présence du personnel pour restaurants',
+                "Présence et pointeuse pour le personnel de restaurant. Salle et cuisine pointent par QR, lié à l'appareil + au réseau. Gestion des congés, alertes de retard. Gratuit jusqu'à 10 employés actifs.",
+            ],
+            'km' => [
+                'កម្មវិធីវត្តមានបុគ្គលិកសម្រាប់ភោជនីយដ្ឋាន',
+                'ការតាមដានវត្តមាន និងម៉ោងសម្រាប់ភោជនីយដ្ឋាន។ បុគ្គលិកមុខ និងផ្ទះបាយចូលរួមតាម QR ភ្ជាប់ទៅឧបករណ៍ + បណ្តាញ។ ការគ្រប់គ្រងការឈប់ និងសញ្ញាយឺត។ ឥតគិតថ្លៃរហូតដល់បុគ្គលិកសកម្ម ១០ នាក់។',
             ],
         ],
         '/bars' => [
@@ -195,11 +219,27 @@ final class SeoMetaResolver
                 'Bar staff attendance app',
                 'Attendance for bar and pub staff. Late-night, high-turnover teams clock in by QR bound to device + network — no biometrics, no buddy punching. Free up to 10 active employees.',
             ],
+            'fr' => [
+                'Application de présence pour personnel de bar',
+                "Présence pour le personnel de bar et pub. Équipes à fort renouvellement, services tardifs : pointage QR lié à l'appareil + réseau — sans biométrie, sans pointage par procuration. Gratuit jusqu'à 10 employés actifs.",
+            ],
+            'km' => [
+                'កម្មវិធីវត្តមានសម្រាប់បុគ្គលិកបារ',
+                'វត្តមានសម្រាប់បុគ្គលិកបារ និងផ្សារកម្សាន្ត។ ក្រុមផ្លាស់ប្ដូរញឹកញាប់ ការងារយប់៖ ចូលរួម QR ភ្ជាប់ទៅឧបករណ៍ + បណ្តាញ — គ្មានជីវមាត្រ គ្មានការចូលរួមជំនួសគ្នា។ ឥតគិតថ្លៃរហូតដល់បុគ្គលិកសកម្ម ១០ នាក់។',
+            ],
         ],
         '/bakeries' => [
             'en' => [
                 'Attendance app for bakeries',
                 'Staff attendance for bakeries. Early-morning bakers clock in by QR bound to device + network. Track hours and late flags without biometrics. Free up to 10 active employees.',
+            ],
+            'fr' => [
+                'Application de présence pour boulangeries',
+                "Présence du personnel pour boulangeries. Les boulangers du matin pointent par QR lié à l'appareil + réseau. Suivez les heures et alertes de retard sans biométrie. Gratuit jusqu'à 10 employés actifs.",
+            ],
+            'km' => [
+                'កម្មវិធីវត្តមានសម្រាប់ហាងនំ',
+                'វត្តមានបុគ្គលិកសម្រាប់ហាងនំ។ អ្នកធ្វើនំព្រឹកព្រលឹមចូលរួម QR ភ្ជាប់ទៅឧបករណ៍ + បណ្តាញ។ តាមដានម៉ោង និងសញ្ញាយឺតដោយគ្មានជីវមាត្រ។ ឥតគិតថ្លៃរហូតដល់បុគ្គលិកសកម្ម ១០ នាក់។',
             ],
         ],
         '/food-trucks' => [
@@ -207,11 +247,27 @@ final class SeoMetaResolver
                 'Food truck employee time tracking',
                 "Time tracking for food truck crews. Clock in by QR from the truck, bound to each crew member's device. No fixed hardware, no biometrics. Free up to 10 active employees.",
             ],
+            'fr' => [
+                'Suivi du temps de travail pour food trucks',
+                "Suivi du temps pour équipes de food truck. Pointage QR depuis le camion, lié à l'appareil de chaque membre. Aucun matériel fixe, aucune biométrie. Gratuit jusqu'à 10 employés actifs.",
+            ],
+            'km' => [
+                'ការតាមដានម៉ោងបុគ្គលិកសម្រាប់ Food Truck',
+                'ការតាមដានម៉ោងសម្រាប់ក្រុមបុគ្គលិក Food Truck។ ចូលរួមតាម QR ពីឡាន ភ្ជាប់ទៅឧបករណ៍សមាជិកក្រុមនីមួយៗ។ គ្មានឧបករណ៍ថេរ គ្មានជីវមាត្រ។ ឥតគិតថ្លៃរហូតដល់បុគ្គលិកសកម្ម ១០ នាក់។',
+            ],
         ],
         '/retail' => [
             'en' => [
                 'Retail staff attendance app',
                 "Attendance for retail staff. Sales associates clock in by QR bound to device + the shop's network. No biometrics, no GPS tracking. Free for up to 10 active employees.",
+            ],
+            'fr' => [
+                'Application de présence pour personnel de commerce',
+                "Présence pour le personnel de commerce. Les vendeurs pointent par QR lié à l'appareil + au réseau de la boutique. Sans biométrie, sans GPS. Gratuit jusqu'à 10 employés actifs.",
+            ],
+            'km' => [
+                'កម្មវិធីវត្តមានសម្រាប់បុគ្គលិកលក់រាយ',
+                'វត្តមានសម្រាប់បុគ្គលិកលក់រាយ។ អ្នកលក់ចូលរួម QR ភ្ជាប់ទៅឧបករណ៍ + បណ្តាញហាង។ គ្មានជីវមាត្រ គ្មានការតាមដាន GPS។ ឥតគិតថ្លៃរហូតដល់បុគ្គលិកសកម្ម ១០ នាក់។',
             ],
         ],
         '/small-shops' => [
@@ -219,14 +275,30 @@ final class SeoMetaResolver
                 'Attendance app for small shops',
                 'Simple staff attendance for small shops. Your team clocks in by QR bound to their device and your network. No biometrics, no contracts. Free for up to 10 active employees.',
             ],
+            'fr' => [
+                'Application de présence pour petits commerces',
+                "Présence simple pour petits commerces. Votre équipe pointe par QR lié à leur appareil et à votre réseau. Sans biométrie, sans contrat. Gratuit jusqu'à 10 employés actifs.",
+            ],
+            'km' => [
+                'កម្មវិធីវត្តមានសម្រាប់ហាងតូច',
+                'វត្តមានសាមញ្ញសម្រាប់ហាងតូច។ ក្រុមរបស់អ្នកចូលរួម QR ភ្ជាប់ទៅឧបករណ៍ និងបណ្តាញរបស់អ្នក។ គ្មានជីវមាត្រ គ្មានកិច្ចសន្យា។ ឥតគិតថ្លៃរហូតដល់បុគ្គលិកសកម្ម ១០ នាក់។',
+            ],
         ],
         // ── Competitor comparison pages ───────────────────────────────
-        // Same EN-only deferral note as industries above. Trademark disclaimer
-        // is rendered in CompetitorView itself.
+        // Same en/fr/km coverage as industries. Trademark disclaimer is
+        // rendered in CompetitorView itself.
         '/vs-jibble' => [
             'en' => [
                 'DailyBrew vs Jibble',
                 "DailyBrew vs Jibble for cafés: device + network verification with no biometrics, versus Jibble's face-recognition clock-in. Free up to 10 active employees.",
+            ],
+            'fr' => [
+                'DailyBrew vs Jibble',
+                "DailyBrew vs Jibble pour cafés : vérification appareil + réseau sans biométrie, contre le pointage par reconnaissance faciale de Jibble. Gratuit jusqu'à 10 employés actifs.",
+            ],
+            'km' => [
+                'DailyBrew ប្រៀបធៀប Jibble',
+                'DailyBrew ប្រៀបធៀប Jibble សម្រាប់ហាងកាហ្វេ៖ ការផ្ទៀងផ្ទាត់ឧបករណ៍ + បណ្តាញដោយគ្មានជីវមាត្រ ប្រឆាំងនឹងការចូលរួមដោយការទទួលស្គាល់មុខរបស់ Jibble។ ឥតគិតថ្លៃរហូតដល់បុគ្គលិកសកម្ម ១០ នាក់។',
             ],
         ],
         '/vs-homebase' => [
@@ -234,11 +306,27 @@ final class SeoMetaResolver
                 'DailyBrew vs Homebase',
                 "DailyBrew vs Homebase: device + network verified clock-ins with no shared PINs, versus Homebase's PIN + GPS model. Free up to 10 active employees, no US-only limits.",
             ],
+            'fr' => [
+                'DailyBrew vs Homebase',
+                "DailyBrew vs Homebase : pointages vérifiés par appareil + réseau, sans PIN partagé, contre le modèle PIN + GPS de Homebase. Gratuit jusqu'à 10 employés actifs, sans limite US.",
+            ],
+            'km' => [
+                'DailyBrew ប្រៀបធៀប Homebase',
+                'DailyBrew ប្រៀបធៀប Homebase៖ ការចូលរួមដែលផ្ទៀងផ្ទាត់ដោយឧបករណ៍ + បណ្តាញ គ្មាន PIN រួម ប្រឆាំងនឹងគំរូ PIN + GPS របស់ Homebase។ ឥតគិតថ្លៃរហូតដល់បុគ្គលិកសកម្ម ១០ នាក់ គ្មានកំហិតតែសម្រាប់សហរដ្ឋអាមេរិក។',
+            ],
         ],
         '/vs-connecteam' => [
             'en' => [
                 'DailyBrew vs Connecteam',
                 "DailyBrew vs Connecteam: a café-first three-factor clock-in (device + IP + NFC beta) versus Connecteam's deskless HR suite with NFC and selfie verification.",
+            ],
+            'fr' => [
+                'DailyBrew vs Connecteam',
+                "DailyBrew vs Connecteam : pointage trois facteurs orienté café (appareil + IP + NFC bêta) contre la suite RH sans bureau de Connecteam avec NFC et vérification selfie.",
+            ],
+            'km' => [
+                'DailyBrew ប្រៀបធៀប Connecteam',
+                'DailyBrew ប្រៀបធៀប Connecteam៖ ការចូលរួមបីកត្តាសម្រាប់ហាងកាហ្វេ (ឧបករណ៍ + IP + NFC បែតា) ប្រឆាំងនឹង Suite HR ដែលគ្មានកន្លែងធ្វើការរបស់ Connecteam ជាមួយ NFC និងការផ្ទៀងផ្ទាត់ selfie។',
             ],
         ],
         '/vs-clockify' => [
@@ -246,17 +334,41 @@ final class SeoMetaResolver
                 'DailyBrew vs Clockify',
                 "DailyBrew vs Clockify: per-punch device + network verification versus Clockify's shareable kiosk PIN. Stop buddy punching that PIN-based clocks can't.",
             ],
+            'fr' => [
+                'DailyBrew vs Clockify',
+                "DailyBrew vs Clockify : vérification appareil + réseau à chaque pointage, contre le PIN partageable du kiosque Clockify. Arrêtez le pointage par procuration que les pointeuses PIN ne peuvent pas.",
+            ],
+            'km' => [
+                'DailyBrew ប្រៀបធៀប Clockify',
+                'DailyBrew ប្រៀបធៀប Clockify៖ ការផ្ទៀងផ្ទាត់ឧបករណ៍ + បណ្តាញរាល់ការចូលរួម ប្រឆាំងនឹង PIN kiosk ដែលអាចចែករំលែករបស់ Clockify។ បញ្ឈប់ការចូលរួមជំនួសគ្នាដែលនាឡិកា PIN មិនអាច។',
+            ],
         ],
         '/vs-buddy-punch' => [
             'en' => [
                 'DailyBrew vs Buddy Punch',
                 'DailyBrew vs Buddy Punch: device + IP verification as the primary defense, no photo-on-punch. A café-first alternative with a free tier for up to 10 active employees.',
             ],
+            'fr' => [
+                'DailyBrew vs Buddy Punch',
+                "DailyBrew vs Buddy Punch : vérification appareil + IP comme défense principale, sans photo au pointage. Une alternative orientée café avec un forfait gratuit jusqu'à 10 employés actifs.",
+            ],
+            'km' => [
+                'DailyBrew ប្រៀបធៀប Buddy Punch',
+                'DailyBrew ប្រៀបធៀប Buddy Punch៖ ការផ្ទៀងផ្ទាត់ឧបករណ៍ + IP ជាការការពារសំខាន់ គ្មានរូបថតពេលចូលរួម។ ជម្រើសសម្រាប់ហាងកាហ្វេជាមួយកម្រិតឥតគិតថ្លៃរហូតដល់បុគ្គលិកសកម្ម ១០ នាក់។',
+            ],
         ],
         '/vs-7shifts' => [
             'en' => [
                 'DailyBrew vs 7shifts',
                 "DailyBrew vs 7shifts: a free, device-verified time clock for small teams versus 7shifts' restaurant scheduling suite with photo + geofencing punch.",
+            ],
+            'fr' => [
+                'DailyBrew vs 7shifts',
+                "DailyBrew vs 7shifts : pointeuse gratuite à vérification d'appareil pour petites équipes, contre la suite de planification de restaurant de 7shifts avec photo + géorepérage.",
+            ],
+            'km' => [
+                'DailyBrew ប្រៀបធៀប 7shifts',
+                'DailyBrew ប្រៀបធៀប 7shifts៖ នាឡិកាពេលវេលាឥតគិតថ្លៃជាមួយការផ្ទៀងផ្ទាត់ឧបករណ៍សម្រាប់ក្រុមតូច ប្រឆាំងនឹង Suite កំណត់វេនភោជនីយដ្ឋានរបស់ 7shifts ជាមួយរូបថត + geofencing។',
             ],
         ],
         '/stop-buddy-punching' => [
