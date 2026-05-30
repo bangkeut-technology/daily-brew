@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.93.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.92.0...v1.93.0) (2026-05-30)
+
+
+### Features
+
+* **seo:** fr/km translations for 14 industry + competitor SeoMetaResolver entries ([#227](https://github.com/bangkeut-technology/daily-brew/issues/227)) ([90d5c6e](https://github.com/bangkeut-technology/daily-brew/commit/90d5c6e026366f22ca35ece76781ba473df7b12b))
+
 ## [1.92.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.91.0...v1.92.0) (2026-05-29)
 
 
