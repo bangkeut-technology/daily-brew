@@ -448,15 +448,15 @@ final class SeoMetaResolver
         '/pricing' => [
             'en' => [
                 'Pricing',
-                'DailyBrew plans start free for up to 10 employees. Espresso at $14.99/month adds geofencing, device verification, and leave management. Double Espresso for unlimited staff.',
+                'DailyBrew plans start free for up to 10 employees. Espresso at $19.99/month adds geofencing, device verification, and leave management. Double Espresso for unlimited staff.',
             ],
             'fr' => [
                 'Tarifs',
-                "Les plans DailyBrew commencent gratuitement jusqu'à 10 employés. Espresso à 14,99 $/mois ajoute le géorepérage, la vérification d'appareil et la gestion des congés. Double Espresso pour un personnel illimité.",
+                "Les plans DailyBrew commencent gratuitement jusqu'à 10 employés. Espresso à 19,99 $/mois ajoute le géorepérage, la vérification d'appareil et la gestion des congés. Double Espresso pour un personnel illimité.",
             ],
             'km' => [
                 'តម្លៃ',
-                'គម្រោង DailyBrew ចាប់ផ្តើមឥតគិតថ្លៃរហូតដល់បុគ្គលិក ១០ នាក់។ Espresso តម្លៃ $14.99/ខែ បន្ថែម geofencing ការផ្ទៀងផ្ទាត់ឧបករណ៍ និងការគ្រប់គ្រងការឈប់។ Double Espresso សម្រាប់បុគ្គលិកគ្មានកំណត់។',
+                'គម្រោង DailyBrew ចាប់ផ្តើមឥតគិតថ្លៃរហូតដល់បុគ្គលិក ១០ នាក់។ Espresso តម្លៃ $19.99/ខែ បន្ថែម geofencing ការផ្ទៀងផ្ទាត់ឧបករណ៍ និងការគ្រប់គ្រងការឈប់។ Double Espresso សម្រាប់បុគ្គលិកគ្មានកំណត់។',
             ],
         ],
         '/faq' => [

@@ -113,7 +113,7 @@ export const COMPETITORS: Competitor[] = [
     rows: [
       { dimension: 'Anti-buddy-punching', dailybrew: 'Device + IP + NFC tag (beta)', them: 'Photo + geofencing' },
       { dimension: 'GPS / location permission', dailybrew: 'Not required', them: 'Used for clock-in' },
-      { dimension: 'Starting price', dailybrew: 'Free up to 10 active; $14.99/mo', them: 'From ~$44.99/location/mo' },
+      { dimension: 'Starting price', dailybrew: 'Free up to 10 active; $19.99/mo', them: 'From ~$44.99/location/mo' },
       { dimension: 'Built for', dailybrew: 'Cafés & small shops', them: 'Restaurants (scheduling-first)' },
     ],
     summary:

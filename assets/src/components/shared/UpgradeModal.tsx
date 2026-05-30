@@ -121,7 +121,7 @@ export function UpgradeModal({ open, onOpenChange, feature }: UpgradeModalProps)
             </div>
 
             <p className="text-[15px] font-semibold text-text-primary mb-1">
-              {billing === 'annual' ? '$149/year' : '$14.99/month'}
+              {billing === 'annual' ? '$199/year' : '$19.99/month'}
             </p>
             {billing === 'annual' && (
               <p className="text-[13px] text-green font-medium mb-3">Save 17% vs monthly</p>

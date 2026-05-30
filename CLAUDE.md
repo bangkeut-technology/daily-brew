@@ -10,7 +10,7 @@ Owner creates Workspace (restaurant), adds Employees with Shifts. Workspace QR a
 
 ### Plans
 - **Free** — ≤10 employees
-- **Espresso** ($14.99/mo, $149/yr) — ≤20 employees, IP restriction, device verification, geofencing, per-day shifts, leave management, BasilBook `username` linking, manager (max 2), Expo push + Mailgun email, daily summary
+- **Espresso** ($19.99/mo, $199/yr) — ≤20 employees, IP restriction, device verification, geofencing, per-day shifts, leave management, BasilBook `username` linking, manager (max 2), Expo push + Mailgun email, daily summary
 - **Double Espresso** ($39.99/mo, $399/yr) — unlimited employees & managers, sub-QR codes (per-cluster IP/geofence/device overrides, optional per-QR manager)
 
 Users can be owner and/or employee in different workspaces; onboarding chooses initial role.
