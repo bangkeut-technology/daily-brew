@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.93.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.93.0...v1.93.1) (2026-05-30)
+
+
+### Bug Fixes
+
+* **i18n,km:** translate /three-factor-attendance marketing page (missing block, was falling back to English) ([#229](https://github.com/bangkeut-technology/daily-brew/issues/229)) ([f6bdf93](https://github.com/bangkeut-technology/daily-brew/commit/f6bdf934551a5cf8217256c4b96bdc0538be2026))
+
 ## [1.93.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.92.0...v1.93.0) (2026-05-30)
 
 
