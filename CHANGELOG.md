@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.96.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.95.0...v1.96.0) (2026-05-30)
+
+
+### Features
+
+* **telegram:** name Telegram in Espresso marketing + one-tap workspace group linking ([#245](https://github.com/bangkeut-technology/daily-brew/issues/245)) ([6c4a567](https://github.com/bangkeut-technology/daily-brew/commit/6c4a567e2ddc14dc79d5e4767002dd1806f2f114))
+
 ## [1.95.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.94.2...v1.95.0) (2026-05-30)
 
 
