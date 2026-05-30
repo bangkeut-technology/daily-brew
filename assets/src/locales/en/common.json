@@ -612,7 +612,7 @@
       "whoIsItFor": "DailyBrew is designed for restaurant owners, managers, and staff. Owners manage the workspace, shifts, and employees. Managers receive only the permissions you grant them — for example leave approvals, attendance oversight, employee management, or any combination. Staff check in and out by scanning the workspace QR code.",
       "mobileApp": "Yes — DailyBrew is on the App Store and Play Store for owners and managers. Staff don't need it: any phone with a camera can scan the workspace QR and check in from the mobile web. The app adds push notifications, NFC tap-to-check-in, and offline tolerance for managers running a floor.",
       "freePlan": "The Free plan includes up to 10 active employees, QR check-in, shift tracking, closure periods, and the attendance dashboard. It is free forever with no time limit.",
-      "espressoPlan": "Espresso supports up to 20 employees and adds leave request management, IP restriction, device verification, geofencing, per-day shift schedules, manager role with granular permissions (up to 2), push and email notifications, and daily attendance summaries.",
+      "espressoPlan": "Espresso supports up to 20 employees and adds leave request management, IP restriction, device verification, geofencing, per-day shift schedules, manager role with granular permissions (up to 2), push, email and Telegram notifications, and daily attendance summaries.",
       "espressoCost": "Espresso costs $19.99 per month, or $199 per year if you choose annual billing. The yearly plan saves you $40.88 compared to paying monthly.",
       "cancelAnytime": "Yes, there are no contracts or lock-in periods. You can cancel your Espresso subscription at any time from your dashboard Settings. After cancellation, you will continue to have access until the end of your current billing period.",
       "qrCheckin": "Each workspace has a unique QR code. Display it at your restaurant entrance. Staff open the DailyBrew app, scan the QR code, and tap the Check In button to record their arrival. They scan again and tap Check Out when they leave.",
@@ -732,8 +732,8 @@
           "desc": "Employees submit leave requests (paid or unpaid, full or partial day). Owners approve or reject with a note. Full history and status tracking."
         },
         "notifications": {
-          "title": "Push & email notifications",
-          "desc": "Real-time push notifications and email alerts for leave requests, approvals, shift changes, closures, and daily attendance summaries."
+          "title": "Push, email & Telegram notifications",
+          "desc": "Real-time push notifications, email alerts and Telegram messages for leave requests, approvals, shift changes, closures, and daily attendance summaries."
         }
       },
       "why": {
@@ -932,7 +932,7 @@
         },
         "notifications": {
           "title": "Notifications",
-          "desc": "Push and email alerts for leave requests, shift changes, closures, and daily summaries."
+          "desc": "Push, email and Telegram alerts for leave requests, shift changes, closures, and daily summaries."
         }
       }
     },
@@ -1056,7 +1056,7 @@
         "perDaySchedules": "Per-day shift schedules",
         "manager": "Manager role with granular permissions (up to 2)",
         "basilbook": "<brand></brand> integration + API",
-        "notifications": "Push & email notifications",
+        "notifications": "Push, email & Telegram notifications",
         "dailySummary": "Daily attendance summary",
         "trial14": "14-day free trial"
       }
@@ -1430,7 +1430,7 @@
             "label": "<brand></brand> integration + API"
           },
           "notifications": {
-            "label": "Push & email notifications"
+            "label": "Push, email & Telegram notifications"
           },
           "manager": {
             "label": "Manager role"
