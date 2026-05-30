@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.93.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.93.1...v1.93.2) (2026-05-30)
+
+
+### Bug Fixes
+
+* **i18n:** close 118 locale-coverage gaps (82 fr + 36 km routes.threeFactor relocation) ([#231](https://github.com/bangkeut-technology/daily-brew/issues/231)) ([acdc2d3](https://github.com/bangkeut-technology/daily-brew/commit/acdc2d376d5e13f68813a3f48d80f4836c989354))
+
 ## [1.93.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.93.0...v1.93.1) (2026-05-30)
 
 
