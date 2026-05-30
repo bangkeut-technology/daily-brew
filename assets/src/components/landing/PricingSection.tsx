@@ -243,13 +243,6 @@ export function PricingSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          {/* Coming soon badge */}
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-            <span className="text-[12px] font-semibold uppercase tracking-wider px-3.5 py-1 rounded-full bg-text-tertiary text-white shadow-[0_2px_8px_rgba(174,157,149,0.3)]">
-              {t('pricing.doubleEspresso.comingSoon')}
-            </span>
-          </div>
-
           {/* Accent bar */}
           <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-coffee via-coffee-light to-amber opacity-60 rounded-t-2xl" />
 
@@ -295,12 +288,13 @@ export function PricingSection() {
             })}
           </ul>
 
-          <button
-            disabled
-            className="relative flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-[15px] font-medium bg-cream-3/60 text-text-tertiary border border-cream-3 cursor-not-allowed no-underline"
+          <Link
+            to="/sign-up"
+            className="relative btn-shimmer flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-[15px] font-semibold text-white border-none cursor-pointer transition-all duration-150 hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] no-underline"
           >
-            {t('pricing.doubleEspresso.comingSoon')}
-          </button>
+            {t('pricing.doubleEspresso.cta')}
+            <ChevronRight size={14} />
+          </Link>
         </motion.div>
       </div>
 

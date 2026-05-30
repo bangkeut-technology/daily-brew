@@ -1062,6 +1062,7 @@
       "name": "Double Espresso",
       "subtitle": "For large operations",
       "comingSoon": "Coming soon",
+      "cta": "Start with Double Espresso",
       "roadmapBadge": "Roadmap",
       "perMonthHint": "That's just {{price}}/month",
       "features": {

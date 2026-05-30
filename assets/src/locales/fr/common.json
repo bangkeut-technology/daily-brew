@@ -1013,6 +1013,7 @@
       "name": "Double Espresso",
       "subtitle": "Pour les grandes opérations",
       "comingSoon": "Bientôt disponible",
+      "cta": "Commencer avec Double Espresso",
       "roadmapBadge": "Feuille de route",
       "perMonthHint": "Soit seulement {{price}}/mois",
       "features": {
