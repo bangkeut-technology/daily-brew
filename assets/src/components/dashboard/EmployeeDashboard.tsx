@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { Link } from '@tanstack/react-router';
@@ -9,13 +9,12 @@ import {
   CalendarDays,
   CalendarOff,
   Loader2,
-  MapPinOff,
   Plus,
   X,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRoleContext } from '@/hooks/queries/useRoleContext';
-import { useCheckinStatus, useCheckinAction } from '@/hooks/queries/useCheckin';
+import { useCheckinStatus } from '@/hooks/queries/useCheckin';
 import { useWorkspace } from '@/hooks/queries/useWorkspaces';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { useLeaveRequests, useDeleteLeaveRequest } from '@/hooks/queries/useLeaveRequests';
@@ -58,49 +57,13 @@ export function EmployeeDashboard() {
   const { data: closures } = useClosures(workspaceId);
   const { data: allLeaves } = useLeaveRequests(workspaceId);
   const fmtDate = useDateFormat();
-  const { data: checkinData, isLoading: checkinLoading, refetch } = useCheckinStatus(workspaceQrToken);
-  const checkinAction = useCheckinAction(workspaceQrToken);
+  // Read-only status only — the web dashboard intentionally doesn't expose
+  // a check-in/check-out action so every punch goes through the QR scan +
+  // device + IP + (NFC tag) verification stack via the mobile app or the
+  // /checkin/{token} route. React Query refetches on window focus by default
+  // so the status stays fresh when the user comes back from the mobile app.
+  const { data: checkinData, isLoading: checkinLoading } = useCheckinStatus(workspaceQrToken);
   const wsTz = useWorkspaceTimezone();
-
-  const [actionError, setActionError] = useState<string | null>(null);
-  const [locationDenied, setLocationDenied] = useState(false);
-
-  const handleCheckin = useCallback(async () => {
-    setActionError(null);
-    setLocationDenied(false);
-
-    const performCheckin = async (coords?: { latitude: number; longitude: number }) => {
-      try {
-        await checkinAction.mutateAsync(coords);
-        refetch();
-      } catch (err: unknown) {
-        const message =
-          err && typeof err === 'object' && 'response' in err
-            ? (err as { response: { data: { message: string } } }).response?.data?.message
-            : t('checkin.failed', 'Check-in failed. Please try again.');
-        setActionError(message);
-      }
-    };
-
-    if (!navigator.geolocation) {
-      await performCheckin();
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        await performCheckin({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        });
-      },
-      async () => {
-        setLocationDenied(true);
-        await performCheckin();
-      },
-      { enableHighAccuracy: true, timeout: 8000 },
-    );
-  }, [checkinAction, refetch, t]);
 
   if (ctxLoading) {
     return (
@@ -308,78 +271,13 @@ export function EmployeeDashboard() {
                 )}
               </div>
             ) : (
-              <div className="space-y-3">
-                <p className="text-[15px] text-text-secondary font-sans">
-                  {t('dashboard.readyToCheckIn', 'You have not checked in yet today.')}
-                </p>
-
-                {actionError && (
-                  <div className="bg-red/10 border border-red/20 rounded-xl px-4 py-2.5 text-[14px] text-red font-medium font-sans">
-                    {actionError}
-                  </div>
-                )}
-
-                {locationDenied && (
-                  <div className="flex items-center gap-1.5 text-[13px] text-amber font-sans">
-                    <MapPinOff size={12} />
-                    {t('dashboard.locationDenied', 'Location access denied. Check-in sent without location.')}
-                  </div>
-                )}
-
-                <button
-                  onClick={handleCheckin}
-                  disabled={checkinAction.isPending}
-                  className="w-full bg-coffee text-white text-[17px] font-semibold rounded-xl py-3.5 border-none cursor-pointer shadow-[0_4px_14px_rgba(107,66,38,0.30)] active:scale-[0.97] transition-transform disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  {checkinAction.isPending ? (
-                    <>
-                      <Loader2 size={16} className="animate-spin" />
-                      {t('common.loading', 'Loading...')}
-                    </>
-                  ) : (
-                    <>
-                      <LogIn size={16} />
-                      {t('checkin.checkIn', 'Check in')}
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
-
-            {/* Check-out button when checked in but not out */}
-            {checkedIn && !checkedOut && (
-              <div className="mt-3">
-                {actionError && (
-                  <div className="bg-red/10 border border-red/20 rounded-xl px-4 py-2.5 text-[14px] text-red font-medium font-sans mb-3">
-                    {actionError}
-                  </div>
-                )}
-
-                {locationDenied && (
-                  <div className="flex items-center gap-1.5 text-[13px] text-amber font-sans mb-3">
-                    <MapPinOff size={12} />
-                    {t('dashboard.locationDenied', 'Location access denied. Check-in sent without location.')}
-                  </div>
-                )}
-
-                <button
-                  onClick={handleCheckin}
-                  disabled={checkinAction.isPending}
-                  className="w-full bg-glass-bg backdrop-blur-sm text-text-primary text-[16px] font-medium rounded-xl py-3 border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3 disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  {checkinAction.isPending ? (
-                    <>
-                      <Loader2 size={16} className="animate-spin" />
-                      {t('common.loading', 'Loading...')}
-                    </>
-                  ) : (
-                    <>
-                      <LogOut size={16} />
-                      {t('checkin.checkOut', 'Check out')}
-                    </>
-                  )}
-                </button>
-              </div>
+              /* Web dashboard is read-only — the user checks in/out via the
+                 mobile app or the QR /checkin/{token} flow, both of which run
+                 the device + IP + (NFC) verification stack. The dashboard
+                 just tells them their status. */
+              <p className="text-[15px] text-text-secondary font-sans">
+                {t('dashboard.readyToCheckIn', 'You have not checked in yet today.')}
+              </p>
             )}
           </div>
         </GlassCard>

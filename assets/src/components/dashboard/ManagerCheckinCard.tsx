@@ -1,44 +1,26 @@
-import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LogIn, LogOut, CheckCircle, AlertTriangle } from 'lucide-react';
-import { useCheckinStatus, useCheckinAction } from '@/hooks/queries/useCheckin';
+import { LogIn, LogOut, CheckCircle } from 'lucide-react';
+import { useCheckinStatus } from '@/hooks/queries/useCheckin';
 import { GlassCard } from '@/components/shared/GlassCard';
 
 interface ManagerCheckinCardProps {
   qrToken: string;
 }
 
+/**
+ * Manager-view "today" status card for the console dashboard.
+ *
+ * The web check-in/check-out action button was removed deliberately — every
+ * legitimate punch should go through the QR scan + device + IP + (NFC tag)
+ * verification stack, which only the mobile app and the /checkin/{token}
+ * route can run. The dashboard card stays as a read-only status indicator
+ * so a manager who's logged in from a desktop can still see whether their
+ * own day is open / closed without rendering an action that would bypass
+ * verification.
+ */
 export function ManagerCheckinCard({ qrToken }: ManagerCheckinCardProps) {
   const { t } = useTranslation();
-  const { data, isLoading, refetch } = useCheckinStatus(qrToken);
-  const checkinAction = useCheckinAction(qrToken);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleCheckin = useCallback(async () => {
-    setError(null);
-    const perform = async (coords?: { latitude: number; longitude: number }) => {
-      try {
-        await checkinAction.mutateAsync(coords);
-        refetch();
-      } catch (err: unknown) {
-        const message =
-          err && typeof err === 'object' && 'response' in err
-            ? (err as { response: { data: { message: string } } }).response?.data?.message
-            : t('checkin.failed', 'Check-in failed');
-        setError(message);
-      }
-    };
-
-    if (!navigator.geolocation) {
-      await perform();
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => perform({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
-      async () => perform(),
-      { enableHighAccuracy: true, timeout: 8000 },
-    );
-  }, [checkinAction, refetch, t]);
+  const { data, isLoading } = useCheckinStatus(qrToken);
 
   if (isLoading || !data) return null;
 
@@ -75,32 +57,7 @@ export function ManagerCheckinCard({ qrToken }: ManagerCheckinCardProps) {
             )}
           </div>
         </div>
-
-        {!completed && (
-          <button
-            type="button"
-            onClick={handleCheckin}
-            disabled={checkinAction.isPending}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[14px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light hover:-translate-y-px disabled:opacity-50"
-          >
-            {checkedIn ? <LogOut size={14} /> : <LogIn size={14} />}
-            {checkinAction.isPending
-              ? '...'
-              : checkedIn
-                ? t('checkin.checkOut', 'Check Out')
-                : t('checkin.checkIn', 'Check In')}
-          </button>
-        )}
       </div>
-
-      {error && (
-        <div className="px-5 pb-4">
-          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red/8 border border-red/15">
-            <AlertTriangle size={14} className="text-red flex-shrink-0" />
-            <p className="text-[13.5px] text-red">{error}</p>
-          </div>
-        </div>
-      )}
     </GlassCard>
   );
 }
