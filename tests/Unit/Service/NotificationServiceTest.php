@@ -659,6 +659,47 @@ class NotificationServiceTest extends TestCase
         $this->assertEqualsCanonicalizing(['-100', '@owner'], $sentChatIds);
     }
 
+    public function testNotifyEmployeeCheckinPushesToOwnerWhenPushAlertEnabled(): void
+    {
+        $owner = (new User())->setEmail('owner@x.com');
+        $workspace = $this->workspace($owner, pushCheckinAlertsEnabled: true);
+
+        $emp = (new Employee())->setFirstName('Sokha')->setLastName('Sun');
+        $emp->setWorkspace($workspace);
+
+        $attendance = new \App\Entity\Attendance();
+        $attendance->setEmployee($emp);
+        $attendance->setWorkspace($workspace);
+        $attendance->setCheckInAt(new DateTimeImmutable('2026-04-10T09:00:00+00:00'));
+
+        $this->deviceTokenRepo = $this->createStub(DeviceTokenRepository::class);
+        $this->deviceTokenRepo->method('findBy')->willReturn([
+            $this->deviceToken('ExpoToken[OWNER]'),
+        ]);
+        $this->svc = new NotificationService(
+            $this->expo,
+            $this->email,
+            $this->telegram,
+            $this->deviceTokenRepo,
+            $this->employeeRepo,
+        );
+
+        // Push fires; Telegram does not (telegram alert flag is off).
+        $this->telegram->expects($this->never())->method('send');
+        $this->expo->expects($this->once())
+            ->method('send')
+            ->with(
+                ['ExpoToken[OWNER]'],
+                $this->stringContains('Sokha Sun'),
+                $this->anything(),
+                $this->callback(fn ($data) => is_array($data)
+                    && ($data['type'] ?? null) === 'employee_checkin'
+                    && ($data['action'] ?? null) === 'in'),
+            );
+
+        $this->svc->notifyEmployeeCheckin($attendance, 'in');
+    }
+
     public function testNotifyDeviceAnomalyAlsoEmailsOwner(): void
     {
         $owner = (new User())->setEmail('owner@x.com');
@@ -695,6 +736,7 @@ class NotificationServiceTest extends TestCase
         bool $telegramEnabled = false,
         ?string $telegramChatId = null,
         bool $telegramCheckinAlertsEnabled = false,
+        bool $pushCheckinAlertsEnabled = false,
     ): Workspace {
         $ws = new Workspace();
         $ws->setName('Test Workspace');
@@ -707,6 +749,7 @@ class NotificationServiceTest extends TestCase
             $setting->setTelegramChatId($telegramChatId);
         }
         $setting->setTelegramCheckinAlertsEnabled($telegramCheckinAlertsEnabled);
+        $setting->setPushCheckinAlertsEnabled($pushCheckinAlertsEnabled);
         $ws->setSetting($setting);
         return $ws;
     }

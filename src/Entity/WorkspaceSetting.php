@@ -68,6 +68,16 @@ class WorkspaceSetting extends AbstractBaseEntity
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $telegramCheckinAlertsEnabled = false;
 
+    /**
+     * Per-check-in Expo push alert toggle. Same semantics as
+     * `telegramCheckinAlertsEnabled` but delivered to the owner's logged-in
+     * mobile devices instead of Telegram. Off by default and Espresso-gated
+     * (same plan check as Telegram alerts) — a busy café would flood the
+     * owner with one push per punch otherwise.
+     */
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $pushCheckinAlertsEnabled = false;
+
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $tapCheckinEnabled = false;
 
@@ -235,6 +245,17 @@ class WorkspaceSetting extends AbstractBaseEntity
     public function setTelegramCheckinAlertsEnabled(bool $telegramCheckinAlertsEnabled): static
     {
         $this->telegramCheckinAlertsEnabled = $telegramCheckinAlertsEnabled;
+        return $this;
+    }
+
+    public function isPushCheckinAlertsEnabled(): bool
+    {
+        return $this->pushCheckinAlertsEnabled;
+    }
+
+    public function setPushCheckinAlertsEnabled(bool $pushCheckinAlertsEnabled): static
+    {
+        $this->pushCheckinAlertsEnabled = $pushCheckinAlertsEnabled;
         return $this;
     }
 

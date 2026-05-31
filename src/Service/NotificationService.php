@@ -581,7 +581,13 @@ class NotificationService
         }
 
         $setting = $workspace->getSetting();
-        if ($setting === null || !$setting->isTelegramCheckinAlertsEnabled()) {
+        if ($setting === null) {
+            return;
+        }
+
+        $telegramEnabled = $setting->isTelegramCheckinAlertsEnabled();
+        $pushEnabled = $setting->isPushCheckinAlertsEnabled();
+        if (!$telegramEnabled && !$pushEnabled) {
             return;
         }
 
@@ -590,25 +596,44 @@ class NotificationService
         $when = $isOut ? $attendance->getCheckOutAt() : $attendance->getCheckInAt();
         $tz = new \DateTimeZone($setting->getTimezone());
         $timeStr = $when !== null ? $when->setTimezone($tz)->format('H:i') : '—';
-
-        $emoji = $isOut ? '🟠' : '🟢';
-        $tgText = sprintf(
-            "%s <b>%s %s</b> at %s",
-            $emoji,
-            htmlspecialchars($employee->getName(), ENT_HTML5 | ENT_QUOTES, 'UTF-8'),
-            $verb,
-            $timeStr,
-        );
-
-        // Workspace group chat — sendTelegram is already gated internally on
-        // isTelegramNotificationsEnabled + telegramChatId being set, so this
-        // is a no-op when the workspace hasn't configured group notifications.
-        $this->sendTelegram($workspace, $tgText);
-
-        // Owner DM — linking personal Telegram is itself the opt-in (no gate).
         $owner = $workspace->getOwner();
-        if ($owner !== null) {
-            $this->sendTelegramToUser($owner, $tgText);
+
+        if ($telegramEnabled) {
+            $emoji = $isOut ? '🟠' : '🟢';
+            $tgText = sprintf(
+                "%s <b>%s %s</b> at %s",
+                $emoji,
+                htmlspecialchars($employee->getName(), ENT_HTML5 | ENT_QUOTES, 'UTF-8'),
+                $verb,
+                $timeStr,
+            );
+
+            // Workspace group chat — sendTelegram is already gated internally on
+            // isTelegramNotificationsEnabled + telegramChatId being set, so this
+            // is a no-op when the workspace hasn't configured group notifications.
+            $this->sendTelegram($workspace, $tgText);
+
+            // Owner DM — linking personal Telegram is itself the opt-in (no gate).
+            if ($owner !== null) {
+                $this->sendTelegramToUser($owner, $tgText);
+            }
+        }
+
+        // Owner push — fires to every registered Expo device for the owner.
+        // No-op if the owner has never signed in on the mobile app (no
+        // device tokens) so a Telegram-only workspace pays no extra cost.
+        if ($pushEnabled && $owner !== null) {
+            $this->expoPushService->send(
+                $this->getTokensForUser($owner),
+                sprintf('%s %s', $employee->getName(), $verb),
+                sprintf('at %s', $timeStr),
+                [
+                    'type' => 'employee_checkin',
+                    'action' => $action,
+                    'workspacePublicId' => $workspace->getPublicId(),
+                    'attendancePublicId' => $attendance->getPublicId(),
+                ],
+            );
         }
     }
 

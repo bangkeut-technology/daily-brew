@@ -169,6 +169,10 @@ function SettingsPage() {
   // because a 5-person café would otherwise get 10+ pings/day; only turn it on if
   // the owner explicitly wants live check-in noise.
   const [telegramCheckinAlertsEnabled, setTelegramCheckinAlertsEnabled] = useState(false);
+  // Same idea, delivered via Expo push to the owner's mobile devices instead
+  // of Telegram. Independent of Telegram setup — the owner just needs to be
+  // signed in on the mobile app for the tokens to exist.
+  const [pushCheckinAlertsEnabled, setPushCheckinAlertsEnabled] = useState(false);
   const telegramTest = useTelegramTest(currentWsId);
 
   // Stop polling the moment the chat ID flips in the response (the webhook
@@ -229,6 +233,7 @@ function SettingsPage() {
       setTelegramEnabled(settings.telegramNotificationsEnabled);
       setTelegramChatId(settings.telegramChatId || '');
       setTelegramCheckinAlertsEnabled(settings.telegramCheckinAlertsEnabled ?? false);
+      setPushCheckinAlertsEnabled(settings.pushCheckinAlertsEnabled ?? false);
       setGeofencingEnabled(settings.geofencingEnabled);
       setGeofencingLat(settings.geofencingLatitude);
       setGeofencingLng(settings.geofencingLongitude);
@@ -255,6 +260,7 @@ function SettingsPage() {
         telegramChatId: telegramEnabled ? (telegramChatId.trim() || null) : null,
         // Master Telegram toggle off => alerts also off, regardless of local state.
         telegramCheckinAlertsEnabled: telegramEnabled && telegramCheckinAlertsEnabled,
+        pushCheckinAlertsEnabled,
         tapCheckinEnabled,
         nfcCheckinEnabled,
         nfcCheckinIntervalMinutes,
@@ -1386,6 +1392,54 @@ function SettingsPage() {
             </div>
           </GlassCard>
         )}
+        {/* Push notifications — independent of Telegram. Same noise-profile
+            warning applies (10+ pings/day on a 5-person café) so it ships
+            off by default behind an explicit opt-in. Espresso-gated. */}
+        {currentWsId && (
+          <GlassCard hover={false} className="lg:col-span-2">
+            <GlassCardHeader
+              title={t('settings.pushTitle', 'Push notifications')}
+              action={
+                pushCheckinAlertsEnabled && plan?.canUseTelegramNotifications && (
+                  <StatusBadge label={t('settings.activeBadge', 'Active')} variant="green" />
+                )
+              }
+            />
+            <div className="p-5">
+              <div className="flex items-center gap-2">
+                <Toggle
+                  id="push-checkin-alerts"
+                  checked={pushCheckinAlertsEnabled && (plan?.canUseTelegramNotifications ?? false)}
+                  onChange={(v) => {
+                    if (!plan?.canUseTelegramNotifications) {
+                      upgradeModal.openFor('telegramNotifications');
+                      return;
+                    }
+                    setPushCheckinAlertsEnabled(v);
+                  }}
+                />
+                <label
+                  htmlFor="push-checkin-alerts"
+                  className="text-[15px] text-text-primary cursor-pointer"
+                >
+                  {t('settings.pushCheckinAlertsLabel', 'Notify owner on every check-in/out')}
+                  {!plan?.canUseTelegramNotifications && (
+                    <span className="ml-1.5 text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
+                      Espresso
+                    </span>
+                  )}
+                </label>
+              </div>
+              <p className="text-[13px] text-text-tertiary leading-relaxed mt-2 ml-9">
+                {t(
+                  'settings.pushCheckinAlertsDesc',
+                  "Sends a push notification to every mobile device you're signed into. High-frequency — a 5-person café will see 10+ pings a day.",
+                )}
+              </p>
+            </div>
+          </GlassCard>
+        )}
+
         {/* Telegram notifications */}
         {currentWsId && (
           <GlassCard hover={false} className="lg:col-span-2">

@@ -134,6 +134,21 @@ class WorkspaceSettingController extends AbstractController
             $setting->setTelegramCheckinAlertsEnabled(false);
         }
 
+        // Per-check-in Expo push alerts (Espresso gated; off by default).
+        // Same noise-profile reasoning as Telegram alerts above — independent
+        // opt-in so an owner can pick the channel that suits them. Reuses the
+        // canUseTelegramNotifications plan check because both live under the
+        // same "alerts" umbrella; no DB column distinguishes them at the plan
+        // level.
+        if (isset($data['pushCheckinAlertsEnabled']) && $data['pushCheckinAlertsEnabled']) {
+            if (!$planService->canUseTelegramNotifications($workspace)) {
+                return $this->jsonError('Push check-in alerts require the Espresso plan', 402);
+            }
+            $setting->setPushCheckinAlertsEnabled(true);
+        } elseif (isset($data['pushCheckinAlertsEnabled'])) {
+            $setting->setPushCheckinAlertsEnabled(false);
+        }
+
         // Tap check-in (Espresso gated)
         if (isset($data['tapCheckinEnabled']) && $data['tapCheckinEnabled']) {
             if (!$planService->canUseTapCheckin($workspace)) {
@@ -294,6 +309,7 @@ class WorkspaceSettingController extends AbstractController
             'telegramNotificationsEnabled' => $setting?->isTelegramNotificationsEnabled() ?? false,
             'telegramChatId' => $setting?->getTelegramChatId(),
             'telegramCheckinAlertsEnabled' => $setting?->isTelegramCheckinAlertsEnabled() ?? false,
+            'pushCheckinAlertsEnabled' => $setting?->isPushCheckinAlertsEnabled() ?? false,
             'tapCheckinEnabled' => $setting?->isTapCheckinEnabled() ?? false,
             'nfcCheckinEnabled' => $setting?->isNfcCheckinEnabled() ?? false,
             'nfcCheckinIntervalMinutes' => $setting?->getNfcCheckinIntervalMinutes() ?? 15,

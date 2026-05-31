@@ -204,6 +204,7 @@ export interface WorkspaceSetting {
   telegramNotificationsEnabled: boolean;
   telegramChatId: string | null;
   telegramCheckinAlertsEnabled: boolean;
+  pushCheckinAlertsEnabled: boolean;
   tapCheckinEnabled: boolean;
   nfcCheckinEnabled: boolean;
   nfcCheckinIntervalMinutes: number;
