@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.98.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.97.0...v1.98.0) (2026-05-31)
+
+
+### Features
+
+* **notifications:** add Espresso push alerts on every employee check-in/out ([982e7d4](https://github.com/bangkeut-technology/daily-brew/commit/982e7d42b02547ddcdcea4c158e81137e9a25225))
+
 ## [1.97.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.96.2...v1.97.0) (2026-05-30)
 
 
