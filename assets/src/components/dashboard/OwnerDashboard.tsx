@@ -194,7 +194,7 @@ export function OwnerDashboard() {
           </div>
         }
         action={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {data.pendingLeaves > 0 && canUseLeave && (
               <Link
                 to="/console/leave"

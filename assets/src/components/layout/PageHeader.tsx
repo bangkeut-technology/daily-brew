@@ -37,10 +37,14 @@ export function PageHeader({ title, badge, action, help }: PageHeaderProps) {
   const { i18n } = useTranslation();
   const base = (i18n.language ?? 'en').split('-')[0];
   return (
-    <div className="flex items-center justify-between mb-6">
-      <div className="flex items-center gap-3">
+    // Below sm the header stacks: title-row on top, action-row beneath.
+    // At sm+ it reverts to the single-row "title left, actions right" layout.
+    // The title group is `flex-wrap` so a long title plus badges plus the help
+    // icon can ladder over multiple lines on a phone without clipping.
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 min-w-0">
         <h1
-          className="text-[26px] font-semibold text-text-primary"
+          className="text-[22px] sm:text-[26px] font-semibold text-text-primary"
           style={{ fontFamily: "'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif" }}
         >
           {title}

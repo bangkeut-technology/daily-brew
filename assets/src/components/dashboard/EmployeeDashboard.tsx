@@ -511,7 +511,7 @@ export function EmployeeDashboard() {
           <GlassCardHeader
             title={t('dashboard.myLeaveRequests', 'My leave requests')}
             action={
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <Link
                   to="/console/leave"
                   className="text-xs text-amber font-medium cursor-pointer no-underline"

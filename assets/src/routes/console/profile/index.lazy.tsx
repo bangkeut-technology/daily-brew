@@ -353,7 +353,7 @@ function ProfilePage() {
             <GlassCardHeader
               title={t('profile.linkEmployee', 'Link to employee')}
               action={
-                <div className="flex items-center gap-1.5">
+                <div className="flex flex-wrap items-center gap-1.5">
                   <Link2 size={13} className="text-amber" />
                   <span className="text-[13px] text-amber font-medium">
                     {t('profile.optional', 'Optional')}
@@ -736,7 +736,7 @@ function ProfilePage() {
           <GlassCardHeader
             title={t('profile.deleteAccount', 'Delete account')}
             action={
-              <div className="flex items-center gap-1.5">
+              <div className="flex flex-wrap items-center gap-1.5">
                 <AlertTriangle size={13} className="text-red" />
                 <span className="text-[13px] text-red font-medium">
                   {t('profile.danger', 'Danger')}

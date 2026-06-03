@@ -1067,7 +1067,7 @@ function SettingsPage() {
             <GlassCardHeader
               title={t('settings.deviceVerification')}
               action={
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <SettingsHelpLink to="/features/device-verification" label={t('settings.learnMore', 'Learn more')} />
                   <Smartphone size={14} className="text-amber" />
                   {deviceVerificationEnabled && plan?.canUseDeviceVerification && (
@@ -1118,7 +1118,7 @@ function SettingsPage() {
             <GlassCardHeader
               title={t('settings.tapCheckin', 'Tap check-in')}
               action={
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <SettingsHelpLink to="/features" label={t('settings.learnMore', 'Learn more')} />
                   <MousePointerClick size={14} className="text-amber" />
                   {tapCheckinEnabled && plan?.canUseTapCheckin && (
@@ -1172,7 +1172,7 @@ function SettingsPage() {
             <GlassCardHeader
               title={t('settings.nfcCheckin', 'NFC check-in')}
               action={
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <Nfc size={14} className="text-amber" />
                   {nfcStage && <FeatureStageBadge stage={nfcStage} />}
                   {nfcCheckinEnabled && plan?.canUseNfcCheckin && (
@@ -1256,7 +1256,7 @@ function SettingsPage() {
             <GlassCardHeader
               title={t('settings.geofencing', 'Geofencing')}
               action={
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <SettingsHelpLink to="/features/geofencing" label={t('settings.learnMore', 'Learn more')} />
                   <MapPin size={14} className="text-amber" />
                   {geofencingEnabled && plan?.canUseGeofencing && (
@@ -1446,7 +1446,7 @@ function SettingsPage() {
             <GlassCardHeader
               title={t('settings.telegramTitle', 'Telegram notifications')}
               action={
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <Send size={14} className="text-amber" />
                   {telegramEnabled && plan?.canUseTelegramNotifications && (
                     <StatusBadge label={t('settings.activeBadge', 'Active')} variant="green" />
