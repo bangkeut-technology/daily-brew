@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.99.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.99.1...v1.99.2) (2026-06-03)
+
+
+### Bug Fixes
+
+* **mobile:** make attendance + employees-list filter rows responsive ([#261](https://github.com/bangkeut-technology/daily-brew/issues/261)) ([f9d8b75](https://github.com/bangkeut-technology/daily-brew/commit/f9d8b757000d4ccd29a24b1d28b768485e542849))
+
 ## [1.99.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.99.0...v1.99.1) (2026-06-03)
 
 
