@@ -273,7 +273,7 @@ function NewEmployeePage() {
                     placeholder={t('shift.name', 'Shift name (e.g. Morning)')}
                     className={inputClassName}
                   />
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div>
                       <label id="inline-shift-start-label" className="block text-[13px] text-text-tertiary mb-1">
                         {t('shift.startTime', 'Start')}

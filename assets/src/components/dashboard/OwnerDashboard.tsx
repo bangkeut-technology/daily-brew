@@ -261,7 +261,7 @@ export function OwnerDashboard() {
       {/* QR Check-in card — owner only */}
       {!isManagerView && currentWs?.qrToken && (
         <GlassCard hover={false} className="mb-6">
-          <div className="p-5 flex items-center gap-5">
+          <div className="p-5 flex flex-col md:flex-row items-center gap-4 md:gap-5">
             <div className="p-3 bg-white rounded-xl shadow-[0_2px_8px_rgba(107,66,38,0.06)] shrink-0">
               <QRCodeSVG
                 value={`dailybrew:ws:${currentWs.qrToken}`}
