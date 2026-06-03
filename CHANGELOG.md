@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.98.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.98.1...v1.98.2) (2026-06-03)
+
+
+### Performance Improvements
+
+* **landing:** code-split authenticated routes and prune mobile hero anims ([#254](https://github.com/bangkeut-technology/daily-brew/issues/254)) ([0419b10](https://github.com/bangkeut-technology/daily-brew/commit/0419b109c63bd3d7e055991cbcedb362e3f7cfae))
+
 ## [1.98.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.98.0...v1.98.1) (2026-06-03)
 
 
