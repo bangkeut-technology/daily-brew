@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.98.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.98.0...v1.98.1) (2026-06-03)
+
+
+### Bug Fixes
+
+* **landing:** scroll to top on logo click and clarify hero CTA ([#253](https://github.com/bangkeut-technology/daily-brew/issues/253)) ([0ed1bb0](https://github.com/bangkeut-technology/daily-brew/commit/0ed1bb00a9b442023f376ad95e328cfa485c79a6))
+
 ## [1.98.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.97.0...v1.98.0) (2026-05-31)
 
 
