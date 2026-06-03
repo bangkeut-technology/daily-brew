@@ -526,7 +526,7 @@ function SettingSection({
       <GlassCardHeader
         title={title}
         action={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-[12.5px] text-text-secondary">
               {t('qrCodes.sameAsWorkspace', 'Same as workspace')}
             </span>
