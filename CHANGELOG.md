@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.99.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.99.0...v1.99.1) (2026-06-03)
+
+
+### Bug Fixes
+
+* **layout:** make PageHeader stack on mobile so action buttons stop clipping ([#259](https://github.com/bangkeut-technology/daily-brew/issues/259)) ([470e9cc](https://github.com/bangkeut-technology/daily-brew/commit/470e9ccbdd99c20e13854d1fc6c11ee44c9b9b81))
+
 ## [1.99.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.98.2...v1.99.0) (2026-06-03)
 
 
