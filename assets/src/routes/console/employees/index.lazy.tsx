@@ -70,9 +70,10 @@ function EmployeeListPage() {
         }
       />
 
-      {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3 mb-4">
-        <div className="relative">
+      {/* Filters — stacks below sm so the search input gets a full row of its
+          own on phones instead of fighting the filter chips for horizontal space. */}
+      <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 mb-4">
+        <div className="relative w-full sm:w-auto">
           <Search
             size={16}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary pointer-events-none"
@@ -84,7 +85,7 @@ function EmployeeListPage() {
             placeholder={t('common.search')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 pr-3 py-2 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee transition-colors w-56"
+            className="pl-9 pr-3 py-2 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee transition-colors w-full sm:w-56"
           />
         </div>
 
