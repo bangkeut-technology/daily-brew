@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.99.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.98.2...v1.99.0) (2026-06-03)
+
+
+### Features
+
+* **console+admin:** responsive shells with off-canvas sidebar on mobile ([#257](https://github.com/bangkeut-technology/daily-brew/issues/257)) ([d18bdde](https://github.com/bangkeut-technology/daily-brew/commit/d18bdde7a3082f41229be0306d632f2b323d0311))
+
 ## [1.98.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.98.1...v1.98.2) (2026-06-03)
 
 
