@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createLazyFileRoute } from '@tanstack/react-router';
 import { ToggleLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -12,7 +12,7 @@ import { CustomSelect } from '@/components/shared/CustomSelect';
 import { FeatureStageBadge } from '@/components/shared/FeatureStageBadge';
 import { cn } from '@/lib/utils';
 
-export const Route = createFileRoute('/admin/feature-flags/')({
+export const Route = createLazyFileRoute('/admin/feature-flags/')({
   component: AdminFeatureFlagsPage,
 });
 

@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { createLazyFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -23,7 +23,7 @@ import { CheckinUrlRow } from '@/components/shared/CheckinUrlRow';
 import { useFeatureEnabled } from '@/hooks/queries/useFeatures';
 import type { WorkspaceQrCode, WorkspaceQrCodeInput } from '@/types';
 
-export const Route = createFileRoute('/console/qr-codes/$publicId/')({
+export const Route = createLazyFileRoute('/console/qr-codes/$publicId/')({
   component: QrCodeDetailPage,
 });
 

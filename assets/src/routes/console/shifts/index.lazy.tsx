@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createLazyFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -26,7 +26,7 @@ import { ChevronDown, ChevronUp, Crown, Clock, Pencil, Trash2, Plus, Users, X } 
 import { cn } from '@/lib/utils';
 import type { Shift, Employee, ShiftTimeRule } from '@/types';
 
-export const Route = createFileRoute('/console/shifts/')({
+export const Route = createLazyFileRoute('/console/shifts/')({
   component: ShiftsPage,
 });
 

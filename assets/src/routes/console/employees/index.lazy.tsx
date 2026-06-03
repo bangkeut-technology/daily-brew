@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createLazyFileRoute, Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Search, Trash2, Link2, Unlink } from 'lucide-react';
@@ -12,7 +12,7 @@ import { StatusBadge } from '@/components/shared/StatusBadge';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { useState } from 'react';
 
-export const Route = createFileRoute('/console/employees/')({
+export const Route = createLazyFileRoute('/console/employees/')({
   component: EmployeeListPage,
 });
 

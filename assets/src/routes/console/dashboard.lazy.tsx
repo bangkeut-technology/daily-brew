@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createLazyFileRoute } from '@tanstack/react-router';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getWorkspacePublicId, setWorkspacePublicId } from '@/lib/auth';
@@ -20,7 +20,7 @@ import { toast } from 'sonner';
  */
 const EMPLOYEE_QR_PREFIX = 'dailybrew:emp:';
 
-export const Route = createFileRoute('/console/dashboard')({
+export const Route = createLazyFileRoute('/console/dashboard')({
   component: DashboardPage,
 });
 

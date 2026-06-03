@@ -1,14 +1,14 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createLazyFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useAdminSubscriptions } from '@/hooks/queries/useAdmin';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard } from '@/components/shared/GlassCard';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { PlanBadge } from '@/components/shared/PlanBadge';
-import { Pagination } from '@/routes/admin/workspaces/index';
+import { Pagination } from '@/components/shared/Pagination';
 import { cn } from '@/lib/utils';
 
-export const Route = createFileRoute('/admin/subscriptions/')({
+export const Route = createLazyFileRoute('/admin/subscriptions/')({
   component: AdminSubscriptionsPage,
 });
 

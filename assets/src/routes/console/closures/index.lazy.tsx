@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createLazyFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -31,7 +31,7 @@ const createClosureSchema = z
 
 type CreateClosureForm = z.infer<typeof createClosureSchema>;
 
-export const Route = createFileRoute('/console/closures/')({
+export const Route = createLazyFileRoute('/console/closures/')({
   component: ClosuresPage,
 });
 

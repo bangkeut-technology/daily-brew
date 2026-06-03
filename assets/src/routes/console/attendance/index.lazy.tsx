@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createLazyFileRoute } from '@tanstack/react-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CalendarDays, ChevronDown, ClipboardList, GanttChart, LayoutGrid, List, Pencil } from 'lucide-react';
@@ -148,7 +148,7 @@ function GanttCellGlyph({ spec, onClick }: { spec: GanttCellSpec; onClick?: () =
   );
 }
 
-export const Route = createFileRoute('/console/attendance/')({
+export const Route = createLazyFileRoute('/console/attendance/')({
   component: AttendancePage,
 });
 

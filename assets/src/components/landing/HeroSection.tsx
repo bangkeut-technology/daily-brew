@@ -26,8 +26,11 @@ export function HeroSection() {
   const { t } = useTranslation();
   return (
     <section className="relative pt-32 pb-24 px-6 md:px-8 overflow-hidden">
-      {/* Animated background gradient */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {/* Animated background gradients — desktop only. On mobile the infinite
+          framer-motion rAF loops dominated main-thread time and caused tap
+          delay; the blobs are also partially off-screen at narrow widths, so
+          dropping them on small viewports costs no real visual fidelity. */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden hidden md:block">
         <motion.div
           className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-amber/[0.07] blur-[100px]"
           animate={{ y: [0, 30, 0], x: [0, 15, 0] }}

@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createLazyFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -19,7 +19,7 @@ import { LeaveRequestModal } from '@/components/shared/LeaveRequestModal';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { useDateFormat } from '@/hooks/useDateFormat';
 
-export const Route = createFileRoute('/console/leave/')({
+export const Route = createLazyFileRoute('/console/leave/')({
   component: LeaveRequestsPage,
 });
 

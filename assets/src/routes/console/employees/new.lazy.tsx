@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createLazyFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -51,7 +51,7 @@ function SectionHeader({ children }: { children: ReactNode }) {
 
 type CreateEmployeeForm = z.infer<typeof createEmployeeSchema>;
 
-export const Route = createFileRoute('/console/employees/new')({
+export const Route = createLazyFileRoute('/console/employees/new')({
   component: NewEmployeePage,
 });
 

@@ -1,10 +1,10 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createLazyFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForgotPassword } from '@/hooks/queries/useProfile';
 import { toast } from 'sonner';
 
-export const Route = createFileRoute('/forgot-password')({
+export const Route = createLazyFileRoute('/forgot-password')({
   component: ForgotPasswordPage,
 });
 

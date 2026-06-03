@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createLazyFileRoute, useNavigate } from '@tanstack/react-router';
 import { cn } from '@/lib/utils';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -40,7 +40,7 @@ import { CheckinUrlRow } from '@/components/shared/CheckinUrlRow';
 import { useFeatureEnabled, useFeatureStage } from '@/hooks/queries/useFeatures';
 import { FeatureStageBadge } from '@/components/shared/FeatureStageBadge';
 
-export const Route = createFileRoute('/console/settings')({
+export const Route = createLazyFileRoute('/console/settings')({
   component: SettingsPage,
 });
 
