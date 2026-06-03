@@ -13,6 +13,7 @@ import {
     QrCode,
     ShieldCheck,
     HelpCircle,
+    X,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePlan } from '@/hooks/queries/usePlan';
@@ -183,7 +184,7 @@ function Divider() {
     return <div className="my-3 border-t border-cream-3" />;
 }
 
-export function Sidebar() {
+export function Sidebar({ mobileOpen = false, onMobileClose }: { mobileOpen?: boolean; onMobileClose?: () => void } = {}) {
     const { t } = useTranslation();
     const signOut = () => {
         sessionStorage.removeItem('workspace_public_id');
@@ -225,10 +226,27 @@ export function Sidebar() {
         : ownerManageNav;
 
     return (
-        <aside className="fixed left-0 top-0 bottom-0 w-55 bg-cream-2 border-r border-cream-3 flex flex-col z-10">
-            {/* Logo */}
-            <div className="px-5 py-5">
+        <aside
+            className={cn(
+                'fixed left-0 top-0 bottom-0 w-55 bg-cream-2 border-r border-cream-3 flex flex-col',
+                'z-50 md:z-10 transform transition-transform duration-300 ease-in-out md:translate-x-0',
+                mobileOpen ? 'translate-x-0' : '-translate-x-full',
+            )}
+            aria-label={t('nav.sidebar', 'Main navigation')}
+        >
+            {/* Logo row — close button on mobile for parity with the open hamburger */}
+            <div className="px-5 py-5 flex items-center justify-between">
                 <LogoBrand size={28} />
+                {onMobileClose && (
+                    <button
+                        type="button"
+                        onClick={onMobileClose}
+                        className="md:hidden p-1 -mr-1 text-text-secondary hover:text-text-primary transition-colors"
+                        aria-label={t('common.close', 'Close')}
+                    >
+                        <X size={20} />
+                    </button>
+                )}
             </div>
 
             {/* Workspace switcher — always show, combines owned + linked workspaces */}

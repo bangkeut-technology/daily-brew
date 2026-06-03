@@ -1,6 +1,9 @@
 import React from 'react';
 import { createLazyFileRoute, Outlet, useRouter } from '@tanstack/react-router';
+import { Menu } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Sidebar } from '@/components/layout/Sidebar';
+import { LogoBrand } from '@/components/shared/Logo';
 import { useAuthenticationState } from '@/hooks/use-authentication';
 import { useRoleContext } from '@/hooks/queries/useRoleContext';
 import { getWorkspacePublicId, clearWorkspacePublicId } from '@/lib/auth';
@@ -36,8 +39,27 @@ const PERMISSION_GATED_ROUTES: Record<string, ManagerPermission> = {
 
 function ConsoleLayout() {
   const router = useRouter();
+  const { t } = useTranslation();
   const auth = useAuthenticationState();
   const { data: roleContext } = useRoleContext();
+  const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
+
+  // Close the mobile drawer on every route change so navigation feels native.
+  // Listens on the resolved pathname so back/forward also dismiss the drawer.
+  React.useEffect(() => {
+    setMobileNavOpen(false);
+  }, [router.state.location.pathname]);
+
+  // Lock body scroll while the drawer is open. Restoring on unmount handles
+  // the case where the layout unmounts mid-open (e.g. sign-out).
+  React.useEffect(() => {
+    if (!mobileNavOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [mobileNavOpen]);
 
   React.useEffect(() => {
     if (auth.status === 'unauthenticated') {
@@ -111,8 +133,39 @@ function ConsoleLayout() {
 
   return (
     <div className="min-h-screen">
-      <Sidebar />
-      <main className="ml-[220px] p-8 page-enter">
+      {/* Mobile top bar — hidden on md+. Only utility is the drawer trigger;
+          per design decision, all account/lang/theme controls stay inside
+          the drawer. Logo doubles as a quick "back to dashboard" affordance
+          via the Sidebar's own logo on md+, but is purely decorative here. */}
+      <header className="md:hidden fixed top-0 left-0 right-0 h-14 bg-cream-2 border-b border-cream-3 flex items-center px-4 z-30">
+        <button
+          type="button"
+          onClick={() => setMobileNavOpen(true)}
+          className="p-2 -ml-2 text-text-secondary hover:text-text-primary transition-colors"
+          aria-label={t('nav.openMenu', 'Open menu')}
+          aria-expanded={mobileNavOpen}
+        >
+          <Menu size={22} />
+        </button>
+        <div className="flex-1 flex justify-center">
+          <LogoBrand size={26} />
+        </div>
+        {/* Right-side spacer keeps the logo optically centred over the hamburger. */}
+        <div className="w-9" aria-hidden />
+      </header>
+
+      {/* Backdrop — closes the drawer on tap. Only renders while open so it
+          doesn't intercept events on desktop. */}
+      {mobileNavOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/40 z-40"
+          onClick={() => setMobileNavOpen(false)}
+          aria-hidden
+        />
+      )}
+
+      <Sidebar mobileOpen={mobileNavOpen} onMobileClose={() => setMobileNavOpen(false)} />
+      <main className="pt-14 md:pt-0 p-4 md:p-8 md:ml-[220px] page-enter">
         <Outlet />
       </main>
     </div>

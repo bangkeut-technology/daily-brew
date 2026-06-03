@@ -1,7 +1,7 @@
 import { createLazyFileRoute, Link, Outlet, useLocation, useNavigate } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuthenticationState } from '@/hooks/use-authentication';
-import { LayoutDashboard, ShieldCheck, LogOut, Building2, UserCircle, CreditCard, ScrollText, Smartphone, ToggleLeft, AlarmClock } from 'lucide-react';
+import { LayoutDashboard, ShieldCheck, LogOut, Building2, UserCircle, CreditCard, ScrollText, Smartphone, ToggleLeft, AlarmClock, Menu, X } from 'lucide-react';
 import { LogoBrand } from '@/components/shared/Logo';
 import { cn } from '@/lib/utils';
 
@@ -24,6 +24,7 @@ function AdminLayout() {
   const auth = useAuthenticationState();
   const location = useLocation();
   const navigate = useNavigate();
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   // Hard gate: only super admins
   useEffect(() => {
@@ -31,6 +32,21 @@ function AdminLayout() {
       navigate({ to: '/console/dashboard', replace: true });
     }
   }, [auth.status, auth.user, navigate]);
+
+  // Close the drawer on every navigation. Watching pathname catches back/forward too.
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [location.pathname]);
+
+  // Lock body scroll while the drawer is open.
+  useEffect(() => {
+    if (!mobileNavOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [mobileNavOpen]);
 
   if (auth.status === 'loading') return null;
   if (auth.status === 'authenticated' && !auth.user?.isSuperAdmin) return null;
@@ -46,10 +62,50 @@ function AdminLayout() {
 
   return (
     <div className="min-h-screen">
-      {/* Sidebar */}
-      <aside className="fixed left-0 top-0 bottom-0 w-55 bg-cream-2 border-r border-cream-3 flex flex-col z-10">
-        <div className="px-5 py-5">
+      {/* Mobile top bar — same shape as the console shell so super-admins
+          on a phone get the familiar drawer pattern. */}
+      <header className="md:hidden fixed top-0 left-0 right-0 h-14 bg-cream-2 border-b border-cream-3 flex items-center px-4 z-30">
+        <button
+          type="button"
+          onClick={() => setMobileNavOpen(true)}
+          className="p-2 -ml-2 text-text-secondary hover:text-text-primary transition-colors"
+          aria-label="Open menu"
+          aria-expanded={mobileNavOpen}
+        >
+          <Menu size={22} />
+        </button>
+        <div className="flex-1 flex justify-center">
+          <LogoBrand size={26} />
+        </div>
+        <div className="w-9" aria-hidden />
+      </header>
+
+      {mobileNavOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/40 z-40"
+          onClick={() => setMobileNavOpen(false)}
+          aria-hidden
+        />
+      )}
+
+      {/* Sidebar — off-canvas below md, persistent at md+ */}
+      <aside
+        className={cn(
+          'fixed left-0 top-0 bottom-0 w-55 bg-cream-2 border-r border-cream-3 flex flex-col',
+          'z-50 md:z-10 transform transition-transform duration-300 ease-in-out md:translate-x-0',
+          mobileNavOpen ? 'translate-x-0' : '-translate-x-full',
+        )}
+      >
+        <div className="px-5 py-5 flex items-center justify-between">
           <LogoBrand size={28} />
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen(false)}
+            className="md:hidden p-1 -mr-1 text-text-secondary hover:text-text-primary transition-colors"
+            aria-label="Close"
+          >
+            <X size={20} />
+          </button>
         </div>
 
         <div className="px-3 pb-3">
@@ -59,7 +115,7 @@ function AdminLayout() {
           </div>
         </div>
 
-        <nav className="flex-1 px-3 flex flex-col">
+        <nav className="flex-1 px-3 flex flex-col overflow-y-auto">
           {navItems.map((item) => {
             const active = item.exact
               ? location.pathname === item.to
@@ -101,7 +157,7 @@ function AdminLayout() {
         </nav>
       </aside>
 
-      <main className="ml-[220px] p-8 page-enter">
+      <main className="pt-14 md:pt-0 p-4 md:p-8 md:ml-[220px] page-enter">
         <Outlet />
       </main>
     </div>
