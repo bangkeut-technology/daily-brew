@@ -274,20 +274,20 @@ function AttendancePage() {
       </p>
 
       <div className="flex flex-wrap items-end gap-3 mb-6">
-        <div>
+        <div className="w-full sm:w-auto">
           <label id="attendance-from-label" className="block text-[13px] font-medium text-text-secondary mb-1">
             {t('attendance.from', 'From')}
           </label>
           <CustomDatePicker value={from} onChange={setFrom} />
         </div>
-        <div>
+        <div className="w-full sm:w-auto">
           <label id="attendance-to-label" className="block text-[13px] font-medium text-text-secondary mb-1">
             {t('attendance.to', 'To')}
           </label>
           <CustomDatePicker value={to} onChange={setTo} />
         </div>
         {!isEmployee && (
-          <div className="w-48">
+          <div className="w-full sm:w-48">
             <label id="attendance-employee-label" className="block text-[13px] font-medium text-text-secondary mb-1">
               {t('attendance.employee', 'Employee')}
             </label>
@@ -624,7 +624,7 @@ function SegmentedControl({
   return (
     <div
       ref={containerRef}
-      className="relative flex gap-1 ml-auto bg-glass-bg border border-glass-border rounded-xl p-1"
+      className="relative flex gap-1 sm:ml-auto bg-glass-bg border border-glass-border rounded-xl p-1"
     >
       {pill && (
         <div
