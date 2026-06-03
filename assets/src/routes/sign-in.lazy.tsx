@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { createLazyFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
@@ -15,18 +15,15 @@ import { PlayStoreBadge } from '@/components/shared/PlayStoreBadge';
 import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
 import { motion } from 'framer-motion';
 
-const signUpSchema = z.object({
-  firstName: z.string().min(1, 'First name is required'),
-  lastName: z.string().min(1, 'Last name is required'),
+const signInSchema = z.object({
   email: z.string().email('Please enter a valid email'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  agreedToTerms: z.literal(true, { message: 'You must agree to the terms' }),
+  password: z.string().min(1, 'Password is required'),
 });
 
-type SignUpForm = z.infer<typeof signUpSchema>;
+type SignInForm = z.infer<typeof signInSchema>;
 
-export const Route = createFileRoute('/sign-up')({
-  component: SignUpPage,
+export const Route = createLazyFileRoute('/sign-in')({
+  component: SignInPage,
 });
 
 const floatingIcons = [
@@ -38,10 +35,10 @@ const floatingIcons = [
   { icon: <MapPin size={18} />, x: '92%', y: '45%', delay: 2.0, color: '#7C5C9B' },
 ];
 
-function SignUpPage() {
+function SignInPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { register: registerUser } = useAuth();
+  const { login } = useAuth();
   const auth = useAuthenticationState();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -49,9 +46,9 @@ function SignUpPage() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<SignUpForm>({
-    resolver: zodResolver(signUpSchema),
-    defaultValues: { firstName: '', lastName: '', email: '', password: '', agreedToTerms: false as unknown as true },
+  } = useForm<SignInForm>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: { email: '', password: '' },
   });
 
   // Redirect if already authenticated
@@ -61,16 +58,23 @@ function SignUpPage() {
     }
   }, [auth.status, navigate]);
 
-  const onSubmit = async (data: SignUpForm) => {
+  // Show error from OAuth redirect
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get('error');
+    if (error) {
+      toast.error(error);
+      window.history.replaceState({}, '', '/sign-in');
+    }
+  }, []);
+
+  const onSubmit = async (data: SignInForm) => {
     try {
-      await registerUser(data.email, data.password, data.firstName, data.lastName);
-      window.location.href = '/onboarding';
-    } catch (err: unknown) {
-      const message =
-        err && typeof err === 'object' && 'response' in err
-          ? (err as { response: { data: { message: string } } }).response?.data?.message
-          : 'Registration failed';
-      toast.error(message);
+      await login(data.email, data.password);
+      // Full reload so the server embeds the authenticated user into __DAILYBREW__
+      window.location.replace('/console/dashboard');
+    } catch {
+      toast.error('Invalid email or password');
     }
   };
 
@@ -79,9 +83,9 @@ function SignUpPage() {
   return (
     <div className="min-h-screen flex items-center justify-center px-6 py-12 relative overflow-hidden">
       <PageSeo
-        title="Sign up"
-        description="Create your free DailyBrew account. Start tracking staff attendance with QR check-in in minutes. No credit card required."
-        path="/sign-up"
+        title="Sign in"
+        description="Sign in to DailyBrew to manage your restaurant staff attendance, shifts, and leave requests."
+        path="/sign-in"
       />
       {/* Floating language switcher — top-right, above the orbs */}
       <div className="absolute top-4 right-4 z-20">
@@ -133,7 +137,7 @@ function SignUpPage() {
           <Link to="/" className="no-underline inline-block">
             <LogoBrand size={36} className="justify-center" />
           </Link>
-          <p className="text-[15px] text-text-secondary mt-2">Get started for free</p>
+          <p className="text-[15px] text-text-secondary mt-2">Welcome back</p>
         </div>
 
         <div className="glass-card !rounded-2xl p-6 hover:!transform-none">
@@ -144,14 +148,14 @@ function SignUpPage() {
               className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg text-[15px] font-medium bg-glass-bg border border-cream-3 text-text-primary no-underline transition-all hover:bg-cream-3/50"
             >
               <GoogleIcon />
-              Sign up with Google
+              {t('auth.signIn')} with {t('auth.google')}
             </a>
             <a
               href="/oauth/auth/apple"
               className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg text-[15px] font-medium bg-glass-bg border border-cream-3 text-text-primary no-underline transition-all hover:bg-cream-3/50"
             >
               <AppleIcon />
-              Sign up with Apple
+              {t('auth.signIn')} with {t('auth.apple')}
             </a>
           </div>
 
@@ -162,36 +166,6 @@ function SignUpPage() {
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
-                  {t('employee.firstName')}
-                </label>
-                <input
-                  type="text"
-                  {...register('firstName')}
-                  placeholder="John"
-                  className="w-full px-3 py-2.5 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
-                />
-                {errors.firstName && (
-                  <p className="text-[13px] text-red mt-1">{errors.firstName.message}</p>
-                )}
-              </div>
-              <div>
-                <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
-                  {t('employee.lastName')}
-                </label>
-                <input
-                  type="text"
-                  {...register('lastName')}
-                  placeholder="Doe"
-                  className="w-full px-3 py-2.5 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
-                />
-                {errors.lastName && (
-                  <p className="text-[13px] text-red mt-1">{errors.lastName.message}</p>
-                )}
-              </div>
-            </div>
             <div>
               <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
                 {t('auth.email')}
@@ -207,14 +181,21 @@ function SignUpPage() {
               )}
             </div>
             <div>
-              <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
-                {t('auth.password')}
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-[14px] font-medium text-text-secondary">
+                  {t('auth.password')}
+                </label>
+                <Link
+                  to="/forgot-password"
+                  className="text-[13px] text-amber no-underline hover:text-coffee transition-colors"
+                >
+                  {t('auth.forgotPassword')}
+                </Link>
+              </div>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   {...register('password')}
-                  placeholder="8+ characters"
                   className="w-full px-3 py-2.5 pr-10 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee focus:ring-1 focus:ring-coffee/20 transition-all"
                 />
                 <button
@@ -229,42 +210,20 @@ function SignUpPage() {
                 <p className="text-[13px] text-red mt-1">{errors.password.message}</p>
               )}
             </div>
-
-            <label className="flex items-start gap-2.5 cursor-pointer">
-              <input
-                type="checkbox"
-                {...register('agreedToTerms')}
-                className="mt-0.5 w-4 h-4 rounded border-cream-3 accent-coffee"
-              />
-              <span className="text-[13.5px] text-text-secondary leading-snug">
-                I agree to the{' '}
-                <Link to="/terms" className="text-coffee no-underline hover:text-coffee-light font-medium">
-                  Terms of Use
-                </Link>{' '}
-                and{' '}
-                <Link to="/privacy" className="text-coffee no-underline hover:text-coffee-light font-medium">
-                  Privacy Policy
-                </Link>
-              </span>
-            </label>
-            {errors.agreedToTerms && (
-              <p className="text-[13px] text-red">{errors.agreedToTerms.message}</p>
-            )}
-
             <button
               type="submit"
               disabled={isSubmitting}
               className="w-full px-4 py-2.5 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all hover:bg-coffee-light hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)] disabled:opacity-50"
             >
-              {isSubmitting ? t('common.loading') : t('auth.signUp')}
+              {isSubmitting ? t('common.loading') : t('auth.signIn')}
             </button>
           </form>
 
           <div className="mt-5 text-center">
             <p className="text-[14px] text-text-tertiary">
-              {t('auth.hasAccount')}{' '}
-              <Link to="/sign-in" className="text-coffee font-medium no-underline hover:text-coffee-light">
-                {t('auth.signIn')}
+              {t('auth.noAccount')}{' '}
+              <Link to="/sign-up" className="text-coffee font-medium no-underline hover:text-coffee-light">
+                {t('auth.signUp')}
               </Link>
             </p>
           </div>

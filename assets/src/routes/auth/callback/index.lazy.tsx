@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createLazyFileRoute, useNavigate } from '@tanstack/react-router';
 import { useAuthentication } from '@/hooks/use-authentication';
 
-export const Route = createFileRoute('/auth/callback/')({
+export const Route = createLazyFileRoute('/auth/callback/')({
     component: AuthCallbackPage,
 });
 

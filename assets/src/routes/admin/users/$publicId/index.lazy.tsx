@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createLazyFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { ArrowLeft, ShieldCheck, ShieldOff } from 'lucide-react';
@@ -9,7 +9,7 @@ import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { cn } from '@/lib/utils';
 
-export const Route = createFileRoute('/admin/users/$publicId/')({
+export const Route = createLazyFileRoute('/admin/users/$publicId/')({
   component: AdminUserDetailPage,
 });
 

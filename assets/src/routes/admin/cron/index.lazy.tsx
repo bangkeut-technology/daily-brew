@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createLazyFileRoute } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { formatDistanceToNow, formatDistanceToNowStrict } from 'date-fns';
@@ -39,7 +39,7 @@ import type {
   ScheduledCommand,
 } from '@/types/admin-cron';
 
-export const Route = createFileRoute('/admin/cron/')({
+export const Route = createLazyFileRoute('/admin/cron/')({
   component: AdminCronPage,
 });
 

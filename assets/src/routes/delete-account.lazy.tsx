@@ -1,10 +1,10 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createLazyFileRoute, Link } from '@tanstack/react-router';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { LandingFooter } from '@/components/landing/LandingFooter';
 import { PageSeo } from '@/components/shared/PageSeo';
 import { Trash2, ShieldCheck, Mail } from 'lucide-react';
 
-export const Route = createFileRoute('/delete-account')({
+export const Route = createLazyFileRoute('/delete-account')({
   component: DeleteAccountPage,
 });
 

@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createLazyFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Search, ShieldCheck, ShieldOff } from 'lucide-react';
@@ -8,10 +8,10 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard } from '@/components/shared/GlassCard';
 import { Toggle } from '@/components/shared/Toggle';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
-import { Pagination } from '@/routes/admin/workspaces/index';
+import { Pagination } from '@/components/shared/Pagination';
 import type { AdminUserRow } from '@/types';
 
-export const Route = createFileRoute('/admin/users/')({
+export const Route = createLazyFileRoute('/admin/users/')({
   component: AdminUsersPage,
 });
 

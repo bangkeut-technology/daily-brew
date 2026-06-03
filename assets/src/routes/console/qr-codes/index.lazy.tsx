@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { createLazyFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -17,7 +17,7 @@ import { GlassCard } from '@/components/shared/GlassCard';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import type { WorkspaceQrCode, WorkspaceQrCodeInput } from '@/types';
 
-export const Route = createFileRoute('/console/qr-codes/')({
+export const Route = createLazyFileRoute('/console/qr-codes/')({
   component: QrCodesPage,
 });
 

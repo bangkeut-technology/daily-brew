@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createLazyFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { ArrowLeft, Ban, RotateCcw } from 'lucide-react';
@@ -19,7 +19,7 @@ import { TestingTrackBadge } from '@/components/shared/TestingTrackBadge';
 import { PlanBadge } from '@/components/shared/PlanBadge';
 import { cn } from '@/lib/utils';
 
-export const Route = createFileRoute('/admin/workspaces/$publicId/')({
+export const Route = createLazyFileRoute('/admin/workspaces/$publicId/')({
   component: AdminWorkspaceDetailPage,
 });
 

@@ -1,13 +1,13 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createLazyFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useAdminAuditLog } from '@/hooks/queries/useAdmin';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard } from '@/components/shared/GlassCard';
 import { CustomSelect } from '@/components/shared/CustomSelect';
-import { Pagination } from '@/routes/admin/workspaces/index';
+import { Pagination } from '@/components/shared/Pagination';
 import { cn } from '@/lib/utils';
 
-export const Route = createFileRoute('/admin/audit-log/')({
+export const Route = createLazyFileRoute('/admin/audit-log/')({
   component: AdminAuditLogPage,
 });
 

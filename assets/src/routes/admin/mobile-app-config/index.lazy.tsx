@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createLazyFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { Apple, Smartphone, CheckCircle2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
@@ -7,7 +7,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard } from '@/components/shared/GlassCard';
 import { cn } from '@/lib/utils';
 
-export const Route = createFileRoute('/admin/mobile-app-config/')({
+export const Route = createLazyFileRoute('/admin/mobile-app-config/')({
   component: AdminMobileAppConfigPage,
 });
 

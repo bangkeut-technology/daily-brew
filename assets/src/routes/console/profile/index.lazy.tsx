@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createLazyFileRoute } from '@tanstack/react-router';
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuthentication } from '@/hooks/use-authentication';
@@ -43,7 +43,7 @@ import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { QRCodeSVG } from 'qrcode.react';
 import { cn } from '@/lib/utils';
 
-export const Route = createFileRoute('/console/profile/')({
+export const Route = createLazyFileRoute('/console/profile/')({
   component: ProfilePage,
 });
 

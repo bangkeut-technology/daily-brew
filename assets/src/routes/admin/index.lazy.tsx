@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createLazyFileRoute, Link } from '@tanstack/react-router';
 import { useAdminDashboard } from '@/hooks/queries/useAdmin';
 import {
   Building2,
@@ -28,7 +28,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard } from '@/components/shared/GlassCard';
 import { cn } from '@/lib/utils';
 
-export const Route = createFileRoute('/admin/')({
+export const Route = createLazyFileRoute('/admin/')({
   component: AdminDashboardPage,
 });
 

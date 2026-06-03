@@ -1,11 +1,11 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createLazyFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useCheckinStatus, useCheckinAction } from '@/hooks/queries/useCheckin';
 import { useAuthentication } from '@/hooks/use-authentication';
 import { useState, useEffect } from 'react';
 import { MapPin, LogIn, ShieldCheck } from 'lucide-react';
 
-export const Route = createFileRoute('/checkin/$qrToken')({
+export const Route = createLazyFileRoute('/checkin/$qrToken')({
   component: CheckinPage,
 });
 
