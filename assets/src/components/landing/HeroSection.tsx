@@ -3,8 +3,6 @@ import { ChevronRight, QrCode, CheckCircle, Clock, Users, Shield, Nfc, Smartphon
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import { AppStoreBadge } from '@/components/shared/AppStoreBadge';
-import { PlayStoreBadge } from '@/components/shared/PlayStoreBadge';
 
 const floatingCardVariants = {
   hidden: { opacity: 0, scale: 0.92, y: 30 },
@@ -139,18 +137,6 @@ export function HeroSection() {
               <p className="text-[13.5px] text-text-tertiary">
                 {t('homepage.hero.noHardware')}
               </p>
-            </motion.div>
-
-            <motion.div
-              className="mt-6"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
-            >
-              <div className="flex flex-wrap items-center gap-3">
-                <AppStoreBadge className="inline-block opacity-80 hover:opacity-100 transition-opacity" />
-                <PlayStoreBadge className="inline-block opacity-80 hover:opacity-100 transition-opacity" />
-              </div>
             </motion.div>
           </div>
 

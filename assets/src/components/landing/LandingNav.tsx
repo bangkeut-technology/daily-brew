@@ -62,7 +62,11 @@ export function LandingNav() {
       />
 
       <div className="flex items-center justify-between px-6 md:px-8 py-4 max-w-6xl mx-auto">
-        <Link to="/" className="no-underline">
+        <Link
+          to="/"
+          className="no-underline"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        >
           <LogoBrand size={30} />
         </Link>
 
