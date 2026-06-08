@@ -93,6 +93,7 @@
     "exportPdf": "នាំចេញទៅ PDF",
     "exportEspressoRequired": "ការនាំចេញតម្រូវឱ្យមានគម្រោង Espresso",
     "exportError": "បរាជ័យក្នុងការនាំចេញវត្តមាន",
+    "notEmployedOnDate": "មិនសកម្មនៅថ្ងៃនេះ",
     "verification": {
       "title": "ការផ្ទៀងផ្ទាត់ការចូល",
       "atRestaurant": "នៅភោជនីយដ្ឋាន",
