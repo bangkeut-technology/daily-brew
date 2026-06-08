@@ -136,6 +136,19 @@ task('symfony:dump_env_prod', function () {
 });
 
 /**
+ * `cache:clear` runs as the deploy user (debian), so the cache subdirs
+ * Symfony creates (var/cache/prod/vich_uploader, etc.) are owned
+ * debian:debian — PHP-FPM (www-data) can't write into them at runtime.
+ * Re-set group ownership + group-write so the live web user can use the
+ * cache that was warmed at deploy time.
+ */
+task('deploy:cache:fix_perms', function () {
+    cd('{{release_path}}');
+    run('chgrp -R www-data var/cache');
+    run('chmod -R g+rwX var/cache');
+});
+
+/**
  * PHP-FPM graceful reload. Unlike `restart`, `reload` waits for workers to
  * finish their current request before recycling them — no dropped responses.
  * Requires the deploy user to have NOPASSWD sudo on systemctl reload for
@@ -187,6 +200,12 @@ after('frontend:spa:build', 'frontend:next:build');
 // appends it via {{console_options}} and prepending the flag emits it BEFORE
 // the command name on some Symfony Console versions, which errors out.
 before('deploy:symlink', 'database:migrate');
+
+// cache:clear runs as the deploy user — fix the cache group + perms so
+// PHP-FPM (www-data) can write at runtime. Runs after cache:clear but
+// before the symlink swap so the live release has correct perms from
+// the moment it goes live.
+after('deploy:cache:clear', 'deploy:cache:fix_perms');
 
 // Symlink swap is `deploy:symlink`, contributed by the base recipe and fired
 // from `deploy:publish`. Reload PHP-FPM the moment the swap completes so
