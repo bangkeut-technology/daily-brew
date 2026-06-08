@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
  * processes the JWT clear cookies — same flow as the prior sidebar button.
  */
 export function UserAvatarMenu() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const auth = useAuthenticationState();
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -38,9 +38,14 @@ export function UserAvatarMenu() {
 
   const signOut = () => {
     sessionStorage.removeItem('workspace_public_id');
+    // Use the live i18n locale (i18next BCP-47 tag → trim region) rather than
+    // reading `sessionStorage.getItem('locale')` directly. The language
+    // provider keeps both in sync, but reading from i18n makes the dependency
+    // explicit and survives anyone touching the storage key later.
+    const locale = (i18n.language ?? 'en').split('-')[0];
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = `/api/v1/${sessionStorage.getItem('locale') || 'en'}/auth/logout`;
+    form.action = `/api/v1/${locale}/auth/logout`;
     document.body.appendChild(form);
     form.submit();
   };
