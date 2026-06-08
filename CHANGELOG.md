@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.100.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.99.3...v1.100.0) (2026-06-08)
+
+
+### Features
+
+* **attendance:** Espresso-gated Excel + PDF export of the attendance log ([#267](https://github.com/bangkeut-technology/daily-brew/issues/267)) ([8deefb1](https://github.com/bangkeut-technology/daily-brew/commit/8deefb1f471ba5b790e1ffb1df3161782b85c508))
+
 ## [1.99.3](https://github.com/bangkeut-technology/daily-brew/compare/v1.99.2...v1.99.3) (2026-06-08)
 
 
