@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.103.4](https://github.com/bangkeut-technology/daily-brew/compare/v1.103.3...v1.103.4) (2026-06-08)
+
+
+### Bug Fixes
+
+* **deploy:** clone repo over HTTPS+GITHUB_TOKEN so prod doesn't need a GitHub SSH key ([4ca4529](https://github.com/bangkeut-technology/daily-brew/commit/4ca4529a14e4e58e696d53fad21d0c91a02c67e3))
+
 ## [1.103.3](https://github.com/bangkeut-technology/daily-brew/compare/v1.103.2...v1.103.3) (2026-06-08)
 
 
