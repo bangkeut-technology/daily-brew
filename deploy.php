@@ -98,8 +98,11 @@ task('frontend:next:build', function () {
     cd('{{release_path}}/frontend');
     run('npm ci', ['timeout' => 600]);
     run('npm run build', ['timeout' => 900]);
-    // Per Next standalone docs: static + public aren't auto-copied.
-    run('rm -rf .next/standalone/.next/static .next/standalone/public');
+    // Per Next standalone docs: static + public aren't auto-copied. Fail
+    // loudly if `next build` silently skipped standalone emission (e.g. OOM
+    // on the host) — otherwise the cp would 1) silently fail and 2) the
+    // dailybrew-next restart would crash-loop on a non-existent server.js.
+    run('test -d .next/standalone');
     run('cp -R .next/static .next/standalone/.next/static');
     run('cp -R public .next/standalone/public');
 });
@@ -134,9 +137,15 @@ task('service:php-fpm:reload', function () {
  * Skipped gracefully if the unit isn't installed (pre-Phase-6 hosts).
  */
 task('service:next:restart', function () {
-    $hasUnit = run('systemctl list-unit-files dailybrew-next.service 2>/dev/null | grep -c dailybrew-next || true');
-    if ((int) trim($hasUnit) > 0) {
+    // Mirror the legacy deploy.yaml's gating shape (line 63 of deploy.yaml):
+    // systemctl exit status, NOT stdout count — so a degraded systemctl that
+    // errors to stderr can't silently make us skip the restart.
+    $installed = run('systemctl list-unit-files dailybrew-next.service >/dev/null 2>&1 && echo yes || echo no');
+    if (trim($installed) === 'yes') {
         run('sudo /bin/systemctl restart dailybrew-next');
+        // Wait for Next to come back up — otherwise nginx returns 502
+        // indefinitely and the workflow reports success. 5s budget.
+        run('for i in 1 2 3 4 5; do curl -fs -o /dev/null http://127.0.0.1:3000/ && exit 0; sleep 1; done; exit 1');
     } else {
         writeln('  <comment>dailybrew-next.service not installed — skipping (legacy SPA still serving)</comment>');
     }
@@ -144,9 +153,10 @@ task('service:next:restart', function () {
 
 // ── Recipe wiring ───────────────────────────────────────────────────────────
 //
-// The Symfony recipe already pulls `deploy:prepare`, `deploy:vendors`,
-// `deploy:cache:clear`, `database:migrate`, `deploy:publish`, etc. We extend
-// the pipeline with the SPA + Next builds and the systemd reloads.
+// recipe/symfony.php's default `deploy` chain is:
+//   deploy:prepare → deploy:vendors → deploy:cache:clear → deploy:publish
+// `database:migrate` is DEFINED by the recipe but NOT in that chain — we wire
+// it ourselves below. Same for our SPA + Next builds and the systemd reloads.
 
 after('deploy:vendors', 'symfony:dump_env_prod');
 after('symfony:dump_env_prod', 'frontend:spa:build');
@@ -156,10 +166,10 @@ after('frontend:spa:build', 'frontend:next:build');
 // backward-compatible — the previous release is still serving traffic at this
 // moment. See DEPLOYER-CUTOVER.md §6 for the safe-migration rules.
 //
-// `database:migrate` is provided by recipe/symfony.php. Override the default
-// command so we explicitly pass --no-interaction (the recipe's default does
-// this but we make it explicit).
-set('bin/console', '{{bin/php}} {{release_path}}/bin/console --no-interaction');
+// Do NOT override `bin/console` to bake --no-interaction; the recipe already
+// appends it via {{console_options}} and prepending the flag emits it BEFORE
+// the command name on some Symfony Console versions, which errors out.
+before('deploy:symlink', 'database:migrate');
 
 // Symlink swap is `deploy:symlink`, contributed by the base recipe and fired
 // from `deploy:publish`. Reload PHP-FPM the moment the swap completes so
@@ -169,9 +179,11 @@ after('service:php-fpm:reload', 'service:next:restart');
 
 // Rollback flow: when `dep rollback production` runs, it points `current` at
 // the previous release. We still want PHP-FPM + Next to pick up the
-// directory swap, so the same reload hooks fire.
+// directory swap, so the same reload hooks fire on rollback:done. (Declaring
+// after('service:php-fpm:reload', ...) a second time would replace the deploy
+// hook, so we hang the next-restart off rollback:done directly.)
 after('rollback:done', 'service:php-fpm:reload');
-after('service:php-fpm:reload', 'service:next:restart');
+after('rollback:done', 'service:next:restart');
 
 // On any deploy failure, release the lock so the next run isn't blocked.
 fail('deploy', 'deploy:unlock');

@@ -19,6 +19,13 @@ on:
                 required: false
                 type: string
 
+# Serialise deploys per environment. Two release tags landing within the build
+# window otherwise spawn parallel runs that race for Deployer's host lock; one
+# fails fast with a confusing error. Concurrency keeps them sequential.
+concurrency:
+    group: deploy-production
+    cancel-in-progress: false
+
 jobs:
     deploy:
         name:        'Atomic deploy to production'
@@ -47,10 +54,11 @@ jobs:
                     php-version: '8.5'
                     tools:       composer:v2
 
-            -   name: Install Deployer + dev deps
-                # Deployer runs on the CI runner (it SSHes to prod). Dev deps
-                # are needed for vendor/bin/dep; we don't ship them to prod.
-                run:  composer install --no-interaction --prefer-dist
+            -   name: Install Deployer (dev deps only the runner needs)
+                # Deployer runs on the CI runner (it SSHes to prod). Skip
+                # post-install scripts — we don't need cache:clear or
+                # assets:install on the runner side, just vendor/bin/dep.
+                run:  composer install --no-interaction --prefer-dist --no-scripts
 
             -   name: Configure SSH
                 uses: webfactory/ssh-agent@v0.9.0

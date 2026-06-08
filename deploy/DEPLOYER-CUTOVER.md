@@ -22,67 +22,115 @@ the new code without dropping in-flight requests.
 
 ```
 /var/www/dailybrew/
-├── current   → releases/v1.103.0/      ← single atomic symlink
+├── current   → releases/3/              ← single atomic symlink
 ├── releases/
-│   ├── v1.101.0/
-│   ├── v1.102.0/                       ← previous, kept for rollback
-│   └── v1.103.0/                       ← live
+│   ├── 1/                               ← `pre-cutover` after §2.1
+│   ├── 2/                               ← previous, kept for rollback
+│   └── 3/                               ← live
 └── shared/
-    ├── .env.local                      ← per-host secrets
+    ├── .env.local                       ← per-host secrets
     ├── config/jwt/
-    │   ├── private.pem                 ← LexikJWT keypair
+    │   ├── private.pem                  ← LexikJWT keypair
     │   └── public.pem
-    ├── var/log/                        ← persistent across releases
-    └── public/uploads/                 ← user-uploaded avatars
+    ├── var/log/                         ← persistent across releases
+    └── public/uploads/                  ← user-uploaded avatars
 ```
 
 Each release contains a complete checkout + a built `vendor/`, `public/build/`,
 and `frontend/.next/standalone/`. The release tree is read-only at runtime —
 anything that needs to persist lives in `shared/` and is symlinked in.
 
+> **Naming gotcha:** Deployer's `release_name` is a **monotonic integer**
+> (1, 2, 3, …), tracked in `.dep/releases_log`. NOT the git tag. We seed the
+> sequence by renaming the pre-cutover snapshot to `releases/1/` below; the
+> first `dep deploy` run after that lands in `releases/2/`.
+
 ---
 
 ## 2. Pre-flight on the prod host (one-time)
+
+### 2.0 SSH key for CI (one-time, BEFORE any of the host migration below)
+
+The new workflow `deploy-atomic.yaml` authenticates with a private key — the
+legacy `deploy.yaml` used password auth via `secrets.PASSWORD`. Both can
+coexist during the bake; you do this once.
+
+On the prod host, as the deploy user:
+
+```bash
+ssh-keygen -t ed25519 -f ~/.ssh/dailybrew-ci -N ""
+cat ~/.ssh/dailybrew-ci.pub >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+cat ~/.ssh/dailybrew-ci
+# ↑ COPY THIS PRIVATE-KEY OUTPUT
+```
+
+In GitHub: **Settings → Secrets and variables → Actions → New repository
+secret**:
+
+- Name: `DEPLOY_SSH_KEY`
+- Value: paste the private key (including the `-----BEGIN/END-----` lines)
+
+Smoke test locally:
+
+```bash
+ssh -i ~/.ssh/dailybrew-ci -p $PORT $DEPLOY_USER@$HOST 'echo ok'
+```
 
 ### 2.1 Move existing state into `shared/`
 
 ```bash
 ssh prod
+sudo bash    # the rest of this section runs as root for fewer sudo prefixes
 cd /var/www/dailybrew
 
-# Stop firing the legacy deploy until cutover is done.
-# (We'll re-enable atomic deploys at the end.)
+# 1. shared dirs + per-host secrets
+mkdir -p releases shared shared/config/jwt shared/var shared/public
+mv .env.local                       shared/.env.local
+mv config/jwt/private.pem           shared/config/jwt/private.pem
+mv config/jwt/public.pem            shared/config/jwt/public.pem
+mv var/log                          shared/var/log
+mv public/uploads                   shared/public/uploads || true
 
-# Snapshot the current tree as the first "release"
-sudo mkdir -p releases shared shared/config shared/var shared/public
-sudo mv .env.local                       shared/.env.local
-sudo mv config/jwt/private.pem           shared/config/jwt/private.pem
-sudo mv config/jwt/public.pem            shared/config/jwt/public.pem
-sudo mv var/log                          shared/var/log
-sudo mv public/uploads                   shared/public/uploads || true
+# 2. Snapshot the current tree as releases/1/ (Deployer's release_name is
+#    a monotonic integer — seeding it with 1 keeps the count consistent).
+#    Use `find` with an explicit deny-list instead of mv `*` — globs don't
+#    catch dotfiles + we'd accidentally recurse into the just-created dirs.
+mkdir -p releases/1
+shopt -s dotglob
+find . -maxdepth 1 -mindepth 1 \
+    ! -name releases ! -name shared ! -name current \
+    -exec mv -t releases/1/ {} +
+shopt -u dotglob
 
-# Stash the current working tree as releases/pre-cutover/ so we have a
-# rollback target before the first Deployer run.
-sudo mv * .[^.]* releases/pre-cutover/ 2>/dev/null || true
-# (re-create the top-level dirs that need to exist as siblings)
-sudo mkdir -p releases shared
-sudo mv releases/pre-cutover/releases/* releases/ 2>/dev/null || true
-sudo mv releases/pre-cutover/shared/*   shared/   2>/dev/null || true
+# 3. Bridge the pre-cutover release back to shared/ so nginx + the Next
+#    process can serve uploads + write logs DURING the gap between this
+#    cutover and the first successful `dep deploy` (avatars would 404
+#    otherwise — public/uploads is the only directory consumed by URL).
+ln -s ../../shared/.env.local                     releases/1/.env.local
+ln -s ../../../shared/config/jwt/private.pem      releases/1/config/jwt/private.pem
+ln -s ../../../shared/config/jwt/public.pem       releases/1/config/jwt/public.pem
+ln -s ../../shared/var/log                        releases/1/var/log
+ln -s ../../shared/public/uploads                 releases/1/public/uploads
 
-sudo ln -s releases/pre-cutover current
+# 4. Atomic current → 1
+ln -s releases/1 current
 ls -la
-# Expected: current symlink, releases/pre-cutover/, shared/
+# Expected: `current` symlink → releases/1, `releases/1/` populated, `shared/` populated.
+exit   # leave the root subshell
 ```
 
-> If anything in this step looks off, `mv releases/pre-cutover/* .` puts the
-> tree back exactly as it was. Do that FIRST before debugging.
+> **Rollback this step:** `sudo bash -c 'rm current; mv releases/1/* releases/1/.[!.]* .; rmdir releases/1'`
+> puts the tree back. Do that FIRST before debugging if §2.1 looked off.
 
 ### 2.2 Fix ownership
 
+Set `$DEPLOY_USER` to the SSH user that authenticates with the key from §2.0
+(commonly `deploy` or `www-data` — whichever logs in via `webfactory/ssh-agent`).
+
 ```bash
+export DEPLOY_USER=deploy   # ← set this first, BEFORE running the chown
 sudo chown -R www-data:www-data /var/www/dailybrew
-# Deployer needs SSH login for the deploy user — typically NOT www-data.
-# Adjust to match whatever user appsleboy/ssh-action was logging in as.
 sudo chown -R "$DEPLOY_USER":www-data /var/www/dailybrew
 sudo chmod -R g+w /var/www/dailybrew/shared
 ```
@@ -99,13 +147,25 @@ NOPASSWD sudo on this specific command.
 sudo visudo -f /etc/sudoers.d/dailybrew-deploy
 ```
 
-Add:
+Add (replace `deploy` with whatever user the GitHub Actions SSH key authenticates as — see §2.0):
 
 ```
+# Non-tty sudo is required because the deploy fires over SSH without a PTY.
+# RHEL-family hosts default to `Defaults requiretty` which BLOCKS NOPASSWD
+# sudo over SSH — override it for the deploy user only.
+Defaults:deploy !requiretty
+
 deploy ALL=(root) NOPASSWD: /bin/systemctl reload php8.5-fpm, /bin/systemctl restart dailybrew-next
 ```
 
-Replace `deploy` with whatever user the GitHub Actions ssh key authenticates as.
+Smoke-test from your local shell (NOT the host shell — must go over SSH so
+the requiretty path is exercised):
+
+```bash
+ssh -i ~/.ssh/dailybrew-ci $DEPLOY_USER@$HOST 'sudo -n /bin/systemctl reload php8.5-fpm && echo ok'
+# Expected: "ok". If you see "sudo: a password is required" the requiretty
+# line is missing or the user/path doesn't match.
+```
 
 ---
 
@@ -201,16 +261,17 @@ Watch the output. Key milestones:
 
 - `[OK] deploy:vendors` — composer install --no-dev finished
 - `[OK] symfony:dump_env_prod` — `.env.local.php` materialized in the new release
-- `[OK] frontend:spa:build` — Encore bundle built into `releases/<tag>/public/build/`
+- `[OK] frontend:spa:build` — Encore bundle built into `releases/<n>/public/build/`
 - `[OK] frontend:next:build` — Next standalone built
-- `[OK] database:migrate` — migrations applied to the live DB
+- `[OK] database:migrate` — migrations applied to the live DB (BEFORE the symlink swap so we abort if migrations fail)
 - `[OK] deploy:symlink` — **the atomic swap; new code goes live here**
 - `[OK] service:php-fpm:reload` — workers recycled gracefully
-- `[OK] service:next:restart` — Next process restarted
+- `[OK] service:next:restart` — Next process restarted; readiness probe waits for `http://127.0.0.1:3000/` to return 200
 
 If anything before `deploy:symlink` fails, the new release is just an unused
 directory — production keeps serving from the old `current` target. Cleanup:
-`rm -rf releases/<failed-tag>` on the host.
+`sudo rm -rf releases/<failed-N>` on the host (find the highest integer
+under `releases/` that isn't pointed at by `current`).
 
 ### Rollback
 
@@ -233,18 +294,21 @@ This re-points `current` at the previous release and reloads PHP-FPM. Sub-second
 Once §7 succeeds twice in a row from manual `workflow_dispatch`:
 
 1. In `.github/workflows/deploy-atomic.yaml`, uncomment the `release.types: [published]` trigger.
-2. In `.github/workflows/deploy.yaml`, comment out the same trigger (keep the file as a fallback for emergencies).
+2. In `.github/workflows/deploy.yaml`, **comment out** the `release.types: [published]` trigger
+   (keep the file checked in — easy `git revert` if you need to roll back to in-place
+   deploys mid-bake).
 3. Push the change. The next release-please release will go through the atomic flow.
 
 Bake for two release cycles. Then:
 
 ```bash
 # On the host — confirm legacy is dormant
-sudo rm /var/www/dailybrew/releases/pre-cutover/public/.maintenance || true
+sudo rm /var/www/dailybrew/releases/1/public/.maintenance || true
 # (the legacy flow's maintenance trap is gone from nginx; this is just hygiene)
 ```
 
-After a third successful release through Deployer, delete `deploy.yaml`.
+After a third successful release through Deployer (and you've verified no
+caller still hits `deploy.yaml`), delete it in a separate PR.
 
 ---
 
