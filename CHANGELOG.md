@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.103.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.102.2...v1.103.0) (2026-06-08)
+
+
+### Features
+
+* **employee:** editable tracking-start date on the employee form ([#281](https://github.com/bangkeut-technology/daily-brew/issues/281)) ([afd74f5](https://github.com/bangkeut-technology/daily-brew/commit/afd74f544a18fae2494dbcc96759ecef80ca0790))
+
 ## [1.102.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.102.1...v1.102.2) (2026-06-08)
 
 
