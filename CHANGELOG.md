@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.102.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.101.0...v1.102.0) (2026-06-08)
+
+
+### Features
+
+* **console:** add sticky topbar with workspace switcher + user menu ([#274](https://github.com/bangkeut-technology/daily-brew/issues/274)) ([d534dee](https://github.com/bangkeut-technology/daily-brew/commit/d534deeaaa69a4feef1698cbff0d4479d9457c3c))
+
 ## [1.101.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.100.1...v1.101.0) (2026-06-08)
 
 
