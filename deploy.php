@@ -31,7 +31,17 @@ require 'recipe/symfony.php';
 // ── Project ─────────────────────────────────────────────────────────────────
 
 set('application', 'dailybrew');
-set('repository', 'git@github.com:bangkeut-technology/daily-brew.git');
+
+// HTTPS with the runner-injected GITHUB_TOKEN — prod has no SSH key for
+// GitHub, so a `git@github.com:` URL fails at `deploy:update_code` with
+// exit 128. The token is short-lived (workflow run lifetime), scoped to
+// this repo's contents:read, and persists only inside `releases/N/.git/`
+// until Deployer's cleanup removes the release. Mirrors what the legacy
+// deploy.yaml does with `git fetch https://user:token@github.com/...`.
+set('repository', static fn () => sprintf(
+    'https://x-access-token:%s@github.com/bangkeut-technology/daily-brew.git',
+    getenv('GITHUB_TOKEN') ?: '',
+));
 
 // Use the release-please tag passed in by CI (DEPLOY_TAG). Locally falls back
 // to whatever branch the operator is on. Tag overrides branch in Deployer's

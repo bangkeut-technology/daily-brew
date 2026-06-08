@@ -72,6 +72,10 @@ jobs:
 
             -   name: Deploy
                 env:
+                    # GITHUB_TOKEN is auto-injected and scoped to contents:read
+                    # on this repo — Deployer's repository URL bakes it in for
+                    # the remote `git clone` (prod has no GitHub SSH key).
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                     DEPLOY_TAG:  ${{ steps.tag.outputs.deploy_tag }}
                     DEPLOY_HOST: ${{ secrets.HOST }}
                     DEPLOY_USER: ${{ secrets.USERNAME }}
