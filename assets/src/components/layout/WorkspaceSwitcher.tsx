@@ -96,8 +96,12 @@ export function WorkspaceSwitcher({ workspaces, planLabel, isEspresso }: Workspa
             side="bottom"
             align="start"
             sideOffset={4}
+            // Match the trigger width so the dropdown lines up cleanly under it
+            // — Radix exposes the trigger's measured width on the anchor CSS
+            // var, with a 200px floor so narrow triggers (mobile) still fit.
+            style={{ width: 'max(var(--radix-popover-trigger-width), 200px)' }}
             className="
-              w-[200px] max-h-[280px] overflow-y-auto
+              max-h-[280px] overflow-y-auto
               bg-cream-2 border border-cream-3 rounded-xl
               shadow-[0_8px_30px_rgba(107,66,38,0.12)]
               p-1.5 z-50
