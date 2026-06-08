@@ -1,4 +1,4 @@
-import { createLazyFileRoute } from '@tanstack/react-router';
+import { createLazyFileRoute, Link } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CalendarDays, ChevronDown, ClipboardList, GanttChart, LayoutGrid, List, Pencil } from 'lucide-react';
@@ -184,6 +184,8 @@ function AttendancePage() {
   const employeePublicId = roleContext?.employee?.publicId;
   const canEditAttendance = !!roleContext
     && (roleContext.isOwner || (roleContext.managerPermissions ?? []).includes('manage_attendance'));
+  const canViewEmployee = !!roleContext
+    && (roleContext.isOwner || (roleContext.managerPermissions ?? []).includes('manage_employees'));
 
   const [editTarget, setEditTarget] = useState<{
     publicId: string;
@@ -441,9 +443,19 @@ function AttendancePage() {
                           <div className="flex items-center gap-2.5">
                             <Avatar name={emp.employeeName} index={empIdx} size={26} />
                             <div className="min-w-0 flex-1">
-                              <div className="text-[13px] font-medium text-text-primary leading-tight truncate">
-                                {emp.employeeName}
-                              </div>
+                              {canViewEmployee ? (
+                                <Link
+                                  to="/console/employees/$publicId"
+                                  params={{ publicId: emp.employeePublicId }}
+                                  className="text-[13px] font-medium text-text-primary leading-tight truncate no-underline hover:text-coffee transition-colors block"
+                                >
+                                  {emp.employeeName}
+                                </Link>
+                              ) : (
+                                <div className="text-[13px] font-medium text-text-primary leading-tight truncate">
+                                  {emp.employeeName}
+                                </div>
+                              )}
                               <div className="text-[10.5px] text-text-tertiary leading-tight mt-0.5">
                                 {emp.shiftName || t('attendance.noShift', 'No shift')}
                               </div>
@@ -526,6 +538,7 @@ function AttendancePage() {
                 emp={emp}
                 empIdx={empIdx}
                 t={t}
+                canViewEmployee={canViewEmployee}
                 onEditDay={canEditAttendance
                   ? (day) => setEditTarget({
                       publicId: day.attendancePublicId!,
@@ -562,6 +575,8 @@ function AttendancePage() {
                 <AttendanceRow
                   key={a.publicId}
                   employee={a.employeeName || ''}
+                  employeePublicId={a.employeePublicId}
+                  canViewEmployee={canViewEmployee}
                   shift={a.shiftName || null}
                   date={fmtDate(a.date)}
                   time={a.checkInAt}
@@ -695,11 +710,13 @@ function SummaryCard({
   empIdx,
   t,
   onEditDay,
+  canViewEmployee,
 }: {
   emp: import('@/types').AttendanceSummaryEmployee;
   empIdx: number;
   t: (key: string, fallback: string) => string;
   onEditDay?: (day: AttendanceDayStatus) => void;
+  canViewEmployee?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const presentDays = emp.days.filter((d) => d.status === 'present').length;
@@ -709,15 +726,33 @@ function SummaryCard({
 
   return (
     <GlassCard hover={false}>
-      <button
-        type="button"
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-3 px-5 py-3 w-full text-left cursor-pointer bg-transparent border-none"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setOpen((v) => !v);
+          }
+        }}
+        className="flex items-center gap-3 px-5 py-3 w-full text-left cursor-pointer"
       >
         <Avatar name={emp.employeeName} index={empIdx} size={36} />
         <div className="flex-1 min-w-0">
           <div className="text-[15.5px] font-medium text-text-primary font-sans">
-            {emp.employeeName}
+            {canViewEmployee ? (
+              <Link
+                to="/console/employees/$publicId"
+                params={{ publicId: emp.employeePublicId }}
+                onClick={(e) => e.stopPropagation()}
+                className="no-underline text-text-primary hover:text-coffee transition-colors"
+              >
+                {emp.employeeName}
+              </Link>
+            ) : (
+              emp.employeeName
+            )}
           </div>
           <div className="text-[13px] text-text-tertiary font-sans">
             {emp.shiftName || t('attendance.noShift', 'No shift')}
@@ -750,7 +785,7 @@ function SummaryCard({
             open && 'rotate-180',
           )}
         />
-      </button>
+      </div>
       <div
         className="grid transition-[grid-template-rows] duration-250 ease-out"
         style={{ gridTemplateRows: open ? '1fr' : '0fr' }}
