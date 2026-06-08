@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.103.3](https://github.com/bangkeut-technology/daily-brew/compare/v1.103.2...v1.103.3) (2026-06-08)
+
+
+### Bug Fixes
+
+* **deploy:** rollback hooks use `rollback` not `rollback:done` ([b4f67c9](https://github.com/bangkeut-technology/daily-brew/commit/b4f67c94eb61240a42a278cf772dbbe9b5252a65))
+
 ## [1.103.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.103.1...v1.103.2) (2026-06-08)
 
 
