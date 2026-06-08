@@ -14,7 +14,14 @@
     "signOut": "ចាកចេញ",
     "myAttendance": "វត្តមានរបស់ខ្ញុំ",
     "myLeaveRequests": "សំណើឈប់របស់ខ្ញុំ",
-    "adminPanel": "ផ្ទាំងគ្រប់គ្រងអ្នកគ្រប់គ្រង"
+    "adminPanel": "ផ្ទាំងគ្រប់គ្រងអ្នកគ្រប់គ្រង",
+    "userMenu": "ម៉ឺនុយអ្នកប្រើ",
+    "topbar": "របារកន្លែងធ្វើការ",
+    "openMenu": "បើកម៉ឺនុយ"
+  },
+  "notifications": {
+    "title": "ការជូនដំណឹង",
+    "comingSoon": "មកដល់ឆាប់ៗ"
   },
   "profile": {
     "workspaceCount_one": "ការងារ {{count}}",
