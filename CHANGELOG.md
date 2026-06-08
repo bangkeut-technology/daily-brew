@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.99.3](https://github.com/bangkeut-technology/daily-brew/compare/v1.99.2...v1.99.3) (2026-06-08)
+
+
+### Bug Fixes
+
+* **attendance:** anchor absent calc to Employee.linkedAt so mid-month linked staff aren't over-counted ([#265](https://github.com/bangkeut-technology/daily-brew/issues/265)) ([adaeb1d](https://github.com/bangkeut-technology/daily-brew/commit/adaeb1d8750f4caf2c5024c73a58992e836d1d43))
+
 ## [1.99.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.99.1...v1.99.2) (2026-06-03)
 
 
