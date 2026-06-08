@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.100.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.100.0...v1.100.1) (2026-06-08)
+
+
+### Bug Fixes
+
+* **attendance:** generate gantt header from date range, not first employee's days ([#269](https://github.com/bangkeut-technology/daily-brew/issues/269)) ([f7ae707](https://github.com/bangkeut-technology/daily-brew/commit/f7ae7079f3e9e9594bd421962d76055728f34248))
+
 ## [1.100.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.99.3...v1.100.0) (2026-06-08)
 
 
