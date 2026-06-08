@@ -146,7 +146,11 @@ function ConsoleLayout() {
       )}
 
       <Sidebar mobileOpen={mobileNavOpen} onMobileClose={() => setMobileNavOpen(false)} />
-      <main className="pt-14 p-4 md:p-8 md:ml-[220px] page-enter">
+      {/* mt-14 (not pt-14) so the topbar's 56px clearance survives the p-4 /
+          md:p-8 shorthand on `main` — Tailwind's `p-*` declares all four
+          paddings, which silently overrode the earlier `pt-14` and caused the
+          PageHeader to render UNDER the topbar. */}
+      <main className="mt-14 p-4 md:p-8 md:ml-[220px] page-enter">
         <Outlet />
       </main>
     </div>
