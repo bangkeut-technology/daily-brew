@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.103.5](https://github.com/bangkeut-technology/daily-brew/compare/v1.103.4...v1.103.5) (2026-06-08)
+
+
+### Bug Fixes
+
+* **deploy:** writable_dirs only contains var/cache; switch mode to chmod ([cc569cd](https://github.com/bangkeut-technology/daily-brew/commit/cc569cdaf8854249507300bfb948535ce0f19e72))
+
 ## [1.103.4](https://github.com/bangkeut-technology/daily-brew/compare/v1.103.3...v1.103.4) (2026-06-08)
 
 
