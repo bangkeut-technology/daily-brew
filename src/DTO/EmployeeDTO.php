@@ -24,6 +24,7 @@ final readonly class EmployeeDTO
         public ?string $shiftPublicId,
         public ?string $dob,
         public ?string $joinedAt,
+        public ?string $linkedAt,
         public ?string $leftAt,
         public string  $createdAt,
         /** @var list<string> */
@@ -54,6 +55,7 @@ final readonly class EmployeeDTO
             shiftPublicId: $e->getShift() ? (string) $e->getShift()->getPublicId() : null,
             dob: $e->getDob()?->format('Y-m-d'),
             joinedAt: $e->getJoinedAt()?->format('Y-m-d'),
+            linkedAt: $e->getLinkedAt()?->format('Y-m-d'),
             leftAt: $e->getLeftAt()?->format('Y-m-d'),
             createdAt: $e->getCreatedAt()->format('c'),
             managerPermissions: $e->getManagerPermissionValues(),
@@ -80,6 +82,7 @@ final readonly class EmployeeDTO
             'shiftPublicId' => $this->shiftPublicId,
             'dob' => $this->dob,
             'joinedAt' => $this->joinedAt,
+            'linkedAt' => $this->linkedAt,
             'leftAt' => $this->leftAt,
             'createdAt' => $this->createdAt,
             'managerPermissions' => $this->managerPermissions,

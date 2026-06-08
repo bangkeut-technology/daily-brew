@@ -263,6 +263,16 @@ class EmployeeController extends AbstractController
             $employee->setJoinedAt(!empty($data['joinedAt']) ? \App\Service\DateService::parse($data['joinedAt']) : null);
         }
 
+        // linkedAt is the absent-baseline anchor (PR #265). Owner-editable
+        // because the backfill set it to created_at for historical employees,
+        // which over-counts absences for staff actually linked mid-month.
+        // Clearing it (null) excludes the employee from absent calc until
+        // their next link transition. Future-dated values are accepted —
+        // they just mean "don't count absences before this date".
+        if (array_key_exists('linkedAt', $data)) {
+            $employee->setLinkedAt(!empty($data['linkedAt']) ? \App\Service\DateService::parse($data['linkedAt']) : null);
+        }
+
         if (array_key_exists('attendanceTracking', $data)) {
             $mode = EmployeeAttendanceTrackingEnum::tryFrom((string) $data['attendanceTracking']);
             if ($mode === null) {

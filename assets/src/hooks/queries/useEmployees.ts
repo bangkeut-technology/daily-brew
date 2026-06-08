@@ -75,6 +75,7 @@ export function useUpdateEmployee(workspacePublicId: string) {
       linkedUserPublicId?: string | null;
       dob?: string | null;
       joinedAt?: string | null;
+      linkedAt?: string | null;
       attendanceTracking?: EmployeeAttendanceTracking;
       role?: 'employee' | 'manager';
     }) => {
