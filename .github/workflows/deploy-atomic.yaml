@@ -1,0 +1,81 @@
+name: 'DailyBrew Application Deploy (atomic)'
+
+# Atomic, zero-downtime deploy via Deployer. Triggered the same way as the
+# legacy deploy.yaml (on a release publish from release-please), but builds
+# each release into a fresh `releases/<tag>/` directory and atomically swaps
+# the `current` symlink. PHP-FPM is gracefully reloaded — no dropped requests.
+#
+# This workflow is OFF by default during the cutover bake. Enable it AND
+# disable the legacy deploy.yaml in the same operation per
+# deploy/DEPLOYER-CUTOVER.md. Running both at once would double-deploy.
+
+on:
+    # release:
+    #     types: [published]
+    workflow_dispatch:           # manual trigger during the bake
+        inputs:
+            tag:
+                description: 'Release tag to deploy (e.g. v1.103.0). Defaults to latest.'
+                required: false
+                type: string
+
+jobs:
+    deploy:
+        name:        'Atomic deploy to production'
+        environment: release
+        runs-on:     ubuntu-latest
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+                with:
+                    fetch-depth: 0
+
+            -   name: Resolve deploy tag
+                id:   tag
+                run:  |
+                      if [ -n "${{ inputs.tag }}" ]; then
+                        echo "deploy_tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+                      elif [ "${{ github.event_name }}" = "release" ]; then
+                        echo "deploy_tag=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+                      else
+                        echo "deploy_tag=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
+                      fi
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.5'
+                    tools:       composer:v2
+
+            -   name: Install Deployer + dev deps
+                # Deployer runs on the CI runner (it SSHes to prod). Dev deps
+                # are needed for vendor/bin/dep; we don't ship them to prod.
+                run:  composer install --no-interaction --prefer-dist
+
+            -   name: Configure SSH
+                uses: webfactory/ssh-agent@v0.9.0
+                with:
+                    ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+            -   name: Trust the production host key
+                run:  |
+                      mkdir -p ~/.ssh
+                      ssh-keyscan -p ${{ secrets.PORT }} ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+
+            -   name: Deploy
+                env:
+                    DEPLOY_TAG:  ${{ steps.tag.outputs.deploy_tag }}
+                    DEPLOY_HOST: ${{ secrets.HOST }}
+                    DEPLOY_USER: ${{ secrets.USERNAME }}
+                    DEPLOY_PORT: ${{ secrets.PORT }}
+                    DEPLOY_PATH: ${{ secrets.PROJECT_FOLDER }}
+                run:  vendor/bin/dep deploy production --revision "${DEPLOY_TAG}" -vv
+
+            -   name: Rollback on failure
+                if:   failure()
+                env:
+                    DEPLOY_HOST: ${{ secrets.HOST }}
+                    DEPLOY_USER: ${{ secrets.USERNAME }}
+                    DEPLOY_PORT: ${{ secrets.PORT }}
+                    DEPLOY_PATH: ${{ secrets.PROJECT_FOLDER }}
+                run:  vendor/bin/dep deploy:unlock production || true
