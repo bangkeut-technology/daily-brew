@@ -179,11 +179,11 @@ after('service:php-fpm:reload', 'service:next:restart');
 
 // Rollback flow: when `dep rollback production` runs, it points `current` at
 // the previous release. We still want PHP-FPM + Next to pick up the
-// directory swap, so the same reload hooks fire on rollback:done. (Declaring
-// after('service:php-fpm:reload', ...) a second time would replace the deploy
-// hook, so we hang the next-restart off rollback:done directly.)
-after('rollback:done', 'service:php-fpm:reload');
-after('rollback:done', 'service:next:restart');
+// directory swap, so the same reload hooks fire after `rollback`. (The task
+// name is `rollback`, NOT `rollback:done` — Deployer 7 doesn't expose the
+// latter; the first deploy crashed with `Task rollback:done not found`.)
+after('rollback', 'service:php-fpm:reload');
+after('rollback', 'service:next:restart');
 
 // On any deploy failure, release the lock so the next run isn't blocked.
 fail('deploy', 'deploy:unlock');
