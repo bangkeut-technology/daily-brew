@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.102.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.102.1...v1.102.2) (2026-06-08)
+
+
+### Bug Fixes
+
+* **console:** admin link back in sidebar + workspace dropdown matches trigger width ([#278](https://github.com/bangkeut-technology/daily-brew/issues/278)) ([0d3f7ad](https://github.com/bangkeut-technology/daily-brew/commit/0d3f7ad90ebb1bc18ddb31a9f6e71239ade85c2c))
+
 ## [1.102.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.102.0...v1.102.1) (2026-06-08)
 
 
