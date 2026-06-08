@@ -267,10 +267,24 @@ class EmployeeController extends AbstractController
         // because the backfill set it to created_at for historical employees,
         // which over-counts absences for staff actually linked mid-month.
         // Clearing it (null) excludes the employee from absent calc until
-        // their next link transition. Future-dated values are accepted —
-        // they just mean "don't count absences before this date".
+        // their next link transition.
+        //
+        // Reject future-dated values: AttendanceRowBuilder skips every day
+        // before linkedAt, so a future date silently hides the employee from
+        // attendance views with no error. A typo in the date picker would
+        // make a real employee disappear until the owner noticed.
         if (array_key_exists('linkedAt', $data)) {
-            $employee->setLinkedAt(!empty($data['linkedAt']) ? \App\Service\DateService::parse($data['linkedAt']) : null);
+            if (!empty($data['linkedAt'])) {
+                $linkedAt = \App\Service\DateService::parse($data['linkedAt']);
+                $workspaceTz = new \DateTimeZone($employee->getWorkspace()?->getSetting()?->getTimezone() ?? 'UTC');
+                $todayInWs = \App\Service\DateService::today($workspaceTz)->format('Y-m-d');
+                if ($linkedAt->format('Y-m-d') > $todayInWs) {
+                    return $this->jsonError('Tracking start cannot be in the future', 400);
+                }
+                $employee->setLinkedAt($linkedAt);
+            } else {
+                $employee->setLinkedAt(null);
+            }
         }
 
         if (array_key_exists('attendanceTracking', $data)) {

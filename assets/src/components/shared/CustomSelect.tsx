@@ -69,7 +69,10 @@ export function CustomSelect({
       if (!trigger) return;
       const rect = trigger.getBoundingClientRect();
       const spaceBelow = window.innerHeight - rect.bottom;
-      const dropUp = spaceBelow < 320;
+      // 340px = 280 (options max-h) + ~50 (search bar when shown at 8+ opts)
+      // + py-1 padding + sideOffset. Earlier 320 clipped the bottom of the
+      // menu when triggers had 320–335px below them.
+      const dropUp = spaceBelow < 340;
       setPosition({
         top: dropUp ? rect.top : rect.bottom,
         left: rect.left,

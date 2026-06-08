@@ -591,6 +591,11 @@ function EmployeeDetailPage() {
                   <CustomDatePicker
                     value={watch('linkedAt') || ''}
                     onChange={(v) => setValue('linkedAt', v, { shouldDirty: true })}
+                    todayOverride={wsTz.today()}
+                    // Disable future dates so the absent calc can't silently
+                    // hide the employee — backend also rejects future linkedAt
+                    // with a 400, but blocking it at the picker is friendlier.
+                    isDateDisabled={(d) => d > wsTz.today()}
                   />
                   <p className="mt-1 text-[12.5px] text-text-tertiary leading-snug">
                     {t('employee.linkedAtHint', 'Absent count starts from this date. Clear it to exclude this employee from absent calc until they re-link.')}
