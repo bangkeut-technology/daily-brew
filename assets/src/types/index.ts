@@ -275,6 +275,9 @@ export interface Employee {
   shiftPublicId: string | null;
   dob: string | null;
   joinedAt: string | null;
+  /** Absent-baseline anchor — first date the employee can be counted absent.
+      Stamped on linkUser; editable by the owner to correct historical data. */
+  linkedAt: string | null;
   /** Last day worked — set when the employee is deactivated. */
   leftAt: string | null;
   linkedUserPublicId: string | null;

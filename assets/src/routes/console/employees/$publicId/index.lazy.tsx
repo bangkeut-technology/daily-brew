@@ -45,6 +45,7 @@ const editEmployeeSchema = z.object({
   username: z.string().optional(),
   dob: z.string().optional(),
   joinedAt: z.string().optional(),
+  linkedAt: z.string().optional(),
   leftAt: z.string().optional(),
   shiftPublicId: z.string().optional(),
   active: z.boolean(),
@@ -188,6 +189,7 @@ function EmployeeDetailPage() {
           username: employee.username || '',
           dob: employee.dob || '',
           joinedAt: employee.joinedAt || '',
+          linkedAt: employee.linkedAt || '',
           leftAt: employee.leftAt || '',
           shiftPublicId: employee.shiftPublicId || '',
           active: employee.active,
@@ -254,6 +256,7 @@ function EmployeeDetailPage() {
         username: values.username || null,
         dob: values.dob || null,
         joinedAt: values.joinedAt || null,
+        linkedAt: values.linkedAt || null,
         // leftAt is only meaningful when the employee is inactive; clearing on
         // re-activation is handled server-side too, but we send null here for
         // clarity.
@@ -579,6 +582,19 @@ function EmployeeDetailPage() {
                     value={watch('joinedAt') || ''}
                     onChange={(v) => setValue('joinedAt', v)}
                   />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block text-[14px] font-medium text-text-secondary mb-1.5">
+                    {t('employee.linkedAt', 'Tracking start')}
+                  </label>
+                  <CustomDatePicker
+                    value={watch('linkedAt') || ''}
+                    onChange={(v) => setValue('linkedAt', v, { shouldDirty: true })}
+                  />
+                  <p className="mt-1 text-[12.5px] text-text-tertiary leading-snug">
+                    {t('employee.linkedAtHint', 'Absent count starts from this date. Clear it to exclude this employee from absent calc until they re-link.')}
+                  </p>
                 </div>
               </div>
 
