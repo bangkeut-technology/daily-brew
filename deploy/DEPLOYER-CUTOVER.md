@@ -6,7 +6,7 @@
 
 This runbook walks the operator through migrating from the legacy in-place
 deploy (drop a `.maintenance` flag, mutate `/var/www/dailybrew` in place,
-restart PHP-FPM) to an atomic `releases/<tag>/` + symlink-swap flow driven by
+restart PHP-FPM) to an atomic `releases/<N>/` + symlink-swap flow driven by
 [Deployer](https://deployer.org/). After the cutover, every deploy is
 zero-downtime: nginx keeps serving the previous release while the new one
 builds, then an atomic `ln -sfn` flip + `systemctl reload php8.5-fpm` promotes
@@ -22,11 +22,11 @@ the new code without dropping in-flight requests.
 
 ```
 /var/www/dailybrew/
-├── current   → releases/3/              ← single atomic symlink
+├── current   → releases/2/              ← single atomic symlink
 ├── releases/
-│   ├── 1/                               ← `pre-cutover` after §2.1
-│   ├── 2/                               ← previous, kept for rollback
-│   └── 3/                               ← live
+│   ├── pre-cutover/                     ← snapshot from §2.1, kept for emergency restore
+│   ├── 1/                               ← first dep deploy
+│   └── 2/                               ← live
 └── shared/
     ├── .env.local                       ← per-host secrets
     ├── config/jwt/
@@ -41,9 +41,11 @@ and `frontend/.next/standalone/`. The release tree is read-only at runtime —
 anything that needs to persist lives in `shared/` and is symlinked in.
 
 > **Naming gotcha:** Deployer's `release_name` is a **monotonic integer**
-> (1, 2, 3, …), tracked in `.dep/releases_log`. NOT the git tag. We seed the
-> sequence by renaming the pre-cutover snapshot to `releases/1/` below; the
-> first `dep deploy` run after that lands in `releases/2/`.
+> (1, 2, 3, …), tracked in `.dep/releases_log`. NOT the git tag. The
+> pre-cutover snapshot in §2.1 is named `pre-cutover/` (non-numeric) so
+> Deployer's counter can claim `releases/1/` on the first `dep deploy`
+> without collision. If you instead named the snapshot `releases/1/`,
+> Deployer's first run would error trying to mkdir an existing directory.
 
 ---
 
@@ -92,47 +94,73 @@ mv config/jwt/public.pem            shared/config/jwt/public.pem
 mv var/log                          shared/var/log
 mv public/uploads                   shared/public/uploads || true
 
-# 2. Snapshot the current tree as releases/1/ (Deployer's release_name is
-#    a monotonic integer — seeding it with 1 keeps the count consistent).
+# 2. Snapshot the current tree as releases/pre-cutover/ (a non-numeric name
+#    so Deployer's first run can claim releases/1/ without collision —
+#    Deployer's release_name is a monotonic integer counter that starts at 1
+#    when releases/ is empty, and trips up if it sees an existing releases/1).
 #    Use `find` with an explicit deny-list instead of mv `*` — globs don't
 #    catch dotfiles + we'd accidentally recurse into the just-created dirs.
-mkdir -p releases/1
-shopt -s dotglob
+mkdir -p releases/pre-cutover
 find . -maxdepth 1 -mindepth 1 \
     ! -name releases ! -name shared ! -name current \
-    -exec mv -t releases/1/ {} +
-shopt -u dotglob
+    -exec mv -t releases/pre-cutover/ {} +
 
-# 3. Bridge the pre-cutover release back to shared/ so nginx + the Next
-#    process can serve uploads + write logs DURING the gap between this
-#    cutover and the first successful `dep deploy` (avatars would 404
-#    otherwise — public/uploads is the only directory consumed by URL).
-ln -s ../../shared/.env.local                     releases/1/.env.local
-ln -s ../../../shared/config/jwt/private.pem      releases/1/config/jwt/private.pem
-ln -s ../../../shared/config/jwt/public.pem       releases/1/config/jwt/public.pem
-ln -s ../../shared/var/log                        releases/1/var/log
-ln -s ../../shared/public/uploads                 releases/1/public/uploads
+# 3. Bridge the pre-cutover release back to shared/ so nginx keeps serving
+#    DURING the gap between this cutover and the first successful `dep deploy`.
+#    Avatar URLs would 404 otherwise (public/uploads is the only shared dir
+#    consumed by URL). Depth note: var/log + public/uploads live ONE level
+#    deeper than .env.local — they need three `..`, not two, to escape to
+#    /var/www/dailybrew/. JWT keys live TWO levels deeper than .env.local
+#    so they need four `..`. Each path is computed from the LINK's parent
+#    dir; sanity-test with `readlink -f releases/pre-cutover/var/log`.
+ln -s ../../shared/.env.local                       releases/pre-cutover/.env.local
+ln -s ../../../../shared/config/jwt/private.pem     releases/pre-cutover/config/jwt/private.pem
+ln -s ../../../../shared/config/jwt/public.pem      releases/pre-cutover/config/jwt/public.pem
+ln -s ../../../shared/var/log                       releases/pre-cutover/var/log
+ln -s ../../../shared/public/uploads                releases/pre-cutover/public/uploads
 
-# 4. Atomic current → 1
-ln -s releases/1 current
+# 4. Atomic current → pre-cutover (until the first dep deploy lands releases/1)
+ln -s releases/pre-cutover current
 ls -la
-# Expected: `current` symlink → releases/1, `releases/1/` populated, `shared/` populated.
+# Expected: `current` symlink → releases/pre-cutover, `releases/pre-cutover/` populated, `shared/` populated.
+
+# 5. Sanity-check the symlinks actually resolve (broken symlinks would
+#    surface as PHP 500s after the nginx flip in §4 — catch them now).
+test -f releases/pre-cutover/.env.local                     && echo ".env.local OK"     || echo ".env.local BROKEN"
+test -f releases/pre-cutover/config/jwt/private.pem         && echo "private.pem OK"    || echo "private.pem BROKEN"
+test -f releases/pre-cutover/config/jwt/public.pem          && echo "public.pem OK"     || echo "public.pem BROKEN"
+test -d releases/pre-cutover/var/log                        && echo "var/log OK"        || echo "var/log BROKEN"
+test -d releases/pre-cutover/public/uploads                 && echo "uploads OK"        || echo "uploads BROKEN"
+
 exit   # leave the root subshell
 ```
 
-> **Rollback this step:** `sudo bash -c 'rm current; mv releases/1/* releases/1/.[!.]* .; rmdir releases/1'`
+> **Rollback this step:** `sudo bash -c 'rm current; mv releases/pre-cutover/* releases/pre-cutover/.[!.]* .; rmdir releases/pre-cutover'`
 > puts the tree back. Do that FIRST before debugging if §2.1 looked off.
 
-### 2.2 Fix ownership
+### 2.2 Fix ownership + group membership
 
 Set `$DEPLOY_USER` to the SSH user that authenticates with the key from §2.0
-(commonly `deploy` or `www-data` — whichever logs in via `webfactory/ssh-agent`).
+(commonly `deploy` or `debian` — whichever logs in via `webfactory/ssh-agent`).
 
 ```bash
 export DEPLOY_USER=deploy   # ← set this first, BEFORE running the chown
-sudo chown -R www-data:www-data /var/www/dailybrew
+
+# Ownership: deploy user owns the tree (so Deployer can write new releases)
+# with www-data as the group (so nginx + PHP-FPM can read/write).
 sudo chown -R "$DEPLOY_USER":www-data /var/www/dailybrew
 sudo chmod -R g+w /var/www/dailybrew/shared
+
+# Group membership: deploy user MUST be in the www-data group, otherwise
+# `chgrp` calls inside the deploy recipe (deploy:cache:fix_perms) fail
+# with "Operation not permitted" — Linux requires you to be a member of
+# the target group to chgrp a file you own. New SSH sessions (including
+# the one GH Actions opens for each deploy) pick this up automatically;
+# no log-out needed.
+sudo usermod -aG www-data "$DEPLOY_USER"
+
+# Confirm
+id "$DEPLOY_USER"   # expected: groups list includes www-data
 ```
 
 ---
@@ -264,9 +292,11 @@ Watch the output. Key milestones:
 - `[OK] frontend:spa:build` — Encore bundle built into `releases/<n>/public/build/`
 - `[OK] frontend:next:build` — Next standalone built
 - `[OK] database:migrate` — migrations applied to the live DB (BEFORE the symlink swap so we abort if migrations fail)
+- `[OK] deploy:cache:clear` — Symfony cache warmed; runs as the deploy user
+- `[OK] deploy:cache:fix_perms` — `chgrp -R www-data var/cache` + `chmod -R g+rwX var/cache` so PHP-FPM (www-data) can write at runtime. **This is why §2.2 adds the deploy user to the www-data group — chgrp fails otherwise.**
 - `[OK] deploy:symlink` — **the atomic swap; new code goes live here**
 - `[OK] service:php-fpm:reload` — workers recycled gracefully
-- `[OK] service:next:restart` — Next process restarted; readiness probe waits for `http://127.0.0.1:3000/` to return 200
+- `[OK] service:next:restart` — Next process restarted; readiness probe waits for `http://127.0.0.1:3000/` to return 200 (skipped if the unit isn't installed)
 
 If anything before `deploy:symlink` fails, the new release is just an unused
 directory — production keeps serving from the old `current` target. Cleanup:
@@ -291,24 +321,20 @@ This re-points `current` at the previous release and reloads PHP-FPM. Sub-second
 
 ## 8. Enable the atomic workflow + disable the legacy one
 
-Once §7 succeeds twice in a row from manual `workflow_dispatch`:
+**Status:** done on `main` as of cutover. `deploy-atomic.yaml` fires on
+`release.types: [published]` (auto-deploys every release-please publish).
+`deploy.yaml` is `workflow_dispatch:` only — kept checked in as an
+emergency-rollback path.
 
-1. In `.github/workflows/deploy-atomic.yaml`, uncomment the `release.types: [published]` trigger.
-2. In `.github/workflows/deploy.yaml`, **comment out** the `release.types: [published]` trigger
-   (keep the file checked in — easy `git revert` if you need to roll back to in-place
-   deploys mid-bake).
-3. Push the change. The next release-please release will go through the atomic flow.
+This section is retained for the next operator who reads this — and as
+the rollback procedure if atomic deploys ever need to be paused:
 
-Bake for two release cycles. Then:
+1. In `.github/workflows/deploy-atomic.yaml`: comment out `release.types: [published]` and uncomment `workflow_dispatch:`.
+2. In `.github/workflows/deploy.yaml`: uncomment `release.types: [published]`.
+3. Push. The next release-please publish goes through legacy in-place deploys (which require the host tree to be back at the pre-cutover layout — reverse §2.1).
 
-```bash
-# On the host — confirm legacy is dormant
-sudo rm /var/www/dailybrew/releases/1/public/.maintenance || true
-# (the legacy flow's maintenance trap is gone from nginx; this is just hygiene)
-```
-
-After a third successful release through Deployer (and you've verified no
-caller still hits `deploy.yaml`), delete it in a separate PR.
+After a third successful release through Deployer (and verifying no
+caller hits `deploy.yaml`), delete it in a separate PR.
 
 ---
 
