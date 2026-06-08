@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.103.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.103.0...v1.103.1) (2026-06-08)
+
+
+### Bug Fixes
+
+* **avatar:** empty name no longer renders as "UN" initials + signout uses live i18n locale ([#283](https://github.com/bangkeut-technology/daily-brew/issues/283)) ([6a98ef2](https://github.com/bangkeut-technology/daily-brew/commit/6a98ef25a3a2518c25347d186536afbbadd622fe))
+
 ## [1.103.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.102.2...v1.103.0) (2026-06-08)
 
 
