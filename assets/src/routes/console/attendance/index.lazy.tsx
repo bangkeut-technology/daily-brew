@@ -1,5 +1,5 @@
 import { createLazyFileRoute } from '@tanstack/react-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CalendarDays, ChevronDown, ClipboardList, GanttChart, LayoutGrid, List, Pencil } from 'lucide-react';
 import { useAttendance } from '@/hooks/queries/useAttendance';
@@ -9,7 +9,7 @@ import { usePlan } from '@/hooks/queries/usePlan';
 import { useRoleContext } from '@/hooks/queries/useRoleContext';
 import { useWorkspaceTimezone } from '@/hooks/useWorkspaceTimezone';
 import { getWorkspacePublicId } from '@/lib/auth';
-import { endOfMonthInTimezone, parseDateAsUTC } from '@/lib/timezone';
+import { endOfMonthInTimezone, formatDateUTC, parseDateAsUTC } from '@/lib/timezone';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { AttendanceRow } from '@/components/shared/AttendanceRow';
@@ -238,8 +238,20 @@ function AttendancePage() {
     ...(employees?.map((e) => ({ value: e.publicId, label: e.name })) ?? []),
   ];
 
-  // Extract day numbers from the first employee's days for the Gantt header
-  const ganttDays = filteredSummary?.[0]?.days ?? [];
+  // Generate the gantt header dates from the query range — NOT from the first
+  // employee's days, since each row may now have a different sub-range after
+  // the per-employee linkedAt/leftAt filtering. Without this, the header is
+  // only as wide as the shortest employee window and cells overflow horizontally.
+  const ganttDates = useMemo(() => {
+    const dates: string[] = [];
+    const start = parseDateAsUTC(from);
+    const end = parseDateAsUTC(to);
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || start > end) return dates;
+    for (const d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + 1)) {
+      dates.push(formatDateUTC(d));
+    }
+    return dates;
+  }, [from, to]);
   const todayStr = wsTz.today();
 
   if (roleLoading) {
@@ -375,17 +387,17 @@ function AttendancePage() {
                     <th className="sticky left-0 z-10 bg-glass-bg backdrop-blur-md text-left px-3 py-2.5 text-[13px] font-semibold text-text-primary border-b border-cream-3/60 min-w-[200px]">
                       {t('attendance.employee', 'Employee')}
                     </th>
-                    {ganttDays.map((day) => {
-                      const d = parseDateAsUTC(day.date);
+                    {ganttDates.map((date) => {
+                      const d = parseDateAsUTC(date);
                       const dayNum = d.getUTCDate();
                       const weekday = d.toLocaleDateString('en', { weekday: 'narrow', timeZone: 'UTC' });
                       const dow = d.getUTCDay();
                       const isWeekend = dow === 0 || dow === 6;
                       const isWeekEnd = dow === 0; // Sunday → draw divider on the right
-                      const isToday = day.date === todayStr;
+                      const isToday = date === todayStr;
                       return (
                         <th
-                          key={day.date}
+                          key={date}
                           className={cn(
                             'px-0.5 pt-1.5 pb-1 text-center font-medium border-b border-cream-3/60 min-w-[32px] relative',
                             isWeekend && !isToday && 'bg-cream-3/30',
@@ -421,6 +433,7 @@ function AttendancePage() {
                     const lateCount = emp.days.filter((d) => d.status === 'present' && d.isLate).length;
                     const leaveCount = emp.days.filter((d) => d.status === 'leave').length;
                     const scheduledDays = emp.days.filter((d) => d.status !== 'closure' && d.status !== 'upcoming').length;
+                    const dayByDate = new Map(emp.days.map((d) => [d.date, d]));
 
                     return (
                       <tr key={emp.employeePublicId} className="hover:bg-cream-3/25 transition-colors duration-[120ms]">
@@ -449,19 +462,19 @@ function AttendancePage() {
                             </div>
                           </div>
                         </td>
-                        {emp.days.map((day) => {
-                          const cell = ganttCell(day, hasShift);
-                          const d = parseDateAsUTC(day.date);
+                        {ganttDates.map((date) => {
+                          const day = dayByDate.get(date);
+                          const d = parseDateAsUTC(date);
                           const dow = d.getUTCDay();
                           const isWeekend = dow === 0 || dow === 6;
                           const isWeekEnd = dow === 0;
-                          const isToday = day.date === todayStr;
+                          const isToday = date === todayStr;
                           const editable = canEditAttendance
-                            && day.status === 'present'
-                            && !!day.attendancePublicId;
+                            && day?.status === 'present'
+                            && !!day?.attendancePublicId;
                           return (
                             <td
-                              key={day.date}
+                              key={date}
                               className={cn(
                                 'px-0.5 py-1.5 text-center border-b border-cream-3/30',
                                 isWeekend && !isToday && 'bg-cream-3/20',
@@ -469,20 +482,27 @@ function AttendancePage() {
                                 isWeekEnd && 'border-r border-cream-3/40',
                               )}
                             >
-                              <GanttCellGlyph
-                                spec={cell}
-                                onClick={editable
-                                  ? () => setEditTarget({
-                                      publicId: day.attendancePublicId!,
-                                      employeeName: emp.employeeName,
-                                      date: day.date,
-                                      checkInAt: day.checkInAt ?? null,
-                                      checkOutAt: day.checkOutAt ?? null,
-                                      originalCheckInAt: day.originalCheckInAt ?? null,
-                                      originalCheckOutAt: day.originalCheckOutAt ?? null,
-                                    })
-                                  : undefined}
-                              />
+                              {day ? (
+                                <GanttCellGlyph
+                                  spec={ganttCell(day, hasShift)}
+                                  onClick={editable
+                                    ? () => setEditTarget({
+                                        publicId: day.attendancePublicId!,
+                                        employeeName: emp.employeeName,
+                                        date: day.date,
+                                        checkInAt: day.checkInAt ?? null,
+                                        checkOutAt: day.checkOutAt ?? null,
+                                        originalCheckInAt: day.originalCheckInAt ?? null,
+                                        originalCheckOutAt: day.originalCheckOutAt ?? null,
+                                      })
+                                    : undefined}
+                                />
+                              ) : (
+                                <span
+                                  title={t('attendance.notEmployedOnDate', 'Not active on this date')}
+                                  className="inline-block w-[6px] h-[6px] rounded-full bg-cream-3/40"
+                                />
+                              )}
                             </td>
                           );
                         })}

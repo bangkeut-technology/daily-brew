@@ -93,6 +93,7 @@
     "exportPdf": "Exporter vers PDF",
     "exportEspressoRequired": "L'export nécessite l'abonnement Espresso",
     "exportError": "Échec de l'export de la présence",
+    "notEmployedOnDate": "Non actif à cette date",
     "verification": {
       "title": "Vérification du pointage",
       "atRestaurant": "Au restaurant",

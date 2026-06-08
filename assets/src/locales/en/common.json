@@ -271,6 +271,7 @@
     "exportPdf": "Export to PDF",
     "exportEspressoRequired": "Export requires Espresso plan",
     "exportError": "Failed to export attendance",
+    "notEmployedOnDate": "Not active on this date",
     "verification": {
       "title": "Check-in verification",
       "atRestaurant": "At restaurant",
