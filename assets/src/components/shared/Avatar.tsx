@@ -18,12 +18,17 @@ interface AvatarProps {
 }
 
 export function Avatar({ name, index = 0, size = 32, radius = '50%', imageUrl }: AvatarProps) {
+  // filter(Boolean) drops empty tokens so a `name` of '' or '   ' doesn't
+  // collapse to "undefined" → slice → "UN" — that looked like a real user's
+  // initials in the topbar avatar when fullName/firstName/lastName/email
+  // were all missing. `|| '?'` is the final fallback.
   const initials = name
     .split(' ')
+    .filter(Boolean)
     .map((n) => n[0])
     .join('')
     .slice(0, 2)
-    .toUpperCase();
+    .toUpperCase() || '?';
 
   if (imageUrl) {
     return (
