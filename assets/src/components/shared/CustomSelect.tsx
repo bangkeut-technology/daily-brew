@@ -69,7 +69,7 @@ export function CustomSelect({
       if (!trigger) return;
       const rect = trigger.getBoundingClientRect();
       const spaceBelow = window.innerHeight - rect.bottom;
-      const dropUp = spaceBelow < 260;
+      const dropUp = spaceBelow < 320;
       setPosition({
         top: dropUp ? rect.top : rect.bottom,
         left: rect.left,
@@ -143,7 +143,7 @@ export function CustomSelect({
               </div>
             </div>
           )}
-          <div className="max-h-[220px] overflow-y-auto py-1">
+          <div className="max-h-[280px] overflow-y-auto overscroll-contain py-1" style={{ touchAction: 'pan-y' }}>
             {filtered.length === 0 ? (
               <p className="px-3 py-2 text-[14px] text-text-tertiary text-center">No results</p>
             ) : (
