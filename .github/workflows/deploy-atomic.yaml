@@ -1,18 +1,17 @@
 name: 'DailyBrew Application Deploy (atomic)'
 
-# Atomic, zero-downtime deploy via Deployer. Triggered the same way as the
-# legacy deploy.yaml (on a release publish from release-please), but builds
-# each release into a fresh `releases/<tag>/` directory and atomically swaps
-# the `current` symlink. PHP-FPM is gracefully reloaded — no dropped requests.
+# Atomic, zero-downtime deploy via Deployer. Each release builds into a fresh
+# `releases/N/` directory and an atomic symlink swap promotes it; PHP-FPM is
+# gracefully reloaded so in-flight requests are not dropped.
 #
-# This workflow is OFF by default during the cutover bake. Enable it AND
-# disable the legacy deploy.yaml in the same operation per
-# deploy/DEPLOYER-CUTOVER.md. Running both at once would double-deploy.
+# release.types: [published] auto-fires this workflow on every release-please
+# publish. The legacy deploy.yaml has its `release` trigger commented out;
+# only one workflow runs per release tag.
 
 on:
-    # release:
-    #     types: [published]
-    workflow_dispatch:           # manual trigger during the bake
+    release:
+        types: [published]
+    workflow_dispatch:           # manual trigger for re-deploys / hotfixes
         inputs:
             tag:
                 description: 'Release tag to deploy (e.g. v1.103.0). Defaults to latest.'
