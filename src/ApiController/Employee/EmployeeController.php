@@ -305,7 +305,6 @@ class EmployeeController extends AbstractController
         // Handle linking/unlinking user account
         if (array_key_exists('linkedUserPublicId', $data)) {
             if ($data['linkedUserPublicId'] === null || $data['linkedUserPublicId'] === '') {
-                $employee->setLinkedUser(null);
                 $employeeService->linkUser($employee, null);
             } else {
                 $linkedUser = $userRepository->findByPublicId($data['linkedUserPublicId']);

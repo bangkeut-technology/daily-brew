@@ -143,6 +143,7 @@ class WorkspaceService
                 $linkedUser->setCurrentWorkspace(null);
             }
             $employee->setLinkedUser(null);
+            $employee->setLinkedAt(null);
         }
 
         $workspace->setDeletedAt($now);

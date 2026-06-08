@@ -81,6 +81,17 @@ class Employee extends AbstractBaseEntity
     #[Groups(['employee:read'])]
     private ?DateTimeImmutable $leftAt = null;
 
+    /**
+     * When the employee was linked to a User. Anchors the absent baseline so an
+     * employee added mid-month doesn't get counted absent for prior days — they
+     * literally couldn't check in before this date (QR check-in needs auth).
+     * Stamped on link transition (null→user) by the service layer; cleared when
+     * unlinked so a future re-link sets a fresh anchor.
+     */
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    #[Groups(['employee:read'])]
+    private ?DateTimeImmutable $linkedAt = null;
+
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?DateTimeImmutable $deletedAt = null;
 
@@ -291,6 +302,17 @@ class Employee extends AbstractBaseEntity
     public function setLeftAt(?DateTimeImmutable $leftAt): static
     {
         $this->leftAt = $leftAt;
+        return $this;
+    }
+
+    public function getLinkedAt(): ?DateTimeImmutable
+    {
+        return $this->linkedAt;
+    }
+
+    public function setLinkedAt(?DateTimeImmutable $linkedAt): static
+    {
+        $this->linkedAt = $linkedAt;
         return $this;
     }
 
