@@ -13,6 +13,7 @@ use App\Repository\UserRepository;
 use App\Repository\WorkspaceRepository;
 use App\Service\AccountDeletionService;
 use App\Service\AuthService;
+use App\Service\DateService;
 use App\Service\TelegramLinkTokenService;
 use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -173,6 +174,7 @@ class UserController extends AbstractController
         }
 
         $employee->setLinkedUser($user);
+        $employee->setLinkedAt(DateService::now());
         $employeeRepository->flush();
 
         return $this->jsonSuccess([
@@ -215,6 +217,7 @@ class UserController extends AbstractController
         }
 
         $employee->setLinkedUser(null);
+        $employee->setLinkedAt(null);
         $employeeRepository->flush();
 
         return $this->jsonSuccess(null);

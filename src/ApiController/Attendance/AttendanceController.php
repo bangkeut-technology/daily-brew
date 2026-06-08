@@ -133,6 +133,15 @@ class AttendanceController extends AbstractController
                     continue;
                 }
 
+                // Skip days before the employee was linked to a User. An
+                // unlinked employee can't check in (QR auth needs a JWT that
+                // resolves to a linked employee), so absent rows before this
+                // date would over-count.
+                $linkedAt = $emp->getLinkedAt()?->format('Y-m-d');
+                if ($linkedAt === null || $dateStr < $linkedAt) {
+                    continue;
+                }
+
                 $key = $emp->getId() . '_' . $dateStr;
 
                 if (isset($attendanceMap[$key])) {
@@ -294,6 +303,7 @@ class AttendanceController extends AbstractController
         $result = [];
         foreach ($employees as $emp) {
             $leftAtStr = $emp->getLeftAt()?->format('Y-m-d');
+            $linkedAtStr = $emp->getLinkedAt()?->format('Y-m-d');
             $days = [];
             $period = new \DatePeriod($fromDate, new \DateInterval('P1D'), (clone $toDate)->modify('+1 day'));
             foreach ($period as $day) {
@@ -303,6 +313,13 @@ class AttendanceController extends AbstractController
                 // Past employee's last working day — omit so they don't show
                 // absent/upcoming for dates they weren't employed.
                 if ($leftAtStr !== null && $dateStr > $leftAtStr) {
+                    continue;
+                }
+
+                // Before the employee was linked — omit for the same reason: a
+                // mid-month linked employee shouldn't show absent rows for the
+                // days before they had an account that could check in.
+                if ($linkedAtStr === null || $dateStr < $linkedAtStr) {
                     continue;
                 }
 
@@ -348,6 +365,13 @@ class AttendanceController extends AbstractController
                 } else {
                     $days[] = ['date' => $dateStr, 'status' => 'absent'];
                 }
+            }
+
+            // Omit employees with no days in range (never-linked, or linked
+            // after the range / left before it) so the gantt isn't padded with
+            // empty rows.
+            if (empty($days)) {
+                continue;
             }
 
             $result[] = [

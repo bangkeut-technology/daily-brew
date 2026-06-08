@@ -172,6 +172,7 @@ class EmployeeServiceTest extends TestCase
 
     public function testLinkUserSetsLinkedUserAndFlushes(): void
     {
+        DateService::setClock(new MockClock('2026-05-15 14:00:00', new DateTimeZone('UTC')));
         $emp = new Employee();
         $user = new User();
         $this->repo->expects($this->once())->method('flush');
@@ -179,6 +180,61 @@ class EmployeeServiceTest extends TestCase
         $result = $this->svc->linkUser($emp, $user);
 
         $this->assertSame($user, $result->getLinkedUser());
+        $this->assertSame('2026-05-15', $result->getLinkedAt()?->format('Y-m-d'));
+    }
+
+    public function testUnlinkClearsLinkedAt(): void
+    {
+        // linkedAt is paired with linkedUser — clearing the relationship clears
+        // the anchor so a future re-link gets a fresh timestamp.
+        $workspace = $this->workspaceWithId(7, ownerId: 99);
+        $emp = (new Employee())->setWorkspace($workspace);
+        $emp->setLinkedUser($this->user(2));
+        $emp->setLinkedAt(new DateTimeImmutable('2026-05-01 10:00:00'));
+
+        $this->repo->expects($this->once())->method('flush');
+
+        $this->svc->linkUser($emp, null);
+
+        $this->assertNull($emp->getLinkedAt());
+    }
+
+    public function testRelinkAfterUnlinkStampsFreshLinkedAt(): void
+    {
+        // Owner unlinks then re-links the same employee to a different user.
+        // The new link date is the right anchor — pre-relink absences shouldn't
+        // be counted against the new account.
+        DateService::setClock(new MockClock('2026-05-20 09:00:00', new DateTimeZone('UTC')));
+        $emp = new Employee();
+        $this->repo->expects($this->exactly(3))->method('flush');
+
+        $this->svc->linkUser($emp, $this->user(2));
+        DateService::setClock(new MockClock('2026-06-01 09:00:00', new DateTimeZone('UTC')));
+        $this->svc->linkUser($emp, null);
+        $this->assertNull($emp->getLinkedAt());
+
+        DateService::setClock(new MockClock('2026-06-10 09:00:00', new DateTimeZone('UTC')));
+        $this->svc->linkUser($emp, $this->user(3));
+
+        $this->assertSame('2026-06-10', $emp->getLinkedAt()?->format('Y-m-d'));
+    }
+
+    public function testRelinkToSameUserDoesNotRestampLinkedAt(): void
+    {
+        // No real transition — guard against accidentally shifting the anchor
+        // forward when callers re-set the same user (idempotent updates).
+        $user = $this->user(2);
+        $emp = new Employee();
+        $emp->setLinkedUser($user);
+        $original = new DateTimeImmutable('2026-05-01 10:00:00');
+        $emp->setLinkedAt($original);
+
+        DateService::setClock(new MockClock('2026-06-10 09:00:00', new DateTimeZone('UTC')));
+        $this->repo->expects($this->once())->method('flush');
+
+        $this->svc->linkUser($emp, $user);
+
+        $this->assertEquals($original, $emp->getLinkedAt());
     }
 
     public function testUnlinkClearsLinkedUserCurrentWorkspaceWhenItMatches(): void
@@ -224,6 +280,7 @@ class EmployeeServiceTest extends TestCase
 
         $emp = (new Employee())->setWorkspace($workspace);
         $emp->setLinkedUser($linkedUser);
+        $emp->setLinkedAt(new DateTimeImmutable('2026-05-01'));
 
         $this->repo->expects($this->once())->method('flush');
 
@@ -231,6 +288,7 @@ class EmployeeServiceTest extends TestCase
 
         $this->assertNotNull($emp->getDeletedAt());
         $this->assertNull($emp->getLinkedUser());
+        $this->assertNull($emp->getLinkedAt());
         $this->assertNull($linkedUser->getCurrentWorkspace());
     }
 

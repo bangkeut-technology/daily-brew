@@ -89,6 +89,17 @@ class EmployeeService
         $previousUser = $employee->getLinkedUser();
         $employee->setLinkedUser($user);
 
+        // linkedAt anchors the absent baseline. Stamp on link transitions only:
+        // - null → user: first link, stamp now
+        // - user → null: unlink, clear so a future re-link sets a fresh anchor
+        // - user → different user: re-link, stamp now (new relationship)
+        // - user → same user: no transition, leave anchor untouched
+        if ($user === null) {
+            $employee->setLinkedAt(null);
+        } elseif ($previousUser === null || $previousUser->getId() !== $user->getId()) {
+            $employee->setLinkedAt(DateService::now());
+        }
+
         // If unlinking, clear currentWorkspace if it pointed to this workspace
         if ($user === null && $previousUser !== null) {
             $this->clearCurrentWorkspaceIfMatches($previousUser, $employee->getWorkspace());
@@ -134,6 +145,7 @@ class EmployeeService
         $linkedUser = $employee->getLinkedUser();
         $employee->setDeletedAt(DateService::now());
         $employee->setLinkedUser(null);
+        $employee->setLinkedAt(null);
 
         // Clear currentWorkspace if the deleted employee's user was viewing this workspace
         if ($linkedUser !== null) {
