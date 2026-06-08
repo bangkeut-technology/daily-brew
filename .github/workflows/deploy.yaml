@@ -1,8 +1,14 @@
 name: 'DailyBrew Application Deploy'
 
+# DISABLED during the atomic-deploy cutover (PR #279 + cutover runbook).
+# The prod host's directory layout has moved from in-place
+# /var/www/dailybrew/* to releases/N + shared/ + current → so this
+# in-place workflow's `git fetch` + `touch public/.maintenance` would
+# fail. Re-enable by uncommenting the trigger if you need to roll back.
 on:
-    release:
-        types: [published]
+    workflow_dispatch:           # manual only — emergency rollback
+    # release:
+    #     types: [published]
 
 jobs:
     deploy:
