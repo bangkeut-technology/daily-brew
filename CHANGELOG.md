@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.103.6](https://github.com/bangkeut-technology/daily-brew/compare/v1.103.5...v1.103.6) (2026-06-08)
+
+
+### Bug Fixes
+
+* **deploy:** chgrp+chmod var/cache after cache:clear so PHP-FPM can write ([9ba7162](https://github.com/bangkeut-technology/daily-brew/commit/9ba71620059723b50b50669041071a61549b8cbf))
+
 ## [1.103.5](https://github.com/bangkeut-technology/daily-brew/compare/v1.103.4...v1.103.5) (2026-06-08)
 
 
