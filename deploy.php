@@ -65,12 +65,19 @@ add('shared_dirs', [
 ]);
 
 // Files Deployer creates fresh on every deploy but writes from the release
-// tree (var/cache lives under the release; the symfony recipe handles this).
-add('writable_dirs', [
-    'var/cache',
-    'var/log',
-    'public/uploads',
-]);
+// tree. `var/log` and `public/uploads` are SYMLINKS to shared/ after
+// `deploy:shared` runs, and shared/* is already mode 0775 + debian:www-data
+// — `deploy:writable` would try (and fail) to chmod through the symlinks.
+// Only `var/cache` is per-release and needs writability set on each deploy.
+set('writable_dirs', ['var/cache']);
+
+// Default writable_mode is `acl` (setfacl) which isn't always installed.
+// Plain chmod with group-write is enough: PHP-FPM runs as www-data which is
+// already the group on releases.
+set('writable_mode', 'chmod');
+set('writable_chmod_mode', '0775');
+set('writable_use_sudo', false);
+set('writable_recursive', true);
 
 // ── Hosts ───────────────────────────────────────────────────────────────────
 //
