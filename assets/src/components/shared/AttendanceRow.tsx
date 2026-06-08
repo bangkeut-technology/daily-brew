@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { Pencil } from 'lucide-react';
 import { Avatar } from './Avatar';
@@ -7,6 +8,9 @@ import type { AttendanceStatus } from '@/types';
 
 interface AttendanceRowProps {
   employee: string;
+  /** When provided alongside canViewEmployee, the name links to /console/employees/{publicId}. */
+  employeePublicId?: string;
+  canViewEmployee?: boolean;
   shift: string | null;
   time: string | null;
   checkOut: string | null;
@@ -22,6 +26,8 @@ interface AttendanceRowProps {
 
 export function AttendanceRow({
   employee,
+  employeePublicId,
+  canViewEmployee,
   shift,
   time,
   checkOut,
@@ -56,7 +62,17 @@ export function AttendanceRow({
       <Avatar name={employee} imageUrl={employeePhotoUrl} index={index} size={32} />
       <div className="flex-1">
         <div className="text-[15.5px] font-medium text-text-primary font-sans flex items-center gap-2">
-          {employee}
+          {canViewEmployee && employeePublicId ? (
+            <Link
+              to="/console/employees/$publicId"
+              params={{ publicId: employeePublicId }}
+              className="no-underline text-text-primary hover:text-coffee transition-colors"
+            >
+              {employee}
+            </Link>
+          ) : (
+            employee
+          )}
           {edited && (
             <span
               title={t('attendance.editedTooltip', 'Edited by a manager')}
