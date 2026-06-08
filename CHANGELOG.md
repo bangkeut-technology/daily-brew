@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.101.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.100.1...v1.101.0) (2026-06-08)
+
+
+### Features
+
+* **attendance:** make employee name clickable to open the employee detail page ([#271](https://github.com/bangkeut-technology/daily-brew/issues/271)) ([2c8d544](https://github.com/bangkeut-technology/daily-brew/commit/2c8d544104f9f770d2d0d74904b16dc4b48619f6))
+
+
+### Bug Fixes
+
+* **custom-select:** dropdown scrolls smoothly for long employee lists ([#272](https://github.com/bangkeut-technology/daily-brew/issues/272)) ([67cf46f](https://github.com/bangkeut-technology/daily-brew/commit/67cf46f8b67e33d3156529ea67d880abcdb63b92))
+
 ## [1.100.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.100.0...v1.100.1) (2026-06-08)
 
 
