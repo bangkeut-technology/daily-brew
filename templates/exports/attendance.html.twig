@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Attendance — {{ workspaceName }} — {{ from }} to {{ to }}</title>
+    <style>
+        @page { margin: 18mm 12mm; }
+        body { font-family: DejaVu Sans, sans-serif; font-size: 9pt; color: #1E1916; }
+        h1 { font-family: Palatino, Georgia, serif; font-size: 16pt; margin: 0 0 4px; color: #6B4226; }
+        .meta { font-size: 9pt; color: #6B6463; margin-bottom: 14px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #EFEAE3; color: #1E1916; text-align: left; font-weight: 600; font-size: 8.5pt;
+             padding: 6px 5px; border-bottom: 2px solid #6B4226; }
+        td { padding: 5px 5px; border-bottom: 1px solid #E5DFD6; font-size: 8.5pt; vertical-align: top; }
+        tr:nth-child(even) td { background: #FAF7F2; }
+        .status { font-weight: 600; }
+        .status-present { color: #4A7C59; }
+        .status-absent { color: #C0392B; }
+        .status-on_leave { color: #3B6FA0; }
+        .status-late { color: #C0392B; }
+        .num { text-align: right; font-variant-numeric: tabular-nums; }
+        .footer { margin-top: 16px; font-size: 8pt; color: #6B6463; text-align: right; }
+    </style>
+</head>
+<body>
+    <h1>Attendance — {{ workspaceName }}</h1>
+    <div class="meta">{{ from }} to {{ to }} ({{ timezone }}) · {{ rows|length }} row{{ rows|length == 1 ? '' : 's' }}</div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Date</th>
+                <th>Shift</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>Status</th>
+                <th class="num">Hours</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in rows %}
+            <tr>
+                <td>{{ row.employeeName }}</td>
+                <td>{{ row.date }}</td>
+                <td>{{ row.shiftName ?? '—' }}</td>
+                <td>{{ row.checkInAt ?? '—' }}</td>
+                <td>{{ row.checkOutAt ?? '—' }}</td>
+                <td class="status status-{{ row.status }}">
+                    {{ row.statusLabel }}{% if row.isLate %} · <span class="status-late">Late</span>{% endif %}{% if row.leftEarly %} · <span class="status-late">Left early</span>{% endif %}
+                </td>
+                <td class="num">{{ row.hoursWorked ?? '' }}</td>
+                <td>{{ row.editReason ?? '' }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">Generated {{ generatedAt }} · DailyBrew</div>
+</body>
+</html>

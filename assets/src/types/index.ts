@@ -404,6 +404,7 @@ export interface PlanDetails {
   canUseTapCheckin: boolean;
   canUseNfcCheckin: boolean;
   canUseSubQrCodes: boolean;
+  canExportAttendance: boolean;
   managerLimit: number | null;
   managerCount: number;
   currentPeriodEnd: string | null;

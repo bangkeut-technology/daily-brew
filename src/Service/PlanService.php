@@ -113,6 +113,11 @@ class PlanService
         return $this->isDoubleEspresso($workspace);
     }
 
+    public function canExportAttendance(Workspace $workspace): bool
+    {
+        return $this->isAtLeastEspresso($workspace);
+    }
+
     public function getManagerLimit(Workspace $workspace): ?int
     {
         $plan = $this->getPlan($workspace);
@@ -186,6 +191,7 @@ class PlanService
             'canUseTapCheckin' => $this->canUseTapCheckin($workspace),
             'canUseNfcCheckin' => $this->canUseNfcCheckin($workspace),
             'canUseSubQrCodes' => $this->canUseSubQrCodes($workspace),
+            'canExportAttendance' => $this->canExportAttendance($workspace),
             'managerLimit' => $this->getManagerLimit($workspace),
             'managerCount' => $this->employeeRepository->countManagersByWorkspace($workspace),
             'currentPeriodEnd' => $subscription?->getCurrentPeriodEnd()?->format('c'),

@@ -88,6 +88,11 @@
     "yourPublicId": "លេខសម្គាល់សាធារណៈរបស់អ្នក"
   },
   "attendance": {
+    "export": "នាំចេញ",
+    "exportExcel": "នាំចេញទៅ Excel",
+    "exportPdf": "នាំចេញទៅ PDF",
+    "exportEspressoRequired": "ការនាំចេញតម្រូវឱ្យមានគម្រោង Espresso",
+    "exportError": "បរាជ័យក្នុងការនាំចេញវត្តមាន",
     "verification": {
       "title": "ការផ្ទៀងផ្ទាត់ការចូល",
       "atRestaurant": "នៅភោជនីយដ្ឋាន",
