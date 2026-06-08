@@ -129,14 +129,20 @@ class AttendanceRowBuilder
                         'date' => $dateStr,
                         'checkInAt' => $formatTime($a->getCheckInAt()),
                         'checkOutAt' => $formatTime($a->getCheckOutAt()),
-                        'isLate' => $a->isLate(),
-                        'leftEarly' => $a->hasLeftEarly(),
-                        'status' => 'present',
+                        'isLate' => $a->isLate() && !$a->isVoided(),
+                        'leftEarly' => $a->hasLeftEarly() && !$a->isVoided(),
+                        // Voided rows still surface in the list (with badge) so
+                        // managers can see why a day disappeared; dashboard stats
+                        // and the BasilBook export drop them at the query layer.
+                        'status' => $a->isVoided() ? 'voided' : 'present',
                         'editedAt' => $a->getEditedAt()?->format(\DateTimeInterface::ATOM),
                         'editedByEmail' => $a->getEditedByEmail(),
                         'editReason' => $a->getEditReason(),
                         'originalCheckInAt' => $formatTime($a->getOriginalCheckInAt()),
                         'originalCheckOutAt' => $formatTime($a->getOriginalCheckOutAt()),
+                        'voidedAt' => $a->getVoidedAt()?->format(\DateTimeInterface::ATOM),
+                        'voidedByEmail' => $a->getVoidedByEmail(),
+                        'voidReason' => $a->getVoidReason(),
                     ];
                 } elseif (!$isClosure && !$isFuture) {
                     $onLeave = false;
@@ -180,7 +186,7 @@ class AttendanceRowBuilder
      */
     public static function sortByDateDescStatusName(array $rows): array
     {
-        $statusOrder = ['present' => 0, 'on_leave' => 1, 'absent' => 2];
+        $statusOrder = ['present' => 0, 'on_leave' => 1, 'absent' => 2, 'voided' => 3];
         usort($rows, static function (array $a, array $b) use ($statusOrder): int {
             $dateCmp = $b['date'] <=> $a['date'];
             if ($dateCmp !== 0) {

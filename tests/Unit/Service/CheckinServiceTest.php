@@ -457,6 +457,46 @@ class CheckinServiceTest extends TestCase
         $this->assertNull($result->getCheckOutAt());
     }
 
+    // ── Void resurrection ─────────────────────────────────────────────
+
+    public function testCheckInResurrectsExistingVoidedRowInPlace(): void
+    {
+        DateService::setClock(new MockClock(new DateTimeImmutable('2026-04-10 09:30:00', new \DateTimeZone('UTC'))));
+
+        $voided = (new Attendance())
+            ->setCheckInAt(new DateTimeImmutable('2026-04-10 08:00:00', new \DateTimeZone('UTC')))
+            ->setCheckOutAt(new DateTimeImmutable('2026-04-10 16:00:00', new \DateTimeZone('UTC')))
+            ->setCheckInDeviceId('old-device')
+            ->setCheckOutDeviceId('old-device');
+        $voided->setVoidedAt(new DateTimeImmutable('2026-04-10 09:00:00', new \DateTimeZone('UTC')));
+        $voided->setVoidedByEmail('owner@example.com');
+        $voided->setVoidReason('wrong shift');
+
+        $this->attendanceRepo = $this->createMock(AttendanceRepository::class);
+        $this->attendanceRepo->method('findByEmployeeAndDate')->willReturn($voided);
+        $this->rebuildService();
+
+        // A resurrection reuses the existing row — no new persist.
+        $this->attendanceRepo->expects($this->never())->method('persist');
+        $this->attendanceRepo->expects($this->once())->method('flush');
+
+        $result = $this->svc->checkin(
+            $this->employee(),
+            clientIp: '203.0.113.5',
+            deviceId: 'new-device',
+            deviceName: 'iPhone 16',
+            settings: $this->settings(),
+        );
+
+        $this->assertSame($voided, $result);
+        $this->assertFalse($result->isVoided());
+        $this->assertNull($result->getVoidedByEmail());
+        $this->assertNull($result->getVoidReason());
+        $this->assertSame('09:30', $result->getCheckInAt()?->setTimezone(new \DateTimeZone('UTC'))->format('H:i'));
+        $this->assertNull($result->getCheckOutAt(), 'check-out must be wiped — resurrection starts a fresh cycle');
+        $this->assertSame('new-device', $result->getCheckInDeviceId());
+    }
+
     protected function tearDown(): void
     {
         // Release the frozen clock so other tests run against real "now".

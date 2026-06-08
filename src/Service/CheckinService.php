@@ -60,7 +60,7 @@ class CheckinService
             $cooldownMinutes = $workspace?->getSetting()?->getNfcCheckinIntervalMinutes() ?? 0;
             if ($cooldownMinutes > 0) {
                 $existing = $this->attendanceRepository->findByEmployeeAndDate($employee, $today);
-                if ($existing !== null && $existing->getCheckInAt() !== null) {
+                if ($existing !== null && !$existing->isVoided() && $existing->getCheckInAt() !== null) {
                     $lastPunchAt = $existing->getCheckOutAt() ?? $existing->getCheckInAt();
                     $diffSeconds = $nowUtc->getTimestamp() - $lastPunchAt->getTimestamp();
                     if ($diffSeconds >= 0 && $diffSeconds < $cooldownMinutes * 60) {
@@ -113,9 +113,13 @@ class CheckinService
 
         // Find or create attendance
         $attendance = $this->attendanceRepository->findByEmployeeAndDate($employee, $today);
+        // A voided row is a tombstone holding the (employee, date) slot — treat
+        // it as if no row existed for check-in purposes. Resurrect by wiping
+        // void + scan state, then run the fresh check-in path.
+        $resurrecting = $attendance !== null && $attendance->isVoided();
         $action = null;
 
-        if ($attendance === null) {
+        if ($attendance === null || $resurrecting) {
             // Device double check-in prevention (Espresso feature)
             if ($settings->deviceVerificationEnabled && $deviceId !== null) {
                 $existing = $this->attendanceRepository->findByDeviceIdAndDateExcludingEmployee(
@@ -129,10 +133,19 @@ class CheckinService
                 }
             }
 
-            // Check in
-            $attendance = new Attendance();
-            $attendance->setEmployee($employee);
-            $attendance->setWorkspace($workspace);
+            if ($attendance === null) {
+                $attendance = new Attendance();
+                $attendance->setEmployee($employee);
+                $attendance->setWorkspace($workspace);
+            } else {
+                // Wipe the resurrected row so it starts a clean check-in cycle.
+                $attendance->clearVoid()
+                    ->setCheckOutAt(null)
+                    ->setCheckOutLat(null)->setCheckOutLng(null)
+                    ->setCheckOutDeviceId(null)->setCheckOutDeviceName(null)
+                    ->setOriginalCheckInAt(null)->setOriginalCheckOutAt(null)
+                    ->setEditedAt(null)->setEditedBy(null)->setEditedByEmail(null)->setEditReason(null);
+            }
             $attendance->setQrCode($qrCode);
             $attendance->setDate($today);
             $attendance->setCheckInAt($nowUtc);
@@ -144,7 +157,9 @@ class CheckinService
 
             $this->flagCalculator->recompute($attendance, $employee, $wsTz);
 
-            $this->attendanceRepository->persist($attendance);
+            if (!$resurrecting) {
+                $this->attendanceRepository->persist($attendance);
+            }
             $action = 'in';
         } elseif ($attendance->getCheckOutAt() === null) {
             // Device verification check (Espresso feature)

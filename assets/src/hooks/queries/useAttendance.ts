@@ -73,3 +73,26 @@ export function useCreateAttendance(workspacePublicId: string) {
     },
   });
 }
+
+/** Soft-deletes an attendance row. The row stays in the database
+ *  with voidedAt/By/Reason populated so it's visible in the log as a
+ *  tombstone, but it's dropped from stats and exports. A new scan or
+ *  manual entry on the same day resurrects it. */
+export function useDeleteAttendance(workspacePublicId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ publicId, reason }: { publicId: string; reason: string }) => {
+      const { data } = await apiAxios.delete<AttendanceRecord>(
+        `/workspaces/${workspacePublicId}/attendances/${publicId}`,
+        { data: { reason } },
+      );
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['attendance', workspacePublicId] });
+      qc.invalidateQueries({ queryKey: ['attendance-summary', workspacePublicId] });
+      qc.invalidateQueries({ queryKey: ['employee-attendance'] });
+      qc.invalidateQueries({ queryKey: ['dashboard'] });
+    },
+  });
+}

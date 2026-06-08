@@ -449,6 +449,119 @@ class AttendanceServiceTest extends TestCase
         $this->assertFalse($attendance->hasLeftEarly());
     }
 
+    // ── Void (soft-delete) ───────────────────────────────────────────
+
+    public function testVoidStampsAuditFieldsAndPreservesScanTimes(): void
+    {
+        $attendance = $this->buildAttendance(
+            checkIn: '2026-04-10 09:00:00',
+            checkOut: '2026-04-10 17:00:00',
+        );
+        $actor = (new User())->setEmail('owner@example.com');
+
+        $this->attendanceRepo->expects($this->once())->method('flush');
+
+        $this->svc->void($attendance, $actor, 'Wrong day');
+
+        $this->assertTrue($attendance->isVoided());
+        $this->assertSame('owner@example.com', $attendance->getVoidedByEmail());
+        $this->assertSame('Wrong day', $attendance->getVoidReason());
+        $this->assertSame($actor, $attendance->getVoidedBy());
+        // Scan times are preserved on the tombstone — voiding is reversible.
+        $this->assertSame('09:00', $attendance->getCheckInAt()?->format('H:i'));
+        $this->assertSame('17:00', $attendance->getCheckOutAt()?->format('H:i'));
+    }
+
+    public function testVoidRejectsEmptyReason(): void
+    {
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('reason is required');
+
+        $this->svc->void(
+            $this->buildAttendance('2026-04-10 09:00:00', null),
+            $this->actor(),
+            '   ',
+        );
+    }
+
+    public function testVoidRejectsAlreadyVoidedRow(): void
+    {
+        $attendance = $this->buildAttendance('2026-04-10 09:00:00', null);
+        $this->svc->void($attendance, $this->actor(), 'first');
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('already been voided');
+
+        $this->svc->void($attendance, $this->actor(), 'second');
+    }
+
+    public function testVoidRejectsReasonOver255Chars(): void
+    {
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('255 characters or fewer');
+
+        $this->svc->void(
+            $this->buildAttendance('2026-04-10 09:00:00', null),
+            $this->actor(),
+            str_repeat('a', 256),
+        );
+    }
+
+    public function testOverrideRejectsVoidedAttendance(): void
+    {
+        $attendance = $this->buildAttendance('2026-04-10 09:00:00', null);
+        $this->svc->void($attendance, $this->actor(), 'tombstone');
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('voided');
+
+        $this->svc->override(
+            $attendance, $this->actor(),
+            checkInAt: null, checkOutAt: '17:30',
+            checkInProvided: false, checkOutProvided: true,
+            reason: 'reactivate',
+        );
+    }
+
+    public function testCreateResurrectsExistingVoidedRow(): void
+    {
+        [$workspace, $employee] = $this->buildWorkspaceEmployee();
+        $voided = (new Attendance())
+            ->setEmployee($employee)
+            ->setWorkspace($workspace)
+            ->setDate(new DateTimeImmutable('2026-04-10'))
+            ->setCheckInAt(new DateTimeImmutable('2026-04-10 09:00:00'))
+            ->setCheckOutAt(new DateTimeImmutable('2026-04-10 17:00:00'));
+        $voided->setVoidedAt(new DateTimeImmutable('2026-04-10 19:00:00'));
+        $voided->setVoidedByEmail('old@example.com');
+        $voided->setVoidReason('mistake');
+
+        $this->attendanceRepo->method('findByEmployeeAndDate')->willReturn($voided);
+        // Resurrection mutates the existing row in place — no fresh persist.
+        $this->attendanceRepo->expects($this->never())->method('persist');
+        $this->attendanceRepo->expects($this->once())->method('flush');
+
+        $result = $this->svc->create(
+            workspace: $workspace,
+            employee: $employee,
+            actor: $this->actor(),
+            date: '2026-04-10',
+            checkInAt: '10:00',
+            checkOutAt: null,
+            reason: 'redo',
+        );
+
+        $this->assertSame($voided, $result);
+        $this->assertFalse($result->isVoided());
+        $this->assertNull($result->getVoidedByEmail());
+        $this->assertNull($result->getVoidReason());
+        $this->assertSame('10:00', $result->getCheckInAt()?->setTimezone(new DateTimeZone('UTC'))->format('H:i'));
+        $this->assertNull($result->getCheckOutAt());
+        // Edit audit gets re-stamped on resurrection so the new entry traces back to the operator.
+        $this->assertTrue($result->isEdited());
+        $this->assertSame('redo', $result->getEditReason());
+    }
+
     // ── Helpers ──────────────────────────────────────────────────────
 
     private function actor(): User

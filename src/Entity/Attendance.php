@@ -110,6 +110,29 @@ class Attendance extends AbstractBaseEntity
     #[Groups(['attendance:read'])]
     private ?DateTimeImmutable $originalCheckOutAt = null;
 
+    /**
+     * Soft-void audit — populated when an owner/manager deletes the row via the
+     * void endpoint. The row stays in place (preserving the unique
+     * (employee, date) slot and the historical check-in/out times) but is
+     * excluded from stats and grayed-out in lists. A subsequent QR check-in or
+     * manual create on the same day resurrects the row (clears these fields).
+     */
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    #[Groups(['attendance:read'])]
+    private ?DateTimeImmutable $voidedAt = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?User $voidedBy = null;
+
+    #[ORM\Column(length: 180, nullable: true)]
+    #[Groups(['attendance:read'])]
+    private ?string $voidedByEmail = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['attendance:read'])]
+    private ?string $voidReason = null;
+
     // ── Date ───────────────────────────────────────────────────
 
     public function getDate(): ?DateTimeImmutable
@@ -270,5 +293,34 @@ class Attendance extends AbstractBaseEntity
     public function isEdited(): bool
     {
         return $this->editedAt !== null;
+    }
+
+    // ── Void audit ─────────────────────────────────────────────
+
+    public function getVoidedAt(): ?DateTimeImmutable { return $this->voidedAt; }
+    public function setVoidedAt(?DateTimeImmutable $v): static { $this->voidedAt = $v; return $this; }
+
+    public function getVoidedBy(): ?User { return $this->voidedBy; }
+    public function setVoidedBy(?User $v): static { $this->voidedBy = $v; return $this; }
+
+    public function getVoidedByEmail(): ?string { return $this->voidedByEmail; }
+    public function setVoidedByEmail(?string $v): static { $this->voidedByEmail = $v; return $this; }
+
+    public function getVoidReason(): ?string { return $this->voidReason; }
+    public function setVoidReason(?string $v): static { $this->voidReason = $v; return $this; }
+
+    public function isVoided(): bool
+    {
+        return $this->voidedAt !== null;
+    }
+
+    /** Clear void audit — used when a voided day is resurrected by a new check-in or manual entry. */
+    public function clearVoid(): static
+    {
+        $this->voidedAt = null;
+        $this->voidedBy = null;
+        $this->voidedByEmail = null;
+        $this->voidReason = null;
+        return $this;
     }
 }
