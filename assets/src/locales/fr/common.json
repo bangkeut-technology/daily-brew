@@ -88,6 +88,11 @@
     "yourPublicId": "Votre ID public"
   },
   "attendance": {
+    "export": "Exporter",
+    "exportExcel": "Exporter vers Excel",
+    "exportPdf": "Exporter vers PDF",
+    "exportEspressoRequired": "L'export nécessite l'abonnement Espresso",
+    "exportError": "Échec de l'export de la présence",
     "verification": {
       "title": "Vérification du pointage",
       "atRestaurant": "Au restaurant",

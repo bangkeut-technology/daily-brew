@@ -266,6 +266,11 @@
     "late": "Late",
     "leftEarly": "Left early",
     "absent": "Absent",
+    "export": "Export",
+    "exportExcel": "Export to Excel",
+    "exportPdf": "Export to PDF",
+    "exportEspressoRequired": "Export requires Espresso plan",
+    "exportError": "Failed to export attendance",
     "verification": {
       "title": "Check-in verification",
       "atRestaurant": "At restaurant",

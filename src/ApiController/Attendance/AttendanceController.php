@@ -14,11 +14,16 @@ use App\Repository\EmployeeRepository;
 use App\Repository\LeaveRequestRepository;
 use App\Repository\WorkspaceRepository;
 use App\Security\Voter\WorkspaceVoter;
+use App\Service\Attendance\AttendanceExportService;
+use App\Service\Attendance\AttendanceRowBuilder;
 use App\Service\AttendanceService;
 use App\Service\DateService;
+use App\Service\PlanService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
@@ -34,10 +39,8 @@ class AttendanceController extends AbstractController
         Request $request,
         #[CurrentUser] User $user,
         WorkspaceRepository $workspaceRepository,
-        AttendanceRepository $attendanceRepository,
         EmployeeRepository $employeeRepository,
-        LeaveRequestRepository $leaveRequestRepository,
-        ClosurePeriodRepository $closurePeriodRepository,
+        AttendanceRowBuilder $rowBuilder,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
         if ($workspace === null) {
@@ -49,160 +52,177 @@ class AttendanceController extends AbstractController
         $wsTz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
         $from = $request->query->get('from', DateService::today($wsTz)->format('Y-m-d'));
         $to = $request->query->get('to', $from);
-        $wsTodayStr = DateService::today($wsTz)->format('Y-m-d');
 
         $fromDate = DateService::parse($from);
         $toDate = DateService::parse($to);
 
-        // Determine role
         $isOwner = $workspace->getOwner()?->getId() === $user->getId();
         $employee = $employeeRepository->findOneByLinkedUserAndWorkspace($user, $workspace);
         $canSeeAll = $isOwner || ($employee?->hasManagerPermission(ManagerPermissionEnum::MANAGE_ATTENDANCE) ?? false);
 
-        // Include employees whose active window overlaps the queried range —
-        // i.e. still active, or deactivated on/after `from`. This keeps
-        // historical absent/present rows visible for deactivated staff.
+        // Include employees whose active window overlaps the queried range so
+        // historical absent/present rows still surface for deactivated staff.
         $activeEmployees = $employeeRepository->findActiveDuringRangeByWorkspace($workspace, $fromDate);
         if (!$canSeeAll && $employee !== null) {
             $empId = $employee->getId();
-            $activeEmployees = array_filter($activeEmployees, fn ($e) => $e->getId() === $empId);
+            $activeEmployees = array_values(array_filter($activeEmployees, fn ($e) => $e->getId() === $empId));
         }
 
-        // Bulk-load attendance, leaves, and closures
-        $attendances = $attendanceRepository->findByWorkspaceAndDateRange(
-            $workspace,
-            DateService::mutableParse($from),
-            DateService::mutableParse($to),
+        $rows = $rowBuilder->build($workspace, $activeEmployees, $fromDate, $toDate);
+        $rows = AttendanceRowBuilder::sortByDateDescStatusName($rows);
+
+        return $this->jsonSuccess($rows);
+    }
+
+    /**
+     * Excel export of the attendance log for the same date range as list().
+     * Espresso+ — owners and managers/employees with view access get their
+     * scoped slice (managers see all if `manage_attendance` is granted).
+     */
+    #[Route('/export.xlsx', name: 'attendances_export_xlsx', methods: ['GET'])]
+    public function exportXlsx(
+        string $workspacePublicId,
+        Request $request,
+        #[CurrentUser] User $user,
+        WorkspaceRepository $workspaceRepository,
+        EmployeeRepository $employeeRepository,
+        AttendanceRowBuilder $rowBuilder,
+        AttendanceExportService $exportService,
+        PlanService $planService,
+    ): Response {
+        [$workspace, $rows, $from, $to] = $this->resolveExport(
+            $workspacePublicId,
+            $request,
+            $user,
+            $workspaceRepository,
+            $employeeRepository,
+            $rowBuilder,
+            $planService,
         );
 
-        $approvedLeaves = $leaveRequestRepository->findApprovedByWorkspaceAndDateRange(
-            $workspace, $fromDate, $toDate,
+        $contents = $exportService->toXlsx($rows, $workspace, $from, $to);
+
+        return $this->binaryResponse(
+            $contents,
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            $this->exportFilename($workspace, $from, $to, 'xlsx'),
+        );
+    }
+
+    /**
+     * PDF export of the attendance log for the same date range as list().
+     * Espresso+, same access model as exportXlsx.
+     */
+    #[Route('/export.pdf', name: 'attendances_export_pdf', methods: ['GET'])]
+    public function exportPdf(
+        string $workspacePublicId,
+        Request $request,
+        #[CurrentUser] User $user,
+        WorkspaceRepository $workspaceRepository,
+        EmployeeRepository $employeeRepository,
+        AttendanceRowBuilder $rowBuilder,
+        AttendanceExportService $exportService,
+        PlanService $planService,
+    ): Response {
+        [$workspace, $rows, $from, $to] = $this->resolveExport(
+            $workspacePublicId,
+            $request,
+            $user,
+            $workspaceRepository,
+            $employeeRepository,
+            $rowBuilder,
+            $planService,
         );
 
-        $closures = $closurePeriodRepository->findAllOverlappingRange(
-            $workspace, $fromDate, $toDate,
+        $contents = $exportService->toPdf($rows, $workspace, $from, $to);
+
+        return $this->binaryResponse(
+            $contents,
+            'application/pdf',
+            $this->exportFilename($workspace, $from, $to, 'pdf'),
         );
+    }
 
-        // Time formatter
-        $tz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
-        $formatTime = static function (?\DateTimeInterface $dt) use ($tz): ?string {
-            if ($dt === null) return null;
-            return \DateTimeImmutable::createFromInterface($dt)->setTimezone($tz)->format('H:i');
-        };
-
-        // Index attendance by "employeeId_date"
-        $attendanceMap = [];
-        foreach ($attendances as $a) {
-            $key = $a->getEmployee()->getId() . '_' . $a->getDate()->format('Y-m-d');
-            $attendanceMap[$key] = $a;
+    /**
+     * Shared resolution for both export endpoints: validates workspace,
+     * permissions, plan gate, and produces the row list for the requested
+     * range (plus optional employeePublicId narrowing).
+     *
+     * @return array{0: \App\Entity\Workspace, 1: list<array<string, mixed>>, 2: string, 3: string}
+     */
+    private function resolveExport(
+        string $workspacePublicId,
+        Request $request,
+        User $user,
+        WorkspaceRepository $workspaceRepository,
+        EmployeeRepository $employeeRepository,
+        AttendanceRowBuilder $rowBuilder,
+        PlanService $planService,
+    ): array {
+        $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
+        if ($workspace === null) {
+            throw new NotFoundHttpException('Workspace not found');
         }
 
-        // Build closure dates set
-        $closureDates = [];
-        foreach ($closures as $c) {
-            $period = new \DatePeriod(
-                \DateTimeImmutable::createFromInterface($c->getStartDate()),
-                new \DateInterval('P1D'),
-                \DateTimeImmutable::createFromInterface($c->getEndDate())->modify('+1 day'),
+        $this->denyAccessUnlessGranted(WorkspaceVoter::VIEW, $workspace);
+
+        if (!$planService->canExportAttendance($workspace)) {
+            throw new \Symfony\Component\HttpKernel\Exception\HttpException(
+                402,
+                'Attendance export requires the Espresso plan',
             );
-            foreach ($period as $d) {
-                $closureDates[$d->format('Y-m-d')] = true;
-            }
         }
 
-        // Index leaves by employee ID
-        $leaveMap = [];
-        foreach ($approvedLeaves as $lr) {
-            $leaveMap[$lr->getEmployee()->getId()][] = $lr;
+        $wsTz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
+        $from = $request->query->get('from', DateService::today($wsTz)->format('Y-m-d'));
+        $to = $request->query->get('to', $from);
+
+        $fromDate = DateService::parse($from);
+        $toDate = DateService::parse($to);
+
+        $isOwner = $workspace->getOwner()?->getId() === $user->getId();
+        $self = $employeeRepository->findOneByLinkedUserAndWorkspace($user, $workspace);
+        $canSeeAll = $isOwner || ($self?->hasManagerPermission(ManagerPermissionEnum::MANAGE_ATTENDANCE) ?? false);
+
+        $employees = $employeeRepository->findActiveDuringRangeByWorkspace($workspace, $fromDate);
+        if (!$canSeeAll && $self !== null) {
+            $empId = $self->getId();
+            $employees = array_values(array_filter($employees, fn ($e) => $e->getId() === $empId));
         }
 
-        // Build result with present, absent, and on_leave records
-        $result = [];
-        $datePeriod = new \DatePeriod($fromDate, new \DateInterval('P1D'), $toDate->modify('+1 day'));
-
-        foreach ($datePeriod as $date) {
-            $dateStr = $date->format('Y-m-d');
-            $isClosure = isset($closureDates[$dateStr]);
-            $isFuture = $dateStr > $wsTodayStr;
-
-            foreach ($activeEmployees as $emp) {
-                // Skip days after the employee's last working day so deactivated
-                // staff stop appearing on dates they weren't employed.
-                $leftAt = $emp->getLeftAt()?->format('Y-m-d');
-                if ($leftAt !== null && $dateStr > $leftAt) {
-                    continue;
-                }
-
-                // Skip days before the employee was linked to a User. An
-                // unlinked employee can't check in (QR auth needs a JWT that
-                // resolves to a linked employee), so absent rows before this
-                // date would over-count.
-                $linkedAt = $emp->getLinkedAt()?->format('Y-m-d');
-                if ($linkedAt === null || $dateStr < $linkedAt) {
-                    continue;
-                }
-
-                $key = $emp->getId() . '_' . $dateStr;
-
-                if (isset($attendanceMap[$key])) {
-                    $a = $attendanceMap[$key];
-                    $result[] = [
-                        'publicId' => (string) $a->getPublicId(),
-                        'employeePublicId' => (string) $emp->getPublicId(),
-                        'employeeName' => $emp->getName(),
-                        'shiftName' => $emp->getShift()?->getName(),
-                        'date' => $dateStr,
-                        'checkInAt' => $formatTime($a->getCheckInAt()),
-                        'checkOutAt' => $formatTime($a->getCheckOutAt()),
-                        'isLate' => $a->isLate(),
-                        'leftEarly' => $a->hasLeftEarly(),
-                        'status' => 'present',
-                        'editedAt' => $a->getEditedAt()?->format(\DateTimeInterface::ATOM),
-                        'editedByEmail' => $a->getEditedByEmail(),
-                        'editReason' => $a->getEditReason(),
-                        'originalCheckInAt' => $formatTime($a->getOriginalCheckInAt()),
-                        'originalCheckOutAt' => $formatTime($a->getOriginalCheckOutAt()),
-                    ];
-                } elseif (!$isClosure && !$isFuture) {
-                    // Check if on approved leave
-                    $onLeave = false;
-                    $empLeaves = $leaveMap[$emp->getId()] ?? [];
-                    foreach ($empLeaves as $lr) {
-                        if ($lr->getStartDate()->format('Y-m-d') <= $dateStr
-                            && $lr->getEndDate()->format('Y-m-d') >= $dateStr) {
-                            $onLeave = true;
-                            break;
-                        }
-                    }
-
-                    $status = $onLeave ? 'on_leave' : 'absent';
-                    $result[] = [
-                        'publicId' => $status . '-' . $emp->getPublicId() . '-' . $dateStr,
-                        'employeePublicId' => (string) $emp->getPublicId(),
-                        'employeeName' => $emp->getName(),
-                        'shiftName' => $emp->getShift()?->getName(),
-                        'date' => $dateStr,
-                        'checkInAt' => null,
-                        'checkOutAt' => null,
-                        'isLate' => false,
-                        'leftEarly' => false,
-                        'status' => $status,
-                    ];
-                }
-            }
+        // Optional per-employee narrowing (matches the list endpoint filter).
+        $employeePublicId = $request->query->get('employeePublicId');
+        if ($employeePublicId !== null && $employeePublicId !== '') {
+            $employees = array_values(array_filter(
+                $employees,
+                fn (Employee $e) => (string) $e->getPublicId() === $employeePublicId,
+            ));
         }
 
-        // Sort: date DESC, then status (present > on_leave > absent), then name ASC
-        $statusOrder = ['present' => 0, 'on_leave' => 1, 'absent' => 2];
-        usort($result, static function (array $a, array $b) use ($statusOrder): int {
-            $dateCmp = $b['date'] <=> $a['date'];
-            if ($dateCmp !== 0) return $dateCmp;
-            $statusCmp = ($statusOrder[$a['status']] ?? 3) <=> ($statusOrder[$b['status']] ?? 3);
-            if ($statusCmp !== 0) return $statusCmp;
-            return $a['employeeName'] <=> $b['employeeName'];
-        });
+        $rows = $rowBuilder->build($workspace, $employees, $fromDate, $toDate);
 
-        return $this->jsonSuccess($result);
+        return [$workspace, $rows, $from, $to];
+    }
+
+    private function binaryResponse(string $body, string $mime, string $filename): Response
+    {
+        $response = new Response($body, 200, [
+            'Content-Type' => $mime,
+            'Content-Length' => (string) strlen($body),
+        ]);
+        $disposition = $response->headers->makeDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $filename,
+        );
+        $response->headers->set('Content-Disposition', $disposition);
+        return $response;
+    }
+
+    private function exportFilename(\App\Entity\Workspace $workspace, string $from, string $to, string $ext): string
+    {
+        $slug = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $workspace->getName()) ?? 'workspace');
+        $slug = trim($slug, '-') ?: 'workspace';
+        return sprintf('attendance-%s-%s-to-%s.%s', $slug, $from, $to, $ext);
     }
 
     /**

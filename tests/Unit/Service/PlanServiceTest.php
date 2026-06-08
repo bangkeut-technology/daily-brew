@@ -197,6 +197,7 @@ class PlanServiceTest extends TestCase
         $this->assertFalse($this->planService->canUseDeviceVerification($this->workspace));
         $this->assertFalse($this->planService->canUseManagers($this->workspace));
         $this->assertFalse($this->planService->canUseTelegramNotifications($this->workspace));
+        $this->assertFalse($this->planService->canExportAttendance($this->workspace));
     }
 
     public function testFeatureGatingOnEspressoPlan(): void
@@ -213,6 +214,7 @@ class PlanServiceTest extends TestCase
         $this->assertTrue($this->planService->canUseDeviceVerification($this->workspace));
         $this->assertTrue($this->planService->canUseManagers($this->workspace));
         $this->assertTrue($this->planService->canUseTelegramNotifications($this->workspace));
+        $this->assertTrue($this->planService->canExportAttendance($this->workspace));
     }
 
     public function testCanPromoteToManagerOnFreePlan(): void

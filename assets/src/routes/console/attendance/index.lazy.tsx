@@ -5,6 +5,7 @@ import { CalendarDays, ChevronDown, ClipboardList, GanttChart, LayoutGrid, List,
 import { useAttendance } from '@/hooks/queries/useAttendance';
 import { useAttendanceSummary } from '@/hooks/queries/useAttendanceSummary';
 import { useEmployees } from '@/hooks/queries/useEmployees';
+import { usePlan } from '@/hooks/queries/usePlan';
 import { useRoleContext } from '@/hooks/queries/useRoleContext';
 import { useWorkspaceTimezone } from '@/hooks/useWorkspaceTimezone';
 import { getWorkspacePublicId } from '@/lib/auth';
@@ -14,6 +15,7 @@ import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { AttendanceRow } from '@/components/shared/AttendanceRow';
 import { AttendanceEditModal } from '@/components/shared/AttendanceEditModal';
 import { AttendanceCreateModal } from '@/components/shared/AttendanceCreateModal';
+import { AttendanceExportButton } from '@/components/shared/AttendanceExportButton';
 import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { StatusBadge } from '@/components/shared/StatusBadge';
@@ -174,6 +176,7 @@ function AttendancePage() {
   const { data: summary, isLoading: summaryLoading } = useAttendanceSummary(workspaceId, from, to);
   const { data: employees } = useEmployees(workspaceId);
   const { data: roleContext, isLoading: roleLoading } = useRoleContext();
+  const { data: plan } = usePlan(workspaceId);
   const fmtDate = useDateFormat();
 
   const isManager = roleContext?.isManager ?? false;
@@ -257,14 +260,25 @@ function AttendancePage() {
         help={isEmployee
           ? { href: '/guides/employee#step-employee-5', label: 'How check-in works' }
           : { href: '/guides/owner#step-owner-7', label: 'How attendance tracking works' }}
-        action={canEditAttendance ? (
-          <button
-            onClick={() => setCreateOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light"
-          >
-            + {t('attendance.addAttendance', 'Add attendance')}
-          </button>
-        ) : undefined}
+        action={(
+          <div className="flex items-center gap-2">
+            <AttendanceExportButton
+              workspacePublicId={workspaceId}
+              from={from}
+              to={to}
+              employeePublicId={activeFilter || undefined}
+              canExport={plan?.canExportAttendance ?? false}
+            />
+            {canEditAttendance && (
+              <button
+                onClick={() => setCreateOpen(true)}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light"
+              >
+                + {t('attendance.addAttendance', 'Add attendance')}
+              </button>
+            )}
+          </div>
+        )}
       />
 
       <p className="text-[15px] text-text-secondary mb-5 -mt-2 leading-relaxed">
