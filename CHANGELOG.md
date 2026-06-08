@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.103.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.103.1...v1.103.2) (2026-06-08)
+
+
+### Bug Fixes
+
+* **employee+select:** reject future-dated linkedAt + bump CustomSelect dropUp threshold ([#284](https://github.com/bangkeut-technology/daily-brew/issues/284)) ([75d93b8](https://github.com/bangkeut-technology/daily-brew/commit/75d93b81e858b92303dd72e11496634ffb99bf04))
+
 ## [1.103.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.103.0...v1.103.1) (2026-06-08)
 
 
