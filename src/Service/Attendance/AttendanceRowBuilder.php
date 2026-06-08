@@ -6,10 +6,12 @@ namespace App\Service\Attendance;
 
 use App\Entity\Employee;
 use App\Entity\Workspace;
+use App\Enum\DayOfWeekEnum;
 use App\Repository\AttendanceRepository;
 use App\Repository\ClosurePeriodRepository;
 use App\Repository\LeaveRequestRepository;
 use App\Service\DateService;
+use App\Service\PlanService;
 
 /**
  * Builds the per-(employee, date) row list that powers the attendance log
@@ -26,6 +28,7 @@ class AttendanceRowBuilder
         private AttendanceRepository $attendanceRepository,
         private LeaveRequestRepository $leaveRequestRepository,
         private ClosurePeriodRepository $closurePeriodRepository,
+        private PlanService $planService,
     ) {}
 
     /**
@@ -98,6 +101,10 @@ class AttendanceRowBuilder
             $leaveMap[$lr->getEmployee()->getId()][] = $lr;
         }
 
+        // Per-day rules are an Espresso+ feature — short-circuit the check so
+        // the rest of the loop stays plain-array work.
+        $perDayRulesActive = $this->planService->canUseShiftTimeRules($workspace);
+
         $result = [];
         $datePeriod = new \DatePeriod($from, new \DateInterval('P1D'), $to->modify('+1 day'));
 
@@ -105,6 +112,7 @@ class AttendanceRowBuilder
             $dateStr = $date->format('Y-m-d');
             $isClosure = isset($closureDates[$dateStr]);
             $isFuture = $dateStr > $wsTodayStr;
+            $dayOfWeek = DayOfWeekEnum::tryFrom((int) $date->format('N'));
 
             foreach ($employees as $emp) {
                 $leftAt = $emp->getLeftAt()?->format('Y-m-d');
@@ -117,7 +125,22 @@ class AttendanceRowBuilder
                     continue;
                 }
 
+                // Off-day skip: an employee with a per-day-ruled shift is not
+                // expected on days outside their schedule. We don't emit an
+                // absent row, but a real check-in (someone came in unexpectedly)
+                // still surfaces below as 'present'.
+                $shift = $emp->getShift();
+                $isOffDay = $perDayRulesActive
+                    && $shift !== null
+                    && $shift->hasAnyTimeRules()
+                    && $dayOfWeek !== null
+                    && !$shift->isScheduledOn($dayOfWeek);
+
                 $key = $emp->getId() . '_' . $dateStr;
+
+                if ($isOffDay && !isset($attendanceMap[$key])) {
+                    continue;
+                }
 
                 if (isset($attendanceMap[$key])) {
                     $a = $attendanceMap[$key];

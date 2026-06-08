@@ -53,6 +53,8 @@ function dayStatusBadge(day: AttendanceDayStatus) {
       return <StatusBadge label="Closed" variant="gray" />;
     case 'upcoming':
       return <StatusBadge label="Upcoming" variant="gray" />;
+    case 'off':
+      return <StatusBadge label="Off" variant="gray" />;
   }
 }
 
@@ -88,6 +90,8 @@ function ganttCell(day: AttendanceDayStatus, hasShift: boolean): GanttCellSpec {
       return { kind: 'badge', code: 'C', bg: 'bg-[#AE9D95]/10', text: 'text-text-tertiary', title: 'Closed' };
     case 'upcoming':
       return { kind: 'dot-muted', title: 'Upcoming' };
+    case 'off':
+      return { kind: 'dot-muted', title: 'Off day' };
   }
 }
 

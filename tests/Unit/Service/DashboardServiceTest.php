@@ -10,14 +10,20 @@ use App\Repository\AttendanceRepository;
 use App\Repository\EmployeeRepository;
 use App\Repository\LeaveRequestRepository;
 use App\Service\DashboardService;
+use App\Service\DateService;
+use App\Service\PlanService;
+use DateTimeImmutable;
+use DateTimeZone;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\MockClock;
 
 class DashboardServiceTest extends TestCase
 {
     private EmployeeRepository&Stub $employeeRepo;
     private AttendanceRepository&Stub $attendanceRepo;
     private LeaveRequestRepository&Stub $leaveRepo;
+    private PlanService&Stub $planService;
     private DashboardService $svc;
 
     protected function setUp(): void
@@ -25,10 +31,14 @@ class DashboardServiceTest extends TestCase
         $this->employeeRepo = $this->createStub(EmployeeRepository::class);
         $this->attendanceRepo = $this->createStub(AttendanceRepository::class);
         $this->leaveRepo = $this->createStub(LeaveRequestRepository::class);
+        $this->planService = $this->createStub(PlanService::class);
+        // Default: per-day rules off (Free tier) — preserves legacy stats math.
+        $this->planService->method('canUseShiftTimeRules')->willReturn(false);
         $this->svc = new DashboardService(
             $this->employeeRepo,
             $this->attendanceRepo,
             $this->leaveRepo,
+            $this->planService,
         );
     }
 
@@ -108,6 +118,34 @@ class DashboardServiceTest extends TestCase
 
         $this->assertSame(10, $stats['totalEmployees'], 'Seat-limit count still includes None-tracked');
         $this->assertSame(1, $stats['absent'], '7 tracked - 5 present - 1 on leave = 1');
+    }
+
+    public function testOffDayEmployeesDropOutOfAbsentBaselineOnEspresso(): void
+    {
+        // Saturday on Espresso. 5 tracked employees in total, but 1 GM has a Mon-Fri
+        // shift → only 4 are "scheduled today". 3 present, 0 leave → absent = 1, not 2.
+        // Without this fix, the GM would show as absent every weekend.
+        DateService::setClock(new MockClock(new DateTimeImmutable('2026-04-11 12:00:00', new DateTimeZone('UTC'))));
+
+        $workspace = $this->workspaceWithTimezone('UTC');
+        $espresso = $this->createStub(PlanService::class);
+        $espresso->method('canUseShiftTimeRules')->willReturn(true);
+        $svc = new DashboardService($this->employeeRepo, $this->attendanceRepo, $this->leaveRepo, $espresso);
+
+        $this->employeeRepo->method('countActiveByWorkspace')->willReturn(5);
+        // Legacy baseline returns 5 — DashboardService must NOT use it on Espresso.
+        $this->employeeRepo->method('countAttendanceTrackedByWorkspace')->willReturn(5);
+        $this->employeeRepo->method('countAttendanceTrackedAndScheduledOn')->willReturn(4);
+        $this->attendanceRepo->method('countByWorkspaceAndDate')->willReturn(3);
+        $this->attendanceRepo->method('countLateByWorkspaceAndDate')->willReturn(0);
+        $this->leaveRepo->method('countApprovedByWorkspaceAndDate')->willReturn(0);
+        $this->attendanceRepo->method('findByWorkspaceAndDate')->willReturn([]);
+        $this->leaveRepo->method('countPendingByWorkspace')->willReturn(0);
+
+        $stats = $svc->getTodayStats($workspace);
+
+        DateService::setClock(null);
+        $this->assertSame(1, $stats['absent'], '4 scheduled - 3 present - 0 leave = 1, off-day GM excluded');
     }
 
     private function workspaceWithTimezone(string $tz): Workspace

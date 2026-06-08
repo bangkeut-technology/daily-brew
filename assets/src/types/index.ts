@@ -289,7 +289,12 @@ export interface Employee {
   photoUrl?: string | null;
 }
 
-export type AttendanceStatus = 'present' | 'absent' | 'on_leave' | 'voided';
+/** 'off' = employee's shift has per-day rules and today isn't in the schedule
+ *  (e.g. Mon-Fri GM on Saturday). Distinct from 'absent' so the gantt and
+ *  log can render it neutrally instead of as a no-show.
+ *  'voided' = a manager soft-deleted the row; still in DB for audit but
+ *  excluded from stats and rendered as a tombstone in the log. */
+export type AttendanceStatus = 'present' | 'absent' | 'on_leave' | 'voided' | 'off';
 
 export interface AttendanceRecord {
   publicId: string;
@@ -314,7 +319,7 @@ export interface AttendanceRecord {
 
 export interface AttendanceDayStatus {
   date: string;
-  status: 'present' | 'absent' | 'leave' | 'closure' | 'upcoming';
+  status: 'present' | 'absent' | 'leave' | 'closure' | 'upcoming' | 'off';
   attendancePublicId?: string;
   checkInAt?: string | null;
   checkOutAt?: string | null;

@@ -530,6 +530,12 @@ function DaySchedulePanel({ shift, workspaceId }: DaySchedulePanelProps) {
 
   return (
     <div className="px-5 pb-4 space-y-1">
+      <p className="text-[12.5px] text-text-tertiary leading-snug pb-2">
+        {t(
+          'shift.daysAreSchedule',
+          'Days left blank are off-days — staff aren’t expected to check in and won’t be counted absent. Changes apply to past dates too.',
+        )}
+      </p>
       {DAY_KEYS.map((dayKey, index) => {
         const dayOfWeek = index + 1; // 1=Monday ... 7=Sunday
         const existingRule = rulesByDay[dayOfWeek];

@@ -71,18 +71,32 @@ class AttendanceFlagCalculator
         }
     }
 
+    /**
+     * Resolve the effective shift start time for a given date.
+     *
+     * If the shift has per-day rules and the workspace is on a plan that supports
+     * them: a matching rule wins; no matching rule means today is an off-day, so
+     * we return null and the caller suppresses the late flag. We deliberately do
+     * NOT fall back to the default start time here — that was the old behavior
+     * and it caused a GM with a Mon-Fri shift to fire a "late" flag on Saturday.
+     *
+     * A shift with no per-day rules at all (Free plan, or Espresso users who
+     * haven't set per-day overrides) keeps the legacy semantics: the default
+     * start time applies every day.
+     */
     private function resolveEffectiveStartTime(Shift $shift, \DateTimeInterface $date): ?\DateTimeInterface
     {
         $workspace = $shift->getWorkspace();
-        if ($workspace !== null && $this->planService->canUseShiftTimeRules($workspace)) {
+        if ($workspace !== null
+            && $this->planService->canUseShiftTimeRules($workspace)
+            && $shift->hasAnyTimeRules()
+        ) {
             $dayOfWeek = DayOfWeekEnum::tryFrom((int) $date->format('N'));
-            if ($dayOfWeek !== null) {
-                foreach ($shift->getTimeRules() as $rule) {
-                    if ($rule->getDayOfWeek() === $dayOfWeek) {
-                        return DateService::createFromFormat('H:i', $rule->getStartTime()) ?: null;
-                    }
-                }
+            if ($dayOfWeek === null) {
+                return null;
             }
+            $rule = $shift->getTimeRuleFor($dayOfWeek);
+            return $rule === null ? null : (DateService::createFromFormat('H:i', $rule->getStartTime()) ?: null);
         }
         return $shift->getStartTime();
     }
@@ -90,15 +104,16 @@ class AttendanceFlagCalculator
     private function resolveEffectiveEndTime(Shift $shift, \DateTimeInterface $date): ?\DateTimeInterface
     {
         $workspace = $shift->getWorkspace();
-        if ($workspace !== null && $this->planService->canUseShiftTimeRules($workspace)) {
+        if ($workspace !== null
+            && $this->planService->canUseShiftTimeRules($workspace)
+            && $shift->hasAnyTimeRules()
+        ) {
             $dayOfWeek = DayOfWeekEnum::tryFrom((int) $date->format('N'));
-            if ($dayOfWeek !== null) {
-                foreach ($shift->getTimeRules() as $rule) {
-                    if ($rule->getDayOfWeek() === $dayOfWeek) {
-                        return DateService::createFromFormat('H:i', $rule->getEndTime()) ?: null;
-                    }
-                }
+            if ($dayOfWeek === null) {
+                return null;
             }
+            $rule = $shift->getTimeRuleFor($dayOfWeek);
+            return $rule === null ? null : (DateService::createFromFormat('H:i', $rule->getEndTime()) ?: null);
         }
         return $shift->getEndTime();
     }

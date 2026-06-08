@@ -7,6 +7,8 @@ namespace App\Repository;
 use App\Entity\Employee;
 use App\Entity\User;
 use App\Entity\Workspace;
+use App\Enum\DayOfWeekEnum;
+use App\Enum\EmployeeAttendanceTrackingEnum;
 use App\Enum\EmployeeRoleEnum;
 use App\Enum\EmployeeStatusEnum;
 use Doctrine\Persistence\ManagerRegistry;
@@ -129,9 +131,46 @@ class EmployeeRepository extends AbstractRepository
             ->andWhere('e.attendanceTracking = :tracking')
             ->setParameter('ws', $workspace)
             ->setParameter('status', EmployeeStatusEnum::ACTIVE)
-            ->setParameter('tracking', \App\Enum\EmployeeAttendanceTrackingEnum::Full)
+            ->setParameter('tracking', EmployeeAttendanceTrackingEnum::Full)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /**
+     * Subset of countAttendanceTrackedByWorkspace() restricted to employees
+     * whose shift schedules them on the given weekday. Used by the dashboard
+     * "absent" calculation so a Mon-Fri GM doesn't inflate the absent count on
+     * Saturday. Employees with no shift, or a shift that has no per-day rules
+     * at all, are always counted (legacy "every day" semantics).
+     *
+     * We eager-load shift + timeRules and filter in PHP via Shift::isScheduledOn
+     * — workspaces are small (rarely > 50 employees) so one query beats the
+     * subquery gymnastics required to express this in DQL cleanly.
+     */
+    public function countAttendanceTrackedAndScheduledOn(Workspace $workspace, DayOfWeekEnum $day): int
+    {
+        /** @var Employee[] $employees */
+        $employees = $this->createQueryBuilder('e')
+            ->leftJoin('e.shift', 's')->addSelect('s')
+            ->leftJoin('s.timeRules', 'r')->addSelect('r')
+            ->where('e.workspace = :ws')
+            ->andWhere('e.status = :status')
+            ->andWhere('e.deletedAt IS NULL')
+            ->andWhere('e.attendanceTracking = :tracking')
+            ->setParameter('ws', $workspace)
+            ->setParameter('status', EmployeeStatusEnum::ACTIVE)
+            ->setParameter('tracking', EmployeeAttendanceTrackingEnum::Full)
+            ->getQuery()
+            ->getResult();
+
+        $count = 0;
+        foreach ($employees as $emp) {
+            $shift = $emp->getShift();
+            if ($shift === null || $shift->isScheduledOn($day)) {
+                $count++;
+            }
+        }
+        return $count;
     }
 
     public function findDuplicate(Workspace $workspace, string $firstName, string $lastName): ?Employee
