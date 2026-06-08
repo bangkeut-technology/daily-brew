@@ -7,26 +7,17 @@ import {
     Clock,
     CalendarOff,
     Settings,
-    UserCircle,
-    LogOut,
     Crown,
     QrCode,
-    ShieldCheck,
     HelpCircle,
     X,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePlan } from '@/hooks/queries/usePlan';
 import { useRoleContext } from '@/hooks/queries/useRoleContext';
-import { useAuthenticationState } from '@/hooks/use-authentication';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { cn } from '@/lib/utils';
-import { LogoBrand } from '@/components/shared/Logo';
-import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
-import { WorkspaceSwitcher } from './WorkspaceSwitcher';
-import { useTheme } from 'next-themes';
-import { Sun, Moon } from 'lucide-react';
-import {EmployeeRole, ManagerPermission} from "@/types";
+import { ManagerPermission } from "@/types";
 
 interface NavItemDef {
     to: string;
@@ -186,21 +177,9 @@ function Divider() {
 
 export function Sidebar({ mobileOpen = false, onMobileClose }: { mobileOpen?: boolean; onMobileClose?: () => void } = {}) {
     const { t } = useTranslation();
-    const signOut = () => {
-        sessionStorage.removeItem('workspace_public_id');
-        // Submit as a real form POST so the browser follows the redirect
-        // and processes Set-Cookie headers to clear the JWT cookies
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/api/v1/${sessionStorage.getItem('locale') || 'en'}/auth/logout`;
-        document.body.appendChild(form);
-        form.submit();
-    };
     const workspacePublicId = getWorkspacePublicId() ?? '';
     const { data: plan } = usePlan(workspacePublicId);
     const { data: roleContext } = useRoleContext();
-    const auth = useAuthenticationState();
-    const isSuperAdmin = auth.user?.isSuperAdmin ?? false;
 
     const isOwner = roleContext?.isOwner ?? false;
     const isEmployee = roleContext?.isEmployee ?? false;
@@ -228,45 +207,30 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: { mobileOpen?: bo
     return (
         <aside
             className={cn(
-                'fixed left-0 top-0 bottom-0 w-55 bg-cream-2 border-r border-cream-3 flex flex-col',
+                'fixed left-0 top-0 md:top-14 bottom-0 w-55 bg-cream-2 border-r border-cream-3 flex flex-col',
                 'z-50 md:z-10 transform transition-transform duration-300 ease-in-out md:translate-x-0',
                 mobileOpen ? 'translate-x-0' : '-translate-x-full',
             )}
             aria-label={t('nav.sidebar', 'Main navigation')}
         >
-            {/* Logo row — close button on mobile for parity with the open hamburger */}
-            <div className="px-5 py-5 flex items-center justify-between">
-                <LogoBrand size={28} />
-                {onMobileClose && (
+            {/* Mobile-only close button — the topbar's logo + workspace selector
+                live in the topbar, so we only need the close X on the drawer
+                version of the sidebar. md+ hides this entirely. */}
+            {onMobileClose && (
+                <div className="md:hidden px-5 py-4 flex items-center justify-end border-b border-cream-3/40">
                     <button
                         type="button"
                         onClick={onMobileClose}
-                        className="md:hidden p-1 -mr-1 text-text-secondary hover:text-text-primary transition-colors"
+                        className="p-1 -mr-1 text-text-secondary hover:text-text-primary transition-colors"
                         aria-label={t('common.close', 'Close')}
                     >
                         <X size={20} />
                     </button>
-                )}
-            </div>
-
-            {/* Workspace switcher — always show, combines owned + linked workspaces */}
-            {roleContext && (
-                <div className="px-3 pb-2">
-                    <WorkspaceSwitcher
-                        workspaces={[
-                            ...(roleContext.ownedWorkspaces ?? []).map((ws) => ({ ...ws, role: 'owner' as const })),
-                            ...(roleContext.linkedWorkspaces ?? [])
-                                .filter((lw) => lw.workspacePublicId && !roleContext.ownedWorkspaces?.some((ow) => ow.publicId === lw.workspacePublicId))
-                                .map((lw) => ({ publicId: lw.workspacePublicId!, name: lw.workspaceName ?? '', role: (lw.role === 'manager' ? 'manager' : 'employee') as EmployeeRole })),
-                        ]}
-                        planLabel={plan?.planLabel}
-                        isEspresso={plan?.isEspresso}
-                    />
                 </div>
             )}
 
             {/* Navigation */}
-            <nav className="flex-1 px-3 flex flex-col overflow-y-auto">
+            <nav className="flex-1 px-3 pt-3 flex flex-col overflow-y-auto">
                 {showOwnerView && (
                     <>
                         <NavItem to="/console/dashboard" icon={LayoutDashboard} label="nav.dashboard" />
@@ -318,37 +282,11 @@ export function Sidebar({ mobileOpen = false, onMobileClose }: { mobileOpen?: bo
 
                 <Divider />
 
-                {/* Bottom section: Profile + Help + Sign Out */}
-                <div className="space-y-0.5">
-                    <NavItem
-                        to="/console/profile"
-                        icon={UserCircle}
-                        label="nav.profile"
-                    />
+                {/* Bottom section: Help link only. Profile / Admin panel /
+                    Sign out moved to the topbar user-avatar menu; language +
+                    theme moved to the topbar action row. */}
+                <div className="space-y-0.5 mt-auto mb-4">
                     <HelpLink />
-                </div>
-
-                <div className="mt-auto mb-4 space-y-1">
-                    {isSuperAdmin && (
-                        <Link
-                            to="/admin"
-                            className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer w-full font-sans text-[15.5px] text-coffee hover:bg-coffee/8 transition-all duration-180 no-underline"
-                        >
-                            <ShieldCheck size={16} />
-                            {t('nav.adminPanel', 'Admin panel')}
-                        </Link>
-                    )}
-                    <div className="px-2.5 pb-1">
-                        <LanguageSwitcher className="!w-full" />
-                    </div>
-                    <ThemeToggle />
-                    <button
-                        onClick={signOut}
-                        className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer w-full font-sans text-[15.5px] text-text-secondary hover:bg-cream-3 hover:text-text-primary transition-all duration-180 border-none bg-transparent"
-                    >
-                        <LogOut size={16} />
-                        {t('nav.signOut')}
-                    </button>
                 </div>
             </nav>
         </aside>
@@ -367,21 +305,5 @@ function HelpLink() {
             <HelpCircle size={16} />
             <span className="flex-1">{t('nav.help')}</span>
         </a>
-    );
-}
-
-function ThemeToggle() {
-    const { t } = useTranslation();
-    const { theme, setTheme } = useTheme();
-    const isDark = theme === 'dark';
-
-    return (
-        <button
-            onClick={() => setTheme(isDark ? 'light' : 'dark')}
-            className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer w-full font-sans text-[15.5px] text-text-secondary hover:bg-cream-3 hover:text-text-primary transition-all duration-180 border-none bg-transparent"
-        >
-            {isDark ? <Sun size={16} /> : <Moon size={16} />}
-            {isDark ? t('theme.light', 'Light mode') : t('theme.dark', 'Dark mode')}
-        </button>
     );
 }

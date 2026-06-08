@@ -14,7 +14,14 @@
     "profile": "Profile",
     "help": "Help",
     "signOut": "Sign out",
-    "adminPanel": "Admin panel"
+    "adminPanel": "Admin panel",
+    "userMenu": "User menu",
+    "topbar": "Workspace bar",
+    "openMenu": "Open menu"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "comingSoon": "Coming soon"
   },
   "profile": {
     "workspaceCount_one": "{{count}} workspace",

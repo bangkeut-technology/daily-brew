@@ -14,7 +14,14 @@
     "signOut": "Déconnexion",
     "adminPanel": "Panneau d'administration",
     "myAttendance": "Ma présence",
-    "myLeaveRequests": "Mes demandes de congé"
+    "myLeaveRequests": "Mes demandes de congé",
+    "userMenu": "Menu utilisateur",
+    "topbar": "Barre de l'espace de travail",
+    "openMenu": "Ouvrir le menu"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "comingSoon": "Bientôt disponible"
   },
   "profile": {
     "workspaceCount_one": "{{count}} espace",
