@@ -54,6 +54,9 @@ export function AttendanceRow({
     if (attendanceStatus === 'voided') {
       return { label: t('attendance.voided', 'Voided'), variant: 'gray' as const };
     }
+    if (attendanceStatus === 'off') {
+      return { label: t('attendance.off', 'Off'), variant: 'gray' as const };
+    }
     if (attendanceStatus === 'absent') {
       return { label: t('attendance.absent', 'Absent'), variant: 'red' as const };
     }
@@ -66,9 +69,13 @@ export function AttendanceRow({
   };
 
   const badge = getStatusBadge();
-  // Voided rows are tombstones — no edit or delete actions; un-void by re-scanning or manual entry.
-  const showEdit = !!onEdit && attendanceStatus === 'present' && !voided;
-  const showDelete = !!onDelete && attendanceStatus === 'present' && !voided;
+  // 'voided' is a tombstone — keep the original times visible (line-through)
+  // so the audit is readable, but hide edit/delete actions. Placeholder rows
+  // (absent / on_leave / off) have no real times to show, so we render a dash.
+  const isVoided = voided || attendanceStatus === 'voided';
+  const isPlaceholderRow = attendanceStatus === 'absent' || attendanceStatus === 'on_leave' || attendanceStatus === 'off';
+  const showEdit = !!onEdit && !isPlaceholderRow && !isVoided;
+  const showDelete = !!onDelete && !isPlaceholderRow && !isVoided;
 
   return (
     <div
@@ -114,10 +121,10 @@ export function AttendanceRow({
       <div
         className={cn(
           'text-[14.5px] text-text-secondary font-mono tabular-nums',
-          voided && 'line-through',
+          isVoided && 'line-through',
         )}
       >
-        {attendanceStatus === 'absent' || attendanceStatus === 'on_leave'
+        {isPlaceholderRow
           ? '—'
           : (
             <>

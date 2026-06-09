@@ -7,7 +7,9 @@ namespace App\Tests\Unit\Service;
 use App\Entity\Attendance;
 use App\Entity\Employee;
 use App\Entity\Shift;
+use App\Entity\ShiftTimeRule;
 use App\Entity\Workspace;
+use App\Enum\DayOfWeekEnum;
 use App\Enum\EmployeeAttendanceTrackingEnum;
 use App\Repository\AttendanceRepository;
 use App\Repository\ClosurePeriodRepository;
@@ -297,6 +299,74 @@ class CheckinServiceLateEarlyTest extends TestCase
         $this->assertNotNull($existing->getCheckOutAt(), 'But check-out time IS still recorded');
     }
 
+    // ── Per-day shift schedule = full schedule (off-day flag suppression) ─
+
+    public function testCheckInOnOffDayDoesNotFireLateFlagWhenShiftHasPerDayRules(): void
+    {
+        // 2026-04-11 is a Saturday. The GM's shift has Mon-Fri rules only.
+        // Even though check-in is at 10:00 (1h past the default 09:00), Saturday
+        // is an off-day — no rule applies, no late flag fires.
+        $this->pinClockTo('2026-04-11 10:00:00');
+        $this->planService->method('canUseShiftTimeRules')->willReturn(true);
+        $this->attendanceRepo->method('findByEmployeeAndDate')->willReturn(null);
+
+        $captured = null;
+        $this->attendanceRepo->expects($this->once())
+            ->method('persist')
+            ->with($this->callback(function (Attendance $a) use (&$captured): bool {
+                $captured = $a;
+                return true;
+            }));
+
+        $this->svc->checkin(
+            $this->gmEmployeeWithWeekdayRules(),
+            clientIp: '203.0.113.5',
+            settings: $this->settings(),
+        );
+
+        $this->assertFalse($captured->isLate(), 'Saturday = off-day, no late flag even at 10:00');
+    }
+
+    public function testCheckOutOnOffDayDoesNotFireLeftEarlyFlag(): void
+    {
+        // Saturday check-out at 14:00 (3h before the default 17:00) — no flag because off-day.
+        $this->pinClockTo('2026-04-11 14:00:00');
+        $this->planService->method('canUseShiftTimeRules')->willReturn(true);
+        $existing = $this->existingCheckInAttendance(deviceId: null);
+        $existing->setCheckInAt(new DateTimeImmutable('2026-04-11 09:00:00'));
+        $existing->setDate(new DateTimeImmutable('2026-04-11'));
+        $this->attendanceRepo->method('findByEmployeeAndDate')->willReturn($existing);
+
+        $this->svc->checkin(
+            $this->gmEmployeeWithWeekdayRules(),
+            clientIp: '203.0.113.5',
+            settings: $this->settings(),
+        );
+
+        $this->assertFalse($existing->hasLeftEarly(), 'Saturday = off-day, no left-early flag');
+    }
+
+    public function testCheckInOnScheduledDayUsesPerDayRuleStart(): void
+    {
+        // Monday 07:30 — Monday rule says 08:00 start, so 07:30 is on time.
+        $this->pinClockTo('2026-04-13 07:30:00');
+        $this->planService->method('canUseShiftTimeRules')->willReturn(true);
+        $this->attendanceRepo->method('findByEmployeeAndDate')->willReturn(null);
+
+        $captured = null;
+        $this->attendanceRepo->expects($this->once())
+            ->method('persist')
+            ->with($this->callback(function (Attendance $a) use (&$captured): bool {
+                $captured = $a;
+                return true;
+            }));
+
+        $emp = $this->gmEmployeeWithWeekdayRules(monStart: '08:00', monEnd: '16:00');
+        $this->svc->checkin($emp, clientIp: '203.0.113.5', settings: $this->settings());
+
+        $this->assertFalse($captured->isLate(), 'Monday rule 08:00 honored — 07:30 is early, not late');
+    }
+
     // ── Timezone interaction ─────────────────────────────────────────
 
     public function testLateDetectionUsesWorkspaceLocalTimeNotUtc(): void
@@ -352,6 +422,34 @@ class CheckinServiceLateEarlyTest extends TestCase
             ->setCheckInAt(new DateTimeImmutable('2026-04-10 09:00:00'))
             ->setCheckInDeviceId($deviceId);
         return $att;
+    }
+
+    /**
+     * GM-style employee: shift with per-day rules covering Mon-Fri only.
+     * Saturday + Sunday are off — flag calc should suppress late/early there.
+     */
+    private function gmEmployeeWithWeekdayRules(
+        string $monStart = '09:00',
+        string $monEnd = '17:00',
+    ): Employee {
+        $workspace = new Workspace();
+        $shift = (new Shift())
+            ->setWorkspace($workspace)
+            ->setStartTime(new DateTimeImmutable('09:00:00'))
+            ->setEndTime(new DateTimeImmutable('17:00:00'));
+        $weekdays = [
+            [DayOfWeekEnum::Monday, $monStart, $monEnd],
+            [DayOfWeekEnum::Tuesday, '09:00', '17:00'],
+            [DayOfWeekEnum::Wednesday, '09:00', '17:00'],
+            [DayOfWeekEnum::Thursday, '09:00', '17:00'],
+            [DayOfWeekEnum::Friday, '09:00', '17:00'],
+        ];
+        foreach ($weekdays as [$day, $start, $end]) {
+            $shift->addTimeRule((new ShiftTimeRule())->setDayOfWeek($day)->setStartTime($start)->setEndTime($end));
+        }
+        $emp = (new Employee())->setShift($shift);
+        $emp->setWorkspace($workspace);
+        return $emp;
     }
 
     private function settings(string $timezone = 'UTC'): EffectiveCheckinSettings

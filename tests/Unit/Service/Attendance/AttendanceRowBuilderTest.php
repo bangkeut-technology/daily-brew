@@ -8,14 +8,18 @@ use App\Entity\Attendance;
 use App\Entity\ClosurePeriod;
 use App\Entity\Employee;
 use App\Entity\LeaveRequest;
+use App\Entity\Shift;
+use App\Entity\ShiftTimeRule;
 use App\Entity\Workspace;
 use App\Entity\WorkspaceSetting;
+use App\Enum\DayOfWeekEnum;
 use App\Enum\LeaveTypeEnum;
 use App\Repository\AttendanceRepository;
 use App\Repository\ClosurePeriodRepository;
 use App\Repository\LeaveRequestRepository;
 use App\Service\Attendance\AttendanceRowBuilder;
 use App\Service\DateService;
+use App\Service\PlanService;
 use DateTimeImmutable;
 use DateTimeZone;
 use PHPUnit\Framework\MockObject\Stub;
@@ -27,6 +31,7 @@ class AttendanceRowBuilderTest extends TestCase
     private AttendanceRepository&Stub $attendances;
     private LeaveRequestRepository&Stub $leaves;
     private ClosurePeriodRepository&Stub $closures;
+    private PlanService&Stub $planService;
     private AttendanceRowBuilder $builder;
 
     protected function setUp(): void
@@ -34,9 +39,20 @@ class AttendanceRowBuilderTest extends TestCase
         $this->attendances = $this->createStub(AttendanceRepository::class);
         $this->leaves = $this->createStub(LeaveRequestRepository::class);
         $this->closures = $this->createStub(ClosurePeriodRepository::class);
-        $this->builder = new AttendanceRowBuilder($this->attendances, $this->leaves, $this->closures);
+        // Default: per-day rules off so existing Free-tier-shaped tests keep their semantics.
+        // Tests that need Espresso behavior call $this->withEspresso() to rebuild the SUT.
+        $this->planService = $this->createStub(PlanService::class);
+        $this->planService->method('canUseShiftTimeRules')->willReturn(false);
+        $this->builder = new AttendanceRowBuilder($this->attendances, $this->leaves, $this->closures, $this->planService);
 
         DateService::setClock(new MockClock('2026-05-31 23:00:00', new DateTimeZone('UTC')));
+    }
+
+    private function withEspresso(): void
+    {
+        $this->planService = $this->createStub(PlanService::class);
+        $this->planService->method('canUseShiftTimeRules')->willReturn(true);
+        $this->builder = new AttendanceRowBuilder($this->attendances, $this->leaves, $this->closures, $this->planService);
     }
 
     protected function tearDown(): void
@@ -207,6 +223,94 @@ class AttendanceRowBuilderTest extends TestCase
         $this->assertSame(['2026-05-30', '2026-05-31'], array_column($rows, 'date'));
     }
 
+    // ── Per-day shift schedule (off-days excluded from absent) ─────────
+
+    public function testGmWithWeekdayShiftHasNoAbsentRowOnSaturday(): void
+    {
+        // Week starting Monday 2026-05-11. GM shift covers Mon-Fri only.
+        // Expected: 5 absent rows (Mon-Fri), 0 rows for Sat/Sun.
+        $ws = $this->workspace();
+        $emp = $this->employee(linkedAt: new DateTimeImmutable('2026-05-01'));
+        $emp->setShift($this->gmShift());
+        $this->withEspresso();
+
+        $this->attendances->method('findByWorkspaceAndDateRange')->willReturn([]);
+        $this->leaves->method('findApprovedByWorkspaceAndDateRange')->willReturn([]);
+        $this->closures->method('findAllOverlappingRange')->willReturn([]);
+
+        $rows = $this->builder->build(
+            $ws,
+            [$emp],
+            new DateTimeImmutable('2026-05-11'),
+            new DateTimeImmutable('2026-05-17'),
+        );
+
+        $this->assertSame(
+            ['2026-05-11', '2026-05-12', '2026-05-13', '2026-05-14', '2026-05-15'],
+            array_column($rows, 'date'),
+            'Only Mon-Fri produce rows — Sat (16) and Sun (17) are off-days',
+        );
+        foreach ($rows as $r) {
+            $this->assertSame('absent', $r['status']);
+        }
+    }
+
+    public function testActualCheckInOnOffDayStillSurfacesAsPresent(): void
+    {
+        // GM came in on Saturday for an emergency — that row should still appear
+        // (as present), even though the day is normally off-schedule.
+        $ws = $this->workspace();
+        $emp = $this->employee(linkedAt: new DateTimeImmutable('2026-05-01'));
+        $emp->setShift($this->gmShift());
+        $this->withEspresso();
+
+        $satCheckIn = $this->attendance(
+            $emp,
+            '2026-05-16',
+            checkIn: new DateTimeImmutable('2026-05-16 10:00:00'),
+        );
+
+        $this->attendances->method('findByWorkspaceAndDateRange')->willReturn([$satCheckIn]);
+        $this->leaves->method('findApprovedByWorkspaceAndDateRange')->willReturn([]);
+        $this->closures->method('findAllOverlappingRange')->willReturn([]);
+
+        $rows = $this->builder->build(
+            $ws,
+            [$emp],
+            new DateTimeImmutable('2026-05-16'),
+            new DateTimeImmutable('2026-05-17'),
+        );
+
+        // Saturday: present (because actual scan). Sunday: skipped (off-day, no scan).
+        $this->assertCount(1, $rows);
+        $this->assertSame('2026-05-16', $rows[0]['date']);
+        $this->assertSame('present', $rows[0]['status']);
+    }
+
+    public function testOffDaySkipDoesNotFireOnFreePlan(): void
+    {
+        // Free plan: per-day rules feature off → legacy "every day expected"
+        // semantics. Even with rules on the shift, Saturday should be absent.
+        $ws = $this->workspace();
+        $emp = $this->employee(linkedAt: new DateTimeImmutable('2026-05-01'));
+        $emp->setShift($this->gmShift());
+        // planService stub default already returns false → no override needed.
+
+        $this->attendances->method('findByWorkspaceAndDateRange')->willReturn([]);
+        $this->leaves->method('findApprovedByWorkspaceAndDateRange')->willReturn([]);
+        $this->closures->method('findAllOverlappingRange')->willReturn([]);
+
+        $rows = $this->builder->build(
+            $ws,
+            [$emp],
+            new DateTimeImmutable('2026-05-16'),
+            new DateTimeImmutable('2026-05-16'),
+        );
+
+        $this->assertCount(1, $rows);
+        $this->assertSame('absent', $rows[0]['status']);
+    }
+
     // ── Helpers ────────────────────────────────────────────────────────
 
     private function workspace(): Workspace
@@ -270,6 +374,25 @@ class AttendanceRowBuilderTest extends TestCase
         $c->setStartDate(new DateTimeImmutable($start));
         $c->setEndDate(new DateTimeImmutable($end));
         return $c;
+    }
+
+    /** Mon-Fri 09:00-17:00 shift (no rule for Sat/Sun → off-day). */
+    private function gmShift(): Shift
+    {
+        $shift = (new Shift())
+            ->setName('GM')
+            ->setStartTime(new DateTimeImmutable('09:00:00'))
+            ->setEndTime(new DateTimeImmutable('17:00:00'));
+        foreach ([
+            DayOfWeekEnum::Monday,
+            DayOfWeekEnum::Tuesday,
+            DayOfWeekEnum::Wednesday,
+            DayOfWeekEnum::Thursday,
+            DayOfWeekEnum::Friday,
+        ] as $day) {
+            $shift->addTimeRule((new ShiftTimeRule())->setDayOfWeek($day)->setStartTime('09:00')->setEndTime('17:00'));
+        }
+        return $shift;
     }
 
     private function setEntityId(object $entity, int $id): void

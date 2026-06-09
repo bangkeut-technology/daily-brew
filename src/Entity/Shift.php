@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\DayOfWeekEnum;
 use App\Repository\ShiftRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -167,6 +168,41 @@ class Shift extends AbstractBaseEntity
             $rule->setShift(null);
         }
         return $this;
+    }
+
+    public function hasAnyTimeRules(): bool
+    {
+        return !$this->timeRules->isEmpty();
+    }
+
+    public function getTimeRuleFor(DayOfWeekEnum $day): ?ShiftTimeRule
+    {
+        foreach ($this->timeRules as $rule) {
+            if ($rule->getDayOfWeek() === $day) {
+                return $rule;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Is the employee assigned to this shift expected to work on the given day?
+     *
+     * A shift with no per-day rules (the only kind on the Free plan) is treated as
+     * "works every day" — that's the legacy semantics and we don't want to change
+     * it under existing customers. A shift with per-day rules is treated as a
+     * complete schedule: days without a rule are off-days, not "fall back to the
+     * default time". This is what makes the GM who works Mon-Fri stop being marked
+     * absent on Saturday.
+     *
+     * Plan gating happens at the caller — this helper is pure entity logic.
+     */
+    public function isScheduledOn(DayOfWeekEnum $day): bool
+    {
+        if (!$this->hasAnyTimeRules()) {
+            return true;
+        }
+        return $this->getTimeRuleFor($day) !== null;
     }
 
     // ── Employees ──────────────────────────────────────────────

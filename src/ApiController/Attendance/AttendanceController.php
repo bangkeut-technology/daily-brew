@@ -6,6 +6,7 @@ use App\ApiController\Trait\ApiResponseTrait;
 use App\DTO\AttendanceDTO;
 use App\Entity\Employee;
 use App\Entity\User;
+use App\Enum\DayOfWeekEnum;
 use App\Enum\ManagerPermissionEnum;
 use App\Exception\AttendanceAlreadyExistsException;
 use App\Repository\AttendanceRepository;
@@ -239,6 +240,7 @@ class AttendanceController extends AbstractController
         EmployeeRepository $employeeRepository,
         LeaveRequestRepository $leaveRequestRepository,
         ClosurePeriodRepository $closurePeriodRepository,
+        PlanService $planService,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
         if ($workspace === null) {
@@ -319,11 +321,13 @@ class AttendanceController extends AbstractController
         };
 
         $wsTodayStr = DateService::today($wsTz)->format('Y-m-d');
+        $perDayRulesActive = $planService->canUseShiftTimeRules($workspace);
 
         $result = [];
         foreach ($employees as $emp) {
             $leftAtStr = $emp->getLeftAt()?->format('Y-m-d');
             $linkedAtStr = $emp->getLinkedAt()?->format('Y-m-d');
+            $shift = $emp->getShift();
             $days = [];
             $period = new \DatePeriod($fromDate, new \DateInterval('P1D'), (clone $toDate)->modify('+1 day'));
             foreach ($period as $day) {
@@ -342,6 +346,17 @@ class AttendanceController extends AbstractController
                 if ($linkedAtStr === null || $dateStr < $linkedAtStr) {
                     continue;
                 }
+
+                // Off-day: this employee's per-day-ruled shift skips this
+                // weekday. Surface it as 'off' on the gantt instead of 'absent'
+                // so a Mon-Fri GM doesn't look like a no-show every Saturday.
+                // A real check-in below still overrides this to 'present'.
+                $dayOfWeek = DayOfWeekEnum::tryFrom((int) $day->format('N'));
+                $isOffDay = $perDayRulesActive
+                    && $shift !== null
+                    && $shift->hasAnyTimeRules()
+                    && $dayOfWeek !== null
+                    && !$shift->isScheduledOn($dayOfWeek);
 
                 if (isset($closureDates[$dateStr])) {
                     $days[] = ['date' => $dateStr, 'status' => 'closure'];
@@ -380,6 +395,11 @@ class AttendanceController extends AbstractController
                         ];
                         continue;
                     }
+                }
+
+                if ($isOffDay) {
+                    $days[] = ['date' => $dateStr, 'status' => 'off'];
+                    continue;
                 }
 
                 // Future dates are not yet absent
