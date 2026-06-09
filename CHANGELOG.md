@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.107.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.107.0...v1.107.1) (2026-06-09)
+
+
+### Bug Fixes
+
+* **attendance:** hide voided rows from employee log + export ([84c5323](https://github.com/bangkeut-technology/daily-brew/commit/84c5323e6bd6ac9d7447a945b4a08c52a2523a03))
+
 ## [1.107.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.106.1...v1.107.0) (2026-06-09)
 
 
