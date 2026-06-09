@@ -146,7 +146,12 @@ class ShiftSummaryService
 
         foreach ($roster as $employee) {
             $attendance = $this->attendanceRepository->findByEmployeeAndDate($employee, $today);
-            if ($attendance === null || $attendance->getCheckInAt() === null) {
+            // Voided rows are tombstones; for digest purposes the day didn't
+            // happen, so the employee falls into the missed bucket.
+            if ($attendance === null
+                || $attendance->isVoided()
+                || $attendance->getCheckInAt() === null
+            ) {
                 $missed[] = $employee;
                 continue;
             }
@@ -188,7 +193,11 @@ class ShiftSummaryService
 
         foreach ($roster as $employee) {
             $attendance = $this->attendanceRepository->findByEmployeeAndDate($employee, $today);
-            if ($attendance === null || $attendance->getCheckInAt() === null) {
+            // Voided rows: see buildStartSummary — treat as missed.
+            if ($attendance === null
+                || $attendance->isVoided()
+                || $attendance->getCheckInAt() === null
+            ) {
                 $missed[] = $employee;
                 continue;
             }
