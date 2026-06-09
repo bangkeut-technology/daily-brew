@@ -58,3 +58,26 @@ export function useCreateAttendance(workspacePublicId: string) {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["attendance", workspacePublicId] }),
   });
 }
+
+/**
+ * Soft-deletes an attendance row. The row stays in the database with
+ * voidedAt/By/Reason populated so it's still in the log as a tombstone,
+ * but it's dropped from dashboard stats and exports. A new QR scan or
+ * manual entry on the same day resurrects it (clears the void fields).
+ */
+export function useDeleteAttendance(workspacePublicId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ publicId, reason }: { publicId: string; reason: string }) =>
+      (
+        await apiAxios.delete<AttendanceRecord>(
+          `/workspaces/${workspacePublicId}/attendances/${publicId}`,
+          { data: { reason } },
+        )
+      ).data,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["attendance", workspacePublicId] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+  });
+}
