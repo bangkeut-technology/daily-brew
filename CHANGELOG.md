@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.104.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.103.6...v1.104.0) (2026-06-09)
+
+
+### Features
+
+* **attendance:** owner/manager soft-void with audit + resurrection ([#292](https://github.com/bangkeut-technology/daily-brew/issues/292)) ([799616f](https://github.com/bangkeut-technology/daily-brew/commit/799616f263dd979baea3a7e703151936d5339860))
+
 ## [1.103.6](https://github.com/bangkeut-technology/daily-brew/compare/v1.103.5...v1.103.6) (2026-06-08)
 
 
