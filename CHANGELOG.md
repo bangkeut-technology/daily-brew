@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.106.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.106.0...v1.106.1) (2026-06-09)
+
+
+### Bug Fixes
+
+* **compose:** switch local DB service from Postgres to MySQL 8.4 ([#303](https://github.com/bangkeut-technology/daily-brew/issues/303)) ([44d7cee](https://github.com/bangkeut-technology/daily-brew/commit/44d7cee7205378aaf96e227ed8919a6fc1408837))
+* **deploy:** fail-fast guard on staging-next workflow when secrets are unset ([#302](https://github.com/bangkeut-technology/daily-brew/issues/302)) ([6a20393](https://github.com/bangkeut-technology/daily-brew/commit/6a203930df3ce94d7c5ee5714fd7b1526dffb8e3))
+
 ## [1.106.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.105.0...v1.106.0) (2026-06-09)
 
 
