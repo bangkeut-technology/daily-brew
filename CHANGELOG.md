@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.108.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.107.3...v1.108.0) (2026-06-09)
+
+
+### Features
+
+* **deploy:** add releases:cleanup-stale task + workflow ([79e9121](https://github.com/bangkeut-technology/daily-brew/commit/79e9121c755b6ff26d178901b14bdc8820520efc))
+
+
+### Bug Fixes
+
+* **deploy:** cleanup-stale refuses to run during in-flight deploys ([cfb9485](https://github.com/bangkeut-technology/daily-brew/commit/cfb94854e5aab58452607cbcfddad7c12577ebcc))
+
 ## [1.107.3](https://github.com/bangkeut-technology/daily-brew/compare/v1.107.2...v1.107.3) (2026-06-09)
 
 
