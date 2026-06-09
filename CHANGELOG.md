@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.106.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.105.0...v1.106.0) (2026-06-09)
+
+
+### Features
+
+* **frontend:** port attendance void + 'off' status type to Next ([#297](https://github.com/bangkeut-technology/daily-brew/issues/297)) ([5f114e7](https://github.com/bangkeut-technology/daily-brew/commit/5f114e7d960fb2cfa0478cb0d5b956eff0baf209))
+
 ## [1.105.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.104.0...v1.105.0) (2026-06-09)
 
 
