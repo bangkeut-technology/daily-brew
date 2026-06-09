@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Dialog from '@radix-ui/react-dialog';
 import { toast } from 'sonner';
-import { X } from 'lucide-react';
+import { Trash2, X } from 'lucide-react';
 import { CustomTimePicker } from './CustomTimePicker';
 import { Toggle } from './Toggle';
 import { CheckinVerification } from './CheckinVerification';
@@ -21,6 +21,11 @@ interface AttendanceEditModalProps {
     originalCheckInAt?: string | null;
     originalCheckOutAt?: string | null;
   } | null;
+  /** Optional: surface a Remove button alongside Save. Caller decides what
+   *  happens (typically: close this modal + open the AttendanceDeleteModal
+   *  pre-populated with the same record). Lets users reach void from
+   *  Monthly view's cell-click flow, not just the Log view's row buttons. */
+  onRequestDelete?: () => void;
 }
 
 export function AttendanceEditModal({
@@ -28,6 +33,7 @@ export function AttendanceEditModal({
   onOpenChange,
   workspacePublicId,
   attendance,
+  onRequestDelete,
 }: AttendanceEditModalProps) {
   const { t } = useTranslation();
   const override = useOverrideAttendance(workspacePublicId);
@@ -150,22 +156,45 @@ export function AttendanceEditModal({
               />
             </div>
 
-            <div className="flex justify-end gap-2 pt-1">
-              <button
-                type="button"
-                onClick={() => onOpenChange(false)}
-                className="px-4 py-2 rounded-lg text-[15px] font-medium bg-transparent text-text-secondary border border-cream-3 cursor-pointer hover:bg-cream-3 transition-colors"
-              >
-                {t('common.cancel', 'Cancel')}
-              </button>
-              <button
-                type="button"
-                onClick={handleSubmit}
-                disabled={!reason.trim() || clearingExistingCheckOut || override.isPending}
-                className="px-4 py-2 rounded-lg text-[15px] font-medium text-white bg-coffee border-none cursor-pointer hover:bg-coffee-light transition-colors disabled:opacity-50"
-              >
-                {override.isPending ? t('common.loading', 'Loading...') : t('common.save', 'Save')}
-              </button>
+            <div className="flex items-center justify-between gap-2 pt-1">
+              {/* Remove button on the left — disabled visually with red text so
+                  it's clearly destructive, but only rendered when the parent
+                  wires onRequestDelete (Log view rows already have an inline
+                  Trash2, so the parent only needs to wire this for the
+                  Monthly/Summary cell-click flow if it wants delete reachable
+                  there). */}
+              {onRequestDelete ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onOpenChange(false);
+                    onRequestDelete();
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[14.5px] font-medium bg-transparent text-red border border-transparent cursor-pointer hover:bg-red/10 transition-colors"
+                >
+                  <Trash2 size={14} />
+                  {t('attendance.deleteConfirm', 'Remove')}
+                </button>
+              ) : (
+                <span aria-hidden />
+              )}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => onOpenChange(false)}
+                  className="px-4 py-2 rounded-lg text-[15px] font-medium bg-transparent text-text-secondary border border-cream-3 cursor-pointer hover:bg-cream-3 transition-colors"
+                >
+                  {t('common.cancel', 'Cancel')}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={!reason.trim() || clearingExistingCheckOut || override.isPending}
+                  className="px-4 py-2 rounded-lg text-[15px] font-medium text-white bg-coffee border-none cursor-pointer hover:bg-coffee-light transition-colors disabled:opacity-50"
+                >
+                  {override.isPending ? t('common.loading', 'Loading...') : t('common.save', 'Save')}
+                </button>
+              </div>
             </div>
           </div>
           <Dialog.Close className="absolute top-3 right-3 w-7 h-7 rounded-lg flex items-center justify-center bg-transparent border-none text-text-tertiary hover:text-text-secondary hover:bg-cream-3/40 cursor-pointer transition-all">

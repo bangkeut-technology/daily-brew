@@ -633,6 +633,22 @@ function AttendancePage() {
         onOpenChange={(open) => { if (!open) setEditTarget(null); }}
         workspacePublicId={workspaceId}
         attendance={editTarget}
+        onRequestDelete={canEditAttendance && editTarget
+          ? () => {
+              // Hand the same record to the delete modal so users can void
+              // straight from the Monthly cell → edit flow, not just the
+              // Log view's inline trash button.
+              const target = editTarget;
+              setEditTarget(null);
+              setDeleteTarget({
+                publicId: target.publicId,
+                employeeName: target.employeeName,
+                date: target.date,
+                checkInAt: target.checkInAt,
+                checkOutAt: target.checkOutAt,
+              });
+            }
+          : undefined}
       />
 
       <AttendanceDeleteModal
