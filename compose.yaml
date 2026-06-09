@@ -1,22 +1,28 @@
 
 services:
 ###> doctrine/doctrine-bundle ###
+  # MySQL 8.4, matching .github/workflows/ci.yaml (mysql:8.4 service) and the
+  # production install. The Symfony Flex doctrine-bundle recipe ships Postgres
+  # by default; we keep the marker comments so the recipe is still tracked, but
+  # the engine is intentionally MySQL — every migration is MySQL-pure
+  # (TINYINT(1), AUTO_INCREMENT, DEFAULT CHARACTER SET utf8mb4, SMALLINT
+  # UNSIGNED) and Doctrine identity_generation_preferences pins MySQLPlatform.
+  # If `flex recipe update` ever wants to overwrite this block back to Postgres,
+  # decline.
   database:
-    image: postgres:${POSTGRES_VERSION:-16}-alpine
+    image: mysql:${MYSQL_VERSION:-8.4}
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
-      POSTGRES_USER: ${POSTGRES_USER:-app}
+      MYSQL_DATABASE:      ${MYSQL_DATABASE:-dailybrew}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
     healthcheck:
-      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-root}"]
       timeout: 5s
       retries: 5
       start_period: 60s
     volumes:
-      - database_data:/var/lib/postgresql/data:rw
+      - database_data:/var/lib/mysql:rw
       # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./docker/db/data:/var/lib/postgresql/data:rw
+      # - ./docker/db/data:/var/lib/mysql:rw
 ###< doctrine/doctrine-bundle ###
 
 volumes:

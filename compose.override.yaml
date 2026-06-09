@@ -1,9 +1,12 @@
 
 services:
 ###> doctrine/doctrine-bundle ###
+  # Expose MySQL on the dev host. The .env DATABASE_URL uses 127.0.0.1:3306,
+  # so the published port stays at 3306 — `docker compose up` then gives
+  # you a working DB without any further config.
   database:
     ports:
-      - "5432"
+      - "3306:3306"
 ###< doctrine/doctrine-bundle ###
 
 ###> symfony/mailer ###
