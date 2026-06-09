@@ -70,6 +70,15 @@ class AttendanceController extends AbstractController
         }
 
         $rows = $rowBuilder->build($workspace, $activeEmployees, $fromDate, $toDate);
+        // Voided rows are tombstones for managers; an employee viewing their own
+        // history sees nothing (matches summary/dashboard semantics — "the day
+        // didn't happen"). Owner/manager still see the tombstone with badge.
+        if (!$canSeeAll) {
+            $rows = array_values(array_filter(
+                $rows,
+                static fn (array $r): bool => ($r['status'] ?? null) !== 'voided',
+            ));
+        }
         $rows = AttendanceRowBuilder::sortByDateDescStatusName($rows);
 
         return $this->jsonSuccess($rows);
@@ -201,6 +210,14 @@ class AttendanceController extends AbstractController
         }
 
         $rows = $rowBuilder->build($workspace, $employees, $fromDate, $toDate);
+        // Mirror list(): an employee exporting their own log shouldn't see
+        // voided tombstones — those are manager forensic data.
+        if (!$canSeeAll) {
+            $rows = array_values(array_filter(
+                $rows,
+                static fn (array $r): bool => ($r['status'] ?? null) !== 'voided',
+            ));
+        }
 
         return [$workspace, $rows, $from, $to];
     }
