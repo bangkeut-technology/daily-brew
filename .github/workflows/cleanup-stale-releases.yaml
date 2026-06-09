@@ -1,0 +1,62 @@
+name: 'DailyBrew Cleanup Stale Releases'
+
+# Manual cleanup for releases/N directories that deploy:cleanup couldn't rm
+# because PHP-FPM wrote www-data-owned cache files into them with no
+# group-write. Defaults to a dry-run so the operator sees what would be
+# deleted before running for real. The `current` symlink target is resolved
+# via readlink -f and is never touched.
+#
+# Requires sudoers entry on the host (see DEPLOYER-CUTOVER.md §2.3):
+#     deploy ALL=(root) NOPASSWD: /bin/rm -rf /var/www/dailybrew/releases/*
+
+on:
+    workflow_dispatch:
+        inputs:
+            dry_run:
+                description: 'Preview only — do not actually delete'
+                required: true
+                type: boolean
+                default: true
+
+# Serialise against the deploy workflow so a cleanup can't race a
+# deploy:symlink or grab the host while a release is being promoted.
+concurrency:
+    group: deploy-production
+    cancel-in-progress: false
+
+jobs:
+    cleanup:
+        name:        'Remove stale release directories'
+        environment: release
+        runs-on:     ubuntu-latest
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: '8.5'
+                    tools:       composer:v2
+
+            -   name: Install Deployer (dev deps only the runner needs)
+                run:  composer install --no-interaction --prefer-dist --no-scripts
+
+            -   name: Configure SSH
+                uses: webfactory/ssh-agent@v0.9.0
+                with:
+                    ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+            -   name: Trust the production host key
+                run:  |
+                      mkdir -p ~/.ssh
+                      ssh-keyscan -p ${{ secrets.PORT }} ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+
+            -   name: Run cleanup
+                env:
+                    DRY_RUN:     ${{ inputs.dry_run }}
+                    DEPLOY_HOST: ${{ secrets.HOST }}
+                    DEPLOY_USER: ${{ secrets.USERNAME }}
+                    DEPLOY_PORT: ${{ secrets.PORT }}
+                    DEPLOY_PATH: ${{ secrets.PROJECT_FOLDER }}
+                run:  vendor/bin/dep releases:cleanup-stale production -vv

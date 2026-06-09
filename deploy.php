@@ -193,6 +193,66 @@ task('service:next:restart', function () {
     }
 });
 
+/**
+ * Remove stale `releases/N` directories that deploy:cleanup couldn't rm
+ * because PHP-FPM (www-data) wrote cache pool files into them with no
+ * group-write. Resolves `current` via readlink -f and refuses to touch it.
+ *
+ * Runs `sudo rm -rf` — requires this sudoers entry on the host:
+ *
+ *     deploy ALL=(root) NOPASSWD: /bin/rm -rf /var/www/dailybrew/releases/*
+ *
+ * Triggered from .github/workflows/cleanup-stale-releases.yaml; honours a
+ * dry_run env var so the workflow defaults to a preview before destruction.
+ */
+desc('Remove stale releases/ directories left behind by deploy:cleanup');
+task('releases:cleanup-stale', function () {
+    $dryRun = filter_var(getenv('DRY_RUN') ?: 'true', FILTER_VALIDATE_BOOLEAN);
+
+    $current = trim(run('readlink -f {{deploy_path}}/current'));
+    if ($current === '') {
+        throw new \RuntimeException('Could not resolve current → aborting (would risk deleting the live release)');
+    }
+
+    $entries = trim(run('ls -1 {{deploy_path}}/releases'));
+    if ($entries === '') {
+        writeln('  <info>releases/ is empty — nothing to clean</info>');
+        return;
+    }
+
+    $stale = [];
+    foreach (explode("\n", $entries) as $rel) {
+        $rel = trim($rel);
+        if ($rel === '') {
+            continue;
+        }
+        $absolute = trim(run('readlink -f {{deploy_path}}/releases/' . escapeshellarg($rel)));
+        if ($absolute === $current) {
+            writeln(sprintf('  <comment>skip live release: %s</comment>', $rel));
+            continue;
+        }
+        $stale[] = $rel;
+    }
+
+    if (empty($stale)) {
+        writeln('  <info>no stale releases to remove</info>');
+        return;
+    }
+
+    foreach ($stale as $rel) {
+        if ($dryRun) {
+            writeln(sprintf('  <comment>[dry-run]</comment> would rm releases/%s', $rel));
+        } else {
+            writeln(sprintf('  <info>removing</info> releases/%s', $rel));
+            run('sudo /bin/rm -rf {{deploy_path}}/releases/' . escapeshellarg($rel));
+        }
+    }
+
+    if ($dryRun) {
+        writeln('  <comment>dry_run=true — re-run with dry_run=false to actually delete</comment>');
+    }
+});
+
 // ── Recipe wiring ───────────────────────────────────────────────────────────
 //
 // recipe/symfony.php's default `deploy` chain is:
