@@ -372,7 +372,7 @@ export function GeofencingContent() {
             Available on the Espresso plan
           </p>
           <p className="text-[14.5px] text-text-secondary leading-relaxed">
-            Geofencing is included in the Espresso plan ($14.99/month or $149/year) alongside
+            Geofencing is included in the Espresso plan ($19.99/month or $199/year) alongside
             IP restriction, device verification, leave management, manager roles, and more.
           </p>
         </div>

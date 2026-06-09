@@ -150,7 +150,7 @@ export const playbooks: Playbook[] = [
       },
       {
         title: 'Pick monthly or yearly',
-        desc: 'Monthly is $14.99. Yearly is $149 — about 17% cheaper. A 14-day free trial covers your first run.',
+        desc: 'Monthly is $19.99. Yearly is $199 — about 17% cheaper. A 14-day free trial covers your first run.',
       },
       {
         title: 'Lock check-in to your restaurant',

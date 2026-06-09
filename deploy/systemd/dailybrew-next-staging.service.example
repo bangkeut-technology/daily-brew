@@ -1,0 +1,87 @@
+# dailybrew-next-staging.service — Next.js process for next.dailybrew.work
+#
+# Distinct from dailybrew-next.service (prod cutover, port 3000) so the
+# staging mirror can redeploy on every push-to-main via
+# .github/workflows/deploy-staging-next.yaml without disturbing the
+# cutover-ready bundle. Reads from /var/www/dailybrew-staging-next/current
+# (a fresh tree maintained by the staging workflow, NOT the production
+# /var/www/dailybrew/ release tree).
+#
+# Provisioning (one-time, manual, on the prod host — after the staging
+# subdomain DNS + TLS + nginx site are in place per deploy/CUTOVER.md §0):
+#
+#   # 1. Create the staging directory layout
+#   sudo install -d -o www-data -g www-data \
+#        /var/www/dailybrew-staging-next/current \
+#        /var/www/dailybrew-staging-next/shared
+#
+#   # 2. Install the unit
+#   sudo cp /var/www/dailybrew/current/deploy/systemd/dailybrew-next-staging.service.example \
+#           /etc/systemd/system/dailybrew-next-staging.service
+#   sudo $EDITOR /etc/systemd/system/dailybrew-next-staging.service   # fill NEXT_PUBLIC_*
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now dailybrew-next-staging
+#   systemctl status dailybrew-next-staging
+#
+#   # 3. Authorize the deploy workflow's SSH key for staging-only sudo
+#   #    (separate from the Deployer/prod key — least-privilege).
+#   #    Add this line to /etc/sudoers.d/dailybrew-next-staging:
+#   #      <deploy-user> ALL=(ALL) NOPASSWD: \
+#   #          /bin/chown -R www-data\:www-data /var/www/dailybrew-staging-next/current, \
+#   #          /bin/systemctl restart dailybrew-next-staging
+#
+# The first push to main after the unit is provisioned will land an empty
+# tree until the workflow's rsync completes — the systemctl restart only
+# fires after rsync, so cold start is fine.
+
+[Unit]
+Description=DailyBrew Next.js frontend — STAGING mirror (next.dailybrew.work)
+Documentation=file:///var/www/dailybrew/current/deploy/CUTOVER.md
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+
+WorkingDirectory=/var/www/dailybrew-staging-next/current
+ExecStart=/usr/bin/node server.js
+
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGINT
+TimeoutStopSec=30
+
+# Port 3001 — staging port, must not collide with dailybrew-next.service
+# on port 3000 (the prod-cutover-ready unit).
+Environment=NODE_ENV=production
+Environment=PORT=3001
+Environment=HOSTNAME=127.0.0.1
+
+# Internal Symfony origin — same socket as prod (staging shares the prod
+# DB + Symfony API; cookies stay scoped to next.dailybrew.work).
+Environment=SYMFONY_ORIGIN=http://127.0.0.1:8000
+
+# Public client-side config — match the values baked into the legacy SPA.
+# Same caveat as the prod unit: NEXT_PUBLIC_* are baked at build time, so
+# changes only take effect after the deploy-staging-next workflow runs.
+Environment=NEXT_PUBLIC_APPLE_CLIENT_ID=
+Environment=NEXT_PUBLIC_CONTACT_EMAIL=support@mail.dailybrew.work
+Environment=NEXT_PUBLIC_GA_MEASUREMENT_ID=
+Environment=NEXT_PUBLIC_GOOGLE_CLIENT_ID=
+Environment=NEXT_PUBLIC_MAX_FREE_EMPLOYEES=10
+Environment=NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=
+
+# StagingBanner is hostname-driven (window.location.hostname startsWith
+# "next.") so no env wiring needed — same artifact would work in either
+# unit if you point them at the same code.
+
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/www/dailybrew-staging-next
+
+[Install]
+WantedBy=multi-user.target

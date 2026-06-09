@@ -1,0 +1,102 @@
+name: 'Deploy staging (Next)'
+
+# Builds the Next.js frontend on the runner and ships the standalone
+# bundle to next.dailybrew.work on the prod host. Independent of the
+# release-tag flow that deploy-atomic.yaml drives — every push to main
+# that touches frontend/ refreshes staging within a minute or two.
+#
+# Staging serves from /var/www/dailybrew-staging-next/current/, restarted
+# via dailybrew-next-staging.service (port 3001). The prod Symfony API
+# and the prod database are SHARED — see CUTOVER.md §0 for the caveats.
+#
+# Requires (one-time, operator) per
+# deploy/systemd/dailybrew-next-staging.service.example:
+#   - /var/www/dailybrew-staging-next/{current,shared} exist + are www-data
+#   - dailybrew-next-staging.service is installed and enabled
+#   - The deploy user has NOPASSWD sudo on `chown -R www-data:www-data
+#     /var/www/dailybrew-staging-next/current` and
+#     `systemctl restart dailybrew-next-staging`
+
+on:
+    push:
+        branches: [main]
+        paths:
+            - 'frontend/**'
+            - '.github/workflows/deploy-staging-next.yaml'
+    workflow_dispatch:           # manual rebuild without a code change
+
+# Cancel an in-flight staging deploy when a newer one starts — staging
+# can churn fast and only the latest commit matters.
+concurrency:
+    group: deploy-staging-next
+    cancel-in-progress: true
+
+jobs:
+    deploy:
+        name:        'Build + ship Next to staging'
+        environment: staging-next
+        runs-on:     ubuntu-latest
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+
+            -   name: Setup Node
+                uses: actions/setup-node@v5
+                with:
+                    node-version: 24
+                    cache:        npm
+                    cache-dependency-path: frontend/package-lock.json
+
+            -   name: Install + build Next
+                working-directory: frontend
+                run: |
+                    npm ci
+                    npm run build
+
+            -   name: Assemble standalone bundle
+                # Next's `output: "standalone"` produces server.js + the
+                # minimal node_modules dependency tree, but DOES NOT copy
+                # .next/static or public — same step as deploy.php does
+                # for prod. Clear stale first or `cp -R src dst` will
+                # nest the source inside an already-existing dst.
+                working-directory: frontend
+                run: |
+                    rm -rf .next/standalone/.next/static .next/standalone/public
+                    cp -R .next/static .next/standalone/.next/static
+                    cp -R public .next/standalone/public
+
+            -   name: Configure SSH
+                uses: webfactory/ssh-agent@v0.9.0
+                with:
+                    ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+            -   name: Trust the production host key
+                run: |
+                    mkdir -p ~/.ssh
+                    ssh-keyscan -p ${{ secrets.PORT }} ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+
+            -   name: Rsync standalone bundle to staging path
+                # --delete keeps the staging tree minimal — anything no
+                # longer in the build (renamed chunks, removed pages) is
+                # purged. Trailing slashes matter: copy CONTENTS of
+                # standalone/ into current/, not the standalone dir itself.
+                run: |
+                    rsync -az --delete \
+                      -e "ssh -p ${{ secrets.PORT }}" \
+                      frontend/.next/standalone/ \
+                      ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/var/www/dailybrew-staging-next/current/
+
+            -   name: Fix ownership and restart staging service
+                # rsync ships files as the deploy user; the systemd unit
+                # runs as www-data and needs to read them. The chown +
+                # restart commands are NOPASSWD-scoped per the unit's
+                # provisioning instructions.
+                run: |
+                    ssh -p ${{ secrets.PORT }} ${{ secrets.USERNAME }}@${{ secrets.HOST }} \
+                      "set -euo pipefail
+                       sudo /bin/chown -R www-data:www-data /var/www/dailybrew-staging-next/current
+                       if systemctl list-unit-files dailybrew-next-staging.service >/dev/null 2>&1; then
+                         sudo /bin/systemctl restart dailybrew-next-staging
+                       else
+                         echo '::warning::dailybrew-next-staging.service not installed yet — skipping restart. Provision per deploy/systemd/dailybrew-next-staging.service.example.'
+                       fi"

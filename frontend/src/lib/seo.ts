@@ -71,7 +71,7 @@ export const PAGES = {
   "/pricing": {
     title: "Pricing",
     description:
-      "DailyBrew plans start free for up to 10 active employees. Espresso at $14.99/month adds geofencing, device verification, and leave management. Double Espresso for unlimited staff.",
+      "DailyBrew plans start free for up to 10 active employees. Espresso at $19.99/month adds geofencing, device verification, and leave management. Double Espresso for unlimited staff.",
   },
   "/faq": {
     title: "FAQ",

@@ -329,7 +329,7 @@ export function DeviceVerificationContent() {
             Available on the Espresso plan
           </p>
           <p className="text-[14.5px] text-text-secondary leading-relaxed">
-            Device verification is included in the Espresso plan ($14.99/month or $149/year).
+            Device verification is included in the Espresso plan ($19.99/month or $199/year).
             Combine it with IP restriction and geofencing for complete check-in security.
           </p>
         </div>

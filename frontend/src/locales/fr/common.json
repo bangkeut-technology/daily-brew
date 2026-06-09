@@ -276,14 +276,13 @@
     "featurePerQrSettings": "Géolocalisation et paramètres par QR",
     "featureEmployeeAssign": "Affectation des employés par QR",
     "featureManagerRole": "Rôle de manager",
-    "featureWhiteLabel": "Marque blanche",
     "roadmapBadge": "Feuille de route",
     "comingSoon": "Bientôt disponible",
     "billingMonthly": "Mensuel",
     "billingAnnual": "Annuel",
     "save17": "Économisez 17 % vs mensuel",
-    "priceEspressoMonth": "14,99 $/mois",
-    "priceEspressoYear": "149 $/an",
+    "priceEspressoMonth": "19,99 $/mois",
+    "priceEspressoYear": "199 $/an",
     "priceDoubleMonth": "39,99 $/mois",
     "priceDoubleYear": "399 $/an",
     "startFreeTrial": "Démarrer l'essai gratuit de 14 jours",
@@ -522,7 +521,7 @@
       "mobileApp": "Le check-in du personnel fonctionne entièrement via le navigateur web mobile. Quand un employé scanne le code QR, une page de check-in optimisée pour mobile s'ouvre instantanément. Aucun téléchargement d'application n'est requis.",
       "freePlan": "Le plan Gratuit inclut jusqu'à 10 employés actifs, le check-in par QR, le suivi des horaires, les périodes de fermeture et le tableau de bord des présences. Il est gratuit pour toujours, sans limite de temps.",
       "espressoPlan": "Espresso prend en charge jusqu'à 20 employés et ajoute la gestion des demandes de congé, la restriction IP, la vérification d'appareil, le géorepérage, les horaires par jour, le rôle de manager avec permissions granulaires (jusqu'à 2), les notifications push et email, et les résumés de présence quotidiens.",
-      "espressoCost": "Espresso coûte 14,99 $ par mois, ou 149 $ par an si vous choisissez la facturation annuelle. Le plan annuel vous fait économiser 30,88 $ par rapport au paiement mensuel.",
+      "espressoCost": "Espresso coûte 19,99 $ par mois, ou 199 $ par an si vous choisissez la facturation annuelle. Le plan annuel vous fait économiser 40,88 $ par rapport au paiement mensuel.",
       "cancelAnytime": "Oui, il n'y a aucun contrat ni période d'engagement. Vous pouvez annuler votre abonnement Espresso à tout moment depuis les Paramètres de votre tableau de bord. Après l'annulation, vous continuerez à avoir accès jusqu'à la fin de votre période de facturation actuelle.",
       "qrCheckin": "Chaque espace de travail dispose d'un code QR unique. Affichez-le à l'entrée de votre restaurant. Le personnel ouvre l'app DailyBrew, scanne le code QR, et appuie sur le bouton Check In pour enregistrer son arrivée. Il scanne à nouveau et appuie sur Check Out en partant.",
       "geofencing": "Le géorepérage limite le check-in à une zone géographique spécifique. Vous définissez un point central et un rayon, et le personnel doit être physiquement dans cette zone pour pointer. Cela garantit que les présences ne sont enregistrées que lorsque les employés sont effectivement au restaurant.",
@@ -977,8 +976,7 @@
         "multipleQrStations": "Plusieurs stations QR",
         "perQrGeofence": "Géorepérage et paramètres par QR",
         "perQrAssignment": "Affectation des employés par QR",
-        "perQrManager": "Affectation de manager par QR",
-        "whiteLabel": "Image de marque blanche"
+        "perQrManager": "Affectation de manager par QR"
       }
     },
     "footnote": "Aucune carte de crédit requise pour commencer. Évoluez à tout moment depuis votre tableau de bord."
@@ -1086,7 +1084,7 @@
         },
         "pickBilling": {
           "title": "Choisissez mensuel ou annuel",
-          "desc": "Le mensuel coûte 14,99 $. L'annuel coûte 149 $ — environ 17 % moins cher. Un essai gratuit de 14 jours couvre votre première utilisation."
+          "desc": "Le mensuel coûte 19,99 $. L'annuel coûte 199 $ — environ 17 % moins cher. Un essai gratuit de 14 jours couvre votre première utilisation."
         },
         "lockCheckin": {
           "title": "Verrouillez le pointage à votre restaurant",
@@ -1360,9 +1358,6 @@
           },
           "perQrAssignment": {
             "label": "Affectation d'employés par QR (feuille de route)"
-          },
-          "whiteLabel": {
-            "label": "Image de marque blanche (feuille de route)"
           }
         }
       },
@@ -1797,7 +1792,7 @@
             "a": "Non. La vérification d'appareil fonctionne entièrement via le navigateur web. L'identifiant d'appareil est un UUID stocké dans localStorage — il est généré automatiquement la première fois qu'un employé ouvre DailyBrew. Pas d'installation d'app, pas de permissions, pas de configuration."
           }
         },
-        "espressoCallout": "La vérification d'appareil est incluse dans le forfait Espresso (14,99 $/mois ou 149 $/an). Combinez-la avec la restriction IP et le géorepérage pour une sécurité de check-in complète.",
+        "espressoCallout": "La vérification d'appareil est incluse dans le forfait Espresso (19,99 $/mois ou 199 $/an). Combinez-la avec la restriction IP et le géorepérage pour une sécurité de check-in complète.",
         "cta": {
           "title": "Arrêtez le pointage par collègue dès aujourd'hui"
         }
@@ -1938,7 +1933,7 @@
             }
           }
         },
-        "espressoCallout": "Le géorepérage est inclus dans le forfait Espresso (14,99 $/mois ou 149 $/an) avec la restriction IP, la vérification d'appareil, la gestion des congés, les rôles de manager et plus.",
+        "espressoCallout": "Le géorepérage est inclus dans le forfait Espresso (19,99 $/mois ou 199 $/an) avec la restriction IP, la vérification d'appareil, la gestion des congés, les rôles de manager et plus.",
         "cta": {
           "title": "Prêt à définir votre frontière ?"
         }
@@ -2026,7 +2021,7 @@
             "a": "DailyBrew traite une liste d'IP vide comme une mauvaise configuration et autorise tous les check-ins. C'est un filet de sécurité — vous ne verrouillerez pas accidentellement toute votre équipe."
           }
         },
-        "espressoCallout": "La restriction IP est incluse dans le forfait Espresso (14,99 $/mois ou 149 $/an). Inclut aussi la vérification d'appareil, le géorepérage, la gestion des congés, les rôles de manager et plus.",
+        "espressoCallout": "La restriction IP est incluse dans le forfait Espresso (19,99 $/mois ou 199 $/an). Inclut aussi la vérification d'appareil, le géorepérage, la gestion des congés, les rôles de manager et plus.",
         "cta": {
           "title": "Prêt à sécuriser vos check-ins ?"
         }
@@ -2162,7 +2157,7 @@
             "a": "Toutes les heures dans la réponse de l'API sont formatées dans le fuseau horaire de votre espace (ex. : Asia/Phnom_Penh). Le fuseau horaire est inclus dans la réponse pour que BasilBook puisse interpréter les heures correctement."
           }
         },
-        "espressoCallout": "L'intégration BasilBook et les jetons API sont inclus dans le forfait Espresso (14,99 $/mois ou 149 $/an). Les noms d'utilisateur d'employés pour la liaison inter-produits sont également exclusifs à Espresso.",
+        "espressoCallout": "L'intégration BasilBook et les jetons API sont inclus dans le forfait Espresso (19,99 $/mois ou 199 $/an). Les noms d'utilisateur d'employés pour la liaison inter-produits sont également exclusifs à Espresso.",
         "relatedShort": {
           "ipRestriction": "Verrouillez les check-ins au Wi-Fi de votre restaurant.",
           "deviceVerification": "Empêchez le pointage par collègue avec la liaison d'appareil.",

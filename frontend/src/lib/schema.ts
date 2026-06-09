@@ -26,7 +26,7 @@ export function softwareApplicationSchema() {
     ],
     offers: [
       { "@type": "Offer", name: "Free", price: "0", priceCurrency: "USD" },
-      { "@type": "Offer", name: "Espresso", price: "14.99", priceCurrency: "USD" },
+      { "@type": "Offer", name: "Espresso", price: "19.99", priceCurrency: "USD" },
       { "@type": "Offer", name: "Double Espresso", price: "39.99", priceCurrency: "USD" },
     ],
   };
