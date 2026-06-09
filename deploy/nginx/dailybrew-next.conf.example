@@ -1,0 +1,128 @@
+# dailybrew-next.conf.example — nginx site for the staging subdomain
+#
+# Stands up next.dailybrew.work (or whatever subdomain you pick) as a
+# real public Next.js mirror that shares the production database and
+# Symfony API. Production dailybrew.work keeps serving the legacy SPA
+# untouched while you QA the Next surface on the subdomain for as long
+# as you like, then either flip prod to the same config or compose a
+# split-proxy from what you learned.
+#
+# This is a REFERENCE config. The operator must:
+#   1. Reserve a DNS A/AAAA for `next.dailybrew.work` pointing at this host
+#   2. Provision a TLS cert:
+#         sudo certbot --nginx -d next.dailybrew.work --expand
+#   3. Copy this file to /etc/nginx/sites-available/dailybrew-next.conf
+#      (do NOT replace dailybrew.conf — both sites coexist)
+#   4. Update the OAuth providers (Google, Apple) to whitelist
+#         https://next.dailybrew.work/oauth/google/callback
+#         https://next.dailybrew.work/oauth/apple/callback
+#      (verify exact callback paths with `bin/console debug:router | grep oauth`)
+#   5. If you want to gate access to team only, uncomment the basic-auth
+#      block below and create the htpasswd file:
+#         sudo htpasswd -c /etc/nginx/.htpasswd-next dailybrew
+#   6. Symlink + reload:
+#         sudo ln -s /etc/nginx/sites-available/dailybrew-next.conf \
+#                    /etc/nginx/sites-enabled/dailybrew-next.conf
+#         sudo nginx -t && sudo systemctl reload nginx
+#
+# The two upstream blocks below reuse the names from dailybrew.conf.example —
+# define them ONCE (in dailybrew.conf or in /etc/nginx/conf.d/upstreams.conf),
+# not twice. If you copy the upstream blocks into both files nginx will refuse
+# to start with "duplicate upstream" — delete them from this file in that case.
+
+upstream dailybrew_php {
+    server unix:/run/php/php8.5-fpm.sock;
+}
+
+upstream dailybrew_next {
+    server 127.0.0.1:3000;
+    keepalive 32;
+}
+
+server {
+    # ---- KEEP YOUR CERTBOT-WRITTEN LINES ----
+    # listen 443 ssl http2;
+    # server_name next.dailybrew.work;
+    # ssl_certificate     /etc/letsencrypt/live/next.dailybrew.work/fullchain.pem;
+    # ssl_certificate_key /etc/letsencrypt/live/next.dailybrew.work/privkey.pem;
+    # include /etc/letsencrypt/options-ssl-nginx.conf;
+    # ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+    # access_log /var/log/nginx/dailybrew-next.access.log;
+    # error_log  /var/log/nginx/dailybrew-next.error.log;
+    # ---------------------------------------------
+
+    root  /var/www/dailybrew/public;
+    index index.php;
+
+    client_max_body_size 25M;
+
+    # ---- SEO: never let Google index the staging mirror ----
+    # Belt: response header on every proxied response.
+    # Suspenders: hard-disallow robots.txt for the subdomain.
+    add_header X-Robots-Tag "noindex, nofollow" always;
+
+    location = /robots.txt {
+        add_header Content-Type "text/plain" always;
+        return 200 "User-agent: *\nDisallow: /\n";
+    }
+
+    # ---- Optional: HTTP basic auth to gate the subdomain to team only.
+    # Uncomment + create the htpasswd file (see header comment).
+    # auth_basic           "DailyBrew staging";
+    # auth_basic_user_file /etc/nginx/.htpasswd-next;
+
+    # ---- API surface — straight to PHP-FPM, never through Next ----
+    # Same Symfony backend as production: cookies stay scoped to
+    # next.dailybrew.work, so signing in here creates a fresh session
+    # that's separate from your production login. Same DB though —
+    # data you create on staging IS production data.
+
+    location ~ ^/api(/|$) {
+        try_files $uri /index.php$is_args$args;
+    }
+    location ~ ^/oauth(/|$) {
+        try_files $uri /index.php$is_args$args;
+    }
+    location ~ ^/\.well-known(/|$) {
+        try_files $uri /index.php$is_args$args;
+    }
+
+    location ~ ^/index\.php(/|$) {
+        fastcgi_pass dailybrew_php;
+        fastcgi_split_path_info ^(.+\.php)(/.*)$;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        fastcgi_param DOCUMENT_ROOT  $realpath_root;
+        internal;
+    }
+    location ~ \.php$ {
+        return 404;
+    }
+
+    # ---- Static assets Symfony still owns ----
+    # Same paths as prod — needed because some marketing pages still link
+    # to /apple-touch-icon.png and friends served from Symfony's public/.
+    location ~ ^/(maintenance\.html|robots\.txt|favicon\.ico|apple-touch-icon\.png)(/|$) {
+        access_log off;
+        expires 7d;
+        add_header Cache-Control "public, max-age=604800, immutable";
+        try_files $uri =404;
+    }
+
+    # ---- Everything else → Next.js ----
+    # Same dailybrew-next.service that the production cutover will use; we
+    # don't run two Next processes. One server, two server_name blocks.
+
+    location / {
+        proxy_pass http://dailybrew_next;
+        proxy_http_version 1.1;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host  $host;
+        proxy_set_header Connection "";
+        proxy_buffering off;
+        proxy_read_timeout 60s;
+    }
+}

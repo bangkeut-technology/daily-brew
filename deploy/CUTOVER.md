@@ -15,6 +15,112 @@ the SPA.
 
 ---
 
+## 0. Staging subdomain — recommended before §1
+
+Rather than the internal-only dark canary on `127.0.0.1:3000`, stand up
+`next.dailybrew.work` as a **real public mirror** of prod that shares the
+production database and Symfony API. The legacy SPA on `dailybrew.work`
+stays untouched. You QA the entire Next surface on the subdomain for as
+long as you like, then run §1–§2 against `dailybrew.work` with confidence.
+
+The Next surface on the subdomain includes the **in-progress Next
+console** (currently ~13% of SPA parity). The basic-auth gate in step 0.5
+keeps non-team visitors out while you bring console parity up to scratch.
+
+### 0.1 DNS + TLS (one-time, ~15 min)
+
+```bash
+# In your DNS provider, add:
+#   next.dailybrew.work  A    <prod host IPv4>
+#   next.dailybrew.work  AAAA <prod host IPv6>   # optional
+
+ssh prod
+sudo certbot --nginx -d next.dailybrew.work --expand
+# Certbot writes the certificate paths into the new server block we add in 0.4.
+```
+
+### 0.2 systemd unit (one-time, ~10 min)
+
+Exactly the same steps as §1.2 below — the same `dailybrew-next.service`
+serves both `dailybrew.work` (post-cutover) and `next.dailybrew.work`. Do
+that step now and the unit is ready for both.
+
+### 0.3 OAuth providers — whitelist the subdomain (one-time, ~5 min each)
+
+Without this, sign-in via Google or Apple on the subdomain fails with
+`redirect_uri_mismatch`.
+
+```bash
+# Confirm the exact callback paths Symfony exposes:
+php bin/console debug:router | grep oauth
+```
+
+Then in each provider's console, add the staging redirect URI alongside
+the production one:
+
+- Google Cloud Console → OAuth client → Authorized redirect URIs:
+  `https://next.dailybrew.work/oauth/google/callback`
+- Apple Developer → Services ID → Return URLs:
+  `https://next.dailybrew.work/oauth/apple/callback`
+
+### 0.4 nginx site (~20 min)
+
+```bash
+sudo cp /var/www/dailybrew/deploy/nginx/dailybrew-next.conf.example \
+        /etc/nginx/sites-available/dailybrew-next.conf
+sudo $EDITOR /etc/nginx/sites-available/dailybrew-next.conf
+# Uncomment the `listen 443 ssl http2;`, `server_name`, `ssl_*`, and
+# `*_log` lines (certbot may have written them in a separate snippet).
+# Drop the duplicate `upstream` blocks at the top if dailybrew.conf
+# already defines them (nginx refuses "duplicate upstream").
+
+sudo ln -s /etc/nginx/sites-available/dailybrew-next.conf \
+           /etc/nginx/sites-enabled/dailybrew-next.conf
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+### 0.5 Optional but recommended: basic auth gate
+
+While the Next console is still incomplete, keep the subdomain visible
+only to people you give the password to.
+
+```bash
+sudo htpasswd -c /etc/nginx/.htpasswd-next dailybrew
+# (you'll be prompted for the password)
+sudo $EDITOR /etc/nginx/sites-available/dailybrew-next.conf
+# Uncomment the auth_basic + auth_basic_user_file lines
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+### 0.6 First smoke test
+
+```bash
+curl -sI https://next.dailybrew.work/ | head -5
+# Expect: HTTP/2 200 (or 401 if basic-auth enabled),
+#         X-Robots-Tag: noindex, nofollow,
+#         and either x-powered-by: Next.js (if visible) or the response served by Next
+
+curl -s https://next.dailybrew.work/robots.txt
+# Expect: User-agent: *
+#         Disallow: /
+```
+
+Then in a real browser (incognito): visit `https://next.dailybrew.work`,
+confirm the amber **"Staging mirror — actions affect production data"**
+banner is at the top, browse marketing pages, sign in via email/password,
+confirm OAuth round-trips, confirm dashboard loads. **Test on real iOS
+Safari** — that's where the 1.68.1 refresh-token bug lived.
+
+### 0.7 Use the subdomain to find gaps
+
+While the subdomain is up, work through the SPA console feature list
+against the Next console to surface parity gaps that block §1–§2. The
+goal is to reach §1 with no surprises. Track gaps as PRs; merge each
+into `main` to deploy them to both prod (Next artifact, not served yet)
+and the staging subdomain (served immediately).
+
+---
+
 ## 1. Pre-flight (do all of this before the actual flip)
 
 ### 1.1 Confirm the build artifact is on the host
