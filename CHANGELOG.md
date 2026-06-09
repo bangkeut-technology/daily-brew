@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.105.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.104.0...v1.105.0) (2026-06-09)
+
+
+### Features
+
+* **shift:** per-day rules = full schedule; off-days excluded from absent ([#293](https://github.com/bangkeut-technology/daily-brew/issues/293)) ([e69297c](https://github.com/bangkeut-technology/daily-brew/commit/e69297cdf3d94cc73e1903777c05472ecfdebe3e))
+
 ## [1.104.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.103.6...v1.104.0) (2026-06-09)
 
 
