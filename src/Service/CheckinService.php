@@ -216,10 +216,14 @@ class CheckinService
     public function getStatus(Employee $employee): ?Attendance
     {
         $tz = new \DateTimeZone($employee->getWorkspace()?->getSetting()?->getTimezone() ?? 'UTC');
-        return $this->attendanceRepository->findByEmployeeAndDate(
+        $attendance = $this->attendanceRepository->findByEmployeeAndDate(
             $employee,
             DateService::today($tz)
         );
+        // A voided row is a tombstone — for the employee's "today" status it
+        // didn't happen, so they read as not-checked-in until they scan again
+        // (which resurrects the row via checkin()'s tombstone path).
+        return $attendance?->isVoided() ? null : $attendance;
     }
 
     /**
