@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
+import { StagingBanner } from "@/components/StagingBanner";
 
 const SITE_NAME = "DailyBrew";
 const DESCRIPTION =
@@ -51,6 +52,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-scroll-behavior="smooth" className="h-full">
       <body className="min-h-full">
+        <StagingBanner />
         <div className="app-shell flex min-h-full flex-col">{children}</div>
         <ServiceWorkerRegister />
       </body>

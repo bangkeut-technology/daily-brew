@@ -60,6 +60,11 @@ Environment=NEXT_PUBLIC_GOOGLE_CLIENT_ID=
 Environment=NEXT_PUBLIC_MAX_FREE_EMPLOYEES=10
 Environment=NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=
 
+# The staging banner detects the hostname server-side via headers(), so
+# no env wiring is needed here — the same artifact serves both
+# dailybrew.work (post-cutover) and next.dailybrew.work (staging). See
+# frontend/src/components/StagingBanner.tsx.
+
 # Hardening
 NoNewPrivileges=true
 ProtectSystem=full
