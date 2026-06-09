@@ -30,6 +30,17 @@
 #   #          /bin/chown -R www-data\:www-data /var/www/dailybrew-staging-next/current, \
 #   #          /bin/systemctl restart dailybrew-next-staging
 #
+#   # 4. Add the deploy secrets to the GitHub Actions `staging-next`
+#   #    environment (GitHub Settings → Environments → staging-next).
+#   #    These do NOT inherit from the `release` environment, even
+#   #    though they're the same values.
+#   #      DEPLOY_SSH_KEY  (private half of the keypair authorized in step 3)
+#   #      HOST            (same as release env)
+#   #      USERNAME        (same as release env)
+#   #      PORT            (same as release env)
+#   #    The deploy-staging-next.yaml workflow fails fast with a clear
+#   #    message if any of these are missing.
+#
 # The first push to main after the unit is provisioned will land an empty
 # tree until the workflow's rsync completes — the systemctl restart only
 # fires after rsync, so cold start is fine.
