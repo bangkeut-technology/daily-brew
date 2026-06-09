@@ -37,6 +37,30 @@ jobs:
         environment: staging-next
         runs-on:     ubuntu-latest
         steps:
+            -   name: Verify required secrets
+                # `webfactory/ssh-agent` fails with a cryptic "The
+                # ssh-private-key argument is empty" if the secret isn't
+                # set on the `staging-next` environment. Fail fast here
+                # with a useful pointer instead.
+                env:
+                    DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+                    HOST:           ${{ secrets.HOST }}
+                    USERNAME:       ${{ secrets.USERNAME }}
+                    PORT:           ${{ secrets.PORT }}
+                run: |
+                    missing=()
+                    [ -z "$DEPLOY_SSH_KEY" ] && missing+=("DEPLOY_SSH_KEY")
+                    [ -z "$HOST" ]           && missing+=("HOST")
+                    [ -z "$USERNAME" ]       && missing+=("USERNAME")
+                    [ -z "$PORT" ]           && missing+=("PORT")
+                    if [ ${#missing[@]} -gt 0 ]; then
+                      echo "::error::Missing secrets in the 'staging-next' environment: ${missing[*]}"
+                      echo "::error::These secrets exist on the 'release' environment (used by deploy-atomic.yaml) but are NOT inherited by other environments."
+                      echo "::error::Fix: GitHub repo Settings → Environments → staging-next → Add secret. Copy the same values used by 'release'."
+                      echo "::error::See deploy/systemd/dailybrew-next-staging.service.example for the one-time host setup that must also be done before this workflow can succeed."
+                      exit 1
+                    fi
+
             -   name: Checkout
                 uses: actions/checkout@v4
 

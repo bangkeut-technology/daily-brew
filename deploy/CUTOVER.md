@@ -82,6 +82,19 @@ sudo commands in `/etc/sudoers.d/dailybrew-next-staging`:
     /bin/systemctl restart dailybrew-next-staging
 ```
 
+Finally, add the deploy secrets to the **GitHub Actions `staging-next`
+environment** (repo Settings → Environments → staging-next). They do NOT
+inherit from the `release` environment — same values, different scope:
+
+| Secret | Same as `release` env? |
+|---|---|
+| `DEPLOY_SSH_KEY` | yes — private half of the keypair authorized above |
+| `HOST` | yes |
+| `USERNAME` | yes |
+| `PORT` | yes |
+
+The workflow fails fast with a clear pointer if any are missing.
+
 The first push to `main` after this completes triggers
 `.github/workflows/deploy-staging-next.yaml`, which rsyncs the standalone
 bundle into `/var/www/dailybrew-staging-next/current/` and restarts the
