@@ -250,6 +250,71 @@ systemctl status dailybrew-next
 
 ---
 
+## 5.5. Update the system crontab (REQUIRED — easy to miss)
+
+The dukecity scheduler relies on a single master crontab entry that runs
+`scheduler:execute` every minute. Pre-atomic that entry typically read:
+
+```
+* * * * * cd /var/www/dailybrew && /usr/bin/php bin/console scheduler:execute --no-interaction >> var/log/scheduler.log 2>&1
+```
+
+After the atomic cutover, `cd /var/www/dailybrew` lands the shell in the
+PARENT directory (the new layout's container, not the project) — so
+`/usr/bin/php bin/console` errors with "No such file or directory" every
+minute and the error redirect path is also wrong. There is no log noise
+in syslog because the bundle's own logger never runs; the symptom is
+**all scheduled commands silently stop firing**. We hit this on the
+1.106.x cutover — daily summary + shift-summary digests went dark for
+~18 hours before someone noticed they hadn't received a notification.
+
+Identify the crontab owner (commonly `www-data` since the bundle persists
+runs via Doctrine and needs the app user's DB access):
+
+```bash
+sudo crontab -lu www-data
+# or for the deploy user, or root — check each one
+sudo crontab -l
+```
+
+Edit and rewrite both the `cd` path and the log path under `shared/` so
+they survive future release rotations:
+
+```bash
+sudo crontab -eu www-data
+```
+
+```diff
+- * * * * * cd /var/www/dailybrew && /usr/bin/php bin/console scheduler:execute --no-interaction >> var/log/scheduler.log 2>&1
++ * * * * * cd /var/www/dailybrew/current && /usr/bin/php bin/console scheduler:execute --no-interaction >> /var/www/dailybrew/shared/var/log/scheduler.log 2>&1
+```
+
+Verify within ~90 seconds:
+
+```bash
+# Log is now writing
+tail -20 /var/www/dailybrew/shared/var/log/scheduler.log
+
+# cron daemon is firing dailybrew at all
+journalctl -u cron --since '-2 min' | grep dailybrew
+
+# Last-run timestamps in the admin UI are bumping
+# https://dailybrew.work/admin/cron → click any schedule → runs tab
+```
+
+Manual smoke (no waiting for the scheduled hour):
+
+```bash
+cd /var/www/dailybrew/current
+sudo -u www-data /usr/bin/php bin/console dailybrew:send-daily-summary
+```
+
+If that emits cleanly but a recipient still doesn't get a notification,
+the failure is downstream of cron (Mailgun / Expo push / Telegram) — not
+this section's problem.
+
+---
+
 ## 6. Migration safety (read before every release)
 
 The symlink swap is instant, but the database is shared between the old and
