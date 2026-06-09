@@ -105,11 +105,14 @@ Cross-product link via Employee `username` (Espresso). Tokens at `/api/v1/{local
 ## Commands
 
 ```bash
+docker compose up -d database                       # MySQL 8.4 on 127.0.0.1:3306 (root/root, db: dailybrew)
 composer install && php bin/console doctrine:migrations:migrate && php bin/console lexik:jwt:generate-keypair
 npm ci && npm run router:generate && npm run dev
 php bin/console dailybrew:send-daily-summary       # cron daily ~18:00
 php bin/console dailybrew:admin:promote-user <email>
 ```
+
+**Database is MySQL 8.4, not Postgres.** Every migration is MySQL-pure (`TINYINT(1)`, `AUTO_INCREMENT`, `DEFAULT CHARACTER SET utf8mb4`, `SMALLINT UNSIGNED`); `doctrine.yaml` pins `MySQLPlatform` for identity generation; CI runs `mysql:8.4`. `compose.yaml` ships MySQL 8.4 matching CI (defaults: db `dailybrew`, root password `root`, port `3306:3306` via `compose.override.yaml`) — `.env` `DATABASE_URL` works against `docker compose up` out of the box. The Symfony Flex `###> doctrine/doctrine-bundle ###` markers around the service block are intentionally kept but the engine diverges from Flex's Postgres default — if `flex recipe update` ever wants to overwrite back to Postgres, decline. See PR #303.
 
 ## Phase 6 (Next.js cutover) — prep checked in, not applied
 
