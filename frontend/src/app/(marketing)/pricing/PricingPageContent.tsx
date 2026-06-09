@@ -55,7 +55,6 @@ const comparisonRows: {
   { feature: "Multiple QR stations (roadmap)", free: false, espresso: false, double: true },
   { feature: "Per-QR geofence & settings (roadmap)", free: false, espresso: false, double: true },
   { feature: "Employee assignment per QR (roadmap)", free: false, espresso: false, double: true },
-  { feature: "White-label branding (roadmap)", free: false, espresso: false, double: true },
 ];
 
 const faqItems = [

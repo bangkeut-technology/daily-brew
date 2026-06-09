@@ -290,7 +290,7 @@ export function IpRestrictionContent() {
             Available on the Espresso plan
           </p>
           <p className="text-[14.5px] text-text-secondary leading-relaxed">
-            IP restriction is included in the Espresso plan ($14.99/month or $149/year). It also
+            IP restriction is included in the Espresso plan ($19.99/month or $199/year). It also
             includes device verification, geofencing, leave management, manager roles, and more.
           </p>
         </div>

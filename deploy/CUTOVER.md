@@ -6,8 +6,8 @@
 
 This runbook walks the operator through flipping production from the legacy
 Symfony+TanStack-Router SPA to the Next.js frontend that
-`.github/workflows/deploy.yaml` has been quietly building since 1.75.3 alongside
-the SPA.
+`.github/workflows/deploy-atomic.yaml` has been quietly building since 1.75.3
+alongside the SPA.
 
 > Until the nginx file is swapped, `dailybrew.work` keeps serving the legacy
 > SPA. The Next process can be installed and running for hours/days first as a
@@ -27,6 +27,21 @@ The Next surface on the subdomain includes the **in-progress Next
 console** (currently ~13% of SPA parity). The basic-auth gate in step 0.5
 keeps non-team visitors out while you bring console parity up to scratch.
 
+**Two distinct Next processes** run side-by-side on the host:
+
+- `dailybrew-next.service` on port **3000** — the cutover-ready unit
+  built by `deploy-atomic.yaml` on every release tag. Served by
+  `dailybrew.conf` only after step §2 below.
+- `dailybrew-next-staging.service` on port **3001** — the staging unit
+  built by `.github/workflows/deploy-staging-next.yaml` on every push to
+  `main` that touches `frontend/**`. Served by `dailybrew-next.conf`
+  immediately at this subdomain.
+
+Separate ports + units mean staging can churn fast (each merge to main
+refreshes it within a minute or two) without disturbing the prod
+artifact, and the eventual prod cutover doesn't have to wait for a
+staging deploy window.
+
 ### 0.1 DNS + TLS (one-time, ~15 min)
 
 ```bash
@@ -39,11 +54,43 @@ sudo certbot --nginx -d next.dailybrew.work --expand
 # Certbot writes the certificate paths into the new server block we add in 0.4.
 ```
 
-### 0.2 systemd unit (one-time, ~10 min)
+### 0.2 systemd unit + staging path (one-time, ~10 min)
 
-Exactly the same steps as §1.2 below — the same `dailybrew-next.service`
-serves both `dailybrew.work` (post-cutover) and `next.dailybrew.work`. Do
-that step now and the unit is ready for both.
+Install the **staging** unit — it's separate from the prod-cutover unit
+in §1.2 and runs on a different port (3001) with a different
+WorkingDirectory.
+
+```bash
+sudo install -d -o www-data -g www-data \
+     /var/www/dailybrew-staging-next/current \
+     /var/www/dailybrew-staging-next/shared
+
+sudo cp /var/www/dailybrew/current/deploy/systemd/dailybrew-next-staging.service.example \
+        /etc/systemd/system/dailybrew-next-staging.service
+sudo $EDITOR /etc/systemd/system/dailybrew-next-staging.service   # fill NEXT_PUBLIC_*
+sudo systemctl daemon-reload
+sudo systemctl enable --now dailybrew-next-staging
+systemctl status dailybrew-next-staging
+```
+
+Then authorize the GitHub Actions deploy user for the two staging-only
+sudo commands in `/etc/sudoers.d/dailybrew-next-staging`:
+
+```
+<deploy-user> ALL=(ALL) NOPASSWD: \
+    /bin/chown -R www-data\:www-data /var/www/dailybrew-staging-next/current, \
+    /bin/systemctl restart dailybrew-next-staging
+```
+
+The first push to `main` after this completes triggers
+`.github/workflows/deploy-staging-next.yaml`, which rsyncs the standalone
+bundle into `/var/www/dailybrew-staging-next/current/` and restarts the
+service. Confirm with `systemctl status dailybrew-next-staging` —
+should be `active (running)` and listening on 3001.
+
+> The prod-cutover-ready `dailybrew-next.service` (port 3000) is provisioned
+> separately in §1.2 below. You do NOT need it for the staging mirror; it's
+> only required when you're about to flip the prod nginx site.
 
 ### 0.3 OAuth providers — whitelist the subdomain (one-time, ~5 min each)
 
@@ -129,7 +176,7 @@ and the staging subdomain (served immediately).
 ssh prod
 ls /var/www/dailybrew/frontend/.next/standalone/server.js
 # → must exist. If not, trigger a deploy first (any `fix:` or `feat:` commit
-#   to main will do it via release-please → deploy.yaml).
+#   to main will do it via release-please → deploy-atomic.yaml).
 ```
 
 ### 1.2 Provision the systemd unit (one-time)
@@ -241,7 +288,7 @@ Monitor:
   delivering
 
 Both stacks remain deployable side-by-side during this window. Releases continue
-to push to `main` → release-please → deploy.yaml — the SPA bundle and the Next
+to push to `main` → release-please → deploy-atomic.yaml — the SPA bundle and the Next
 build are both produced on every deploy.
 
 ---
@@ -253,7 +300,7 @@ Do not include this in the cutover PR. A separate PR after bake will:
 - Delete `src/Controller/SpaController.php` and its routes
 - Delete `templates/page/*` + the SEO Twig that `SpaController` rendered
 - Remove the `react-helmet-async` + TanStack Router runtime (`assets/src/`)
-- Remove Encore + the `npm run build` step from `deploy.yaml` (Symfony side)
+- Remove Encore + the `npm run build` step from `deploy-atomic.yaml` (Symfony side) and the corresponding `frontend:spa:build` Deployer task in `deploy.php`
 - Delete `routeTree.gen` and `npm run router:generate`
 - Remove `SeoMetaResolver` if nothing else consumes it
 - Drop the `/public/build/` location block from the nginx config
@@ -266,8 +313,8 @@ controllers, the cron infrastructure — those are Symfony backend, untouched.
 
 ## 5. What this runbook deliberately does NOT do
 
-- **It does not modify deploy.yaml to flip the proxy.** The proxy lives in
-  nginx on the host. `deploy.yaml` only builds and copies artifacts.
+- **It does not modify deploy-atomic.yaml to flip the proxy.** The proxy lives in
+  nginx on the host. `deploy-atomic.yaml` only builds and copies artifacts.
 - **It does not auto-install the systemd unit.** Per the project's deploy
   posture, host-level configuration is a one-time operator concern.
 - **It does not enforce that you swap before decommissioning.** You can run

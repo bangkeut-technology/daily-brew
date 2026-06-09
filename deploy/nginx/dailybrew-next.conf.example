@@ -7,6 +7,17 @@
 # as you like, then either flip prod to the same config or compose a
 # split-proxy from what you learned.
 #
+# Two distinct Next processes run side-by-side on the host:
+#   - dailybrew-next.service          → port 3000  (prod cutover, served
+#                                                    by dailybrew.conf when
+#                                                    the operator flips)
+#   - dailybrew-next-staging.service  → port 3001  (this file, deployed by
+#                                                    .github/workflows/
+#                                                    deploy-staging-next.yaml
+#                                                    on every push to main)
+# Independent ports + units → staging can deploy on every main merge
+# without disturbing the prod-cutover-ready bundle.
+#
 # This is a REFERENCE config. The operator must:
 #   1. Reserve a DNS A/AAAA for `next.dailybrew.work` pointing at this host
 #   2. Provision a TLS cert:
@@ -34,8 +45,8 @@ upstream dailybrew_php {
     server unix:/run/php/php8.5-fpm.sock;
 }
 
-upstream dailybrew_next {
-    server 127.0.0.1:3000;
+upstream dailybrew_next_staging {
+    server 127.0.0.1:3001;
     keepalive 32;
 }
 
@@ -109,12 +120,12 @@ server {
         try_files $uri =404;
     }
 
-    # ---- Everything else → Next.js ----
-    # Same dailybrew-next.service that the production cutover will use; we
-    # don't run two Next processes. One server, two server_name blocks.
+    # ---- Everything else → Next.js (staging process on port 3001) ----
+    # Distinct from the prod-cutover-ready dailybrew-next.service (port 3000)
+    # so staging can redeploy on every main merge without disturbing it.
 
     location / {
-        proxy_pass http://dailybrew_next;
+        proxy_pass http://dailybrew_next_staging;
         proxy_http_version 1.1;
         proxy_set_header Host              $host;
         proxy_set_header X-Real-IP         $remote_addr;

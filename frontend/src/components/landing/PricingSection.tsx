@@ -30,8 +30,8 @@ const freePlan = {
 
 const espressoPlan = {
   name: "Espresso",
-  monthly: { price: "$14.99", period: "/month" },
-  yearly: { price: "$149", period: "/year", savings: "Save $30.88", monthly: "$12.42" },
+  monthly: { price: "$19.99", period: "/month" },
+  yearly: { price: "$199", period: "/year", savings: "Save $40.88", monthly: "$16.58" },
   subtitle: "For growing restaurants",
   features: [
     { text: "Up to 20 employees" },
@@ -69,7 +69,6 @@ const doubleEspressoPlan = {
     { text: "Per-QR geofence & settings", roadmap: true },
     { text: "Employee assignment per QR", roadmap: true },
     { text: "Per-QR manager assignment", roadmap: true },
-    { text: "White-label branding", roadmap: true },
   ] as { text: string; roadmap: boolean }[],
 };
 

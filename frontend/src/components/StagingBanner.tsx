@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 /**
  * Renders a thin sticky banner across the top of every page when the
@@ -14,14 +14,20 @@ import { useEffect, useState } from "react";
  * all to dynamic), which defeats the SSG/LCP gain that's the entire
  * point of porting marketing to Next. The brief banner-less flash on
  * staging is an acceptable trade for keeping production routes static.
+ *
+ * Uses useSyncExternalStore rather than useEffect+useState because the
+ * hostname is genuinely "external state" that never changes during a
+ * session — the older effect pattern trips react-hooks/set-state-in-effect.
  */
-export function StagingBanner() {
-  const [isStaging, setIsStaging] = useState(false);
+const subscribe = () => () => {};
+const getSnapshot = () => {
+  const host = window.location.hostname;
+  return host.startsWith("next.") || host.startsWith("staging.");
+};
+const getServerSnapshot = () => false;
 
-  useEffect(() => {
-    const host = window.location.hostname;
-    setIsStaging(host.startsWith("next.") || host.startsWith("staging."));
-  }, []);
+export function StagingBanner() {
+  const isStaging = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   if (!isStaging) {
     return null;

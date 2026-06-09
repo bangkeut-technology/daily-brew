@@ -345,14 +345,13 @@
     "featurePerQrSettings": "Per-QR geofence & settings",
     "featureEmployeeAssign": "Employee assignment per QR",
     "featureManagerRole": "Manager role",
-    "featureWhiteLabel": "White-label branding",
     "roadmapBadge": "Roadmap",
     "comingSoon": "Coming soon",
     "billingMonthly": "Monthly",
     "billingAnnual": "Annual",
     "save17": "Save 17% vs monthly",
-    "priceEspressoMonth": "$14.99/month",
-    "priceEspressoYear": "$149/year",
+    "priceEspressoMonth": "$19.99/month",
+    "priceEspressoYear": "$199/year",
     "priceDoubleMonth": "$39.99/month",
     "priceDoubleYear": "$399/year",
     "startFreeTrial": "Start 14-day free trial",
@@ -611,7 +610,7 @@
       "mobileApp": "Staff check-in works entirely through the mobile web browser. When an employee scans their QR code, a mobile-optimized check-in page opens instantly. No app download is required.",
       "freePlan": "The Free plan includes up to 10 active employees, QR check-in, shift tracking, closure periods, and the attendance dashboard. It is free forever with no time limit.",
       "espressoPlan": "Espresso supports up to 20 employees and adds leave request management, IP restriction, device verification, geofencing, per-day shift schedules, manager role with granular permissions (up to 2), push and email notifications, and daily attendance summaries.",
-      "espressoCost": "Espresso costs $14.99 per month, or $149 per year if you choose annual billing. The yearly plan saves you $30.88 compared to paying monthly.",
+      "espressoCost": "Espresso costs $19.99 per month, or $199 per year if you choose annual billing. The yearly plan saves you $40.88 compared to paying monthly.",
       "cancelAnytime": "Yes, there are no contracts or lock-in periods. You can cancel your Espresso subscription at any time from your dashboard Settings. After cancellation, you will continue to have access until the end of your current billing period.",
       "qrCheckin": "Each workspace has a unique QR code. Display it at your restaurant entrance. Staff open the DailyBrew app, scan the QR code, and tap the Check In button to record their arrival. They scan again and tap Check Out when they leave.",
       "geofencing": "Geofencing restricts check-in to a specific geographic area. You set a center point and a radius, and staff must be physically within that area to check in. This ensures attendance is only recorded when employees are actually at the restaurant.",
@@ -1066,8 +1065,7 @@
         "multipleQrStations": "Multiple QR stations",
         "perQrGeofence": "Per-QR geofence & settings",
         "perQrAssignment": "Employee assignment per QR",
-        "perQrManager": "Per-QR manager assignment",
-        "whiteLabel": "White-label branding"
+        "perQrManager": "Per-QR manager assignment"
       }
     },
     "footnote": "No credit card required to start. Upgrade anytime from your dashboard."
@@ -1175,7 +1173,7 @@
         },
         "pickBilling": {
           "title": "Pick monthly or yearly",
-          "desc": "Monthly is $14.99. Yearly is $149 — about 17% cheaper. A 14-day free trial covers your first run."
+          "desc": "Monthly is $19.99. Yearly is $199 — about 17% cheaper. A 14-day free trial covers your first run."
         },
         "lockCheckin": {
           "title": "Lock check-in to your restaurant",
@@ -1449,9 +1447,6 @@
           },
           "perQrAssignment": {
             "label": "Employee assignment per QR (roadmap)"
-          },
-          "whiteLabel": {
-            "label": "White-label branding (roadmap)"
           }
         }
       },
@@ -1886,7 +1881,7 @@
             "a": "No. Device verification works entirely through the web browser. The device ID is a UUID stored in localStorage — it's generated automatically the first time an employee opens DailyBrew. No app install, no permissions, no setup."
           }
         },
-        "espressoCallout": "Device verification is included in the Espresso plan ($14.99/month or $149/year). Combine it with IP restriction and geofencing for complete check-in security.",
+        "espressoCallout": "Device verification is included in the Espresso plan ($19.99/month or $199/year). Combine it with IP restriction and geofencing for complete check-in security.",
         "cta": {
           "title": "Stop buddy punching today"
         }
@@ -2027,7 +2022,7 @@
             }
           }
         },
-        "espressoCallout": "Geofencing is included in the Espresso plan ($14.99/month or $149/year) alongside IP restriction, device verification, leave management, manager roles, and more.",
+        "espressoCallout": "Geofencing is included in the Espresso plan ($19.99/month or $199/year) alongside IP restriction, device verification, leave management, manager roles, and more.",
         "cta": {
           "title": "Ready to set your boundary?"
         }
@@ -2115,7 +2110,7 @@
             "a": "DailyBrew treats an empty IP list as a misconfiguration and allows all check-ins. This is a safety net — you won't accidentally lock out your entire team."
           }
         },
-        "espressoCallout": "IP restriction is included in the Espresso plan ($14.99/month or $149/year). It also includes device verification, geofencing, leave management, manager roles, and more.",
+        "espressoCallout": "IP restriction is included in the Espresso plan ($19.99/month or $199/year). It also includes device verification, geofencing, leave management, manager roles, and more.",
         "cta": {
           "title": "Ready to secure your check-ins?"
         }
@@ -2251,7 +2246,7 @@
             "a": "All times in the API response are formatted in your workspace timezone (e.g., Asia/Phnom_Penh). The timezone is included in the response so BasilBook can interpret the times correctly."
           }
         },
-        "espressoCallout": "BasilBook integration and API tokens are included in the Espresso plan ($14.99/month or $149/year). Employee usernames for cross-product linking are also Espresso-only.",
+        "espressoCallout": "BasilBook integration and API tokens are included in the Espresso plan ($19.99/month or $199/year). Employee usernames for cross-product linking are also Espresso-only.",
         "relatedShort": {
           "ipRestriction": "Lock check-ins to your restaurant's WiFi.",
           "deviceVerification": "Prevent buddy punching with device binding.",

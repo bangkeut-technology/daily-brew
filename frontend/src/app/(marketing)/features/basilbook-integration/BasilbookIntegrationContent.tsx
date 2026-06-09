@@ -340,8 +340,8 @@ export function BasilbookIntegrationContent() {
             Available on the Espresso plan
           </p>
           <p className="text-[14.5px] text-text-secondary leading-relaxed">
-            BasilBook integration and API tokens are included in the Espresso plan ($14.99/month
-            or $149/year). Employee usernames for cross-product linking are also Espresso-only.
+            BasilBook integration and API tokens are included in the Espresso plan ($19.99/month
+            or $199/year). Employee usernames for cross-product linking are also Espresso-only.
           </p>
         </div>
       </motion.div>
