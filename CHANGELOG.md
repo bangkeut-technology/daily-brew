@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.107.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.107.1...v1.107.2) (2026-06-09)
+
+
+### Bug Fixes
+
+* **checkin:** treat voided attendance as not-checked-in in getStatus ([dbe7601](https://github.com/bangkeut-technology/daily-brew/commit/dbe76015b10e7acb07d2923f3d77d2f41ecdfffc))
+* **shift-digest:** treat voided attendance as missed in start/end summaries ([218c009](https://github.com/bangkeut-technology/daily-brew/commit/218c0091db9c95dbfcf8d00711ca1c6197fea1d2))
+
 ## [1.107.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.107.0...v1.107.1) (2026-06-09)
 
 
