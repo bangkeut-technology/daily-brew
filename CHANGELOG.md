@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.107.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.106.1...v1.107.0) (2026-06-09)
+
+
+### Features
+
+* **attendance:** expose Remove from the edit modal so void is reachable from Monthly view ([#307](https://github.com/bangkeut-technology/daily-brew/issues/307)) ([0e5cfe6](https://github.com/bangkeut-technology/daily-brew/commit/0e5cfe6194b0f34f87499217cb96fb4f88c35cc1))
+
 ## [1.106.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.106.0...v1.106.1) (2026-06-09)
 
 
