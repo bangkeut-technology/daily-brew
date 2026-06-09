@@ -209,6 +209,20 @@ desc('Remove stale releases/ directories left behind by deploy:cleanup');
 task('releases:cleanup-stale', function () {
     $dryRun = filter_var(getenv('DRY_RUN') ?: 'true', FILTER_VALIDATE_BOOLEAN);
 
+    // Refuse to run while a deploy is in flight — the in-progress release dir
+    // exists but `current` still points at the OLD release (symlink swap is
+    // the last step). Without this guard, an SSH-invoked cleanup will nuke
+    // the new release mid-`npm ci` and the deploy fails 254 with no useful
+    // signal that *we* caused it. Lesson learned 2026-06-09 / v1.107.3.
+    $lockExists = trim(run('test -e {{deploy_path}}/.dep/deploy.lock && echo yes || echo no'));
+    if ($lockExists === 'yes') {
+        throw new \RuntimeException(
+            'Deploy lock present at {{deploy_path}}/.dep/deploy.lock — refusing to clean while a deploy is in flight. '
+            . 'Wait for the deploy to finish (or release the lock if you know it\'s stale: '
+            . '`vendor/bin/dep deploy:unlock production`).'
+        );
+    }
+
     $current = trim(run('readlink -f {{deploy_path}}/current'));
     if ($current === '') {
         throw new \RuntimeException('Could not resolve current → aborting (would risk deleting the live release)');
@@ -229,6 +243,21 @@ task('releases:cleanup-stale', function () {
         $absolute = trim(run('readlink -f {{deploy_path}}/releases/' . escapeshellarg($rel)));
         if ($absolute === $current) {
             writeln(sprintf('  <comment>skip live release: %s</comment>', $rel));
+            continue;
+        }
+        // Belt-and-suspenders: skip anything modified in the last 10 minutes.
+        // Catches a deploy that crashed without leaving a lockfile, or a
+        // release dir being created in parallel by a process we missed.
+        $modAgeSec = (int) trim(run(sprintf(
+            'echo $(( $(date +%%s) - $(stat -c %%Y %s) ))',
+            escapeshellarg('{{deploy_path}}/releases/' . $rel),
+        )));
+        if ($modAgeSec < 600) {
+            writeln(sprintf(
+                '  <comment>skip recently-modified: %s (touched %ds ago)</comment>',
+                $rel,
+                $modAgeSec,
+            ));
             continue;
         }
         $stale[] = $rel;
