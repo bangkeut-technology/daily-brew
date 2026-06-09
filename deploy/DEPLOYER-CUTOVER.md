@@ -358,7 +358,7 @@ Watch the output. Key milestones:
 - `[OK] frontend:next:build` — Next standalone built
 - `[OK] database:migrate` — migrations applied to the live DB (BEFORE the symlink swap so we abort if migrations fail)
 - `[OK] deploy:cache:clear` — Symfony cache warmed; runs as the deploy user
-- `[OK] deploy:cache:fix_perms` — `chgrp -R www-data var/cache` + `chmod -R g+rwX var/cache` so PHP-FPM (www-data) can write at runtime. **This is why §2.2 adds the deploy user to the www-data group — chgrp fails otherwise.**
+- `[OK] deploy:cache:fix_perms` — `chgrp -R www-data var/cache` + `chmod -R g+rwX var/cache` + `setfacl` default ACL `g:www-data:rwX` so PHP-FPM (www-data) can write at runtime AND the deploy user can clean the runtime-created cache pool subdirs (`var/cache/prod/pools/system/…`) when the release rotates out. Without the default ACL, PHP-FPM's umask 022 creates 0755 subdirs that `deploy:cleanup` cannot rm → workflow reports failure even though the symlink swap succeeded. **This is why §2.2 adds the deploy user to the www-data group — chgrp fails otherwise.** Host needs the `acl` package (default on Debian/Ubuntu); setfacl is wrapped in `|| true` so the deploy survives if it's missing.
 - `[OK] deploy:symlink` — **the atomic swap; new code goes live here**
 - `[OK] service:php-fpm:reload` — workers recycled gracefully
 - `[OK] service:next:restart` — Next process restarted; readiness probe waits for `http://127.0.0.1:3000/` to return 200 (skipped if the unit isn't installed)

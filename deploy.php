@@ -141,11 +141,23 @@ task('symfony:dump_env_prod', function () {
  * debian:debian — PHP-FPM (www-data) can't write into them at runtime.
  * Re-set group ownership + group-write so the live web user can use the
  * cache that was warmed at deploy time.
+ *
+ * The default ACL below covers a separate problem: PHP-FPM creates
+ * additional cache pool subdirs at runtime (var/cache/prod/pools/system/…)
+ * with umask 022 → mode 0755 dirs that the deploy user (in www-data
+ * group) cannot rm during `deploy:cleanup` of old releases. Without this,
+ * stale `releases/N` dirs accumulate and the workflow reports failure
+ * even though the symlink swap succeeded. setfacl forces every entry
+ * created under var/cache to inherit g:www-data:rwx regardless of umask.
+ * `acl` is default-installed on Debian/Ubuntu; the `|| true` keeps the
+ * deploy resilient on hosts where it isn't.
  */
 task('deploy:cache:fix_perms', function () {
     cd('{{release_path}}');
     run('chgrp -R www-data var/cache');
     run('chmod -R g+rwX var/cache');
+    run('setfacl -R -d -m g:www-data:rwX var/cache 2>/dev/null || true');
+    run('setfacl -R    -m g:www-data:rwX var/cache 2>/dev/null || true');
 });
 
 /**
