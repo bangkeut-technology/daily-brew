@@ -50,6 +50,9 @@ class AttendanceService
         if (!$checkInProvided && !$checkOutProvided) {
             throw new BadRequestHttpException('Nothing to update — provide checkInAt and/or checkOutAt.');
         }
+        if ($attendance->isVoided()) {
+            throw new BadRequestHttpException('This attendance has been voided — restore it before editing.');
+        }
 
         $workspace = $attendance->getWorkspace() ?? $attendance->getEmployee()?->getWorkspace();
         $wsTz = new \DateTimeZone($workspace?->getSetting()?->getTimezone() ?? 'UTC');
@@ -148,6 +151,34 @@ class AttendanceService
 
         $existing = $this->attendanceRepository->findByEmployeeAndDate($employee, $dateImmutable);
         if ($existing !== null) {
+            // A voided row holds the unique (employee, date) slot but is logically
+            // deleted — resurrect it in-place rather than 409'ing the operator into
+            // a dead end. The void audit is preserved in the application log (the
+            // create event below stamps a fresh editedBy/at/reason for traceability).
+            if ($existing->isVoided()) {
+                $existing->clearVoid();
+                $existing->setQrCode(null);
+                $existing->setIpAddress(null);
+                $existing->setCheckInLat(null)->setCheckInLng(null);
+                $existing->setCheckOutLat(null)->setCheckOutLng(null);
+                $existing->setCheckInDeviceId(null)->setCheckInDeviceName(null);
+                $existing->setCheckOutDeviceId(null)->setCheckOutDeviceName(null);
+                $existing->setOriginalCheckInAt(null)->setOriginalCheckOutAt(null);
+                $existing->setCheckInAt($checkIn);
+                $existing->setCheckOutAt($checkOut);
+
+                $this->flagCalculator->recompute($existing, $employee, $wsTz);
+
+                $existing->setEditedAt(DateService::now());
+                $existing->setEditedBy($actor);
+                $existing->setEditedByEmail($actor->getEmail());
+                $existing->setEditReason($reason);
+
+                $this->attendanceRepository->flush();
+
+                return $existing;
+            }
+
             throw new AttendanceAlreadyExistsException($existing);
         }
 
@@ -167,6 +198,38 @@ class AttendanceService
         $attendance->setEditReason($reason);
 
         $this->attendanceRepository->persist($attendance);
+        $this->attendanceRepository->flush();
+
+        return $attendance;
+    }
+
+    /**
+     * Soft-void an attendance row. The row stays in the database — preserving
+     * the unique (employee, date) slot and the historical scan times — but
+     * stats, the BasilBook export, and dashboard "present" feeds exclude it.
+     * A subsequent QR check-in or manual entry on the same day resurrects the
+     * row by clearing the void audit (see create() and CheckinService).
+     *
+     * @throws BadRequestHttpException on missing/invalid reason or double-void
+     */
+    public function void(Attendance $attendance, User $actor, string $reason): Attendance
+    {
+        $reason = trim($reason);
+        if ($reason === '') {
+            throw new BadRequestHttpException('A reason is required to delete attendance.');
+        }
+        if (mb_strlen($reason) > 255) {
+            throw new BadRequestHttpException('Reason must be 255 characters or fewer.');
+        }
+        if ($attendance->isVoided()) {
+            throw new BadRequestHttpException('This attendance has already been voided.');
+        }
+
+        $attendance->setVoidedAt(DateService::now());
+        $attendance->setVoidedBy($actor);
+        $attendance->setVoidedByEmail($actor->getEmail());
+        $attendance->setVoidReason($reason);
+
         $this->attendanceRepository->flush();
 
         return $attendance;

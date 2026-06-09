@@ -15,6 +15,7 @@ import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { AttendanceRow } from '@/components/shared/AttendanceRow';
 import { AttendanceEditModal } from '@/components/shared/AttendanceEditModal';
 import { AttendanceCreateModal } from '@/components/shared/AttendanceCreateModal';
+import { AttendanceDeleteModal } from '@/components/shared/AttendanceDeleteModal';
 import { AttendanceExportButton } from '@/components/shared/AttendanceExportButton';
 import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
 import { CustomSelect } from '@/components/shared/CustomSelect';
@@ -195,6 +196,13 @@ function AttendancePage() {
     checkOutAt: string | null;
     originalCheckInAt?: string | null;
     originalCheckOutAt?: string | null;
+  } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    publicId: string;
+    employeeName?: string | null;
+    date: string;
+    checkInAt: string | null;
+    checkOutAt: string | null;
   } | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
 
@@ -586,6 +594,9 @@ function AttendancePage() {
                   status={a.status}
                   index={i}
                   edited={!!a.editedAt}
+                  voided={a.status === 'voided'}
+                  voidedByEmail={a.voidedByEmail ?? null}
+                  voidReason={a.voidReason ?? null}
                   onEdit={canEditAttendance && a.status === 'present'
                     ? () => setEditTarget({
                         publicId: a.publicId,
@@ -595,6 +606,15 @@ function AttendancePage() {
                         checkOutAt: a.checkOutAt,
                         originalCheckInAt: a.originalCheckInAt ?? null,
                         originalCheckOutAt: a.originalCheckOutAt ?? null,
+                      })
+                    : undefined}
+                  onDelete={canEditAttendance && a.status === 'present'
+                    ? () => setDeleteTarget({
+                        publicId: a.publicId,
+                        employeeName: a.employeeName,
+                        date: a.date,
+                        checkInAt: a.checkInAt,
+                        checkOutAt: a.checkOutAt,
                       })
                     : undefined}
                 />
@@ -609,6 +629,13 @@ function AttendancePage() {
         onOpenChange={(open) => { if (!open) setEditTarget(null); }}
         workspacePublicId={workspaceId}
         attendance={editTarget}
+      />
+
+      <AttendanceDeleteModal
+        open={!!deleteTarget}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+        workspacePublicId={workspaceId}
+        attendance={deleteTarget}
       />
 
       {canEditAttendance && (

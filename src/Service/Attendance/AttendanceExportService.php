@@ -132,6 +132,12 @@ class AttendanceExportService
     {
         $decorated = [];
         foreach ($rows as $row) {
+            // Voided rows are soft-deleted — exports drop them so payroll math
+            // matches the dashboard. The in-app list still shows them with a
+            // "Voided" badge for the audit trail.
+            if (($row['status'] ?? null) === 'voided') {
+                continue;
+            }
             $row['statusLabel'] = self::STATUS_LABELS[$row['status']] ?? ucfirst((string) $row['status']);
             $row['hoursWorked'] = $this->hoursWorked($row['checkInAt'] ?? null, $row['checkOutAt'] ?? null);
             $decorated[] = $row;

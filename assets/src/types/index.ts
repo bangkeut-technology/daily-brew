@@ -289,7 +289,7 @@ export interface Employee {
   photoUrl?: string | null;
 }
 
-export type AttendanceStatus = 'present' | 'absent' | 'on_leave';
+export type AttendanceStatus = 'present' | 'absent' | 'on_leave' | 'voided';
 
 export interface AttendanceRecord {
   publicId: string;
@@ -307,6 +307,9 @@ export interface AttendanceRecord {
   editReason?: string | null;
   originalCheckInAt?: string | null;
   originalCheckOutAt?: string | null;
+  voidedAt?: string | null;
+  voidedByEmail?: string | null;
+  voidReason?: string | null;
 }
 
 export interface AttendanceDayStatus {

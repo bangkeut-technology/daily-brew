@@ -116,6 +116,12 @@ class AttendanceController extends AbstractController
                 continue;
             }
 
+            // Voided rows are soft-deleted — BasilBook should treat them as
+            // absent days (omitted), matching the dashboard's stats.
+            if ($attendance->isVoided()) {
+                continue;
+            }
+
             $username = $employeeMap[$emp->getId()]->getUsername();
             $result[$username]['records'][] = [
                 'date' => $attendance->getDate()->format('Y-m-d'),

@@ -22,13 +22,19 @@ class AttendanceRepository extends AbstractRepository
         return $this->findOneBy(['employee' => $employee, 'date' => $date]);
     }
 
-    /** @return Attendance[] */
+    /**
+     * Recent attendance feed for the dashboard. Voided rows are excluded — a
+     * soft-deleted row shouldn't reappear in "happening now."
+     *
+     * @return Attendance[]
+     */
     public function findByWorkspaceAndDate(Workspace $workspace, \DateTimeInterface $date): array
     {
         return $this->createQueryBuilder('a')
             ->join('a.employee', 'e')
             ->where('e.workspace = :workspace')
             ->andWhere('a.date = :date')
+            ->andWhere('a.voidedAt IS NULL')
             ->setParameter('workspace', $workspace)
             ->setParameter('date', $date)
             ->orderBy('a.checkInAt', 'DESC')
@@ -52,6 +58,7 @@ class AttendanceRepository extends AbstractRepository
             ->getResult();
     }
 
+    /** Voided rows are excluded so the dashboard's "absent" baseline rises again when a row is deleted. */
     public function countByWorkspaceAndDate(Workspace $workspace, \DateTimeInterface $date): int
     {
         return (int) $this->createQueryBuilder('a')
@@ -60,6 +67,7 @@ class AttendanceRepository extends AbstractRepository
             ->where('e.workspace = :workspace')
             ->andWhere('a.date = :date')
             ->andWhere('a.checkInAt IS NOT NULL')
+            ->andWhere('a.voidedAt IS NULL')
             ->setParameter('workspace', $workspace)
             ->setParameter('date', $date)
             ->getQuery()
@@ -74,6 +82,7 @@ class AttendanceRepository extends AbstractRepository
             ->where('e.workspace = :workspace')
             ->andWhere('a.date = :date')
             ->andWhere('a.isLate = true')
+            ->andWhere('a.voidedAt IS NULL')
             ->setParameter('workspace', $workspace)
             ->setParameter('date', $date)
             ->getQuery()

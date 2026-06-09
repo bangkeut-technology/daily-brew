@@ -360,7 +360,10 @@ class AttendanceController extends AbstractController
 
                 if (isset($attendanceMap[$key])) {
                     $a = $attendanceMap[$key];
-                    if ($a->getCheckInAt() !== null) {
+                    // A voided row is a tombstone — the day didn't happen for
+                    // gantt purposes. Fall through to closure/leave/absent so
+                    // the chart matches dashboard stats.
+                    if ($a->getCheckInAt() !== null && !$a->isVoided()) {
                         $days[] = [
                             'date' => $dateStr,
                             'status' => 'present',
@@ -533,5 +536,43 @@ class AttendanceController extends AbstractController
         }
 
         return $this->jsonCreated(AttendanceDTO::fromEntity($attendance, includeEmployee: true, tz: $wsTz)->toArray());
+    }
+
+    /**
+     * Soft-void an attendance row. The row stays in the database (preserving
+     * the unique (employee, date) slot and historical times) but is excluded
+     * from dashboard stats, the BasilBook export, and is rendered as a
+     * tombstone in the list. A subsequent QR scan or manual entry on the same
+     * day resurrects it. Owner or a manager with `manage_attendance`.
+     */
+    #[Route('/{publicId}', name: 'attendances_delete', methods: ['DELETE'])]
+    public function delete(
+        string $workspacePublicId,
+        string $publicId,
+        Request $request,
+        #[CurrentUser] User $user,
+        WorkspaceRepository $workspaceRepository,
+        AttendanceRepository $attendanceRepository,
+        AttendanceService $attendanceService,
+    ): JsonResponse {
+        $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
+        if ($workspace === null) {
+            throw new NotFoundHttpException('Workspace not found');
+        }
+
+        $attendance = $attendanceRepository->findByPublicId($publicId);
+        if ($attendance === null || $attendance->getEmployee()?->getWorkspace()?->getId() !== $workspace->getId()) {
+            throw new NotFoundHttpException('Attendance not found');
+        }
+
+        $this->denyAccessUnlessGranted(WorkspaceVoter::DELETE, $attendance);
+
+        $data = json_decode($request->getContent(), true);
+        $reason = is_array($data) && is_string($data['reason'] ?? null) ? $data['reason'] : '';
+
+        $attendanceService->void($attendance, $user, $reason);
+
+        $wsTz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
+        return $this->jsonSuccess(AttendanceDTO::fromEntity($attendance, includeEmployee: true, tz: $wsTz)->toArray());
     }
 }
