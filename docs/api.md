@@ -275,4 +275,25 @@ Main QR routes by `/checkin/{workspaceQrToken}`; sub-QR (Double Espresso) by `/c
 
 ## BasilBook API
 
-External attendance pull for the BasilBook accounting integration. Uses `X-Api-Key` instead of JWT. See [basilbook.md](./basilbook.md) for the request/response spec, plan gating, and limits.
+External attendance pull for the BasilBook accounting integration. Uses `X-Api-Key` instead of JWT (the key resolves to its workspace via `BasilBookApiKeyAuthenticator`), and has **no locale prefix**. Espresso-gated (`403` otherwise). Issue the key with the [API Tokens](#api-tokens-authenticated-owner-only) endpoints above.
+
+- `GET /api/v1/basilbook/attendances?from=YYYY-MM-DD&to=YYYY-MM-DD` — attendance for the range, grouped per employee. Only employees with a `username` are returned; voided rows and absent days are omitted; times are in the workspace timezone. Both `from` and `to` are required and the range may not exceed **93 days**.
+  ```json
+  {
+    "workspace": "The Daily Grind",
+    "timezone": "Asia/Phnom_Penh",
+    "from": "2026-04-01",
+    "to": "2026-04-30",
+    "employees": [{
+      "username": "john_doe",
+      "name": "John Doe",
+      "shiftName": "Morning",
+      "records": [
+        { "date": "2026-04-01", "checkInAt": "08:02", "checkOutAt": "17:05", "isLate": false, "leftEarly": false }
+      ]
+    }]
+  }
+  ```
+  Manually overridden rows report the edited times (not the original scan). Errors: `401` (missing/invalid key), `403` (not Espresso), `422` (missing/invalid dates or range > 93 days).
+
+See [basilbook.md](./basilbook.md) for the full field reference, the `username` linking model, and token lifecycle.
