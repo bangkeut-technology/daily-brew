@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.110.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.109.0...v1.110.0) (2026-06-11)
+
+
+### Features
+
+* **settings:** add API keys management UI for BasilBook sync ([#315](https://github.com/bangkeut-technology/daily-brew/issues/315)) ([a9e7621](https://github.com/bangkeut-technology/daily-brew/commit/a9e76218f0b802ea323ebea08391acb1a6c14429))
+
 ## [1.109.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.108.0...v1.109.0) (2026-06-11)
 
 
