@@ -50,3 +50,6 @@ tsconfig.tsbuildinfo
 
 # Claude Code harness state
 .claude/
+
+# graphify knowledge-graph output
+/graphify-out/
