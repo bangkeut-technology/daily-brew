@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiAxios } from '@/lib/apiAxios';
-import type { Workspace, WorkspaceSetting } from '@/types';
+import type { Workspace, WorkspaceSetting, ApiToken, ApiTokenCreated } from '@/types';
 
 export function useWorkspaces() {
   return useQuery({
@@ -130,6 +130,56 @@ export function useWorkspaceTelegramLinkToken(workspacePublicId: string) {
         expiresInSeconds: number;
       }>(`/workspaces/${workspacePublicId}/settings/telegram-link-token`);
       return data;
+    },
+  });
+}
+
+/**
+ * BasilBook (and any other API consumer) authenticates with workspace-scoped
+ * API tokens. List returns active + revoked tokens; the plaintext key is only
+ * ever returned by useCreateApiToken() and is never stored server-side.
+ */
+export function useApiTokens(workspacePublicId: string) {
+  return useQuery({
+    queryKey: ['workspaces', workspacePublicId, 'api-tokens'],
+    queryFn: async () => {
+      const { data } = await apiAxios.get<ApiToken[]>(
+        `/workspaces/${workspacePublicId}/api-tokens`,
+      );
+      return data;
+    },
+    enabled: !!workspacePublicId,
+  });
+}
+
+export function useCreateApiToken(workspacePublicId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (name: string) => {
+      const { data } = await apiAxios.post<ApiTokenCreated>(
+        `/workspaces/${workspacePublicId}/api-tokens`,
+        { name },
+      );
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['workspaces', workspacePublicId, 'api-tokens'],
+      });
+    },
+  });
+}
+
+export function useRevokeApiToken(workspacePublicId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (tokenPublicId: string) => {
+      await apiAxios.delete(`/workspaces/${workspacePublicId}/api-tokens/${tokenPublicId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['workspaces', workspacePublicId, 'api-tokens'],
+      });
     },
   });
 }

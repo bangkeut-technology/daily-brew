@@ -13,6 +13,7 @@ import {
   FileText,
   Clock,
   Send,
+  KeyRound,
   Check,
   X,
   type LucideIcon,
@@ -34,6 +35,7 @@ const featureConfig: Record<EspressoFeature, { icon: LucideIcon; titleKey: strin
   telegramNotifications: { icon: Send, titleKey: 'upgrade.telegramNotifications.title', descKey: 'upgrade.telegramNotifications.description' },
   tapCheckin: { icon: MousePointerClick, titleKey: 'upgrade.tapCheckin.title', descKey: 'upgrade.tapCheckin.description' },
   nfcCheckin: { icon: Nfc, titleKey: 'upgrade.nfcCheckin.title', descKey: 'upgrade.nfcCheckin.description' },
+  apiTokens: { icon: KeyRound, titleKey: 'upgrade.apiTokens.title', descKey: 'upgrade.apiTokens.description' },
 };
 
 const espressoBenefits = [

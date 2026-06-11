@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import * as Dialog from '@radix-ui/react-dialog';
-import { Crown, Check, MapPin, MousePointerClick, Navigation, Nfc, Smartphone, Building2, Users, Calendar, Plus, X, Copy, Pencil, Trash2, Send, RotateCcw, HelpCircle } from 'lucide-react';
+import { Crown, Check, MapPin, MousePointerClick, Navigation, Nfc, Smartphone, Building2, Users, Calendar, Plus, X, Copy, Pencil, Trash2, Send, RotateCcw, HelpCircle, KeyRound } from 'lucide-react';
 import { useDateFormat } from '@/hooks/useDateFormat';
 import { usePaddle } from '@/hooks/usePaddle';
 import { useDevTogglePlan } from '@/hooks/useDevTogglePlan';
@@ -21,6 +21,9 @@ import {
   useUpdateWorkspaceSettings,
   useTelegramTest,
   useWorkspaceTelegramLinkToken,
+  useApiTokens,
+  useCreateApiToken,
+  useRevokeApiToken,
 } from '@/hooks/queries/useWorkspaces';
 import { usePlan } from '@/hooks/queries/usePlan';
 import { useEmployees } from '@/hooks/queries/useEmployees';
@@ -39,6 +42,7 @@ import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { CheckinUrlRow } from '@/components/shared/CheckinUrlRow';
 import { useFeatureEnabled, useFeatureStage } from '@/hooks/queries/useFeatures';
 import { FeatureStageBadge } from '@/components/shared/FeatureStageBadge';
+import type { ApiTokenCreated } from '@/types';
 
 export const Route = createLazyFileRoute('/console/settings')({
   component: SettingsPage,
@@ -174,6 +178,17 @@ function SettingsPage() {
   // signed in on the mobile app for the tokens to exist.
   const [pushCheckinAlertsEnabled, setPushCheckinAlertsEnabled] = useState(false);
   const telegramTest = useTelegramTest(currentWsId);
+
+  // API tokens (BasilBook & other API consumers). Espresso-gated; the plaintext
+  // key is shown exactly once on creation (newApiToken), then never again.
+  const canUseApiTokens = (plan?.isEspresso || plan?.isDoubleEspresso) ?? false;
+  const { data: apiTokens } = useApiTokens(canUseApiTokens ? currentWsId : '');
+  const createApiToken = useCreateApiToken(currentWsId);
+  const revokeApiToken = useRevokeApiToken(currentWsId);
+  const [apiTokenModalOpen, setApiTokenModalOpen] = useState(false);
+  const [apiTokenName, setApiTokenName] = useState('BasilBook');
+  const [newApiToken, setNewApiToken] = useState<ApiTokenCreated | null>(null);
+  const [revokeTokenTarget, setRevokeTokenTarget] = useState<{ publicId: string; name: string } | null>(null);
 
   // Stop polling the moment the chat ID flips in the response (the webhook
   // stored it after the group's /start fired). Toast keeps the success
@@ -1640,7 +1655,250 @@ function SettingsPage() {
             </div>
           </GlassCard>
         )}
+
+        {/* API keys — workspace-scoped tokens for BasilBook & other API
+            consumers. Espresso-gated; the plaintext key is shown once on
+            creation, then only its prefix is ever displayed again. */}
+        {currentWsId && (
+          <GlassCard hover={false} className="lg:col-span-2">
+            <GlassCardHeader
+              title={t('settings.apiKeysTitle', 'API keys')}
+              action={
+                canUseApiTokens ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setApiTokenName('BasilBook');
+                      setNewApiToken(null);
+                      setApiTokenModalOpen(true);
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[14px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,66,38,0.30)]"
+                  >
+                    <Plus size={14} />
+                    {t('settings.apiKeysGenerate', 'Generate key')}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => upgradeModal.openFor('apiTokens')}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[14px] font-medium bg-glass-bg border border-cream-3 text-text-primary cursor-pointer transition-all duration-150 hover:bg-cream-3"
+                  >
+                    <Crown size={14} className="text-amber" />
+                    {t('settings.upgradeCta', 'Upgrade')}
+                  </button>
+                )
+              }
+            />
+            <div className="p-5 pt-2">
+              <p className="text-[13.5px] text-text-tertiary leading-relaxed mb-4">
+                {t(
+                  'settings.apiKeysDesc',
+                  'Generate a secret key to let BasilBook (or your own tools) pull attendance from this workspace. Send it as the X-Api-Key header. The full key is shown only once — store it somewhere safe.',
+                )}
+                {!canUseApiTokens && (
+                  <span className="ml-1.5 text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
+                    Espresso
+                  </span>
+                )}
+              </p>
+
+              {canUseApiTokens && (
+                apiTokens && apiTokens.length > 0 ? (
+                  <div className="flex flex-col gap-2">
+                    {apiTokens.map((tk) => (
+                      <div
+                        key={tk.publicId}
+                        className={cn(
+                          'flex items-center justify-between gap-3 p-3 rounded-xl border',
+                          tk.active
+                            ? 'border-cream-3 bg-glass-bg'
+                            : 'border-cream-3/60 bg-cream-3/10 opacity-70',
+                        )}
+                      >
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <KeyRound size={13} className="text-text-tertiary flex-shrink-0" />
+                            <span className="text-[14px] font-medium text-text-primary truncate">
+                              {tk.name}
+                            </span>
+                            <StatusBadge
+                              label={
+                                tk.active
+                                  ? t('settings.apiKeysActive', 'Active')
+                                  : t('settings.apiKeysRevoked', 'Revoked')
+                              }
+                              variant={tk.active ? 'green' : 'red'}
+                            />
+                          </div>
+                          <p className="mt-1 text-[12.5px] text-text-tertiary font-mono">
+                            {tk.prefix}…
+                            <span className="ml-2 font-sans">
+                              {tk.lastUsedAt
+                                ? t('settings.apiKeysLastUsed', 'Last used {{date}}', {
+                                    date: fmtDate(tk.lastUsedAt),
+                                  })
+                                : t('settings.apiKeysNeverUsed', 'Never used')}
+                            </span>
+                          </p>
+                        </div>
+                        {tk.active && (
+                          <button
+                            type="button"
+                            onClick={() => setRevokeTokenTarget({ publicId: tk.publicId, name: tk.name })}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13.5px] font-medium bg-glass-bg border border-red/30 text-red cursor-pointer transition-all duration-150 hover:bg-red/10 flex-shrink-0"
+                          >
+                            <Trash2 size={12} />
+                            {t('settings.apiKeysRevoke', 'Revoke')}
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[13.5px] text-text-tertiary italic">
+                    {t('settings.apiKeysEmpty', 'No API keys yet. Generate one to connect BasilBook.')}
+                  </p>
+                )
+              )}
+            </div>
+          </GlassCard>
+        )}
       </div>
+
+      {/* Generate API key modal */}
+      <Dialog.Root
+        open={apiTokenModalOpen}
+        onOpenChange={(open) => {
+          setApiTokenModalOpen(open);
+          if (!open) setNewApiToken(null);
+        }}
+      >
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[calc(100%-2rem)] max-w-[440px] bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl shadow-[0_16px_50px_rgba(107,66,38,0.15)] outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 p-6">
+            <Dialog.Title className="text-[18px] font-semibold text-text-primary font-serif mb-1">
+              {newApiToken
+                ? t('settings.apiKeysCreatedTitle', 'Copy your API key')
+                : t('settings.apiKeysGenerateTitle', 'Generate API key')}
+            </Dialog.Title>
+
+            {newApiToken ? (
+              <>
+                <Dialog.Description className="text-[13.5px] text-text-tertiary leading-relaxed mb-4">
+                  {t(
+                    'settings.apiKeysCreatedDesc',
+                    "This is the only time you'll see the full key. Copy it now and paste it into BasilBook — we only store a hashed version.",
+                  )}
+                </Dialog.Description>
+                <div className="flex items-center gap-2 p-3 rounded-xl border border-cream-3 bg-cream-3/20">
+                  <code className="text-[13px] font-mono text-text-primary break-all flex-1">
+                    {newApiToken.token}
+                  </code>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(newApiToken.token);
+                        toast.success(t('settings.apiKeysCopied', 'API key copied'));
+                      } catch {
+                        toast.error(t('common.copyFailed', 'Failed to copy'));
+                      }
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13.5px] font-medium bg-coffee text-white border-none cursor-pointer flex-shrink-0"
+                  >
+                    <Copy size={12} />
+                    {t('settings.copy', 'Copy')}
+                  </button>
+                </div>
+                <div className="mt-5 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setApiTokenModalOpen(false);
+                      setNewApiToken(null);
+                    }}
+                    className="px-4 py-2 rounded-xl text-[14px] font-medium bg-coffee text-white border-none cursor-pointer"
+                  >
+                    {t('settings.apiKeysDone', "Done — I've saved it")}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <Dialog.Description className="text-[13.5px] text-text-tertiary leading-relaxed mb-4">
+                  {t('settings.apiKeysNameDesc', 'Give this key a name so you can recognise it later.')}
+                </Dialog.Description>
+                <label htmlFor="api-token-name" className="block text-[13px] font-medium text-text-secondary mb-1.5">
+                  {t('settings.apiKeysNameLabel', 'Key name')}
+                </label>
+                <input
+                  id="api-token-name"
+                  name="apiTokenName"
+                  type="text"
+                  value={apiTokenName}
+                  onChange={(e) => setApiTokenName(e.target.value)}
+                  maxLength={100}
+                  className="w-full px-3 py-2 rounded-xl bg-glass-bg border border-cream-3 text-[14px] text-text-primary outline-none focus:border-coffee transition-colors"
+                />
+                <div className="mt-5 flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setApiTokenModalOpen(false)}
+                    className="px-4 py-2 rounded-xl text-[14px] font-medium bg-glass-bg border border-cream-3 text-text-primary cursor-pointer"
+                  >
+                    {t('common.cancel', 'Cancel')}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!apiTokenName.trim() || createApiToken.isPending}
+                    onClick={async () => {
+                      try {
+                        const created = await createApiToken.mutateAsync(apiTokenName.trim());
+                        setNewApiToken(created);
+                      } catch {
+                        toast.error(t('settings.apiKeysCreateError', 'Could not generate the key'));
+                      }
+                    }}
+                    className="px-4 py-2 rounded-xl text-[14px] font-medium bg-coffee text-white border-none cursor-pointer disabled:opacity-50"
+                  >
+                    {t('settings.apiKeysGenerate', 'Generate key')}
+                  </button>
+                </div>
+              </>
+            )}
+
+            <Dialog.Close className="absolute top-3 right-3 w-7 h-7 rounded-lg flex items-center justify-center bg-transparent border-none text-text-tertiary hover:text-text-secondary hover:bg-cream-3/40 cursor-pointer transition-all">
+              <X size={15} />
+            </Dialog.Close>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+
+      {/* Revoke API key confirm */}
+      <ConfirmModal
+        open={revokeTokenTarget !== null}
+        onOpenChange={(open) => { if (!open) setRevokeTokenTarget(null); }}
+        title={t('settings.apiKeysRevokeTitle', 'Revoke API key')}
+        description={t(
+          'settings.apiKeysRevokeDesc',
+          'Revoking "{{name}}" immediately stops any tool using it from pulling data. This cannot be undone.',
+          { name: revokeTokenTarget?.name ?? '' },
+        )}
+        confirmLabel={t('settings.apiKeysRevoke', 'Revoke')}
+        variant="danger"
+        loading={revokeApiToken.isPending}
+        onConfirm={async () => {
+          if (!revokeTokenTarget) return;
+          try {
+            await revokeApiToken.mutateAsync(revokeTokenTarget.publicId);
+            toast.success(t('settings.apiKeysRevoked', 'Revoked'));
+          } catch {
+            toast.error(t('settings.apiKeysRevokeError', 'Could not revoke the key'));
+          } finally {
+            setRevokeTokenTarget(null);
+          }
+        }}
+      />
 
       {/* Danger zone */}
       <div className="mt-8">
