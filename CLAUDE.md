@@ -100,7 +100,7 @@ Warm cafe glassmorphism, dark mode with coffee tones. **Palette** (light→dark)
 
 ## BasilBook integration
 
-Cross-product link via Employee `username` (Espresso). Tokens at `/api/v1/{locale}/workspaces/{id}/api-tokens`. Pull: `GET /api/v1/basilbook/attendances?from=&to=` with `X-Api-Key`. Max 93 days, only `username`-set employees, times in workspace TZ, absent days omitted.
+Cross-product link via Employee `username` (Espresso). Tokens at `/api/v1/{locale}/workspaces/{id}/api-tokens`. Pull: `GET /api/v1/basilbook/attendances?from=&to=` with `X-Api-Key`. Max 93 days, only `username`-set employees, times in workspace TZ, absent + voided days omitted. Each employee carries both `username` (mutable linking key the feed is keyed by) and `publicId` (stable, immutable public employee ID — not the internal DB id — recommended long-term join key). See [docs/basilbook.md](./docs/basilbook.md).
 
 ## Commands
 

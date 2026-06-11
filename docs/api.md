@@ -297,4 +297,6 @@ External attendance pull for the BasilBook accounting integration. Uses `X-Api-K
   ```
   Manually overridden rows report the edited times (not the original scan). Errors: `401` (missing/invalid key), `403` (not Espresso), `422` (missing/invalid dates or range > 93 days).
 
-See [basilbook.md](./basilbook.md) for the full field reference, the `username` linking model, and token lifecycle.
+Each employee carries two identifiers: `username` (the owner-assigned, **mutable** linking key the feed is keyed by) and `publicId` (DailyBrew's **stable, immutable** public employee ID — not the internal DB id). Match on `username` for the initial import, then key off `publicId` for subsequent syncs so a later rename doesn't orphan accumulated history.
+
+See [basilbook.md](./basilbook.md) for the full field reference, the identifier/linking model, and token lifecycle.

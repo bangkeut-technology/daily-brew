@@ -2,9 +2,18 @@
 
 BasilBook is an external accounting / POS system. Restaurants that run both DailyBrew and BasilBook can reconcile attendance against sales and labor data by pulling DailyBrew's attendance records into BasilBook on a schedule.
 
-The link is the **Employee `username`** field — the workspace owner sets it on each employee to match the staff name or ID used in BasilBook. The pull endpoint then returns only employees that have a `username` set, keyed by that field, so BasilBook can join records on its own side without DailyBrew exposing any internal IDs. The feature is **Espresso-only** — Free workspaces don't see the API tokens UI and the endpoint returns 403.
+The link is the **Employee `username`** field — the workspace owner sets it on each employee to match the staff name or ID used in BasilBook. The pull endpoint returns only employees that have a `username` set, keyed by that field, so BasilBook can join records on its own side. The feature is **Espresso-only** — Free workspaces don't see the API tokens UI and the endpoint returns 403.
 
 Authentication is per-workspace API tokens (`db_` + 45 alphanumeric, SHA-256 hashed at rest, plain token shown once at creation). Tokens are revocable from the workspace settings page; revoking kills BasilBook's access without affecting any other integration or the owner's own login session.
+
+## Identifiers
+
+Each employee in the response carries two identifiers, and they serve different purposes:
+
+- **`username`** — the human-assigned linking key. The owner types it in to match BasilBook's own staff record, so it's the natural join key on first import. But it's **mutable** (an owner can rename or clear it) and **not guaranteed unique across time** — if it's cleared the employee drops out of the feed entirely, and if it's reassigned the records would re-key under a different staff member.
+- **`publicId`** — DailyBrew's **stable, immutable** employee identifier (12 characters from `abcdefghjkmnpqrstuvwxyz23456789`, the same public-ID scheme used everywhere else in the API). It is **not** the internal auto-increment database id — it's a public-facing, non-enumerable token that's safe to expose and never changes for the life of the employee.
+
+**Recommended approach:** match on `username` during the initial import to establish the mapping, then store and key off `publicId` for all subsequent syncs. That way a later username change or typo fix on the DailyBrew side won't orphan or misattribute the history BasilBook has already accumulated.
 
 ## Endpoint
 
@@ -55,8 +64,8 @@ curl "https://dailybrew.work/api/v1/basilbook/attendances?from=2026-04-01&to=202
 | `workspace` | string | Restaurant name |
 | `timezone` | string | IANA timezone — all times formatted in this TZ |
 | `from` / `to` | string | Requested date range (YYYY-MM-DD) |
-| `employees[].publicId` | string | Stable DailyBrew employee public ID (12 chars) |
-| `employees[].username` | string | BasilBook staff linking key |
+| `employees[].publicId` | string | Stable, immutable DailyBrew employee ID (12 chars) — preferred long-term join key; see [Identifiers](#identifiers) |
+| `employees[].username` | string | Mutable BasilBook staff linking key (the field the owner sets) |
 | `employees[].name` | string | Employee full name |
 | `employees[].shiftName` | string \| null | Assigned shift, or null |
 | `employees[].records[]` | array | Attendance entries (absent days omitted) |
@@ -71,7 +80,7 @@ curl "https://dailybrew.work/api/v1/basilbook/attendances?from=2026-04-01&to=202
 - Requires Espresso plan (403 if not)
 - Both `from` and `to` are required (YYYY-MM-DD)
 - Maximum range: 93 days
-- Only employees with a `username` are included
+- Only employees with a `username` are included (the feed is keyed by it); `publicId` is always present and stable across syncs — see [Identifiers](#identifiers)
 - Days with no attendance are omitted — absence = missing date
 - `isLate` / `leftEarly` are always `false` if employee has no shift
 - If an owner/manager has manually overridden an attendance row, the returned `checkInAt`/`checkOutAt` reflect the **edited values**, not the original scan times (the override represents "what really happened"). Originals stay in the DB for audit but aren't exposed here.
