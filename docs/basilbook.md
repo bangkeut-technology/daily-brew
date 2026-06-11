@@ -30,6 +30,7 @@ curl "https://dailybrew.work/api/v1/basilbook/attendances?from=2026-04-01&to=202
   "to": "2026-04-30",
   "employees": [
     {
+      "publicId": "ab3k9mnp7qrs",
       "username": "john_doe",
       "name": "John Doe",
       "shiftName": "Morning",
@@ -54,6 +55,7 @@ curl "https://dailybrew.work/api/v1/basilbook/attendances?from=2026-04-01&to=202
 | `workspace` | string | Restaurant name |
 | `timezone` | string | IANA timezone — all times formatted in this TZ |
 | `from` / `to` | string | Requested date range (YYYY-MM-DD) |
+| `employees[].publicId` | string | Stable DailyBrew employee public ID (12 chars) |
 | `employees[].username` | string | BasilBook staff linking key |
 | `employees[].name` | string | Employee full name |
 | `employees[].shiftName` | string \| null | Assigned shift, or null |

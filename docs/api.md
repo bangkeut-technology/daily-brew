@@ -285,6 +285,7 @@ External attendance pull for the BasilBook accounting integration. Uses `X-Api-K
     "from": "2026-04-01",
     "to": "2026-04-30",
     "employees": [{
+      "publicId": "ab3k9mnp7qrs",
       "username": "john_doe",
       "name": "John Doe",
       "shiftName": "Morning",

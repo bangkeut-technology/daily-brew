@@ -102,6 +102,7 @@ class AttendanceController extends AbstractController
         $result = [];
         foreach ($employees as $emp) {
             $result[$emp->getUsername()] = [
+                'publicId' => (string) $emp->getPublicId(),
                 'username' => $emp->getUsername(),
                 'name' => $emp->getName(),
                 'shiftName' => $emp->getShift()?->getName(),
