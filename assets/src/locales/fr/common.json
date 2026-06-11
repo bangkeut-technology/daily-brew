@@ -423,6 +423,28 @@
     "nfcCheckin": "Pointage NFC",
     "enableNfcCheckin": "Autoriser le pointage en tapant un tag NFC",
     "nfcCheckinDesc": "Lorsqu'il est activé, les employés peuvent pointer en tapant leur téléphone contre un tag NFC (autocollant NTAG213, environ 1 $ pièce) placé à votre espace. Programmez le tag avec le jeton QR de votre espace via une app gratuite d'écriture de tag comme NFC Tools. La restriction IP, le géorepérage et la vérification d'appareil s'appliquent toujours.",
+    "upgradeCta": "Mettre à niveau",
+    "copy": "Copier",
+    "apiKeysTitle": "Clés API",
+    "apiKeysDesc": "Générez une clé secrète pour permettre à BasilBook (ou à vos propres outils) de récupérer les pointages de cet espace. Envoyez-la dans l'en-tête X-Api-Key. La clé complète n'est affichée qu'une seule fois — conservez-la en lieu sûr.",
+    "apiKeysGenerate": "Générer une clé",
+    "apiKeysGenerateTitle": "Générer une clé API",
+    "apiKeysNameLabel": "Nom de la clé",
+    "apiKeysNameDesc": "Donnez un nom à cette clé pour la reconnaître plus tard.",
+    "apiKeysCreatedTitle": "Copiez votre clé API",
+    "apiKeysCreatedDesc": "C'est la seule fois où la clé complète sera affichée. Copiez-la maintenant et collez-la dans BasilBook — nous n'en stockons qu'une version hachée.",
+    "apiKeysCopied": "Clé API copiée",
+    "apiKeysDone": "Terminé — je l'ai enregistrée",
+    "apiKeysCreateError": "Impossible de générer la clé",
+    "apiKeysEmpty": "Aucune clé API pour l'instant. Générez-en une pour connecter BasilBook.",
+    "apiKeysActive": "Active",
+    "apiKeysRevoked": "Révoquée",
+    "apiKeysLastUsed": "Utilisée le {{date}}",
+    "apiKeysNeverUsed": "Jamais utilisée",
+    "apiKeysRevoke": "Révoquer",
+    "apiKeysRevokeTitle": "Révoquer la clé API",
+    "apiKeysRevokeDesc": "Révoquer « {{name}} » empêche immédiatement tout outil l'utilisant de récupérer des données. Cette action est irréversible.",
+    "apiKeysRevokeError": "Impossible de révoquer la clé",
     "enableGeofencing": "Activer le géorepérage",
     "geofencingDesc": "N'autoriser les pointages que dans un rayon défini autour de votre restaurant",
     "geofencingEspresso": "Le géorepérage nécessite Espresso"
@@ -557,6 +579,10 @@
     "telegramNotifications": {
       "title": "Débloquer les notifications Telegram",
       "description": "Envoyez les demandes de congé, les changements d'équipe, les fermetures et les résumés quotidiens dans un chat ou groupe Telegram."
+    },
+    "apiTokens": {
+      "title": "Débloquer les clés API",
+      "description": "Générez des clés secrètes pour que BasilBook et vos propres outils puissent récupérer les pointages de cet espace."
     }
   },
   "faq": {

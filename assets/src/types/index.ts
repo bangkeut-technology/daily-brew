@@ -423,6 +423,25 @@ export interface PlanDetails {
   paddleSubscriptionId: string | null;
 }
 
+export interface ApiToken {
+  publicId: string;
+  name: string;
+  prefix: string;
+  active: boolean;
+  lastUsedAt: string | null;
+  revokedAt: string | null;
+  createdAt: string;
+}
+
+/** Create response — `token` (the full plaintext key) is returned only once. */
+export interface ApiTokenCreated {
+  publicId: string;
+  name: string;
+  prefix: string;
+  token: string;
+  createdAt: string;
+}
+
 export interface WorkspaceQrCodeRef {
   publicId: string;
   name: string;

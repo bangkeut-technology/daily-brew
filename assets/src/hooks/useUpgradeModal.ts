@@ -8,7 +8,8 @@ export type EspressoFeature =
   | 'shiftTimeRules'
   | 'telegramNotifications'
   | 'tapCheckin'
-  | 'nfcCheckin';
+  | 'nfcCheckin'
+  | 'apiTokens';
 
 export function useUpgradeModal() {
   const [feature, setFeature] = useState<EspressoFeature | null>(null);

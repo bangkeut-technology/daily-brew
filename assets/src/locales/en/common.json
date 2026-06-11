@@ -467,7 +467,29 @@
     "tapCheckinDesc": "When enabled, employees can check in by tapping a button in the mobile app instead of scanning the workspace QR. IP, geofence, and device verification still apply, so rely on those to keep check-in tied to your location.",
     "nfcCheckin": "NFC check-in",
     "enableNfcCheckin": "Allow check-in by tapping an NFC tag",
-    "nfcCheckinDesc": "When enabled, employees can check in by tapping their phone against an NFC tag (NTAG213 sticker, ~$1 each) placed at your workspace. Program the tag with your workspace QR token using a free tag-writing app like NFC Tools. IP, geofence, and device verification still apply."
+    "nfcCheckinDesc": "When enabled, employees can check in by tapping their phone against an NFC tag (NTAG213 sticker, ~$1 each) placed at your workspace. Program the tag with your workspace QR token using a free tag-writing app like NFC Tools. IP, geofence, and device verification still apply.",
+    "upgradeCta": "Upgrade",
+    "copy": "Copy",
+    "apiKeysTitle": "API keys",
+    "apiKeysDesc": "Generate a secret key to let BasilBook (or your own tools) pull attendance from this workspace. Send it as the X-Api-Key header. The full key is shown only once — store it somewhere safe.",
+    "apiKeysGenerate": "Generate key",
+    "apiKeysGenerateTitle": "Generate API key",
+    "apiKeysNameLabel": "Key name",
+    "apiKeysNameDesc": "Give this key a name so you can recognise it later.",
+    "apiKeysCreatedTitle": "Copy your API key",
+    "apiKeysCreatedDesc": "This is the only time you'll see the full key. Copy it now and paste it into BasilBook — we only store a hashed version.",
+    "apiKeysCopied": "API key copied",
+    "apiKeysDone": "Done — I've saved it",
+    "apiKeysCreateError": "Could not generate the key",
+    "apiKeysEmpty": "No API keys yet. Generate one to connect BasilBook.",
+    "apiKeysActive": "Active",
+    "apiKeysRevoked": "Revoked",
+    "apiKeysLastUsed": "Last used {{date}}",
+    "apiKeysNeverUsed": "Never used",
+    "apiKeysRevoke": "Revoke",
+    "apiKeysRevokeTitle": "Revoke API key",
+    "apiKeysRevokeDesc": "Revoking \"{{name}}\" immediately stops any tool using it from pulling data. This cannot be undone.",
+    "apiKeysRevokeError": "Could not revoke the key"
   },
   "checkin": {
     "checkIn": "Check In",
@@ -606,6 +628,10 @@
     "telegramNotifications": {
       "title": "Unlock Telegram notifications",
       "description": "Send real-time leave requests, shift changes, closures, and daily summaries to a Telegram chat or group."
+    },
+    "apiTokens": {
+      "title": "Unlock API keys",
+      "description": "Generate secret keys so BasilBook and your own tools can pull attendance from this workspace."
     }
   },
   "faq": {
