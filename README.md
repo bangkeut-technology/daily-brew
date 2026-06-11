@@ -172,8 +172,8 @@ All three accounts can be used to experience the app from each role's perspectiv
 ## Documentation
 
 - [docs/architecture.md](./docs/architecture.md) — project structure, ER diagram, and the QR check-in / leave request / authentication flow diagrams
-- [docs/api.md](./docs/api.md) — every HTTP endpoint, the locale-prefix convention, and which firewalls authenticate them
-- [docs/basilbook.md](./docs/basilbook.md) — BasilBook accounting integration: `username` linkage, API token management, attendance pull endpoint
+- [docs/api.md](./docs/api.md) — every HTTP endpoint with its **response shape** (return-data JSON examples), the response-envelope/error conventions, the locale-prefix convention, and which firewalls authenticate them
+- [docs/basilbook.md](./docs/basilbook.md) — BasilBook accounting integration: the `username` vs stable `publicId` identifier model, API token management, and the attendance pull endpoint
 
 ## Design
 
