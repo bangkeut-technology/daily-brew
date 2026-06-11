@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.109.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.108.0...v1.109.0) (2026-06-11)
+
+
+### Features
+
+* **basilbook:** expose employee publicId in attendance pull ([093acab](https://github.com/bangkeut-technology/daily-brew/commit/093acab642a01eb6efa8db71e8bae5674c37c1bc))
+
 ## [1.108.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.107.3...v1.108.0) (2026-06-09)
 
 
