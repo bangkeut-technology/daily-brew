@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.111.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.110.0...v1.111.0) (2026-06-12)
+
+
+### Features
+
+* **basilbook:** expose full EmployeeDTO shape in attendance feed ([#317](https://github.com/bangkeut-technology/daily-brew/issues/317)) ([d29b785](https://github.com/bangkeut-technology/daily-brew/commit/d29b7855f074645ad675523311ea0b9bf74b3792))
+
 ## [1.110.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.109.0...v1.110.0) (2026-06-11)
 
 
