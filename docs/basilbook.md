@@ -40,9 +40,24 @@ curl "https://dailybrew.work/api/v1/basilbook/attendances?from=2026-04-01&to=202
   "employees": [
     {
       "publicId": "ab3k9mnp7qrs",
-      "username": "john_doe",
+      "firstName": "John",
+      "lastName": "Doe",
       "name": "John Doe",
+      "jobTitle": "Barista",
+      "username": "john_doe",
+      "active": true,
+      "role": "employee",
+      "linkedUserPublicId": null,
       "shiftName": "Morning",
+      "shiftPublicId": "sh7k2mnp9qrs",
+      "dob": "1995-03-12",
+      "joinedAt": "2026-01-05",
+      "linkedAt": null,
+      "leftAt": null,
+      "createdAt": "2026-01-05T08:00:00+00:00",
+      "managerPermissions": [],
+      "attendanceTracking": "full",
+      "photoUrl": null,
       "records": [
         {
           "date": "2026-04-01",
@@ -64,10 +79,9 @@ curl "https://dailybrew.work/api/v1/basilbook/attendances?from=2026-04-01&to=202
 | `workspace` | string | Restaurant name |
 | `timezone` | string | IANA timezone — all times formatted in this TZ |
 | `from` / `to` | string | Requested date range (YYYY-MM-DD) |
+| `employees[]` | object | Full employee record — the console's `EmployeeDTO` field set minus the PII the feed omits (`linkedUserEmail`, `phoneNumber`): `firstName`, `lastName`, `name`, `jobTitle`, `active`, `role`, `linkedUserPublicId`, `shiftName`, `shiftPublicId`, `dob`, `joinedAt`, `linkedAt`, `leftAt`, `createdAt`, `managerPermissions`, `attendanceTracking`, `photoUrl`, plus the two keys below |
 | `employees[].publicId` | string | Stable, immutable DailyBrew employee ID (12 chars) — preferred long-term join key; see [Identifiers](#identifiers) |
 | `employees[].username` | string | Mutable BasilBook staff linking key (the field the owner sets) |
-| `employees[].name` | string | Employee full name |
-| `employees[].shiftName` | string \| null | Assigned shift, or null |
 | `employees[].records[]` | array | Attendance entries (absent days omitted) |
 | `records[].date` | string | Calendar date (YYYY-MM-DD) |
 | `records[].checkInAt` | string \| null | Check-in time (HH:mm in workspace TZ) |

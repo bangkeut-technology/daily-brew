@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\ApiController\BasilBook;
 
 use App\ApiController\Trait\ApiResponseTrait;
+use App\DTO\EmployeeDTO;
 use App\Entity\Workspace;
 use App\Repository\AttendanceRepository;
 use App\Repository\EmployeeRepository;
@@ -98,16 +99,15 @@ class AttendanceController extends AbstractController
             return \DateTimeImmutable::createFromInterface($dt)->setTimezone($wsTz)->format('H:i');
         };
 
-        // Group attendance by employee username
+        // Group attendance by employee username. Each employee carries the full
+        // EmployeeDTO shape (so BasilBook sees the same fields as the console)
+        // plus a `records` array of that employee's attendance for the period.
+        // PII the external feed doesn't need is stripped.
         $result = [];
         foreach ($employees as $emp) {
-            $result[$emp->getUsername()] = [
-                'publicId' => (string) $emp->getPublicId(),
-                'username' => $emp->getUsername(),
-                'name' => $emp->getName(),
-                'shiftName' => $emp->getShift()?->getName(),
-                'records' => [],
-            ];
+            $employee = EmployeeDTO::fromEntity($emp)->toArray();
+            unset($employee['linkedUserEmail'], $employee['phoneNumber']);
+            $result[$emp->getUsername()] = $employee + ['records' => []];
         }
 
         foreach ($attendances as $attendance) {

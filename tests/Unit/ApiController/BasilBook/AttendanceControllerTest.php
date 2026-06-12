@@ -45,6 +45,35 @@ class AttendanceControllerTest extends TestCase
         $this->assertSame('john_doe', $employee['username']);
     }
 
+    public function testEmployeeCarriesFullEmployeeDtoShapePlusRecords(): void
+    {
+        $workspace = (new Workspace())->setName('The Daily Grind');
+        $emp = $this->withId((new Employee())
+            ->setFirstName('John')
+            ->setLastName('Doe')
+            ->setUsername('john_doe'), 1);
+
+        $data = $this->invoke($workspace, [$emp], []);
+        $employee = $data['employees'][0];
+
+        // Mirrors EmployeeDTO::toArray() so BasilBook sees the same fields as
+        // the console, with `records` appended.
+        foreach (['firstName', 'lastName', 'name', 'jobTitle',
+            'active', 'role', 'linkedUserPublicId',
+            'shiftPublicId', 'dob', 'joinedAt', 'linkedAt', 'leftAt',
+            'createdAt', 'managerPermissions', 'attendanceTracking', 'photoUrl',
+            'records'] as $key) {
+            $this->assertArrayHasKey($key, $employee);
+        }
+        $this->assertSame('John', $employee['firstName']);
+        $this->assertSame('Doe', $employee['lastName']);
+        $this->assertSame('employee', $employee['role']);
+
+        // PII the external feed doesn't need is stripped.
+        $this->assertArrayNotHasKey('linkedUserEmail', $employee);
+        $this->assertArrayNotHasKey('phoneNumber', $employee);
+    }
+
     public function testPublicIdIsPresentAlongsideAttendanceRecordsButNotPerRecord(): void
     {
         $workspace = (new Workspace())->setName('The Daily Grind');
