@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.111.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.111.0...v1.111.1) (2026-06-12)
+
+
+### Bug Fixes
+
+* **deploy:** sudo-prune old releases in deploy:cleanup ([#319](https://github.com/bangkeut-technology/daily-brew/issues/319)) ([deb4c14](https://github.com/bangkeut-technology/daily-brew/commit/deb4c143b0c95679eae1695059bd3f0a5a02f1b4))
+
 ## [1.111.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.110.0...v1.111.0) (2026-06-12)
 
 
