@@ -282,6 +282,45 @@ task('releases:cleanup-stale', function () {
     }
 });
 
+/**
+ * Override Deployer's built-in `deploy:cleanup` so it prunes old releases with
+ * `sudo /bin/rm -rf` instead of a plain `rm` run as the deploy user.
+ *
+ * Why: PHP-FPM (www-data) writes cache pool dirs into each release at runtime
+ * (var/cache/prod/pools/system/…) that the deploy user can't delete.
+ * `deploy:cache:fix_perms` installs a *default ACL* so pool files created in
+ * FUTURE releases inherit g:www-data:rwx — but releases created before that ACL
+ * existed stay un-removable. The stock cleanup then dies with "Permission
+ * denied" and fails the whole workflow *after* the symlink swap already went
+ * live (observed v1.111.0 / 2026-06-12 on stale releases/12). Escalating the rm
+ * to root clears them cleanly and the deploy reports the success it actually
+ * achieved. Self-healing: the first deploy carrying this change sudo-removes the
+ * wedged dirs, no manual host cleanup needed.
+ *
+ * Reuses the SAME NOPASSWD sudoers entry that `releases:cleanup-stale` already
+ * relies on — no new host privilege:
+ *
+ *     deploy ALL=(root) NOPASSWD: /bin/rm -rf /var/www/dailybrew/releases/*
+ *
+ * `/bin/rm` is spelled out (not bare `sudo rm`, i.e. not `cleanup_use_sudo`) so
+ * the resolved binary matches the sudoers path literally — a bare `rm` can
+ * resolve to /usr/bin/rm on usrmerged hosts, miss the rule, and prompt for a
+ * password that hangs CI. Mirrors the explicit `/bin/rm` in releases:cleanup-stale.
+ */
+desc('Cleanup old releases (sudo rm — clears www-data-owned cache pool dirs)');
+task('deploy:cleanup', function () {
+    $releases = get('releases_list');
+    $keep = get('keep_releases');
+
+    run('cd {{deploy_path}} && if [ -e release ]; then rm release; fi');
+
+    if ($keep > 0) {
+        foreach (array_slice($releases, $keep) as $release) {
+            run("sudo /bin/rm -rf {{deploy_path}}/releases/$release");
+        }
+    }
+});
+
 // ── Recipe wiring ───────────────────────────────────────────────────────────
 //
 // recipe/symfony.php's default `deploy` chain is:
