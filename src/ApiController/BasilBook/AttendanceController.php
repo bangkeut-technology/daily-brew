@@ -71,16 +71,13 @@ class AttendanceController extends AbstractController
             return $this->jsonError('Date range cannot exceed 93 days.', 422);
         }
 
-        // Get employees with usernames (BasilBook linking field)
-        $employees = $employeeRepository->findWithUsernameByWorkspace($workspace);
+        // All active employees — including those without a username. BasilBook
+        // wants every employee in the feed so it can reconcile staff it hasn't
+        // matched yet; username-less rows carry `username: null` and are joined
+        // on the stable `publicId` instead (the documented long-term join key).
+        $employees = $employeeRepository->findActiveByWorkspace($workspace);
         if (empty($employees)) {
             return $this->jsonSuccess(['employees' => [], 'from' => $fromStr, 'to' => $toStr]);
-        }
-
-        // Build employee lookup by ID
-        $employeeMap = [];
-        foreach ($employees as $emp) {
-            $employeeMap[$emp->getId()] = $emp;
         }
 
         // Fetch attendance records for the period
@@ -99,7 +96,8 @@ class AttendanceController extends AbstractController
             return \DateTimeImmutable::createFromInterface($dt)->setTimezone($wsTz)->format('H:i');
         };
 
-        // Group attendance by employee username. Each employee carries the full
+        // Group attendance per employee, keyed by internal id (the username can
+        // be null, so it can't be the array key). Each employee carries the full
         // EmployeeDTO shape (so BasilBook sees the same fields as the console)
         // plus a `records` array of that employee's attendance for the period.
         // PII the external feed doesn't need is stripped.
@@ -107,13 +105,13 @@ class AttendanceController extends AbstractController
         foreach ($employees as $emp) {
             $employee = EmployeeDTO::fromEntity($emp)->toArray();
             unset($employee['linkedUserEmail'], $employee['phoneNumber']);
-            $result[$emp->getUsername()] = $employee + ['records' => []];
+            $result[$emp->getId()] = $employee + ['records' => []];
         }
 
         foreach ($attendances as $attendance) {
             $emp = $attendance->getEmployee();
-            // Only include employees that have a username (are in our map)
-            if (!isset($employeeMap[$emp->getId()])) {
+            // Only include attendance for employees in this workspace's feed
+            if (!isset($result[$emp->getId()])) {
                 continue;
             }
 
@@ -123,8 +121,7 @@ class AttendanceController extends AbstractController
                 continue;
             }
 
-            $username = $employeeMap[$emp->getId()]->getUsername();
-            $result[$username]['records'][] = [
+            $result[$emp->getId()]['records'][] = [
                 'date' => $attendance->getDate()->format('Y-m-d'),
                 'checkInAt' => $formatTime($attendance->getCheckInAt()),
                 'checkOutAt' => $formatTime($attendance->getCheckOutAt()),

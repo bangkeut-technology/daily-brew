@@ -45,6 +45,38 @@ class AttendanceControllerTest extends TestCase
         $this->assertSame('john_doe', $employee['username']);
     }
 
+    public function testUsernameLessEmployeesAreIncludedWithNullUsername(): void
+    {
+        $workspace = (new Workspace())->setName('The Daily Grind');
+        $withUsername = $this->withId((new Employee())
+            ->setFirstName('John')
+            ->setLastName('Doe')
+            ->setUsername('john_doe'), 1);
+        // No username set — BasilBook joins this one on publicId instead.
+        $noUsername = $this->withId((new Employee())
+            ->setFirstName('Jane')
+            ->setLastName('Roe'), 2);
+
+        $attendance = (new Attendance())
+            ->setEmployee($noUsername)
+            ->setDate(new DateTimeImmutable('2026-04-03'))
+            ->setCheckInAt(new DateTimeImmutable('2026-04-03 09:00:00'));
+
+        $data = $this->invoke($workspace, [$withUsername, $noUsername], [$attendance]);
+
+        $this->assertCount(2, $data['employees']);
+        $byPublicId = [];
+        foreach ($data['employees'] as $e) {
+            $byPublicId[$e['publicId']] = $e;
+        }
+        $jane = $byPublicId[$noUsername->getPublicId()];
+        $this->assertNull($jane['username']);
+        $this->assertSame('Jane Roe', $jane['name']);
+        // Attendance still attaches to the username-less employee (keyed by id).
+        $this->assertCount(1, $jane['records']);
+        $this->assertSame('2026-04-03', $jane['records'][0]['date']);
+    }
+
     public function testEmployeeCarriesFullEmployeeDtoShapePlusRecords(): void
     {
         $workspace = (new Workspace())->setName('The Daily Grind');
@@ -126,7 +158,7 @@ class AttendanceControllerTest extends TestCase
         $request->attributes->set('_basilbook_workspace', $workspace);
 
         $employeeRepo = $this->createMock(EmployeeRepository::class);
-        $employeeRepo->method('findWithUsernameByWorkspace')->willReturn($employees);
+        $employeeRepo->method('findActiveByWorkspace')->willReturn($employees);
 
         $attendanceRepo = $this->createMock(AttendanceRepository::class);
         $attendanceRepo->method('findByWorkspaceAndDateRange')->willReturn($attendances);
