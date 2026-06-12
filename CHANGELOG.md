@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.112.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.111.1...v1.112.0) (2026-06-12)
+
+
+### Features
+
+* **basilbook:** include username-less employees in attendance feed ([#321](https://github.com/bangkeut-technology/daily-brew/issues/321)) ([1eb17e3](https://github.com/bangkeut-technology/daily-brew/commit/1eb17e382aa0be1ee2b4bf77bd2a529cce850f75))
+
 ## [1.111.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.111.0...v1.111.1) (2026-06-12)
 
 
