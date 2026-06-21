@@ -119,6 +119,10 @@
       "upsell": "Passez à Espresso pour vérifier où, sur quel appareil et depuis quel réseau votre personnel pointe."
     },
     "absent": "Absent",
+    "present": "Présent",
+    "leave": "Congé",
+    "voided": "Annulé",
+    "filterStatusAll": "Tous",
     "checkIn": "Pointer à l'arrivée",
     "checkOut": "Pointer la sortie",
     "date": "Date",

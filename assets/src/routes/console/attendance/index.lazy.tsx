@@ -23,9 +23,56 @@ import { StatusBadge } from '@/components/shared/StatusBadge';
 import { Avatar } from '@/components/shared/Avatar';
 import { useDateFormat } from '@/hooks/useDateFormat';
 import { cn } from '@/lib/utils';
-import type { AttendanceDayStatus } from '@/types';
+import type { AttendanceDayStatus, AttendanceRecord } from '@/types';
 
 type ViewMode = 'gantt' | 'summary' | 'log';
+
+/** Log-view status filter. 'late' is a sub-filter of present (status=present + isLate). */
+type StatusFilter = 'all' | 'present' | 'late' | 'absent' | 'leave' | 'voided';
+
+const STATUS_FILTERS: { value: StatusFilter; labelKey: string; fallback: string }[] = [
+  { value: 'all', labelKey: 'attendance.filterStatusAll', fallback: 'All' },
+  { value: 'present', labelKey: 'attendance.present', fallback: 'Present' },
+  { value: 'late', labelKey: 'attendance.late', fallback: 'Late' },
+  { value: 'absent', labelKey: 'attendance.absent', fallback: 'Absent' },
+  { value: 'leave', labelKey: 'attendance.leave', fallback: 'Leave' },
+  { value: 'voided', labelKey: 'attendance.voided', fallback: 'Voided' },
+];
+
+function matchesStatusFilter(a: AttendanceRecord, f: StatusFilter): boolean {
+  switch (f) {
+    case 'all':
+      return true;
+    case 'present':
+      return a.status === 'present';
+    case 'late':
+      return a.status === 'present' && !!a.isLate;
+    case 'absent':
+      return a.status === 'absent';
+    case 'leave':
+      return a.status === 'on_leave';
+    case 'voided':
+      return a.status === 'voided';
+  }
+}
+
+/** Same status filter, applied to a Monthly/gantt day-cell. */
+function dayMatchesStatusFilter(day: AttendanceDayStatus, f: StatusFilter): boolean {
+  switch (f) {
+    case 'all':
+      return true;
+    case 'present':
+      return day.status === 'present';
+    case 'late':
+      return day.status === 'present' && !!day.isLate;
+    case 'absent':
+      return day.status === 'absent';
+    case 'leave':
+      return day.status === 'leave';
+    case 'voided':
+      return day.status === 'voided';
+  }
+}
 
 function updateSearchParams(from: string, to: string, employee: string, view: string) {
   const url = new URL(window.location.href);
@@ -55,6 +102,8 @@ function dayStatusBadge(day: AttendanceDayStatus) {
       return <StatusBadge label="Upcoming" variant="gray" />;
     case 'off':
       return <StatusBadge label="Off" variant="gray" />;
+    case 'voided':
+      return <StatusBadge label="Voided" variant="gray" />;
   }
 }
 
@@ -92,6 +141,8 @@ function ganttCell(day: AttendanceDayStatus, hasShift: boolean): GanttCellSpec {
       return { kind: 'dot-muted', title: 'Upcoming' };
     case 'off':
       return { kind: 'dot-muted', title: 'Off day' };
+    case 'voided':
+      return { kind: 'badge', code: 'V', bg: 'bg-[#AE9D95]/10', text: 'text-text-tertiary', title: `Voided${day.voidedByEmail ? ` — removed by ${day.voidedByEmail}` : ''}` };
   }
 }
 
@@ -209,6 +260,7 @@ function AttendancePage() {
     checkOutAt: string | null;
   } | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
   const setFrom = (value: string) => {
     setFromState(value);
@@ -242,6 +294,15 @@ function AttendancePage() {
   const filtered = activeFilter
     ? attendance?.filter((a) => a.employeePublicId === activeFilter)
     : attendance;
+
+  // Log view applies the status filter on top of the employee filter.
+  const logRows = statusFilter === 'all'
+    ? filtered
+    : filtered?.filter((a) => matchesStatusFilter(a, statusFilter));
+
+  // Per-status counts for the filter pills (employee-filtered, status-agnostic base).
+  const statusCounts = (value: StatusFilter): number =>
+    filtered?.filter((a) => matchesStatusFilter(a, value)).length ?? 0;
 
   const filteredSummary = activeFilter
     ? summary?.filter((s) => s.employeePublicId === activeFilter)
@@ -362,6 +423,32 @@ function AttendancePage() {
         <SegmentedControl view={view} setView={setView} t={t} />
       </div>
 
+      {/* ── Status filter (log + monthly views) ── */}
+      {(view === 'log' || view === 'gantt') && (
+        <div className="flex flex-wrap gap-1 mb-5 -mt-1">
+          {STATUS_FILTERS.map((s) => {
+            const isActive = statusFilter === s.value;
+            // Counts reflect the flat log list; in the Monthly grid the same
+            // status spans many cells, so we show labels without a count there.
+            const count = view === 'log'
+              ? (s.value === 'all' ? (filtered?.length ?? 0) : statusCounts(s.value))
+              : null;
+            return (
+              <button
+                key={s.value}
+                onClick={() => setStatusFilter(s.value)}
+                className={cn(
+                  'px-3 py-1.5 rounded-lg text-[14px] font-medium border-none cursor-pointer transition-colors',
+                  isActive ? 'bg-coffee/12 text-coffee' : 'bg-glass-bg text-text-secondary hover:bg-cream-3',
+                )}
+              >
+                {t(s.labelKey, s.fallback)}{count !== null ? ` (${count})` : ''}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* ── Legend (shown for gantt and summary) ── */}
       {view !== 'log' && (
         <div className="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-[12px] font-medium text-text-secondary">
@@ -377,6 +464,7 @@ function AttendancePage() {
           <span className="flex items-center gap-1.5"><span className="inline-block w-5 h-5 rounded bg-amber/15 text-amber text-center leading-5 font-mono text-[11px]">E</span> {t('attendance.earlyLeave', 'Early leave')}</span>
           <span className="flex items-center gap-1.5"><span className="inline-block w-5 h-5 rounded bg-[#3B6FA0]/12 text-blue text-center leading-5 font-mono text-[11px]">Lv</span> {t('attendance.leave', 'Leave')}</span>
           <span className="flex items-center gap-1.5"><span className="inline-block w-5 h-5 rounded bg-[#AE9D95]/10 text-text-tertiary text-center leading-5 font-mono text-[11px]">C</span> {t('attendance.closed', 'Closed')}</span>
+          <span className="flex items-center gap-1.5"><span className="inline-block w-5 h-5 rounded bg-[#AE9D95]/10 text-text-tertiary text-center leading-5 font-mono text-[11px]">V</span> {t('attendance.voided', 'Voided')}</span>
           <span className="flex items-center gap-1.5 text-text-tertiary/70">
             <span className="inline-flex items-center justify-center w-5 h-5 text-text-tertiary/45 font-mono">–</span>
             {t('attendance.notTracked', 'Not tracked')}
@@ -496,6 +584,9 @@ function AttendancePage() {
                           const editable = canEditAttendance
                             && day?.status === 'present'
                             && !!day?.attendancePublicId;
+                          const dimmed = !!day
+                            && statusFilter !== 'all'
+                            && !dayMatchesStatusFilter(day, statusFilter);
                           return (
                             <td
                               key={date}
@@ -507,20 +598,22 @@ function AttendancePage() {
                               )}
                             >
                               {day ? (
-                                <GanttCellGlyph
-                                  spec={ganttCell(day, hasShift)}
-                                  onClick={editable
-                                    ? () => setEditTarget({
-                                        publicId: day.attendancePublicId!,
-                                        employeeName: emp.employeeName,
-                                        date: day.date,
-                                        checkInAt: day.checkInAt ?? null,
-                                        checkOutAt: day.checkOutAt ?? null,
-                                        originalCheckInAt: day.originalCheckInAt ?? null,
-                                        originalCheckOutAt: day.originalCheckOutAt ?? null,
-                                      })
-                                    : undefined}
-                                />
+                                <span className={cn('inline-block transition-opacity duration-150', dimmed && 'opacity-15')}>
+                                  <GanttCellGlyph
+                                    spec={ganttCell(day, hasShift)}
+                                    onClick={editable
+                                      ? () => setEditTarget({
+                                          publicId: day.attendancePublicId!,
+                                          employeeName: emp.employeeName,
+                                          date: day.date,
+                                          checkInAt: day.checkInAt ?? null,
+                                          checkOutAt: day.checkOutAt ?? null,
+                                          originalCheckInAt: day.originalCheckInAt ?? null,
+                                          originalCheckOutAt: day.originalCheckOutAt ?? null,
+                                        })
+                                      : undefined}
+                                  />
+                                </span>
                               ) : (
                                 <span
                                   title={t('attendance.notEmployedOnDate', 'Not active on this date')}
@@ -568,7 +661,7 @@ function AttendancePage() {
         )
       ) : (
         /* ── Log view (original) ── */
-        filtered?.length === 0 ? (
+        logRows?.length === 0 ? (
           <EmptyState t={t} />
         ) : (
           <GlassCard hover={false}>
@@ -578,12 +671,12 @@ function AttendancePage() {
                 <span className="flex items-center gap-1.5 text-[14px] text-text-tertiary">
                   <CalendarDays size={13} />
                   {from === to ? fmtDate(from) : `${fmtDate(from)} \u2013 ${fmtDate(to)}`}
-                  <span className="ml-1">({filtered?.length} records)</span>
+                  <span className="ml-1">({logRows?.length} records)</span>
                 </span>
               }
             />
             <div>
-              {filtered?.map((a, i) => (
+              {logRows?.map((a, i) => (
                 <AttendanceRow
                   key={a.publicId}
                   employee={a.employeeName || ''}

@@ -319,7 +319,7 @@ export interface AttendanceRecord {
 
 export interface AttendanceDayStatus {
   date: string;
-  status: 'present' | 'absent' | 'leave' | 'closure' | 'upcoming' | 'off';
+  status: 'present' | 'absent' | 'leave' | 'closure' | 'upcoming' | 'off' | 'voided';
   attendancePublicId?: string;
   checkInAt?: string | null;
   checkOutAt?: string | null;
@@ -331,6 +331,8 @@ export interface AttendanceDayStatus {
   editReason?: string | null;
   originalCheckInAt?: string | null;
   originalCheckOutAt?: string | null;
+  voidedByEmail?: string | null;
+  voidReason?: string | null;
 }
 
 export interface AttendanceSummaryEmployee {
