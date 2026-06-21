@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.113.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.112.0...v1.113.0) (2026-06-21)
+
+
+### Features
+
+* **attendance:** add status filter to log + monthly, surface voided in summary ([#323](https://github.com/bangkeut-technology/daily-brew/issues/323)) ([6745dc3](https://github.com/bangkeut-technology/daily-brew/commit/6745dc38d6900bd0347dbbab3af9e4259aa4e3ff))
+
 ## [1.112.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.111.1...v1.112.0) (2026-06-12)
 
 
