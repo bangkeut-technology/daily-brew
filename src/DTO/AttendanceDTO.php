@@ -15,6 +15,7 @@ final readonly class AttendanceDTO
         public ?string $checkOutAt,
         public bool    $isLate,
         public bool    $leftEarly,
+        public string  $status = 'present',
         public ?string $editedAt = null,
         public ?string $editedByEmail = null,
         public ?string $editReason = null,
@@ -50,6 +51,9 @@ final readonly class AttendanceDTO
             // "Late" / "Left early" pills don't render on a tombstone.
             isLate: $a->isLate() && !$a->isVoided(),
             leftEarly: $a->hasLeftEarly() && !$a->isVoided(),
+            // A real attendance row is either present or a voided tombstone —
+            // the synthetic absent/leave statuses only come from the row builder.
+            status: $a->isVoided() ? 'voided' : 'present',
             editedAt: $editedAt?->format(\DateTimeInterface::ATOM),
             editedByEmail: $a->getEditedByEmail(),
             editReason: $a->getEditReason(),
@@ -73,6 +77,7 @@ final readonly class AttendanceDTO
             'checkOutAt' => $this->checkOutAt,
             'isLate' => $this->isLate,
             'leftEarly' => $this->leftEarly,
+            'status' => $this->status,
             'editedAt' => $this->editedAt,
             'editedByEmail' => $this->editedByEmail,
             'editReason' => $this->editReason,
