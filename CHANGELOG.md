@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.114.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.113.0...v1.114.0) (2026-06-21)
+
+
+### Features
+
+* **attendance:** expose status on AttendanceDTO ([#325](https://github.com/bangkeut-technology/daily-brew/issues/325)) ([e41f440](https://github.com/bangkeut-technology/daily-brew/commit/e41f44085f700a2e54c79a6ea732aaff5dfbad78))
+
 ## [1.113.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.112.0...v1.113.0) (2026-06-21)
 
 
