@@ -392,9 +392,6 @@ class AttendanceController extends AbstractController
 
                 if (isset($attendanceMap[$key])) {
                     $a = $attendanceMap[$key];
-                    // A voided row is a tombstone — the day didn't happen for
-                    // gantt purposes. Fall through to closure/leave/absent so
-                    // the chart matches dashboard stats.
                     if ($a->getCheckInAt() !== null && !$a->isVoided()) {
                         $days[] = [
                             'date' => $dateStr,
@@ -409,6 +406,23 @@ class AttendanceController extends AbstractController
                             'editReason' => $a->getEditReason(),
                             'originalCheckInAt' => $formatTime($a->getOriginalCheckInAt()),
                             'originalCheckOutAt' => $formatTime($a->getOriginalCheckOutAt()),
+                        ];
+                        continue;
+                    }
+
+                    // A voided row is a tombstone — a manager soft-deleted the
+                    // scan. Surface it as its own 'voided' status (neutral, not
+                    // counted as present/absent — matching dashboard stats which
+                    // drop voided rows) so the Monthly grid can show & filter it.
+                    if ($a->isVoided()) {
+                        $days[] = [
+                            'date' => $dateStr,
+                            'status' => 'voided',
+                            'attendancePublicId' => (string) $a->getPublicId(),
+                            'checkInAt' => $formatTime($a->getOriginalCheckInAt() ?? $a->getCheckInAt()),
+                            'checkOutAt' => $formatTime($a->getOriginalCheckOutAt() ?? $a->getCheckOutAt()),
+                            'voidedByEmail' => $a->getVoidedByEmail(),
+                            'voidReason' => $a->getVoidReason(),
                         ];
                         continue;
                     }
