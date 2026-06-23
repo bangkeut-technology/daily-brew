@@ -103,11 +103,11 @@ task('frontend:spa:build', function () {
     run('npm ci --legacy-peer-deps', ['timeout' => 600]);
     run('npm run router:generate');
 
-    // The in-console feedback widget bakes SUPPORTDOCK_API_KEY into the bundle
-    // at build time (webpack reads .env + the shared .env.local symlinked in by
-    // deploy:shared, .env.local winning). Surface a missing key here rather
-    // than silently shipping a hidden widget — it's non-fatal because the
-    // widget no-ops gracefully when no key is configured.
+    // The in-console feedback widget reads SUPPORTDOCK_API_KEY at request time
+    // (SpaController injects it into window.__DAILYBREW__ — not baked into the
+    // bundle), so the key only needs to live in the server's env. Surface a
+    // missing key here rather than silently shipping a hidden widget — it's
+    // non-fatal because the widget no-ops gracefully when no key is configured.
     $supportdockKey = trim(run('{ grep -hs "^SUPPORTDOCK_API_KEY=" .env .env.local || true; } | tail -n1 | cut -d= -f2-'));
     if ($supportdockKey === '') {
         writeln('<comment>⚠ SUPPORTDOCK_API_KEY is empty — console feedback widget will be hidden in this release. Set it in shared/.env.local on the host.</comment>');
