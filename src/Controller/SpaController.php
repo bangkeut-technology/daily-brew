@@ -28,6 +28,7 @@ class SpaController extends AbstractController
         string $paddlePriceIdDoubleEspressoAnnual,
         string $gaMeasurementId,
         string $telegramBotUsername,
+        string $supportdockApiKey,
     ): Response {
         $locale = $this->resolveLocale($request, $seoMetaResolver);
         $seo = $seoMetaResolver->resolve($request->getPathInfo(), $locale);
@@ -45,6 +46,7 @@ class SpaController extends AbstractController
             'paddlePriceIdDoubleEspressoAnnual' => $paddlePriceIdDoubleEspressoAnnual,
             'gaMeasurementId' => $gaMeasurementId,
             'telegramBotUsername' => $telegramBotUsername,
+            'supportdockApiKey' => $supportdockApiKey,
             'user' => null,
             'metaTitle' => $seo->title,
             'metaDescription' => $seo->description,

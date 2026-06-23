@@ -16,6 +16,7 @@ declare global {
             paddlePriceIdDoubleEspressoMonthly?: string;
             paddlePriceIdDoubleEspressoAnnual?: string;
             telegramBotUsername?: string;
+            supportdockApiKey?: string;
         };
         Paddle?: {
             Environment?: {

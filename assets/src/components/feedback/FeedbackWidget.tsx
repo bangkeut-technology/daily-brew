@@ -22,10 +22,10 @@ import { cn } from '@/lib/utils';
  * In-console feedback launcher backed by the SupportDock JS SDK.
  *
  * Unlike the public `/support` page (which proxies through our PHP backend),
- * this widget talks to SupportDock directly from the browser using a key baked
- * into the bundle at build time (`process.env.SUPPORTDOCK_API_KEY`, injected by
- * webpack — see webpack.config.js). The widget renders nothing when no key is
- * configured, so dev/preview builds without a key simply don't show it.
+ * this widget talks to SupportDock directly from the browser using a key the
+ * server injects at request time (`window.__DAILYBREW__.supportdockApiKey`, set
+ * by SpaController → base.html.twig). The widget renders nothing when no key is
+ * configured, so environments without a key simply don't show it.
  */
 
 const MAX_IMAGES = 3;
@@ -52,10 +52,22 @@ function fileToDataUrl(file: File): Promise<string> {
   });
 }
 
+/**
+ * Outer guard: `useSupportDock` constructs the SupportDock client synchronously
+ * on first render and throws when no `apiKey` is configured. Because hooks must
+ * run before any early return, the inner widget can't guard against that itself —
+ * so we gate mounting it here. Builds without a key (dev/preview/missing secret)
+ * simply render nothing instead of crashing the console.
+ */
 export function FeedbackWidget() {
+  const apiKey = window.__DAILYBREW__?.supportdockApiKey;
+  if (!apiKey) return null;
+  return <FeedbackWidgetInner apiKey={apiKey} />;
+}
+
+function FeedbackWidgetInner({ apiKey }: { apiKey: string }) {
   const { t } = useTranslation();
   const auth = useAuthenticationState();
-  const apiKey = process.env.SUPPORTDOCK_API_KEY;
 
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<FeedbackType>('general');
@@ -65,7 +77,7 @@ export function FeedbackWidget() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { sendFeedback, loading, error, success, reset } = useSupportDock({
-    apiKey: apiKey || '',
+    apiKey,
     defaultMetadata: { product: 'dailybrew', source: 'console' },
   });
 
@@ -138,9 +150,6 @@ export function FeedbackWidget() {
     },
     [message, sendFeedback, type, user?.email, name, images, t],
   );
-
-  // No key configured → don't render the launcher at all.
-  if (!apiKey) return null;
 
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>
