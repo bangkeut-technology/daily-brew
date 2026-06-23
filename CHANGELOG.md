@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.115.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.114.0...v1.115.0) (2026-06-23)
+
+
+### Features
+
+* **support:** in-console feedback widget via SupportDock JS SDK ([#327](https://github.com/bangkeut-technology/daily-brew/issues/327)) ([2a109a8](https://github.com/bangkeut-technology/daily-brew/commit/2a109a8cbc621b13d51624ba0218a36138bae7ae))
+
 ## [1.114.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.113.0...v1.114.0) (2026-06-21)
 
 
