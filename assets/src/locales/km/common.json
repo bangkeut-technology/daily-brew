@@ -2568,5 +2568,36 @@
       "tooLarge": "រូបភាពត្រូវតែ 5 MB ឬតិចជាង",
       "invalidType": "រូបភាពត្រូវតែជា JPEG, PNG ឬ WebP"
     }
+  },
+  "feedback": {
+    "launcher": "មតិកែលម្អ",
+    "title": "ផ្ញើមតិកែលម្អមកយើង",
+    "subtitle": "ឃើញកំហុស ឬមានគំនិត? ប្រាប់យើង — វានឹងទៅដល់ក្រុមការងាររបស់យើងដោយផ្ទាល់។",
+    "typeLabel": "ប្រភេទមតិអ្វី?",
+    "types": {
+      "bug": "រាយការណ៍កំហុស",
+      "feature": "ស្នើសុំមុខងារ",
+      "question": "សំណួរ",
+      "general": "ទូទៅ"
+    },
+    "messageLabel": "សារ",
+    "messagePlaceholder": "ពណ៌នាអំពីអ្វីដែលបានកើតឡើង ឬអ្វីដែលអ្នកចង់ឃើញ…",
+    "screenshotsLabel": "រូបថតអេក្រង់",
+    "screenshotsOptional": "(ស្រេចចិត្ត រហូតដល់ {{max}})",
+    "addScreenshot": "បន្ថែម",
+    "attachmentAlt": "ឯកសារភ្ជាប់ {{n}}",
+    "removeAttachment": "លុបឯកសារភ្ជាប់",
+    "send": "ផ្ញើមតិកែលម្អ",
+    "sending": "កំពុងផ្ញើ…",
+    "success": {
+      "title": "អរគុណសម្រាប់មតិកែលម្អ!",
+      "subtitle": "យើងបានទទួលសាររបស់អ្នក ហើយនឹងពិនិត្យមើល។",
+      "sendAnother": "ផ្ញើម្ដងទៀត"
+    },
+    "errors": {
+      "message": "សូមបញ្ចូលយ៉ាងតិច ១០ តួអក្សរ។",
+      "maxImages": "អ្នកអាចភ្ជាប់រូបភាពរហូតដល់ {{max}}។",
+      "invalidType": "អនុញ្ញាតតែរូបភាព PNG, JPEG, WebP ឬ GIF ប៉ុណ្ណោះ។"
+    }
   }
 }

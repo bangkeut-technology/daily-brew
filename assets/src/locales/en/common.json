@@ -2568,5 +2568,36 @@
       "tooLarge": "Image must be 5 MB or smaller",
       "invalidType": "Image must be JPEG, PNG or WebP"
     }
+  },
+  "feedback": {
+    "launcher": "Feedback",
+    "title": "Send us feedback",
+    "subtitle": "Found a bug or have an idea? Tell us — it goes straight to our team.",
+    "typeLabel": "What kind of feedback?",
+    "types": {
+      "bug": "Bug report",
+      "feature": "Feature request",
+      "question": "Question",
+      "general": "General"
+    },
+    "messageLabel": "Message",
+    "messagePlaceholder": "Describe what happened or what you'd like to see…",
+    "screenshotsLabel": "Screenshots",
+    "screenshotsOptional": "(optional, up to {{max}})",
+    "addScreenshot": "Add",
+    "attachmentAlt": "Attachment {{n}}",
+    "removeAttachment": "Remove attachment",
+    "send": "Send feedback",
+    "sending": "Sending…",
+    "success": {
+      "title": "Thanks for your feedback!",
+      "subtitle": "We've received your message and will take a look.",
+      "sendAnother": "Send another"
+    },
+    "errors": {
+      "message": "Please enter at least 10 characters.",
+      "maxImages": "You can attach up to {{max}} images.",
+      "invalidType": "Only PNG, JPEG, WebP, or GIF images are allowed."
+    }
   }
 }
