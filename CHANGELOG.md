@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.115.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.115.0...v1.115.1) (2026-06-23)
+
+
+### Bug Fixes
+
+* **support:** inject SupportDock key at request time, not build time ([#330](https://github.com/bangkeut-technology/daily-brew/issues/330)) ([31f891c](https://github.com/bangkeut-technology/daily-brew/commit/31f891cd69cb0cc77605beef12c60408db4c2704))
+
 ## [1.115.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.114.0...v1.115.0) (2026-06-23)
 
 
