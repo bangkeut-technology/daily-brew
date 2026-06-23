@@ -2568,5 +2568,36 @@
       "tooLarge": "L'image doit faire 5 Mo ou moins",
       "invalidType": "L'image doit être au format JPEG, PNG ou WebP"
     }
+  },
+  "feedback": {
+    "launcher": "Commentaires",
+    "title": "Envoyez-nous vos commentaires",
+    "subtitle": "Un bug ou une idée ? Dites-le-nous — votre message va directement à notre équipe.",
+    "typeLabel": "Quel type de commentaire ?",
+    "types": {
+      "bug": "Signaler un bug",
+      "feature": "Demande de fonctionnalité",
+      "question": "Question",
+      "general": "Général"
+    },
+    "messageLabel": "Message",
+    "messagePlaceholder": "Décrivez ce qui s'est passé ou ce que vous aimeriez voir…",
+    "screenshotsLabel": "Captures d'écran",
+    "screenshotsOptional": "(facultatif, jusqu'à {{max}})",
+    "addScreenshot": "Ajouter",
+    "attachmentAlt": "Pièce jointe {{n}}",
+    "removeAttachment": "Retirer la pièce jointe",
+    "send": "Envoyer",
+    "sending": "Envoi…",
+    "success": {
+      "title": "Merci pour votre retour !",
+      "subtitle": "Nous avons bien reçu votre message et allons l'examiner.",
+      "sendAnother": "En envoyer un autre"
+    },
+    "errors": {
+      "message": "Veuillez saisir au moins 10 caractères.",
+      "maxImages": "Vous pouvez joindre jusqu'à {{max}} images.",
+      "invalidType": "Seules les images PNG, JPEG, WebP ou GIF sont autorisées."
+    }
   }
 }

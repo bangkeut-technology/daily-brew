@@ -2,6 +2,7 @@ import React from 'react';
 import { createLazyFileRoute, Outlet, useRouter } from '@tanstack/react-router';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TopBar } from '@/components/layout/TopBar';
+import { FeedbackWidget } from '@/components/feedback/FeedbackWidget';
 import { useAuthenticationState } from '@/hooks/use-authentication';
 import { useRoleContext } from '@/hooks/queries/useRoleContext';
 import { getWorkspacePublicId, clearWorkspacePublicId } from '@/lib/auth';
@@ -153,6 +154,9 @@ function ConsoleLayout() {
       <main className="mt-14 p-4 md:p-8 md:ml-[220px] page-enter">
         <Outlet />
       </main>
+
+      {/* Floating SupportDock feedback launcher — present on every console route. */}
+      <FeedbackWidget />
     </div>
   );
 }

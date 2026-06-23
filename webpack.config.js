@@ -1,10 +1,25 @@
 const Encore = require('@symfony/webpack-encore');
+const webpack = require('webpack');
+const dotenv = require('dotenv');
 const path = require('path');
 const { InjectManifest } = require('workbox-webpack-plugin');
 
 if (!Encore.isRuntimeEnvironmentConfigured()) {
     Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
 }
+
+// Load Symfony's env files so a handful of build-time values can reach the
+// bundle. .env.local overrides .env (matching Symfony's resolution order);
+// a value already present in the real process env wins over both.
+const dotenvVars = {
+    ...dotenv.config({ path: path.resolve(__dirname, '.env') }).parsed,
+    ...dotenv.config({ path: path.resolve(__dirname, '.env.local') }).parsed,
+    ...process.env,
+};
+
+// The console feedback widget talks to SupportDock directly from the browser,
+// so its key is intentionally baked into the client bundle at build time.
+const supportdockPublicKey = dotenvVars.SUPPORTDOCK_API_KEY || '';
 
 Encore
     .setOutputPath('public/build/')
@@ -36,6 +51,12 @@ const config = Encore.getWebpackConfig();
 config.resolve.alias = {
     '@': path.resolve(__dirname, 'assets/src'),
 };
+
+config.plugins.push(
+    new webpack.DefinePlugin({
+        'process.env.SUPPORTDOCK_API_KEY': JSON.stringify(supportdockPublicKey),
+    })
+);
 
 if (Encore.isProduction()) {
     config.plugins.push(
