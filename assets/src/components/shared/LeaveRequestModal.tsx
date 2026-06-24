@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next';
 import * as Dialog from '@radix-ui/react-dialog';
 import { toast } from 'sonner';
 import { X } from 'lucide-react';
-import { useCreateLeaveRequest } from '@/hooks/queries/useLeaveRequests';
+import { useCreateLeaveRequest, useEditLeaveRequest } from '@/hooks/queries/useLeaveRequests';
 import { CustomDatePicker } from '@/components/shared/CustomDatePicker';
 import { CustomTimePicker } from '@/components/shared/CustomTimePicker';
 import { Toggle } from '@/components/shared/Toggle';
 import { CustomSelect } from '@/components/shared/CustomSelect';
-import type { ClosurePeriod } from '@/types';
+import type { ClosurePeriod, LeaveRequest } from '@/types';
 import { parseDateAsUTC, formatDateUTC } from '@/lib/timezone';
 
 interface LeaveRequestModalProps {
@@ -18,6 +18,8 @@ interface LeaveRequestModalProps {
   employeePublicId?: string;
   employees?: { publicId: string; name: string }[];
   closures?: ClosurePeriod[];
+  /** When provided, the modal edits this request instead of creating a new one (owner/manager). */
+  leaveRequest?: LeaveRequest | null;
 }
 
 function buildClosureDateSet(closures: ClosurePeriod[]): Set<string> {
@@ -41,18 +43,26 @@ export function LeaveRequestModal({
   employeePublicId,
   employees,
   closures = [],
+  leaveRequest = null,
 }: LeaveRequestModalProps) {
   const { t } = useTranslation();
   const createLeave = useCreateLeaveRequest(workspacePublicId);
+  const editLeave = useEditLeaveRequest(workspacePublicId);
+  const isEdit = !!leaveRequest;
   const [selectedEmployee, setSelectedEmployee] = useState(employeePublicId ?? '');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [reason, setReason] = useState('');
+  const [isMultiDay, setIsMultiDay] = useState(false);
   const [isPartial, setIsPartial] = useState(false);
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('17:00');
 
-  const resolvedEmployeeId = employees ? selectedEmployee : (employeePublicId ?? '');
+  const resolvedEmployeeId = isEdit
+    ? leaveRequest.employeePublicId
+    : employees
+      ? selectedEmployee
+      : (employeePublicId ?? '');
 
   // Pre-select the employee when modal opens
   useEffect(() => {
@@ -60,6 +70,20 @@ export function LeaveRequestModal({
       setSelectedEmployee(employeePublicId);
     }
   }, [open, employeePublicId]);
+
+  // Prefill the form from the request being edited.
+  useEffect(() => {
+    if (open && leaveRequest) {
+      setStartDate(leaveRequest.startDate);
+      setEndDate(leaveRequest.endDate);
+      setReason(leaveRequest.reason ?? '');
+      setIsMultiDay(leaveRequest.startDate !== leaveRequest.endDate);
+      const partial = !leaveRequest.isFullDay;
+      setIsPartial(partial);
+      setStartTime(leaveRequest.startTime ?? '09:00');
+      setEndTime(leaveRequest.endTime ?? '17:00');
+    }
+  }, [open, leaveRequest]);
 
   const closureDates = buildClosureDateSet(closures);
   const isDateDisabled = (dateStr: string) => closureDates.has(dateStr);
@@ -69,23 +93,41 @@ export function LeaveRequestModal({
     setStartDate('');
     setEndDate('');
     setReason('');
+    setIsMultiDay(false);
     setIsPartial(false);
     setStartTime('09:00');
     setEndTime('17:00');
   };
 
+  // Single-day requests collapse the range: end date follows the chosen date.
+  const effectiveEndDate = isMultiDay ? endDate : startDate;
+
+  const isPending = isEdit ? editLeave.isPending : createLeave.isPending;
+
   const handleSubmit = async () => {
-    if (!resolvedEmployeeId || !startDate || !endDate || !reason.trim()) return;
+    if (!resolvedEmployeeId || !startDate || !effectiveEndDate || !reason.trim()) return;
     try {
-      await createLeave.mutateAsync({
-        employeePublicId: resolvedEmployeeId,
-        startDate,
-        endDate,
-        reason: reason.trim(),
-        startTime: isPartial ? startTime : undefined,
-        endTime: isPartial ? endTime : undefined,
-      });
-      toast.success(t('leave.submitSuccess', 'Leave request submitted'));
+      if (isEdit && leaveRequest) {
+        await editLeave.mutateAsync({
+          publicId: leaveRequest.publicId,
+          startDate,
+          endDate: effectiveEndDate,
+          reason: reason.trim(),
+          startTime: isPartial ? startTime : undefined,
+          endTime: isPartial ? endTime : undefined,
+        });
+        toast.success(t('leave.editSuccess', 'Leave request updated'));
+      } else {
+        await createLeave.mutateAsync({
+          employeePublicId: resolvedEmployeeId,
+          startDate,
+          endDate: effectiveEndDate,
+          reason: reason.trim(),
+          startTime: isPartial ? startTime : undefined,
+          endTime: isPartial ? endTime : undefined,
+        });
+        toast.success(t('leave.submitSuccess', 'Leave request submitted'));
+      }
       onOpenChange(false);
       reset();
     } catch (err: unknown) {
@@ -107,13 +149,19 @@ export function LeaveRequestModal({
         >
           <div className="p-6 space-y-4">
             <Dialog.Title className="text-[18px] font-semibold text-text-primary font-serif">
-              {t('leave.submitRequest', 'Submit leave request')}
+              {isEdit
+                ? t('leave.editRequest', 'Edit leave request')
+                : t('leave.submitRequest', 'Submit leave request')}
             </Dialog.Title>
             <Dialog.Description className="text-[14.5px] text-text-secondary leading-relaxed -mt-2">
-              {t('leave.submitDescription', 'Select the dates you need off and provide a reason.')}
+              {isEdit
+                ? t('leave.editDescription', 'Adjust the dates or reason for {{name}}.', {
+                    name: leaveRequest?.employeeName,
+                  })
+                : t('leave.submitDescription', 'Select the dates you need off and provide a reason.')}
             </Dialog.Description>
 
-            {employees && employees.length > 0 && (
+            {!isEdit && employees && employees.length > 0 && (
               <div>
                 <label className="block text-[13px] font-medium text-text-secondary mb-1">
                   {t('leave.employee', 'Employee')}
@@ -129,7 +177,7 @@ export function LeaveRequestModal({
 
             <div>
               <label htmlFor="leave-start" className="block text-[13px] font-medium text-text-secondary mb-1">
-                {t('leave.startDate', 'Start date')}
+                {isMultiDay ? t('leave.startDate', 'Start date') : t('leave.date', 'Date')}
               </label>
               <CustomDatePicker
                 value={startDate}
@@ -140,16 +188,34 @@ export function LeaveRequestModal({
                 isDateDisabled={isDateDisabled}
               />
             </div>
-            <div>
-              <label htmlFor="leave-end" className="block text-[13px] font-medium text-text-secondary mb-1">
-                {t('leave.endDate', 'End date')}
-              </label>
-              <CustomDatePicker
-                value={endDate}
-                onChange={setEndDate}
-                isDateDisabled={isDateDisabled}
+
+            {/* Multiple days toggle */}
+            <div className="flex items-center gap-2">
+              <Toggle
+                id="multi-day"
+                checked={isMultiDay}
+                onChange={(checked) => {
+                  setIsMultiDay(checked);
+                  if (!checked) setEndDate(startDate);
+                }}
               />
+              <label htmlFor="multi-day" className="text-[15px] text-text-primary cursor-pointer">
+                {t('leave.multipleDays', 'Multiple days')}
+              </label>
             </div>
+
+            {isMultiDay && (
+              <div>
+                <label htmlFor="leave-end" className="block text-[13px] font-medium text-text-secondary mb-1">
+                  {t('leave.endDate', 'End date')}
+                </label>
+                <CustomDatePicker
+                  value={endDate}
+                  onChange={setEndDate}
+                  isDateDisabled={isDateDisabled}
+                />
+              </div>
+            )}
 
             {/* Partial day toggle */}
             <div className="flex items-center gap-2">
@@ -206,10 +272,14 @@ export function LeaveRequestModal({
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={!resolvedEmployeeId || !startDate || !endDate || !reason.trim() || createLeave.isPending}
+                disabled={!resolvedEmployeeId || !startDate || !effectiveEndDate || !reason.trim() || isPending}
                 className="px-4 py-2 rounded-lg text-[15px] font-medium text-white bg-coffee border-none cursor-pointer hover:bg-coffee-light transition-colors disabled:opacity-50"
               >
-                {createLeave.isPending ? t('common.loading', 'Loading...') : t('common.submit', 'Submit')}
+                {isPending
+                  ? t('common.loading', 'Loading...')
+                  : isEdit
+                    ? t('common.save', 'Save')
+                    : t('common.submit', 'Submit')}
               </button>
             </div>
           </div>
