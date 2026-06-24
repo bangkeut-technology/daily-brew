@@ -152,8 +152,20 @@ class LeaveRequestController extends AbstractController
             $leaveRequest = $leaveRequestService->approve($leaveRequest, $user);
         } elseif ($status === 'rejected') {
             $leaveRequest = $leaveRequestService->reject($leaveRequest, $user, $data['reviewNote'] ?? null);
+        } elseif (!empty($data['startDate']) && !empty($data['endDate'])) {
+            $startTime = !empty($data['startTime']) ? \DateTimeImmutable::createFromFormat('H:i', $data['startTime']) ?: null : null;
+            $endTime = !empty($data['endTime']) ? \DateTimeImmutable::createFromFormat('H:i', $data['endTime']) ?: null : null;
+
+            $leaveRequest = $leaveRequestService->edit(
+                $leaveRequest,
+                \App\Service\DateService::mutableParse($data['startDate']),
+                \App\Service\DateService::mutableParse($data['endDate']),
+                $data['reason'] ?? null,
+                $startTime,
+                $endTime,
+            );
         } else {
-            return $this->jsonError('Status must be "approved" or "rejected"');
+            return $this->jsonError('Provide a status ("approved"/"rejected") or startDate and endDate to edit');
         }
 
         return $this->jsonSuccess(LeaveRequestDTO::fromEntity($leaveRequest)->toArray());

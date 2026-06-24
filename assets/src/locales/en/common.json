@@ -309,6 +309,11 @@
     "reject": "Reject",
     "reason": "Reason",
     "submit": "Submit request",
+    "date": "Date",
+    "multipleDays": "Multiple days",
+    "editRequest": "Edit leave request",
+    "editDescription": "Adjust the dates or reason for {{name}}.",
+    "editSuccess": "Leave request updated",
     "noRequests": "No leave requests found"
   },
   "shifts": {

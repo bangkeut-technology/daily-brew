@@ -2,9 +2,10 @@ import { createLazyFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { Crown, Inbox, Plus, X } from 'lucide-react';
+import { Crown, Inbox, Pencil, Plus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLeaveRequests, useUpdateLeaveRequest, useDeleteLeaveRequest } from '@/hooks/queries/useLeaveRequests';
+import type { LeaveRequest } from '@/types';
 import { useEmployees } from '@/hooks/queries/useEmployees';
 import { useClosures } from '@/hooks/queries/useClosures';
 import { useRoleContext } from '@/hooks/queries/useRoleContext';
@@ -53,6 +54,7 @@ function LeaveRequestsPage() {
   const deleteLeave = useDeleteLeaveRequest(workspaceId);
   const fmtDate = useDateFormat();
   const [confirmCancelId, setConfirmCancelId] = useState<string | null>(null);
+  const [editingRequest, setEditingRequest] = useState<LeaveRequest | null>(null);
 
   if (planLoading || roleLoading) {
     return (
@@ -220,6 +222,15 @@ function LeaveRequestsPage() {
                     <X size={14} />
                   </button>
                 )}
+                {canManage && lr.status !== 'rejected' && (
+                  <button
+                    onClick={() => setEditingRequest(lr)}
+                    className="w-7 h-7 flex items-center justify-center rounded-md bg-transparent border-none cursor-pointer text-text-tertiary hover:bg-coffee/10 hover:text-coffee transition-colors"
+                    title={t('leave.editRequest', 'Edit leave request')}
+                  >
+                    <Pencil size={14} />
+                  </button>
+                )}
                 {!isEmployee && lr.status === 'pending' && (
                   <div className="flex gap-1.5 ml-2">
                     <button
@@ -262,6 +273,16 @@ function LeaveRequestsPage() {
           closures={closures}
         />
       ) : null}
+
+      {canManage && (
+        <LeaveRequestModal
+          open={editingRequest !== null}
+          onOpenChange={(open) => { if (!open) setEditingRequest(null); }}
+          workspacePublicId={workspaceId}
+          leaveRequest={editingRequest}
+          closures={closures}
+        />
+      )}
 
       <ConfirmModal
         open={confirmCancelId !== null}

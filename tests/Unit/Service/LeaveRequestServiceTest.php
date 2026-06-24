@@ -191,8 +191,113 @@ class LeaveRequestServiceTest extends TestCase
         $this->assertSame('preserved', $result->getReviewNote());
     }
 
+    public function testEditRejectsWhenStartDateAfterEndDate(): void
+    {
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('Start date must be before or equal to end date');
+
+        $this->leaveRepo->expects($this->never())->method('flush');
+        $this->notifications->expects($this->never())->method('notifyLeaveRequestSubmitted');
+
+        $this->svc->edit(
+            $this->leaveRequest(),
+            new DateTimeImmutable('2026-04-10'),
+            new DateTimeImmutable('2026-04-09'),
+        );
+    }
+
+    public function testEditRejectsWhenDatesOverlapClosure(): void
+    {
+        $closure = (new ClosurePeriod())->setName('Pchum Ben');
+        $this->closureRepo->method('findOverlappingClosure')->willReturn($closure);
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('Pchum Ben');
+
+        $this->leaveRepo->expects($this->never())->method('flush');
+        $this->notifications->expects($this->never())->method('notifyLeaveRequestSubmitted');
+
+        $this->svc->edit(
+            $this->leaveRequest(),
+            new DateTimeImmutable('2026-04-14'),
+            new DateTimeImmutable('2026-04-16'),
+        );
+    }
+
+    public function testEditRejectsWhenAnotherOverlappingRequestExists(): void
+    {
+        $this->closureRepo->method('findOverlappingClosure')->willReturn(null);
+        $this->leaveRepo->method('findOverlappingForEmployee')->willReturn(new LeaveRequest());
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('already has a pending or approved leave request');
+
+        $this->leaveRepo->expects($this->never())->method('flush');
+        $this->notifications->expects($this->never())->method('notifyLeaveRequestSubmitted');
+
+        $this->svc->edit(
+            $this->leaveRequest(),
+            new DateTimeImmutable('2026-04-10'),
+            new DateTimeImmutable('2026-04-12'),
+        );
+    }
+
+    public function testEditUpdatesDatesReasonAndTimesOnSuccess(): void
+    {
+        $this->closureRepo->method('findOverlappingClosure')->willReturn(null);
+        $this->leaveRepo->method('findOverlappingForEmployee')->willReturn(null);
+        $this->leaveRepo->expects($this->once())->method('flush');
+        // Editing is a manager fix-up — it must not re-notify like a fresh submission.
+        $this->notifications->expects($this->never())->method('notifyLeaveRequestSubmitted');
+
+        $req = $this->leaveRequest();
+        $result = $this->svc->edit(
+            $req,
+            new DateTimeImmutable('2026-04-20'),
+            new DateTimeImmutable('2026-04-22'),
+            'updated reason',
+            new DateTimeImmutable('2026-04-20 09:00:00'),
+            new DateTimeImmutable('2026-04-20 12:00:00'),
+        );
+
+        $this->assertSame('2026-04-20', $result->getStartDate()?->format('Y-m-d'));
+        $this->assertSame('2026-04-22', $result->getEndDate()?->format('Y-m-d'));
+        $this->assertSame('updated reason', $result->getReason());
+        $this->assertFalse($result->isFullDay());
+    }
+
+    public function testEditClearsTimesWhenSwitchingToFullDay(): void
+    {
+        $this->closureRepo->method('findOverlappingClosure')->willReturn(null);
+        $this->leaveRepo->method('findOverlappingForEmployee')->willReturn(null);
+        $this->leaveRepo->expects($this->once())->method('flush');
+        $this->notifications->expects($this->never())->method('notifyLeaveRequestSubmitted');
+
+        $req = $this->leaveRequest()
+            ->setStartTime(new DateTimeImmutable('2026-04-20 09:00:00'))
+            ->setEndTime(new DateTimeImmutable('2026-04-20 12:00:00'));
+
+        $result = $this->svc->edit(
+            $req,
+            new DateTimeImmutable('2026-04-20'),
+            new DateTimeImmutable('2026-04-20'),
+            'now full day',
+        );
+
+        $this->assertTrue($result->isFullDay());
+        $this->assertNull($result->getStartTime());
+        $this->assertNull($result->getEndTime());
+    }
+
     private function employee(): Employee
     {
         return new Employee();
+    }
+
+    private function leaveRequest(): LeaveRequest
+    {
+        return (new LeaveRequest())
+            ->setEmployee($this->employee())
+            ->setWorkspace(new Workspace());
     }
 }

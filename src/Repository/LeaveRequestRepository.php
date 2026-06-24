@@ -103,9 +103,9 @@ class LeaveRequestRepository extends AbstractRepository
             ->getOneOrNullResult();
     }
 
-    public function findOverlappingForEmployee(Employee $employee, \DateTimeInterface $startDate, \DateTimeInterface $endDate): ?LeaveRequest
+    public function findOverlappingForEmployee(Employee $employee, \DateTimeInterface $startDate, \DateTimeInterface $endDate, ?LeaveRequest $exclude = null): ?LeaveRequest
     {
-        return $this->createQueryBuilder('lr')
+        $qb = $this->createQueryBuilder('lr')
             ->where('lr.employee = :employee')
             ->andWhere('lr.startDate <= :endDate')
             ->andWhere('lr.endDate >= :startDate')
@@ -115,9 +115,14 @@ class LeaveRequestRepository extends AbstractRepository
             ->setParameter('startDate', $startDate)
             ->setParameter('endDate', $endDate)
             ->setParameter('rejected', LeaveRequestStatusEnum::REJECTED)
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
+            ->setMaxResults(1);
+
+        if ($exclude !== null && $exclude->getId() !== null) {
+            $qb->andWhere('lr.id != :excludeId')
+                ->setParameter('excludeId', $exclude->getId());
+        }
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
     /** @return LeaveRequest[] */

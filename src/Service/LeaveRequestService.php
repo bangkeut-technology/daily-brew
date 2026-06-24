@@ -72,6 +72,47 @@ readonly class LeaveRequestService
         return $leaveRequest;
     }
 
+    /**
+     * Edit an existing leave request's dates, times and reason (owner / manager fix-up).
+     * Re-runs the same validation as create, excluding this request from the duplicate check.
+     */
+    public function edit(
+        LeaveRequest       $leaveRequest,
+        DateTimeInterface  $startDate,
+        DateTimeInterface  $endDate,
+        ?string            $reason = null,
+        ?DateTimeInterface $startTime = null,
+        ?DateTimeInterface $endTime = null,
+    ): LeaveRequest
+    {
+        if ($startDate > $endDate) {
+            throw new BadRequestHttpException('Start date must be before or equal to end date');
+        }
+
+        $employee = $leaveRequest->getEmployee();
+        $workspace = $leaveRequest->getWorkspace();
+
+        $closure = $this->closurePeriodRepository->findOverlappingClosure($workspace, $startDate, $endDate);
+        if ($closure !== null) {
+            throw new BadRequestHttpException('Leave dates overlap with closure: ' . $closure->getName());
+        }
+
+        $existing = $this->leaveRequestRepository->findOverlappingForEmployee($employee, $startDate, $endDate, $leaveRequest);
+        if ($existing !== null) {
+            throw new BadRequestHttpException('This employee already has a pending or approved leave request for these dates');
+        }
+
+        $leaveRequest->setStartDate(\DateTimeImmutable::createFromInterface($startDate));
+        $leaveRequest->setEndDate(\DateTimeImmutable::createFromInterface($endDate));
+        $leaveRequest->setReason($reason);
+        $leaveRequest->setStartTime($startTime !== null ? \DateTimeImmutable::createFromInterface($startTime) : null);
+        $leaveRequest->setEndTime($endTime !== null ? \DateTimeImmutable::createFromInterface($endTime) : null);
+
+        $this->leaveRequestRepository->flush();
+
+        return $leaveRequest;
+    }
+
     public function approve(LeaveRequest $leaveRequest, ?User $reviewedBy = null): LeaveRequest
     {
         $leaveRequest->setStatus(LeaveRequestStatusEnum::APPROVED);

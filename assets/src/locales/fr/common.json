@@ -2468,7 +2468,12 @@
     "reason": "Raison",
     "reject": "Rejeter",
     "rejected": "Rejeté",
-    "submit": "Soumettre la demande"
+    "submit": "Soumettre la demande",
+    "date": "Date",
+    "multipleDays": "Plusieurs jours",
+    "editRequest": "Modifier la demande de congé",
+    "editDescription": "Ajustez les dates ou le motif pour {{name}}.",
+    "editSuccess": "Demande de congé mise à jour"
   },
   "closure": {
     "empty": "Aucune période de fermeture définie",

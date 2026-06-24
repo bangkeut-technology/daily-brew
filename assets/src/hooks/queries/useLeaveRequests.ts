@@ -67,3 +67,30 @@ export function useUpdateLeaveRequest(workspacePublicId: string) {
     },
   });
 }
+
+export function useEditLeaveRequest(workspacePublicId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      publicId,
+      ...payload
+    }: {
+      publicId: string;
+      startDate: string;
+      endDate: string;
+      reason?: string;
+      startTime?: string;
+      endTime?: string;
+    }) => {
+      const { data } = await apiAxios.put<LeaveRequest>(
+        `/workspaces/${workspacePublicId}/leave-requests/${publicId}`,
+        payload,
+      );
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leaveRequests', workspacePublicId] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard', workspacePublicId] });
+    },
+  });
+}
