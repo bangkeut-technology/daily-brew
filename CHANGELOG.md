@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.116.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.115.1...v1.116.0) (2026-06-24)
+
+
+### Features
+
+* **leave:** single-date default + manager/owner can edit requests ([#332](https://github.com/bangkeut-technology/daily-brew/issues/332)) ([0e9006f](https://github.com/bangkeut-technology/daily-brew/commit/0e9006f052064068b51bc44e7c4171457ec11795))
+
 ## [1.115.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.115.0...v1.115.1) (2026-06-23)
 
 
