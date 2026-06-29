@@ -110,7 +110,7 @@ function ShiftsPage() {
       </p>
 
       {showForm && (
-        <GlassCard hover={false} className="mb-4">
+        <GlassCard hover={false} className="mb-4 overflow-visible">
           <form onSubmit={handleCreate} className="p-5 space-y-3">
             <input
               id="shift-name"
@@ -330,7 +330,7 @@ function ShiftCard({
   const durationMins = durationMinutes % 60;
 
   return (
-    <GlassCard hover={!isExpanded && !showAssign && !isEditing} className={isExpanded ? 'overflow-visible' : undefined}>
+    <GlassCard hover={!isExpanded && !showAssign && !isEditing} className={isExpanded || isEditing ? 'overflow-visible' : undefined}>
       {/* Header with time accent bar */}
       <div className="relative">
         <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-linear-to-r from-amber to-coffee" />
