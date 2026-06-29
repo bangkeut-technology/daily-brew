@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.118.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.117.0...v1.118.0) (2026-06-29)
+
+
+### Features
+
+* **attendance:** gantt-style (monthly grid) export ([#341](https://github.com/bangkeut-technology/daily-brew/issues/341)) ([3edeac1](https://github.com/bangkeut-technology/daily-brew/commit/3edeac14a5ab98f62c10ff85491ffe0dbbc23e6c))
+
 ## [1.117.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.116.0...v1.117.0) (2026-06-29)
 
 
