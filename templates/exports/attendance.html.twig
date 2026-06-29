@@ -26,6 +26,8 @@
         .s-leave .code { color: #3B6FA0; }
         .s-off, .s-closure, .s-voided { background: #F1EEEB; }
         .s-off .code, .s-closure .code, .s-voided .code, .s-untracked .code { color: #6B6463; }
+        th.tot, td.tot { width: 26px; font-weight: 700; font-size: 7pt; background: #F6F2EC; }
+        thead th.tot { font-size: 6.5pt; }
         .legend { margin-top: 10px; font-size: 7pt; color: #6B6463; }
         .legend b { color: #1E1916; }
         .footer { margin-top: 8px; font-size: 7pt; color: #6B6463; text-align: right; }
@@ -42,6 +44,11 @@
                 {% for col in columns %}
                     <th>{{ col.weekday }}<br>{{ col.day }}</th>
                 {% endfor %}
+                <th class="tot">Pre</th>
+                <th class="tot">Sch</th>
+                <th class="tot">Abs</th>
+                <th class="tot">Late</th>
+                <th class="tot">Lv</th>
             </tr>
         </thead>
         <tbody>
@@ -58,6 +65,11 @@
                         </td>
                     {% endif %}
                 {% endfor %}
+                <td class="tot">{{ row.totals.present }}</td>
+                <td class="tot">{{ row.totals.scheduled }}</td>
+                <td class="tot">{{ row.totals.absent }}</td>
+                <td class="tot">{{ row.totals.late }}</td>
+                <td class="tot">{{ row.totals.leave }}</td>
             </tr>
         {% endfor %}
         </tbody>

@@ -39,7 +39,7 @@ class AttendanceExportServiceTest extends TestCase
     {
         $grid = [
             $this->employee('Alice Anderson', 'Morning', [
-                $this->day('2026-05-10', 'present', ['checkInAt' => '09:00', 'isLate' => false, 'leftEarly' => false]),
+                $this->day('2026-05-10', 'present', ['checkInAt' => '09:00', 'checkOutAt' => '17:30', 'isLate' => false, 'leftEarly' => false]),
                 $this->day('2026-05-11', 'present', ['checkInAt' => '09:15', 'isLate' => true, 'leftEarly' => false]),
             ]),
             $this->employee('Bob Brown', 'Evening', [
@@ -63,19 +63,28 @@ class AttendanceExportServiceTest extends TestCase
         $sheet = IOFactory::load($tmp)->getActiveSheet();
         unlink($tmp);
 
-        // Row 3 = header: A = "Employee", B/C = day columns for the two dates.
+        // Row 3 = header: A = "Employee", B/C = day columns, D-H = per-employee totals.
         $this->assertSame('Employee', $sheet->getCell('A3')->getValue());
         $this->assertStringContainsString('10', (string) $sheet->getCell('B3')->getValue());
         $this->assertStringContainsString('11', (string) $sheet->getCell('C3')->getValue());
+        $this->assertSame('Present', $sheet->getCell('D3')->getValue());
+        $this->assertSame('Scheduled', $sheet->getCell('E3')->getValue());
+        $this->assertSame('Late', $sheet->getCell('G3')->getValue());
 
-        // Alice: on-time present then late, with check-in times stacked under the code.
+        // Alice: present with check-in–check-out range, then a late day (no checkout yet).
         $this->assertSame('Alice Anderson', $sheet->getCell('A4')->getValue());
-        $this->assertSame("Pre\n09:00", $sheet->getCell('B4')->getValue());
+        $this->assertSame("Pre\n09:00\u{2013}17:30", $sheet->getCell('B4')->getValue());
         $this->assertSame("Lt\n09:15", $sheet->getCell('C4')->getValue());
+        // Totals: 2 present / 2 scheduled, 1 late.
+        $this->assertEquals(2, $sheet->getCell('D4')->getValue());
+        $this->assertEquals(2, $sheet->getCell('E4')->getValue());
+        $this->assertEquals(1, $sheet->getCell('G4')->getValue());
 
-        // Bob: absent (has a shift) then on paid leave.
+        // Bob: absent (has a shift) then on paid leave → 1 absent, 1 leave.
         $this->assertSame("Abs", $sheet->getCell('B5')->getValue());
         $this->assertSame("Lv", $sheet->getCell('C5')->getValue());
+        $this->assertEquals(1, $sheet->getCell('F5')->getValue());
+        $this->assertEquals(1, $sheet->getCell('H5')->getValue());
 
         // Cleo: absent with no shift → "—"; not employed on the 11th → blank cell.
         $this->assertSame("\u{2014}", $sheet->getCell('B6')->getValue());
