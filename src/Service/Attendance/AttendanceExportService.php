@@ -8,6 +8,7 @@ use App\Entity\Workspace;
 use App\Service\DateService;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
@@ -16,71 +17,104 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Twig\Environment;
 
 /**
- * Renders the attendance row list (from AttendanceRowBuilder) as XLSX or PDF
- * for the Espresso+ download buttons on the attendance page. The row list is
- * the same shape the list endpoint returns; this service derives a few
- * presentation fields (status label, hours worked) before handing off to the
- * renderer.
+ * Renders the attendance grid (from AttendanceSummaryBuilder) as a gantt-style
+ * monthly matrix — employees down the rows, calendar days across the columns,
+ * each cell a short status code (Pre / Lt / LfE / Abs / Lv / Off / C / Vd) plus
+ * the check-in time on present days. Used by the Espresso+ XLSX/PDF download
+ * buttons on the attendance page; the layout mirrors the on-screen Monthly view.
  */
 class AttendanceExportService
 {
-    private const STATUS_LABELS = [
-        'present' => 'Present',
-        'absent' => 'Absent',
-        'on_leave' => 'On leave',
+    /**
+     * Short code + cell tint per resolved status. `tint` is an ARGB fill (null
+     * = no fill); `code` is the abbreviation shown in the cell.
+     */
+    private const STATUS_STYLE = [
+        'present' => ['tint' => 'FFEAF3EC'],   // soft green
+        'flag' => ['tint' => 'FFFBF1E0'],      // soft amber (late / left early)
+        'absent' => ['tint' => 'FFF8E8E6'],    // soft red
+        'untracked' => ['tint' => null],
+        'leave' => ['tint' => 'FFE9F0F7'],     // soft blue
+        'off' => ['tint' => 'FFF1EEEB'],       // light gray
+        'closure' => ['tint' => 'FFF1EEEB'],
+        'voided' => ['tint' => 'FFEDE9E6'],
+        'upcoming' => ['tint' => null],
     ];
 
-    public function __construct(private Environment $twig) {}
+    public function __construct(private readonly Environment $twig) {}
 
     /**
-     * @param list<array<string, mixed>> $rows raw output from AttendanceRowBuilder::build()
+     * @param list<array<string, mixed>> $grid AttendanceSummaryBuilder::build() output
      */
-    public function toXlsx(array $rows, Workspace $workspace, string $from, string $to): string
+    public function toXlsx(array $grid, Workspace $workspace, string $from, string $to): string
     {
-        $decorated = $this->decorate($rows);
+        ['columns' => $columns, 'rows' => $rows] = $this->buildMatrix($grid, $from, $to);
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Attendance');
 
-        $headers = ['Employee', 'Date', 'Shift', 'Check-in', 'Check-out', 'Status', 'Late', 'Left early', 'Hours', 'Notes'];
-        $sheet->fromArray($headers, null, 'A1');
+        $colCount = 1 + count($columns); // employee column + one per day
+        $lastCol = Coordinate::stringFromColumnIndex($colCount);
 
-        $headerStyle = $sheet->getStyle('A1:J1');
-        $headerStyle->getFont()->setBold(true);
-        $headerStyle->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFEFEAE3');
-        $headerStyle->getBorders()->getBottom()->setBorderStyle(Border::BORDER_MEDIUM)->getColor()->setARGB('FF6B4226');
-
-        $rowIdx = 2;
-        foreach ($decorated as $row) {
-            $sheet->setCellValue("A{$rowIdx}", $row['employeeName']);
-            $sheet->setCellValue("B{$rowIdx}", $row['date']);
-            $sheet->setCellValue("C{$rowIdx}", $row['shiftName'] ?? '');
-            $sheet->setCellValue("D{$rowIdx}", $row['checkInAt'] ?? '');
-            $sheet->setCellValue("E{$rowIdx}", $row['checkOutAt'] ?? '');
-            $sheet->setCellValue("F{$rowIdx}", $row['statusLabel']);
-            $sheet->setCellValue("G{$rowIdx}", $row['isLate'] ? 'Yes' : '');
-            $sheet->setCellValue("H{$rowIdx}", $row['leftEarly'] ? 'Yes' : '');
-            $sheet->setCellValue("I{$rowIdx}", $row['hoursWorked'] ?? '');
-            $sheet->setCellValue("J{$rowIdx}", $row['editReason'] ?? '');
-            $rowIdx++;
-        }
-
-        // Auto-size columns
-        foreach (range('A', 'J') as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
-        }
-        // Right-align hours column
-        $sheet->getStyle('I2:I' . ($rowIdx - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-
-        // Header bar with workspace name + range above the table
-        $sheet->insertNewRowBefore(1, 2);
+        // Title bar (rows 1-2)
         $sheet->setCellValue('A1', sprintf('%s — Attendance %s to %s', $workspace->getName(), $from, $to));
-        $sheet->mergeCells('A1:J1');
+        $sheet->mergeCells("A1:{$lastCol}1");
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13);
         $sheet->setCellValue('A2', sprintf('Timezone: %s · Generated %s', $this->timezone($workspace), DateService::now()->format('Y-m-d H:i')));
-        $sheet->mergeCells('A2:J2');
+        $sheet->mergeCells("A2:{$lastCol}2");
         $sheet->getStyle('A2')->getFont()->setItalic(true)->getColor()->setARGB('FF6B6463');
+
+        // Header row (row 3): Employee + day labels
+        $headerRow = 3;
+        $sheet->setCellValue("A{$headerRow}", 'Employee');
+        foreach ($columns as $i => $col) {
+            $cell = Coordinate::stringFromColumnIndex($i + 2) . $headerRow;
+            $sheet->setCellValue($cell, $col['weekday'] . "\n" . $col['day']);
+        }
+        $headerStyle = $sheet->getStyle("A{$headerRow}:{$lastCol}{$headerRow}");
+        $headerStyle->getFont()->setBold(true)->setSize(9);
+        $headerStyle->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFEFEAE3');
+        $headerStyle->getBorders()->getBottom()->setBorderStyle(Border::BORDER_MEDIUM)->getColor()->setARGB('FF6B4226');
+        $headerStyle->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setWrapText(true);
+
+        // Data rows
+        $rowIdx = $headerRow + 1;
+        foreach ($rows as $row) {
+            $sheet->setCellValue("A{$rowIdx}", $row['name']);
+            foreach ($row['cells'] as $i => $cell) {
+                $coord = Coordinate::stringFromColumnIndex($i + 2) . $rowIdx;
+                if ($cell === null) {
+                    continue;
+                }
+                $text = $cell['time'] !== null ? $cell['code'] . "\n" . $cell['time'] : $cell['code'];
+                $sheet->setCellValue($coord, $text);
+                $tint = self::STATUS_STYLE[$cell['status']]['tint'] ?? null;
+                if ($tint !== null) {
+                    $sheet->getStyle($coord)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB($tint);
+                }
+            }
+            $rowIdx++;
+        }
+        $lastRow = $rowIdx - 1;
+
+        // Sizing & alignment
+        $sheet->getColumnDimension('A')->setWidth(24);
+        for ($i = 2; $i <= $colCount; $i++) {
+            $sheet->getColumnDimension(Coordinate::stringFromColumnIndex($i))->setWidth(7);
+        }
+        if ($lastRow >= $headerRow + 1) {
+            $dataRange = 'B' . ($headerRow + 1) . ":{$lastCol}{$lastRow}";
+            $sheet->getStyle($dataRange)->getAlignment()
+                ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+                ->setVertical(Alignment::VERTICAL_CENTER)
+                ->setWrapText(true);
+            $sheet->getStyle($dataRange)->getFont()->setSize(9);
+        }
+
+        // Freeze the employee column + the title/header band so it stays put
+        // while scrolling a wide month.
+        $sheet->freezePane('B' . ($headerRow + 1));
 
         $writer = new Xlsx($spreadsheet);
         $stream = fopen('php://temp', 'r+');
@@ -93,18 +127,19 @@ class AttendanceExportService
     }
 
     /**
-     * @param list<array<string, mixed>> $rows raw output from AttendanceRowBuilder::build()
+     * @param list<array<string, mixed>> $grid AttendanceSummaryBuilder::build() output
      */
-    public function toPdf(array $rows, Workspace $workspace, string $from, string $to): string
+    public function toPdf(array $grid, Workspace $workspace, string $from, string $to): string
     {
-        $decorated = $this->decorate($rows);
+        ['columns' => $columns, 'rows' => $rows] = $this->buildMatrix($grid, $from, $to);
 
         $html = $this->twig->render('exports/attendance.html.twig', [
             'workspaceName' => $workspace->getName(),
             'from' => $from,
             'to' => $to,
             'timezone' => $this->timezone($workspace),
-            'rows' => $decorated,
+            'columns' => $columns,
+            'rows' => $rows,
             'generatedAt' => DateService::now()->format('Y-m-d H:i'),
         ]);
 
@@ -121,49 +156,77 @@ class AttendanceExportService
     }
 
     /**
-     * Adds presentation fields (status label, hours worked) and sorts rows
-     * chronologically — exports read more naturally oldest-first.
+     * Pivots the per-employee grid into a calendar matrix: one column per day in
+     * [from, to], one row per employee, each cell resolved to a code/time/status
+     * (or null when the employee wasn't employed that day).
      *
-     * @param list<array<string, mixed>> $rows
+     * @param list<array<string, mixed>> $grid
      *
-     * @return list<array<string, mixed>>
+     * @return array{columns: list<array{date: string, day: string, weekday: string}>, rows: list<array{name: string, cells: list<array{code: string, time: string|null, status: string}|null>}>}
      */
-    private function decorate(array $rows): array
+    private function buildMatrix(array $grid, string $from, string $to): array
     {
-        $decorated = [];
-        foreach ($rows as $row) {
-            // Voided rows are soft-deleted — exports drop them so payroll math
-            // matches the dashboard. The in-app list still shows them with a
-            // "Voided" badge for the audit trail.
-            if (($row['status'] ?? null) === 'voided') {
-                continue;
-            }
-            $row['statusLabel'] = self::STATUS_LABELS[$row['status']] ?? ucfirst((string) $row['status']);
-            $row['hoursWorked'] = $this->hoursWorked($row['checkInAt'] ?? null, $row['checkOutAt'] ?? null);
-            $decorated[] = $row;
+        $columns = [];
+        $cursor = \DateTime::createFromInterface(DateService::parse($from));
+        $end = \DateTime::createFromInterface(DateService::parse($to));
+        while ($cursor <= $end) {
+            $columns[] = [
+                'date' => $cursor->format('Y-m-d'),
+                'day' => $cursor->format('j'),
+                'weekday' => $cursor->format('D'),
+            ];
+            $cursor->modify('+1 day');
         }
 
-        usort($decorated, static function (array $a, array $b): int {
-            $dateCmp = $a['date'] <=> $b['date'];
-            return $dateCmp !== 0 ? $dateCmp : $a['employeeName'] <=> $b['employeeName'];
-        });
+        $rows = [];
+        foreach ($grid as $emp) {
+            $shiftName = $emp['shiftName'] ?? null;
+            $byDate = [];
+            foreach ($emp['days'] as $day) {
+                $byDate[$day['date']] = $day;
+            }
 
-        return $decorated;
+            $cells = [];
+            foreach ($columns as $col) {
+                $day = $byDate[$col['date']] ?? null;
+                $cells[] = $day === null ? null : $this->cell($day, $shiftName);
+            }
+
+            $rows[] = ['name' => $emp['employeeName'], 'cells' => $cells];
+        }
+
+        return ['columns' => $columns, 'rows' => $rows];
     }
 
-    private function hoursWorked(?string $checkIn, ?string $checkOut): ?string
+    /**
+     * Resolves one grid day into a display cell: short code, optional check-in
+     * time, and a style key (drives the cell tint). Mirrors the on-screen gantt
+     * glyphs — an absent day with no shift reads as "not tracked" rather than a
+     * red "Abs".
+     *
+     * @param array<string, mixed> $day
+     *
+     * @return array{code: string, time: string|null, status: string}
+     */
+    private function cell(array $day, ?string $shiftName): array
     {
-        if ($checkIn === null || $checkOut === null) {
-            return null;
-        }
-        $in = DateService::createFromFormat('H:i', $checkIn);
-        $out = DateService::createFromFormat('H:i', $checkOut);
-        $minutes = (int) (($out->getTimestamp() - $in->getTimestamp()) / 60);
-        if ($minutes < 0) {
-            // Shift crossed midnight — add 24h.
-            $minutes += 24 * 60;
-        }
-        return sprintf('%d:%02d', intdiv($minutes, 60), $minutes % 60);
+        $status = $day['status'] ?? 'absent';
+
+        return match ($status) {
+            'present' => [
+                'code' => !empty($day['isLate']) ? 'Lt' : (!empty($day['leftEarly']) ? 'LfE' : 'Pre'),
+                'time' => $day['checkInAt'] ?? null,
+                'status' => (!empty($day['isLate']) || !empty($day['leftEarly'])) ? 'flag' : 'present',
+            ],
+            'absent' => $shiftName !== null
+                ? ['code' => 'Abs', 'time' => null, 'status' => 'absent']
+                : ['code' => '—', 'time' => null, 'status' => 'untracked'],
+            'leave' => ['code' => 'Lv', 'time' => null, 'status' => 'leave'],
+            'off' => ['code' => 'Off', 'time' => null, 'status' => 'off'],
+            'closure' => ['code' => 'C', 'time' => null, 'status' => 'closure'],
+            'voided' => ['code' => 'Vd', 'time' => $day['checkInAt'] ?? null, 'status' => 'voided'],
+            default => ['code' => '', 'time' => null, 'status' => 'upcoming'],
+        };
     }
 
     private function timezone(Workspace $workspace): string

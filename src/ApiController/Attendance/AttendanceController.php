@@ -6,17 +6,15 @@ use App\ApiController\Trait\ApiResponseTrait;
 use App\DTO\AttendanceDTO;
 use App\Entity\Employee;
 use App\Entity\User;
-use App\Enum\DayOfWeekEnum;
 use App\Enum\ManagerPermissionEnum;
 use App\Exception\AttendanceAlreadyExistsException;
 use App\Repository\AttendanceRepository;
-use App\Repository\ClosurePeriodRepository;
 use App\Repository\EmployeeRepository;
-use App\Repository\LeaveRequestRepository;
 use App\Repository\WorkspaceRepository;
 use App\Security\Voter\WorkspaceVoter;
 use App\Service\Attendance\AttendanceExportService;
 use App\Service\Attendance\AttendanceRowBuilder;
+use App\Service\Attendance\AttendanceSummaryBuilder;
 use App\Service\AttendanceService;
 use App\Service\DateService;
 use App\Service\PlanService;
@@ -96,21 +94,21 @@ class AttendanceController extends AbstractController
         #[CurrentUser] User $user,
         WorkspaceRepository $workspaceRepository,
         EmployeeRepository $employeeRepository,
-        AttendanceRowBuilder $rowBuilder,
+        AttendanceSummaryBuilder $summaryBuilder,
         AttendanceExportService $exportService,
         PlanService $planService,
     ): Response {
-        [$workspace, $rows, $from, $to] = $this->resolveExport(
+        [$workspace, $grid, $from, $to] = $this->resolveExport(
             $workspacePublicId,
             $request,
             $user,
             $workspaceRepository,
             $employeeRepository,
-            $rowBuilder,
+            $summaryBuilder,
             $planService,
         );
 
-        $contents = $exportService->toXlsx($rows, $workspace, $from, $to);
+        $contents = $exportService->toXlsx($grid, $workspace, $from, $to);
 
         return $this->binaryResponse(
             $contents,
@@ -130,21 +128,21 @@ class AttendanceController extends AbstractController
         #[CurrentUser] User $user,
         WorkspaceRepository $workspaceRepository,
         EmployeeRepository $employeeRepository,
-        AttendanceRowBuilder $rowBuilder,
+        AttendanceSummaryBuilder $summaryBuilder,
         AttendanceExportService $exportService,
         PlanService $planService,
     ): Response {
-        [$workspace, $rows, $from, $to] = $this->resolveExport(
+        [$workspace, $grid, $from, $to] = $this->resolveExport(
             $workspacePublicId,
             $request,
             $user,
             $workspaceRepository,
             $employeeRepository,
-            $rowBuilder,
+            $summaryBuilder,
             $planService,
         );
 
-        $contents = $exportService->toPdf($rows, $workspace, $from, $to);
+        $contents = $exportService->toPdf($grid, $workspace, $from, $to);
 
         return $this->binaryResponse(
             $contents,
@@ -155,8 +153,10 @@ class AttendanceController extends AbstractController
 
     /**
      * Shared resolution for both export endpoints: validates workspace,
-     * permissions, plan gate, and produces the row list for the requested
-     * range (plus optional employeePublicId narrowing).
+     * permissions, plan gate, and produces the per-employee/per-day grid for
+     * the requested range (plus optional employeePublicId narrowing). The grid
+     * is the same shape the summary endpoint returns, so the export mirrors the
+     * on-screen Monthly view exactly.
      *
      * @return array{0: \App\Entity\Workspace, 1: list<array<string, mixed>>, 2: string, 3: string}
      */
@@ -166,7 +166,7 @@ class AttendanceController extends AbstractController
         User $user,
         WorkspaceRepository $workspaceRepository,
         EmployeeRepository $employeeRepository,
-        AttendanceRowBuilder $rowBuilder,
+        AttendanceSummaryBuilder $summaryBuilder,
         PlanService $planService,
     ): array {
         $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
@@ -209,17 +209,9 @@ class AttendanceController extends AbstractController
             ));
         }
 
-        $rows = $rowBuilder->build($workspace, $employees, $fromDate, $toDate);
-        // Mirror list(): an employee exporting their own log shouldn't see
-        // voided tombstones — those are manager forensic data.
-        if (!$canSeeAll) {
-            $rows = array_values(array_filter(
-                $rows,
-                static fn (array $r): bool => ($r['status'] ?? null) !== 'voided',
-            ));
-        }
+        $grid = $summaryBuilder->build($workspace, $fromDate, $toDate, $employees);
 
-        return [$workspace, $rows, $from, $to];
+        return [$workspace, $grid, $from, $to];
     }
 
     private function binaryResponse(string $body, string $mime, string $filename): Response
@@ -253,11 +245,8 @@ class AttendanceController extends AbstractController
         Request $request,
         #[CurrentUser] User $user,
         WorkspaceRepository $workspaceRepository,
-        AttendanceRepository $attendanceRepository,
         EmployeeRepository $employeeRepository,
-        LeaveRequestRepository $leaveRequestRepository,
-        ClosurePeriodRepository $closurePeriodRepository,
-        PlanService $planService,
+        AttendanceSummaryBuilder $summaryBuilder,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
         if ($workspace === null) {
@@ -270,8 +259,8 @@ class AttendanceController extends AbstractController
         $from = $request->query->get('from', DateService::today($wsTz)->format('Y-m-d'));
         $to = $request->query->get('to', $from);
 
-        $fromDate = DateService::mutableParse($from);
-        $toDate = DateService::mutableParse($to);
+        $fromDate = DateService::parse($from);
+        $toDate = DateService::parse($to);
 
         // Determine which employees to include
         $isOwner = $workspace->getOwner()?->getId() === $user->getId();
@@ -284,179 +273,10 @@ class AttendanceController extends AbstractController
         } else {
             // See note in list(): include deactivated employees whose active
             // window overlaps the queried range so history is preserved.
-            $employees = $employeeRepository->findActiveDuringRangeByWorkspace(
-                $workspace,
-                \DateTimeImmutable::createFromMutable($fromDate),
-            );
+            $employees = $employeeRepository->findActiveDuringRangeByWorkspace($workspace, $fromDate);
         }
 
-        if (empty($employees)) {
-            return $this->jsonSuccess([]);
-        }
-
-        // Index attendance records by (employeeId, date)
-        $attendances = $attendanceRepository->findByWorkspaceAndDateRange($workspace, $fromDate, $toDate);
-        $attendanceMap = [];
-        foreach ($attendances as $a) {
-            $key = $a->getEmployee()->getId() . '_' . $a->getDate()->format('Y-m-d');
-            $attendanceMap[$key] = $a;
-        }
-
-        // Collect closure dates in range
-        $closureDates = [];
-        $closures = $closurePeriodRepository->findByWorkspace($workspace);
-        foreach ($closures as $closure) {
-            $cStart = max($fromDate->getTimestamp(), $closure->getStartDate()->getTimestamp());
-            $cEnd = min($toDate->getTimestamp(), $closure->getEndDate()->getTimestamp());
-            $current = new \DateTime('@' . $cStart);
-            $end = new \DateTime('@' . $cEnd);
-            while ($current <= $end) {
-                $closureDates[$current->format('Y-m-d')] = true;
-                $current->modify('+1 day');
-            }
-        }
-
-        // Collect approved leaves indexed by (employeeId, date)
-        $leaveMap = [];
-        foreach ($employees as $emp) {
-            $leaves = $leaveRequestRepository->findApprovedInRange($emp, $fromDate, $toDate);
-            foreach ($leaves as $leave) {
-                $lStart = max($fromDate->getTimestamp(), $leave->getStartDate()->getTimestamp());
-                $lEnd = min($toDate->getTimestamp(), $leave->getEndDate()->getTimestamp());
-                $current = new \DateTime('@' . $lStart);
-                $end = new \DateTime('@' . $lEnd);
-                while ($current <= $end) {
-                    $leaveMap[$emp->getId() . '_' . $current->format('Y-m-d')] = $leave;
-                    $current->modify('+1 day');
-                }
-            }
-        }
-
-        $formatTime = static function (?\DateTimeInterface $dt) use ($wsTz): ?string {
-            if ($dt === null) return null;
-            return \DateTimeImmutable::createFromInterface($dt)->setTimezone($wsTz)->format('H:i');
-        };
-
-        $wsTodayStr = DateService::today($wsTz)->format('Y-m-d');
-        $perDayRulesActive = $planService->canUseShiftTimeRules($workspace);
-
-        $result = [];
-        foreach ($employees as $emp) {
-            $leftAtStr = $emp->getLeftAt()?->format('Y-m-d');
-            $linkedAtStr = $emp->getLinkedAt()?->format('Y-m-d');
-            $shift = $emp->getShift();
-            $days = [];
-            $period = new \DatePeriod($fromDate, new \DateInterval('P1D'), (clone $toDate)->modify('+1 day'));
-            foreach ($period as $day) {
-                $dateStr = $day->format('Y-m-d');
-                $key = $emp->getId() . '_' . $dateStr;
-
-                // Past employee's last working day — omit so they don't show
-                // absent/upcoming for dates they weren't employed.
-                if ($leftAtStr !== null && $dateStr > $leftAtStr) {
-                    continue;
-                }
-
-                // Before the employee was linked — omit for the same reason: a
-                // mid-month linked employee shouldn't show absent rows for the
-                // days before they had an account that could check in.
-                if ($linkedAtStr === null || $dateStr < $linkedAtStr) {
-                    continue;
-                }
-
-                // Off-day: this employee's per-day-ruled shift skips this
-                // weekday. Surface it as 'off' on the gantt instead of 'absent'
-                // so a Mon-Fri GM doesn't look like a no-show every Saturday.
-                // A real check-in below still overrides this to 'present'.
-                $dayOfWeek = DayOfWeekEnum::tryFrom((int) $day->format('N'));
-                $isOffDay = $perDayRulesActive
-                    && $shift !== null
-                    && $shift->hasAnyTimeRules()
-                    && $dayOfWeek !== null
-                    && !$shift->isScheduledOn($dayOfWeek);
-
-                if (isset($closureDates[$dateStr])) {
-                    $days[] = ['date' => $dateStr, 'status' => 'closure'];
-                    continue;
-                }
-
-                if (isset($leaveMap[$key])) {
-                    $leave = $leaveMap[$key];
-                    $days[] = [
-                        'date' => $dateStr,
-                        'status' => 'leave',
-                        'leaveType' => $leave->getType()->value,
-                    ];
-                    continue;
-                }
-
-                if (isset($attendanceMap[$key])) {
-                    $a = $attendanceMap[$key];
-                    if ($a->getCheckInAt() !== null && !$a->isVoided()) {
-                        $days[] = [
-                            'date' => $dateStr,
-                            'status' => 'present',
-                            'attendancePublicId' => (string) $a->getPublicId(),
-                            'checkInAt' => $formatTime($a->getCheckInAt()),
-                            'checkOutAt' => $formatTime($a->getCheckOutAt()),
-                            'isLate' => $a->isLate(),
-                            'leftEarly' => $a->hasLeftEarly(),
-                            'editedAt' => $a->getEditedAt()?->format(\DateTimeInterface::ATOM),
-                            'editedByEmail' => $a->getEditedByEmail(),
-                            'editReason' => $a->getEditReason(),
-                            'originalCheckInAt' => $formatTime($a->getOriginalCheckInAt()),
-                            'originalCheckOutAt' => $formatTime($a->getOriginalCheckOutAt()),
-                        ];
-                        continue;
-                    }
-
-                    // A voided row is a tombstone — a manager soft-deleted the
-                    // scan. Surface it as its own 'voided' status (neutral, not
-                    // counted as present/absent — matching dashboard stats which
-                    // drop voided rows) so the Monthly grid can show & filter it.
-                    if ($a->isVoided()) {
-                        $days[] = [
-                            'date' => $dateStr,
-                            'status' => 'voided',
-                            'attendancePublicId' => (string) $a->getPublicId(),
-                            'checkInAt' => $formatTime($a->getOriginalCheckInAt() ?? $a->getCheckInAt()),
-                            'checkOutAt' => $formatTime($a->getOriginalCheckOutAt() ?? $a->getCheckOutAt()),
-                            'voidedByEmail' => $a->getVoidedByEmail(),
-                            'voidReason' => $a->getVoidReason(),
-                        ];
-                        continue;
-                    }
-                }
-
-                if ($isOffDay) {
-                    $days[] = ['date' => $dateStr, 'status' => 'off'];
-                    continue;
-                }
-
-                // Future dates are not yet absent
-                if ($dateStr > $wsTodayStr) {
-                    $days[] = ['date' => $dateStr, 'status' => 'upcoming'];
-                } else {
-                    $days[] = ['date' => $dateStr, 'status' => 'absent'];
-                }
-            }
-
-            // Omit employees with no days in range (never-linked, or linked
-            // after the range / left before it) so the gantt isn't padded with
-            // empty rows.
-            if (empty($days)) {
-                continue;
-            }
-
-            $result[] = [
-                'employeePublicId' => (string) $emp->getPublicId(),
-                'employeeName' => $emp->getName(),
-                'shiftName' => $emp->getShift()?->getName(),
-                'days' => $days,
-            ];
-        }
-
-        return $this->jsonSuccess($result);
+        return $this->jsonSuccess($summaryBuilder->build($workspace, $fromDate, $toDate, $employees));
     }
 
     /**
