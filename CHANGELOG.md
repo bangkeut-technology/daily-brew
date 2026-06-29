@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.119.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.118.0...v1.119.0) (2026-06-29)
+
+
+### Features
+
+* **attendance:** per-employee totals + check-out times in grid export ([#343](https://github.com/bangkeut-technology/daily-brew/issues/343)) ([d85ee6b](https://github.com/bangkeut-technology/daily-brew/commit/d85ee6b5ee139d0b6089e2087753fb0f3c33fa62))
+
 ## [1.118.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.117.0...v1.118.0) (2026-06-29)
 
 
