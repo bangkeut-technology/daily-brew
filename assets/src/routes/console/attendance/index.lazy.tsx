@@ -127,11 +127,11 @@ function ganttCell(day: AttendanceDayStatus, hasShift: boolean): GanttCellSpec {
       if (day.isLate)
         return { kind: 'badge', code: 'Lt', bg: 'bg-amber/15', text: 'text-amber', title: `Late \u2014 ${day.checkInAt || ''}` };
       if (day.leftEarly)
-        return { kind: 'badge', code: 'E', bg: 'bg-amber/15', text: 'text-amber', title: `Left early \u2014 ${day.checkOutAt || ''}` };
-      return { kind: 'dot-filled', title: `Present \u2014 ${day.checkInAt || ''}${day.checkOutAt ? ` \u2192 ${day.checkOutAt}` : ''}` };
+        return { kind: 'badge', code: 'LfE', bg: 'bg-amber/15', text: 'text-amber', title: `Left early \u2014 ${day.checkOutAt || ''}` };
+      return { kind: 'badge', code: 'Pre', bg: 'bg-green/12', text: 'text-green', title: `Present \u2014 ${day.checkInAt || ''}${day.checkOutAt ? ` \u2192 ${day.checkOutAt}` : ''}` };
     case 'absent':
       return hasShift
-        ? { kind: 'dot-open', title: 'Absent' }
+        ? { kind: 'badge', code: 'Abs', bg: 'bg-red/12', text: 'text-red', title: 'Absent' }
         : { kind: 'dot-muted', title: 'Not tracked' };
     case 'leave':
       return { kind: 'badge', code: 'Lv', bg: 'bg-[#3B6FA0]/12', text: 'text-blue', title: day.leaveType === 'paid' ? 'Paid leave' : 'Unpaid leave' };
@@ -140,9 +140,9 @@ function ganttCell(day: AttendanceDayStatus, hasShift: boolean): GanttCellSpec {
     case 'upcoming':
       return { kind: 'dot-muted', title: 'Upcoming' };
     case 'off':
-      return { kind: 'dot-muted', title: 'Off day' };
+      return { kind: 'badge', code: 'Off', bg: 'bg-[#AE9D95]/10', text: 'text-text-tertiary', title: 'Off day' };
     case 'voided':
-      return { kind: 'badge', code: 'V', bg: 'bg-[#AE9D95]/10', text: 'text-text-tertiary', title: `Voided${day.voidedByEmail ? ` — removed by ${day.voidedByEmail}` : ''}` };
+      return { kind: 'badge', code: 'Vd', bg: 'bg-[#AE9D95]/10', text: 'text-text-tertiary', title: `Voided${day.voidedByEmail ? ` — removed by ${day.voidedByEmail}` : ''}` };
   }
 }
 
@@ -452,19 +452,14 @@ function AttendancePage() {
       {/* ── Legend (shown for gantt and summary) ── */}
       {view !== 'log' && (
         <div className="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-[12px] font-medium text-text-secondary">
-          <span className="flex items-center gap-1.5">
-            <span className="inline-block w-[10px] h-[10px] rounded-full bg-green" />
-            {t('attendance.present', 'Present')}
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="inline-block w-[10px] h-[10px] rounded-full border-[1.5px] border-red/55" />
-            {t('attendance.absent', 'Absent')}
-          </span>
+          <span className="flex items-center gap-1.5"><span className="inline-block w-5 h-5 rounded bg-green/12 text-green text-center leading-5 font-mono text-[11px]">Pre</span> {t('attendance.present', 'Present')}</span>
+          <span className="flex items-center gap-1.5"><span className="inline-block w-5 h-5 rounded bg-red/12 text-red text-center leading-5 font-mono text-[11px]">Abs</span> {t('attendance.absent', 'Absent')}</span>
           <span className="flex items-center gap-1.5"><span className="inline-block w-5 h-5 rounded bg-amber/15 text-amber text-center leading-5 font-mono text-[11px]">Lt</span> {t('attendance.late', 'Late')}</span>
-          <span className="flex items-center gap-1.5"><span className="inline-block w-5 h-5 rounded bg-amber/15 text-amber text-center leading-5 font-mono text-[11px]">E</span> {t('attendance.earlyLeave', 'Early leave')}</span>
+          <span className="flex items-center gap-1.5"><span className="inline-block w-5 h-5 rounded bg-amber/15 text-amber text-center leading-5 font-mono text-[11px]">LfE</span> {t('attendance.earlyLeave', 'Left early')}</span>
           <span className="flex items-center gap-1.5"><span className="inline-block w-5 h-5 rounded bg-[#3B6FA0]/12 text-blue text-center leading-5 font-mono text-[11px]">Lv</span> {t('attendance.leave', 'Leave')}</span>
+          <span className="flex items-center gap-1.5"><span className="inline-block w-5 h-5 rounded bg-[#AE9D95]/10 text-text-tertiary text-center leading-5 font-mono text-[11px]">Off</span> {t('attendance.off', 'Off day')}</span>
           <span className="flex items-center gap-1.5"><span className="inline-block w-5 h-5 rounded bg-[#AE9D95]/10 text-text-tertiary text-center leading-5 font-mono text-[11px]">C</span> {t('attendance.closed', 'Closed')}</span>
-          <span className="flex items-center gap-1.5"><span className="inline-block w-5 h-5 rounded bg-[#AE9D95]/10 text-text-tertiary text-center leading-5 font-mono text-[11px]">V</span> {t('attendance.voided', 'Voided')}</span>
+          <span className="flex items-center gap-1.5"><span className="inline-block w-5 h-5 rounded bg-[#AE9D95]/10 text-text-tertiary text-center leading-5 font-mono text-[11px]">Vd</span> {t('attendance.voided', 'Voided')}</span>
           <span className="flex items-center gap-1.5 text-text-tertiary/70">
             <span className="inline-flex items-center justify-center w-5 h-5 text-text-tertiary/45 font-mono">–</span>
             {t('attendance.notTracked', 'Not tracked')}
