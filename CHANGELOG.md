@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.117.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.116.0...v1.117.0) (2026-06-29)
+
+
+### Features
+
+* **attendance:** abbreviation codes for every status in monthly gantt ([#335](https://github.com/bangkeut-technology/daily-brew/issues/335)) ([04d8ccf](https://github.com/bangkeut-technology/daily-brew/commit/04d8ccf8c5190a04a8d40f350a568ff7c57662a8))
+
+
+### Bug Fixes
+
+* **shifts:** time picker dropdown clipped by card overflow ([#334](https://github.com/bangkeut-technology/daily-brew/issues/334)) ([31b7c23](https://github.com/bangkeut-technology/daily-brew/commit/31b7c23e16eb6ae7c607730751b5b88d3a382af2))
+* **support:** console feedback widget submits via backend, not browser ([#336](https://github.com/bangkeut-technology/daily-brew/issues/336)) ([30796a1](https://github.com/bangkeut-technology/daily-brew/commit/30796a1a54d5962d595c1a0649b34011674ac685))
+
 ## [1.116.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.115.1...v1.116.0) (2026-06-24)
 
 
