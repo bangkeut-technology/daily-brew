@@ -16,6 +16,7 @@ class FeedbackController extends AbstractController
     use ApiResponseTrait;
 
     private const array ALLOWED_TYPES = ['bug', 'feature', 'question', 'general'];
+    private const array ALLOWED_SOURCES = ['website', 'console'];
     private const int MAX_IMAGES = 3;
     private const string ALLOWED_IMAGE_PATTERN = '/^data:image\/(png|jpeg|webp|gif);base64,/';
 
@@ -35,6 +36,9 @@ class FeedbackController extends AbstractController
         $message = trim($data['message'] ?? '');
         $email = trim($data['email'] ?? '');
         $subject = trim($data['subject'] ?? '');
+        $source = in_array($data['source'] ?? null, self::ALLOWED_SOURCES, true)
+            ? $data['source']
+            : 'website';
 
         if (!in_array($type, self::ALLOWED_TYPES, true)) {
             return $this->jsonError('Invalid type. Must be one of: ' . implode(', ', self::ALLOWED_TYPES));
@@ -67,7 +71,7 @@ class FeedbackController extends AbstractController
             email: $email ?: null,
             name: $name ?: null,
             subject: $subject ?: null,
-            source: 'website',
+            source: $source,
             metadata: [
                 'page' => $data['page'] ?? '/support',
                 'platform' => $request->headers->get('User-Agent', 'unknown'),
