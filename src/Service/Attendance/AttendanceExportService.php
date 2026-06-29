@@ -54,7 +54,10 @@ class AttendanceExportService
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Attendance');
 
-        $colCount = 1 + count($columns); // employee column + one per day
+        $dayCount = count($columns);
+        $totalHeaders = ['Present', 'Scheduled', 'Absent', 'Late', 'Leave'];
+        $firstTotalCol = 2 + $dayCount; // 1-based index of the first totals column
+        $colCount = 1 + $dayCount + count($totalHeaders); // employee + days + totals
         $lastCol = Coordinate::stringFromColumnIndex($colCount);
 
         // Title bar (rows 1-2)
@@ -71,6 +74,10 @@ class AttendanceExportService
         foreach ($columns as $i => $col) {
             $cell = Coordinate::stringFromColumnIndex($i + 2) . $headerRow;
             $sheet->setCellValue($cell, $col['weekday'] . "\n" . $col['day']);
+        }
+        foreach ($totalHeaders as $j => $label) {
+            $cell = Coordinate::stringFromColumnIndex($firstTotalCol + $j) . $headerRow;
+            $sheet->setCellValue($cell, $label);
         }
         $headerStyle = $sheet->getStyle("A{$headerRow}:{$lastCol}{$headerRow}");
         $headerStyle->getFont()->setBold(true)->setSize(9);
@@ -94,14 +101,24 @@ class AttendanceExportService
                     $sheet->getStyle($coord)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB($tint);
                 }
             }
+
+            $totals = $row['totals'];
+            $totalValues = [$totals['present'], $totals['scheduled'], $totals['absent'], $totals['late'], $totals['leave']];
+            foreach ($totalValues as $j => $value) {
+                $sheet->setCellValue(Coordinate::stringFromColumnIndex($firstTotalCol + $j) . $rowIdx, $value);
+            }
             $rowIdx++;
         }
         $lastRow = $rowIdx - 1;
 
         // Sizing & alignment
         $sheet->getColumnDimension('A')->setWidth(24);
-        for ($i = 2; $i <= $colCount; $i++) {
-            $sheet->getColumnDimension(Coordinate::stringFromColumnIndex($i))->setWidth(7);
+        for ($i = 2; $i < $firstTotalCol; $i++) {
+            // Wider than the codes alone so "09:00–17:30" fits on the time line.
+            $sheet->getColumnDimension(Coordinate::stringFromColumnIndex($i))->setWidth(11);
+        }
+        for ($i = $firstTotalCol; $i <= $colCount; $i++) {
+            $sheet->getColumnDimension(Coordinate::stringFromColumnIndex($i))->setWidth(10);
         }
         if ($lastRow >= $headerRow + 1) {
             $dataRange = 'B' . ($headerRow + 1) . ":{$lastCol}{$lastRow}";
@@ -110,6 +127,10 @@ class AttendanceExportService
                 ->setVertical(Alignment::VERTICAL_CENTER)
                 ->setWrapText(true);
             $sheet->getStyle($dataRange)->getFont()->setSize(9);
+
+            // Emphasise the totals block.
+            $totalsRange = Coordinate::stringFromColumnIndex($firstTotalCol) . ($headerRow + 1) . ":{$lastCol}{$lastRow}";
+            $sheet->getStyle($totalsRange)->getFont()->setBold(true);
         }
 
         // Freeze the employee column + the title/header band so it stays put
@@ -162,7 +183,7 @@ class AttendanceExportService
      *
      * @param list<array<string, mixed>> $grid
      *
-     * @return array{columns: list<array{date: string, day: string, weekday: string}>, rows: list<array{name: string, cells: list<array{code: string, time: string|null, status: string}|null>}>}
+     * @return array{columns: list<array{date: string, day: string, weekday: string}>, rows: list<array{name: string, cells: list<array{code: string, time: string|null, status: string}|null>, totals: array{present: int, scheduled: int, absent: int, late: int, leave: int}}>}
      */
     private function buildMatrix(array $grid, string $from, string $to): array
     {
@@ -192,10 +213,46 @@ class AttendanceExportService
                 $cells[] = $day === null ? null : $this->cell($day, $shiftName);
             }
 
-            $rows[] = ['name' => $emp['employeeName'], 'cells' => $cells];
+            $rows[] = [
+                'name' => $emp['employeeName'],
+                'cells' => $cells,
+                'totals' => $this->totals($emp['days']),
+            ];
         }
 
         return ['columns' => $columns, 'rows' => $rows];
+    }
+
+    /**
+     * Per-employee tallies that mirror the on-screen Monthly view's row summary
+     * (present/scheduled · absent · late · leave). "Scheduled" is every day that
+     * counts toward the ratio — i.e. excludes future and closure days.
+     *
+     * @param list<array<string, mixed>> $days
+     *
+     * @return array{present: int, scheduled: int, absent: int, late: int, leave: int}
+     */
+    private function totals(array $days): array
+    {
+        $totals = ['present' => 0, 'scheduled' => 0, 'absent' => 0, 'late' => 0, 'leave' => 0];
+        foreach ($days as $day) {
+            $status = $day['status'] ?? null;
+            if ($status !== 'closure' && $status !== 'upcoming') {
+                $totals['scheduled']++;
+            }
+            if ($status === 'present') {
+                $totals['present']++;
+                if (!empty($day['isLate'])) {
+                    $totals['late']++;
+                }
+            } elseif ($status === 'absent') {
+                $totals['absent']++;
+            } elseif ($status === 'leave') {
+                $totals['leave']++;
+            }
+        }
+
+        return $totals;
     }
 
     /**
@@ -215,7 +272,7 @@ class AttendanceExportService
         return match ($status) {
             'present' => [
                 'code' => !empty($day['isLate']) ? 'Lt' : (!empty($day['leftEarly']) ? 'LfE' : 'Pre'),
-                'time' => $day['checkInAt'] ?? null,
+                'time' => $this->timeRange($day['checkInAt'] ?? null, $day['checkOutAt'] ?? null),
                 'status' => (!empty($day['isLate']) || !empty($day['leftEarly'])) ? 'flag' : 'present',
             ],
             'absent' => $shiftName !== null
@@ -224,9 +281,22 @@ class AttendanceExportService
             'leave' => ['code' => 'Lv', 'time' => null, 'status' => 'leave'],
             'off' => ['code' => 'Off', 'time' => null, 'status' => 'off'],
             'closure' => ['code' => 'C', 'time' => null, 'status' => 'closure'],
-            'voided' => ['code' => 'Vd', 'time' => $day['checkInAt'] ?? null, 'status' => 'voided'],
+            'voided' => ['code' => 'Vd', 'time' => $this->timeRange($day['checkInAt'] ?? null, $day['checkOutAt'] ?? null), 'status' => 'voided'],
             default => ['code' => '', 'time' => null, 'status' => 'upcoming'],
         };
+    }
+
+    /**
+     * Formats a check-in/check-out pair for a cell: "09:00–17:30", or just
+     * "09:00" when there's no check-out yet (forgotten / still on shift).
+     */
+    private function timeRange(?string $checkIn, ?string $checkOut): ?string
+    {
+        if ($checkIn === null) {
+            return null;
+        }
+
+        return $checkOut !== null ? $checkIn . '–' . $checkOut : $checkIn;
     }
 
     private function timezone(Workspace $workspace): string
