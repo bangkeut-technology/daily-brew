@@ -128,7 +128,10 @@
     "date": "Date",
     "late": "En retard",
     "leftEarly": "Parti tôt",
-    "onTime": "À l'heure"
+    "onTime": "À l'heure",
+    "off": "Jour de repos",
+    "closed": "Fermé",
+    "notTracked": "Non suivi"
   },
   "auth": {
     "signIn": "Connexion",
