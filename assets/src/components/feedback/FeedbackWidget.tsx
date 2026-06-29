@@ -13,20 +13,24 @@ import {
   X,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useSupportDock } from '@bangkeut-technology/supportdock-sdk';
-import type { FeedbackType } from '@bangkeut-technology/supportdock-sdk';
 import { useAuthenticationState } from '@/hooks/use-authentication';
+import { axios } from '@/lib/apiAxios';
 import { cn } from '@/lib/utils';
 
 /**
- * In-console feedback launcher backed by the SupportDock JS SDK.
+ * In-console feedback launcher.
  *
- * Unlike the public `/support` page (which proxies through our PHP backend),
- * this widget talks to SupportDock directly from the browser using a key the
- * server injects at request time (`window.__DAILYBREW__.supportdockApiKey`, set
- * by SpaController → base.html.twig). The widget renders nothing when no key is
- * configured, so environments without a key simply don't show it.
+ * Submits through our own PHP backend (`POST /api/v1/support/feedback`), exactly
+ * like the public `/support` page — a same-origin request that proxies to
+ * SupportDock server-side. It deliberately does NOT call SupportDock directly
+ * from the browser: that cross-origin request is blocked by CORS (SupportDock
+ * sends no `Access-Control-Allow-Origin`), which surfaced as "Failed to fetch".
+ *
+ * The launcher only renders when feedback is configured on the server, signalled
+ * by the presence of `window.__DAILYBREW__.supportdockApiKey`.
  */
+
+type FeedbackType = 'bug' | 'feature' | 'question' | 'general';
 
 const MAX_IMAGES = 3;
 const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
@@ -53,19 +57,18 @@ function fileToDataUrl(file: File): Promise<string> {
 }
 
 /**
- * Outer guard: `useSupportDock` constructs the SupportDock client synchronously
- * on first render and throws when no `apiKey` is configured. Because hooks must
- * run before any early return, the inner widget can't guard against that itself —
- * so we gate mounting it here. Builds without a key (dev/preview/missing secret)
- * simply render nothing instead of crashing the console.
+ * Outer guard: only surface the launcher when feedback is configured on the
+ * server. The SupportDock key injected into `window.__DAILYBREW__` doubles as
+ * that "enabled" flag — the actual submission goes through our PHP backend, not
+ * the browser, so the key itself is never used client-side for the request.
  */
 export function FeedbackWidget() {
-  const apiKey = window.__DAILYBREW__?.supportdockApiKey;
-  if (!apiKey) return null;
-  return <FeedbackWidgetInner apiKey={apiKey} />;
+  const enabled = !!window.__DAILYBREW__?.supportdockApiKey;
+  if (!enabled) return null;
+  return <FeedbackWidgetInner />;
 }
 
-function FeedbackWidgetInner({ apiKey }: { apiKey: string }) {
+function FeedbackWidgetInner() {
   const { t } = useTranslation();
   const auth = useAuthenticationState();
 
@@ -74,12 +77,16 @@ function FeedbackWidgetInner({ apiKey }: { apiKey: string }) {
   const [message, setMessage] = useState('');
   const [images, setImages] = useState<string[]>([]);
   const [localError, setLocalError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { sendFeedback, loading, error, success, reset } = useSupportDock({
-    apiKey,
-    defaultMetadata: { product: 'dailybrew', source: 'console' },
-  });
+  const reset = useCallback(() => {
+    setSuccess(false);
+    setError(null);
+    setLoading(false);
+  }, []);
 
   const user = auth.user;
   const name = useMemo(() => {
@@ -136,19 +143,27 @@ function FeedbackWidgetInner({ apiKey }: { apiKey: string }) {
         return;
       }
       setLocalError(null);
-      await sendFeedback({
-        type,
-        message: message.trim(),
-        email: user?.email,
-        name,
-        images: images.length ? images : undefined,
-        metadata: {
+      setError(null);
+      setLoading(true);
+      try {
+        await axios.post('/support/feedback', {
+          type,
+          name,
+          email: user?.email,
+          subject: '',
+          message: message.trim(),
+          images,
           page: window.location.pathname,
-          platform: navigator.userAgent,
-        },
-      });
+          source: 'console',
+        });
+        setSuccess(true);
+      } catch {
+        setError(t('feedback.errors.sendFailed', 'Could not send feedback. Please try again.'));
+      } finally {
+        setLoading(false);
+      }
     },
-    [message, sendFeedback, type, user?.email, name, images, t],
+    [message, type, user, name, images, t],
   );
 
   return (
