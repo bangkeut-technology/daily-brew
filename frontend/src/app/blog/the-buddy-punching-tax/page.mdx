@@ -1,0 +1,63 @@
+import { JsonLd } from "@/components/JsonLd";
+import { articleSchema } from "@/lib/schema";
+
+export const metadata = {
+  title: "The buddy punching tax: what time theft really costs a small café",
+  description:
+    "Nucleus Research pegs buddy punching at 2.2% of payroll, and 75% of businesses are affected. Here's what that looks like on a 5-person café budget — and why face recognition and GPS aren't the right fix.",
+  alternates: { canonical: "/blog/the-buddy-punching-tax" },
+  openGraph: {
+    type: "article",
+    url: "/blog/the-buddy-punching-tax",
+    title: "The buddy punching tax: what time theft really costs a small café",
+    description:
+      "What 2.2% of payroll looks like on a 5-person café budget — and why face recognition and GPS aren't the right fix.",
+  },
+};
+
+<JsonLd
+  data={articleSchema({
+    title: "The buddy punching tax: what time theft really costs a small café",
+    description:
+      "What 2.2% of payroll looks like on a 5-person café budget — and why face recognition and GPS aren't the right fix.",
+    url: "https://dailybrew.work/blog/the-buddy-punching-tax",
+    datePublished: "2026-05-29",
+  })}
+/>
+
+# The buddy punching tax: what time theft really costs a small café
+
+A 5-person café paying $30,000 a month in wages loses roughly $660 every month to buddy punching. That's not the price of one fancy espresso machine per year — it's two. Over a decade, it pays for the build-out.
+
+The 2.2% number comes from Nucleus Research; the American Payroll Association estimates roughly 75% of businesses are affected. On a small team the _percentage_ is the same as on a 200-person operation, but the _visibility_ is worse: one staff member covering for a chronically late friend over six months is the difference between a tight budget and a bad month.
+
+## What buddy punching actually looks like
+
+It's almost never theft for theft's sake. It's:
+
+- The texted "I clocked you in" from the parking lot
+- The PIN written on the back of the iPad by the register
+- The "we share a phone — Mia logs in for both of us" arrangement
+- The QR code photographed and shared in a group chat
+
+Each one is invisible in a normal time-clock report.
+
+## The two bad fixes
+
+**Face recognition** was designed for 200-person factories. It collects biometric data — triggering laws like Illinois' BIPA, which has produced settlements in the hundreds of millions — staff hate it, and a single bad scan in the morning rush is a 20-minute headache.
+
+**GPS / geofencing** demands always-on location permission and drains batteries. It tells you a phone is _near_ the shop — not _whose_ phone, and not whether it's actually inside.
+
+Neither matches the budget or the ethics of a small café.
+
+## The actual fix: three small layers
+
+1. **The phone is bound to the person.** First clock-in registers the device; later punches from someone else's phone don't count.
+2. **The clock-in is bound to your shop's network.** Off-network punches are flagged or blocked. No GPS, no battery drain.
+3. **The punch is bound to your shop's NFC tag (beta).** A coin-sized sticker by the espresso machine. The tap has to happen there.
+
+To fake a punch you'd need a co-worker's enrolled phone, on your shop's WiFi, tapping a tag bolted to your wall. At that point they're just... at work.
+
+## What to do today
+
+Read the [three-factor explainer](/blog/three-factor-attendance) for the deeper conceptual story, see the [stop buddy punching](/stop-buddy-punching) walk-through, or [start free](/sign-up) — up to 10 active employees, no credit card, no hardware.
