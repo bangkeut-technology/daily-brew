@@ -9,6 +9,7 @@ import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { DetailSkeleton } from '@/components/admin/AdminDataStates';
 import { cn } from '@/lib/utils';
+import { formatAdminDateTime } from '@/lib/adminDate';
 
 export const Route = createLazyFileRoute('/admin/users/$publicId/')({
   component: AdminUserDetailPage,
@@ -90,8 +91,8 @@ function AdminUserDetailPage() {
             <Field label="Onboarding" value={user.onboardingCompleted ? 'Completed' : 'Pending'} />
             <Field label="Auth" value={[user.hasPassword && 'password', user.hasGoogle && 'Google', user.hasApple && 'Apple'].filter(Boolean).join(' · ') || '—'} />
             <Field label="Role" value={user.isSuperAdmin ? 'Super admin' : 'User'} className={user.isSuperAdmin ? 'text-coffee font-medium' : ''} />
-            <Field label="Created" value={new Date(user.createdAt).toLocaleString()} />
-            <Field label="Updated" value={new Date(user.updatedAt).toLocaleString()} />
+            <Field label="Created" value={formatAdminDateTime(user.createdAt)} />
+            <Field label="Updated" value={formatAdminDateTime(user.updatedAt)} />
           </dl>
         </GlassCard>
 

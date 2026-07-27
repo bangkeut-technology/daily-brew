@@ -15,6 +15,7 @@ import {
   TableSkeletonRows,
 } from '@/components/admin/AdminDataStates';
 import { cn } from '@/lib/utils';
+import { formatAdminDateTime } from '@/lib/adminDate';
 
 export const Route = createLazyFileRoute('/admin/audit-log/')({
   component: AdminAuditLogPage,
@@ -99,7 +100,7 @@ function AdminAuditLogPage() {
                 <div className="flex items-start justify-between gap-2">
                   <ActionBadge action={row.action} label={row.actionLabel} />
                   <span className="text-[11.5px] text-text-tertiary tabular-nums whitespace-nowrap">
-                    {new Date(row.createdAt).toLocaleString()}
+                    {formatAdminDateTime(row.createdAt)}
                   </span>
                 </div>
                 <p className="mt-2 text-[13.5px] text-text-primary">
@@ -141,7 +142,7 @@ function AdminAuditLogPage() {
                     className="border-t border-cream-3/60 hover:bg-cream-3/20 transition-colors"
                   >
                     <td className="px-4 py-2.5 text-text-tertiary text-[12.5px] tabular-nums whitespace-nowrap">
-                      {new Date(row.createdAt).toLocaleString()}
+                      {formatAdminDateTime(row.createdAt)}
                     </td>
                     <td className="px-4 py-2.5 text-text-secondary">
                       {row.actor ? (

@@ -28,6 +28,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard } from '@/components/shared/GlassCard';
 import { Skeleton } from '@/components/admin/AdminDataStates';
 import { cn } from '@/lib/utils';
+import { formatAdminDate, formatAdminDayMonth } from '@/lib/adminDate';
 
 export const Route = createLazyFileRoute('/admin/')({
   component: AdminDashboardPage,
@@ -532,15 +533,10 @@ function GrowthTooltip({ active, payload, label }: TooltipContentProps<number, s
   );
 }
 
+// Axis ticks drop the year to stay compact across 30 points; the tooltip
+// carries the full DD/MM/YYYY.
 function formatChartDate(iso: string, withYear = false): string {
-  if (!iso) return '';
-  const [y, m, d] = iso.split('-').map((s) => Number(s));
-  const date = new Date(y, (m ?? 1) - 1, d ?? 1);
-  return date.toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    ...(withYear ? { year: 'numeric' } : {}),
-  });
+  return withYear ? formatAdminDate(iso) : formatAdminDayMonth(iso);
 }
 
 function formatRelative(iso: string): string {
@@ -550,5 +546,5 @@ function formatRelative(iso: string): string {
   if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
   if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
   if (diffSec < 86400 * 7) return `${Math.floor(diffSec / 86400)}d ago`;
-  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  return formatAdminDate(iso);
 }

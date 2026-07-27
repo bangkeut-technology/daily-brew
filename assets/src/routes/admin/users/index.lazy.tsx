@@ -21,6 +21,7 @@ import {
   TableSkeletonRows,
 } from '@/components/admin/AdminDataStates';
 import { cn } from '@/lib/utils';
+import { formatAdminDate } from '@/lib/adminDate';
 import type { AdminUserRow } from '@/types';
 
 export const Route = createLazyFileRoute('/admin/users/')({
@@ -158,7 +159,7 @@ function AdminUsersPage() {
                     )}
                     <MobileField label="Auth">{authMethods(u)}</MobileField>
                     <MobileField label="Created">
-                      {new Date(u.createdAt).toLocaleDateString()}
+                      {formatAdminDate(u.createdAt)}
                     </MobileField>
                   </div>
                 </MobileCard>
@@ -209,7 +210,7 @@ function AdminUsersPage() {
                       </td>
                       <td className="px-4 py-2.5">{u.isSuperAdmin && <SuperAdminPill />}</td>
                       <td className="px-4 py-2.5 text-text-tertiary text-[12.5px] tabular-nums">
-                        {new Date(u.createdAt).toLocaleDateString()}
+                        {formatAdminDate(u.createdAt)}
                       </td>
                       <td className="px-4 py-2.5 text-right">
                         <RoleActionButton

@@ -11,6 +11,7 @@ import { GlassCard, GlassCardHeader } from "@/components/shared/GlassCard";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";
 import { DetailSkeleton } from "@/components/admin/AdminDataStates";
 import { cn } from "@/lib/utils";
+import { formatAdminDateTime } from "@/lib/adminDate";
 
 export default function AdminUserDetailPage({
   params,
@@ -99,8 +100,8 @@ export default function AdminUserDetailPage({
               value={user.isSuperAdmin ? "Super admin" : "User"}
               className={user.isSuperAdmin ? "font-medium text-coffee" : undefined}
             />
-            <Field label="Created" value={new Date(user.createdAt).toLocaleString()} />
-            <Field label="Updated" value={new Date(user.updatedAt).toLocaleString()} />
+            <Field label="Created" value={formatAdminDateTime(user.createdAt)} />
+            <Field label="Updated" value={formatAdminDateTime(user.updatedAt)} />
           </dl>
         </GlassCard>
 

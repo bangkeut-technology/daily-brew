@@ -20,6 +20,7 @@ import { GlassCard } from "@/components/shared/GlassCard";
 import { GrowthChart } from "@/components/admin/GrowthChart";
 import { Skeleton } from "@/components/admin/AdminDataStates";
 import { cn } from "@/lib/utils";
+import { formatAdminDate } from "@/lib/adminDate";
 
 export default function AdminDashboardPage() {
   const { data, isLoading, error, refetch, isFetching } = useAdminDashboard();
@@ -412,5 +413,5 @@ function formatRelative(iso: string): string {
   if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
   if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
   if (diffSec < 86400 * 7) return `${Math.floor(diffSec / 86400)}d ago`;
-  return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  return formatAdminDate(iso);
 }

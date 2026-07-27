@@ -18,6 +18,7 @@ import {
   TableSkeletonRows,
 } from '@/components/admin/AdminDataStates';
 import { cn } from '@/lib/utils';
+import { formatAdminDate } from '@/lib/adminDate';
 
 export const Route = createLazyFileRoute('/admin/subscriptions/')({
   component: AdminSubscriptionsPage,
@@ -117,7 +118,7 @@ function AdminSubscriptionsPage() {
                 </div>
                 <div className="mt-2 space-y-1">
                   <MobileField label="Period end">
-                    {s.currentPeriodEnd ? new Date(s.currentPeriodEnd).toLocaleDateString() : '—'}
+                    {formatAdminDate(s.currentPeriodEnd)}
                   </MobileField>
                   <MobileField label="Paddle ID">
                     <span className="font-mono text-[11.5px]">
@@ -180,9 +181,7 @@ function AdminSubscriptionsPage() {
                       </span>
                     </td>
                     <td className="px-4 py-2.5 text-text-tertiary text-[12.5px] tabular-nums">
-                      {s.currentPeriodEnd
-                        ? new Date(s.currentPeriodEnd).toLocaleDateString()
-                        : '—'}
+                      {formatAdminDate(s.currentPeriodEnd)}
                     </td>
                     <td className="px-4 py-2.5 text-text-tertiary text-[11.5px] font-mono">
                       {s.paddleSubscriptionId ? (

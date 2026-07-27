@@ -5,6 +5,7 @@ import { TrendingUp } from "lucide-react";
 import type { GrowthPoint } from "@/types/admin";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { cn } from "@/lib/utils";
+import { formatAdminDate, formatAdminDayMonth } from "@/lib/adminDate";
 
 type SeriesKey = "attendances" | "employees" | "workspaces" | "users";
 
@@ -31,16 +32,10 @@ function niceCeiling(value: number): number {
   return Math.ceil(value / magnitude) * magnitude;
 }
 
+// Axis ticks drop the year to stay compact across 30 points; the tooltip
+// carries the full DD/MM/YYYY.
 function formatChartDate(iso: string, withYear = false): string {
-  if (!iso) return "";
-  const [y, m, d] = iso.split("-").map(Number);
-  // Constructed from parts, not `new Date(iso)` — the string form is parsed as
-  // UTC and shifts the label a day backwards west of Greenwich.
-  return new Date(y, (m ?? 1) - 1, d ?? 1).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    ...(withYear ? { year: "numeric" } : {}),
-  });
+  return withYear ? formatAdminDate(iso) : formatAdminDayMonth(iso);
 }
 
 export function GrowthChart({ series }: { series: GrowthPoint[] }) {

@@ -21,6 +21,7 @@ import { SubscriptionStatusBadge } from "@/components/shared/SubscriptionStatusB
 import { TestingTrackBadge } from "@/components/shared/TestingTrackBadge";
 import { DetailSkeleton } from "@/components/admin/AdminDataStates";
 import { cn } from "@/lib/utils";
+import { formatAdminDateTime } from "@/lib/adminDate";
 
 const PLAN_OPTIONS = [
   { value: "free", label: "Free" },
@@ -97,10 +98,10 @@ export default function AdminWorkspaceDetailPage({
           <dl className="grid grid-cols-[140px_1fr] gap-y-2 p-5 text-[13.5px]">
             <Field label="Public ID" value={ws.publicId} mono />
             <Field label="QR token" value={ws.qrToken} mono />
-            <Field label="Created" value={new Date(ws.createdAt).toLocaleString()} />
-            <Field label="Updated" value={new Date(ws.updatedAt).toLocaleString()} />
+            <Field label="Created" value={formatAdminDateTime(ws.createdAt)} />
+            <Field label="Updated" value={formatAdminDateTime(ws.updatedAt)} />
             {ws.deletedAt && (
-              <Field label="Deleted" value={new Date(ws.deletedAt).toLocaleString()} className="text-red" />
+              <Field label="Deleted" value={formatAdminDateTime(ws.deletedAt)} className="text-red" />
             )}
           </dl>
         </GlassCard>
@@ -142,24 +143,16 @@ export default function AdminWorkspaceDetailPage({
                 />
                 <Field
                   label="Period end"
-                  value={
-                    ws.subscription.currentPeriodEnd
-                      ? new Date(ws.subscription.currentPeriodEnd).toLocaleString()
-                      : "—"
-                  }
+                  value={formatAdminDateTime(ws.subscription.currentPeriodEnd)}
                 />
                 <Field
                   label="Trial end"
-                  value={
-                    ws.subscription.trialEndsAt
-                      ? new Date(ws.subscription.trialEndsAt).toLocaleString()
-                      : "—"
-                  }
+                  value={formatAdminDateTime(ws.subscription.trialEndsAt)}
                 />
                 {ws.subscription.canceledAt && (
                   <Field
                     label="Canceled"
-                    value={new Date(ws.subscription.canceledAt).toLocaleString()}
+                    value={formatAdminDateTime(ws.subscription.canceledAt)}
                     className="text-red"
                   />
                 )}

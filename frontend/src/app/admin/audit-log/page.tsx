@@ -18,6 +18,7 @@ import {
   TableSkeletonRows,
 } from "@/components/admin/AdminDataStates";
 import { cn } from "@/lib/utils";
+import { formatAdminDateTime } from "@/lib/adminDate";
 
 // Fallback vocabulary for deployments where the API doesn't ship filter
 // options yet; the response's own lists win when present.
@@ -116,7 +117,7 @@ export default function AdminAuditLogPage() {
                 <div className="flex items-start justify-between gap-2">
                   <ActionBadge action={row.action} label={row.actionLabel} />
                   <span className="whitespace-nowrap text-[11.5px] tabular-nums text-text-tertiary">
-                    {new Date(row.createdAt).toLocaleString()}
+                    {formatAdminDateTime(row.createdAt)}
                   </span>
                 </div>
                 <p className="mt-2 text-[13.5px] text-text-primary">
@@ -154,7 +155,7 @@ export default function AdminAuditLogPage() {
                     className="border-t border-cream-3/60 transition-colors hover:bg-cream-3/20"
                   >
                     <td className="whitespace-nowrap px-4 py-2.5 text-[12.5px] tabular-nums text-text-tertiary">
-                      {new Date(row.createdAt).toLocaleString()}
+                      {formatAdminDateTime(row.createdAt)}
                     </td>
                     <td className="px-4 py-2.5 text-text-secondary">
                       {row.actor ? (
