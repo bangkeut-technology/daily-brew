@@ -1,0 +1,75 @@
+import { JsonLd } from "@/components/JsonLd";
+import { articleSchema } from "@/lib/schema";
+
+export const metadata = {
+  title: "Live check-in alerts: a Telegram toggle for owners who want every clock-in",
+  description:
+    "Turn on a single setting and DailyBrew sends a Telegram ping the moment any staff member clocks in or out. Espresso+ feature, off by default — the noise profile is intentional.",
+  alternates: { canonical: "/blog/live-checkin-alerts-on-telegram" },
+  openGraph: {
+    type: "article",
+    url: "/blog/live-checkin-alerts-on-telegram",
+    title: "Live check-in alerts: a Telegram toggle for owners who want every clock-in",
+    description:
+      "A Telegram ping the moment any staff member clocks in or out. Off by default — the noise profile is intentional.",
+  },
+};
+
+<JsonLd
+  data={articleSchema({
+    title: "Live check-in alerts: a Telegram toggle for owners who want every clock-in",
+    description:
+      "A Telegram ping the moment any staff member clocks in or out. Off by default — the noise profile is intentional.",
+    url: "https://dailybrew.work/blog/live-checkin-alerts-on-telegram",
+    datePublished: "2026-05-29",
+  })}
+/>
+
+# Live check-in alerts: a Telegram toggle for owners who want every clock-in
+
+You can already get Telegram notifications for leave requests, shift changes, closures, and the daily summary. Now there's one more: live check-in/out pings, the moment they happen.
+
+It's off by default. Here's why — and why you might still want it on.
+
+## Why off by default
+
+A 5-person café with normal opening and closing shifts sees about 10 punches a day. Add lunch breaks (some workspaces clock those too) and you're at 20. That's 20 Telegram messages a day, just from one shop, on top of whatever else lives in your inbox.
+
+For most owners that's too much signal-shaped noise. The daily summary at 6pm tells you who showed up, who was late, who's still on a long shift — without 20 individual pings.
+
+But if you're not at the shop, or if you're scaling to a second location and want to feel the pulse of the place from across town, the live pings turn that into a steady, low-resolution sense of "yes, the morning crew is in" without staring at the dashboard.
+
+## What an alert looks like
+
+> 🟢 **Sokha Sun checked in** at 06:32
+>
+> 🟠 **Lyhour Huy checked out** at 14:05
+
+Two channels in parallel: your workspace Telegram group (if you've set one up under Settings → Telegram notifications), and your personal Telegram DM (if you've linked it on your profile). Same message, two destinations.
+
+## How to turn it on
+
+1. Go to **Settings → Telegram notifications**
+2. Make sure the master "Enable Telegram notifications" toggle is on (it gates the workspace group send)
+3. Below the group chat setup, flip the new **Live check-in/out alerts** toggle
+4. Save
+
+That's the whole flow. Espresso plan and up — same plan tier as the rest of Telegram notifications.
+
+## How this pairs with other alerts
+
+DailyBrew already sends:
+
+- **Daily summary** at 6pm (Telegram + email) — the digest that doesn't depend on this toggle
+- **New-device alert** (Telegram + push + email) — fires when an employee uses a phone they've never used before, which is the alert _you actually care about_ most of the time. Covered in the [new-device alert post](/blog/the-new-device-alert).
+- **Leave / shift / closure** (Telegram + push + email) — administrative changes
+
+The live check-in pings sit alongside these. Most owners turn them on for a week, get a feel for the rhythm of their shop, then either keep them or turn them off. There's no wrong answer.
+
+## What this doesn't do
+
+This isn't device verification. The toggle just decides whether you _hear_ about each check-in — it doesn't change which check-ins are _allowed_. DailyBrew's device verification (a separate Espresso feature) enforces same-day consistency: within a single day, one device per employee, and the check-out has to come from the same device as the check-in. Tomorrow that same employee can use a different phone — no problem, the constraint is per-day, not per-lifetime. That keeps active buddy punching from succeeding silently. The live alerts let you watch it work.
+
+## A note on noise
+
+If you turn this on and find yourself ignoring the pings, that's a signal to turn it off. Notifications you ignore train your brain to ignore the _channel_, which means the actually-urgent things (new-device alerts, leave requests) blend in. We left it off by default for that reason. Use it when the live feedback matters, mute it when it doesn't.
