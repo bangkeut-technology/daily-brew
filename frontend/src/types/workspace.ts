@@ -1,3 +1,5 @@
+export type { Workspace } from "./auth";
+
 export interface WorkspaceSetting {
   ipRestrictionEnabled: boolean;
   allowedIps: string[] | null;

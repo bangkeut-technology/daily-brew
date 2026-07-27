@@ -37,10 +37,25 @@ export function formatDateUTC(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
-/** Format an ISO datetime to "HH:MM" in the workspace timezone. */
-export function formatTimeInTz(iso: string | null | undefined, tz: string): string {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleTimeString("en-GB", {
+const HH_MM = /^\d{2}:\d{2}$/;
+
+/**
+ * Format a time value to "HH:MM" in the workspace timezone.
+ *
+ * Accepts both shapes the API produces. `AttendanceDTO` and
+ * `AttendanceRowBuilder` already emit `H:i` **in workspace time** — feeding
+ * one of those to `new Date()` yields Invalid Date, which is why every
+ * attendance row used to render "Invalid Date". Those values are returned
+ * as-is; only genuine ISO datetimes get converted.
+ */
+export function formatTimeInTz(value: string | null | undefined, tz: string): string {
+  if (!value) return "—";
+  if (HH_MM.test(value)) return value;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+
+  return date.toLocaleTimeString("en-GB", {
     timeZone: tz,
     hour: "2-digit",
     minute: "2-digit",

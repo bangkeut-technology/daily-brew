@@ -13,6 +13,10 @@ export interface User {
 export interface Workspace {
   publicId: string;
   name: string;
+  /** Absent from the trimmed workspace stub the auth payload carries. */
+  qrToken?: string;
+  createdAt?: string;
+  logoUrl?: string | null;
 }
 
 export type ManagerPermission =
