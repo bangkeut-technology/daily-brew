@@ -12,6 +12,7 @@ import {
   CalendarOff,
   QrCode,
   Settings,
+  UserCircle,
   LogOut,
   X,
   type LucideIcon,
@@ -120,6 +121,19 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
           );
         })}
       </nav>
+
+      <Link
+        href="/console/profile"
+        className={cn(
+          "m-3 mb-0 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm no-underline transition-colors",
+          pathname === "/console/profile"
+            ? "bg-coffee text-white"
+            : "text-text-secondary hover:bg-cream-3 hover:text-text-primary",
+        )}
+      >
+        <UserCircle className="h-4 w-4" />
+        {t("nav.profile", "Profile")}
+      </Link>
 
       <button
         type="button"
