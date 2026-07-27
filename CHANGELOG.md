@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.122.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.121.1...v1.122.0) (2026-07-27)
+
+
+### Features
+
+* **admin:** surface workspace activity, adoption, and an activation funnel ([#354](https://github.com/bangkeut-technology/daily-brew/issues/354)) ([b9f1616](https://github.com/bangkeut-technology/daily-brew/commit/b9f16166889b216b39c19baf06d6a2ed5d430d6a))
+* **next/console:** port the employee detail page ([#353](https://github.com/bangkeut-technology/daily-brew/issues/353)) ([fdbee5d](https://github.com/bangkeut-technology/daily-brew/commit/fdbee5ded87eb6504037ebc74d0acb71c8469723))
+
 ## [1.121.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.121.0...v1.121.1) (2026-07-27)
 
 
