@@ -28,6 +28,7 @@ import {
 } from '@/hooks/queries/useAdminCron';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
+import { Skeleton } from '@/components/admin/AdminDataStates';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { Toggle } from '@/components/shared/Toggle';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
@@ -190,7 +191,16 @@ function AdminCronPage() {
       </div>
 
       {isLoading ? (
-        <GlassCard hover={false}><div className="p-8 text-center text-[14px] text-text-tertiary">Loading…</div></GlassCard>
+        <GlassCard hover={false}>
+          <div className="divide-y divide-cream-3/60" aria-busy="true">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="p-4 space-y-2">
+                <Skeleton className="h-3.5 w-1/3" />
+                <Skeleton className="h-3 w-2/3" />
+              </div>
+            ))}
+          </div>
+        </GlassCard>
       ) : visible.length === 0 ? (
         <GlassCard hover={false}>
           <div className="p-8 text-center text-[14px] text-text-tertiary space-y-3">
@@ -594,7 +604,11 @@ function HistorySheet({ schedule, onClose }: { schedule: ScheduledCommand; onClo
           </div>
           <div className="px-5 pb-6 space-y-3">
             {isLoading ? (
-              <p className="text-[13.5px] text-text-tertiary">Loading…</p>
+              <div className="space-y-3" aria-busy="true">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-20 rounded-2xl" />
+                ))}
+              </div>
             ) : runs.length === 0 ? (
               <p className="text-[13.5px] text-text-tertiary">No runs recorded yet.</p>
             ) : (

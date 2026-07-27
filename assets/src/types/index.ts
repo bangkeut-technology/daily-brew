@@ -133,6 +133,17 @@ export interface AdminUserDetail extends AdminUserRow {
   }[];
 }
 
+export interface AdminFilterOption {
+  value: string;
+  label: string;
+}
+
+/** The audit-log list ships its own filter vocabulary — see AdminAuditLogController. */
+export interface AdminAuditLogResponse extends AdminPagedResponse<AdminAuditLogRow> {
+  actions: AdminFilterOption[];
+  targetTypes: AdminFilterOption[];
+}
+
 export interface AdminAuditLogRow {
   publicId: string;
   action: string;

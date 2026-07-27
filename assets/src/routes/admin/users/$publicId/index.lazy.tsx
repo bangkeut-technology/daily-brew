@@ -7,6 +7,7 @@ import { useAuthenticationState } from '@/hooks/use-authentication';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
+import { DetailSkeleton } from '@/components/admin/AdminDataStates';
 import { cn } from '@/lib/utils';
 
 export const Route = createLazyFileRoute('/admin/users/$publicId/')({
@@ -20,9 +21,10 @@ function AdminUserDetailPage() {
   const promote = usePromoteUser();
   const demote = useDemoteUser();
   const [confirmDemote, setConfirmDemote] = useState(false);
+  const [confirmPromote, setConfirmPromote] = useState(false);
 
   if (isLoading || !user) {
-    return <div><PageHeader title="User" /><p className="text-text-tertiary">Loading…</p></div>;
+    return <DetailSkeleton cards={3} />;
   }
 
   const isSelf = auth.user?.publicId === user.publicId;
@@ -31,6 +33,7 @@ function AdminUserDetailPage() {
     try {
       await promote.mutateAsync(user.publicId);
       toast.success('User promoted to super admin');
+      setConfirmPromote(false);
     } catch (e: any) {
       toast.error(e?.response?.data?.message ?? 'Failed to promote');
     }
@@ -66,7 +69,7 @@ function AdminUserDetailPage() {
             </button>
           ) : (
             <button
-              onClick={handlePromote}
+              onClick={() => setConfirmPromote(true)}
               disabled={promote.isPending}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[14px] font-medium bg-coffee text-white border-none cursor-pointer hover:bg-coffee-light disabled:opacity-50 transition-colors"
             >
@@ -134,6 +137,18 @@ function AdminUserDetailPage() {
           </div>
         </GlassCard>
       </div>
+
+      <ConfirmModal
+        open={confirmPromote}
+        onOpenChange={setConfirmPromote}
+        title="Grant super-admin role"
+        description={`Grant super admin to ${user.email}? They get full read/write access to every workspace, user, and subscription on the platform.`}
+        confirmLabel="Grant"
+        cancelLabel="Cancel"
+        variant="default"
+        loading={promote.isPending}
+        onConfirm={handlePromote}
+      />
 
       <ConfirmModal
         open={confirmDemote}

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiAxios } from '@/lib/apiAxios';
 import type {
-  AdminAuditLogRow,
+  AdminAuditLogResponse,
   AdminDashboardData,
   AdminMobileAppConfig,
   AdminMobileAppConfigInput,
@@ -89,7 +89,7 @@ export function useAdminAuditLog(params: ListParams & { action?: string; targetT
   return useQuery({
     queryKey: ['admin-audit-log', params],
     queryFn: async () => {
-      const { data } = await apiAxios.get<AdminPagedResponse<AdminAuditLogRow>>('/admin/audit-log', { params });
+      const { data } = await apiAxios.get<AdminAuditLogResponse>('/admin/audit-log', { params });
       return data;
     },
     placeholderData: (prev) => prev,

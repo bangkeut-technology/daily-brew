@@ -15,6 +15,9 @@ interface CustomSelectProps {
   placeholder?: string;
   className?: string;
   searchable?: boolean;
+  disabled?: boolean;
+  /** Tooltip explaining why the control is locked — pair it with `disabled`. */
+  title?: string;
   renderOption?: (option: SelectOption, index: number) => React.ReactNode;
   renderSelected?: (option: SelectOption) => React.ReactNode;
 }
@@ -33,6 +36,8 @@ export function CustomSelect({
   placeholder = 'Select…',
   className = '',
   searchable,
+  disabled,
+  title,
   renderOption,
   renderSelected,
 }: CustomSelectProps) {
@@ -107,8 +112,14 @@ export function CustomSelect({
       <button
         ref={triggerRef}
         type="button"
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none transition-colors cursor-pointer focus:border-coffee focus:ring-1 focus:ring-coffee/20"
+        disabled={disabled}
+        title={title}
+        aria-disabled={disabled || undefined}
+        onClick={() => !disabled && setOpen(!open)}
+        className={cn(
+          'w-full flex items-center justify-between px-3 py-2 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none transition-colors focus:border-coffee focus:ring-1 focus:ring-coffee/20',
+          disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+        )}
       >
         <span className={cn('flex items-center gap-2 min-w-0', !selected && 'text-text-tertiary')}>
           {selected ? (renderSelected ? renderSelected(selected) : selected.label) : placeholder}

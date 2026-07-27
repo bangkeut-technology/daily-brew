@@ -26,6 +26,7 @@ import type { TooltipContentProps } from 'recharts/types/component/Tooltip';
 import type { AdminDashboardData } from '@/types';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard } from '@/components/shared/GlassCard';
+import { Skeleton } from '@/components/admin/AdminDataStates';
 import { cn } from '@/lib/utils';
 
 export const Route = createLazyFileRoute('/admin/')({
@@ -33,7 +34,7 @@ export const Route = createLazyFileRoute('/admin/')({
 });
 
 function AdminDashboardPage() {
-  const { data, isLoading, error } = useAdminDashboard();
+  const { data, isLoading, error, refetch, isFetching } = useAdminDashboard();
 
   return (
     <div>
@@ -42,8 +43,22 @@ function AdminDashboardPage() {
         Platform-wide totals across all workspaces. Visible only to staff with super-admin role.
       </p>
 
-      {isLoading && <p className="text-[15px] text-text-tertiary">Loading…</p>}
-      {error && <p className="text-[14px] text-red">Failed to load admin data.</p>}
+      {isLoading && <DashboardSkeleton />}
+      {error && (
+        <GlassCard hover={false}>
+          <div className="flex flex-col items-center gap-3 px-4 py-10 text-center">
+            <p className="text-[14px] text-red">Failed to load admin data.</p>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              disabled={isFetching}
+              className="px-3 py-1.5 rounded-lg text-[13px] font-medium bg-glass-bg border border-cream-3 text-text-secondary cursor-pointer hover:bg-cream-3/40 disabled:opacity-40 transition-colors"
+            >
+              {isFetching ? 'Retrying…' : 'Try again'}
+            </button>
+          </div>
+        </GlassCard>
+      )}
 
       {data && (
         <>
@@ -203,6 +218,63 @@ function AdminDashboardPage() {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+/**
+ * Mirrors the real layout (5 stat cards, two half-width panels, the chart, the
+ * status strip, three list cards) so the page doesn't reflow when data lands.
+ */
+function DashboardSkeleton() {
+  return (
+    <div aria-busy="true">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <GlassCard key={i} hover={false}>
+            <div className="px-5 pt-5 pb-4 space-y-3">
+              <Skeleton className="h-3 w-1/2" />
+              <Skeleton className="h-7 w-2/3" />
+            </div>
+          </GlassCard>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        {Array.from({ length: 2 }).map((_, i) => (
+          <GlassCard key={i} hover={false}>
+            <div className="px-5 py-4 space-y-3">
+              <Skeleton className="h-3 w-1/3" />
+              <Skeleton className="h-3" />
+              <Skeleton className="h-3 w-5/6" />
+              <Skeleton className="h-3 w-2/3" />
+            </div>
+          </GlassCard>
+        ))}
+      </div>
+      <GlassCard hover={false} className="mt-4">
+        <div className="px-5 py-4 space-y-3">
+          <Skeleton className="h-3 w-1/4" />
+          <Skeleton className="h-[220px]" />
+        </div>
+      </GlassCard>
+      <GlassCard hover={false} className="mt-4">
+        <div className="px-5 py-4 space-y-3">
+          <Skeleton className="h-3 w-1/5" />
+          <Skeleton className="h-12" />
+        </div>
+      </GlassCard>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <GlassCard key={i} hover={false}>
+            <div className="px-5 py-4 space-y-3">
+              <Skeleton className="h-3 w-1/2" />
+              <Skeleton className="h-3" />
+              <Skeleton className="h-3 w-4/5" />
+              <Skeleton className="h-3 w-3/5" />
+            </div>
+          </GlassCard>
+        ))}
+      </div>
     </div>
   );
 }
