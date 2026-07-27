@@ -1,22 +1,11 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { apiAxios } from "@/lib/api";
-import type { Workspace } from "@/types/auth";
 
-export function useCreateWorkspace() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (name: string) => {
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const { data } = await apiAxios.post<Workspace>("/workspaces", { name, timezone });
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["workspaces"] });
-    },
-  });
-}
+// Onboarding and the no-workspace dashboard create workspaces the same way;
+// one implementation lives in useWorkspaces.
+export { useCreateWorkspace } from "@/hooks/useWorkspaces";
 
 export function useCompleteOnboarding() {
   return useMutation({
