@@ -8,6 +8,13 @@ export interface AdminDashboardData {
   };
   byPlan: Record<"free" | "espresso" | "double_espresso", number>;
   byStatus: Record<"active" | "trialing" | "past_due" | "paused" | "canceled", number>;
+  /** Each step is a strict subset of the one above it. */
+  activation: {
+    workspacesTotal: number;
+    workspacesWithEmployees: number;
+    workspacesWithAttendance: number;
+    workspacesActiveLast7d: number;
+  };
   growth: {
     usersLast7d: number;
     usersLast30d: number;
@@ -76,6 +83,8 @@ export interface AdminWorkspaceRow {
   currentPeriodEnd: string | null;
   isTrialing: boolean;
   employeeCount: number;
+  /** Workspace-local date of the most recent check-in; null if never used. */
+  lastActivityDate: string | null;
   createdAt: string;
   deletedAt: string | null;
   testingTrack: "none" | "alpha" | "beta";
@@ -124,6 +133,14 @@ export interface AdminWorkspaceDetail {
   owner: { publicId: string; email: string; fullName: string } | null;
   employeeCount: number;
   qrCodeCount: number;
+  activity: {
+    lastActivityDate: string | null;
+    attendancesTotal: number;
+    attendancesLast7d: number;
+    attendancesLast30d: number;
+    linkedEmployeeCount: number;
+    managerCount: number;
+  };
   subscription: {
     plan: string;
     status: string;

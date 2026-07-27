@@ -20,6 +20,7 @@ import { PlanBadge } from "@/components/shared/PlanBadge";
 import { SubscriptionStatusBadge } from "@/components/shared/SubscriptionStatusBadge";
 import { TestingTrackBadge } from "@/components/shared/TestingTrackBadge";
 import { DetailSkeleton } from "@/components/admin/AdminDataStates";
+import { LastActivityCell } from "@/components/admin/LastActivityCell";
 import { cn } from "@/lib/utils";
 import { formatAdminDateTime } from "@/lib/adminDate";
 
@@ -184,6 +185,55 @@ export default function AdminWorkspaceDetailPage({
           </dl>
         </GlassCard>
 
+        <GlassCard hover={false} className="md:col-span-2">
+          <GlassCardHeader
+            title="Activity & adoption"
+            action={<LastActivityCell date={ws.activity.lastActivityDate} className="items-end" />}
+          />
+          <div className="p-5">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              <ActivityStat label="Check-ins · 7d" value={ws.activity.attendancesLast7d} />
+              <ActivityStat label="Check-ins · 30d" value={ws.activity.attendancesLast30d} />
+              <ActivityStat label="Check-ins · all time" value={ws.activity.attendancesTotal} />
+              <ActivityStat label="Managers" value={ws.activity.managerCount} />
+            </div>
+
+            {/* An employee without a linked user account cannot check in at
+                all, so this gap — not the headcount — is the real onboarding
+                drop-off. */}
+            <div className="mt-4 rounded-xl bg-cream-3/40 px-4 py-3">
+              <div className="mb-1.5 flex items-baseline justify-between">
+                <span className="text-[13px] text-text-secondary">
+                  Employees with a linked account
+                </span>
+                <span className="text-[13px] tabular-nums text-text-primary">
+                  <span className="font-semibold">{ws.activity.linkedEmployeeCount}</span>
+                  <span className="text-text-tertiary"> / {ws.employeeCount}</span>
+                </span>
+              </div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-cream-3">
+                <div
+                  className={cn(
+                    "h-full rounded-full transition-all",
+                    ws.employeeCount > 0 && ws.activity.linkedEmployeeCount === ws.employeeCount
+                      ? "bg-green"
+                      : "bg-amber",
+                  )}
+                  style={{
+                    width: `${ws.employeeCount > 0 ? Math.round((ws.activity.linkedEmployeeCount / ws.employeeCount) * 100) : 0}%`,
+                  }}
+                />
+              </div>
+              {ws.employeeCount > ws.activity.linkedEmployeeCount && (
+                <p className="mt-2 text-xs leading-snug text-text-tertiary">
+                  {ws.employeeCount - ws.activity.linkedEmployeeCount} employee(s) can&apos;t check
+                  in until their user account is linked.
+                </p>
+              )}
+            </div>
+          </div>
+        </GlassCard>
+
         <GlassCard hover={false}>
           <GlassCardHeader
             title="Plan override"
@@ -287,6 +337,17 @@ export default function AdminWorkspaceDetailPage({
           })
         }
       />
+    </div>
+  );
+}
+
+function ActivityStat({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-xl bg-cream-3/40 px-3 py-2.5">
+      <div className="text-[11.5px] uppercase tracking-wide text-text-tertiary">{label}</div>
+      <div className="mt-0.5 text-[22px] font-semibold leading-tight tabular-nums text-text-primary">
+        {value.toLocaleString()}
+      </div>
     </div>
   );
 }

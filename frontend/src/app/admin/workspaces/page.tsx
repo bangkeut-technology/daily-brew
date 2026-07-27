@@ -16,6 +16,7 @@ import { Toggle } from "@/components/shared/Toggle";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";
 import { Pager } from "@/components/admin/Pager";
 import { AdminSearchInput } from "@/components/admin/AdminSearchInput";
+import { LastActivityCell } from "@/components/admin/LastActivityCell";
 import {
   AdminEmpty,
   CardSkeletonList,
@@ -131,6 +132,9 @@ export default function AdminWorkspacesPage() {
                 </div>
                 <div className="mt-2 space-y-1">
                   <MobileField label="Employees">{ws.employeeCount}</MobileField>
+                  <MobileField label="Last activity">
+                    <LastActivityCell date={ws.lastActivityDate} className="items-end" />
+                  </MobileField>
                   <MobileField label="Created">
                     {formatAdminDate(ws.createdAt)}
                   </MobileField>
@@ -152,6 +156,7 @@ export default function AdminWorkspacesPage() {
                 <th className="px-4 py-2.5 text-left font-medium">Track</th>
                 <th className="px-4 py-2.5 text-left font-medium">Status</th>
                 <th className="px-4 py-2.5 text-right font-medium">Employees</th>
+                <th className="px-4 py-2.5 text-left font-medium">Last activity</th>
                 <th className="px-4 py-2.5 text-left font-medium">Created</th>
                 <th className="w-10 px-4 py-2.5 text-right font-medium">
                   <span className="sr-only">Actions</span>
@@ -159,8 +164,8 @@ export default function AdminWorkspacesPage() {
               </tr>
             </thead>
             <tbody>
-              {isLoading && <TableSkeletonRows cols={8} />}
-              {isEmpty && <TableEmptyRow colSpan={8} {...emptyProps} />}
+              {isLoading && <TableSkeletonRows cols={9} />}
+              {isEmpty && <TableEmptyRow colSpan={9} {...emptyProps} />}
               {!isLoading &&
                 workspaces.map((ws) => (
                   <tr
@@ -195,6 +200,9 @@ export default function AdminWorkspacesPage() {
                       </span>
                     </td>
                     <td className="px-4 py-2.5 text-right tabular-nums">{ws.employeeCount}</td>
+                    <td className="px-4 py-2.5">
+                      <LastActivityCell date={ws.lastActivityDate} />
+                    </td>
                     <td className="px-4 py-2.5 text-[12.5px] tabular-nums text-text-tertiary">
                       {formatAdminDate(ws.createdAt)}
                     </td>
