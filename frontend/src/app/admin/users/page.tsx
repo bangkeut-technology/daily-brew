@@ -25,6 +25,7 @@ import {
   TableSkeletonRows,
 } from "@/components/admin/AdminDataStates";
 import { cn } from "@/lib/utils";
+import { formatAdminDate } from "@/lib/adminDate";
 
 function authMethods(u: AdminUserRow): string {
   return (
@@ -145,7 +146,7 @@ export default function AdminUsersPage() {
                   )}
                   <MobileField label="Auth">{authMethods(u)}</MobileField>
                   <MobileField label="Created">
-                    {new Date(u.createdAt).toLocaleDateString()}
+                    {formatAdminDate(u.createdAt)}
                   </MobileField>
                 </div>
               </MobileCard>
@@ -190,7 +191,7 @@ export default function AdminUsersPage() {
                     <td className="px-4 py-2.5 text-[12.5px] text-text-secondary">{authMethods(u)}</td>
                     <td className="px-4 py-2.5">{u.isSuperAdmin && <SuperAdminPill />}</td>
                     <td className="px-4 py-2.5 text-[12.5px] tabular-nums text-text-tertiary">
-                      {new Date(u.createdAt).toLocaleDateString()}
+                      {formatAdminDate(u.createdAt)}
                     </td>
                     <td className="px-4 py-2.5 text-right">
                       <RoleActionButton

@@ -27,6 +27,7 @@ import {
   TableSkeletonRows,
 } from "@/components/admin/AdminDataStates";
 import { cn } from "@/lib/utils";
+import { formatAdminDate } from "@/lib/adminDate";
 
 export default function AdminWorkspacesPage() {
   const [page, setPage] = useState(1);
@@ -131,7 +132,7 @@ export default function AdminWorkspacesPage() {
                 <div className="mt-2 space-y-1">
                   <MobileField label="Employees">{ws.employeeCount}</MobileField>
                   <MobileField label="Created">
-                    {new Date(ws.createdAt).toLocaleDateString()}
+                    {formatAdminDate(ws.createdAt)}
                   </MobileField>
                 </div>
               </MobileCard>
@@ -195,7 +196,7 @@ export default function AdminWorkspacesPage() {
                     </td>
                     <td className="px-4 py-2.5 text-right tabular-nums">{ws.employeeCount}</td>
                     <td className="px-4 py-2.5 text-[12.5px] tabular-nums text-text-tertiary">
-                      {new Date(ws.createdAt).toLocaleDateString()}
+                      {formatAdminDate(ws.createdAt)}
                     </td>
                     <td className="px-4 py-2.5 text-right">
                       {ws.deletedAt && (

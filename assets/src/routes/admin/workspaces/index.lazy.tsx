@@ -22,6 +22,7 @@ import {
   TableSkeletonRows,
 } from '@/components/admin/AdminDataStates';
 import { cn } from '@/lib/utils';
+import { formatAdminDate } from '@/lib/adminDate';
 
 export const Route = createLazyFileRoute('/admin/workspaces/')({
   component: AdminWorkspacesPage,
@@ -144,7 +145,7 @@ function AdminWorkspacesPage() {
                 <div className="mt-2 space-y-1">
                   <MobileField label="Employees">{w.employeeCount}</MobileField>
                   <MobileField label="Created">
-                    {new Date(w.createdAt).toLocaleDateString()}
+                    {formatAdminDate(w.createdAt)}
                   </MobileField>
                 </div>
               </MobileCard>
@@ -209,7 +210,7 @@ function AdminWorkspacesPage() {
                     </td>
                     <td className="px-4 py-2.5 text-right tabular-nums">{w.employeeCount}</td>
                     <td className="px-4 py-2.5 text-text-tertiary text-[12.5px] tabular-nums">
-                      {new Date(w.createdAt).toLocaleDateString()}
+                      {formatAdminDate(w.createdAt)}
                     </td>
                     <td className="px-4 py-2.5 text-right">
                       {w.deletedAt && (

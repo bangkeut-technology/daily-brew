@@ -21,6 +21,7 @@ import {
   TableSkeletonRows,
 } from "@/components/admin/AdminDataStates";
 import { cn } from "@/lib/utils";
+import { formatAdminDate } from "@/lib/adminDate";
 
 // Values must be the serialised `SubscriptionStatusEnum` values — the API
 // compares them straight against the stored column.
@@ -39,15 +40,6 @@ const PLAN_OPTIONS = [
   { value: "espresso", label: "Espresso" },
   { value: "double_espresso", label: "Double Espresso" },
 ];
-
-function fmtDate(iso: string | null): string {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
 
 export default function AdminSubscriptionsPage() {
   const [page, setPage] = useState(1);
@@ -124,7 +116,7 @@ export default function AdminSubscriptionsPage() {
                     )}
                   </div>
                   <div className="mt-2 space-y-1">
-                    <MobileField label="Period end">{fmtDate(s.currentPeriodEnd)}</MobileField>
+                    <MobileField label="Period end">{formatAdminDate(s.currentPeriodEnd)}</MobileField>
                     <MobileField label="Paddle ID">
                       <span className="font-mono text-[11.5px]">{s.paddleSubscriptionId ?? "—"}</span>
                     </MobileField>
@@ -181,7 +173,7 @@ export default function AdminSubscriptionsPage() {
                       </span>
                     </td>
                     <td className="px-4 py-2.5 text-[12.5px] tabular-nums text-text-tertiary">
-                      {fmtDate(s.currentPeriodEnd)}
+                      {formatAdminDate(s.currentPeriodEnd)}
                     </td>
                     <td className="px-4 py-2.5 font-mono text-[11.5px] text-text-tertiary">
                       {s.paddleSubscriptionId ? (
