@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiAxios } from "@/lib/api";
 import type {
-  AdminAuditLogRow,
+  AdminAuditLogResponse,
   AdminDashboardData,
   AdminFeatureFlagRow,
   AdminFeatureFlagStageOption,
@@ -11,9 +11,13 @@ import type {
   AdminMobileAppConfigInput,
   AdminPagedResponse,
   AdminSubscriptionRow,
+  AdminUserDetail,
   AdminUserRow,
+  AdminWorkspaceDetail,
   AdminWorkspaceRow,
   FeatureFlagStage,
+  WorkspacePlan,
+  WorkspaceTestingTrack,
 } from "@/types/admin";
 
 export function useAdminDashboard() {
@@ -23,29 +27,103 @@ export function useAdminDashboard() {
   });
 }
 
-export function useAdminWorkspaces(params: { page?: number; q?: string; includeDeleted?: boolean } = {}) {
+export function useAdminWorkspaces(
+  params: { page?: number; search?: string; includeDeleted?: boolean } = {},
+) {
   return useQuery({
     queryKey: ["admin", "workspaces", params],
     queryFn: async () =>
       (await apiAxios.get<AdminPagedResponse<AdminWorkspaceRow>>("/admin/workspaces", { params }))
         .data,
+    placeholderData: (prev) => prev,
   });
 }
 
-export function useAdminSubscriptions(params: { page?: number; status?: string } = {}) {
+export function useAdminWorkspace(publicId: string) {
+  return useQuery({
+    queryKey: ["admin", "workspace", publicId],
+    queryFn: async () =>
+      (await apiAxios.get<AdminWorkspaceDetail>(`/admin/workspaces/${publicId}`)).data,
+    enabled: !!publicId,
+  });
+}
+
+export function useCancelWorkspaceSubscription() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (publicId: string) =>
+      (
+        await apiAxios.post<{ status: string; canceledAt: string | null }>(
+          `/admin/workspaces/${publicId}/cancel-subscription`,
+        )
+      ).data,
+    onSuccess: (_data, publicId) => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "workspace", publicId] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "workspaces"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "subscriptions"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "audit-log"] });
+    },
+  });
+}
+
+export function useUpdateAdminWorkspaceTestingTrack() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ publicId, track }: { publicId: string; track: WorkspaceTestingTrack }) =>
+      (
+        await apiAxios.put<{ publicId: string; testingTrack: WorkspaceTestingTrack }>(
+          `/admin/workspaces/${publicId}/testing-track`,
+          { track },
+        )
+      ).data,
+    onSuccess: (_data, vars) => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "workspace", vars.publicId] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "workspaces"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "audit-log"] });
+      queryClient.invalidateQueries({ queryKey: ["features"] });
+    },
+  });
+}
+
+export function useUpdateAdminWorkspacePlan() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ publicId, plan }: { publicId: string; plan: WorkspacePlan }) =>
+      (
+        await apiAxios.put<{ publicId: string; plan: WorkspacePlan }>(
+          `/admin/workspaces/${publicId}/plan`,
+          { plan },
+        )
+      ).data,
+    onSuccess: (_data, vars) => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "workspace", vars.publicId] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "workspaces"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "subscriptions"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "audit-log"] });
+    },
+  });
+}
+
+export function useAdminSubscriptions(
+  params: { page?: number; status?: string; plan?: string } = {},
+) {
   return useQuery({
     queryKey: ["admin", "subscriptions", params],
     queryFn: async () =>
       (await apiAxios.get<AdminPagedResponse<AdminSubscriptionRow>>("/admin/subscriptions", { params }))
         .data,
+    placeholderData: (prev) => prev,
   });
 }
 
-export function useAdminAuditLog(params: { page?: number } = {}) {
+export function useAdminAuditLog(
+  params: { page?: number; action?: string; targetType?: string } = {},
+) {
   return useQuery({
     queryKey: ["admin", "audit-log", params],
     queryFn: async () =>
-      (await apiAxios.get<AdminPagedResponse<AdminAuditLogRow>>("/admin/audit-log", { params })).data,
+      (await apiAxios.get<AdminAuditLogResponse>("/admin/audit-log", { params })).data,
+    placeholderData: (prev) => prev,
   });
 }
 
@@ -96,11 +174,17 @@ export function useRestoreWorkspace() {
       );
       return data;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin", "workspaces"] }),
+    onSuccess: (_data, publicId) => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "workspaces"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "workspace", publicId] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "audit-log"] });
+    },
   });
 }
 
-export function useAdminUsers(params: { page?: number; q?: string } = {}) {
+export function useAdminUsers(
+  params: { page?: number; search?: string; superAdminOnly?: boolean } = {},
+) {
   return useQuery({
     queryKey: ["admin", "users", params],
     queryFn: async () => {
@@ -109,6 +193,15 @@ export function useAdminUsers(params: { page?: number; q?: string } = {}) {
       });
       return data;
     },
+    placeholderData: (prev) => prev,
+  });
+}
+
+export function useAdminUser(publicId: string) {
+  return useQuery({
+    queryKey: ["admin", "user", publicId],
+    queryFn: async () => (await apiAxios.get<AdminUserDetail>(`/admin/users/${publicId}`)).data,
+    enabled: !!publicId,
   });
 }
 
@@ -121,7 +214,11 @@ export function usePromoteUser() {
       );
       return data;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin", "users"] }),
+    onSuccess: (_data, publicId) => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "user", publicId] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "audit-log"] });
+    },
   });
 }
 
@@ -134,6 +231,10 @@ export function useDemoteUser() {
       );
       return data;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin", "users"] }),
+    onSuccess: (_data, publicId) => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "user", publicId] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "audit-log"] });
+    },
   });
 }

@@ -6,6 +6,7 @@ import { useAdminMobileAppConfig, useUpdateAdminMobileAppConfig } from "@/hooks/
 import type { AdminMobileAppConfig } from "@/types/admin";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { GlassCard, GlassCardHeader } from "@/components/shared/GlassCard";
+import { Skeleton } from "@/components/admin/AdminDataStates";
 
 const inputClass =
   "w-full rounded-lg border border-cream-3 bg-glass-bg px-3 py-2 text-[15px] text-text-primary outline-none transition-colors focus:border-coffee focus:ring-1 focus:ring-coffee/20";
@@ -16,7 +17,18 @@ export default function AdminMobileAppConfigPage() {
   return (
     <div className="page-enter max-w-2xl">
       <PageHeader title="Mobile app config" />
-      {!data ? <p className="text-text-secondary">Loading…</p> : <ConfigForm config={data} />}
+      {!data ? (
+        <div className="space-y-3" aria-busy="true">
+          <Skeleton className="h-3 w-1/4" />
+          <Skeleton className="h-10" />
+          <Skeleton className="h-3 w-1/4" />
+          <Skeleton className="h-10" />
+          <Skeleton className="h-3 w-1/4" />
+          <Skeleton className="h-10" />
+        </div>
+      ) : (
+        <ConfigForm config={data} />
+      )}
     </div>
   );
 }
