@@ -17,6 +17,8 @@ import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { TestingTrackBadge } from '@/components/shared/TestingTrackBadge';
 import { PlanBadge } from '@/components/shared/PlanBadge';
+import { SubscriptionStatusBadge } from '@/components/shared/SubscriptionStatusBadge';
+import { DetailSkeleton } from '@/components/admin/AdminDataStates';
 import { cn } from '@/lib/utils';
 
 export const Route = createLazyFileRoute('/admin/workspaces/$publicId/')({
@@ -34,16 +36,14 @@ function AdminWorkspaceDetailPage() {
   const [confirmRestore, setConfirmRestore] = useState(false);
 
   if (isLoading || !ws) {
-    return (
-      <div>
-        <PageHeader title="Workspace" />
-        <p className="text-text-tertiary">Loading…</p>
-      </div>
-    );
+    return <DetailSkeleton cards={6} />;
   }
 
   const canCancel = ws.subscription !== null && ws.subscription.isActive;
   const isDeleted = ws.deletedAt !== null;
+  // The endpoint refuses a comp while Paddle owns billing, so lock the control
+  // instead of letting it look operable and fail on submit.
+  const planLocked = ws.subscription?.paddleSubscriptionId != null;
 
   const handleCancel = async () => {
     try {
@@ -132,7 +132,10 @@ function AdminWorkspaceDetailPage() {
           <dl className="p-5 grid grid-cols-[140px_1fr] gap-y-2 text-[13.5px]">
             {ws.subscription ? (
               <>
-                <Field label="Status" value={ws.subscription.status + (ws.subscription.isActive ? ' (active)' : '')} />
+                <dt className="text-text-tertiary">Status</dt>
+                <dd>
+                  <SubscriptionStatusBadge status={ws.subscription.status} />
+                </dd>
                 <Field label="Period end" value={ws.subscription.currentPeriodEnd ? new Date(ws.subscription.currentPeriodEnd).toLocaleString() : '—'} />
                 <Field label="Trial end" value={ws.subscription.trialEndsAt ? new Date(ws.subscription.trialEndsAt).toLocaleString() : '—'} />
                 {ws.subscription.canceledAt && <Field label="Canceled" value={new Date(ws.subscription.canceledAt).toLocaleString()} className="text-red" />}
@@ -171,6 +174,8 @@ function AdminWorkspaceDetailPage() {
             <div className="w-56">
               <CustomSelect
                 value={ws.subscription?.plan ?? 'free'}
+                disabled={planLocked}
+                title={planLocked ? 'Cancel the Paddle subscription first' : undefined}
                 onChange={async (v) => {
                   try {
                     await planMutation.mutateAsync({ publicId, plan: v as WorkspacePlan });
@@ -186,9 +191,9 @@ function AdminWorkspaceDetailPage() {
                 ]}
               />
             </div>
-            {ws.subscription?.paddleSubscriptionId && (
+            {planLocked && (
               <p className="text-[12.5px] text-amber leading-relaxed">
-                Paddle subscription <span className="font-mono">{ws.subscription.paddleSubscriptionId}</span> is attached — admin override blocked.
+                Paddle subscription <span className="font-mono">{ws.subscription?.paddleSubscriptionId}</span> is attached — admin override blocked.
               </p>
             )}
           </div>

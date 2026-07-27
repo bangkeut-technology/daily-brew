@@ -28,4 +28,13 @@ class AdminAuditActionEnumTest extends TestCase
         $this->assertSame('Updated mobile app config', AdminAuditActionEnum::UpdateMobileAppConfig->label());
         $this->assertSame('Updated workspace testing track', AdminAuditActionEnum::UpdateWorkspaceTestingTrack->label());
     }
+
+    public function testEveryCaseHasANonEmptyLabel(): void
+    {
+        // The audit-log filter dropdown is built from cases() + label(), so a
+        // new case without a label would ship an unusable filter option.
+        foreach (AdminAuditActionEnum::cases() as $case) {
+            $this->assertNotSame('', $case->label(), "Missing label for {$case->value}");
+        }
+    }
 }

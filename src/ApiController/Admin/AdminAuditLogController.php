@@ -6,6 +6,8 @@ namespace App\ApiController\Admin;
 
 use App\ApiController\Trait\ApiResponseTrait;
 use App\Entity\AdminAuditLog;
+use App\Enum\AdminAuditActionEnum;
+use App\Enum\AdminAuditTargetTypeEnum;
 use App\Repository\AdminAuditLogRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -69,6 +71,17 @@ class AdminAuditLogController extends AbstractController
             'page' => $page,
             'pageSize' => self::PAGE_SIZE,
             'total' => (int) $total,
+            // Filter options travel with the payload so the admin dropdowns
+            // can't drift out of sync with the enums the way a hardcoded
+            // frontend list does.
+            'actions' => array_map(
+                fn (AdminAuditActionEnum $a) => ['value' => $a->value, 'label' => $a->label()],
+                AdminAuditActionEnum::cases(),
+            ),
+            'targetTypes' => array_map(
+                fn (AdminAuditTargetTypeEnum $t) => ['value' => $t->value, 'label' => $t->label()],
+                AdminAuditTargetTypeEnum::cases(),
+            ),
         ]);
     }
 }
