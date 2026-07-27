@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.121.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.120.0...v1.121.0) (2026-07-27)
+
+
+### Features
+
+* **next/console:** real dashboard, mobile drawer, attendance time fix ([#348](https://github.com/bangkeut-technology/daily-brew/issues/348)) ([bcdb3ff](https://github.com/bangkeut-technology/daily-brew/commit/bcdb3ffc6660d7a58daad5f87e31d394e696b15c))
+
 ## [1.120.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.119.0...v1.120.0) (2026-07-27)
 
 
