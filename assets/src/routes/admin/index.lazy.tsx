@@ -12,6 +12,7 @@ import {
   Crown,
   ScrollText,
   ArrowRight,
+  Activity,
 } from 'lucide-react';
 import {
   CartesianGrid,
@@ -110,6 +111,47 @@ function AdminDashboardPage() {
               </div>
             </GlassCard>
           </div>
+
+          {/* Activation funnel — signups say nothing about whether a workspace
+              ever got off the ground. Each step is a subset of the one above. */}
+          <GlassCard className="mt-4">
+            <div className="px-5 py-4">
+              <div className="flex items-center gap-2 text-text-tertiary mb-3">
+                <Activity size={14} />
+                <span className="text-[12.5px] font-medium uppercase tracking-wide">Activation</span>
+              </div>
+              <div className="space-y-2.5">
+                <FunnelRow
+                  label="Workspaces created"
+                  count={data.activation.workspacesTotal}
+                  total={data.activation.workspacesTotal}
+                  color="bg-text-tertiary"
+                />
+                <FunnelRow
+                  label="Added an employee"
+                  count={data.activation.workspacesWithEmployees}
+                  total={data.activation.workspacesTotal}
+                  color="bg-blue"
+                />
+                <FunnelRow
+                  label="Recorded a check-in"
+                  count={data.activation.workspacesWithAttendance}
+                  total={data.activation.workspacesTotal}
+                  color="bg-amber"
+                />
+                <FunnelRow
+                  label="Active in the last 7 days"
+                  count={data.activation.workspacesActiveLast7d}
+                  total={data.activation.workspacesTotal}
+                  color="bg-green"
+                />
+              </div>
+              <p className="text-[11.5px] text-text-tertiary mt-3 leading-snug">
+                Percentages are of all live workspaces. Deleted workspaces are excluded, and voided
+                attendance doesn&apos;t count as a check-in.
+              </p>
+            </div>
+          </GlassCard>
 
           {/* 30-day growth chart */}
           <GrowthChart series={data.growthSeries} className="mt-4" />
@@ -328,6 +370,38 @@ function PlanRow({
           {Icon && <Icon size={12} className="opacity-70" />}
           {label}
         </span>
+        <span className="tabular-nums text-text-primary">
+          <span className="font-semibold">{count.toLocaleString()}</span>
+          <span className="text-text-tertiary"> · {pct}%</span>
+        </span>
+      </div>
+      <div className="h-1.5 rounded-full bg-cream-3 overflow-hidden">
+        <div className={cn('h-full rounded-full transition-all', color)} style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * One step of the activation funnel: absolute count, share of all live
+ * workspaces, and a bar so the drop-off between steps is visible at a glance.
+ */
+function FunnelRow({
+  label,
+  count,
+  total,
+  color,
+}: {
+  label: string;
+  count: number;
+  total: number;
+  color: string;
+}) {
+  const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+  return (
+    <div>
+      <div className="flex items-center justify-between text-[13.5px] mb-1">
+        <span className="text-text-secondary">{label}</span>
         <span className="tabular-nums text-text-primary">
           <span className="font-semibold">{count.toLocaleString()}</span>
           <span className="text-text-tertiary"> · {pct}%</span>

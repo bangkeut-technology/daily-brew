@@ -248,6 +248,15 @@ class AdminDashboardController extends AbstractController
             ],
         ]);
 
+        // Activation funnel — signups alone say nothing about whether a
+        // workspace ever got off the ground. Each step is a strict subset of
+        // the one above it.
+        $workspacesWithEmployees = $employeeRepository->countWorkspacesWithEmployees();
+        $workspacesWithAttendance = $attendanceRepository->countWorkspacesWithAttendance();
+        $workspacesActive7d = $attendanceRepository->countWorkspacesWithAttendance(
+            DateService::relative('-7 days'),
+        );
+
         return $this->jsonSuccess([
             'totals' => [
                 'users' => $userRepository->count([]),
@@ -255,6 +264,12 @@ class AdminDashboardController extends AbstractController
                 'employees' => $employeeRepository->count(['deletedAt' => null]),
                 'attendances' => $attendanceRepository->count([]),
                 'subscriptions' => $liveSubscriptions,
+            ],
+            'activation' => [
+                'workspacesTotal' => $totalWorkspaces,
+                'workspacesWithEmployees' => $workspacesWithEmployees,
+                'workspacesWithAttendance' => $workspacesWithAttendance,
+                'workspacesActiveLast7d' => $workspacesActive7d,
             ],
             'byPlan' => $byPlan,
             'byStatus' => $byStatus,

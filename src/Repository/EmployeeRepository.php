@@ -188,6 +188,35 @@ class EmployeeRepository extends AbstractRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * Employees who have actually connected a user account. The gap between
+     * this and the headcount is the real onboarding drop-off — an unlinked
+     * employee cannot check in at all.
+     */
+    public function countLinkedByWorkspace(Workspace $workspace): int
+    {
+        return (int) $this->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->where('e.workspace = :ws')
+            ->andWhere('e.linkedUser IS NOT NULL')
+            ->andWhere('e.deletedAt IS NULL')
+            ->setParameter('ws', $workspace)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /** Live workspaces that have at least one employee — activation funnel step 1. */
+    public function countWorkspacesWithEmployees(): int
+    {
+        return (int) $this->createQueryBuilder('e')
+            ->select('COUNT(DISTINCT IDENTITY(e.workspace))')
+            ->join('e.workspace', 'w')
+            ->where('w.deletedAt IS NULL')
+            ->andWhere('e.deletedAt IS NULL')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function countManagersByWorkspace(Workspace $workspace): int
     {
         return (int) $this->createQueryBuilder('e')

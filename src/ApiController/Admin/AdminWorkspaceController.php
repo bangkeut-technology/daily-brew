@@ -12,11 +12,13 @@ use App\Enum\AdminAuditActionEnum;
 use App\Enum\AdminAuditTargetTypeEnum;
 use App\Enum\PlanEnum;
 use App\Enum\SubscriptionStatusEnum;
+use App\Repository\AttendanceRepository;
 use App\Repository\EmployeeRepository;
 use App\Repository\SubscriptionRepository;
 use App\Repository\WorkspaceQrCodeRepository;
 use App\Repository\WorkspaceRepository;
 use App\Service\AdminAuditService;
+use App\Service\DateService;
 use App\Service\WorkspaceService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -38,6 +40,7 @@ class AdminWorkspaceController extends AbstractController
         WorkspaceRepository $workspaceRepository,
         EmployeeRepository $employeeRepository,
         SubscriptionRepository $subscriptionRepository,
+        AttendanceRepository $attendanceRepository,
     ): JsonResponse {
         $page = max(1, (int) $request->query->get('page', '1'));
         $search = trim((string) $request->query->get('search', ''));
@@ -90,7 +93,11 @@ class AdminWorkspaceController extends AbstractController
             $employeeRepository,
         );
 
-        $rows = array_map(function (Workspace $w) use ($subsByWorkspaceId, $employeeCountByWorkspaceId) {
+        $lastActivityByWorkspaceId = $attendanceRepository->findLastAttendanceDateByWorkspaceIds(
+            array_map(fn (Workspace $w) => $w->getId(), $workspaces),
+        );
+
+        $rows = array_map(function (Workspace $w) use ($subsByWorkspaceId, $employeeCountByWorkspaceId, $lastActivityByWorkspaceId) {
             $sub = $subsByWorkspaceId[$w->getId()] ?? null;
             $rowPlan = $sub?->getPlan()->value ?? 'free';
             return [
@@ -106,6 +113,9 @@ class AdminWorkspaceController extends AbstractController
                 'currentPeriodEnd' => $sub?->getCurrentPeriodEnd()?->format('c'),
                 'isTrialing' => $sub?->isTrialing() ?? false,
                 'employeeCount' => $employeeCountByWorkspaceId[$w->getId()] ?? 0,
+                // Workspace-local calendar date of the most recent check-in,
+                // or null if nobody has ever checked in.
+                'lastActivityDate' => $lastActivityByWorkspaceId[$w->getId()] ?? null,
                 'createdAt' => $w->getCreatedAt()->format('c'),
                 'deletedAt' => $w->getDeletedAt()?->format('c'),
                 'testingTrack' => $w->getTestingTrack()->value,
@@ -254,6 +264,7 @@ class AdminWorkspaceController extends AbstractController
         EmployeeRepository $employeeRepository,
         SubscriptionRepository $subscriptionRepository,
         WorkspaceQrCodeRepository $qrCodeRepository,
+        AttendanceRepository $attendanceRepository,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByPublicId($publicId);
         if (!$workspace instanceof Workspace) {
@@ -263,6 +274,12 @@ class AdminWorkspaceController extends AbstractController
         $sub = $subscriptionRepository->findByWorkspace($workspace);
         $employeeCount = $employeeRepository->count(['workspace' => $workspace, 'deletedAt' => null]);
         $qrCount = $qrCodeRepository->count(['workspace' => $workspace]);
+
+        // Activity block — answers "is this account actually being used?",
+        // which the identity/subscription fields alone can't.
+        $lastActivity = $attendanceRepository->findLastAttendanceDateByWorkspaceIds([$workspace->getId()]);
+        $sevenDaysAgo = DateService::relative('-7 days');
+        $thirtyDaysAgo = DateService::relative('-30 days');
 
         return $this->jsonSuccess([
             'publicId' => (string) $workspace->getPublicId(),
@@ -278,6 +295,16 @@ class AdminWorkspaceController extends AbstractController
             ] : null,
             'employeeCount' => $employeeCount,
             'qrCodeCount' => $qrCount,
+            'activity' => [
+                'lastActivityDate' => $lastActivity[$workspace->getId()] ?? null,
+                'attendancesTotal' => $attendanceRepository->countByWorkspace($workspace),
+                'attendancesLast7d' => $attendanceRepository->countByWorkspace($workspace, $sevenDaysAgo),
+                'attendancesLast30d' => $attendanceRepository->countByWorkspace($workspace, $thirtyDaysAgo),
+                // Employees without a linked user cannot check in at all, so
+                // this gap is the onboarding drop-off.
+                'linkedEmployeeCount' => $employeeRepository->countLinkedByWorkspace($workspace),
+                'managerCount' => $employeeRepository->countManagersByWorkspace($workspace),
+            ],
             'subscription' => $sub ? [
                 'plan' => $sub->getPlan()->value,
                 'status' => $sub->getStatus()->value,
