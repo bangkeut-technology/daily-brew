@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.121.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.121.0...v1.121.1) (2026-07-27)
+
+
+### Bug Fixes
+
+* **admin:** pin every admin date to DD/MM/YYYY ([#351](https://github.com/bangkeut-technology/daily-brew/issues/351)) ([1898f0c](https://github.com/bangkeut-technology/daily-brew/commit/1898f0ce15868c8e8c79f48f69e9b917d3444216))
+
 ## [1.121.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.120.0...v1.121.0) (2026-07-27)
 
 
