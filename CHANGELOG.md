@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.123.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.122.0...v1.123.0) (2026-07-27)
+
+
+### Features
+
+* **next/admin:** port workspace activity, adoption, and the activation funnel ([#356](https://github.com/bangkeut-technology/daily-brew/issues/356)) ([03e66dd](https://github.com/bangkeut-technology/daily-brew/commit/03e66dd0fd038b8fbfba05ddf914e6f86c9931a9))
+* **next/console:** port the profile page ([#357](https://github.com/bangkeut-technology/daily-brew/issues/357)) ([a67761c](https://github.com/bangkeut-technology/daily-brew/commit/a67761ce1619572e67889c7313b54108972bfca6))
+
 ## [1.122.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.121.1...v1.122.0) (2026-07-27)
 
 
