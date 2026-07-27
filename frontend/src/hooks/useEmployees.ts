@@ -18,6 +18,27 @@ export interface EmployeeInput {
   shiftPublicId?: string | null;
 }
 
+/**
+ * The detail page can additionally flip status, move the absent-baseline
+ * anchor, and link/unlink the user account — none of which the create form
+ * exposes. `null` on `linkedUserPublicId` unlinks.
+ */
+export interface EmployeeUpdateInput extends Partial<EmployeeInput> {
+  active?: boolean;
+  linkedAt?: string | null;
+  leftAt?: string | null;
+  linkedUserPublicId?: string | null;
+}
+
+export function useEmployee(workspacePublicId: string, publicId: string) {
+  return useQuery({
+    queryKey: ["employees", workspacePublicId, publicId],
+    queryFn: async () =>
+      (await apiAxios.get<Employee>(`/workspaces/${workspacePublicId}/employees/${publicId}`)).data,
+    enabled: !!workspacePublicId && !!publicId,
+  });
+}
+
 export function useEmployees(workspacePublicId: string) {
   return useQuery({
     queryKey: ["employees", workspacePublicId],
@@ -50,15 +71,18 @@ export function useCreateEmployee(workspacePublicId: string) {
 export function useUpdateEmployee(workspacePublicId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ publicId, ...input }: EmployeeInput & { publicId: string }) => {
+    mutationFn: async ({ publicId, ...input }: EmployeeUpdateInput & { publicId: string }) => {
       const { data } = await apiAxios.put<Employee>(
         `/workspaces/${workspacePublicId}/employees/${publicId}`,
         input,
       );
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["employees", workspacePublicId] });
+      queryClient.invalidateQueries({
+        queryKey: ["employees", workspacePublicId, variables.publicId],
+      });
     },
   });
 }
@@ -73,7 +97,12 @@ export function useUpdateManagerPermissions(workspacePublicId: string) {
           { permissions },
         )
       ).data,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["employees", workspacePublicId] }),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["employees", workspacePublicId] });
+      queryClient.invalidateQueries({
+        queryKey: ["employees", workspacePublicId, variables.publicId],
+      });
+    },
   });
 }
 

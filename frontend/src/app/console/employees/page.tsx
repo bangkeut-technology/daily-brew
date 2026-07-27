@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { Pencil, Plus, ShieldCheck, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -78,13 +79,18 @@ export default function EmployeesPage() {
         <GlassCard hover={false} className="divide-y divide-cream-3/70">
           {employees.map((emp, i) => (
             <div key={emp.publicId} className="flex items-center gap-4 px-5 py-4">
-              <Avatar name={emp.name} index={i} size={40} />
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-medium text-text-primary">{emp.name}</p>
+              <Avatar name={emp.name} imageUrl={emp.photoUrl} index={i} size={40} />
+              <Link
+                href={`/console/employees/${emp.publicId}`}
+                className="min-w-0 flex-1 no-underline"
+              >
+                <p className="truncate font-medium text-text-primary transition-colors hover:text-coffee">
+                  {emp.name}
+                </p>
                 {emp.jobTitle && (
                   <p className="truncate text-sm text-text-tertiary">{emp.jobTitle}</p>
                 )}
-              </div>
+              </Link>
               <div className="flex items-center gap-2">
                 {emp.role === "manager" && <StatusBadge label="Manager" variant="blue" />}
                 {emp.attendanceTracking === "none" && (

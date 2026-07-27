@@ -12,9 +12,11 @@ interface AvatarProps {
   index?: number;
   size?: number;
   radius?: string;
+  /** Uploaded headshot; falls back to the initials tile when absent. */
+  imageUrl?: string | null;
 }
 
-export function Avatar({ name, index = 0, size = 32, radius = "50%" }: AvatarProps) {
+export function Avatar({ name, index = 0, size = 32, radius = "50%", imageUrl }: AvatarProps) {
   const initials = name
     .split(" ")
     .map((n) => n[0])
@@ -22,12 +24,31 @@ export function Avatar({ name, index = 0, size = 32, radius = "50%" }: AvatarPro
     .slice(0, 2)
     .toUpperCase();
 
+  const base = {
+    width: size,
+    height: size,
+    borderRadius: radius,
+    flexShrink: 0,
+  } as const;
+
+  if (imageUrl) {
+    return (
+      // Plain <img>, not next/image: these are same-origin Symfony-served
+      // uploads behind auth, so the optimizer would add a round trip for no
+      // gain and would need remotePatterns config per environment.
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={imageUrl}
+        alt={name}
+        style={{ ...base, objectFit: "cover" }}
+      />
+    );
+  }
+
   return (
     <div
       style={{
-        width: size,
-        height: size,
-        borderRadius: radius,
+        ...base,
         background: AVATAR_GRADIENTS[index % AVATAR_GRADIENTS.length],
         display: "flex",
         alignItems: "center",
@@ -35,7 +56,6 @@ export function Avatar({ name, index = 0, size = 32, radius = "50%" }: AvatarPro
         fontSize: size * 0.38,
         fontWeight: 600,
         color: "white",
-        flexShrink: 0,
       }}
     >
       {initials}
