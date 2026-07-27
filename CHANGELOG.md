@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.124.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.123.0...v1.124.0) (2026-07-27)
+
+
+### Features
+
+* **next/console:** port the sub-QR detail page and make sub-QRs manageable ([#359](https://github.com/bangkeut-technology/daily-brew/issues/359)) ([86c3b2b](https://github.com/bangkeut-technology/daily-brew/commit/86c3b2bf9a00978a4eeccd919d1518ac8b5168d2))
+* **next/marketing:** port the three SPA-only blog posts and the alias route ([#360](https://github.com/bangkeut-technology/daily-brew/issues/360)) ([dca94c4](https://github.com/bangkeut-technology/daily-brew/commit/dca94c4b2853a7e9c5b4b2012b88c43a9bf4c326))
+
 ## [1.123.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.122.0...v1.123.0) (2026-07-27)
 
 
