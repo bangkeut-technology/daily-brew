@@ -8,6 +8,43 @@ export interface AdminDashboardData {
   };
   byPlan: Record<"free" | "espresso" | "double_espresso", number>;
   byStatus: Record<"active" | "trialing" | "past_due" | "paused" | "canceled", number>;
+  growth: {
+    usersLast7d: number;
+    usersLast30d: number;
+    workspacesLast7d: number;
+    workspacesLast30d: number;
+    employeesLast7d: number;
+    employeesLast30d: number;
+    attendancesLast7d: number;
+    attendancesLast30d: number;
+  };
+  growthSeries: GrowthPoint[];
+  recentSignups: { publicId: string; email: string; fullName: string; createdAt: string }[];
+  recentWorkspaces: {
+    publicId: string;
+    name: string;
+    owner: { publicId: string; email: string } | null;
+    createdAt: string;
+  }[];
+  recentActivity: {
+    publicId: string;
+    action: string;
+    actionLabel: string;
+    actorEmail: string | null;
+    targetType: string;
+    targetPublicId: string | null;
+    targetLabel: string | null;
+    createdAt: string;
+  }[];
+}
+
+export interface GrowthPoint {
+  /** YYYY-MM-DD */
+  date: string;
+  users: number;
+  workspaces: number;
+  employees: number;
+  attendances: number;
 }
 
 export interface AdminPagedResponse<T> {
@@ -58,6 +95,63 @@ export interface AdminSubscriptionRow {
   workspace: { publicId: string; name: string };
   owner: { publicId: string; email: string } | null;
   createdAt: string;
+}
+
+export interface AdminUserDetail extends AdminUserRow {
+  locale: string | null;
+  onboardingCompleted: boolean;
+  updatedAt: string;
+  ownedWorkspaces: { publicId: string; name: string; deletedAt: string | null }[];
+  linkedWorkspaces: {
+    employeePublicId: string;
+    employeeName: string;
+    workspacePublicId: string | null;
+    workspaceName: string | null;
+    role: string;
+  }[];
+}
+
+export type WorkspaceTestingTrack = "none" | "alpha" | "beta";
+export type WorkspacePlan = "free" | "espresso" | "double_espresso";
+
+export interface AdminWorkspaceDetail {
+  publicId: string;
+  name: string;
+  qrToken: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  owner: { publicId: string; email: string; fullName: string } | null;
+  employeeCount: number;
+  qrCodeCount: number;
+  subscription: {
+    plan: string;
+    status: string;
+    paddleSubscriptionId: string | null;
+    paddleCustomerId: string | null;
+    currentPeriodEnd: string | null;
+    trialEndsAt: string | null;
+    canceledAt: string | null;
+    isActive: boolean;
+  } | null;
+  settings: {
+    timezone: string;
+    ipRestrictionEnabled: boolean;
+    geofencingEnabled: boolean;
+    deviceVerificationEnabled: boolean;
+  } | null;
+  testingTrack: WorkspaceTestingTrack;
+}
+
+export interface AdminFilterOption {
+  value: string;
+  label: string;
+}
+
+/** The audit-log list ships its own filter vocabulary — see AdminAuditLogController. */
+export interface AdminAuditLogResponse extends AdminPagedResponse<AdminAuditLogRow> {
+  actions?: AdminFilterOption[];
+  targetTypes?: AdminFilterOption[];
 }
 
 export interface AdminAuditLogRow {

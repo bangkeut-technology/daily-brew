@@ -1,139 +1,279 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Shield, ShieldOff } from "lucide-react";
+import Link from "next/link";
+import { ShieldCheck, ShieldOff, UserCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useAdminUsers, usePromoteUser, useDemoteUser } from "@/hooks/useAdmin";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useAuth } from "@/providers/auth-provider";
 import type { AdminUserRow } from "@/types/admin";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { GlassCard } from "@/components/shared/GlassCard";
-import { StatusBadge } from "@/components/shared/StatusBadge";
+import { Toggle } from "@/components/shared/Toggle";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";
+import { Pager } from "@/components/admin/Pager";
+import { AdminSearchInput } from "@/components/admin/AdminSearchInput";
+import {
+  AdminEmpty,
+  CardSkeletonList,
+  MobileCard,
+  MobileField,
+  STICKY_HEAD,
+  TABLE_SCROLL,
+  TableEmptyRow,
+  TableSkeletonRows,
+} from "@/components/admin/AdminDataStates";
+import { cn } from "@/lib/utils";
+
+function authMethods(u: AdminUserRow): string {
+  return (
+    [u.hasPassword && "pw", u.hasGoogle && "google", u.hasApple && "apple"]
+      .filter(Boolean)
+      .join(" · ") || "—"
+  );
+}
 
 export default function AdminUsersPage() {
   const { user: currentUser } = useAuth();
   const [page, setPage] = useState(1);
-  const [q, setQ] = useState("");
-  const { data, isLoading } = useAdminUsers({ page, q: q || undefined });
+  const [search, setSearch] = useState("");
+  const [superAdminOnly, setSuperAdminOnly] = useState(false);
+  const debouncedSearch = useDebouncedValue(search);
+  const { data, isLoading } = useAdminUsers({
+    page,
+    search: debouncedSearch || undefined,
+    superAdminOnly: superAdminOnly || undefined,
+  });
   const promote = usePromoteUser();
   const demote = useDemoteUser();
-  const [target, setTarget] = useState<{ user: AdminUserRow; action: "promote" | "demote" } | null>(null);
+  const [target, setTarget] = useState<{ user: AdminUserRow; action: "promote" | "demote" } | null>(
+    null,
+  );
+
+  const users = data?.items ?? [];
+  const isEmpty = !isLoading && users.length === 0;
+  const isFiltered = debouncedSearch !== "" || superAdminOnly;
+  const pending = promote.isPending || demote.isPending;
 
   const confirm = () => {
     if (!target) return;
     const mutation = target.action === "promote" ? promote : demote;
     mutation.mutate(target.user.publicId, {
-      onSuccess: () => toast.success(`${target.user.email} ${target.action}d`),
+      onSuccess: () => {
+        toast.success(`${target.user.email} ${target.action}d`);
+        setTarget(null);
+      },
       onError: () => toast.error("Action failed"),
     });
   };
 
-  const totalPages = data ? Math.max(1, Math.ceil(data.total / data.pageSize)) : 1;
+  const emptyProps = {
+    icon: UserCircle,
+    title: isFiltered ? "No users match these filters" : "No users yet",
+    hint: isFiltered ? "Try a different email, or turn off the super-admins filter." : undefined,
+  };
 
   return (
     <div className="page-enter">
       <PageHeader title="Users" />
 
-      <div className="mb-5 max-w-sm">
-        <div className="relative">
-          <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary" />
-          <input
-            id="user-search"
-            name="user-search"
-            value={q}
-            onChange={(e) => {
-              setQ(e.target.value);
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <AdminSearchInput
+          id="admin-user-search"
+          label="Search users"
+          value={search}
+          onChange={(v) => {
+            setSearch(v);
+            setPage(1);
+          }}
+          placeholder="Search by email or name…"
+          className="flex-1 sm:max-w-sm"
+        />
+        <div className="flex items-center gap-3">
+          <label htmlFor="admin-users-super-only" className="text-[13px] text-text-secondary">
+            Super admins only
+          </label>
+          <Toggle
+            id="admin-users-super-only"
+            checked={superAdminOnly}
+            onChange={(v) => {
+              setSuperAdminOnly(v);
               setPage(1);
             }}
-            placeholder="Search by email or name"
-            className="w-full rounded-lg border border-cream-3 bg-glass-bg py-2 pl-9 pr-3 text-[15px] text-text-primary outline-none focus:border-coffee"
           />
         </div>
       </div>
 
-      {isLoading || !data ? (
-        <p className="text-text-secondary">Loading…</p>
-      ) : (
-        <>
-          <GlassCard hover={false} className="divide-y divide-cream-3/70">
-            {data.items.map((u) => {
-              const isSelf = u.publicId === currentUser?.publicId;
-              return (
-                <div key={u.publicId} className="flex items-center gap-4 px-5 py-3.5">
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-text-primary">{u.fullName || u.email}</p>
-                    <p className="truncate text-sm text-text-tertiary">{u.email}</p>
-                  </div>
-                  {u.isSuperAdmin && <StatusBadge label="Super admin" variant="green" />}
-                  {u.isSuperAdmin ? (
-                    <button
-                      type="button"
-                      disabled={isSelf}
-                      onClick={() => setTarget({ user: u, action: "demote" })}
-                      title={isSelf ? "You can't demote yourself" : "Demote"}
-                      className="rounded-lg p-2 text-text-tertiary transition-colors hover:bg-red/10 hover:text-red disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      <ShieldOff size={16} />
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => setTarget({ user: u, action: "promote" })}
-                      title="Promote to super admin"
-                      className="rounded-lg p-2 text-text-tertiary transition-colors hover:bg-green/10 hover:text-green"
-                    >
-                      <Shield size={16} />
-                    </button>
-                  )}
-                </div>
-              );
-            })}
+      {/* Phones get cards — a 6-column table forces horizontal scrolling that
+          hides the promote/demote action off-screen. */}
+      <div className="md:hidden">
+        {isLoading && <CardSkeletonList />}
+        {isEmpty && (
+          <GlassCard hover={false}>
+            <AdminEmpty {...emptyProps} />
           </GlassCard>
-
-          <div className="mt-4 flex items-center justify-between text-sm text-text-secondary">
-            <span>
-              {data.total} user{data.total === 1 ? "" : "s"}
-            </span>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                disabled={page <= 1}
-                onClick={() => setPage((p) => p - 1)}
-                className="rounded-lg border border-cream-3 px-3 py-1.5 disabled:opacity-40"
-              >
-                Prev
-              </button>
-              <span>
-                {page} / {totalPages}
-              </span>
-              <button
-                type="button"
-                disabled={page >= totalPages}
-                onClick={() => setPage((p) => p + 1)}
-                className="rounded-lg border border-cream-3 px-3 py-1.5 disabled:opacity-40"
-              >
-                Next
-              </button>
-            </div>
+        )}
+        {!isLoading && users.length > 0 && (
+          <div className="space-y-2">
+            {users.map((u) => (
+              <MobileCard key={u.publicId}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <Link
+                      href={`/admin/users/${u.publicId}`}
+                      className="block truncate text-[14.5px] font-medium text-text-primary no-underline hover:text-coffee"
+                    >
+                      {u.email}
+                    </Link>
+                    {u.fullName && (
+                      <p className="truncate text-[12.5px] text-text-tertiary">{u.fullName}</p>
+                    )}
+                  </div>
+                  <RoleActionButton
+                    user={u}
+                    isSelf={u.publicId === currentUser?.publicId}
+                    pending={pending}
+                    onAction={(action) => setTarget({ user: u, action })}
+                  />
+                </div>
+                <div className="mt-2 space-y-1">
+                  {u.isSuperAdmin && (
+                    <MobileField label="Role">
+                      <SuperAdminPill />
+                    </MobileField>
+                  )}
+                  <MobileField label="Auth">{authMethods(u)}</MobileField>
+                  <MobileField label="Created">
+                    {new Date(u.createdAt).toLocaleDateString()}
+                  </MobileField>
+                </div>
+              </MobileCard>
+            ))}
           </div>
-        </>
+        )}
+      </div>
+
+      <GlassCard hover={false} className="hidden md:block">
+        <div className={TABLE_SCROLL}>
+          <table className="w-full text-[13.5px]">
+            <thead className={STICKY_HEAD}>
+              <tr>
+                <th className="px-4 py-2.5 text-left font-medium">Email</th>
+                <th className="px-4 py-2.5 text-left font-medium">Name</th>
+                <th className="px-4 py-2.5 text-left font-medium">Auth</th>
+                <th className="px-4 py-2.5 text-left font-medium">Role</th>
+                <th className="px-4 py-2.5 text-left font-medium">Created</th>
+                <th className="w-10 px-4 py-2.5 text-right font-medium">
+                  <span className="sr-only">Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {isLoading && <TableSkeletonRows cols={6} />}
+              {isEmpty && <TableEmptyRow colSpan={6} {...emptyProps} />}
+              {!isLoading &&
+                users.map((u) => (
+                  <tr
+                    key={u.publicId}
+                    className="border-t border-cream-3/60 transition-colors hover:bg-cream-3/20"
+                  >
+                    <td className="px-4 py-2.5">
+                      <Link
+                        href={`/admin/users/${u.publicId}`}
+                        className="font-medium text-text-primary no-underline hover:text-coffee"
+                      >
+                        {u.email}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-2.5 text-text-secondary">{u.fullName || "—"}</td>
+                    <td className="px-4 py-2.5 text-[12.5px] text-text-secondary">{authMethods(u)}</td>
+                    <td className="px-4 py-2.5">{u.isSuperAdmin && <SuperAdminPill />}</td>
+                    <td className="px-4 py-2.5 text-[12.5px] tabular-nums text-text-tertiary">
+                      {new Date(u.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-2.5 text-right">
+                      <RoleActionButton
+                        user={u}
+                        isSelf={u.publicId === currentUser?.publicId}
+                        pending={pending}
+                        onAction={(action) => setTarget({ user: u, action })}
+                      />
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      </GlassCard>
+
+      {data && (
+        <Pager page={data.page} total={data.total} pageSize={data.pageSize} onPage={setPage} noun="user" />
       )}
 
       <ConfirmModal
         open={target !== null}
         onOpenChange={(open) => !open && setTarget(null)}
-        title={target?.action === "promote" ? "Promote to super admin" : "Demote super admin"}
+        title={target?.action === "promote" ? "Grant super-admin role" : "Revoke super-admin role"}
         description={
           target?.action === "promote"
-            ? `Give ${target?.user.email} full platform admin access?`
-            : `Remove ${target?.user.email}'s platform admin access?`
+            ? `Grant super admin to ${target?.user.email}? They get full read/write access to every workspace, user, and subscription on the platform.`
+            : `Revoke super-admin from ${target?.user.email}? They will lose access to /admin immediately.`
         }
-        confirmLabel={target?.action === "promote" ? "Promote" : "Demote"}
+        confirmLabel={target?.action === "promote" ? "Grant" : "Revoke"}
         variant={target?.action === "demote" ? "danger" : "default"}
-        loading={promote.isPending || demote.isPending}
+        loading={pending}
         onConfirm={confirm}
       />
     </div>
+  );
+}
+
+function SuperAdminPill() {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-coffee/15 px-2 py-0.5 text-[11.5px] font-medium text-coffee">
+      <ShieldCheck size={11} /> Super admin
+    </span>
+  );
+}
+
+function RoleActionButton({
+  user,
+  isSelf,
+  pending,
+  onAction,
+}: {
+  user: AdminUserRow;
+  isSelf: boolean;
+  pending: boolean;
+  onAction: (action: "promote" | "demote") => void;
+}) {
+  const base =
+    "rounded-lg p-1.5 transition-colors disabled:cursor-not-allowed disabled:opacity-30";
+  if (user.isSuperAdmin) {
+    return (
+      <button
+        type="button"
+        disabled={isSelf || pending}
+        onClick={() => onAction("demote")}
+        title={isSelf ? "You cannot demote yourself" : "Revoke super-admin role"}
+        aria-label="Revoke super admin"
+        className={cn(base, "text-text-tertiary hover:bg-red/10 hover:text-red")}
+      >
+        <ShieldOff size={16} />
+      </button>
+    );
+  }
+  return (
+    <button
+      type="button"
+      disabled={pending}
+      onClick={() => onAction("promote")}
+      title="Promote to super admin"
+      aria-label="Promote to super admin"
+      className={cn(base, "text-text-tertiary hover:bg-coffee/10 hover:text-coffee")}
+    >
+      <ShieldCheck size={16} />
+    </button>
   );
 }

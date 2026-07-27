@@ -15,6 +15,7 @@ import { GlassCard } from "@/components/shared/GlassCard";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";
 import { CronScheduleModal } from "@/components/admin/CronScheduleModal";
+import { Skeleton } from "@/components/admin/AdminDataStates";
 
 const RUN_VARIANT = { success: "green", failed: "red", running: "amber" } as const;
 
@@ -57,7 +58,14 @@ export default function AdminCronPage() {
       />
 
       {isLoading || !schedules ? (
-        <p className="text-text-secondary">Loading…</p>
+        <GlassCard hover={false} className="divide-y divide-cream-3/70">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="space-y-2 px-5 py-4" aria-busy="true">
+              <Skeleton className="h-3.5 w-1/3" />
+              <Skeleton className="h-3 w-2/3" />
+            </div>
+          ))}
+        </GlassCard>
       ) : schedules.length === 0 ? (
         <GlassCard hover={false} className="p-8 text-center">
           <p className="text-text-secondary">No scheduled commands.</p>

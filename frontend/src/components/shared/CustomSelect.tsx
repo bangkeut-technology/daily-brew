@@ -18,6 +18,9 @@ interface CustomSelectProps {
   className?: string;
   searchable?: boolean;
   id?: string;
+  disabled?: boolean;
+  /** Tooltip explaining why the control is locked — pair it with `disabled`. */
+  title?: string;
 }
 
 interface MenuPosition {
@@ -35,6 +38,8 @@ export function CustomSelect({
   className = "",
   searchable,
   id,
+  disabled,
+  title,
 }: CustomSelectProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -103,8 +108,14 @@ export function CustomSelect({
         ref={triggerRef}
         id={id}
         type="button"
-        onClick={() => setOpen(!open)}
-        className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-cream-3 bg-glass-bg px-3 py-2 text-[15.5px] text-text-primary outline-none transition-colors focus:border-coffee focus:ring-1 focus:ring-coffee/20"
+        disabled={disabled}
+        title={title}
+        aria-disabled={disabled || undefined}
+        onClick={() => !disabled && setOpen(!open)}
+        className={cn(
+          "flex w-full items-center justify-between rounded-lg border border-cream-3 bg-glass-bg px-3 py-2 text-[15.5px] text-text-primary outline-none transition-colors focus:border-coffee focus:ring-1 focus:ring-coffee/20",
+          disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
+        )}
       >
         <span className={cn("flex min-w-0 items-center gap-2", !selected && "text-text-tertiary")}>
           {selected ? selected.label : placeholder}

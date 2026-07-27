@@ -6,6 +6,7 @@ import type { FeatureFlagStage } from "@/types/admin";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { CustomSelect } from "@/components/shared/CustomSelect";
+import { Skeleton } from "@/components/admin/AdminDataStates";
 
 export default function AdminFeatureFlagsPage() {
   const { data, isLoading } = useAdminFeatureFlags();
@@ -28,7 +29,14 @@ export default function AdminFeatureFlagsPage() {
       <PageHeader title="Feature flags" />
 
       {isLoading || !data ? (
-        <p className="text-text-secondary">Loading…</p>
+        <GlassCard hover={false} className="divide-y divide-cream-3/70">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="space-y-2 px-5 py-4" aria-busy="true">
+              <Skeleton className="h-3.5 w-1/3" />
+              <Skeleton className="h-3 w-2/3" />
+            </div>
+          ))}
+        </GlassCard>
       ) : (
         <GlassCard hover={false} className="divide-y divide-cream-3/70">
           {data.items.map((flag) => (
