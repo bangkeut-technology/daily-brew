@@ -13,6 +13,7 @@ import {
   QrCode,
   Settings,
   LogOut,
+  X,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -64,7 +65,7 @@ function signOut() {
   form.submit();
 }
 
-export function Sidebar() {
+export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const pathname = usePathname();
   const { t } = useTranslation();
   const { data: roleContext } = useRoleContext();
@@ -74,12 +75,31 @@ export function Sidebar() {
   else if (roleContext?.isManager) items = managerNav(roleContext.managerPermissions);
 
   return (
-    <aside className="fixed inset-y-0 left-0 flex w-[220px] flex-col border-r border-glass-border bg-glass-bg backdrop-blur-md">
-      <Link href="/console/dashboard" className="px-6 py-5 font-serif text-xl font-semibold text-coffee no-underline">
-        DailyBrew
-      </Link>
+    <aside
+      className={cn(
+        "fixed inset-y-0 left-0 z-50 flex w-[220px] flex-col border-r border-glass-border bg-cream-2 md:z-10 md:bg-glass-bg md:backdrop-blur-md",
+        "transform transition-transform duration-300 ease-in-out md:translate-x-0",
+        open ? "translate-x-0" : "-translate-x-full",
+      )}
+    >
+      <div className="flex items-center justify-between px-6 py-5">
+        <Link
+          href="/console/dashboard"
+          className="font-serif text-xl font-semibold text-coffee no-underline"
+        >
+          DailyBrew
+        </Link>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close"
+          className="-mr-1 p-1 text-text-secondary transition-colors hover:text-text-primary md:hidden"
+        >
+          <X className="h-5 w-5" />
+        </button>
+      </div>
 
-      <nav className="flex-1 space-y-1 px-3">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3">
         {items.map((item) => {
           const active = pathname === item.to || pathname.startsWith(item.to + "/");
           const Icon = item.icon;

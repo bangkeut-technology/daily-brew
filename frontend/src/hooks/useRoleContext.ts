@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiAxios, getWorkspacePublicId } from "@/lib/api";
 import type { RoleContext } from "@/types/auth";
 
@@ -14,5 +14,18 @@ export function useRoleContext() {
       });
       return data;
     },
+  });
+}
+
+/**
+ * Link the signed-in user to an employee record by its public ID. The server
+ * enforces the one-employee-per-workspace uniqueness rule.
+ */
+export function useLinkEmployee() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (employeePublicId: string) =>
+      (await apiAxios.post("/users/me/link-employee", { employeePublicId })).data,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["role-context"] }),
   });
 }

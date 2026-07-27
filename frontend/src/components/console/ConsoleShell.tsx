@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { Menu } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
 import { useRoleContext } from "@/hooks/useRoleContext";
 import { getWorkspacePublicId, clearWorkspacePublicId } from "@/lib/api";
@@ -29,6 +30,26 @@ export function ConsoleShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const auth = useAuth();
   const { data: roleContext } = useRoleContext();
+  const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
+
+  // Close the drawer on every navigation, back/forward included. Adjusting
+  // state during render (rather than in an effect) is React's documented
+  // pattern for "reset state when a value changes".
+  const [navPathname, setNavPathname] = React.useState(pathname);
+  if (navPathname !== pathname) {
+    setNavPathname(pathname);
+    if (mobileNavOpen) setMobileNavOpen(false);
+  }
+
+  // Lock body scroll while the drawer is open.
+  React.useEffect(() => {
+    if (!mobileNavOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [mobileNavOpen]);
 
   // Redirect unauthenticated users to sign-in.
   React.useEffect(() => {
@@ -87,8 +108,33 @@ export function ConsoleShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen">
-      <Sidebar />
-      <main className="ml-[220px] p-8 page-enter">{children}</main>
+      {/* Mobile top bar + off-canvas drawer; at md+ the sidebar is persistent. */}
+      <header className="fixed left-0 right-0 top-0 z-30 flex h-14 items-center border-b border-cream-3 bg-cream-2 px-4 md:hidden">
+        <button
+          type="button"
+          onClick={() => setMobileNavOpen(true)}
+          aria-label="Open menu"
+          aria-expanded={mobileNavOpen}
+          className="-ml-2 p-2 text-text-secondary transition-colors hover:text-text-primary"
+        >
+          <Menu size={22} />
+        </button>
+        <div className="flex flex-1 justify-center">
+          <span className="font-serif text-lg font-semibold text-coffee">DailyBrew</span>
+        </div>
+        <div className="w-9" aria-hidden />
+      </header>
+
+      {mobileNavOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 md:hidden"
+          onClick={() => setMobileNavOpen(false)}
+          aria-hidden
+        />
+      )}
+
+      <Sidebar open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
+      <main className="page-enter p-4 pt-18 md:ml-[220px] md:p-8 md:pt-8">{children}</main>
     </div>
   );
 }
