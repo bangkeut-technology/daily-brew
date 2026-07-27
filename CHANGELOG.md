@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.120.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.119.0...v1.120.0) (2026-07-27)
+
+
+### Features
+
+* **admin:** UX pass — debounced search, skeletons, mobile cards, filter fixes ([#345](https://github.com/bangkeut-technology/daily-brew/issues/345)) ([266ddba](https://github.com/bangkeut-technology/daily-brew/commit/266ddbafa7efeea7e7fd5f763a0a234b21916edb))
+* **next/admin:** parity pass — detail pages, dashboard, mobile drawer, search fix ([#346](https://github.com/bangkeut-technology/daily-brew/issues/346)) ([a279a91](https://github.com/bangkeut-technology/daily-brew/commit/a279a91fd7f00495ec0c50b6eb7be0b68dde910e))
+
 ## [1.119.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.118.0...v1.119.0) (2026-06-29)
 
 
