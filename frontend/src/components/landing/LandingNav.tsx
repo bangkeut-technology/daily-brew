@@ -5,17 +5,22 @@ import { useState, useEffect, useCallback } from "react";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 import { LogoBrand } from "@/components/shared/Logo";
+import { Link as LocaleLink } from "@/i18n/navigation";
+import { LocaleSwitcher } from "./LocaleSwitcher";
 
+/** Visible text comes from `marketing.nav.*`; `href` is the marketing route. */
 const navLinks = [
-  { label: "Features", href: "/features" },
-  { label: "How it works", href: "/how-it-works" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "Support", href: "/support" },
-  { label: "FAQ", href: "/faq" },
-];
+  { key: "features", href: "/features" },
+  { key: "howItWorks", href: "/how-it-works" },
+  { key: "pricing", href: "/pricing" },
+  { key: "support", href: "/support" },
+  { key: "faq", href: "/faq" },
+] as const;
 
 export function LandingNav() {
+  const t = useTranslations("marketing.nav");
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -52,33 +57,34 @@ export function LandingNav() {
       />
 
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 md:px-8">
-        <Link href="/" className="no-underline">
+        <LocaleLink href="/" className="no-underline">
           <LogoBrand size={30} />
-        </Link>
+        </LocaleLink>
 
         {/* Desktop links */}
         <div className="hidden items-center gap-6 md:flex">
           {navLinks.map((link) => (
-            <Link
+            <LocaleLink
               key={link.href}
               href={link.href}
               className="text-[15px] font-medium text-text-secondary no-underline transition-colors duration-200 hover:text-coffee"
             >
-              {link.label}
-            </Link>
+              {t(link.key)}
+            </LocaleLink>
           ))}
+          <LocaleSwitcher />
           <div className="h-4 w-px bg-cream-3" />
           <Link
             href="/sign-in"
             className="text-[15px] font-medium text-text-secondary no-underline transition-colors duration-200 hover:text-text-primary"
           >
-            Sign in
+            {t("signIn")}
           </Link>
           <Link
             href="/sign-up"
             className="flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-coffee px-4 py-2 text-[15px] font-medium text-white no-underline transition-all duration-150 hover:-translate-y-px hover:bg-coffee-light hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
           >
-            Get started
+            {t("getStarted")}
           </Link>
         </div>
 
@@ -103,29 +109,30 @@ export function LandingNav() {
             transition={{ duration: 0.25, ease: "easeInOut" }}
           >
             {navLinks.map((link) => (
-              <Link
+              <LocaleLink
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
                 className="block py-1 text-[16px] font-medium text-text-secondary no-underline transition-colors hover:text-coffee"
               >
-                {link.label}
-              </Link>
+                {t(link.key)}
+              </LocaleLink>
             ))}
+            <LocaleSwitcher className="py-1" />
             <div className="my-2 h-px bg-cream-3" />
             <Link
               href="/sign-in"
               onClick={() => setMobileOpen(false)}
               className="block py-1 text-[16px] font-medium text-text-secondary no-underline"
             >
-              Sign in
+              {t("signIn")}
             </Link>
             <Link
               href="/sign-up"
               onClick={() => setMobileOpen(false)}
               className="inline-flex items-center rounded-lg bg-coffee px-4 py-2 text-[15px] font-medium text-white no-underline"
             >
-              Get started
+              {t("getStarted")}
             </Link>
           </motion.div>
         )}

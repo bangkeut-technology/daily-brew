@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import createMDX from "@next/mdx";
+import createNextIntlPlugin from "next-intl/plugin";
 
 /**
  * In production the reverse proxy routes /api, /oauth, and /.well-known to
@@ -40,5 +41,7 @@ const nextConfig: NextConfig = {
 };
 
 const withMDX = createMDX({});
+// Points next-intl at src/i18n/request.ts for server-side message loading.
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
-export default withMDX(nextConfig);
+export default withNextIntl(withMDX(nextConfig));

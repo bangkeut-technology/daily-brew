@@ -3,28 +3,33 @@
 import Link from "next/link";
 import { Coffee } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
+import { Link as LocaleLink } from "@/i18n/navigation";
 import { AppStoreBadge } from "@/components/shared/AppStoreBadge";
 import { PlayStoreBadge } from "@/components/shared/PlayStoreBadge";
 
+/** `key` selects `marketing.footer.<group>Links.<key>`; `to` is the route. */
 const productLinks = [
-  { label: "Features", to: "/features" },
-  { label: "How it works", to: "/how-it-works" },
-  { label: "Guides", to: "/guides" },
-  { label: "Roles & permissions", to: "/roles" },
-  { label: "Try demo", to: "/demo" },
-  { label: "Pricing", to: "/pricing" },
-  { label: "FAQ", to: "/faq" },
-  { label: "Support", to: "/support" },
-];
+  { key: "features", to: "/features" },
+  { key: "howItWorks", to: "/how-it-works" },
+  { key: "guides", to: "/guides" },
+  { key: "roles", to: "/roles" },
+  { key: "demo", to: "/demo" },
+  { key: "pricing", to: "/pricing" },
+  { key: "faq", to: "/faq" },
+  { key: "support", to: "/support" },
+] as const;
 
 const legalLinks = [
-  { label: "Privacy policy", to: "/privacy" },
-  { label: "Terms of use", to: "/terms" },
-  { label: "Refund policy", to: "/refund" },
-  { label: "Delete account", to: "/delete-account" },
-];
+  { key: "privacy", to: "/privacy" },
+  { key: "terms", to: "/terms" },
+  { key: "refund", to: "/refund" },
+  { key: "deleteAccount", to: "/delete-account" },
+] as const;
 
 export function LandingFooter() {
+  const t = useTranslations("marketing.footer");
+
   return (
     <footer className="relative mt-10 border-t border-cream-3/50 bg-cream-2/50 backdrop-blur-sm">
       <div className="mx-auto max-w-5xl px-6 py-14 md:px-8">
@@ -38,8 +43,7 @@ export function LandingFooter() {
           >
             <h4 className="mb-2 font-serif text-[20px] font-semibold text-coffee">DailyBrew</h4>
             <p className="max-w-[220px] text-[14px] leading-relaxed text-text-secondary">
-              Staff attendance and leave tracking for restaurants. Simple, warm, and built for
-              teams that move fast.
+              {t("brandTagline")}
             </p>
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <AppStoreBadge className="inline-block opacity-80 transition-opacity hover:opacity-100" />
@@ -54,17 +58,17 @@ export function LandingFooter() {
             transition={{ duration: 0.4, delay: 0.1 }}
           >
             <p className="mb-4 text-[13px] font-medium uppercase tracking-[1.5px] text-text-tertiary">
-              Product
+              {t("productHeader")}
             </p>
             <ul className="space-y-2.5">
               {productLinks.map((link) => (
                 <li key={link.to}>
-                  <Link
+                  <LocaleLink
                     href={link.to}
                     className="text-[15px] text-text-secondary no-underline transition-colors duration-200 hover:text-coffee"
                   >
-                    {link.label}
-                  </Link>
+                    {t(`productLinks.${link.key}`)}
+                  </LocaleLink>
                 </li>
               ))}
             </ul>
@@ -77,17 +81,17 @@ export function LandingFooter() {
             transition={{ duration: 0.4, delay: 0.2 }}
           >
             <p className="mb-4 text-[13px] font-medium uppercase tracking-[1.5px] text-text-tertiary">
-              Legal
+              {t("legalHeader")}
             </p>
             <ul className="space-y-2.5">
               {legalLinks.map((link) => (
                 <li key={link.to}>
-                  <Link
+                  <LocaleLink
                     href={link.to}
                     className="text-[15px] text-text-secondary no-underline transition-colors duration-200 hover:text-coffee"
                   >
-                    {link.label}
-                  </Link>
+                    {t(`legalLinks.${link.key}`)}
+                  </LocaleLink>
                 </li>
               ))}
             </ul>
@@ -100,7 +104,7 @@ export function LandingFooter() {
             transition={{ duration: 0.4, delay: 0.3 }}
           >
             <p className="mb-4 text-[13px] font-medium uppercase tracking-[1.5px] text-text-tertiary">
-              Get started
+              {t("getStartedHeader")}
             </p>
             <ul className="space-y-2.5">
               <li>
@@ -108,7 +112,7 @@ export function LandingFooter() {
                   href="/sign-up"
                   className="text-[15px] text-text-secondary no-underline transition-colors duration-200 hover:text-coffee"
                 >
-                  Create account
+                  {t("cta.createAccount")}
                 </Link>
               </li>
               <li>
@@ -116,7 +120,7 @@ export function LandingFooter() {
                   href="/sign-in"
                   className="text-[15px] text-text-secondary no-underline transition-colors duration-200 hover:text-coffee"
                 >
-                  Sign in
+                  {t("cta.signIn")}
                 </Link>
               </li>
             </ul>
@@ -131,11 +135,12 @@ export function LandingFooter() {
           transition={{ duration: 0.4, delay: 0.3 }}
         >
           <p className="text-[13px] text-text-tertiary">
-            DailyBrew &copy; {new Date().getFullYear()}. All rights reserved.
+            {t("copyright", { year: new Date().getFullYear() })}
           </p>
           <p className="text-[13px] text-text-tertiary">
             <span className="inline-flex items-center gap-1">
-              Made with <Coffee size={12} className="text-coffee" /> for restaurants everywhere
+              {t("madeWithPrefix")} <Coffee size={12} className="text-coffee" />{" "}
+              {t("madeWithSuffix")}
             </span>
           </p>
         </motion.div>

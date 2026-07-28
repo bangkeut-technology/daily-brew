@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { ChevronRight, QrCode, CheckCircle, Clock, Users, Shield } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
+import { Link as LocaleLink } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { AppStoreBadge } from "@/components/shared/AppStoreBadge";
 import { PlayStoreBadge } from "@/components/shared/PlayStoreBadge";
@@ -17,14 +19,17 @@ const floatingCardVariants = {
   }),
 };
 
+/** `key` selects `homepage.hero.trust.<key>`. */
 const trustItems = [
-  { icon: <QrCode size={14} />, text: "QR check-in" },
-  { icon: <Clock size={14} />, text: "Shift tracking" },
-  { icon: <Users size={14} />, text: "Leave management" },
-  { icon: <Shield size={14} />, text: "Geofencing" },
+  { icon: <QrCode size={14} />, key: "qrCheckin" },
+  { icon: <Clock size={14} />, key: "shiftTracking" },
+  { icon: <Users size={14} />, key: "leaveManagement" },
+  { icon: <Shield size={14} />, key: "geofencing" },
 ];
 
 export function HeroSection() {
+  const t = useTranslations("homepage.hero");
+
   return (
     <section className="relative overflow-hidden px-6 pb-24 pt-32 md:px-8">
       {/* Animated background gradient */}
@@ -58,7 +63,7 @@ export function HeroSection() {
             >
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber" />
               <span className="text-[13px] font-medium tracking-wide text-amber">
-                Free for up to 10 active employees
+                {t("badge")}
               </span>
             </motion.div>
 
@@ -68,9 +73,9 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
-              Staff attendance,
+              {t("titleLine1")}
               <br />
-              <span className="text-coffee">brewed simply.</span>
+              <span className="text-coffee">{t("titleLine2")}</span>
             </motion.h1>
 
             <motion.p
@@ -79,8 +84,7 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              One QR code at your restaurant. Staff scan to check in. You see who&apos;s here,
-              who&apos;s late, and who&apos;s on leave — all in real time.
+              {t("subtitle")}
             </motion.p>
 
             <motion.div
@@ -93,15 +97,15 @@ export function HeroSection() {
                 href="/sign-up"
                 className="btn-shimmer inline-flex cursor-pointer items-center gap-2 rounded-xl border-none px-7 py-3.5 text-[17px] font-semibold text-white no-underline transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(107,66,38,0.30)]"
               >
-                Get started free
+                {t("ctaPrimary")}
                 <ChevronRight size={16} />
               </Link>
-              <Link
+              <LocaleLink
                 href="/demo"
                 className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-glass-border bg-glass-bg px-6 py-3.5 text-[16px] font-medium text-text-primary no-underline backdrop-blur-sm transition-all duration-200 hover:bg-cream-3"
               >
-                Try the demo
-              </Link>
+                {t("ctaSecondary")}
+              </LocaleLink>
             </motion.div>
 
             <motion.div
@@ -110,9 +114,9 @@ export function HeroSection() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.5 }}
             >
-              <p className="text-[13.5px] text-text-tertiary">No credit card required</p>
+              <p className="text-[13.5px] text-text-tertiary">{t("noCreditCard")}</p>
               <span className="h-1 w-1 rounded-full bg-cream-3" />
-              <p className="text-[13.5px] text-text-tertiary">Set up in under 5 minutes</p>
+              <p className="text-[13.5px] text-text-tertiary">{t("fastSetup")}</p>
             </motion.div>
 
             <motion.div
@@ -142,8 +146,10 @@ export function HeroSection() {
                   <CheckCircle size={14} className="text-green" />
                 </div>
                 <div>
-                  <p className="text-[12.5px] font-medium text-text-primary">Sophea checked in</p>
-                  <p className="text-[11px] text-text-tertiary">Just now — on time</p>
+                  <p className="text-[12.5px] font-medium text-text-primary">
+                    {t("preview.notification.title", { name: "Sophea" })}
+                  </p>
+                  <p className="text-[11px] text-text-tertiary">{t("preview.notification.sub")}</p>
                 </div>
               </div>
             </motion.div>
@@ -158,37 +164,41 @@ export function HeroSection() {
               <div className="mb-5 flex items-center justify-between">
                 <div>
                   <p className="mb-0.5 text-[12px] font-medium uppercase tracking-[1px] text-text-tertiary">
-                    Today&apos;s overview
+                    {t("preview.dashboardEyebrow")}
                   </p>
-                  <p className="font-serif text-[17px] font-semibold text-text-primary">Dashboard</p>
+                  <p className="font-serif text-[17px] font-semibold text-text-primary">
+                    {t("preview.dashboardTitle")}
+                  </p>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="h-2 w-2 animate-pulse rounded-full bg-green" />
-                  <span className="text-[12px] font-medium text-green">Live</span>
+                  <span className="text-[12px] font-medium text-green">{t("preview.liveBadge")}</span>
                 </div>
               </div>
 
               <div className="mb-5 grid grid-cols-4 gap-2.5">
                 {[
-                  { label: "Present", value: "7", color: "#4A7C59" },
-                  { label: "Late", value: "1", color: "#C17F3B" },
-                  { label: "Leave", value: "1", color: "#3B6FA0" },
-                  { label: "Absent", value: "0", color: "#C0392B" },
+                  { key: "present", value: "7", color: "#4A7C59" },
+                  { key: "late", value: "1", color: "#C17F3B" },
+                  { key: "leave", value: "1", color: "#3B6FA0" },
+                  { key: "absent", value: "0", color: "#C0392B" },
                 ].map((s) => (
-                  <div key={s.label} className="rounded-xl bg-cream/60 p-2.5 text-center dark:bg-cream/5">
+                  <div key={s.key} className="rounded-xl bg-cream/60 p-2.5 text-center dark:bg-cream/5">
                     <p className="mb-0.5 text-[20px] font-semibold leading-none" style={{ color: s.color }}>
                       {s.value}
                     </p>
-                    <p className="text-[11px] uppercase tracking-wider text-text-tertiary">{s.label}</p>
+                    <p className="text-[11px] uppercase tracking-wider text-text-tertiary">
+                      {t(`preview.stats.${s.key}`)}
+                    </p>
                   </div>
                 ))}
               </div>
 
               <div className="space-y-0">
                 {[
-                  { name: "Sophea Chan", initials: "SC", shift: "Morning", time: "06:58", status: "On time", statusColor: "#4A7C59", grad: 0 },
-                  { name: "Dara Sok", initials: "DS", shift: "Morning", time: "07:12", status: "Late", statusColor: "#C17F3B", grad: 1 },
-                  { name: "Sreyleak Heng", initials: "SH", shift: "Evening", time: "—", status: "On leave", statusColor: "#3B6FA0", grad: 2 },
+                  { name: "Sophea Chan", initials: "SC", shiftKey: "morning", time: "06:58", statusKey: "onTime", statusColor: "#4A7C59", grad: 0 },
+                  { name: "Dara Sok", initials: "DS", shiftKey: "morning", time: "07:12", statusKey: "late", statusColor: "#C17F3B", grad: 1 },
+                  { name: "Sreyleak Heng", initials: "SH", shiftKey: "evening", time: "—", statusKey: "onLeave", statusColor: "#3B6FA0", grad: 2 },
                 ].map((r, i) => (
                   <div
                     key={r.name}
@@ -208,14 +218,14 @@ export function HeroSection() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-[13.5px] font-medium text-text-primary">{r.name}</p>
-                      <p className="text-[11.5px] text-text-tertiary">{r.shift}</p>
+                      <p className="text-[11.5px] text-text-tertiary">{t(`preview.shifts.${r.shiftKey}`)}</p>
                     </div>
                     <span className="mr-2 font-mono text-[12.5px] tabular-nums text-text-secondary">{r.time}</span>
                     <span
                       className="rounded-full px-1.5 py-0.5 text-[11px] font-medium"
                       style={{ background: `${r.statusColor}15`, color: r.statusColor }}
                     >
-                      {r.status}
+                      {t(`preview.statuses.${r.statusKey}`)}
                     </span>
                   </div>
                 ))}
@@ -233,7 +243,7 @@ export function HeroSection() {
                 <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-coffee/10">
                   <QrCode size={13} className="text-coffee" />
                 </div>
-                <p className="text-[12px] font-medium text-text-primary">QR Check-in</p>
+                <p className="text-[12px] font-medium text-text-primary">{t("preview.qrCheckin")}</p>
               </div>
               <div className="flex aspect-square w-full items-center justify-center rounded-xl bg-cream-3/40 p-3 dark:bg-cream-3/10">
                 <svg viewBox="0 0 21 21" className="h-full w-full" shapeRendering="crispEdges">
@@ -274,11 +284,13 @@ export function HeroSection() {
         <div className="flex flex-wrap items-center justify-center gap-3">
           {trustItems.map((item) => (
             <div
-              key={item.text}
+              key={item.key}
               className="flex items-center gap-2 rounded-full border border-glass-border bg-glass-bg px-4 py-2 backdrop-blur-sm"
             >
               <span className="text-coffee">{item.icon}</span>
-              <span className="text-[13.5px] font-medium text-text-secondary">{item.text}</span>
+              <span className="text-[13.5px] font-medium text-text-secondary">
+                {t(`trust.${item.key}`)}
+              </span>
             </div>
           ))}
         </div>

@@ -3,27 +3,19 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRightLeft, FileText, Clock, ChevronRight, Crown } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { BasilBookBrand } from "@/components/shared/BasilBookBrand";
 
+/** Icons are design; `key` selects `homepage.integration.benefits.<key>.{title,desc}`. */
 const benefits = [
-  {
-    icon: <ArrowRightLeft size={18} strokeWidth={1.8} />,
-    title: "Attendance synced to accounting",
-    desc: "Pulls attendance data via API — match who worked with what was sold.",
-  },
-  {
-    icon: <FileText size={18} strokeWidth={1.8} />,
-    title: "Username-based staff linking",
-    desc: "Link employees across both systems with a shared username. One identity, two products.",
-  },
-  {
-    icon: <Clock size={18} strokeWidth={1.8} />,
-    title: "Period-based data retrieval",
-    desc: "Query attendance by date range — daily, weekly, or monthly. Up to 93 days per request.",
-  },
+  { key: "sync", icon: <ArrowRightLeft size={18} strokeWidth={1.8} /> },
+  { key: "link", icon: <FileText size={18} strokeWidth={1.8} /> },
+  { key: "period", icon: <Clock size={18} strokeWidth={1.8} /> },
 ];
 
 export function IntegrationSection() {
+  const t = useTranslations("homepage.integration");
+
   return (
     <section className="mx-auto max-w-5xl px-6 py-24 md:px-8">
       <motion.div
@@ -33,13 +25,12 @@ export function IntegrationSection() {
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
       >
-        <p className="mb-3 text-[13px] font-medium uppercase tracking-[2px] text-amber">Integration</p>
+        <p className="mb-3 text-[13px] font-medium uppercase tracking-[2px] text-amber">{t("eyebrow")}</p>
         <h3 className="font-serif text-[30px] font-semibold leading-tight text-text-primary md:text-[36px]">
-          Works with <BasilBookBrand />
+          {t.rich("titleParts", { brand: () => <BasilBookBrand /> })}
         </h3>
         <p className="mx-auto mt-3 max-w-lg text-[16px] text-text-secondary">
-          Connect staff attendance to your restaurant accounting. Know who worked, when they
-          worked, and how it maps to your financials.
+          {t("subtitle")}
         </p>
       </motion.div>
 
@@ -59,7 +50,7 @@ export function IntegrationSection() {
               <img src="/logo-icon.svg" alt="DailyBrew" className="h-12 w-12 rounded-xl" />
               <div>
                 <p className="text-[17px] font-semibold text-text-primary">DailyBrew</p>
-                <p className="text-[13px] text-text-tertiary">Attendance</p>
+                <p className="text-[13px] text-text-tertiary">{t("brand.attendance")}</p>
               </div>
             </div>
 
@@ -83,7 +74,7 @@ export function IntegrationSection() {
                 <p className="text-[17px]">
                   <BasilBookBrand />
                 </p>
-                <p className="text-[13px] text-text-tertiary">Accounting</p>
+                <p className="text-[13px] text-text-tertiary">{t("brand.accounting")}</p>
               </div>
             </a>
           </div>
@@ -91,7 +82,7 @@ export function IntegrationSection() {
           <div className="mb-8 grid grid-cols-1 gap-5 md:grid-cols-3">
             {benefits.map((b, i) => (
               <motion.div
-                key={b.title}
+                key={b.key}
                 className="flex flex-col gap-3 rounded-xl border border-cream-3/40 bg-cream/40 p-5 dark:bg-cream/5"
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -101,8 +92,12 @@ export function IntegrationSection() {
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber/10 text-amber">
                   {b.icon}
                 </div>
-                <h4 className="text-[15px] font-semibold leading-snug text-text-primary">{b.title}</h4>
-                <p className="text-[14px] leading-relaxed text-text-secondary">{b.desc}</p>
+                <h4 className="text-[15px] font-semibold leading-snug text-text-primary">
+                  {t(`benefits.${b.key}.title`)}
+                </h4>
+                <p className="text-[14px] leading-relaxed text-text-secondary">
+                  {t(`benefits.${b.key}.desc`)}
+                </p>
               </motion.div>
             ))}
           </div>
@@ -110,16 +105,16 @@ export function IntegrationSection() {
           <div className="flex flex-col items-center gap-4 rounded-xl border border-cream-3/40 bg-cream-3/30 px-5 py-4 dark:bg-cream-3/10 sm:flex-row">
             <div className="flex-1">
               <p className="text-[14.5px] leading-relaxed text-text-secondary">
-                <span className="font-medium text-text-primary">How it works:</span> Generate an API
-                token in DailyBrew settings. <BasilBookBrand className="text-[14.5px]" /> uses it to
-                pull attendance data for employees with matching usernames — check-in times, late
-                flags, and shift info.
+                <span className="font-medium text-text-primary">{t("howItWorks.label")}</span>{" "}
+                {t.rich("howItWorks.body", {
+                  brand: () => <BasilBookBrand className="text-[14.5px]" />,
+                })}
               </p>
             </div>
             <div className="flex shrink-0 items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-amber/15 bg-amber/10 px-2.5 py-1 text-[12px] font-semibold text-amber">
                 <Crown size={11} />
-                Espresso
+                {t("espressoPill")}
               </span>
             </div>
           </div>
@@ -129,7 +124,7 @@ export function IntegrationSection() {
               href="/sign-up"
               className="btn-shimmer inline-flex items-center gap-1.5 rounded-lg px-5 py-2.5 text-[15px] font-semibold text-white no-underline transition-all hover:-translate-y-px"
             >
-              Get started with Espresso
+              {t("ctaPrimary")}
               <ChevronRight size={14} />
             </Link>
             <a
@@ -138,7 +133,9 @@ export function IntegrationSection() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-lg border border-cream-3 bg-glass-bg px-5 py-2.5 text-[15px] font-medium text-text-primary no-underline backdrop-blur-sm transition-all hover:bg-cream-3"
             >
-              Learn about <BasilBookBrand className="text-[15px]" />
+              {t.rich("ctaSecondaryParts", {
+                brand: () => <BasilBookBrand className="text-[15px]" />,
+              })}
             </a>
           </div>
         </div>
