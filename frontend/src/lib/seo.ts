@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { LOCALES } from "@/i18n/routing";
 
 export const SITE_NAME = "DailyBrew";
 export const SITE_URL = "https://dailybrew.work";
@@ -147,18 +148,36 @@ export type IndexablePath = keyof typeof PAGES;
  * (no `— DailyBrew` suffix); every other page relies on the title template
  * defined in the root layout. Canonical is the page's own path.
  */
-export function pageMetadata(path: IndexablePath): Metadata {
+/**
+ * Marketing pages are served at `/x`, `/fr/x` and `/km/x`. Each variant
+ * declares the full set so crawlers treat them as translations of one page
+ * rather than duplicate content, with English as `x-default`.
+ */
+function localeAlternates(path: IndexablePath) {
+  const forLocale = (locale: string) =>
+    locale === "en" ? path : `/${locale}${path === "/" ? "" : path}`;
+
+  return {
+    languages: {
+      ...Object.fromEntries(LOCALES.map((locale) => [locale, forLocale(locale)])),
+      "x-default": path,
+    },
+  };
+}
+
+export function pageMetadata(path: IndexablePath, locale: string = "en"): Metadata {
   const { title, description } = PAGES[path];
   const isHome = path === "/";
+  const canonical = locale === "en" ? path : `/${locale}${isHome ? "" : path}`;
 
   return {
     title: isHome ? { absolute: title } : title,
     description,
-    alternates: { canonical: path },
+    alternates: { canonical, ...localeAlternates(path) },
     openGraph: {
       title: isHome ? title : `${title} — ${SITE_NAME}`,
       description,
-      url: path,
+      url: canonical,
       images: [OG_IMAGE],
     },
     twitter: {

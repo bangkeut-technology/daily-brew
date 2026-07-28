@@ -2,10 +2,12 @@
 
 import { Mail, MessageCircle, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { useApplication } from "@/providers/application-provider";
 
 export function ContactSection() {
   const { contactEmail } = useApplication();
+  const t = useTranslations("homepage.contact");
 
   return (
     <section id="contact" className="mx-auto max-w-4xl px-6 py-24 md:px-8">
@@ -16,12 +18,12 @@ export function ContactSection() {
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
       >
-        <p className="mb-3 text-[13px] font-medium uppercase tracking-[2px] text-amber">Contact</p>
+        <p className="mb-3 text-[13px] font-medium uppercase tracking-[2px] text-amber">{t("eyebrow")}</p>
         <h3 className="font-serif text-[30px] font-semibold leading-tight text-text-primary md:text-[36px]">
-          Get in touch
+          {t("title")}
         </h3>
         <p className="mt-3 text-[16px] text-text-secondary">
-          Have questions? We&apos;d love to hear from you.
+          {t("subtitle")}
         </p>
       </motion.div>
 
@@ -38,10 +40,10 @@ export function ContactSection() {
           <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-coffee/10 text-coffee">
             <Mail size={20} strokeWidth={1.8} />
           </div>
-          <h4 className="mb-1 text-[16px] font-semibold text-text-primary">Email us</h4>
+          <h4 className="mb-1 text-[16px] font-semibold text-text-primary">{t("email.title")}</h4>
           <p className="mb-2 text-[14.5px] font-medium text-coffee">{contactEmail}</p>
           <div className="flex items-center gap-1.5">
-            <p className="text-[13px] text-text-tertiary">We typically respond within 24 hours</p>
+            <p className="text-[13px] text-text-tertiary">{t("email.sla")}</p>
             <ArrowRight
               size={12}
               className="text-text-tertiary transition-all group-hover:translate-x-0.5 group-hover:text-coffee"
@@ -60,10 +62,9 @@ export function ContactSection() {
           <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-amber/10 text-amber">
             <MessageCircle size={20} strokeWidth={1.8} />
           </div>
-          <h4 className="mb-1 text-[16px] font-semibold text-text-primary">Feedback</h4>
+          <h4 className="mb-1 text-[16px] font-semibold text-text-primary">{t("feedback.title")}</h4>
           <p className="text-[14.5px] leading-relaxed text-text-secondary">
-            Use the feedback widget in the bottom-right corner to report bugs or suggest features.
-            We read every message.
+            {t("feedback.body")}
           </p>
         </motion.div>
       </div>

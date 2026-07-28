@@ -1,7 +1,6 @@
 "use client";
 
 import type { ReactNode } from "react";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   QrCode,
@@ -19,91 +18,44 @@ import {
   Crown,
   ChevronRight,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { BasilBookBrand } from "@/components/shared/BasilBookBrand";
+import { Link as LocaleLink } from "@/i18n/navigation";
 
-const coreFeatures = [
-  {
-    icon: <QrCode size={22} strokeWidth={1.8} />,
-    title: "QR check-in",
-    desc: "One QR code per workspace. Staff scan it to check in and out — fast, contactless, no extra hardware.",
-    accent: "#C17F3B",
-  },
-  {
-    icon: <Users size={22} strokeWidth={1.8} />,
-    title: "Employee management",
-    desc: "Add staff, assign shifts, and track attendance history. Manage active and inactive employees.",
-    accent: "#4A7C59",
-  },
-  {
-    icon: <Clock size={22} strokeWidth={1.8} />,
-    title: "Shift tracking",
-    desc: "Define morning, evening, or custom shifts. Late arrivals and early departures are flagged automatically.",
-    accent: "#3B6FA0",
-  },
-  {
-    icon: <LayoutDashboard size={22} strokeWidth={1.8} />,
-    title: "Real-time dashboard",
-    desc: "See who's present, late, on leave, or absent. Live stats for owners and employees.",
-    accent: "#9B6B45",
-  },
+interface FeatureShape {
+  key: string;
+  icon: ReactNode;
+  accent: string;
+  /** Render the brand wordmark before the translated suffix instead of a plain title. */
+  titlePrefixBrand?: "basilbook";
+}
+
+const coreFeatures: FeatureShape[] = [
+  { key: "qrCheckin", icon: <QrCode size={22} strokeWidth={1.8} />, accent: "#C17F3B" },
+  { key: "employeeManagement", icon: <Users size={22} strokeWidth={1.8} />, accent: "#4A7C59" },
+  { key: "shiftTracking", icon: <Clock size={22} strokeWidth={1.8} />, accent: "#3B6FA0" },
+  { key: "realtimeDashboard", icon: <LayoutDashboard size={22} strokeWidth={1.8} />, accent: "#9B6B45" },
 ];
 
-const espressoFeatures = [
+const espressoFeatures: FeatureShape[] = [
+  { key: "leaveRequests", icon: <Coffee size={22} strokeWidth={1.8} />, accent: "#6B4226" },
+  { key: "ipRestriction", icon: <Shield size={22} strokeWidth={1.8} />, accent: "#C0392B" },
+  { key: "deviceVerification", icon: <Smartphone size={22} strokeWidth={1.8} />, accent: "#9B6B45" },
+  { key: "geofencing", icon: <MapPin size={22} strokeWidth={1.8} />, accent: "#7C5C9B" },
+  { key: "perDaySchedules", icon: <CalendarDays size={22} strokeWidth={1.8} />, accent: "#3B6FA0" },
+  { key: "managerRole", icon: <ShieldCheck size={22} strokeWidth={1.8} />, accent: "#6B4226" },
   {
-    icon: <Coffee size={22} strokeWidth={1.8} />,
-    title: "Leave requests",
-    desc: "Staff submit leave from their phone. Owners approve or reject with one tap. Full or partial day.",
-    accent: "#6B4226",
-  },
-  {
-    icon: <Shield size={22} strokeWidth={1.8} />,
-    title: "IP restriction",
-    desc: "Lock check-ins to your restaurant's WiFi. Prevent remote punching.",
-    accent: "#C0392B",
-  },
-  {
-    icon: <Smartphone size={22} strokeWidth={1.8} />,
-    title: "Device verification",
-    desc: "Bind check-in/out to one device per employee per day. Prevents buddy punching.",
-    accent: "#9B6B45",
-  },
-  {
-    icon: <MapPin size={22} strokeWidth={1.8} />,
-    title: "Geofencing",
-    desc: "Restrict check-ins to a GPS radius around your restaurant.",
-    accent: "#7C5C9B",
-  },
-  {
-    icon: <CalendarDays size={22} strokeWidth={1.8} />,
-    title: "Per-day schedules",
-    desc: "Set different shift hours for each day of the week.",
-    accent: "#3B6FA0",
-  },
-  {
-    icon: <ShieldCheck size={22} strokeWidth={1.8} />,
-    title: "Manager role",
-    desc: "Promote trusted staff and pick exactly which areas they administer — five granular permissions, configurable per manager.",
-    accent: "#6B4226",
-  },
-  {
+    key: "basilbookIntegration",
     icon: <ArrowRightLeft size={22} strokeWidth={1.8} />,
-    title: (
-      <>
-        <BasilBookBrand className="text-[16px]" /> integration
-      </>
-    ),
-    desc: "Sync staff attendance to your accounting system. Link employees by username and pull data via API.",
     accent: "#2bb673",
+    titlePrefixBrand: "basilbook",
   },
-  {
-    icon: <Bell size={22} strokeWidth={1.8} />,
-    title: "Notifications",
-    desc: "Push and email alerts for leave requests, shift changes, closures, and daily summaries.",
-    accent: "#C17F3B",
-  },
+  { key: "notifications", icon: <Bell size={22} strokeWidth={1.8} />, accent: "#C17F3B" },
 ];
 
 export function FeaturesSection() {
+  const t = useTranslations("homepage.features");
+
   return (
     <section id="features" className="mx-auto max-w-5xl px-6 py-24 md:px-8">
       <motion.div
@@ -113,18 +65,18 @@ export function FeaturesSection() {
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
       >
-        <p className="mb-3 text-[13px] font-medium uppercase tracking-[2px] text-amber">Features</p>
+        <p className="mb-3 text-[13px] font-medium uppercase tracking-[2px] text-amber">{t("eyebrow")}</p>
         <h3 className="font-serif text-[30px] font-semibold leading-tight text-text-primary md:text-[36px]">
-          Everything your restaurant needs
+          {t("title")}
         </h3>
         <p className="mx-auto mt-3 max-w-md text-[16px] text-text-secondary">
-          Built for restaurant owners who want clarity without complexity.
+          {t("subtitle")}
         </p>
       </motion.div>
 
       <div className="mb-5 grid grid-cols-1 gap-5 md:grid-cols-2">
         {coreFeatures.map((f, index) => (
-          <FeatureCard key={index} feature={f} index={index} />
+          <FeatureCard key={f.key} feature={f} group="core" index={index} />
         ))}
       </div>
 
@@ -139,7 +91,7 @@ export function FeaturesSection() {
         <div className="flex items-center gap-2 rounded-full border border-amber/15 bg-amber/8 px-4 py-1.5">
           <Crown size={13} className="text-amber" />
           <span className="text-[13px] font-semibold uppercase tracking-wider text-amber">
-            Espresso plan
+            {t("espressoBadge")}
           </span>
         </div>
         <div className="h-px flex-1 bg-cream-3" />
@@ -147,7 +99,7 @@ export function FeaturesSection() {
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
         {espressoFeatures.map((f, index) => (
-          <FeatureCard key={index} feature={f} index={index + 4} />
+          <FeatureCard key={f.key} feature={f} group="espresso" index={index + 4} />
         ))}
       </div>
 
@@ -158,13 +110,13 @@ export function FeaturesSection() {
         viewport={{ once: true }}
         transition={{ duration: 0.4, delay: 0.3 }}
       >
-        <Link
+        <LocaleLink
           href="/features"
           className="inline-flex items-center gap-1.5 text-[15px] font-medium text-coffee no-underline transition-colors hover:text-coffee-light"
         >
-          See all features in detail
+          {t("seeAll")}
           <ChevronRight size={14} />
-        </Link>
+        </LocaleLink>
       </motion.div>
     </section>
   );
@@ -172,11 +124,15 @@ export function FeaturesSection() {
 
 function FeatureCard({
   feature: f,
+  group,
   index,
 }: {
-  feature: { icon: ReactNode; title: ReactNode; desc: string; accent: string };
+  feature: FeatureShape;
+  group: "core" | "espresso";
   index: number;
 }) {
+  const t = useTranslations("homepage.features");
+
   return (
     <motion.div
       className="group relative cursor-default overflow-hidden rounded-2xl border border-glass-border bg-glass-bg p-6 shadow-[0_2px_12px_rgba(107,66,38,0.05)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(107,66,38,0.10)]"
@@ -197,8 +153,19 @@ function FeatureCard({
           {f.icon}
         </div>
         <div className="min-w-0 flex-1">
-          <h4 className="mb-1.5 text-[16px] font-semibold text-text-primary">{f.title}</h4>
-          <p className="text-[14.5px] leading-relaxed text-text-secondary">{f.desc}</p>
+          <h4 className="mb-1.5 text-[16px] font-semibold text-text-primary">
+            {f.titlePrefixBrand === "basilbook" ? (
+              <>
+                <BasilBookBrand className="text-[16px]" />{" "}
+                {t(`${group}.${f.key}.titleSuffix`)}
+              </>
+            ) : (
+              t(`${group}.${f.key}.title`)
+            )}
+          </h4>
+          <p className="text-[14.5px] leading-relaxed text-text-secondary">
+            {t(`${group}.${f.key}.desc`)}
+          </p>
         </div>
       </div>
     </motion.div>

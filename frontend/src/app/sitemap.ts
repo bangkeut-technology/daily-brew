@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { PAGES, SITE_URL, type IndexablePath } from "@/lib/seo";
+import { LOCALES } from "@/i18n/routing";
 import { getAllPosts } from "@/lib/blog";
 import { INDUSTRIES } from "@/lib/industries";
 import { COMPETITORS } from "@/lib/competitors";
@@ -23,14 +24,30 @@ const HINTS: Partial<Record<IndexablePath, { changeFrequency: Freq; priority: nu
   "/delete-account": { changeFrequency: "yearly", priority: 0.3 },
 };
 
+/** `/x` for English, `/fr/x` and `/km/x` for the rest. */
+function localizedUrl(path: string, locale: string): string {
+  if (locale === "en") return `${SITE_URL}${path}`;
+  return `${SITE_URL}/${locale}${path === "/" ? "" : path}`;
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const pages = (Object.keys(PAGES) as IndexablePath[]).map((path) => {
+  // Marketing pages are indexable in all three languages. Each entry declares
+  // its siblings so crawlers group the variants instead of treating them as
+  // duplicates — the sitemap counterpart to the hreflang tags in the metadata.
+  const pages = (Object.keys(PAGES) as IndexablePath[]).flatMap((path) => {
     const hint = HINTS[path] ?? { changeFrequency: "monthly" as Freq, priority: 0.6 };
-    return {
-      url: `${SITE_URL}${path}`,
+    const languages = Object.fromEntries(
+      LOCALES.map((locale) => [locale, localizedUrl(path, locale)]),
+    );
+
+    return LOCALES.map((locale) => ({
+      url: localizedUrl(path, locale),
       changeFrequency: hint.changeFrequency,
-      priority: hint.priority,
-    };
+      // Translations rank below the English original rather than competing
+      // with it for the same query.
+      priority: locale === "en" ? hint.priority : Math.max(0.1, hint.priority - 0.2),
+      alternates: { languages },
+    }));
   });
 
   const blogIndex = {
