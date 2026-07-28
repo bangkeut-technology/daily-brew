@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.127.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.126.0...v1.127.0) (2026-07-28)
+
+
+### Features
+
+* **next/marketing:** translate content pages + localize SEO metadata ([#366](https://github.com/bangkeut-technology/daily-brew/issues/366)) ([75cb617](https://github.com/bangkeut-technology/daily-brew/commit/75cb6170c0abcbd82a374afdfc07396ffc143fd6))
+
 ## [1.126.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.125.0...v1.126.0) (2026-07-28)
 
 
