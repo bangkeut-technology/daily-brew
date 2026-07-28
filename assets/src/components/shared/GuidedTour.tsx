@@ -1,42 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Joyride, STATUS, type Step, type EventData } from 'react-joyride';
 
 const TOUR_KEY = 'dailybrew_tour_completed';
 
-const ownerSteps: Step[] = [
-  {
-    target: '[data-tour="dashboard"]',
-    content: 'Welcome to your dashboard! Here you can see today\'s attendance at a glance — who\'s present, late, on leave, or absent.',
-    placement: 'bottom',
-  },
-  {
-    target: '[data-tour="nav-employees"]',
-    content: 'Manage your staff here. Add employees, assign them to shifts, and generate QR codes for check-in.',
-    placement: 'right',
-  },
-  {
-    target: '[data-tour="nav-attendance"]',
-    content: 'View the full attendance log. Filter by date range to see who checked in and when.',
-    placement: 'right',
-  },
-  {
-    target: '[data-tour="nav-shifts"]',
-    content: 'Create shifts like "Morning" or "Evening" with start and end times. Employees are assigned to shifts.',
-    placement: 'right',
-  },
-  {
-    target: '[data-tour="nav-settings"]',
-    content: 'Configure your workspace — IP restriction, geofencing, timezone, and manage your Espresso plan.',
-    placement: 'right',
-  },
-  {
-    target: '[data-tour="add-employee"]',
-    content: 'Start by adding your first employee! You\'ll be able to share a check-in link they can use to clock in.',
-    placement: 'top',
-  },
-];
-
 export function GuidedTour() {
+  const { t } = useTranslation();
   const [shouldRun, setShouldRun] = useState(false);
 
   useEffect(() => {
@@ -55,6 +24,59 @@ export function GuidedTour() {
   };
 
   if (!shouldRun) return null;
+
+  // Built inside the component so the copy follows the active language — a
+  // module-level array would freeze whatever locale loaded first.
+  const ownerSteps: Step[] = [
+    {
+      target: '[data-tour="dashboard"]',
+      content: t(
+        'tour.dashboard',
+        "Welcome to your dashboard! Here you can see today's attendance at a glance \u2014 who's present, late, on leave, or absent.",
+      ),
+      placement: 'bottom',
+    },
+    {
+      target: '[data-tour="nav-employees"]',
+      content: t(
+        'tour.employees',
+        'Manage your staff here. Add employees, assign them to shifts, and generate QR codes for check-in.',
+      ),
+      placement: 'right',
+    },
+    {
+      target: '[data-tour="nav-attendance"]',
+      content: t(
+        'tour.attendance',
+        'View the full attendance log. Filter by date range to see who checked in and when.',
+      ),
+      placement: 'right',
+    },
+    {
+      target: '[data-tour="nav-shifts"]',
+      content: t(
+        'tour.shifts',
+        'Create shifts like "Morning" or "Evening" with start and end times. Employees are assigned to shifts.',
+      ),
+      placement: 'right',
+    },
+    {
+      target: '[data-tour="nav-settings"]',
+      content: t(
+        'tour.settings',
+        'Configure your workspace \u2014 IP restriction, geofencing, timezone, and manage your Espresso plan.',
+      ),
+      placement: 'right',
+    },
+    {
+      target: '[data-tour="add-employee"]',
+      content: t(
+        'tour.addEmployee',
+        "Start by adding your first employee! You'll be able to share a check-in link they can use to clock in.",
+      ),
+      placement: 'top',
+    },
+  ];
 
   return (
     <Joyride
@@ -93,11 +115,11 @@ export function GuidedTour() {
         },
       }}
       locale={{
-        back: 'Back',
-        close: 'Got it',
-        last: 'Get started!',
-        next: 'Next',
-        skip: 'Skip tour',
+        back: t('tour.back', 'Back'),
+        close: t('tour.close', 'Got it'),
+        last: t('tour.last', 'Get started!'),
+        next: t('tour.next', 'Next'),
+        skip: t('tour.skip', 'Skip tour'),
       }}
     />
   );

@@ -108,6 +108,9 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
             <Link
               key={item.to}
               href={item.to}
+              // Anchor for the first-run GuidedTour, derived from the route so
+              // a new nav item can't silently drop out of the tour.
+              data-tour={`nav-${item.to.split("/").pop()}`}
               className={cn(
                 "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm no-underline transition-colors",
                 active

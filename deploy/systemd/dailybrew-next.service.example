@@ -60,6 +60,17 @@ Environment=NEXT_PUBLIC_GOOGLE_CLIENT_ID=
 Environment=NEXT_PUBLIC_MAX_FREE_EMPLOYEES=10
 Environment=NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=
 
+# Paddle checkout (console settings > Plan). Leave the client-side token
+# empty to hide the subscribe buttons entirely rather than render ones that
+# silently fail — useful for self-hosted installs with no billing.
+# Set PADDLE_ENVIRONMENT=sandbox to point Paddle.js at the test environment.
+Environment=NEXT_PUBLIC_PADDLE_ENVIRONMENT=production
+Environment=NEXT_PUBLIC_PADDLE_CLIENT_SIDE_TOKEN=
+Environment=NEXT_PUBLIC_PADDLE_PRICE_ESPRESSO_MONTHLY=
+Environment=NEXT_PUBLIC_PADDLE_PRICE_ESPRESSO_ANNUAL=
+Environment=NEXT_PUBLIC_PADDLE_PRICE_DOUBLE_ESPRESSO_MONTHLY=
+Environment=NEXT_PUBLIC_PADDLE_PRICE_DOUBLE_ESPRESSO_ANNUAL=
+
 # The staging banner detects the hostname server-side via headers(), so
 # no env wiring is needed here — the same artifact serves both
 # dailybrew.work (post-cutover) and next.dailybrew.work (staging). See

@@ -48,6 +48,8 @@ import { CustomDatePicker } from "@/components/shared/CustomDatePicker";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";
 import { AvatarUploader } from "@/components/shared/AvatarUploader";
 import { AttendanceEditModal } from "@/components/console/AttendanceEditModal";
+import { ShiftPopover } from "@/components/console/ShiftPopover";
+import { JobTitleInput } from "@/components/shared/JobTitleInput";
 import { DetailSkeleton } from "@/components/admin/AdminDataStates";
 
 const editEmployeeSchema = z.object({
@@ -275,21 +277,16 @@ export default function EmployeeDetailPage({
                 </Field>
 
                 <Field label="Job title" htmlFor="edit-jobTitle">
-                  <input
+                  {/* Free text, with the roster's existing titles plus the
+                      built-in restaurant roles offered as suggestions. */}
+                  <JobTitleInput
                     id="edit-jobTitle"
-                    type="text"
-                    list="job-title-suggestions"
+                    name="jobTitle"
+                    value={watch("jobTitle") || ""}
+                    onChange={(v) => setValue("jobTitle", v)}
                     placeholder="e.g. Cashier, Cook, Waiter"
-                    {...register("jobTitle")}
-                    className={inputClass}
+                    workspaceValues={jobTitleSuggestions}
                   />
-                  {/* Free text, with what the rest of the roster already uses
-                      offered as suggestions. */}
-                  <datalist id="job-title-suggestions">
-                    {jobTitleSuggestions.map((title) => (
-                      <option key={title} value={title} />
-                    ))}
-                  </datalist>
                 </Field>
 
                 <Field label="Phone number" htmlFor="edit-phone">
@@ -505,19 +502,11 @@ export default function EmployeeDetailPage({
                 <div className="grid flex-1 grid-cols-2 gap-x-8 gap-y-3 lg:grid-cols-3">
                   <ReadField label="Shift">
                     {employee.shiftName ? (
-                      <>
-                        <span className="text-[15px] font-medium text-text-primary">
-                          {employee.shiftName}
-                        </span>
-                        {(() => {
-                          const shift = shifts?.find((s) => s.publicId === employee.shiftPublicId);
-                          return shift ? (
-                            <span className="mt-0.5 block font-mono text-[13px] tabular-nums text-text-tertiary">
-                              {shift.startTime} – {shift.endTime}
-                            </span>
-                          ) : null;
-                        })()}
-                      </>
+                      <ShiftPopover
+                        shiftName={employee.shiftName}
+                        shiftPublicId={employee.shiftPublicId}
+                        shifts={shifts}
+                      />
                     ) : (
                       <span className="text-[15px] text-text-tertiary">No shift</span>
                     )}

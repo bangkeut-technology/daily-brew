@@ -12,7 +12,34 @@ export interface WorkspaceSetting {
   geofencingRadiusMeters: number | null;
   telegramNotificationsEnabled: boolean;
   telegramChatId: string | null;
+  /** Per-scan "new device" alerts, on top of the daily summary. */
+  telegramCheckinAlertsEnabled: boolean;
+  pushCheckinAlertsEnabled: boolean;
   tapCheckinEnabled: boolean;
   nfcCheckinEnabled: boolean;
   nfcCheckinIntervalMinutes: number;
+}
+
+/**
+ * Workspace-scoped API credential (BasilBook and any other consumer). The
+ * plaintext key is returned exactly once, by the create call — the server only
+ * ever stores its hash.
+ */
+export interface ApiToken {
+  publicId: string;
+  name: string;
+  prefix: string;
+  active: boolean;
+  lastUsedAt: string | null;
+  revokedAt: string | null;
+  createdAt: string;
+}
+
+export interface ApiTokenCreated {
+  publicId: string;
+  name: string;
+  prefix: string;
+  /** Shown once, never retrievable again. */
+  token: string;
+  createdAt: string;
 }

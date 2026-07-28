@@ -69,3 +69,37 @@ export function formatAdminDayMonth(value: string | null | undefined): string {
   if (!p) return "";
   return `${p.day}/${p.month}`;
 }
+
+const MINUTE = 60_000;
+const UNITS: [limit: number, ms: number, unit: Intl.RelativeTimeFormatUnit][] = [
+  [MINUTE, 1000, "second"],
+  [60 * MINUTE, MINUTE, "minute"],
+  [24 * 60 * MINUTE, 60 * MINUTE, "hour"],
+  [30 * 24 * 60 * MINUTE, 24 * 60 * MINUTE, "day"],
+  [365 * 24 * 60 * MINUTE, 30 * 24 * 60 * MINUTE, "month"],
+  [Infinity, 365 * 24 * 60 * MINUTE, "year"],
+];
+
+/**
+ * "in 4 minutes" / "2 hours ago", via Intl rather than a date library — the
+ * cron screen needs exactly this and nothing else a date library would bring.
+ *
+ * `now` is injectable so the output is testable without a frozen clock.
+ */
+export function formatRelativeTime(
+  value: string | null | undefined,
+  now: number = Date.now(),
+): string {
+  if (!value) return "—";
+  const then = new Date(value).getTime();
+  if (Number.isNaN(then)) return "—";
+
+  const deltaMs = then - now;
+  const abs = Math.abs(deltaMs);
+  const [, divisor, unit] = UNITS.find(([limit]) => abs < limit)!;
+
+  return new Intl.RelativeTimeFormat("en", { numeric: "auto" }).format(
+    Math.round(deltaMs / divisor),
+    unit,
+  );
+}

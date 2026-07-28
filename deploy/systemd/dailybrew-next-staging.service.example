@@ -83,6 +83,18 @@ Environment=NEXT_PUBLIC_GOOGLE_CLIENT_ID=
 Environment=NEXT_PUBLIC_MAX_FREE_EMPLOYEES=10
 Environment=NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=
 
+# Paddle checkout (console settings > Plan). Deliberately left EMPTY here:
+# this staging mirror shares the production database, so a checkout started
+# on next.dailybrew.work would attach a real (or sandbox) subscription to a
+# real workspace. An empty token hides the subscribe buttons entirely rather
+# than rendering ones that silently fail. Test billing against a separate
+# database, not this host.
+Environment=NEXT_PUBLIC_PADDLE_CLIENT_SIDE_TOKEN=
+Environment=NEXT_PUBLIC_PADDLE_PRICE_ESPRESSO_MONTHLY=
+Environment=NEXT_PUBLIC_PADDLE_PRICE_ESPRESSO_ANNUAL=
+Environment=NEXT_PUBLIC_PADDLE_PRICE_DOUBLE_ESPRESSO_MONTHLY=
+Environment=NEXT_PUBLIC_PADDLE_PRICE_DOUBLE_ESPRESSO_ANNUAL=
+
 # StagingBanner is hostname-driven (window.location.hostname startsWith
 # "next.") so no env wiring needed — same artifact would work in either
 # unit if you point them at the same code.

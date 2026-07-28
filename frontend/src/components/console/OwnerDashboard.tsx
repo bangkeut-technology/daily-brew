@@ -37,6 +37,9 @@ import { StatCard } from "@/components/shared/StatCard";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Avatar } from "@/components/shared/Avatar";
 import { CheckinUrlRow } from "@/components/console/CheckinUrlRow";
+import { DashboardInsights } from "@/components/console/DashboardInsights";
+import { GuidedTour } from "@/components/console/GuidedTour";
+import { ManagerCheckinCard } from "@/components/console/ManagerCheckinCard";
 import { Skeleton } from "@/components/admin/AdminDataStates";
 import { cn } from "@/lib/utils";
 
@@ -91,10 +94,10 @@ export function OwnerDashboard() {
 
   if (data.totalEmployees === 0) return <EmptyWorkspaceView />;
 
-  const attendanceRate =
-    data.totalEmployees > 0 ? Math.round((data.present / data.totalEmployees) * 100) : 0;
-  const onTimeRate =
-    data.present > 0 ? Math.round(((data.present - data.late) / data.present) * 100) : 0;
+  const ofEmployees = t("dashboard.ofEmployees", {
+    count: data.totalEmployees,
+    defaultValue: "of {{count}} employees",
+  });
 
   return (
     <div className="page-enter">
@@ -140,13 +143,25 @@ export function OwnerDashboard() {
               >
                 <span className="text-sm font-medium text-amber">
                   {data.pendingLeaves}{" "}
-                  {data.pendingLeaves === 1 ? "leave request pending" : "leave requests pending"}
+                  {data.pendingLeaves === 1
+                    ? t("leave.pendingRequest", "leave request pending")
+                    : t("leave.pendingRequests", "leave requests pending")}
                 </span>
+              </Link>
+            )}
+            {isManagerView && canUseLeave && (
+              <Link
+                href="/console/leave"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-coffee px-3 py-1.5 text-sm font-medium text-white no-underline transition-all hover:bg-coffee-light"
+              >
+                <CalendarDays size={13} />
+                {t("nav.leaveRequests", "Leave requests")}
               </Link>
             )}
             {!isManagerView && (
               <Link
                 href="/console/employees"
+                data-tour="add-employee"
                 className="inline-flex items-center gap-1.5 rounded-lg bg-coffee px-3 py-1.5 text-sm font-medium text-white no-underline transition-all hover:bg-coffee-light"
               >
                 <UserPlus size={13} />
@@ -164,8 +179,16 @@ export function OwnerDashboard() {
         }
       />
 
+      {!isManagerView && <GuidedTour />}
+
+      {isManagerView && qrToken && (
+        <div className="mb-6">
+          <ManagerCheckinCard qrToken={qrToken} />
+        </div>
+      )}
+
       <p className="mb-6 text-[15.5px] leading-relaxed text-text-secondary">
-        {summaryLine(data.present, data.totalEmployees, data.late, data.absent)}
+        {summaryLine(t, data.present, data.totalEmployees, data.late, data.absent)}
       </p>
 
       {!isManagerView && qrToken && (
@@ -213,123 +236,110 @@ export function OwnerDashboard() {
                   <Copy size={12} />
                 </button>
               </div>
-              {nfcEnabled && <CheckinUrlRow qrToken={qrToken} />}
+              {nfcEnabled && (
+                <>
+                  <CheckinUrlRow qrToken={qrToken} />
+                  <Link
+                    href="/guides/nfc"
+                    className="mt-2 inline-flex items-center gap-1 text-[12.5px] font-medium text-coffee no-underline hover:text-coffee-light"
+                  >
+                    {t("dashboard.setUpNfc", "Set up NFC check-in")} &rarr;
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </GlassCard>
       )}
 
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Sits above the stats it explains: when the restaurant is shut, an
+          absent count of 12 is expected rather than alarming. */}
+      {activeClosures.length > 0 && (
+        <div className="mb-6 flex items-center gap-3 rounded-xl border border-red/15 bg-red/8 px-5 py-3">
+          <CalendarOff size={16} className="shrink-0 text-red" />
+          <div className="flex-1">
+            <p className="text-[15px] font-medium text-red">
+              {t("dashboard.closedToday", "Restaurant is closed today")} —{" "}
+              {activeClosures.map((c) => c.name).join(", ")}
+            </p>
+            <p className="text-[13px] text-red/70">
+              {t("dashboard.closedTodayHint", "No attendance is expected during this period.")}
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div data-tour="dashboard" className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label={t("dashboard.present", "Present today")}
           value={data.present}
-          subtitle={`of ${data.totalEmployees} employees`}
+          subtitle={ofEmployees}
           accent="#4A7C59"
           icon={<CheckCircle size={24} />}
         />
         <StatCard
           label={t("dashboard.late", "Late")}
           value={data.late}
-          subtitle={`of ${data.totalEmployees} employees`}
+          subtitle={ofEmployees}
           accent="#C17F3B"
           icon={<AlertTriangle size={24} />}
         />
         <StatCard
           label={t("dashboard.onLeave", "On leave")}
           value={data.onLeave}
-          subtitle={`${data.pendingLeaves} pending`}
+          subtitle={`${data.pendingLeaves} ${t("dashboard.pending", "pending")}`}
           accent="#3B6FA0"
           icon={<Palmtree size={24} />}
         />
         <StatCard
           label={t("dashboard.absent", "Absent")}
           value={data.absent}
-          subtitle={`of ${data.totalEmployees} employees`}
+          subtitle={ofEmployees}
           accent="#C0392B"
           icon={<XCircle size={24} />}
         />
       </div>
 
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <InsightCard
-          label={t("dashboard.attendanceRate", "Attendance rate")}
-          value={`${attendanceRate}%`}
-          tone="text-coffee"
-          hint={`${data.present} of ${data.totalEmployees} checked in`}
-        />
-        <InsightCard
-          label={t("dashboard.onTimeRate", "On-time rate")}
-          value={`${onTimeRate}%`}
-          tone="text-green"
-          hint={`${data.present - data.late} on time · ${data.late} late`}
-        />
-        <InsightCard
-          label={t("dashboard.leaveAbsent", "Leave & absent")}
-          value={String(data.onLeave + data.absent)}
-          tone="text-amber"
-          hint={
-            data.pendingLeaves > 0
-              ? `${data.onLeave} on leave · ${data.absent} absent · ${data.pendingLeaves} pending`
-              : `${data.onLeave} on leave · ${data.absent} absent`
-          }
-        />
-      </div>
+      <DashboardInsights workspaceId={workspaceId} />
 
-      {(activeClosures.length > 0 || upcomingClosures.length > 0) && (
-        <div className="mb-6">
-          {activeClosures.length > 0 && (
-            <div className="mb-3 flex items-center gap-3 rounded-xl border border-red/15 bg-red/8 px-5 py-3">
-              <CalendarOff size={16} className="shrink-0 text-red" />
-              <div className="flex-1">
-                <p className="text-[15px] font-medium text-red">
-                  Restaurant is closed today — {activeClosures.map((c) => c.name).join(", ")}
-                </p>
-                <p className="text-[13px] text-red/70">
-                  No attendance is expected during this period.
-                </p>
-              </div>
-            </div>
-          )}
-          {upcomingClosures.length > 0 && (
-            <GlassCard hover={false}>
-              <GlassCardHeader
-                title="Upcoming closures"
-                action={
-                  !isManagerView ? (
-                    <Link href="/console/closures" className="text-xs font-medium text-amber no-underline">
-                      Manage &rarr;
-                    </Link>
-                  ) : undefined
-                }
-              />
-              <div>
-                {upcomingClosures.map((c) => {
-                  const daysUntil = Math.round(
-                    (parseDateAsUTC(c.startDate).getTime() - today.getTime()) / DAY_MS,
-                  );
-                  return (
-                    <div
-                      key={c.publicId}
-                      className="flex items-center gap-3 border-b border-cream-3/50 px-5 py-3 last:border-0"
-                    >
-                      <CalendarOff size={14} className="shrink-0 text-amber" />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-[15px] font-medium text-text-primary">{c.name}</p>
-                        <p className="text-[13px] text-text-tertiary">
-                          {fmtDate(c.startDate)}
-                          {c.startDate !== c.endDate ? ` – ${fmtDate(c.endDate)}` : ""}
-                        </p>
-                      </div>
-                      <span className="rounded-full bg-amber/10 px-2 py-0.5 text-[12.5px] font-medium text-amber">
-                        in {daysUntil} day{daysUntil !== 1 ? "s" : ""}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </GlassCard>
-          )}
-        </div>
+      {upcomingClosures.length > 0 && (
+        <GlassCard hover={false} className="mb-6">
+          <GlassCardHeader
+            title={t("dashboard.upcomingClosures", "Upcoming closures")}
+            action={
+              !isManagerView ? (
+                <Link href="/console/closures" className="text-xs font-medium text-amber no-underline">
+                  {t("common.manage", "Manage")} &rarr;
+                </Link>
+              ) : undefined
+            }
+          />
+          <div>
+            {upcomingClosures.map((c) => {
+              const daysUntil = Math.round(
+                (parseDateAsUTC(c.startDate).getTime() - today.getTime()) / DAY_MS,
+              );
+              return (
+                <div
+                  key={c.publicId}
+                  className="flex items-center gap-3 border-b border-cream-3/50 px-5 py-3 last:border-0"
+                >
+                  <CalendarOff size={14} className="shrink-0 text-amber" />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[15px] font-medium text-text-primary">{c.name}</p>
+                    <p className="text-[13px] text-text-tertiary">
+                      {fmtDate(c.startDate)}
+                      {c.startDate !== c.endDate ? ` – ${fmtDate(c.endDate)}` : ""}
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-amber/10 px-2 py-0.5 text-[12.5px] font-medium text-amber">
+                    {t("dashboard.inDays", { count: daysUntil, defaultValue: "in {{count}} days" })}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </GlassCard>
       )}
 
       <GlassCard hover={false} className="mb-6">
@@ -501,36 +511,43 @@ const PLACEHOLDER_LEAVES = [
   { publicId: "3", employeeName: "Alex Brown", startDate: "2026-04-10", endDate: "2026-04-12", status: "approved" },
 ];
 
-function summaryLine(present: number, total: number, late: number, absent: number): string {
-  if (total === 0) return "Add your first employee to start tracking attendance.";
-  if (present === total) return `All ${total} employees are checked in today.`;
-  if (present === 0) return `None of your ${total} employees have checked in yet today.`;
-  const parts = [`${present} of ${total} employees are in today.`];
-  if (late > 0) parts.push(`${late} arrived late.`);
-  if (absent > 0) parts.push(`${absent} not accounted for.`);
-  return parts.join(" ");
-}
+type TFunc = ReturnType<typeof useTranslation>["t"];
 
-function InsightCard({
-  label,
-  value,
-  tone,
-  hint,
-}: {
-  label: string;
-  value: string;
-  tone: string;
-  hint: string;
-}) {
-  return (
-    <GlassCard hover={false}>
-      <div className="p-4">
-        <p className="mb-1 text-[13px] uppercase tracking-[1px] text-text-tertiary">{label}</p>
-        <p className={cn("text-[30px] font-bold tabular-nums", tone)}>{value}</p>
-        <p className="mt-1 text-[13px] text-text-tertiary">{hint}</p>
-      </div>
-    </GlassCard>
-  );
+/** Mirrors the legacy console's summary sentence, key for key. */
+function summaryLine(t: TFunc, present: number, total: number, late: number, absent: number): string {
+  if (total === 0) {
+    return t("dashboard.summaryEmpty", "Add your first employee to start tracking attendance.");
+  }
+  if (present === total) {
+    return t("dashboard.summaryAllPresent", {
+      count: total,
+      defaultValue: "All {{count}} employees are checked in today.",
+    });
+  }
+  if (present === 0) {
+    return t("dashboard.summaryNonePresent", {
+      count: total,
+      defaultValue: "None of your {{count}} employees have checked in yet today.",
+    });
+  }
+
+  const parts = [
+    t("dashboard.summarySome", {
+      present,
+      total,
+      defaultValue: "{{present}} of {{total}} employees are in today.",
+    }),
+  ];
+  if (late > 0) {
+    parts.push(t("dashboard.summaryLate", { count: late, defaultValue: "{{count}} arrived late." }));
+  }
+  if (absent > 0) {
+    parts.push(
+      t("dashboard.summaryAbsent", { count: absent, defaultValue: "{{count}} not accounted for." }),
+    );
+  }
+
+  return parts.join(" ");
 }
 
 function EmptyWorkspaceView() {

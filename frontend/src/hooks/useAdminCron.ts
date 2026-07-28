@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiAxios } from "@/lib/api";
 import type {
   CronJobOption,
+  CronLastRun,
   CronRunResult,
   CronScheduleInput,
   ScheduledCommand,
@@ -15,6 +16,19 @@ export function useAdminCronSchedules() {
   return useQuery({
     queryKey: KEY,
     queryFn: async () => (await apiAxios.get<ScheduledCommand[]>("/admin/cron/schedules")).data,
+    // The master cron fires every minute; polling keeps last-run status and
+    // the next-run countdown honest without the admin reloading the page.
+    refetchInterval: 15_000,
+  });
+}
+
+/** Run history for one command, loaded on demand by the history sheet. */
+export function useAdminCronRuns(command: string | null) {
+  return useQuery({
+    queryKey: ["admin", "cron", "runs", command],
+    queryFn: async () =>
+      (await apiAxios.get<CronLastRun[]>("/admin/cron/runs", { params: { command } })).data,
+    enabled: !!command,
   });
 }
 

@@ -16,6 +16,10 @@ export interface CheckinStatus {
     checkOutAt: string | null;
     isLate: boolean;
   };
+  /** Approved leave covers today, so no check-in is expected. */
+  onLeave: boolean;
+  /** A half-day leave still expects a punch for the working half. */
+  leaveIsFullDay: boolean;
 }
 
 export interface CheckinResponse {

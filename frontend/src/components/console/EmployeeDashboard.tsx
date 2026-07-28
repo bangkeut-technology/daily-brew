@@ -15,6 +15,7 @@ import { useDateFormat } from "@/hooks/useDateFormat";
 import { useWorkspaceTimezone } from "@/hooks/useWorkspaceSettings";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { GlassCard, GlassCardHeader } from "@/components/shared/GlassCard";
+import { DashboardInsights } from "@/components/console/DashboardInsights";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Avatar } from "@/components/shared/Avatar";
 import { LeaveRequestModal } from "@/components/console/LeaveRequestModal";
@@ -76,6 +77,9 @@ export function EmployeeDashboard() {
   const checkedIn = today?.checkedIn ?? false;
   const checkedOut = today?.checkedOut ?? false;
   const completed = checkedIn && checkedOut;
+  // A full-day approved leave means no punch is expected at all; a half-day
+  // one still does, so only the full-day case replaces the status.
+  const onFullDayLeave = (checkinData?.onLeave ?? false) && (checkinData?.leaveIsFullDay ?? false);
 
   const todayMid = parseDateAsUTC(wsTz.today());
   const activeClosure = (closures ?? []).find(
@@ -195,13 +199,19 @@ export function EmployeeDashboard() {
           <GlassCardHeader
             title={t("dashboard.myStatus", "My status")}
             action={
-              checkedIn ? (
+              onFullDayLeave && !checkedIn ? (
+                <StatusBadge label={t("dashboard.onLeave", "On leave")} variant="blue" />
+              ) : checkedIn ? (
                 <StatusBadge
-                  label={completed ? "Completed" : "Checked in"}
+                  label={
+                    completed
+                      ? t("dashboard.completed", "Completed")
+                      : t("dashboard.checkedIn", "Checked in")
+                  }
                   variant={completed ? "green" : "blue"}
                 />
               ) : (
-                <StatusBadge label="Not checked in" variant="gray" />
+                <StatusBadge label={t("dashboard.notCheckedIn", "Not checked in")} variant="gray" />
               )
             }
           />
@@ -210,6 +220,18 @@ export function EmployeeDashboard() {
               <div className="flex items-center gap-2 text-[15px] text-text-tertiary">
                 <Loader2 size={14} className="animate-spin" />
                 {t("common.loading", "Loading…")}
+              </div>
+            ) : onFullDayLeave && !checkedIn ? (
+              <div className="flex items-center gap-3 rounded-xl border border-blue/15 bg-blue/8 px-4 py-3">
+                <CalendarOff size={16} className="shrink-0 text-blue" />
+                <div>
+                  <p className="text-[15px] font-medium text-blue">
+                    {t("dashboard.onApprovedLeave", "You are on approved leave today")}
+                  </p>
+                  <p className="text-[13px] text-blue/70">
+                    {t("dashboard.noCheckinRequired", "No check-in required.")}
+                  </p>
+                </div>
               </div>
             ) : checkedIn ? (
               <div className="space-y-2">
@@ -233,7 +255,7 @@ export function EmployeeDashboard() {
               </div>
             ) : (
               <p className="text-[15px] text-text-secondary">
-                You have not checked in yet today.
+                {t("dashboard.notCheckedInYet", "You have not checked in yet today.")}
               </p>
             )}
           </div>
@@ -266,6 +288,10 @@ export function EmployeeDashboard() {
           hint={today?.checkOutAt ? "Recorded" : checkedIn ? "Pending" : "Awaiting"}
         />
       </div>
+
+      {/* Own punctuality over the rolling window — the trends endpoint scopes
+          itself to the caller for non-manager employees. */}
+      <DashboardInsights workspaceId={workspaceId} personal />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <GlassCard hover={false}>
