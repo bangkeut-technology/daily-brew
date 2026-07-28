@@ -1,8 +1,16 @@
+import { setRequestLocale } from "next-intl/server";
 import { pageMetadata } from "@/lib/seo";
 import { RefundContent } from "./RefundContent";
 
-export const metadata = pageMetadata("/refund");
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  return pageMetadata("/refund", locale);
+}
 
-export default function RefundPage() {
+export default async function RefundPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  // Keeps this route statically rendered despite the translated content below.
+  setRequestLocale(locale);
+
   return <RefundContent />;
 }
