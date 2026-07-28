@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.125.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.124.0...v1.125.0) (2026-07-28)
+
+
+### Features
+
+* **dashboard,next:** add attendance trend charts and close the Next console parity gap ([#362](https://github.com/bangkeut-technology/daily-brew/issues/362)) ([0bcf94c](https://github.com/bangkeut-technology/daily-brew/commit/0bcf94caf3e3ded3d360f450ccef5889f397235c))
+
 ## [1.124.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.123.0...v1.124.0) (2026-07-27)
 
 
