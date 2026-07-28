@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.126.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.125.0...v1.126.0) (2026-07-28)
+
+
+### Features
+
+* **next/marketing:** localized /fr and /km routes with hreflang ([#364](https://github.com/bangkeut-technology/daily-brew/issues/364)) ([a182829](https://github.com/bangkeut-technology/daily-brew/commit/a182829c3d55e1437eb8bbcf8fca115b68308ad7))
+
 ## [1.125.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.124.0...v1.125.0) (2026-07-28)
 
 
