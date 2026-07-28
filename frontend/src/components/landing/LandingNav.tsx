@@ -1,13 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
+import NextLink from "next/link";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import { LogoBrand } from "@/components/shared/Logo";
-import { Link as LocaleLink } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 
 /** Visible text comes from `marketing.nav.*`; `href` is the marketing route. */
@@ -57,35 +57,35 @@ export function LandingNav() {
       />
 
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 md:px-8">
-        <LocaleLink href="/" className="no-underline">
+        <Link href="/" className="no-underline">
           <LogoBrand size={30} />
-        </LocaleLink>
+        </Link>
 
         {/* Desktop links */}
         <div className="hidden items-center gap-6 md:flex">
           {navLinks.map((link) => (
-            <LocaleLink
+            <Link
               key={link.href}
               href={link.href}
               className="text-[15px] font-medium text-text-secondary no-underline transition-colors duration-200 hover:text-coffee"
             >
               {t(link.key)}
-            </LocaleLink>
+            </Link>
           ))}
           <LocaleSwitcher />
           <div className="h-4 w-px bg-cream-3" />
-          <Link
+          <NextLink
             href="/sign-in"
             className="text-[15px] font-medium text-text-secondary no-underline transition-colors duration-200 hover:text-text-primary"
           >
             {t("signIn")}
-          </Link>
-          <Link
+          </NextLink>
+          <NextLink
             href="/sign-up"
             className="flex cursor-pointer items-center gap-1.5 rounded-lg border-none bg-coffee px-4 py-2 text-[15px] font-medium text-white no-underline transition-all duration-150 hover:-translate-y-px hover:bg-coffee-light hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
           >
             {t("getStarted")}
-          </Link>
+          </NextLink>
         </div>
 
         {/* Mobile hamburger */}
@@ -109,31 +109,31 @@ export function LandingNav() {
             transition={{ duration: 0.25, ease: "easeInOut" }}
           >
             {navLinks.map((link) => (
-              <LocaleLink
+              <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
                 className="block py-1 text-[16px] font-medium text-text-secondary no-underline transition-colors hover:text-coffee"
               >
                 {t(link.key)}
-              </LocaleLink>
+              </Link>
             ))}
             <LocaleSwitcher className="py-1" />
             <div className="my-2 h-px bg-cream-3" />
-            <Link
+            <NextLink
               href="/sign-in"
               onClick={() => setMobileOpen(false)}
               className="block py-1 text-[16px] font-medium text-text-secondary no-underline"
             >
               {t("signIn")}
-            </Link>
-            <Link
+            </NextLink>
+            <NextLink
               href="/sign-up"
               onClick={() => setMobileOpen(false)}
               className="inline-flex items-center rounded-lg bg-coffee px-4 py-2 text-[15px] font-medium text-white no-underline"
             >
               {t("getStarted")}
-            </Link>
+            </NextLink>
           </motion.div>
         )}
       </AnimatePresence>

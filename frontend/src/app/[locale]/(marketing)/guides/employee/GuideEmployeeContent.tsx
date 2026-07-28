@@ -1,15 +1,18 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from 'framer-motion';
+import NextLink from "next/link";
+import { Link } from "@/i18n/navigation";
 import { ArrowLeft, ChevronRight } from 'lucide-react';
 import { PlaybookSection } from '@/components/landing/PlaybookSection';
 import { ContinueReading } from '@/components/landing/ContinueReading';
-import { playbookByKey } from '@/components/landing/playbooks';
+import { useTranslations } from 'next-intl';
+import { usePlaybook } from '@/components/landing/playbooks';
 
-const playbook = playbookByKey.employee;
 
 export function GuideEmployeeContent() {
+  const t = useTranslations();
+  const playbook = usePlaybook('employee');
   return (
     <div className="pt-28 pb-20 px-6 md:px-8 max-w-3xl mx-auto page-enter">
       <motion.div
@@ -23,7 +26,7 @@ export function GuideEmployeeContent() {
           className="inline-flex items-center gap-1.5 text-[14px] font-medium text-text-tertiary hover:text-coffee no-underline transition-colors"
         >
           <ArrowLeft size={14} />
-          All guides
+          {t('playbooks.continueReading.allGuides')}
         </Link>
       </motion.div>
 
@@ -43,18 +46,18 @@ export function GuideEmployeeContent() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
       >
-        <Link
+        <NextLink
           href="/sign-up"
           className="btn-shimmer flex items-center gap-1.5 px-6 py-2.5 rounded-lg text-[15px] font-semibold text-white no-underline transition-all hover:-translate-y-px"
         >
-          Create an account
+          {t('guides.cta.createAccount')}
           <ChevronRight size={14} />
-        </Link>
+        </NextLink>
         <Link
           href="/guides"
           className="px-6 py-2.5 rounded-lg text-[15px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 no-underline transition-all hover:bg-cream-3"
         >
-          Other guides
+          {t('guides.cta.otherGuides')}
         </Link>
       </motion.div>
     </div>

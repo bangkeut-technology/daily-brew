@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from 'framer-motion';
+import NextLink from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useTranslations } from 'next-intl';
 import {
   QrCode, Users, Clock, Coffee, Shield, LayoutDashboard,
@@ -210,13 +211,13 @@ export function FeaturesContent() {
           {t("cta.subtitle")}
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link
+          <NextLink
             href="/sign-up"
             className="btn-shimmer flex items-center gap-1.5 px-6 py-2.5 rounded-lg text-[15px] font-semibold text-white no-underline transition-all hover:-translate-y-px"
           >
             {t("cta.startFree")}
             <ChevronRight size={14} />
-          </Link>
+          </NextLink>
           <Link
             href="/pricing"
             className="px-6 py-2.5 rounded-lg text-[15px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 no-underline transition-all hover:bg-cream-3"

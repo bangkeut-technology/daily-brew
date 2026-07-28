@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from 'framer-motion';
+import NextLink from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useTranslations } from 'next-intl';
 import {
   UserPlus,
@@ -18,7 +19,7 @@ import {
   CheckCircle,
   ArrowRight,
 } from 'lucide-react';
-import { playbookByKey } from '@/components/landing/playbooks';
+import { usePlaybook } from '@/components/landing/playbooks';
 
 /** Icon/number/accent are design; `key` selects `routes.howItWorks.steps.<key>`. */
 const steps = [
@@ -47,13 +48,12 @@ const employeeFeatures = [
   { icon: <CheckCircle size={18} />, key: "approvalStatus" },
 ];
 
-const ownerPb = playbookByKey.owner;
-const employeePb = playbookByKey.employee;
-const espressoPb = playbookByKey.espresso;
-const EspressoIcon = espressoPb.icon;
-
 export function HowItWorksContent() {
   const t = useTranslations("routes.howItWorks");
+  const ownerPb = usePlaybook('owner');
+  const employeePb = usePlaybook('employee');
+  const espressoPb = usePlaybook('espresso');
+  const EspressoIcon = espressoPb.icon;
 
   return (
     <div className="pt-28 pb-20 px-6 md:px-8 max-w-5xl mx-auto page-enter">
@@ -298,13 +298,13 @@ export function HowItWorksContent() {
           {t("cta.subtitle")}
         </p>
         <div className="flex items-center justify-center gap-3">
-          <Link
+          <NextLink
             href="/sign-up"
             className="btn-shimmer flex items-center gap-1.5 px-6 py-2.5 rounded-lg text-[15px] font-semibold text-white no-underline transition-all hover:-translate-y-px"
           >
             {t("cta.getStartedFree")}
             <ChevronRight size={14} />
-          </Link>
+          </NextLink>
           <Link
             href="/features"
             className="px-6 py-2.5 rounded-lg text-[15px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 no-underline transition-all hover:bg-cream-3"

@@ -1,14 +1,16 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
+import { Link } from "@/i18n/navigation";
 import { ArrowRight, BookOpen } from "lucide-react";
-import { playbooks } from "@/components/landing/playbooks";
+import { useTranslations } from "next-intl";
+import { usePlaybooks } from "@/components/landing/playbooks";
 
 export function GuidesContent() {
   // Marketing is static and provider-free (no useFeatures), so every playbook
   // is listed — the NFC guide is already a public, indexable page.
-  const visiblePlaybooks = playbooks;
+  const t = useTranslations();
+  const visiblePlaybooks = usePlaybooks();
   return (
     <div className="pt-28 pb-20 px-6 md:px-8 max-w-6xl mx-auto page-enter">
       <motion.div
@@ -19,14 +21,13 @@ export function GuidesContent() {
       >
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber/10 text-amber text-[12px] font-semibold uppercase tracking-wider mb-4">
           <BookOpen size={14} />
-          Guides
+          {t("guides.index.badge")}
         </div>
         <h1 className="text-[34px] md:text-[44px] font-semibold text-text-primary font-serif leading-tight">
-          Pick your path
+          {t("guides.index.title")}
         </h1>
         <p className="text-[17px] text-text-secondary mt-4 max-w-xl mx-auto">
-          Short, focused playbooks for the three things people ask us about
-          most. Each one takes about five minutes to read.
+          {t("guides.index.subtitle")}
         </p>
       </motion.div>
 
@@ -58,7 +59,7 @@ export function GuidesContent() {
                 <h2 className="text-[18px] font-semibold text-text-primary font-serif mb-2">{pb.title}</h2>
                 <p className="text-[14px] text-text-secondary leading-relaxed mb-5">{pb.teaser}</p>
                 <div className="flex items-center gap-1.5 text-[13px] font-semibold text-coffee">
-                  <span>{pb.steps.length} steps</span>
+                  <span>{t("playbooks.continueReading.stepsCount", { count: pb.steps.length })}</span>
                   <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
                 </div>
               </Link>
@@ -74,9 +75,9 @@ export function GuidesContent() {
         viewport={{ once: true }}
       >
         <p className="text-[14px] text-text-tertiary">
-          Looking for the big picture instead?{" "}
+          {t("guides.index.bigPicturePrefix")}{" "}
           <Link href="/how-it-works" className="text-coffee font-semibold no-underline hover:underline">
-            See how DailyBrew works
+            {t("guides.index.bigPictureLink")}
           </Link>
           .
         </p>

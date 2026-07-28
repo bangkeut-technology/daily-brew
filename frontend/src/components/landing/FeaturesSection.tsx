@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { BasilBookBrand } from "@/components/shared/BasilBookBrand";
-import { Link as LocaleLink } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 
 interface FeatureShape {
   key: string;
@@ -110,13 +110,13 @@ export function FeaturesSection() {
         viewport={{ once: true }}
         transition={{ duration: 0.4, delay: 0.3 }}
       >
-        <LocaleLink
+        <Link
           href="/features"
           className="inline-flex items-center gap-1.5 text-[15px] font-medium text-coffee no-underline transition-colors hover:text-coffee-light"
         >
           {t("seeAll")}
           <ChevronRight size={14} />
-        </LocaleLink>
+        </Link>
       </motion.div>
     </section>
   );

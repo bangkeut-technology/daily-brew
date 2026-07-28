@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
+import NextLink from "next/link";
 import { ArrowRightLeft, FileText, Clock, ChevronRight, Crown } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { BasilBookBrand } from "@/components/shared/BasilBookBrand";
@@ -120,13 +120,13 @@ export function IntegrationSection() {
           </div>
 
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link
+            <NextLink
               href="/sign-up"
               className="btn-shimmer inline-flex items-center gap-1.5 rounded-lg px-5 py-2.5 text-[15px] font-semibold text-white no-underline transition-all hover:-translate-y-px"
             >
               {t("ctaPrimary")}
               <ChevronRight size={14} />
-            </Link>
+            </NextLink>
             <a
               href="https://basilbook.com"
               target="_blank"

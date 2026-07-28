@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import Link from "next/link";
+import NextLink from "next/link";
 import { Check, X, Crown, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
@@ -177,12 +177,12 @@ export function PricingSection() {
             ))}
           </ul>
 
-          <Link
+          <NextLink
             href="/sign-up"
             className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-cream-3 bg-glass-bg px-4 py-3 text-[15px] font-medium text-text-primary no-underline backdrop-blur-sm transition-all duration-150 hover:bg-cream-3"
           >
             {t("free.cta")}
-          </Link>
+          </NextLink>
         </motion.div>
 
         {/* Espresso plan */}
@@ -230,13 +230,13 @@ export function PricingSection() {
             ))}
           </ul>
 
-          <Link
+          <NextLink
             href="/sign-up"
             className="btn-shimmer relative flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border-none px-4 py-3 text-[15px] font-semibold text-white no-underline transition-all duration-150 hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
           >
             {t("espresso.cta")}
             <ChevronRight size={14} />
-          </Link>
+          </NextLink>
         </motion.div>
 
         {/* Double Espresso plan */}
