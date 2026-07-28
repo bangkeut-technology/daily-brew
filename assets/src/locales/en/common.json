@@ -1656,13 +1656,13 @@
             "label": "Priority support"
           },
           "multipleQrStations": {
-            "label": "Multiple QR stations (roadmap)"
+            "label": "Multiple QR stations"
           },
           "perQrGeofence": {
-            "label": "Per-QR geofence & settings (roadmap)"
+            "label": "Per-QR geofence & settings"
           },
           "perQrAssignment": {
-            "label": "Employee assignment per QR (roadmap)"
+            "label": "Employee assignment per QR"
           }
         }
       },

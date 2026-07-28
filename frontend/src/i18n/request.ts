@@ -2,7 +2,8 @@ import { getRequestConfig } from "next-intl/server";
 import { hasLocale } from "next-intl";
 import { routing } from "./routing";
 
-type Messages = { [key: string]: string | Messages };
+type MessageValue = string | MessageValue[] | { [key: string]: MessageValue };
+type Messages = { [key: string]: MessageValue };
 
 /**
  * The locale catalogues are shared with the console's i18next, which writes
@@ -14,15 +15,15 @@ type Messages = { [key: string]: string | Messages };
  * no marketing message uses i18next's `_one`/`_other` plural suffixes (which
  * have no mechanical ICU equivalent and would need hand-conversion).
  */
-function toIcuPlaceholders(messages: Messages): Messages {
-  const out: Messages = {};
-  for (const [key, value] of Object.entries(messages)) {
-    out[key] =
-      typeof value === "string"
-        ? value.replace(/\{\{(\w+)\}\}/g, "{$1}")
-        : toIcuPlaceholders(value);
-  }
-  return out;
+function toIcuPlaceholders(value: MessageValue): MessageValue {
+  if (typeof value === "string") return value.replace(/\{\{(\w+)\}\}/g, "{$1}");
+  // Arrays must stay arrays — some messages are lists (e.g. the how-it-works
+  // step bullet points), and rebuilding them from Object.entries would turn
+  // them into `{0: …, 1: …}`, which `t.raw()` can't map over.
+  if (Array.isArray(value)) return value.map(toIcuPlaceholders);
+  return Object.fromEntries(
+    Object.entries(value).map(([key, child]) => [key, toIcuPlaceholders(child)]),
+  );
 }
 
 /**
@@ -36,5 +37,5 @@ export default getRequestConfig(async ({ requestLocale }) => {
 
   const messages = (await import(`../locales/${locale}/common.json`)).default as Messages;
 
-  return { locale, messages: toIcuPlaceholders(messages) };
+  return { locale, messages: toIcuPlaceholders(messages) as Messages };
 });

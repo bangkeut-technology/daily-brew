@@ -1542,13 +1542,13 @@
             "label": "Support prioritaire"
           },
           "multipleQrStations": {
-            "label": "Plusieurs stations QR (feuille de route)"
+            "label": "Plusieurs stations QR"
           },
           "perQrGeofence": {
-            "label": "Géorepérage et paramètres par QR (feuille de route)"
+            "label": "Géorepérage et paramètres par QR"
           },
           "perQrAssignment": {
-            "label": "Affectation d'employés par QR (feuille de route)"
+            "label": "Affectation d'employés par QR"
           }
         }
       },

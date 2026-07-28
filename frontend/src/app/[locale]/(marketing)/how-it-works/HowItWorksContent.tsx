@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import {
   UserPlus,
   QrCode,
@@ -19,74 +20,31 @@ import {
 } from 'lucide-react';
 import { playbookByKey } from '@/components/landing/playbooks';
 
+/** Icon/number/accent are design; `key` selects `routes.howItWorks.steps.<key>`. */
 const steps = [
-  {
-    number: '01',
-    icon: <Building2 size={28} strokeWidth={1.6} />,
-    title: 'Create your workspace',
-    desc: 'Sign up and name your restaurant. DailyBrew generates a unique QR code for your workspace automatically — print it and display it at your entrance.',
-    details: [
-      'One workspace per restaurant location',
-      'QR code generated instantly',
-      'Invite your team in minutes',
-    ],
-    accent: '#6B4226',
-  },
-  {
-    number: '02',
-    icon: <UserPlus size={28} strokeWidth={1.6} />,
-    title: 'Add your employees',
-    desc: 'Create employee profiles with names and phone numbers. Assign each person to a shift so DailyBrew knows when to expect them.',
-    details: [
-      'Assign morning, evening, or custom shifts',
-      'Set shift start and end times',
-      'Optionally link employees to user accounts',
-    ],
-    accent: '#4A7C59',
-  },
-  {
-    number: '03',
-    icon: <QrCode size={28} strokeWidth={1.6} />,
-    title: 'Staff scan to check in',
-    desc: 'Employees open the DailyBrew app on their phone, scan the workspace QR code, and they are checked in. Same scan to check out at the end of their shift.',
-    details: [
-      'Works on any smartphone',
-      'One tap to check in, one tap to check out',
-      'Optional IP, device, and geofence verification',
-    ],
-    accent: '#C17F3B',
-  },
-  {
-    number: '04',
-    icon: <BarChart3 size={28} strokeWidth={1.6} />,
-    title: 'Track everything live',
-    desc: 'Your dashboard shows who is present, who is late, who is on leave, and who has not shown up — all in real time. Late arrivals and early departures are flagged automatically.',
-    details: [
-      'Real-time attendance overview',
-      'Late and early departure detection',
-      'Daily attendance summary notifications',
-    ],
-    accent: '#3B6FA0',
-  },
+  { number: "01", icon: <Building2 size={28} strokeWidth={1.6} />, key: "create", accent: "#6B4226" },
+  { number: "02", icon: <UserPlus size={28} strokeWidth={1.6} />, key: "addTeam", accent: "#4A7C59" },
+  { number: "03", icon: <QrCode size={28} strokeWidth={1.6} />, key: "scan", accent: "#C17F3B" },
+  { number: "04", icon: <BarChart3 size={28} strokeWidth={1.6} />, key: "track", accent: "#3B6FA0" },
 ];
 
 const ownerFeatures = [
-  { icon: <BarChart3 size={18} />, label: 'Live dashboard with attendance stats' },
-  { icon: <UserPlus size={18} />, label: 'Add and manage employees' },
-  { icon: <Clock size={18} />, label: 'Define shifts and schedules' },
-  { icon: <CalendarOff size={18} />, label: 'Schedule closures and holidays' },
-  { icon: <CalendarDays size={18} />, label: 'Approve or reject leave requests' },
-  { icon: <Shield size={18} />, label: 'Configure IP, device, and geofence rules' },
-  { icon: <Bell size={18} />, label: 'Daily summary via push and email' },
+  { icon: <BarChart3 size={18} />, key: "dashboard" },
+  { icon: <UserPlus size={18} />, key: "employees" },
+  { icon: <Clock size={18} />, key: "shifts" },
+  { icon: <CalendarOff size={18} />, key: "closures" },
+  { icon: <CalendarDays size={18} />, key: "leave" },
+  { icon: <Shield size={18} />, key: "security" },
+  { icon: <Bell size={18} />, key: "notifications" },
 ];
 
 const employeeFeatures = [
-  { icon: <QrCode size={18} />, label: 'Scan QR to check in and out' },
-  { icon: <Smartphone size={18} />, label: 'Personal dashboard on mobile' },
-  { icon: <Clock size={18} />, label: 'View own shift and attendance history' },
-  { icon: <CalendarDays size={18} />, label: 'Submit leave requests' },
-  { icon: <Bell size={18} />, label: 'Get notified of shift changes and closures' },
-  { icon: <CheckCircle size={18} />, label: 'See approval status in real time' },
+  { icon: <QrCode size={18} />, key: "qrScan" },
+  { icon: <Smartphone size={18} />, key: "mobileDashboard" },
+  { icon: <Clock size={18} />, key: "history" },
+  { icon: <CalendarDays size={18} />, key: "leaveRequests" },
+  { icon: <Bell size={18} />, key: "shiftAlerts" },
+  { icon: <CheckCircle size={18} />, key: "approvalStatus" },
 ];
 
 const ownerPb = playbookByKey.owner;
@@ -95,6 +53,8 @@ const espressoPb = playbookByKey.espresso;
 const EspressoIcon = espressoPb.icon;
 
 export function HowItWorksContent() {
+  const t = useTranslations("routes.howItWorks");
+
   return (
     <div className="pt-28 pb-20 px-6 md:px-8 max-w-5xl mx-auto page-enter">
       {/* Hero */}
@@ -105,14 +65,13 @@ export function HowItWorksContent() {
         transition={{ duration: 0.5 }}
       >
         <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
-          How it works
+          {t("eyebrow")}
         </p>
         <h1 className="text-[34px] md:text-[44px] font-semibold text-text-primary font-serif leading-tight">
-          Up and running in minutes
+          {t("title")}
         </h1>
         <p className="text-[17px] text-text-secondary mt-4 max-w-xl mx-auto">
-          Four simple steps from sign-up to live attendance tracking.
-          No hardware, no complex setup.
+          {t("subtitle")}
         </p>
       </motion.div>
 
@@ -155,13 +114,13 @@ export function HowItWorksContent() {
               {/* Content */}
               <div className="flex-1">
                 <h3 className="text-[20px] font-semibold text-text-primary font-serif mb-2">
-                  {step.title}
+                  {t(`steps.${step.key}.title`)}
                 </h3>
                 <p className="text-[15px] text-text-secondary leading-relaxed mb-4">
-                  {step.desc}
+                  {t(`steps.${step.key}.desc`)}
                 </p>
                 <ul className="space-y-2">
-                  {step.details.map((detail) => (
+                  {(t.raw(`steps.${step.key}.details`) as string[]).map((detail) => (
                     <li key={detail} className="flex items-center gap-2.5">
                       <CheckCircle
                         size={14}
@@ -189,14 +148,13 @@ export function HowItWorksContent() {
         transition={{ duration: 0.5 }}
       >
         <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
-          Two perspectives
+          {t("perspectives.eyebrow")}
         </p>
         <h2 className="text-[30px] md:text-[36px] font-semibold text-text-primary font-serif leading-tight">
-          Built for owners and employees
+          {t("perspectives.title")}
         </h2>
         <p className="text-[16px] text-text-secondary mt-3 max-w-lg mx-auto">
-          Restaurant owners get a management dashboard. Employees get a simple
-          mobile experience.
+          {t("perspectives.subtitle")}
         </p>
       </motion.div>
 
@@ -215,21 +173,21 @@ export function HowItWorksContent() {
             </div>
             <div>
               <h3 className="text-[17px] font-semibold text-text-primary">
-                For owners
+                {t("ownerCard.title")}
               </h3>
               <p className="text-[13px] text-text-tertiary">
-                Full control from your dashboard
+                {t("ownerCard.subtitle")}
               </p>
             </div>
           </div>
           <ul className="space-y-3 mb-6">
             {ownerFeatures.map((f) => (
-              <li key={f.label} className="flex items-center gap-3">
+              <li key={f.key} className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-coffee/8 flex items-center justify-center text-coffee flex-shrink-0">
                   {f.icon}
                 </div>
                 <span className="text-[14.5px] text-text-secondary">
-                  {f.label}
+                  {t(`ownerCard.features.${f.key}`)}
                 </span>
               </li>
             ))}
@@ -238,7 +196,7 @@ export function HowItWorksContent() {
             href={ownerPb.to}
             className="mt-auto inline-flex items-center justify-between gap-2 px-4 py-2.5 rounded-lg bg-coffee/8 hover:bg-coffee/12 text-coffee text-[14px] font-semibold no-underline transition-colors"
           >
-            <span>Read the owner setup guide</span>
+            <span>{t("ownerCard.cta")}</span>
             <ArrowRight size={14} />
           </Link>
         </motion.div>
@@ -257,21 +215,21 @@ export function HowItWorksContent() {
             </div>
             <div>
               <h3 className="text-[17px] font-semibold text-text-primary">
-                For employees
+                {t("employeeCard.title")}
               </h3>
               <p className="text-[13px] text-text-tertiary">
-                Simple mobile experience
+                {t("employeeCard.subtitle")}
               </p>
             </div>
           </div>
           <ul className="space-y-3 mb-6">
             {employeeFeatures.map((f) => (
-              <li key={f.label} className="flex items-center gap-3">
+              <li key={f.key} className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-green/8 flex items-center justify-center text-green flex-shrink-0">
                   {f.icon}
                 </div>
                 <span className="text-[14.5px] text-text-secondary">
-                  {f.label}
+                  {t(`employeeCard.features.${f.key}`)}
                 </span>
               </li>
             ))}
@@ -280,7 +238,7 @@ export function HowItWorksContent() {
             href={employeePb.to}
             className="mt-auto inline-flex items-center justify-between gap-2 px-4 py-2.5 rounded-lg bg-green/8 hover:bg-green/12 text-green text-[14px] font-semibold no-underline transition-colors"
           >
-            <span>Read the employee guide</span>
+            <span>{t("employeeCard.cta")}</span>
             <ArrowRight size={14} />
           </Link>
         </motion.div>
@@ -306,10 +264,10 @@ export function HowItWorksContent() {
             </div>
             <div>
               <p className="text-[13px] font-semibold uppercase tracking-wider text-amber mb-1">
-                Espresso plan
+                {t("espressoTeaser.badge")}
               </p>
               <h3 className="text-[18px] font-semibold text-text-primary font-serif">
-                Ready for geofencing, managers, and BasilBook?
+                {t("espressoTeaser.title")}
               </h3>
               <p className="text-[14px] text-text-secondary mt-1">
                 {espressoPb.teaser}
@@ -317,7 +275,7 @@ export function HowItWorksContent() {
             </div>
           </div>
           <div className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-coffee md:flex-shrink-0">
-            <span>See the upgrade guide</span>
+            <span>{t("espressoTeaser.cta")}</span>
             <ArrowRight
               size={14}
               className="transition-transform group-hover:translate-x-0.5"
@@ -334,24 +292,24 @@ export function HowItWorksContent() {
         viewport={{ once: true }}
       >
         <h3 className="text-[24px] font-semibold text-text-primary font-serif mb-3">
-          Ready to simplify attendance?
+          {t("cta.title")}
         </h3>
         <p className="text-[16px] text-text-secondary mb-6">
-          Free for up to 10 active employees. No credit card required.
+          {t("cta.subtitle")}
         </p>
         <div className="flex items-center justify-center gap-3">
           <Link
             href="/sign-up"
             className="btn-shimmer flex items-center gap-1.5 px-6 py-2.5 rounded-lg text-[15px] font-semibold text-white no-underline transition-all hover:-translate-y-px"
           >
-            Get started free
+            {t("cta.getStartedFree")}
             <ChevronRight size={14} />
           </Link>
           <Link
             href="/features"
             className="px-6 py-2.5 rounded-lg text-[15px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 no-underline transition-all hover:bg-cream-3"
           >
-            View all features
+            {t("cta.viewFeatures")}
           </Link>
         </div>
       </motion.div>

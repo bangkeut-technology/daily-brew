@@ -4,7 +4,10 @@ import { JsonLd } from "@/components/JsonLd";
 import { breadcrumbSchema, softwareApplicationSchema } from "@/lib/schema";
 import { FaqSection } from "@/components/marketing/FaqSection";
 
-export const metadata = pageMetadata("/three-factor-attendance");
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  return pageMetadata("/three-factor-attendance", locale);
+}
 
 const FACTORS = [
   {

@@ -3,98 +3,54 @@
 import { useState } from "react";
 import { Check, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { BasilBookBrand } from "@/components/shared/BasilBookBrand";
 import { cn } from "@/lib/utils";
 
+/**
+ * `key` selects `routes.pricing.comparison.rows.<key>`; `sectionKey` starts a
+ * new section header. Note the three per-QR rows are *not* roadmap items —
+ * sub-QR codes shipped, and the labels used to say "(roadmap)" here.
+ */
 const comparisonRows: {
-  section?: string;
-  feature: string;
-  featureNode?: React.ReactNode;
+  sectionKey?: string;
+  key: string;
+  brandLabel?: boolean;
   free: boolean | string;
   espresso: boolean | string;
   double: boolean | string;
 }[] = [
-  // Core
-  { section: "Core", feature: "Employees", free: "Up to 10", espresso: "Up to 20", double: "Unlimited" },
-  { feature: "Workspace QR code check-in", free: true, espresso: true, double: true },
-  { feature: "Shift management", free: true, espresso: true, double: true },
-  { feature: "Closure periods", free: true, espresso: true, double: true },
-  { feature: "Owner dashboard & stats", free: true, espresso: true, double: true },
-  { feature: "Employee dashboard", free: true, espresso: true, double: true },
-  { feature: "Attendance log", free: true, espresso: true, double: true },
-  { feature: "Dark mode", free: true, espresso: true, double: true },
-  { feature: "Multi-language (EN/FR/KM)", free: true, espresso: true, double: true },
+  { sectionKey: "core", key: "employees", free: "Up to 10", espresso: "Up to 20", double: "Unlimited" },
+  { key: "qrCheckin", free: true, espresso: true, double: true },
+  { key: "shifts", free: true, espresso: true, double: true },
+  { key: "closures", free: true, espresso: true, double: true },
+  { key: "ownerDashboard", free: true, espresso: true, double: true },
+  { key: "employeeDashboard", free: true, espresso: true, double: true },
+  { key: "attendanceLog", free: true, espresso: true, double: true },
+  { key: "darkMode", free: true, espresso: true, double: true },
+  { key: "multiLang", free: true, espresso: true, double: true },
 
-  // Espresso+
-  { section: "Espresso features", feature: "Leave request management", free: false, espresso: true, double: true },
-  { feature: "IP restriction for check-in & out", free: false, espresso: true, double: true },
-  { feature: "Device verification for check-in & out", free: false, espresso: true, double: true },
-  { feature: "Geofencing for check-in & out", free: false, espresso: true, double: true },
-  { feature: "Per-day shift schedules", free: false, espresso: true, double: true },
-  {
-    feature: "BasilBook integration + API",
-    featureNode: (
-      <>
-        <BasilBookBrand className="text-[15px]" /> integration + API
-      </>
-    ),
-    free: false,
-    espresso: true,
-    double: true,
-  },
-  { feature: "Push & email notifications", free: false, espresso: true, double: true },
-  { feature: "Manager role", free: false, espresso: "Up to 2", double: "Unlimited" },
-  { feature: "Daily attendance summary", free: false, espresso: true, double: true },
-  { feature: "14-day free trial", free: false, espresso: true, double: true },
+  { sectionKey: "espresso", key: "leaveRequests", free: false, espresso: true, double: true },
+  { key: "ipRestriction", free: false, espresso: true, double: true },
+  { key: "deviceVerification", free: false, espresso: true, double: true },
+  { key: "geofencing", free: false, espresso: true, double: true },
+  { key: "perDaySchedules", free: false, espresso: true, double: true },
+  { key: "basilbook", brandLabel: true, free: false, espresso: true, double: true },
+  { key: "notifications", free: false, espresso: true, double: true },
+  { key: "manager", free: false, espresso: "Up to 2", double: "Unlimited" },
+  { key: "dailySummary", free: false, espresso: true, double: true },
+  { key: "trial14", free: false, espresso: true, double: true },
 
-  // Double Espresso
-  { section: "Double Espresso features", feature: "Unlimited employees", free: false, espresso: false, double: true },
-  { feature: "Unlimited managers", free: false, espresso: false, double: true },
-  { feature: "Priority support", free: false, espresso: false, double: true },
-  { feature: "Multiple QR stations (roadmap)", free: false, espresso: false, double: true },
-  { feature: "Per-QR geofence & settings (roadmap)", free: false, espresso: false, double: true },
-  { feature: "Employee assignment per QR (roadmap)", free: false, espresso: false, double: true },
+  { sectionKey: "doubleEspresso", key: "unlimitedEmployees", free: false, espresso: false, double: true },
+  { key: "unlimitedManagers", free: false, espresso: false, double: true },
+  { key: "prioritySupport", free: false, espresso: false, double: true },
+  { key: "multipleQrStations", free: false, espresso: false, double: true },
+  { key: "perQrGeofence", free: false, espresso: false, double: true },
+  { key: "perQrAssignment", free: false, espresso: false, double: true },
 ];
 
-const faqItems = [
-  {
-    question: "Can I switch plans anytime?",
-    answer:
-      "Yes, you can upgrade or downgrade your plan at any time from your dashboard Settings. Changes take effect immediately.",
-  },
-  {
-    question: "What payment methods do you accept?",
-    answer:
-      "We use Paddle as our payment provider, which supports credit cards, debit cards, and PayPal.",
-  },
-  {
-    question: "Is there a free trial?",
-    answer:
-      "The Free plan is free forever with no time limit. If you want to try Espresso, you get a 14-day free trial with full access to all Espresso features.",
-  },
-  {
-    question: "Can I cancel anytime?",
-    answer:
-      "Yes, there are no contracts or lock-in periods. You can cancel your Espresso subscription at any time and continue using the Free plan.",
-  },
-  {
-    question: "How does the BasilBook integration work?",
-    answer:
-      "With an Espresso or Double Espresso plan, you can generate an API token from your workspace settings. BasilBook uses this token to pull attendance data for employees that share a username across both systems. The API returns check-in/out times, late/early flags, and shift info for any date range.",
-  },
-];
-
-function CellValue({ value }: { value: boolean | string }) {
-  if (typeof value === "string") {
-    return <span className="text-[15px] font-medium text-text-primary">{value}</span>;
-  }
-  return value ? (
-    <Check size={16} className="text-green" strokeWidth={2.5} />
-  ) : (
-    <X size={16} className="text-text-tertiary" strokeWidth={2} />
-  );
-}
+const faqKeys = ["switchPlans", "paymentMethods", "freeTrial", "cancelAnytime", "basilbook"] as const;
 
 function FaqItem({ question, answer, index }: { question: string; answer: string; index: number }) {
   const [open, setOpen] = useState(false);
@@ -136,6 +92,10 @@ function FaqItem({ question, answer, index }: { question: string; answer: string
 }
 
 export function PricingPageContent() {
+  const t = useTranslations("routes.pricing");
+  // Plan names live under the shared `pricing.*` namespace with the plan cards.
+  const tPlan = useTranslations("pricing");
+
   return (
     <div className="page-enter pt-20">
       <PricingSection />
@@ -149,12 +109,14 @@ export function PricingPageContent() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">Compare</p>
+          <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
+            {t("comparison.eyebrow")}
+          </p>
           <h3 className="text-[30px] md:text-[36px] font-semibold text-text-primary font-serif leading-tight">
-            Feature comparison
+            {t("comparison.title")}
           </h3>
           <p className="text-[16px] text-text-secondary mt-3 max-w-md mx-auto">
-            See exactly what you get with each plan.
+            {t("comparison.subtitle")}
           </p>
         </motion.div>
 
@@ -167,23 +129,27 @@ export function PricingPageContent() {
         >
           {/* Header */}
           <div className="grid grid-cols-4 px-6 py-4 border-b border-cream-3/60">
-            <span className="text-[13px] uppercase tracking-[1.5px] font-medium text-text-tertiary">Feature</span>
-            <span className="text-[13px] uppercase tracking-[1.5px] font-medium text-text-tertiary text-center">
-              Free
+            <span className="text-[13px] uppercase tracking-[1.5px] font-medium text-text-tertiary">
+              {t("comparison.headers.feature")}
             </span>
-            <span className="text-[13px] uppercase tracking-[1.5px] font-medium text-amber text-center">Espresso</span>
+            <span className="text-[13px] uppercase tracking-[1.5px] font-medium text-text-tertiary text-center">
+              {tPlan("free.name")}
+            </span>
+            <span className="text-[13px] uppercase tracking-[1.5px] font-medium text-amber text-center">
+              {tPlan("espresso.name")}
+            </span>
             <span className="text-[13px] uppercase tracking-[1.5px] font-medium text-coffee text-center">
-              Double Espresso
+              {tPlan("doubleEspresso.name")}
             </span>
           </div>
 
           {/* Rows */}
           {comparisonRows.map((row, i) => (
-            <div key={row.feature}>
-              {row.section && (
+            <div key={row.key}>
+              {row.sectionKey && (
                 <div className="px-6 pt-4 pb-2 border-b border-cream-3/40">
                   <span className="text-[12px] uppercase tracking-[1.5px] font-semibold text-text-tertiary">
-                    {row.section}
+                    {t(`comparison.sections.${row.sectionKey}`)}
                   </span>
                 </div>
               )}
@@ -197,7 +163,15 @@ export function PricingPageContent() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.3, delay: 0.15 + i * 0.03 }}
               >
-                <span className="text-[15px] text-text-secondary">{row.featureNode ?? row.feature}</span>
+                <span className="text-[15px] text-text-secondary">
+                  {row.brandLabel ? (
+                    t.rich(`comparison.rows.${row.key}.label`, {
+                      brand: () => <BasilBookBrand className="text-[15px]" />,
+                    })
+                  ) : (
+                    t(`comparison.rows.${row.key}.label`)
+                  )}
+                </span>
                 <span className="flex justify-center">
                   <CellValue value={row.free} />
                 </span>
@@ -222,15 +196,22 @@ export function PricingPageContent() {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">FAQ</p>
+          <p className="text-[13px] uppercase tracking-[2px] font-medium text-amber mb-3">
+            {t("faq.eyebrow")}
+          </p>
           <h3 className="text-[30px] md:text-[36px] font-semibold text-text-primary font-serif leading-tight">
-            Billing questions
+            {t("faq.title")}
           </h3>
         </motion.div>
 
         <div className="space-y-3">
-          {faqItems.map((item, i) => (
-            <FaqItem key={item.question} question={item.question} answer={item.answer} index={i} />
+          {faqKeys.map((key, i) => (
+            <FaqItem
+              key={key}
+              question={t(`faq.items.${key}.question`)}
+              answer={t(`faq.items.${key}.answer`)}
+              index={i}
+            />
           ))}
         </div>
 
@@ -241,15 +222,26 @@ export function PricingPageContent() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          Still have questions?{" "}
+          {t("faq.stillHaveQuestions")}{" "}
           <a
             href="mailto:support@mail.dailybrew.work"
             className="text-coffee font-medium no-underline hover:text-coffee-light transition-colors"
           >
-            Reach out to us
+            {t("faq.reachOut")}
           </a>
         </motion.p>
       </section>
     </div>
+  );
+}
+
+function CellValue({ value }: { value: boolean | string }) {
+  if (typeof value === "string") {
+    return <span className="text-[15px] font-medium text-text-primary">{value}</span>;
+  }
+  return value ? (
+    <Check size={16} className="text-green" strokeWidth={2.5} />
+  ) : (
+    <X size={16} className="text-text-tertiary" strokeWidth={2} />
   );
 }

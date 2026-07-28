@@ -1,8 +1,16 @@
+import { setRequestLocale } from "next-intl/server";
 import { pageMetadata } from "@/lib/seo";
 import { GuidesContent } from "./GuidesContent";
 
-export const metadata = pageMetadata("/guides");
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  return pageMetadata("/guides", locale);
+}
 
-export default function GuidesPage() {
+export default async function GuidesPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  // Keeps this route statically rendered despite the translated content below.
+  setRequestLocale(locale);
+
   return <GuidesContent />;
 }
