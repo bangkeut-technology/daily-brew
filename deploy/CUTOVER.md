@@ -206,6 +206,11 @@ Edit the file:
 - `NEXT_PUBLIC_*` — copy each value from the legacy SPA's `window.__DAILYBREW__`
   (or from `.env.local` / the deploy `secrets`). They're baked into the build, so
   setting them here matters only as the runtime fallback for server components.
+- `NEXT_PUBLIC_PADDLE_*` — the console's Plan card reads these. An empty
+  `..._CLIENT_SIDE_TOKEN` hides the subscribe buttons rather than rendering ones
+  that silently fail, so **an unset value ships a console with no way to
+  upgrade** — fill these before the cutover, not after. Note the staging unit
+  deliberately leaves them empty (it shares the production database).
 
 Activate:
 

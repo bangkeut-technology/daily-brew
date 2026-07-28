@@ -8,6 +8,7 @@ import { useDashboard } from '@/hooks/queries/useDashboard';
 import { useWorkspaces } from '@/hooks/queries/useWorkspaces';
 import { getWorkspacePublicId } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { Skeleton } from '@/components/admin/AdminDataStates';
 import { CheckinUrlRow } from '@/components/shared/CheckinUrlRow';
 import { useFeatureEnabled } from '@/hooks/queries/useFeatures';
 import { StatCard } from '@/components/shared/StatCard';
@@ -20,11 +21,44 @@ import { useRoleContext } from '@/hooks/queries/useRoleContext';
 import { useWorkspace } from '@/hooks/queries/useWorkspaces';
 import { useLeaveRequests, useUpdateLeaveRequest } from '@/hooks/queries/useLeaveRequests';
 import { ManagerCheckinCard } from './ManagerCheckinCard';
+import { DashboardInsights } from './DashboardInsights';
 import { useClosures } from '@/hooks/queries/useClosures';
 import { usePaddle } from '@/hooks/usePaddle';
 import { useDateFormat } from '@/hooks/useDateFormat';
 import { useWorkspaceTimezone } from '@/hooks/useWorkspaceTimezone';
 import { parseDateAsUTC, formatDateUTC } from '@/lib/timezone';
+
+/**
+ * Placeholder that matches the real layout's shape, so the page doesn't jump
+ * when the stats land. Replaces the old bare "Loading..." line.
+ */
+function DashboardSkeleton({ title }: { title: string }) {
+  return (
+    <div className="page-enter" aria-busy="true">
+      <PageHeader title={title} />
+      <Skeleton className="h-4 w-2/3 mb-6" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <GlassCard key={i} hover={false}>
+            <div className="p-5 space-y-3">
+              <Skeleton className="h-3 w-1/2" />
+              <Skeleton className="h-8 w-1/3" />
+              <Skeleton className="h-3 w-2/3" />
+            </div>
+          </GlassCard>
+        ))}
+      </div>
+      <GlassCard hover={false}>
+        <div className="p-5 space-y-3">
+          <Skeleton className="h-3 w-1/4" />
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-10" />
+          ))}
+        </div>
+      </GlassCard>
+    </div>
+  );
+}
 
 export function OwnerDashboard() {
   const { t } = useTranslation();
@@ -92,12 +126,7 @@ export function OwnerDashboard() {
   }
 
   if (isLoading || !data) {
-    return (
-      <div className="page-enter">
-        <PageHeader title={t('nav.dashboard')} />
-        <p className="text-text-tertiary text-[15px] font-sans">{t('common.loading', 'Loading...')}</p>
-      </div>
-    );
+    return <DashboardSkeleton title={t('nav.dashboard')} />;
   }
 
   if (data.totalEmployees === 0) {
@@ -314,6 +343,23 @@ export function OwnerDashboard() {
         </GlassCard>
       )}
 
+      {/* Active closure sits above the stats it explains: when the restaurant
+          is shut, an absent count of 12 is expected rather than alarming. */}
+      {activeClosures.length > 0 && (
+        <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-red/8 border border-red/15 mb-6">
+          <CalendarOff size={16} className="text-red shrink-0" />
+          <div className="flex-1">
+            <p className="text-[15px] font-medium text-red">
+              {t('dashboard.closedToday', 'Restaurant is closed today')} —{' '}
+              {activeClosures.map((c) => c.name).join(', ')}
+            </p>
+            <p className="text-[13px] text-red/70">
+              {t('dashboard.closedTodayHint', 'No attendance is expected during this period.')}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Stats grid */}
       <div data-tour="dashboard" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard
@@ -346,71 +392,19 @@ export function OwnerDashboard() {
         />
       </div>
 
-      {/* Insights row */}
-      {data.totalEmployees > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          <GlassCard hover={false}>
-            <div className="p-4">
-              <p className="text-[13px] text-text-tertiary uppercase tracking-[1px] mb-1">{t('dashboard.attendanceRate')}</p>
-              <p className="text-[30px] font-bold text-coffee tabular-nums">
-                {data.totalEmployees > 0 ? Math.round((data.present / data.totalEmployees) * 100) : 0}%
-              </p>
-              <p className="text-[13px] text-text-tertiary mt-1">
-                {t('dashboard.attendanceRateSubtitle', { present: data.present, total: data.totalEmployees })}
-              </p>
-            </div>
-          </GlassCard>
-          <GlassCard hover={false}>
-            <div className="p-4">
-              <p className="text-[13px] text-text-tertiary uppercase tracking-[1px] mb-1">{t('dashboard.onTimeRate')}</p>
-              <p className="text-[30px] font-bold text-green tabular-nums">
-                {data.present > 0 ? Math.round(((data.present - data.late) / data.present) * 100) : 0}%
-              </p>
-              <p className="text-[13px] text-text-tertiary mt-1">
-                {t('dashboard.onTimeRateSubtitle', { onTime: data.present - data.late, late: data.late })}
-              </p>
-            </div>
-          </GlassCard>
-          <GlassCard hover={false}>
-            <div className="p-4">
-              <p className="text-[13px] text-text-tertiary uppercase tracking-[1px] mb-1">{t('dashboard.leaveAbsent')}</p>
-              <p className="text-[30px] font-bold text-amber tabular-nums">
-                {data.onLeave + data.absent}
-              </p>
-              <p className="text-[13px] text-text-tertiary mt-1">
-                {data.pendingLeaves > 0
-                  ? t('dashboard.leaveAbsentSubtitleWithPending', { onLeave: data.onLeave, absent: data.absent, pending: data.pendingLeaves })
-                  : t('dashboard.leaveAbsentSubtitle', { onLeave: data.onLeave, absent: data.absent })}
-              </p>
-            </div>
-          </GlassCard>
-        </div>
-      )}
+      {/* Rolling-window charts */}
+      <DashboardInsights workspaceId={workspaceId} />
 
-      {/* Current & upcoming closures */}
-      {(activeClosures.length > 0 || upcomingClosures.length > 0) && (
+      {/* Upcoming closures */}
+      {upcomingClosures.length > 0 && (
         <div className="mb-6">
-          {activeClosures.length > 0 && (
-            <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-red/8 border border-red/15 mb-3">
-              <CalendarOff size={16} className="text-red shrink-0" />
-              <div className="flex-1">
-                <p className="text-[15px] font-medium text-red">
-                  Restaurant is closed today — {activeClosures.map((c) => c.name).join(', ')}
-                </p>
-                <p className="text-[13px] text-red/70">
-                  No attendance is expected during this period.
-                </p>
-              </div>
-            </div>
-          )}
-          {upcomingClosures.length > 0 && (
             <GlassCard hover={false}>
               <GlassCardHeader
-                title="Upcoming closures"
+                title={t('dashboard.upcomingClosures', 'Upcoming closures')}
                 action={
                   !isManagerView ? (
                     <Link to="/console/closures" className="text-xs text-amber font-medium cursor-pointer no-underline">
-                      Manage &rarr;
+                      {t('common.manage', 'Manage')} &rarr;
                     </Link>
                   ) : undefined
                 }
@@ -429,14 +423,13 @@ export function OwnerDashboard() {
                         </p>
                       </div>
                       <span className="text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
-                        in {daysUntil} day{daysUntil !== 1 ? 's' : ''}
+                        {t('dashboard.inDays', { count: daysUntil, defaultValue: 'in {{count}} days' })}
                       </span>
                     </div>
                   );
                 })}
               </div>
             </GlassCard>
-          )}
         </div>
       )}
 

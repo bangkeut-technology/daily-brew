@@ -8,6 +8,7 @@ import { z } from "zod";
 import { X } from "lucide-react";
 import { toast } from "sonner";
 import { CustomSelect } from "@/components/shared/CustomSelect";
+import { Toggle } from "@/components/shared/Toggle";
 import {
   useAdminCronJobs,
   useCreateAdminCronSchedule,
@@ -21,11 +22,19 @@ const schema = z.object({
   cronExpression: z.string().trim().min(1, "e.g. 0 18 * * *"),
   arguments: z.string().optional(),
   priority: z.number().int(),
+  disabled: z.boolean(),
 });
 
 type FormValues = z.infer<typeof schema>;
 
-const EMPTY: FormValues = { command: "", name: "", cronExpression: "", arguments: "", priority: 0 };
+const EMPTY: FormValues = {
+  command: "",
+  name: "",
+  cronExpression: "",
+  arguments: "",
+  priority: 0,
+  disabled: false,
+};
 
 const inputClass =
   "w-full rounded-lg border border-cream-3 bg-glass-bg px-3 py-2 text-[15px] text-text-primary outline-none transition-colors focus:border-coffee focus:ring-1 focus:ring-coffee/20";
@@ -61,6 +70,7 @@ export function CronScheduleModal({ open, onOpenChange, schedule }: Props) {
             cronExpression: schedule.cronExpression,
             arguments: schedule.arguments ?? "",
             priority: schedule.priority,
+            disabled: schedule.disabled,
           }
         : EMPTY,
     );
@@ -148,6 +158,18 @@ export function CronScheduleModal({ open, onOpenChange, schedule }: Props) {
               <div>
                 <label htmlFor="arguments" className="mb-1 block text-[13px] font-medium text-text-secondary">Arguments</label>
                 <input id="arguments" className={`${inputClass} font-mono`} placeholder="--option=value" {...register("arguments")} />
+              </div>
+              <div className="flex items-center justify-between pt-1">
+                <label htmlFor="cron-disabled" className="cursor-pointer text-[13.5px] text-text-primary">
+                  Disabled
+                </label>
+                <Controller
+                  control={control}
+                  name="disabled"
+                  render={({ field }) => (
+                    <Toggle id="cron-disabled" checked={field.value} onChange={field.onChange} />
+                  )}
+                />
               </div>
             </div>
 

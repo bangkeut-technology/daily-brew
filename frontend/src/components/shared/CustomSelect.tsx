@@ -21,6 +21,10 @@ interface CustomSelectProps {
   disabled?: boolean;
   /** Tooltip explaining why the control is locked — pair it with `disabled`. */
   title?: string;
+  /** Custom row content, e.g. an avatar beside the name. `index` is the option's position. */
+  renderOption?: (option: SelectOption, index: number) => React.ReactNode;
+  /** Custom content for the closed trigger. Falls back to the option label. */
+  renderSelected?: (option: SelectOption) => React.ReactNode;
 }
 
 interface MenuPosition {
@@ -40,6 +44,8 @@ export function CustomSelect({
   id,
   disabled,
   title,
+  renderOption,
+  renderSelected,
 }: CustomSelectProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -118,7 +124,7 @@ export function CustomSelect({
         )}
       >
         <span className={cn("flex min-w-0 items-center gap-2", !selected && "text-text-tertiary")}>
-          {selected ? selected.label : placeholder}
+          {selected ? (renderSelected ? renderSelected(selected) : selected.label) : placeholder}
         </span>
         <ChevronDown
           size={14}
@@ -162,7 +168,7 @@ export function CustomSelect({
               {filtered.length === 0 ? (
                 <p className="px-3 py-2 text-center text-[14px] text-text-tertiary">No results</p>
               ) : (
-                filtered.map((option) => (
+                filtered.map((option, idx) => (
                   <button
                     key={option.value}
                     type="button"
@@ -187,7 +193,9 @@ export function CustomSelect({
                         : "bg-transparent text-text-primary hover:bg-cream-3/40",
                     )}
                   >
-                    <span className="flex min-w-0 flex-1 items-center gap-2">{option.label}</span>
+                    <span className="flex min-w-0 flex-1 items-center gap-2">
+                      {renderOption ? renderOption(option, idx) : option.label}
+                    </span>
                     {option.value === value && (
                       <Check size={13} className="flex-shrink-0 text-coffee" />
                     )}

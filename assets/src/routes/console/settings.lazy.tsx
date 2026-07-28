@@ -580,23 +580,20 @@ function SettingsPage() {
                   <p className="text-[14px] text-text-tertiary mb-1">{t('settings.priceDoubleMonth', '$39.99/month')}</p>
                   <p className="text-[14px] text-text-tertiary mb-4">{t('settings.planLargeTeams', 'For large teams')}</p>
                   <ul className="space-y-2">
+                    {/* Sub-QR codes shipped (see /console/qr-codes), so these
+                        are no longer roadmap items — they're what the plan buys. */}
                     {[
-                      { text: t('settings.featureUnlimited', 'Unlimited employees') },
-                      { text: t('settings.featureEverythingEspresso', 'Everything in Espresso') },
-                      { text: t('settings.featurePrioritySupport', 'Priority support') },
-                      { text: t('settings.featureMultiQrStations', 'Multiple QR stations'), roadmap: true },
-                      { text: t('settings.featurePerQrSettings', 'Per-QR geofence & settings'), roadmap: true },
-                      { text: t('settings.featureEmployeeAssign', 'Employee assignment per QR'), roadmap: true },
-                      { text: t('settings.featureManagerRole', 'Manager role'), roadmap: true },
+                      t('settings.featureUnlimited', 'Unlimited employees'),
+                      t('settings.featureEverythingEspresso', 'Everything in Espresso'),
+                      t('settings.featurePrioritySupport', 'Priority support'),
+                      t('settings.featureMultiQrStations', 'Multiple QR stations'),
+                      t('settings.featurePerQrSettings', 'Per-QR geofence & settings'),
+                      t('settings.featureEmployeeAssign', 'Employee assignment per QR'),
+                      t('settings.featureManagerRole', 'Unlimited managers'),
                     ].map((f) => (
-                      <li key={f.text} className={cn('flex items-center gap-2 text-[14.5px]', f.roadmap ? 'text-text-tertiary' : 'text-text-secondary')}>
-                        <Check size={14} className={cn('shrink-0', f.roadmap ? 'text-text-tertiary' : 'text-coffee')} />
-                        {f.text}
-                        {f.roadmap && (
-                          <span className="text-[11px] font-medium px-1.5 py-px rounded-full bg-cream-3/60 text-text-tertiary">
-                            {t('settings.roadmapBadge', 'Roadmap')}
-                          </span>
-                        )}
+                      <li key={f} className="flex items-center gap-2 text-[14.5px] text-text-secondary">
+                        <Check size={14} className="shrink-0 text-coffee" />
+                        {f}
                       </li>
                     ))}
                   </ul>

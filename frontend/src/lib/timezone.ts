@@ -23,6 +23,14 @@ export function startOfMonthInTimezone(tz: string): string {
   return `${todayInTimezone(tz).slice(0, 7)}-01`;
 }
 
+/** Last day of the current month (YYYY-MM-DD) in the given timezone. */
+export function endOfMonthInTimezone(tz: string): string {
+  const [year, month] = todayInTimezone(tz).split("-").map(Number);
+  // Day 0 of the next month is the last day of this one.
+  const last = new Date(Date.UTC(year, month, 0));
+  return formatDateUTC(last);
+}
+
 /** Parse YYYY-MM-DD as UTC midnight (no browser-offset drift). */
 export function parseDateAsUTC(dateStr: string): Date {
   const [y, m, d] = dateStr.split("-").map(Number);

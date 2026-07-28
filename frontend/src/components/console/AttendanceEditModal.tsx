@@ -19,9 +19,22 @@ interface Props {
   workspaceId: string;
   tz: string;
   record: AttendanceRecord | null;
+  /**
+   * Hands this record to the delete modal. Present so a Monthly-grid cell can
+   * reach "remove" too — otherwise voiding is only discoverable from the Log
+   * view's inline trash button.
+   */
+  onRequestDelete?: () => void;
 }
 
-export function AttendanceEditModal({ open, onOpenChange, workspaceId, tz, record }: Props) {
+export function AttendanceEditModal({
+  open,
+  onOpenChange,
+  workspaceId,
+  tz,
+  record,
+  onRequestDelete,
+}: Props) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
@@ -34,6 +47,7 @@ export function AttendanceEditModal({ open, onOpenChange, workspaceId, tz, recor
               workspaceId={workspaceId}
               tz={tz}
               onDone={() => onOpenChange(false)}
+              onRequestDelete={onRequestDelete}
             />
           )}
           <Dialog.Close className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-lg text-text-tertiary transition-all hover:bg-cream-3/40 hover:text-text-secondary">
@@ -50,11 +64,13 @@ function EditForm({
   workspaceId,
   tz,
   onDone,
+  onRequestDelete,
 }: {
   record: AttendanceRecord;
   workspaceId: string;
   tz: string;
   onDone: () => void;
+  onRequestDelete?: () => void;
 }) {
   const override = useOverrideAttendance(workspaceId);
   const hadCheckout = record.checkOutAt != null;
@@ -141,7 +157,16 @@ function EditForm({
         </div>
       </div>
 
-      <div className="mt-6 flex justify-end gap-2">
+      <div className="mt-6 flex items-center justify-end gap-2">
+        {onRequestDelete && (
+          <button
+            type="button"
+            onClick={onRequestDelete}
+            className="mr-auto cursor-pointer rounded-lg px-3 py-2 text-[15px] font-medium text-red transition-colors hover:bg-red/10"
+          >
+            Remove
+          </button>
+        )}
         <button
           type="button"
           onClick={onDone}

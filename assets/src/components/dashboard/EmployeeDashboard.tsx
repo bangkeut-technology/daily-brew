@@ -24,6 +24,7 @@ import { useWorkspaceTimezone } from '@/hooks/useWorkspaceTimezone';
 import { parseDateAsUTC, nowInTimezone } from '@/lib/timezone';
 import { Avatar } from '@/components/shared/Avatar';
 import { GlassCard, GlassCardHeader } from '@/components/shared/GlassCard';
+import { DashboardInsights } from './DashboardInsights';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { LeaveRequestModal } from '@/components/shared/LeaveRequestModal';
@@ -102,8 +103,8 @@ export function EmployeeDashboard() {
   const checkedIn = today?.checkedIn ?? false;
   const checkedOut = today?.checkedOut ?? false;
   const completed = checkedIn && checkedOut;
-  const onLeave = (checkinData as { onLeave?: boolean })?.onLeave ?? false;
-  const leaveIsFullDay = (checkinData as { leaveIsFullDay?: boolean })?.leaveIsFullDay ?? false;
+  const onLeave = checkinData?.onLeave ?? false;
+  const leaveIsFullDay = checkinData?.leaveIsFullDay ?? false;
 
   const wsNow = nowInTimezone(wsTz.timezone);
   const todayStr = wsNow.toLocaleDateString(undefined, {
@@ -412,6 +413,10 @@ export function EmployeeDashboard() {
           </GlassCard>
         );
       })()}
+
+      {/* Own punctuality over the rolling window — the trends endpoint scopes
+          itself to the caller for non-manager employees. */}
+      <DashboardInsights workspaceId={workspaceId} personal />
 
       {/* Recent attendance - last 7 days */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">

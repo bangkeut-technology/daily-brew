@@ -100,6 +100,18 @@
     --db-blue: #3B6FA0;
     --db-glass-bg: rgba(255, 255, 255, 0.62);
     --db-glass-border: rgba(255, 255, 255, 0.85);
+
+    /* Chart fills — separate steps from the UI green/red/blue above, which are
+       tuned for text and badges and read too gray as large fills. These are
+       validated against the light surface for the colorblind-separation,
+       chroma and contrast checks in adjacent-pair mode (the one that governs
+       stacked columns, where on-time sits directly under late). */
+    --db-chart-ontime: #1C7047;
+    --db-chart-late: #CE7C12;
+    --db-chart-leave: #2F6DA8;
+    --db-chart-absent: #BF3527;
+    --db-chart-muted: #CFC4B6;
+    --db-chart-grid: #E4DACC;
 }
 
 /* ===================== DARK THEME ===================== */
@@ -149,6 +161,16 @@
     --db-blue: #5A9AD6;
     --db-glass-bg: rgba(50, 42, 34, 0.72);
     --db-glass-border: rgba(90, 78, 62, 0.45);
+
+    /* Dark chart fills — re-picked against the dark surface rather than
+       lightened from the light set: the validator's dark lightness band is
+       narrower, so pastel flips fail it. */
+    --db-chart-ontime: #2FA26A;
+    --db-chart-late: #C97F1E;
+    --db-chart-leave: #4C93D1;
+    --db-chart-absent: #E0574A;
+    --db-chart-muted: #4A4038;
+    --db-chart-grid: #382F27;
 }
 
 /* ---- Base ---- */

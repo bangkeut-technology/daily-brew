@@ -4,12 +4,18 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiAxios } from "@/lib/api";
 import type { LeaveRequest, LeaveStatus } from "@/types/leave";
 
-export function useLeaveRequests(workspacePublicId: string) {
+/**
+ * The API already scopes the list: an employee without `manage_leave` only
+ * ever receives their own requests, so the page's client-side filter is a
+ * display concern rather than the access control.
+ */
+export function useLeaveRequests(workspacePublicId: string, status?: string) {
   return useQuery({
-    queryKey: ["leaveRequests", workspacePublicId],
+    queryKey: ["leaveRequests", workspacePublicId, status ?? "all"],
     queryFn: async () => {
       const { data } = await apiAxios.get<LeaveRequest[]>(
         `/workspaces/${workspacePublicId}/leave-requests`,
+        { params: status ? { status } : undefined },
       );
       return data;
     },
@@ -61,6 +67,38 @@ export function useDeleteLeaveRequest(workspacePublicId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["leaveRequests", workspacePublicId] });
+    },
+  });
+}
+
+/**
+ * Owner/manager edit of an existing request's dates or reason. Distinct from
+ * review (approve/reject) — this rewrites the request itself, which is how a
+ * manager fixes a typo'd date without making the employee resubmit.
+ */
+export function useEditLeaveRequest(workspacePublicId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      publicId,
+      ...payload
+    }: {
+      publicId: string;
+      startDate: string;
+      endDate: string;
+      reason?: string;
+      startTime?: string;
+      endTime?: string;
+    }) =>
+      (
+        await apiAxios.put<LeaveRequest>(
+          `/workspaces/${workspacePublicId}/leave-requests/${publicId}`,
+          payload,
+        )
+      ).data,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["leaveRequests", workspacePublicId] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
     },
   });
 }

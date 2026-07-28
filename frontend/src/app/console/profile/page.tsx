@@ -324,7 +324,7 @@ export default function ProfilePage() {
         {roleContext && (
           <GlassCard hover={false}>
             <GlassCardHeader
-              title="Link to employee"
+              title={t("profile.linkEmployee", "Link to employee")}
               action={
                 <div className="flex flex-wrap items-center gap-1.5">
                   <Link2 size={13} className="text-amber" />
@@ -377,7 +377,7 @@ export default function ProfilePage() {
         {roleContext?.linkedWorkspaces && roleContext.linkedWorkspaces.length > 0 && (
           <GlassCard hover={false}>
             <GlassCardHeader
-              title="Linked workspaces"
+              title={t("profile.linkedWorkspaces", "Linked workspaces")}
               action={
                 <span className="text-[13px] text-text-tertiary">
                   {roleContext.linkedWorkspaces.length} workspace
@@ -425,7 +425,7 @@ export default function ProfilePage() {
         )}
 
         <GlassCard hover={false}>
-          <GlassCardHeader title="Profile information" />
+          <GlassCardHeader title={t("profile.profileInfo", "Profile information")} />
           <form onSubmit={handleProfileSubmit} className="space-y-4 p-6">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
@@ -487,7 +487,7 @@ export default function ProfilePage() {
         </GlassCard>
 
         <GlassCard hover={false}>
-          <GlassCardHeader title="Change password" />
+          <GlassCardHeader title={t("profile.changePassword", "Change password")} />
           <form onSubmit={handlePasswordSubmit} className="space-y-4 p-6">
             {oauthData?.hasPassword && (
               <PasswordField
@@ -531,7 +531,7 @@ export default function ProfilePage() {
         </GlassCard>
 
         <GlassCard hover={false}>
-          <GlassCardHeader title="Connected accounts" />
+          <GlassCardHeader title={t("profile.oauthConnections", "Connected accounts")} />
           <div className="space-y-3 p-6">
             {oauthLoading ? (
               <p className="py-4 text-center text-[15px] text-text-tertiary">Loading…</p>
@@ -577,7 +577,7 @@ export default function ProfilePage() {
         {/* Personal Telegram — per-user, across every workspace the user
             touches. Distinct from the workspace group chat in Settings. */}
         <GlassCard hover={false}>
-          <GlassCardHeader title="Telegram notifications" />
+          <GlassCardHeader title={t("profile.telegram.title", "Telegram notifications")} />
           <div className="space-y-3 p-6">
             <p className="text-[14.5px] leading-relaxed text-text-secondary">
               Get leave decisions, shift assignments, and daily summaries delivered to your personal
@@ -653,7 +653,7 @@ export default function ProfilePage() {
         </GlassCard>
 
         <GlassCard hover={false}>
-          <GlassCardHeader title="Theme preference" />
+          <GlassCardHeader title={t("profile.themePreference", "Theme preference")} />
           <div className="p-6">
             <div className="grid grid-cols-3 gap-3">
               {THEME_OPTIONS.map((opt) => {
@@ -694,7 +694,7 @@ export default function ProfilePage() {
 
         <GlassCard hover={false}>
           <GlassCardHeader
-            title="Delete account"
+            title={t("profile.deleteAccount", "Delete account")}
             action={
               <div className="flex flex-wrap items-center gap-1.5">
                 <AlertTriangle size={13} className="text-red" />
@@ -726,7 +726,7 @@ export default function ProfilePage() {
         onOpenChange={(open) => {
           if (!open) setUnlinkTarget(null);
         }}
-        title="Unlink from workspace"
+        title={t("profile.unlinkTitle", "Unlink from workspace")}
         description={`Unlink your account from ${unlinkTarget?.name ?? ""} at ${unlinkTarget?.workspace ?? ""}? You will no longer be able to check in or view your attendance there.`}
         confirmLabel="Unlink"
         variant="danger"
@@ -750,7 +750,7 @@ export default function ProfilePage() {
         onOpenChange={(open) => {
           if (!open) setShowDeleteConfirm(false);
         }}
-        title="Delete account"
+        title={t("profile.deleteAccount", "Delete account")}
         description="This permanently deletes your account, the workspaces you own, and their attendance history. This cannot be undone."
         confirmLabel="Delete permanently"
         variant="danger"
