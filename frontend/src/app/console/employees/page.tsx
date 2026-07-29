@@ -65,10 +65,6 @@ export default function EmployeesPage() {
     });
   }, [employees, search, linkFilter, statusFilter]);
 
-  const openCreate = () => {
-    setEditing(null);
-    setFormOpen(true);
-  };
   const openEdit = (emp: Employee) => {
     setEditing(emp);
     setFormOpen(true);
@@ -91,14 +87,15 @@ export default function EmployeesPage() {
         title={t("nav.employees", "Employees")}
         help={{ href: "/guides/owner#step-owner-4", label: "How to add and link employees" }}
         action={
-          <button
-            type="button"
-            onClick={openCreate}
-            className="flex items-center gap-1.5 rounded-lg bg-coffee px-4 py-2 text-[15px] font-medium text-white transition-all duration-150 hover:-translate-y-px hover:bg-coffee-light hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
+          /* Creating is a full page, not the edit modal: it also offers user
+             linking and inline shift creation, which need the room. */
+          <Link
+            href="/console/employees/new"
+            className="flex items-center gap-1.5 rounded-lg bg-coffee px-4 py-2 text-[15px] font-medium text-white no-underline transition-all duration-150 hover:-translate-y-px hover:bg-coffee-light hover:shadow-[0_4px_12px_rgba(107,66,38,0.25)]"
           >
             <Plus size={15} />
             {t("employee.add", "Add employee")}
-          </button>
+          </Link>
         }
       />
 

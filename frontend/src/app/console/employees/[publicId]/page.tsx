@@ -2,6 +2,7 @@
 
 import { use, useState, type ReactNode } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -11,13 +12,18 @@ import {
   ArrowLeft,
   AtSign,
   Check,
+  Clock,
   Copy,
+  Globe,
   Info,
   Link2,
   Mail,
+  MapPin,
   Pencil,
+  QrCode,
   ShieldCheck,
   ShieldOff,
+  Smartphone,
   Unlink,
   X,
 } from "lucide-react";
@@ -51,6 +57,76 @@ import { AttendanceEditModal } from "@/components/console/AttendanceEditModal";
 import { ShiftPopover } from "@/components/console/ShiftPopover";
 import { JobTitleInput } from "@/components/shared/JobTitleInput";
 import { DetailSkeleton } from "@/components/admin/AdminDataStates";
+
+/**
+ * Scrolls a section into view and flashes a ring on it. The created-guide's
+ * cards point at cards further down the page, which are easy to lose track of
+ * on a long detail view — the flash is what makes the jump legible.
+ */
+function focusSection(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
+  const ring = ["ring-2", "ring-coffee/40", "ring-offset-2", "ring-offset-cream-1", "rounded-2xl"];
+  el.classList.add(...ring);
+  window.setTimeout(() => el.classList.remove(...ring), 1800);
+}
+
+function OwnerNextStep({
+  icon,
+  title,
+  children,
+  onClick,
+}: {
+  icon: ReactNode;
+  title: string;
+  children: ReactNode;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group flex w-full cursor-pointer gap-3 rounded-xl border border-cream-3/70 bg-glass-bg/70 p-4 text-left transition-colors hover:border-coffee/30 hover:bg-glass-bg"
+    >
+      <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-coffee/10 text-coffee">
+        {icon}
+      </div>
+      <div>
+        <p className="text-[14px] font-semibold text-text-primary">{title}</p>
+        <p className="mt-1 text-[13px] leading-relaxed text-text-tertiary">{children}</p>
+      </div>
+    </button>
+  );
+}
+
+/** One of the three check-in hardening shortcuts under the created guide. */
+function ProtectionLink({
+  hash,
+  icon,
+  title,
+  children,
+}: {
+  hash: string;
+  icon: ReactNode;
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <Link
+      href={`/console/settings#${hash}`}
+      className="flex items-start gap-2 rounded-lg border border-cream-3/70 bg-glass-bg px-3 py-2.5 text-left no-underline transition-colors hover:bg-cream-3/60"
+    >
+      <span className="mt-0.5 shrink-0 text-amber">{icon}</span>
+      <span>
+        <span className="block text-[13.5px] font-semibold text-text-primary">{title}</span>
+        <span className="mt-0.5 block text-[12.5px] leading-relaxed text-text-tertiary">
+          {children}
+        </span>
+      </span>
+    </Link>
+  );
+}
 
 const editEmployeeSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -91,6 +167,11 @@ export default function EmployeeDetailPage({
   const removePhoto = useRemoveEmployeePhoto(workspaceId);
   const fmtDate = useDateFormat();
   const wsTz = useWorkspaceTimezone();
+
+  // `?created=1` is set by the create form's redirect. Held in state so
+  // dismissing survives re-renders without rewriting the URL.
+  const justCreated = useSearchParams().get("created") === "1";
+  const [showCreatedGuide, setShowCreatedGuide] = useState(justCreated);
 
   const [isEditing, setIsEditing] = useState(false);
   const [linkUserId, setLinkUserId] = useState("");
@@ -261,8 +342,102 @@ export default function EmployeeDetailPage({
         }
       />
 
+      {showCreatedGuide && !isEditing && (
+        <GlassCard hover={false} className="mb-6 border-coffee/20 bg-coffee/5">
+          <div className="p-5">
+            <div className="mb-4 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[12px] font-semibold uppercase tracking-[1.5px] text-coffee">
+                  Employee created
+                </p>
+                <h2 className="mt-1 text-[20px] font-semibold text-text-primary">
+                  Next, help this employee check in
+                </h2>
+                <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-text-secondary">
+                  Finish the setup by linking their user account and sharing the check-in
+                  instructions before their first shift.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCreatedGuide(false)}
+                aria-label="Close"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-cream-3 bg-glass-bg text-text-tertiary transition-colors hover:bg-cream-3 hover:text-text-primary"
+              >
+                <X size={14} />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+              <OwnerNextStep
+                icon={<Link2 size={16} />}
+                title="Link their account"
+                onClick={() => focusSection("employee-linking")}
+              >
+                Ask the employee to sign in and send their user public ID, or share this employee ID
+                so they can link during onboarding.
+              </OwnerNextStep>
+              <OwnerNextStep
+                icon={<QrCode size={16} />}
+                title="Share the employee ID or QR"
+                onClick={() => focusSection("employee-qr")}
+              >
+                The QR code and employee ID below are what staff use to connect their account to
+                this profile.
+              </OwnerNextStep>
+              <OwnerNextStep
+                icon={<Clock size={16} />}
+                title="Confirm the shift"
+                onClick={() => focusSection("employee-shift")}
+              >
+                {employee.shiftName
+                  ? `${fullName} is assigned to ${employee.shiftName}.`
+                  : "No shift is assigned yet. Add one so late, absent, and early-leave status can be calculated."}
+              </OwnerNextStep>
+            </div>
+
+            <div className="mt-5 rounded-xl border border-amber/20 bg-amber/8 p-4">
+              <div className="mb-3 flex items-start gap-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber/15 text-amber">
+                  <ShieldCheck size={16} />
+                </div>
+                <div>
+                  <p className="text-[14px] font-semibold text-text-primary">
+                    Turn on advanced check-in protection
+                  </p>
+                  <p className="mt-1 text-[13px] leading-relaxed text-text-tertiary">
+                    After staff profiles are ready, tighten check-in rules so attendance is recorded
+                    from the right place, network, and device.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
+                <ProtectionLink
+                  hash="settings-ip-restriction"
+                  icon={<Globe size={15} />}
+                  title="IP restriction"
+                >
+                  Only allow check-ins from your restaurant Wi-Fi or approved network.
+                </ProtectionLink>
+                <ProtectionLink hash="settings-geofencing" icon={<MapPin size={15} />} title="Geofencing">
+                  Require staff to be near the restaurant before check-in is accepted.
+                </ProtectionLink>
+                <ProtectionLink
+                  hash="settings-device-verification"
+                  icon={<Smartphone size={15} />}
+                  title="Device verification"
+                >
+                  Keep check-in and check-out on the same phone to reduce buddy punching.
+                </ProtectionLink>
+              </div>
+            </div>
+          </div>
+        </GlassCard>
+      )}
+
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <GlassCard hover={false} className="lg:col-span-2">
+        <GlassCard id="employee-shift" hover={false} className="lg:col-span-2">
           {isEditing ? (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 p-6">
               <SectionHeader>Identity</SectionHeader>
@@ -576,7 +751,7 @@ export default function EmployeeDetailPage({
           )}
         </GlassCard>
 
-        <GlassCard hover={false}>
+        <GlassCard id="employee-linking" hover={false}>
           <GlassCardHeader
             title="Link user account"
             action={employee.linkedUserEmail ? <StatusBadge label="Linked" variant="green" /> : undefined}
@@ -658,7 +833,7 @@ export default function EmployeeDetailPage({
                   )}
                 </div>
 
-                <div className="border-t border-cream-3/60 pt-4">
+                <div id="employee-qr" className="border-t border-cream-3/60 pt-4">
                   <p className="mb-3 text-sm text-text-secondary">
                     Or share this QR code or employee ID with the staff member. They can scan it or
                     enter it during onboarding to link their account.
