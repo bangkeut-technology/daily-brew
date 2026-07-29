@@ -43,3 +43,14 @@ export function useFeatureEnabled(key: FeatureFlagKey | string): boolean {
   const { data } = useFeatures();
   return data?.flags?.[key] === true;
 }
+
+/**
+ * The rollout stage of a flag visible to this workspace, or undefined if the
+ * flag isn't visible (or is still loading). Pair with `<FeatureStageBadge>` to
+ * label testing-phase UI as Beta / Alpha / Dev, so an owner can tell a feature
+ * that's still being trialled from one that's fully shipped.
+ */
+export function useFeatureStage(key: FeatureFlagKey | string): FeatureFlagStage | undefined {
+  const { data } = useFeatures();
+  return data?.stages?.[key];
+}
