@@ -14,6 +14,8 @@ import { GlassCard } from "@/components/shared/GlassCard";
 import { CustomTimePicker } from "@/components/shared/CustomTimePicker";
 import { ConfirmModal } from "@/components/shared/ConfirmModal";
 import { ShiftCard } from "@/components/console/ShiftCard";
+import { UpgradeModal } from "@/components/console/UpgradeModal";
+import { useUpgradeModal } from "@/hooks/useUpgradeModal";
 import { Skeleton } from "@/components/admin/AdminDataStates";
 
 export default function ShiftsPage() {
@@ -37,6 +39,7 @@ export default function ShiftsPage() {
   const [expandedShift, setExpandedShift] = useState<string | null>(null);
 
   const canUseTimeRules = plan?.canUseShiftTimeRules ?? false;
+  const upgrade = useUpgradeModal();
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -167,9 +170,13 @@ export default function ShiftsPage() {
                 )}
               </p>
             </div>
-            <span className="shrink-0 rounded-full bg-amber/10 px-2 py-0.5 text-[12.5px] font-medium text-amber">
-              Espresso
-            </span>
+            <button
+              type="button"
+              onClick={() => upgrade.openFor("shiftTimeRules")}
+              className="shrink-0 cursor-pointer rounded-full border-none bg-amber/10 px-3 py-1 text-[12.5px] font-medium text-amber transition-colors hover:bg-amber/20"
+            >
+              {t("upgrade.upgradeButton", "Upgrade to Espresso")}
+            </button>
           </div>
         </GlassCard>
       )}
@@ -231,6 +238,16 @@ export default function ShiftsPage() {
         loading={deleteShift.isPending}
         onConfirm={confirmDelete}
       />
+
+      {upgrade.feature && (
+        <UpgradeModal
+          open={upgrade.isOpen}
+          onOpenChange={(open) => {
+            if (!open) upgrade.close();
+          }}
+          feature={upgrade.feature}
+        />
+      )}
     </div>
   );
 }
