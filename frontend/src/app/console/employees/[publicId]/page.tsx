@@ -3,6 +3,7 @@
 import { use, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -154,6 +155,7 @@ export default function EmployeeDetailPage({
 }: {
   params: Promise<{ publicId: string }>;
 }) {
+  const { t } = useTranslation();
   const { publicId } = use(params);
   const workspaceId = getWorkspacePublicId() || "";
   const { data: employee, isLoading } = useEmployee(workspaceId, publicId);
@@ -240,11 +242,11 @@ export default function EmployeeDetailPage({
     }
     try {
       await updateEmployee.mutateAsync({ publicId, linkedUserPublicId: id });
-      toast.success("User account linked");
+      toast.success(t("employee.userLinked", "User account linked"));
       setLinkUserId("");
       setLinkUserIdError(null);
     } catch {
-      toast.error("Failed to link user. Check the ID and try again.");
+      toast.error(t("employee.userLinkError", "Failed to link user. Check the ID and try again."));
     }
   };
 
@@ -270,19 +272,19 @@ export default function EmployeeDetailPage({
         // rejects role changes from anyone but the owner.
         ...(canPickRole ? { role: values.role } : {}),
       });
-      toast.success("Employee updated");
+      toast.success(t("employee.updateSuccess", "Employee updated"));
       setIsEditing(false);
     } catch {
-      toast.error("Failed to update employee");
+      toast.error(t("employee.updateError", "Failed to update employee"));
     }
   };
 
   const copyPublicId = async () => {
     try {
       await navigator.clipboard.writeText(employee.publicId);
-      toast.success("Copied to clipboard");
+      toast.success(t("common.copied", "Copied to clipboard"));
     } catch {
-      toast.error("Failed to copy");
+      toast.error(t("common.copyFailed", "Failed to copy"));
     }
   };
 
@@ -293,7 +295,7 @@ export default function EmployeeDetailPage({
         className="mb-3 inline-flex items-center gap-1.5 text-[13.5px] text-text-secondary no-underline hover:text-coffee"
       >
         <ArrowLeft size={14} />
-        Back to employees
+        {t("employee.backToList", "Back to employees")}
       </Link>
 
       <PageHeader
@@ -335,7 +337,7 @@ export default function EmployeeDetailPage({
                 className="flex items-center gap-1.5 rounded-lg bg-coffee px-4 py-2 text-[15px] font-medium text-white transition-all hover:bg-coffee-light"
               >
                 <Pencil size={14} />
-                Edit
+                {t("common.edit", "Edit")}
               </button>
             </div>
           ) : undefined
@@ -348,20 +350,19 @@ export default function EmployeeDetailPage({
             <div className="mb-4 flex items-start justify-between gap-4">
               <div>
                 <p className="text-[12px] font-semibold uppercase tracking-[1.5px] text-coffee">
-                  Employee created
+                  {t("employee.createdGuideEyebrow", "Employee created")}
                 </p>
                 <h2 className="mt-1 text-[20px] font-semibold text-text-primary">
-                  Next, help this employee check in
+                  {t("employee.createdGuideTitle", "Next, help this employee check in")}
                 </h2>
                 <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-text-secondary">
-                  Finish the setup by linking their user account and sharing the check-in
-                  instructions before their first shift.
+                  {t("employee.createdGuideDescription", "Finish the setup by linking their user account and sharing the check-in instructions before their first shift.")}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setShowCreatedGuide(false)}
-                aria-label="Close"
+                aria-label={t("common.close", "Close")}
                 className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-cream-3 bg-glass-bg text-text-tertiary transition-colors hover:bg-cream-3 hover:text-text-primary"
               >
                 <X size={14} />
@@ -371,23 +372,21 @@ export default function EmployeeDetailPage({
             <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
               <OwnerNextStep
                 icon={<Link2 size={16} />}
-                title="Link their account"
+                title={t("employee.createdGuideLinkTitle", "Link their account")}
                 onClick={() => focusSection("employee-linking")}
               >
-                Ask the employee to sign in and send their user public ID, or share this employee ID
-                so they can link during onboarding.
-              </OwnerNextStep>
+                {t("employee.createdGuideLinkDesc", "Ask the employee to sign in and send their user public ID, or share this employee ID so they can link during onboarding.")}
+</OwnerNextStep>
               <OwnerNextStep
                 icon={<QrCode size={16} />}
-                title="Share the employee ID or QR"
+                title={t("employee.createdGuideShareTitle", "Share the employee ID or QR")}
                 onClick={() => focusSection("employee-qr")}
               >
-                The QR code and employee ID below are what staff use to connect their account to
-                this profile.
-              </OwnerNextStep>
+                {t("employee.createdGuideShareDesc", "The QR code and employee ID below are what staff use to connect their account to this profile.")}
+</OwnerNextStep>
               <OwnerNextStep
                 icon={<Clock size={16} />}
-                title="Confirm the shift"
+                title={t("employee.createdGuideShiftTitle", "Confirm the shift")}
                 onClick={() => focusSection("employee-shift")}
               >
                 {employee.shiftName
@@ -403,11 +402,10 @@ export default function EmployeeDetailPage({
                 </div>
                 <div>
                   <p className="text-[14px] font-semibold text-text-primary">
-                    Turn on advanced check-in protection
+                    {t("employee.createdGuideAdvancedTitle", "Turn on advanced check-in protection")}
                   </p>
                   <p className="mt-1 text-[13px] leading-relaxed text-text-tertiary">
-                    After staff profiles are ready, tighten check-in rules so attendance is recorded
-                    from the right place, network, and device.
+                    {t("employee.createdGuideAdvancedDesc", "After staff profiles are ready, tighten check-in rules so attendance is recorded from the right place, network, and device.")}
                   </p>
                 </div>
               </div>
@@ -416,19 +414,19 @@ export default function EmployeeDetailPage({
                 <ProtectionLink
                   hash="settings-ip-restriction"
                   icon={<Globe size={15} />}
-                  title="IP restriction"
+                  title={t("employee.createdGuideIpTitle", "IP restriction")}
                 >
-                  Only allow check-ins from your restaurant Wi-Fi or approved network.
+                  {t("employee.createdGuideIpDesc", "Only allow check-ins from your restaurant Wi-Fi or approved network.")}
                 </ProtectionLink>
-                <ProtectionLink hash="settings-geofencing" icon={<MapPin size={15} />} title="Geofencing">
-                  Require staff to be near the restaurant before check-in is accepted.
+                <ProtectionLink hash="settings-geofencing" icon={<MapPin size={15} />} title={t("employee.createdGuideGeofencingTitle", "Geofencing")}>
+                  {t("employee.createdGuideGeofencingDesc", "Require staff to be near the restaurant before check-in is accepted.")}
                 </ProtectionLink>
                 <ProtectionLink
                   hash="settings-device-verification"
                   icon={<Smartphone size={15} />}
-                  title="Device verification"
+                  title={t("employee.createdGuideDeviceTitle", "Device verification")}
                 >
-                  Keep check-in and check-out on the same phone to reduce buddy punching.
+                  {t("employee.createdGuideDeviceDesc", "Keep check-in and check-out on the same phone to reduce buddy punching.")}
                 </ProtectionLink>
               </div>
             </div>
@@ -440,18 +438,18 @@ export default function EmployeeDetailPage({
         <GlassCard id="employee-shift" hover={false} className="lg:col-span-2">
           {isEditing ? (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 p-6">
-              <SectionHeader>Identity</SectionHeader>
+              <SectionHeader>{t("employee.sectionIdentity", "Identity")}</SectionHeader>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Field label="First name" htmlFor="edit-firstName" required error={errors.firstName?.message}>
+                <Field label={t("employee.firstName", "First name")} htmlFor="edit-firstName" required error={errors.firstName?.message}>
                   <input id="edit-firstName" type="text" {...register("firstName")} className={inputClass} />
                 </Field>
 
-                <Field label="Last name" htmlFor="edit-lastName" required error={errors.lastName?.message}>
+                <Field label={t("employee.lastName", "Last name")} htmlFor="edit-lastName" required error={errors.lastName?.message}>
                   <input id="edit-lastName" type="text" {...register("lastName")} className={inputClass} />
                 </Field>
 
-                <Field label="Job title" htmlFor="edit-jobTitle">
+                <Field label={t("employee.jobTitle", "Job title")} htmlFor="edit-jobTitle">
                   {/* Free text, with the roster's existing titles plus the
                       built-in restaurant roles offered as suggestions. */}
                   <JobTitleInput
@@ -459,20 +457,20 @@ export default function EmployeeDetailPage({
                     name="jobTitle"
                     value={watch("jobTitle") || ""}
                     onChange={(v) => setValue("jobTitle", v)}
-                    placeholder="e.g. Cashier, Cook, Waiter"
+                    placeholder={t("employee.jobTitlePlaceholder", "e.g. Cashier, Cook, Waiter")}
                     workspaceValues={jobTitleSuggestions}
                   />
                 </Field>
 
-                <Field label="Phone number" htmlFor="edit-phone">
+                <Field label={t("employee.phoneNumber", "Phone number")} htmlFor="edit-phone">
                   <input id="edit-phone" type="text" {...register("phoneNumber")} className={inputClass} />
                 </Field>
 
-                <Field label="Date of birth">
+                <Field label={t("employee.dob", "Date of birth")}>
                   <CustomDatePicker value={watch("dob") || ""} onChange={(v) => setValue("dob", v)} />
                 </Field>
 
-                <Field label="Join date">
+                <Field label={t("employee.joinedAt", "Join date")}>
                   <CustomDatePicker
                     value={watch("joinedAt") || ""}
                     onChange={(v) => setValue("joinedAt", v)}
@@ -481,7 +479,7 @@ export default function EmployeeDetailPage({
 
                 <div className="sm:col-span-2">
                   <Field
-                    label="Tracking start"
+                    label={t("employee.linkedAt", "Tracking start")}
                     hint="Absent count starts from this date. Clear it to exclude this employee from the absent calc until they re-link."
                   >
                     <CustomDatePicker
@@ -532,7 +530,7 @@ export default function EmployeeDetailPage({
               <SectionHeader>{canPickRole ? "Role & schedule" : "Schedule"}</SectionHeader>
 
               {canPickRole && (
-                <Field label="Role">
+                <Field label={t("employee.role", "Role")}>
                   <CustomSelect
                     value={watch("role")}
                     onChange={(v) => setValue("role", v as "employee" | "manager")}
@@ -545,7 +543,7 @@ export default function EmployeeDetailPage({
               )}
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Field label="Shift">
+                <Field label={t("employee.shift", "Shift")}>
                   <CustomSelect
                     value={watch("shiftPublicId") || ""}
                     onChange={(v) => setValue("shiftPublicId", v)}
@@ -556,12 +554,12 @@ export default function EmployeeDetailPage({
                         label: `${s.name} (${s.startTime} - ${s.endTime})`,
                       })) ?? []),
                     ]}
-                    placeholder="No shift"
+                    placeholder={t("employee.noShift", "No shift")}
                   />
                 </Field>
 
                 <Field
-                  label="Attendance tracking"
+                  label={t("employee.attendanceTracking", "Attendance tracking")}
                   hint={`Set "Excluded" for staff who help run the workspace but don't follow a shift. They can still check in to log times — they just won't be counted as absent.`}
                 >
                   <CustomSelect
@@ -575,7 +573,7 @@ export default function EmployeeDetailPage({
                 </Field>
               </div>
 
-              <SectionHeader>Status</SectionHeader>
+              <SectionHeader>{t("employee.sectionStatus", "Status")}</SectionHeader>
 
               <div className="flex items-center gap-2">
                 <Toggle
@@ -594,7 +592,7 @@ export default function EmployeeDetailPage({
                   }}
                 />
                 <label htmlFor="active-toggle" className="cursor-pointer text-[15px] text-text-secondary">
-                  Active
+                  {t("employee.active", "Active")}
                 </label>
                 {!watch("active") && watch("leftAt") && (
                   <span className="ml-2 text-[13px] text-text-tertiary">
@@ -621,7 +619,7 @@ export default function EmployeeDetailPage({
                   className="flex items-center gap-1.5 rounded-lg border border-cream-3 bg-glass-bg px-4 py-2 text-[15px] font-medium text-text-primary transition-all hover:bg-cream-3"
                 >
                   <X size={14} />
-                  Cancel
+                  {t("common.cancel", "Cancel")}
                 </button>
               </div>
             </form>
@@ -639,15 +637,15 @@ export default function EmployeeDetailPage({
                       uploadPhoto.mutate(
                         { publicId: employee.publicId, file },
                         {
-                          onSuccess: () => toast.success("Photo updated"),
-                          onError: () => toast.error("Could not upload photo"),
+                          onSuccess: () => toast.success(t("avatar.uploaded", "Photo updated")),
+                          onError: () => toast.error(t("avatar.uploadError", "Could not upload photo")),
                         },
                       )
                     }
                     onRemove={() =>
                       removePhoto.mutate(employee.publicId, {
-                        onSuccess: () => toast.success("Photo removed"),
-                        onError: () => toast.error("Could not remove photo"),
+                        onSuccess: () => toast.success(t("avatar.removed", "Photo removed")),
+                        onError: () => toast.error(t("avatar.removeError", "Could not remove photo")),
                       })
                     }
                   />
@@ -666,16 +664,16 @@ export default function EmployeeDetailPage({
                         label={employee.active ? "Active" : "Inactive"}
                         variant={employee.active ? "green" : "gray"}
                       />
-                      {employee.role === "manager" && <StatusBadge label="Manager" variant="amber" />}
+                      {employee.role === "manager" && <StatusBadge label={t("employee.roleManager", "Manager")} variant="amber" />}
                       {employee.attendanceTracking === "none" && (
-                        <StatusBadge label="Not tracked" variant="gray" />
+                        <StatusBadge label={t("employee.notTrackedBadge", "Not tracked")} variant="gray" />
                       )}
                     </div>
                   </div>
                 </div>
 
                 <div className="grid flex-1 grid-cols-2 gap-x-8 gap-y-3 lg:grid-cols-3">
-                  <ReadField label="Shift">
+                  <ReadField label={t("employee.shift", "Shift")}>
                     {employee.shiftName ? (
                       <ShiftPopover
                         shiftName={employee.shiftName}
@@ -683,30 +681,30 @@ export default function EmployeeDetailPage({
                         shifts={shifts}
                       />
                     ) : (
-                      <span className="text-[15px] text-text-tertiary">No shift</span>
+                      <span className="text-[15px] text-text-tertiary">{t("employee.noShift", "No shift")}</span>
                     )}
                   </ReadField>
                   {employee.phoneNumber && (
-                    <ReadField label="Phone">
+                    <ReadField label={t("employee.phone", "Phone")}>
                       <span className="font-mono text-[15px] font-medium text-text-primary">
                         {employee.phoneNumber}
                       </span>
                     </ReadField>
                   )}
                   {employee.dob && (
-                    <ReadField label="Date of birth">
+                    <ReadField label={t("employee.dob", "Date of birth")}>
                       <span className="text-[15px] text-text-secondary">{fmtDate(employee.dob)}</span>
                     </ReadField>
                   )}
                   {employee.joinedAt && (
-                    <ReadField label="Join date">
+                    <ReadField label={t("employee.joinedAt", "Join date")}>
                       <span className="text-[15px] text-text-secondary">
                         {fmtDate(employee.joinedAt)}
                       </span>
                     </ReadField>
                   )}
                   {employee.leftAt && (
-                    <ReadField label="Last day worked">
+                    <ReadField label={t("employee.lastDayWorked", "Last day worked")}>
                       <span className="text-[15px] text-text-secondary">
                         {fmtDate(employee.leftAt)}
                       </span>
@@ -753,8 +751,8 @@ export default function EmployeeDetailPage({
 
         <GlassCard id="employee-linking" hover={false}>
           <GlassCardHeader
-            title="Link user account"
-            action={employee.linkedUserEmail ? <StatusBadge label="Linked" variant="green" /> : undefined}
+            title={t("employee.linkUser", "Link user account")}
+            action={employee.linkedUserEmail ? <StatusBadge label={t("employee.linked", "Linked")} variant="green" /> : undefined}
           />
           <div className="space-y-4 p-5">
             {employee.linkedUserEmail ? (
@@ -771,7 +769,7 @@ export default function EmployeeDetailPage({
                     <p className="truncate text-[15px] font-medium text-text-primary">
                       {employee.linkedUserEmail}
                     </p>
-                    <p className="text-[13px] text-text-tertiary">User account linked</p>
+                    <p className="text-[13px] text-text-tertiary">{t("employee.userLinked", "User account linked")}</p>
                   </div>
                   <button
                     type="button"
@@ -779,7 +777,7 @@ export default function EmployeeDetailPage({
                     className="flex items-center gap-1.5 rounded-lg bg-red/8 px-3 py-1.5 text-sm font-medium text-red transition-colors hover:bg-red/15"
                   >
                     <Unlink size={12} />
-                    Unlink
+                    {t("employee.unlink", "Unlink")}
                   </button>
                 </div>
               </>
@@ -794,7 +792,7 @@ export default function EmployeeDetailPage({
                     htmlFor="link-user-id"
                     className="mb-1.5 block text-sm font-medium text-text-secondary"
                   >
-                    Link by user public ID
+                    {t("employee.linkByPublicId", "Link by user public ID")}
                   </label>
                   <div className="flex items-center gap-2">
                     <input
@@ -808,7 +806,7 @@ export default function EmployeeDetailPage({
                         if (linkUserIdError !== null) setLinkUserIdError(null);
                       }}
                       onBlur={(e) => setLinkUserIdError(publicIdFormatError(e.target.value))}
-                      placeholder="Enter user public ID"
+                      placeholder={t("employee.userPublicIdPlaceholder", "Enter user public ID")}
                       className={cn(
                         "flex-1 rounded-lg border bg-glass-bg px-3 py-2 font-mono text-[15px] text-text-primary outline-none transition-colors",
                         linkUserIdError !== null
@@ -835,8 +833,7 @@ export default function EmployeeDetailPage({
 
                 <div id="employee-qr" className="border-t border-cream-3/60 pt-4">
                   <p className="mb-3 text-sm text-text-secondary">
-                    Or share this QR code or employee ID with the staff member. They can scan it or
-                    enter it during onboarding to link their account.
+                    {t("employee.linkUserDescription", "Or share this QR code or employee ID with the staff member. They can scan it or enter it during onboarding to link their account.")}
                   </p>
                   <div className="flex items-center gap-4">
                     <div className="flex-shrink-0 rounded-xl bg-white p-2 shadow-[0_2px_8px_rgba(107,66,38,0.06)]">
@@ -857,7 +854,7 @@ export default function EmployeeDetailPage({
                         <button
                           type="button"
                           onClick={copyPublicId}
-                          aria-label="Copy employee ID"
+                          aria-label={t("employee.createdGuideCopyAction", "Copy employee ID")}
                           className="flex flex-shrink-0 items-center gap-1 rounded-lg border border-cream-3 bg-glass-bg px-2.5 py-2 text-sm text-text-secondary transition-colors hover:bg-cream-3"
                         >
                           <Copy size={12} />
@@ -874,13 +871,12 @@ export default function EmployeeDetailPage({
         {isOwner && employee.role === "manager" && (
           <GlassCard hover={false}>
             <GlassCardHeader
-              title="Manager permissions"
-              action={<StatusBadge label="Manager" variant="amber" />}
+              title={t("employee.managerPermissionsTitle", "Manager permissions")}
+              action={<StatusBadge label={t("employee.roleManager", "Manager")} variant="amber" />}
             />
             <div className="space-y-4 p-5">
               <p className="text-[13.5px] leading-relaxed text-text-tertiary">
-                Choose which areas this manager can administer. Workspace settings, billing, sub-QR
-                codes and promoting other managers stay with the owner.
+                {t("employee.managerPermissionsDesc", "Choose which areas this manager can administer. Workspace settings, billing, sub-QR codes and promoting other managers stay with the owner.")}
               </p>
               <div className="divide-y divide-cream-3/50">
                 {MANAGER_PERMISSIONS.map((perm) => (
@@ -898,9 +894,9 @@ export default function EmployeeDetailPage({
                           publicId: employee.publicId,
                           permissions: Array.from(set),
                         });
-                        toast.success("Permissions updated");
+                        toast.success(t("employee.permSaved", "Permissions updated"));
                       } catch {
-                        toast.error("Failed to update permissions");
+                        toast.error(t("employee.permSaveError", "Failed to update permissions"));
                       }
                     }}
                   />
@@ -915,7 +911,7 @@ export default function EmployeeDetailPage({
           className={cn(isOwner && employee.role === "manager" && "lg:col-span-2")}
         >
           <GlassCardHeader
-            title="Attendance history"
+            title={t("employee.attendanceHistory", "Attendance history")}
             action={
               employee.attendance && employee.attendance.length > 0 ? (
                 <span className="text-[13px] text-text-tertiary">
@@ -927,7 +923,7 @@ export default function EmployeeDetailPage({
           <div className="max-h-[400px] overflow-y-auto">
             {!employee.attendance || employee.attendance.length === 0 ? (
               <div className="px-5 py-8 text-center">
-                <p className="text-[15px] text-text-tertiary">No attendance records</p>
+                <p className="text-[15px] text-text-tertiary">{t("employee.noAttendance", "No attendance records")}</p>
                 <p className="mt-1 text-[13px] text-text-tertiary">
                   Records will appear here after the employee&apos;s first check-in.
                 </p>
@@ -943,10 +939,10 @@ export default function EmployeeDetailPage({
                       {fmtDate(a.date)}
                       {a.editedAt && (
                         <span
-                          title="Edited by a manager"
+                          title={t("attendance.editedTooltip", "Edited by a manager")}
                           className="inline-flex items-center rounded bg-coffee/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-coffee"
                         >
-                          Edited
+                          {t("attendance.editedBadge", "Edited")}
                         </span>
                       )}
                     </div>
@@ -956,16 +952,16 @@ export default function EmployeeDetailPage({
                     </div>
                   </div>
                   <div className="flex items-center gap-1">
-                    {a.isLate && <StatusBadge label="Late" variant="amber" />}
-                    {a.leftEarly && !a.isLate && <StatusBadge label="Left early" variant="amber" />}
+                    {a.isLate && <StatusBadge label={t("attendance.late", "Late")} variant="amber" />}
+                    {a.leftEarly && !a.isLate && <StatusBadge label={t("attendance.leftEarly", "Left early")} variant="amber" />}
                     {!a.isLate && !a.leftEarly && a.checkInAt && (
-                      <StatusBadge label="On time" variant="green" />
+                      <StatusBadge label={t("attendance.onTime", "On time")} variant="green" />
                     )}
                     {canEditAttendance && a.checkInAt && (
                       <button
                         type="button"
                         onClick={() => setEditAttendance({ ...a, employeeName: fullName })}
-                        aria-label="Edit attendance"
+                        aria-label={t("attendance.editAria", "Edit attendance")}
                         className="flex h-7 w-7 items-center justify-center rounded-lg text-text-tertiary transition-colors hover:bg-cream-3/40 hover:text-coffee"
                       >
                         <Pencil size={13} />
@@ -982,18 +978,18 @@ export default function EmployeeDetailPage({
       <ConfirmModal
         open={showUnlinkConfirm}
         onOpenChange={setShowUnlinkConfirm}
-        title="Unlink user account"
-        description="Remove the link between this employee and their user account? They will no longer be able to see their own dashboard."
-        confirmLabel="Unlink"
+        title={t("employee.unlinkTitle", "Unlink user account")}
+        description={t("employee.unlinkConfirm", "Remove the link between this employee and their user account? They will no longer be able to see their own dashboard.")}
+        confirmLabel={t("employee.unlink", "Unlink")}
         variant="danger"
         loading={updateEmployee.isPending}
         onConfirm={async () => {
           try {
             await updateEmployee.mutateAsync({ publicId, linkedUserPublicId: null });
-            toast.success("User account unlinked");
+            toast.success(t("employee.userUnlinked", "User account unlinked"));
             setShowUnlinkConfirm(false);
           } catch {
-            toast.error("Failed to unlink user");
+            toast.error(t("employee.userUnlinkError", "Failed to unlink user"));
           }
         }}
       />
@@ -1005,9 +1001,9 @@ export default function EmployeeDetailPage({
         onOpenChange={(open) => {
           if (!open) setShowDeactivateModal(false);
         }}
-        title="Deactivate employee"
-        description="Pick the last day this employee worked. Attendance won't be tracked after this date, but their past history stays intact."
-        confirmLabel="Deactivate"
+        title={t("employee.deactivateTitle", "Deactivate employee")}
+        description={t("employee.deactivateDescription", "Pick the last day this employee worked. Attendance won't be tracked after this date, but their past history stays intact.")}
+        confirmLabel={t("employee.deactivateConfirm", "Deactivate")}
         variant="danger"
         onConfirm={() => {
           setValue("active", false, { shouldDirty: true });
@@ -1016,7 +1012,7 @@ export default function EmployeeDetailPage({
         }}
       >
         <div className="mt-3">
-          <p className="mb-1.5 text-sm font-medium text-text-secondary">Last day worked</p>
+          <p className="mb-1.5 text-sm font-medium text-text-secondary">{t("employee.lastDayWorked", "Last day worked")}</p>
           <CustomDatePicker
             value={deactivateDate}
             onChange={setDeactivateDate}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -55,6 +56,7 @@ interface Props {
 }
 
 export function EmployeeFormModal({ open, onOpenChange, workspaceId, employee }: Props) {
+  const { t } = useTranslation();
   const updateEmployee = useUpdateEmployee(workspaceId);
   const { data: shifts } = useShifts(workspaceId);
   const { data: plan } = usePlan(workspaceId);
@@ -122,10 +124,10 @@ export function EmployeeFormModal({ open, onOpenChange, workspaceId, employee }:
       { publicId: employee.publicId, ...payload },
       {
         onSuccess: () => {
-          toast.success("Employee updated");
+          toast.success(t("employee.updateSuccess", "Employee updated"));
           onOpenChange(false);
         },
-        onError: () => toast.error("Could not update employee"),
+        onError: () => toast.error(t("employee.updateError", "Failed to update employee")),
       },
     );
   };
@@ -137,29 +139,29 @@ export function EmployeeFormModal({ open, onOpenChange, workspaceId, employee }:
         <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-[460px] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-glass-border bg-glass-bg shadow-[0_16px_50px_rgba(107,66,38,0.15)] outline-none backdrop-blur-xl">
           <form onSubmit={handleSubmit(onSubmit)} className="p-6">
             <Dialog.Title className="font-serif text-[20px] font-semibold text-text-primary">
-              Edit employee
+              {t("employee.edit", "Edit employee")}
             </Dialog.Title>
             <Dialog.Description className="mt-1 text-sm text-text-secondary">
               Update this employee&apos;s details.
             </Dialog.Description>
 
             <div className="mt-5 grid grid-cols-2 gap-3">
-              <Field label="First name" htmlFor="firstName" error={errors.firstName?.message}>
+              <Field label={t("employee.firstName", "First name")} htmlFor="firstName" error={errors.firstName?.message}>
                 <input id="firstName" className={inputClass} {...register("firstName")} />
               </Field>
-              <Field label="Last name" htmlFor="lastName" error={errors.lastName?.message}>
+              <Field label={t("employee.lastName", "Last name")} htmlFor="lastName" error={errors.lastName?.message}>
                 <input id="lastName" className={inputClass} {...register("lastName")} />
               </Field>
-              <Field label="Job title" htmlFor="jobTitle">
+              <Field label={t("employee.jobTitle", "Job title")} htmlFor="jobTitle">
                 <input id="jobTitle" className={inputClass} {...register("jobTitle")} />
               </Field>
-              <Field label="Phone" htmlFor="phoneNumber">
+              <Field label={t("employee.phone", "Phone")} htmlFor="phoneNumber">
                 <input id="phoneNumber" className={inputClass} {...register("phoneNumber")} />
               </Field>
               <Field label="Username" htmlFor="username">
                 <input id="username" className={inputClass} {...register("username")} />
               </Field>
-              <Field label="Role" htmlFor="role">
+              <Field label={t("employee.role", "Role")} htmlFor="role">
                 <Controller
                   control={control}
                   name="role"
@@ -182,7 +184,7 @@ export function EmployeeFormModal({ open, onOpenChange, workspaceId, employee }:
                   )}
                 />
               </Field>
-              <Field label="Attendance tracking" htmlFor="attendanceTracking">
+              <Field label={t("employee.attendanceTracking", "Attendance tracking")} htmlFor="attendanceTracking">
                 <Controller
                   control={control}
                   name="attendanceTracking"
@@ -199,7 +201,7 @@ export function EmployeeFormModal({ open, onOpenChange, workspaceId, employee }:
                   )}
                 />
               </Field>
-              <Field label="Shift" htmlFor="shiftPublicId">
+              <Field label={t("employee.shift", "Shift")} htmlFor="shiftPublicId">
                 <Controller
                   control={control}
                   name="shiftPublicId"
@@ -213,7 +215,7 @@ export function EmployeeFormModal({ open, onOpenChange, workspaceId, employee }:
                   )}
                 />
               </Field>
-              <Field label="Date of birth" htmlFor="dob">
+              <Field label={t("employee.dob", "Date of birth")} htmlFor="dob">
                 <Controller
                   control={control}
                   name="dob"
@@ -239,14 +241,14 @@ export function EmployeeFormModal({ open, onOpenChange, workspaceId, employee }:
                 onClick={() => onOpenChange(false)}
                 className="cursor-pointer rounded-lg border border-cream-3 px-4 py-2 text-[15px] font-medium text-text-secondary transition-colors hover:bg-cream-3"
               >
-                Cancel
+                {t("common.cancel", "Cancel")}
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
                 className="cursor-pointer rounded-lg bg-coffee px-4 py-2 text-[15px] font-medium text-white transition-colors hover:bg-coffee-light disabled:opacity-50"
               >
-                Save changes
+                {t("common.save", "Save changes")}
               </button>
             </div>
           </form>

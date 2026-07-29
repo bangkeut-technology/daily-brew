@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import { toast } from "sonner";
@@ -44,6 +45,7 @@ export function AttendanceCreateModal(props: Props) {
 }
 
 function CreateForm({ workspaceId, today, defaultDate, onOpenChange, onCollision }: Props) {
+  const { t } = useTranslation();
   const create = useCreateAttendance(workspaceId);
   const { data: employees } = useEmployees(workspaceId);
 
@@ -71,7 +73,7 @@ function CreateForm({ workspaceId, today, defaultDate, onOpenChange, onCollision
       },
       {
         onSuccess: () => {
-          toast.success("Attendance added");
+          toast.success(t("attendance.createSuccess", "Attendance added"));
           onOpenChange(false);
         },
         onError: (err) => {
@@ -92,28 +94,28 @@ function CreateForm({ workspaceId, today, defaultDate, onOpenChange, onCollision
   return (
     <div className="p-6">
       <Dialog.Title className="font-serif text-[20px] font-semibold text-text-primary">
-        Manual attendance
+        {t("attendance.createTitle", "Add attendance")}
       </Dialog.Title>
       <Dialog.Description className="mt-1 text-sm text-text-secondary">
-        Backfill a forgotten scan or broken-QR day.
+        {t("attendance.createDescription", "Record a check-in for a day the employee missed scanning.")}
       </Dialog.Description>
 
       <div className="mt-5 space-y-4">
         <div>
           <label htmlFor="emp" className="mb-1 block text-[13px] font-medium text-text-secondary">
-            Employee
+            {t("attendance.employee", "Employee")}
           </label>
           <CustomSelect
             id="emp"
             value={employeePublicId}
             onChange={setEmployeePublicId}
             options={employeeOptions}
-            placeholder="Select employee"
+            placeholder={t("attendance.selectEmployee", "Select employee")}
           />
         </div>
         <div>
           <label htmlFor="date" className="mb-1 block text-[13px] font-medium text-text-secondary">
-            Date
+            {t("attendance.date", "Date")}
           </label>
           <CustomDatePicker
             id="date"
@@ -125,30 +127,30 @@ function CreateForm({ workspaceId, today, defaultDate, onOpenChange, onCollision
         </div>
         <div>
           <label htmlFor="ci" className="mb-1 block text-[13px] font-medium text-text-secondary">
-            Check-in
+            {t("attendance.checkInTime", "Check-in")}
           </label>
           <CustomTimePicker id="ci" value={checkInAt} onChange={setCheckInAt} />
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-[13px] font-medium text-text-secondary">Add check-out</span>
+          <span className="text-[13px] font-medium text-text-secondary">{t("attendance.hasCheckOut", "Has check-out")}</span>
           <Toggle checked={hasCheckout} onChange={setHasCheckout} />
         </div>
         {hasCheckout && (
           <div>
             <label htmlFor="co" className="mb-1 block text-[13px] font-medium text-text-secondary">
-              Check-out
+              {t("attendance.checkOutTime", "Check-out")}
             </label>
             <CustomTimePicker id="co" value={checkOutAt} onChange={setCheckOutAt} />
           </div>
         )}
         <div>
           <label htmlFor="reason" className="mb-1 block text-[13px] font-medium text-text-secondary">
-            Reason
+            {t("attendance.editReason", "Reason")}
           </label>
           <input
             id="reason"
             className={reasonClass}
-            placeholder="Forgot to scan"
+            placeholder={t("attendance.createReasonPlaceholder", "e.g. QR scanner was offline — confirmed shift with employee")}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
           />
@@ -161,7 +163,7 @@ function CreateForm({ workspaceId, today, defaultDate, onOpenChange, onCollision
           onClick={() => onOpenChange(false)}
           className="cursor-pointer rounded-lg border border-cream-3 px-4 py-2 text-[15px] font-medium text-text-secondary transition-colors hover:bg-cream-3"
         >
-          Cancel
+          {t("common.cancel", "Cancel")}
         </button>
         <button
           type="button"
@@ -169,7 +171,7 @@ function CreateForm({ workspaceId, today, defaultDate, onOpenChange, onCollision
           disabled={!canSave || create.isPending}
           className="cursor-pointer rounded-lg bg-coffee px-4 py-2 text-[15px] font-medium text-white transition-colors hover:bg-coffee-light disabled:opacity-50"
         >
-          Add
+          {t("common.add", "Add")}
         </button>
       </div>
     </div>
