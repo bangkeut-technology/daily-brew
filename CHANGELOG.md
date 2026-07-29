@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.134.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.133.0...v1.134.0) (2026-07-29)
+
+
+### Features
+
+* **i18n:** translate the 152 console strings both apps were showing in English ([#380](https://github.com/bangkeut-technology/daily-brew/issues/380)) ([a918c43](https://github.com/bangkeut-technology/daily-brew/commit/a918c436a1cb4da4d5934a1bbdc1705d1008dd50))
+
 ## [1.133.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.132.0...v1.133.0) (2026-07-29)
 
 
