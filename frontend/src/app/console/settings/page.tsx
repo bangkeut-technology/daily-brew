@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import {
   Copy,
+  Crown,
   KeyRound,
   MapPin,
   Navigation,
@@ -42,6 +43,8 @@ import { ConfirmModal } from "@/components/shared/ConfirmModal";
 import { AvatarUploader } from "@/components/shared/AvatarUploader";
 import { CheckinUrlRow } from "@/components/console/CheckinUrlRow";
 import { PlanCard } from "@/components/console/PlanCard";
+import { UpgradeModal } from "@/components/console/UpgradeModal";
+import { useUpgradeModal } from "@/hooks/useUpgradeModal";
 import { Skeleton } from "@/components/admin/AdminDataStates";
 
 const MIN_GEOFENCE_RADIUS = 50;
@@ -148,6 +151,8 @@ export default function SettingsPage() {
       { enableHighAccuracy: true, timeout: 10_000 },
     );
   };
+
+  const upgrade = useUpgradeModal();
 
   if (isLoading || !settings) {
     return (
@@ -344,6 +349,7 @@ export default function SettingsPage() {
                 "Only allow check-ins from your restaurant's network.",
               )}
               locked={!canUseIp}
+              onUpgrade={() => upgrade.openFor("ipRestriction")}
             >
               <Toggle
                 checked={canUseIp && settings.ipRestrictionEnabled}
@@ -402,6 +408,7 @@ export default function SettingsPage() {
                 "Bind each check-in to the employee's own device.",
               )}
               locked={!canUseDevice}
+              onUpgrade={() => upgrade.openFor("deviceVerification")}
               icon={<Smartphone size={14} className="text-amber" />}
             >
               <Toggle
@@ -418,6 +425,7 @@ export default function SettingsPage() {
                 "When enabled, staff can only check in when they are within a specified radius of your restaurant location.",
               )}
               locked={!canUseGeo}
+              onUpgrade={() => upgrade.openFor("geofencing")}
               icon={<MapPin size={14} className="text-amber" />}
             >
               <Toggle
@@ -450,6 +458,7 @@ export default function SettingsPage() {
                 "Let staff check in by tapping the workspace link instead of scanning.",
               )}
               locked={!canUseTap}
+              onUpgrade={() => upgrade.openFor("tapCheckin")}
             >
               <Toggle
                 checked={canUseTap && settings.tapCheckinEnabled}
@@ -464,6 +473,7 @@ export default function SettingsPage() {
                 "Accept taps from an NFC tag written with your check-in link.",
               )}
               locked={!canUseNfc}
+              onUpgrade={() => upgrade.openFor("nfcCheckin")}
               icon={<Nfc size={14} className="text-amber" />}
             >
               <Toggle
@@ -479,11 +489,17 @@ export default function SettingsPage() {
           workspaceId={wsId}
           settings={settings}
           canUse={canUseTelegram}
+          onUpgrade={() => upgrade.openFor("telegramNotifications")}
           onSave={save}
           saving={update.isPending}
         />
 
-        <ApiTokensCard workspaceId={wsId} formatDate={fmtDate} />
+        <ApiTokensCard
+          workspaceId={wsId}
+          formatDate={fmtDate}
+          canUse={plan?.isEspresso || plan?.isDoubleEspresso || false}
+          onUpgrade={() => upgrade.openFor("apiTokens")}
+        />
 
         <GlassCard hover={false} className="border-red/20">
           <GlassCardHeader title={t("settings.dangerZone", "Danger zone")} />
@@ -559,6 +575,16 @@ export default function SettingsPage() {
           })
         }
       />
+
+      {upgrade.feature && (
+        <UpgradeModal
+          open={upgrade.isOpen}
+          onOpenChange={(open) => {
+            if (!open) upgrade.close();
+          }}
+          feature={upgrade.feature}
+        />
+      )}
     </div>
   );
 }
@@ -683,12 +709,14 @@ function TelegramCard({
   workspaceId,
   settings,
   canUse,
+  onUpgrade,
   onSave,
   saving,
 }: {
   workspaceId: string;
   settings: WorkspaceSetting;
   canUse: boolean;
+  onUpgrade: () => void;
   onSave: (patch: Partial<WorkspaceSetting>) => void;
   saving: boolean;
 }) {
@@ -713,6 +741,7 @@ function TelegramCard({
             "Daily summaries and alerts land in a Telegram chat you control.",
           )}
           locked={!canUse}
+          onUpgrade={onUpgrade}
           icon={<Send size={14} className="text-amber" />}
         >
           <Toggle
@@ -783,12 +812,17 @@ function TelegramCard({
 function ApiTokensCard({
   workspaceId,
   formatDate,
+  canUse,
+  onUpgrade,
 }: {
   workspaceId: string;
   formatDate: (iso: string) => string;
+  /** POST /api-tokens 403s below Espresso, so don't offer the form. */
+  canUse: boolean;
+  onUpgrade: () => void;
 }) {
   const { t } = useTranslation();
-  const { data: tokens } = useApiTokens(workspaceId);
+  const { data: tokens } = useApiTokens(canUse ? workspaceId : "");
   const createToken = useCreateApiToken(workspaceId);
   const revokeToken = useRevokeApiToken(workspaceId);
   const [name, setName] = useState("");
@@ -798,15 +832,35 @@ function ApiTokensCard({
 
   return (
     <GlassCard hover={false}>
-      <GlassCardHeader title={t("settings.apiKeysTitle", "API keys")} />
+      <GlassCardHeader
+        title={t("settings.apiKeysTitle", "API keys")}
+        action={
+          canUse ? undefined : (
+            <button
+              type="button"
+              onClick={onUpgrade}
+              className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-cream-3 bg-glass-bg px-3 py-1.5 text-[14px] font-medium text-text-primary transition-all duration-150 hover:bg-cream-3"
+            >
+              <Crown size={14} className="text-amber" />
+              {t("settings.upgradeCta", "Upgrade")}
+            </button>
+          )
+        }
+      />
       <div className="space-y-4 p-5">
         <p className="text-[13.5px] leading-relaxed text-text-tertiary">
           {t(
             "settings.apiKeysDesc",
             "Workspace-scoped keys for BasilBook and other integrations. The key is shown once — store it somewhere safe.",
           )}
+          {!canUse && (
+            <span className="ml-1.5 rounded-full bg-amber/10 px-2 py-0.5 text-[12.5px] font-medium text-amber">
+              Espresso
+            </span>
+          )}
         </p>
 
+        {canUse && (
         <div className="flex gap-2">
           <label htmlFor="api-token-name" className="sr-only">
             {t("settings.apiKeyName", "Key name")}
@@ -838,6 +892,7 @@ function ApiTokensCard({
             {t("common.create", "Create")}
           </button>
         </div>
+        )}
 
         {created && (
           <div className="rounded-xl border border-green/20 bg-green/5 p-4">
@@ -912,6 +967,7 @@ function SettingRow({
   description,
   locked,
   icon,
+  onUpgrade,
   children,
 }: {
   title: string;
@@ -919,6 +975,8 @@ function SettingRow({
   /** Renders the Espresso pill and greys the control. */
   locked: boolean;
   icon?: ReactNode;
+  /** Makes the Espresso pill open the upgrade prompt for this feature. */
+  onUpgrade?: () => void;
   children: ReactNode;
 }) {
   return (
@@ -927,11 +985,20 @@ function SettingRow({
         <p className="flex items-center gap-2 font-medium text-text-primary">
           {icon}
           {title}
-          {locked && (
-            <span className="rounded-full bg-amber/10 px-2 py-0.5 text-[11px] font-medium text-amber">
-              Espresso
-            </span>
-          )}
+          {locked &&
+            (onUpgrade ? (
+              <button
+                type="button"
+                onClick={onUpgrade}
+                className="cursor-pointer rounded-full border-none bg-amber/10 px-2 py-0.5 text-[11px] font-medium text-amber transition-colors hover:bg-amber/20"
+              >
+                Espresso
+              </button>
+            ) : (
+              <span className="rounded-full bg-amber/10 px-2 py-0.5 text-[11px] font-medium text-amber">
+                Espresso
+              </span>
+            ))}
         </p>
         <p className={cn("mt-0.5 text-sm text-text-secondary", locked && "opacity-70")}>
           {description}

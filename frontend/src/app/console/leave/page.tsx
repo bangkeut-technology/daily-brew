@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { CalendarClock, CalendarDays, Check, Crown, Inbox, Pencil, X } from "lucide-react";
 import { toast } from "sonner";
@@ -21,6 +20,8 @@ import { useDateFormat } from "@/hooks/useDateFormat";
 import { useWorkspaceTimezone } from "@/hooks/useWorkspaceSettings";
 import type { LeaveRequest, LeaveStatus } from "@/types/leave";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { UpgradeModal } from "@/components/console/UpgradeModal";
+import { useUpgradeModal } from "@/hooks/useUpgradeModal";
 import { GlassCard, GlassCardHeader } from "@/components/shared/GlassCard";
 import { Avatar } from "@/components/shared/Avatar";
 import { StatusBadge } from "@/components/shared/StatusBadge";
@@ -456,6 +457,7 @@ function LeaveStat({
  */
 function LeaveUpsell() {
   const { t } = useTranslation();
+  const upgrade = useUpgradeModal();
   return (
     <div className="page-enter">
       <PageHeader title={t("nav.leaveRequests", "Leave requests")} />
@@ -473,14 +475,25 @@ function LeaveUpsell() {
               "Let staff request time off and approve it in one place.",
             )}
           </p>
-          <Link
-            href="/console/settings"
-            className="btn-shimmer inline-block rounded-xl px-6 py-2.5 text-base font-medium text-white no-underline transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,66,38,0.30)]"
+          <button
+            type="button"
+            onClick={() => upgrade.openFor("leaveRequests")}
+            className="btn-shimmer inline-block cursor-pointer rounded-xl border-none px-6 py-2.5 text-base font-medium text-white transition-all hover:-translate-y-px hover:shadow-[0_4px_14px_rgba(107,66,38,0.30)]"
           >
-            {t("upgrade.upgradeButton", "Upgrade")}
-          </Link>
+            {t("upgrade.upgradeButton", "Upgrade to Espresso")}
+          </button>
         </div>
       </GlassCard>
+
+      {upgrade.feature && (
+        <UpgradeModal
+          open={upgrade.isOpen}
+          onOpenChange={(open) => {
+            if (!open) upgrade.close();
+          }}
+          feature={upgrade.feature}
+        />
+      )}
     </div>
   );
 }

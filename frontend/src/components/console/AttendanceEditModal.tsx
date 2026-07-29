@@ -9,6 +9,7 @@ import { CustomTimePicker } from "@/components/shared/CustomTimePicker";
 import { Toggle } from "@/components/shared/Toggle";
 import { formatTimeInTz } from "@/lib/timezone";
 import { useOverrideAttendance } from "@/hooks/useAttendance";
+import { CheckinVerification } from "./CheckinVerification";
 import type { AttendanceRecord } from "@/types/attendance";
 
 const reasonClass =
@@ -118,6 +119,10 @@ function EditForm({
       <Dialog.Description className="mt-1 text-sm text-text-secondary">
         {record.employeeName} · {record.date}
       </Dialog.Description>
+
+      <div className="mt-4">
+        <CheckinVerification workspacePublicId={workspaceId} />
+      </div>
 
       <div className="mt-5 space-y-4">
         <div>
