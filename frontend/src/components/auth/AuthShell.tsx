@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 import type { ReactNode } from "react";
+import { LanguageSwitcher } from "@/components/console/LanguageSwitcher";
 
 interface AuthShellProps {
   title: string;
@@ -10,7 +14,13 @@ interface AuthShellProps {
 
 export function AuthShell({ title, subtitle, children, footer }: AuthShellProps) {
   return (
-    <div className="flex min-h-screen items-center justify-center px-6 py-12">
+    <div className="relative flex min-h-screen items-center justify-center px-6 py-12">
+      {/* The auth screens are the first thing a new user sees, and they land
+          here before any profile locale exists to follow. */}
+      <div className="absolute right-4 top-4 z-20">
+        <LanguageSwitcher />
+      </div>
+
       <div className="w-full max-w-md">
         <div className="mb-6 text-center">
           <Link href="/" className="font-serif text-2xl font-semibold text-coffee no-underline">
@@ -34,6 +44,7 @@ const fieldClass =
 export { fieldClass };
 
 export function OAuthButtons() {
+  const { t } = useTranslation();
   // These are Symfony OAuth endpoints (proxied to the backend), not Next.js
   // routes — they require a real full-page navigation, so a plain <a> is correct.
   const linkClass =
@@ -42,11 +53,11 @@ export function OAuthButtons() {
     <div className="grid grid-cols-2 gap-3">
       {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
       <a href="/oauth/auth/google" className={linkClass}>
-        Google
+        {t("auth.google", "Google")}
       </a>
       {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
       <a href="/oauth/auth/apple" className={linkClass}>
-        Apple
+        {t("auth.apple", "Apple")}
       </a>
     </div>
   );

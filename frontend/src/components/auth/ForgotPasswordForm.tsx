@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +13,7 @@ const schema = z.object({ email: z.string().email("Enter a valid email") });
 type FormValues = z.infer<typeof schema>;
 
 export function ForgotPasswordForm() {
+  const { t } = useTranslation();
   const [sent, setSent] = useState(false);
   const {
     register,
@@ -31,23 +33,23 @@ export function ForgotPasswordForm() {
 
   return (
     <AuthShell
-      title="Reset your password"
-      subtitle="We'll email you a link to set a new password."
+      title={t("auth.resetYourPassword", "Reset your password")}
+      subtitle={t("auth.forgotPasswordSubtitle", "We'll email you a link to set a new password.")}
       footer={
         <Link href="/sign-in" className="font-medium text-coffee no-underline hover:underline">
-          Back to sign in
+          {t("auth.backToSignIn", "Back to sign in")}
         </Link>
       }
     >
       {sent ? (
         <p className="rounded-lg bg-green/10 px-4 py-3 text-sm text-green">
-          If an account exists for that email, a reset link is on its way.
+          {t("auth.resetLinkSent", "If an account exists for that email, a reset link is on its way.")}
         </p>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <label htmlFor="email" className="mb-1 block text-[13px] font-medium text-text-secondary">
-              Email
+              {t("auth.email", "Email")}
             </label>
             <input id="email" type="email" autoComplete="email" className={fieldClass} {...register("email")} />
             {errors.email && <p className="mt-1 text-[12.5px] text-red">{errors.email.message}</p>}
