@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.130.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.129.0...v1.130.0) (2026-07-29)
+
+
+### Features
+
+* **next/console:** translate the console screens that were still English ([#371](https://github.com/bangkeut-technology/daily-brew/issues/371)) ([1ba85a2](https://github.com/bangkeut-technology/daily-brew/commit/1ba85a23a2be927c0e09dcf4d684166d72b6cfc4))
+
 ## [1.129.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.128.0...v1.129.0) (2026-07-29)
 
 
