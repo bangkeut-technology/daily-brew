@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.132.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.131.0...v1.132.0) (2026-07-29)
+
+
+### Features
+
+* **next/console:** make the Espresso walls sell, and stop offering API keys the API rejects ([#376](https://github.com/bangkeut-technology/daily-brew/issues/376)) ([e438ee4](https://github.com/bangkeut-technology/daily-brew/commit/e438ee4ebb259b067360d5e9bf4497330e5d724f))
+
 ## [1.131.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.130.0...v1.131.0) (2026-07-29)
 
 
