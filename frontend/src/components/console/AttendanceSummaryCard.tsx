@@ -8,7 +8,7 @@ import { GlassCard } from "@/components/shared/GlassCard";
 import { Avatar } from "@/components/shared/Avatar";
 import { cn } from "@/lib/utils";
 import type { AttendanceDayStatus, AttendanceSummaryEmployee } from "@/types/attendance";
-import { dayStatusBadge, formatDayLabel } from "./attendanceStatus";
+import { DayStatusBadge, formatDayLabel } from "./attendanceStatus";
 
 /** One employee's month, collapsed to a totals row that expands into day rows. */
 export function AttendanceSummaryCard({
@@ -128,7 +128,7 @@ export function AttendanceSummaryCard({
                       </>
                     )}
                   </div>
-                  {dayStatusBadge(day)}
+                  <DayStatusBadge day={day} />
                   {canEdit && (
                     <button
                       type="button"

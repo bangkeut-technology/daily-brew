@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import * as Dialog from "@radix-ui/react-dialog";
 import { AlertTriangle, X } from "lucide-react";
 import { toast } from "sonner";
@@ -54,6 +55,7 @@ function DeleteForm({
   tz: string;
   onDone: () => void;
 }) {
+  const { t } = useTranslation();
   const del = useDeleteAttendance(workspaceId);
   const [reason, setReason] = useState("");
   const canSubmit = reason.trim().length > 0;
@@ -63,10 +65,10 @@ function DeleteForm({
       { publicId: record.publicId, reason: reason.trim() },
       {
         onSuccess: () => {
-          toast.success("Attendance removed");
+          toast.success(t("attendance.deleteSuccess", "Attendance removed"));
           onDone();
         },
-        onError: () => toast.error("Could not remove attendance"),
+        onError: () => toast.error(t("attendance.deleteError", "Failed to remove attendance")),
       },
     );
   };
@@ -86,7 +88,7 @@ function DeleteForm({
         </div>
         <div className="flex-1">
           <Dialog.Title className="font-serif text-[18px] font-semibold text-text-primary">
-            Remove attendance?
+            {t("attendance.deleteTitle", "Remove attendance?")}
           </Dialog.Title>
           <Dialog.Description className="mt-0.5 text-sm text-text-secondary">
             {record.employeeName} · {record.date}
@@ -101,18 +103,17 @@ function DeleteForm({
       )}
 
       <p className="mt-4 text-[13.5px] leading-relaxed text-text-secondary">
-        The record stays in the log as a tombstone for audit. It drops out of stats and exports. A new
-        scan or manual entry on the same day will replace it.
+        {t("attendance.deleteHint", "The record stays in the log as a tombstone for audit. It drops out of stats and exports. A new scan or manual entry on the same day will replace it.")}
       </p>
 
       <div className="mt-4">
         <label htmlFor="void-reason" className="mb-1 block text-[13px] font-medium text-text-secondary">
-          Reason
+          {t("attendance.deleteReason", "Reason")}
         </label>
         <input
           id="void-reason"
           className={reasonClass}
-          placeholder="Wrong day — employee didn't work this shift"
+          placeholder={t("attendance.deleteReasonPlaceholder", "e.g. Wrong day — employee did not work this shift")}
           value={reason}
           maxLength={255}
           onChange={(e) => setReason(e.target.value)}
@@ -125,7 +126,7 @@ function DeleteForm({
           onClick={onDone}
           className="cursor-pointer rounded-lg border border-cream-3 px-4 py-2 text-[15px] font-medium text-text-secondary transition-colors hover:bg-cream-3"
         >
-          Cancel
+          {t("common.cancel", "Cancel")}
         </button>
         <button
           type="button"

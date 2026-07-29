@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import { toast } from "sonner";
@@ -56,6 +57,7 @@ function PermissionsForm({
   workspaceId: string;
   onDone: () => void;
 }) {
+  const { t } = useTranslation();
   const update = useUpdateManagerPermissions(workspaceId);
   const [selected, setSelected] = useState<Set<ManagerPermission>>(
     () => new Set(employee.managerPermissions),
@@ -75,10 +77,10 @@ function PermissionsForm({
       { publicId: employee.publicId, permissions: [...selected] },
       {
         onSuccess: () => {
-          toast.success("Permissions updated");
+          toast.success(t("employee.permSaved", "Permissions updated"));
           onDone();
         },
-        onError: () => toast.error("Could not update permissions"),
+        onError: () => toast.error(t("employee.permissionsError", "Failed to update permissions")),
       },
     );
   };
@@ -86,7 +88,7 @@ function PermissionsForm({
   return (
     <div className="p-6">
       <Dialog.Title className="font-serif text-[20px] font-semibold text-text-primary">
-        Manager permissions
+        {t("employee.managerPermissionsTitle", "Manager permissions")}
       </Dialog.Title>
       <Dialog.Description className="mt-1 text-sm text-text-secondary">
         What {employee.name} can manage in this workspace.
@@ -110,7 +112,7 @@ function PermissionsForm({
           onClick={onDone}
           className="cursor-pointer rounded-lg border border-cream-3 px-4 py-2 text-[15px] font-medium text-text-secondary transition-colors hover:bg-cream-3"
         >
-          Cancel
+          {t("common.cancel", "Cancel")}
         </button>
         <button
           type="button"
@@ -118,7 +120,7 @@ function PermissionsForm({
           disabled={update.isPending}
           className="cursor-pointer rounded-lg bg-coffee px-4 py-2 text-[15px] font-medium text-white transition-colors hover:bg-coffee-light disabled:opacity-50"
         >
-          Save
+          {t("common.save", "Save")}
         </button>
       </div>
     </div>

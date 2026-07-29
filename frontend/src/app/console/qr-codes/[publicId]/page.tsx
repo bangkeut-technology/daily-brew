@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useMemo, useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
@@ -90,6 +91,7 @@ export default function QrCodeDetailPage({
 }: {
   params: Promise<{ publicId: string }>;
 }) {
+  const { t } = useTranslation();
   const { publicId } = use(params);
   const router = useRouter();
   const workspaceId = getWorkspacePublicId() || "";
@@ -140,16 +142,16 @@ export default function QrCodeDetailPage({
   if (plan && !plan.canUseSubQrCodes) {
     return (
       <div className="page-enter">
-        <PageHeader title="QR code" />
+        <PageHeader title={t("qrCodes.detail", "QR code")} />
         <GlassCard hover={false} className="p-8 text-center">
           <p className="text-text-secondary">
-            Sub QR codes are a Double Espresso feature.
+            {t("qrCodes.planGate", "Multiple QR codes require the Double Espresso plan")}
           </p>
           <Link
             href="/console/settings"
             className="mt-4 inline-block rounded-lg bg-coffee px-4 py-2 text-[15px] font-medium text-white no-underline transition-colors hover:bg-coffee-light"
           >
-            See plans
+            {t("settings.upgradeCta", "Upgrade")}
           </Link>
         </GlassCard>
       </div>
@@ -176,7 +178,7 @@ export default function QrCodeDetailPage({
   const handleSave = async () => {
     const trimmed = form.name.trim();
     if (!trimmed) {
-      toast.error("Name is required");
+      toast.error(t("qrCodes.nameRequired", "Name is required"));
       return;
     }
     const input: WorkspaceQrCodeInput = {
@@ -200,9 +202,9 @@ export default function QrCodeDetailPage({
     try {
       const updated = await updateMutation.mutateAsync({ publicId, ...input });
       setForm(stateFrom(updated));
-      toast.success("QR code updated");
+      toast.success(t("qrCodes.updateSuccess", "QR code updated"));
     } catch {
-      toast.error("Failed to update QR code");
+      toast.error(t("qrCodes.updateError", "Failed to update QR code"));
     }
   };
 
@@ -213,7 +215,7 @@ export default function QrCodeDetailPage({
         className="mb-3 inline-flex items-center gap-1.5 text-[13.5px] text-text-secondary no-underline hover:text-coffee"
       >
         <ArrowLeft size={14} />
-        Back to QR codes
+        {t("qrCodes.backToList", "Back to QR codes")}
       </Link>
 
       <PageHeader
@@ -225,25 +227,25 @@ export default function QrCodeDetailPage({
             className="flex items-center gap-1.5 rounded-lg border border-cream-3 bg-glass-bg px-3 py-2 text-[14.5px] font-medium text-red transition-colors hover:bg-red/8"
           >
             <Trash2 size={14} />
-            Delete
+            {t("common.delete", "Delete")}
           </button>
         }
       />
 
       <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
         <GlassCard hover={false} className="lg:col-span-1">
-          <GlassCardHeader title="QR preview" />
+          <GlassCardHeader title={t("qrCodes.qrPreview", "QR preview")} />
           <div className="flex flex-col items-center gap-4 p-5">
             <div className="rounded-xl border border-cream-3 bg-white p-4">
               <QRCodeSVG value={qrPayload} size={180} level="M" />
             </div>
             <div className="w-full text-center">
-              <p className="mb-1.5 text-xs text-text-tertiary">Encoded payload</p>
+              <p className="mb-1.5 text-xs text-text-tertiary">{t("qrCodes.payload", "Encoded payload")}</p>
               <button
                 type="button"
                 onClick={() => {
                   navigator.clipboard.writeText(qrPayload);
-                  toast.success("Copied to clipboard");
+                  toast.success(t("qrCodes.payloadCopied", "Copied to clipboard"));
                 }}
                 className="inline-flex max-w-full items-center gap-1.5 rounded-lg bg-cream-3/40 px-2.5 py-1.5 font-mono text-[12.5px] text-text-secondary transition-colors hover:bg-cream-3/70"
               >
@@ -260,14 +262,14 @@ export default function QrCodeDetailPage({
         </GlassCard>
 
         <GlassCard hover={false} className="lg:col-span-2">
-          <GlassCardHeader title="Identity" />
+          <GlassCardHeader title={t("qrCodes.identity", "Identity")} />
           <div className="space-y-4 p-5">
             <div>
               <label
                 htmlFor="qr-detail-name"
                 className="mb-1 block text-[13px] font-medium text-text-secondary"
               >
-                Name
+                {t("qrCodes.name", "Name")}
               </label>
               <input
                 id="qr-detail-name"
@@ -275,7 +277,7 @@ export default function QrCodeDetailPage({
                 type="text"
                 value={form.name}
                 onChange={(e) => patch({ name: e.target.value })}
-                placeholder="e.g. Floor 1, Kitchen entrance"
+                placeholder={t("qrCodes.namePlaceholder", "e.g. Floor 1, Kitchen entrance")}
                 className={inputClass}
               />
             </div>
@@ -285,18 +287,17 @@ export default function QrCodeDetailPage({
                 htmlFor="qr-detail-manager"
                 className="mb-1 block text-[13px] font-medium text-text-secondary"
               >
-                Manager (optional)
+                {t("qrCodes.manager", "Manager (optional)")}
               </label>
               <CustomSelect
                 id="qr-detail-manager"
                 value={form.managerPublicId}
                 onChange={(v) => patch({ managerPublicId: v })}
                 options={managerOptions}
-                placeholder="Select a manager…"
+                placeholder={t("qrCodes.selectManager", "Select a manager…")}
               />
               <p className="mt-1.5 text-[12.5px] text-text-tertiary">
-                Manager must have a linked user account. They can approve/reject leave for
-                assigned employees.
+                {t("qrCodes.managerHint", "Manager must have a linked user account. They can approve/reject leave for assigned employees.")}
               </p>
             </div>
           </div>
@@ -305,7 +306,7 @@ export default function QrCodeDetailPage({
 
       <GlassCard hover={false} className="mb-4">
         <GlassCardHeader
-          title="Assigned employees"
+          title={t("qrCodes.assignedEmployees", "Assigned employees")}
           action={
             <span className="rounded-full bg-coffee/10 px-2 py-0.5 text-[12.5px] font-medium tabular-nums text-coffee">
               {form.assignedIds.size} assigned
@@ -315,13 +316,13 @@ export default function QrCodeDetailPage({
         <div className="space-y-3 p-5">
           {activeEmployees.length === 0 ? (
             <p className="text-[13.5px] text-text-tertiary">
-              No employees in this workspace yet.
+              {t("qrCodes.noEmployees", "No employees in this workspace yet.")}
             </p>
           ) : (
             <>
               <div className="relative">
                 <label htmlFor="qr-detail-search" className="sr-only">
-                  Search employees
+                  {t("qrCodes.searchEmployees", "Search employees…")}
                 </label>
                 <Search
                   size={14}
@@ -333,14 +334,14 @@ export default function QrCodeDetailPage({
                   type="search"
                   value={assignedSearch}
                   onChange={(e) => setAssignedSearch(e.target.value)}
-                  placeholder="Search employees…"
+                  placeholder={t("qrCodes.searchEmployees", "Search employees…")}
                   className={cn(inputClass, "pl-9")}
                 />
               </div>
               <div className="-mx-1 max-h-[420px] space-y-1 overflow-y-auto px-1">
                 {filteredEmployees.length === 0 ? (
                   <p className="px-3 py-2 text-[13px] text-text-tertiary">
-                    No employees match your search.
+                    {t("qrCodes.noSearchResults", "No employees match your search.")}
                   </p>
                 ) : (
                   filteredEmployees.map((e) => (
@@ -369,14 +370,14 @@ export default function QrCodeDetailPage({
 
       <div className="mb-4 space-y-4">
         <SettingSection
-          title="IP restriction"
-          description="Only allow check-in via this QR from listed network addresses (e.g. your restaurant Wi-Fi)."
+          title={t("qrCodes.ipRestriction", "IP restriction")}
+          description={t("qrCodes.ipRestrictionDesc", "Only allow check-in via this QR from listed network addresses (e.g. your restaurant Wi-Fi).")}
           inherited={form.inheritIp}
           onInheritChange={(v) => patch({ inheritIp: v })}
           workspaceEnabled={!!settings?.ipRestrictionEnabled}
         >
           <div className="flex items-center justify-between">
-            <span className="text-sm text-text-primary">Enable</span>
+            <span className="text-sm text-text-primary">{t("qrCodes.enable", "Enable")}</span>
             <Toggle checked={form.ipEnabled} onChange={(v) => patch({ ipEnabled: v })} />
           </div>
           <div>
@@ -384,7 +385,7 @@ export default function QrCodeDetailPage({
               htmlFor="qr-detail-ips"
               className="mb-1 block text-[13px] font-medium text-text-secondary"
             >
-              Allowed IPs (one per line)
+              {t("qrCodes.allowedIps", "Allowed IPs (one per line)")}
             </label>
             <textarea
               id="qr-detail-ips"
@@ -399,14 +400,14 @@ export default function QrCodeDetailPage({
         </SettingSection>
 
         <SettingSection
-          title="Geofencing"
-          description="Require employees to be physically near a coordinate to check in via this QR. Useful for sectioning floors or outdoor areas. Radius minimum is 50 meters."
+          title={t("qrCodes.geofencing", "Geofencing")}
+          description={t("qrCodes.geofencingDesc", "Require employees to be physically near a coordinate to check in via this QR. Useful for sectioning floors or outdoor areas. Radius minimum is 50 meters.")}
           inherited={form.inheritGeo}
           onInheritChange={(v) => patch({ inheritGeo: v })}
           workspaceEnabled={!!settings?.geofencingEnabled}
         >
           <div className="flex items-center justify-between">
-            <span className="text-sm text-text-primary">Enable</span>
+            <span className="text-sm text-text-primary">{t("qrCodes.enable", "Enable")}</span>
             <Toggle checked={form.geoEnabled} onChange={(v) => patch({ geoEnabled: v })} />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -415,7 +416,7 @@ export default function QrCodeDetailPage({
                 htmlFor="qr-detail-lat"
                 className="mb-1 block text-[13px] font-medium text-text-secondary"
               >
-                Latitude
+                {t("qrCodes.latitude", "Latitude")}
               </label>
               <input
                 id="qr-detail-lat"
@@ -432,7 +433,7 @@ export default function QrCodeDetailPage({
                 htmlFor="qr-detail-lng"
                 className="mb-1 block text-[13px] font-medium text-text-secondary"
               >
-                Longitude
+                {t("qrCodes.longitude", "Longitude")}
               </label>
               <input
                 id="qr-detail-lng"
@@ -450,7 +451,7 @@ export default function QrCodeDetailPage({
               htmlFor="qr-detail-radius"
               className="mb-1 block text-[13px] font-medium text-text-secondary"
             >
-              Radius (meters, min 50)
+              {t("qrCodes.radiusMeters", "Radius (meters, min 50)")}
             </label>
             <input
               id="qr-detail-radius"
@@ -465,14 +466,14 @@ export default function QrCodeDetailPage({
         </SettingSection>
 
         <SettingSection
-          title="Device verification"
-          description="Bind check-in/out to a single device per employee per day. Prevents one phone from punching in multiple employees and forces check-out from the same device used for check-in."
+          title={t("qrCodes.deviceVerification", "Device verification")}
+          description={t("qrCodes.deviceVerificationDesc", "Bind check-in/out to a single device per employee per day. Prevents one phone from punching in multiple employees and forces check-out from the same device used for check-in.")}
           inherited={form.inheritDevice}
           onInheritChange={(v) => patch({ inheritDevice: v })}
           workspaceEnabled={!!settings?.deviceVerificationEnabled}
         >
           <div className="flex items-center justify-between">
-            <span className="text-sm text-text-primary">Enable</span>
+            <span className="text-sm text-text-primary">{t("qrCodes.enable", "Enable")}</span>
             <Toggle checked={form.deviceEnabled} onChange={(v) => patch({ deviceEnabled: v })} />
           </div>
         </SettingSection>
@@ -480,14 +481,14 @@ export default function QrCodeDetailPage({
 
       {dirty && (
         <div className="sticky bottom-4 z-10 flex items-center justify-between rounded-2xl border border-glass-border bg-glass-bg px-4 py-3 shadow-[0_8px_30px_rgba(107,66,38,0.10)] backdrop-blur-md">
-          <span className="text-[13.5px] text-text-secondary">You have unsaved changes</span>
+          <span className="text-[13.5px] text-text-secondary">{t("qrCodes.unsavedChanges", "You have unsaved changes")}</span>
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => setForm(stateFrom(qrCode))}
               className="rounded-lg border border-cream-3 px-4 py-2 text-[14.5px] font-medium text-text-secondary transition-colors hover:bg-cream-3/40"
             >
-              Discard
+              {t("common.discard", "Discard")}
             </button>
             <button
               type="button"
@@ -504,18 +505,18 @@ export default function QrCodeDetailPage({
       <ConfirmModal
         open={showDelete}
         onOpenChange={setShowDelete}
-        title="Delete QR code"
+        title={t("qrCodes.deleteTitle", "Delete QR code")}
         description={`Delete ${qrCode.name}? Employees assigned to it will lose access. This cannot be undone.`}
-        confirmLabel="Delete"
+        confirmLabel={t("common.delete", "Delete")}
         variant="danger"
         loading={deleteMutation.isPending}
         onConfirm={async () => {
           try {
             await deleteMutation.mutateAsync(publicId);
-            toast.success("QR code deleted");
+            toast.success(t("qrCodes.deleteSuccess", "QR code deleted"));
             router.push("/console/qr-codes");
           } catch {
-            toast.error("Failed to delete QR code");
+            toast.error(t("qrCodes.deleteError", "Failed to delete QR code"));
           }
         }}
       />
@@ -543,13 +544,14 @@ function SettingSection({
   workspaceEnabled: boolean;
   children: ReactNode;
 }) {
+  const { t } = useTranslation();
   return (
     <GlassCard hover={false}>
       <GlassCardHeader
         title={title}
         action={
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[12.5px] text-text-secondary">Same as workspace</span>
+            <span className="text-[12.5px] text-text-secondary">{t("qrCodes.sameAsWorkspace", "Same as workspace")}</span>
             <Toggle checked={inherited} onChange={onInheritChange} />
           </div>
         }
@@ -574,7 +576,7 @@ function SettingSection({
       ) : (
         <div className="space-y-3 p-5 pt-2">
           <p className="text-[12.5px] text-text-tertiary">
-            Custom rules for this QR — workspace settings are ignored.
+            {t("qrCodes.customForThisQr", "Custom rules for this QR — workspace settings are ignored.")}
           </p>
           {children}
         </div>

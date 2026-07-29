@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import { toast } from "sonner";
@@ -72,6 +73,7 @@ function EditForm({
   onDone: () => void;
   onRequestDelete?: () => void;
 }) {
+  const { t } = useTranslation();
   const override = useOverrideAttendance(workspaceId);
   const hadCheckout = record.checkOutAt != null;
 
@@ -100,10 +102,10 @@ function EditForm({
       },
       {
         onSuccess: () => {
-          toast.success("Attendance updated");
+          toast.success(t("attendance.editSuccess", "Attendance updated"));
           onDone();
         },
-        onError: () => toast.error("Could not update attendance"),
+        onError: () => toast.error(t("attendance.editError", "Failed to update attendance")),
       },
     );
   };
@@ -111,7 +113,7 @@ function EditForm({
   return (
     <div className="p-6">
       <Dialog.Title className="font-serif text-[20px] font-semibold text-text-primary">
-        Edit attendance
+        {t("attendance.editTitle", "Edit attendance")}
       </Dialog.Title>
       <Dialog.Description className="mt-1 text-sm text-text-secondary">
         {record.employeeName} · {record.date}
@@ -120,13 +122,13 @@ function EditForm({
       <div className="mt-5 space-y-4">
         <div>
           <label htmlFor="ci" className="mb-1 block text-[13px] font-medium text-text-secondary">
-            Check-in
+            {t("attendance.checkInTime", "Check-in")}
           </label>
           <CustomTimePicker id="ci" value={checkInAt} onChange={setCheckInAt} />
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-[13px] font-medium text-text-secondary">Has check-out</span>
+          <span className="text-[13px] font-medium text-text-secondary">{t("attendance.hasCheckOut", "Has check-out")}</span>
           <Toggle checked={hasCheckout} onChange={setHasCheckout} />
         </div>
         {clearingRealCheckout && (
@@ -137,7 +139,7 @@ function EditForm({
         {hasCheckout && (
           <div>
             <label htmlFor="co" className="mb-1 block text-[13px] font-medium text-text-secondary">
-              Check-out
+              {t("attendance.checkOutTime", "Check-out")}
             </label>
             <CustomTimePicker id="co" value={checkOutAt} onChange={setCheckOutAt} />
           </div>
@@ -145,12 +147,12 @@ function EditForm({
 
         <div>
           <label htmlFor="reason" className="mb-1 block text-[13px] font-medium text-text-secondary">
-            Reason
+            {t("attendance.editReason", "Reason")}
           </label>
           <input
             id="reason"
             className={reasonClass}
-            placeholder="Forgot to check out"
+            placeholder={t("attendance.editReasonPlaceholder", "e.g. Forgot to scan out — confirmed with manager")}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
           />
@@ -164,7 +166,7 @@ function EditForm({
             onClick={onRequestDelete}
             className="mr-auto cursor-pointer rounded-lg px-3 py-2 text-[15px] font-medium text-red transition-colors hover:bg-red/10"
           >
-            Remove
+            {t("attendance.deleteConfirm", "Remove")}
           </button>
         )}
         <button
@@ -172,7 +174,7 @@ function EditForm({
           onClick={onDone}
           className="cursor-pointer rounded-lg border border-cream-3 px-4 py-2 text-[15px] font-medium text-text-secondary transition-colors hover:bg-cream-3"
         >
-          Cancel
+          {t("common.cancel", "Cancel")}
         </button>
         <button
           type="button"
@@ -180,7 +182,7 @@ function EditForm({
           disabled={!canSave || override.isPending}
           className="cursor-pointer rounded-lg bg-coffee px-4 py-2 text-[15px] font-medium text-white transition-colors hover:bg-coffee-light disabled:opacity-50"
         >
-          Save
+          {t("common.save", "Save")}
         </button>
       </div>
     </div>

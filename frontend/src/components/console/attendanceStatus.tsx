@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "react-i18next";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { cn } from "@/lib/utils";
 import { parseDateAsUTC } from "@/lib/timezone";
@@ -52,29 +53,39 @@ export function dayMatchesStatusFilter(day: AttendanceDayStatus, f: StatusFilter
   }
 }
 
-export function dayStatusBadge(day: AttendanceDayStatus) {
+/**
+ * A component rather than a `dayStatusBadge(day)` helper: the labels need
+ * `useTranslation`, and a bare function returning JSX can't hold a hook.
+ */
+export function DayStatusBadge({ day }: { day: AttendanceDayStatus }) {
+  const { t } = useTranslation();
   switch (day.status) {
     case "present":
-      if (day.isLate) return <StatusBadge label="Late" variant="amber" />;
-      if (day.leftEarly) return <StatusBadge label="Left early" variant="amber" />;
-      return <StatusBadge label="Present" variant="green" />;
+      if (day.isLate) return <StatusBadge label={t("attendance.late", "Late")} variant="amber" />;
+      if (day.leftEarly)
+        return <StatusBadge label={t("attendance.leftEarly", "Left early")} variant="amber" />;
+      return <StatusBadge label={t("attendance.present", "Present")} variant="green" />;
     case "absent":
-      return <StatusBadge label="Absent" variant="red" />;
+      return <StatusBadge label={t("attendance.absent", "Absent")} variant="red" />;
     case "leave":
       return (
         <StatusBadge
-          label={day.leaveType === "paid" ? "Paid leave" : "Unpaid leave"}
+          label={
+            day.leaveType === "paid"
+              ? t("leave.typePaid", "Paid leave")
+              : t("leave.typeUnpaid", "Unpaid leave")
+          }
           variant="blue"
         />
       );
     case "closure":
-      return <StatusBadge label="Closed" variant="gray" />;
+      return <StatusBadge label={t("attendance.closed", "Closed")} variant="gray" />;
     case "upcoming":
-      return <StatusBadge label="Upcoming" variant="gray" />;
+      return <StatusBadge label={t("attendance.upcoming", "Upcoming")} variant="gray" />;
     case "off":
-      return <StatusBadge label="Off" variant="gray" />;
+      return <StatusBadge label={t("attendance.off", "Off")} variant="gray" />;
     case "voided":
-      return <StatusBadge label="Voided" variant="gray" />;
+      return <StatusBadge label={t("attendance.voided", "Voided")} variant="gray" />;
   }
 }
 
