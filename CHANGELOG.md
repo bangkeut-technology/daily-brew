@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.133.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.132.0...v1.133.0) (2026-07-29)
+
+
+### Features
+
+* **next/console:** restore the feedback widget and QR-scan account linking ([#378](https://github.com/bangkeut-technology/daily-brew/issues/378)) ([61c3d1d](https://github.com/bangkeut-technology/daily-brew/commit/61c3d1d28cd16a868a4d576d729f9337b20d5d2e))
+
 ## [1.132.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.131.0...v1.132.0) (2026-07-29)
 
 
