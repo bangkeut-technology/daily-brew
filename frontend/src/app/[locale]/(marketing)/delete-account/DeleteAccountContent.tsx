@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { Trash2, ShieldCheck, Mail } from 'lucide-react';
+import { Link } from "@/i18n/navigation";
 
 export function DeleteAccountContent() {
   return (

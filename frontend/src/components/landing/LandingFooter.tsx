@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { Coffee } from "lucide-react";
+import NextLink from "next/link";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { Link as LocaleLink } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 import { AppStoreBadge } from "@/components/shared/AppStoreBadge";
 import { PlayStoreBadge } from "@/components/shared/PlayStoreBadge";
 
@@ -63,12 +63,12 @@ export function LandingFooter() {
             <ul className="space-y-2.5">
               {productLinks.map((link) => (
                 <li key={link.to}>
-                  <LocaleLink
+                  <Link
                     href={link.to}
                     className="text-[15px] text-text-secondary no-underline transition-colors duration-200 hover:text-coffee"
                   >
                     {t(`productLinks.${link.key}`)}
-                  </LocaleLink>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -86,12 +86,12 @@ export function LandingFooter() {
             <ul className="space-y-2.5">
               {legalLinks.map((link) => (
                 <li key={link.to}>
-                  <LocaleLink
+                  <Link
                     href={link.to}
                     className="text-[15px] text-text-secondary no-underline transition-colors duration-200 hover:text-coffee"
                   >
                     {t(`legalLinks.${link.key}`)}
-                  </LocaleLink>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -108,20 +108,20 @@ export function LandingFooter() {
             </p>
             <ul className="space-y-2.5">
               <li>
-                <Link
+                <NextLink
                   href="/sign-up"
                   className="text-[15px] text-text-secondary no-underline transition-colors duration-200 hover:text-coffee"
                 >
                   {t("cta.createAccount")}
-                </Link>
+                </NextLink>
               </li>
               <li>
-                <Link
+                <NextLink
                   href="/sign-in"
                   className="text-[15px] text-text-secondary no-underline transition-colors duration-200 hover:text-coffee"
                 >
                   {t("cta.signIn")}
-                </Link>
+                </NextLink>
               </li>
             </ul>
           </motion.div>

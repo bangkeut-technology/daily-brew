@@ -3,7 +3,7 @@
 import { Building2, UserPlus, QrCode, BarChart3, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { Link as LocaleLink } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 
 /**
  * Icon, number and accent are design; `key` selects the i18n pair
@@ -79,13 +79,13 @@ export function HowItWorksSection() {
         viewport={{ once: true }}
         transition={{ duration: 0.4, delay: 0.4 }}
       >
-        <LocaleLink
+        <Link
           href="/how-it-works"
           className="inline-flex items-center gap-1.5 text-[15px] font-medium text-coffee no-underline transition-colors hover:text-coffee-light"
         >
           {t("learnMore")}
           <ChevronRight size={14} />
-        </LocaleLink>
+        </Link>
       </motion.div>
     </section>
   );

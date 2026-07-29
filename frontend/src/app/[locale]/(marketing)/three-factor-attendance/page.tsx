@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { pageMetadata } from "@/lib/seo";
+import NextLink from "next/link";
+import { Link } from "@/i18n/navigation";
 import { JsonLd } from "@/components/JsonLd";
 import { breadcrumbSchema, softwareApplicationSchema } from "@/lib/schema";
 import { FaqSection } from "@/components/marketing/FaqSection";
@@ -87,12 +88,12 @@ export default function ThreeFactorAttendancePage() {
           mechanically impossible — without a single biometric.
         </p>
         <div className="mt-8 flex items-center justify-center gap-3">
-          <Link
+          <NextLink
             href="/sign-up"
             className="rounded-2xl bg-coffee px-6 py-3 text-sm font-medium text-white no-underline transition-opacity hover:opacity-90"
           >
             Start free
-          </Link>
+          </NextLink>
           <Link
             href="/stop-buddy-punching"
             className="rounded-2xl border border-glass-border bg-glass-bg px-6 py-3 text-sm font-medium text-text-primary no-underline transition-colors hover:bg-cream-3"
@@ -140,12 +141,12 @@ export default function ThreeFactorAttendancePage() {
           <p className="mx-auto mt-3 max-w-md text-text-secondary">
             Free for up to 10 active employees. No credit card, no hardware to buy.
           </p>
-          <Link
+          <NextLink
             href="/sign-up"
             className="mt-6 inline-block rounded-2xl bg-coffee px-6 py-3 text-sm font-medium text-white no-underline transition-opacity hover:opacity-90"
           >
             Create your free account
-          </Link>
+          </NextLink>
         </div>
       </section>
     </>

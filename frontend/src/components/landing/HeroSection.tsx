@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { ChevronRight, QrCode, CheckCircle, Clock, Users, Shield } from "lucide-react";
+import NextLink from "next/link";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { Link as LocaleLink } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { AppStoreBadge } from "@/components/shared/AppStoreBadge";
 import { PlayStoreBadge } from "@/components/shared/PlayStoreBadge";
@@ -93,19 +93,19 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
-              <Link
+              <NextLink
                 href="/sign-up"
                 className="btn-shimmer inline-flex cursor-pointer items-center gap-2 rounded-xl border-none px-7 py-3.5 text-[17px] font-semibold text-white no-underline transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(107,66,38,0.30)]"
               >
                 {t("ctaPrimary")}
                 <ChevronRight size={16} />
-              </Link>
-              <LocaleLink
+              </NextLink>
+              <Link
                 href="/demo"
                 className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-glass-border bg-glass-bg px-6 py-3.5 text-[16px] font-medium text-text-primary no-underline backdrop-blur-sm transition-all duration-200 hover:bg-cream-3"
               >
                 {t("ctaSecondary")}
-              </LocaleLink>
+              </Link>
             </motion.div>
 
             <motion.div
