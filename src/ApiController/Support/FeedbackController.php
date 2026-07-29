@@ -93,4 +93,19 @@ class FeedbackController extends AbstractController
     ): JsonResponse {
         return $this->jsonSuccess($supportDock->listFAQs());
     }
+
+    /**
+     * Whether feedback submission is wired up on this install.
+     *
+     * The legacy SPA learns this from `window.__DAILYBREW__.supportdockApiKey`,
+     * which `SpaController` injects per request. Next.js serves its own HTML and
+     * has no such injection point, so it asks here instead. Only the boolean
+     * crosses the wire — never the key.
+     */
+    #[Route('/support/config', name: 'support_config', methods: ['GET'])]
+    public function config(
+        SupportDockService $supportDock,
+    ): JsonResponse {
+        return $this->jsonSuccess(['feedbackEnabled' => $supportDock->isConfigured()]);
+    }
 }

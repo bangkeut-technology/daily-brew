@@ -8,6 +8,7 @@ import { getWorkspacePublicId, clearWorkspacePublicId } from "@/lib/api";
 import type { ManagerPermission } from "@/types/auth";
 import { Sidebar } from "@/components/console/Sidebar";
 import { TopBar } from "@/components/console/TopBar";
+import { FeedbackWidget } from "@/components/console/FeedbackWidget";
 
 const STAFF_BLOCKED_ROUTES = [
   "/console/employees",
@@ -120,6 +121,7 @@ export function ConsoleShell({ children }: { children: React.ReactNode }) {
 
       <Sidebar open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
       <main className="page-enter mt-14 p-4 md:ml-[220px] md:p-8">{children}</main>
+      <FeedbackWidget />
     </div>
   );
 }

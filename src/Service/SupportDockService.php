@@ -24,6 +24,17 @@ class SupportDockService
     }
 
     /**
+     * Whether a SupportDock key is present, i.e. whether feedback can actually
+     * be delivered. Clients use this to decide whether to offer the feedback
+     * form at all — {@see sendFeedback} returns false without a key, which
+     * would otherwise surface as a 502 only after the user has typed a report.
+     */
+    public function isConfigured(): bool
+    {
+        return $this->client !== null;
+    }
+
+    /**
      * Forward feedback to SupportDock.
      *
      * @param string      $type     bug|feature|question|general
