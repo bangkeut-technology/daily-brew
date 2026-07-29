@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Service;
 
 use App\Service\SupportDockService;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -74,5 +75,28 @@ class SupportDockServiceTest extends TestCase
         );
 
         $this->assertFalse($result);
+    }
+
+    // `isConfigured()` never logs, so setUp's shared logger mock goes
+    // unexercised here — the attribute is the documented opt-out, and
+    // failOnNotice is on.
+
+    #[AllowMockObjectsWithoutExpectations]
+    public function testIsConfiguredIsFalseWithoutAnApiKey(): void
+    {
+        $svc = new SupportDockService($this->createStub(LoggerInterface::class), '');
+
+        $this->assertFalse($svc->isConfigured());
+    }
+
+    #[AllowMockObjectsWithoutExpectations]
+    public function testIsConfiguredIsTrueOnceAnApiKeyIsPresent(): void
+    {
+        // The console asks `GET /support/config` for exactly this, so that it
+        // hides the feedback launcher rather than letting someone type a report
+        // into a form whose submit can only 502.
+        $svc = new SupportDockService($this->createStub(LoggerInterface::class), 'sd_test_key');
+
+        $this->assertTrue($svc->isConfigured());
     }
 }
