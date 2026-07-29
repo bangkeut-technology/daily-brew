@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.128.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.127.0...v1.128.0) (2026-07-29)
+
+
+### Features
+
+* **next/marketing:** translate the remaining pages and fix locale-losing links ([#368](https://github.com/bangkeut-technology/daily-brew/issues/368)) ([5426bc5](https://github.com/bangkeut-technology/daily-brew/commit/5426bc5c7bed9ca99e1c2faf7c9e87c1c80b57d7))
+
 ## [1.127.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.126.0...v1.127.0) (2026-07-28)
 
 
