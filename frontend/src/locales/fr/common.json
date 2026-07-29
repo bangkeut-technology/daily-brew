@@ -17,7 +17,8 @@
     "myLeaveRequests": "Mes demandes de congé",
     "userMenu": "Menu utilisateur",
     "topbar": "Barre de l'espace de travail",
-    "openMenu": "Ouvrir le menu"
+    "openMenu": "Ouvrir le menu",
+    "sidebar": "Navigation principale"
   },
   "profile": {
     "workspaceCount_one": "{{count}} espace",
@@ -88,7 +89,11 @@
     "updateError": "Échec de la mise à jour du profil",
     "updatePassword": "Mettre à jour le mot de passe",
     "updateSuccess": "Profil mis à jour",
-    "yourPublicId": "Votre ID public"
+    "yourPublicId": "Votre ID public",
+    "linkEmployeeDesc": "Saisissez un identifiant public d'employé pour lier votre compte à un espace de travail. Vous pouvez être lié à plusieurs espaces si vous travaillez dans différents restaurants.",
+    "unlinkConfirm": "Délier votre compte de {{name}} chez {{workspace}} ? Vous ne pourrez plus y pointer ni consulter vos présences.",
+    "deleteAccountDesc": "Supprimez définitivement votre compte et toutes les données associées. Cette action est irréversible.",
+    "deleteConfirmDesc": "Saisissez « DELETE » ci-dessous pour confirmer. Votre compte sera définitivement désactivé."
   },
   "attendance": {
     "verification": {
@@ -148,7 +153,32 @@
     "employeeDescription": "Votre historique de pointage. Filtrez par période.",
     "ownerDescription": "Consultez les pointages de tous les employés. Filtrez par période ou par employé.",
     "recordCount_one": "{{count}} enregistrement",
-    "recordCount_other": "{{count}} enregistrements"
+    "recordCount_other": "{{count}} enregistrements",
+    "editSuccess": "Présence mise à jour",
+    "editError": "Échec de la mise à jour de la présence",
+    "editTitle": "Modifier la présence",
+    "checkInTime": "Pointage d'entrée",
+    "hasCheckOut": "Pointage de sortie",
+    "checkOutTime": "Pointage de sortie",
+    "editReason": "Raison",
+    "editReasonPlaceholder": "ex. Oubli du pointage de sortie — confirmé avec le manager",
+    "deleteConfirm": "Supprimer",
+    "createSuccess": "Présence ajoutée",
+    "createTitle": "Ajouter une présence",
+    "createDescription": "Enregistrez un pointage pour un jour où l'employé a oublié de scanner.",
+    "selectEmployee": "Sélectionner un employé",
+    "createReasonPlaceholder": "ex. le scanner QR était hors ligne — service confirmé avec l'employé",
+    "deleteSuccess": "Présence supprimée",
+    "deleteError": "Échec de la suppression de la présence",
+    "deleteTitle": "Supprimer la présence ?",
+    "deleteHint": "L'enregistrement reste dans le journal comme trace d'audit. Il disparaît des statistiques et des exports. Un nouveau scan ou une saisie manuelle le même jour le remplacera.",
+    "deleteReason": "Raison",
+    "deleteReasonPlaceholder": "ex. Mauvais jour — l'employé n'a pas travaillé ce service",
+    "upcoming": "À venir",
+    "originalScan": "À l'origine",
+    "cannotClearCheckOut": "Cet enregistrement a un pointage de sortie — réactivez l'option. Pour corriger une heure erronée, modifiez-la plutôt que de la supprimer.",
+    "alreadyExistsSwitchToEdit": "Un enregistrement existe déjà pour ce jour — ouverture pour modification.",
+    "createError": "Échec de l'ajout de la présence"
   },
   "auth": {
     "signIn": "Connexion",
@@ -161,7 +191,30 @@
     "hasAccount": "Déjà un compte ?",
     "orContinueWith": "Ou continuer avec",
     "google": "Google",
-    "apple": "Apple"
+    "apple": "Apple",
+    "resetYourPassword": "Réinitialisez votre mot de passe",
+    "forgotPasswordSubtitle": "Nous vous enverrons par email un lien pour définir un nouveau mot de passe.",
+    "backToSignIn": "Retour à la connexion",
+    "resetLinkSent": "Si un compte existe pour cet email, un lien de réinitialisation est en route.",
+    "signInSubtitle": "Bon retour sur DailyBrew.",
+    "createAccount": "Créer un compte",
+    "forgotPasswordShort": "Oublié ?",
+    "resetLinkExpired": "Ce lien de réinitialisation est invalide ou a expiré.",
+    "setNewPassword": "Définir un nouveau mot de passe",
+    "resetPasswordSubtitle": "Choisissez un nouveau mot de passe pour votre compte.",
+    "invalidResetToken": "Jeton de réinitialisation invalide ou manquant",
+    "newPassword": "Nouveau mot de passe",
+    "createYourAccount": "Créez votre compte",
+    "signUpSubtitle": "Gratuit jusqu'à 10 employés actifs. Aucune carte de crédit requise.",
+    "passwordMinLength": "Le mot de passe doit comporter au moins 8 caractères",
+    "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+    "passwordResetSuccess": "Mot de passe réinitialisé avec succès",
+    "passwordResetError": "Échec de la réinitialisation du mot de passe. Le lien a peut-être expiré.",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "forgotPasswordError": "Une erreur est survenue. Veuillez réessayer.",
+    "checkYourEmail": "Consultez vos emails",
+    "forgotPasswordDescription": "Saisissez l'adresse email associée à votre compte et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+    "sendResetLink": "Envoyer le lien"
   },
   "dashboard": {
     "present": "Présents aujourd'hui",
@@ -170,7 +223,7 @@
     "absent": "Absents",
     "todayAttendance": "Présence du jour",
     "viewAll": "Tout voir",
-    "ofEmployees": "sur {count} employés",
+    "ofEmployees": "sur {{count}} employés",
     "emptyWelcome": "Bienvenue dans votre espace !",
     "emptySubtitle": "Votre restaurant est prêt. Ajoutez votre équipe pour commencer le suivi des présences.",
     "emptyAddEmployee": "Ajouter un employé",
@@ -231,7 +284,36 @@
     "linkScanStarting": "Démarrage de la caméra…",
     "linkInvalidQr": "Ce QR n'est pas un code employé DailyBrew. Réessayez.",
     "linkHelpTitle": "Où trouver mon ID ?",
-    "linkHelpBody": "Demandez à votre employeur d'ouvrir DailyBrew → Employés → votre nom → Partager. Il verra un QR à scanner et l'ID à coller ici."
+    "linkHelpBody": "Demandez à votre employeur d'ouvrir DailyBrew → Employés → votre nom → Partager. Il verra un QR à scanner et l'ID à coller ici.",
+    "noEmployee": "Votre compte n'est pas encore lié à un profil d'employé.",
+    "welcomeBack": "Bon retour",
+    "noShiftAssigned": "Aucun service assigné",
+    "completed": "Terminé",
+    "checkedIn": "Pointé",
+    "onApprovedLeave": "Vous êtes en congé approuvé aujourd'hui",
+    "noCheckinRequired": "Aucun pointage requis.",
+    "noUpcomingClosures": "Aucune fermeture à venir",
+    "myLeaveRequests": "Mes demandes de congé",
+    "getStarted": "Commencer avec DailyBrew",
+    "chooseRole": "Choisissez comment vous souhaitez utiliser DailyBrew.",
+    "becomeOwner": "Je possède un restaurant",
+    "becomeOwnerDesc": "Créez un espace de travail pour gérer votre personnel, vos services et les présences.",
+    "linkEmployee": "Je suis membre du personnel",
+    "linkEmployeeDesc": "Saisissez l'identifiant d'employé que votre employeur vous a donné pour lier votre compte.",
+    "createWorkspace": "Créez votre espace de travail",
+    "createWorkspaceDesc": "Saisissez le nom de votre restaurant pour commencer.",
+    "checkInTime": "Entrée",
+    "lateLabel": "En retard",
+    "checkOutTime": "Sortie",
+    "readyToCheckIn": "Vous n'avez pas encore pointé aujourd'hui.",
+    "closedNow": "Fermé actuellement",
+    "upcoming": "À venir",
+    "onTimeLabel": "À l'heure",
+    "notYet": "Pas encore",
+    "noRecentAttendance": "Aucune donnée de présence récente",
+    "noWorkspace": "Aucun espace de travail lié",
+    "noLeaveRequests": "Aucune demande de congé",
+    "goToSettings": "Aller aux paramètres"
   },
   "employee": {
     "add": "Ajouter un employé",
@@ -310,14 +392,57 @@
     "noneYet": "Aucun employé pour le moment.",
     "editAria": "Modifier {{name}}",
     "deleteAria": "Supprimer {{name}}",
-    "editPermissionsAria": "Modifier les permissions de {{name}}"
+    "editPermissionsAria": "Modifier les permissions de {{name}}",
+    "updateSuccess": "Employé mis à jour",
+    "updateError": "Échec de la mise à jour de l'employé",
+    "edit": "Modifier l'employé",
+    "dob": "Date de naissance",
+    "permissionsError": "Échec de la mise à jour des permissions",
+    "roleOwner": "Propriétaire",
+    "deleteSuccess": "Employé supprimé",
+    "deleteError": "Échec de la suppression de l'employé",
+    "deleteTitle": "Supprimer l'employé",
+    "deleteConfirm": "Supprimer {{name}} ? Cette action est irréversible.",
+    "userLinked": "Compte utilisateur lié",
+    "userLinkError": "Échec de la liaison. Vérifiez l'identifiant et réessayez.",
+    "backToList": "Retour aux employés",
+    "phoneNumber": "Numéro de téléphone",
+    "joinedAt": "Date d'entrée",
+    "linkedAt": "Début du suivi",
+    "lastDayWorked": "Dernier jour travaillé",
+    "linkUser": "Lier un compte utilisateur",
+    "unlink": "Délier",
+    "linkByPublicId": "Lier par identifiant public",
+    "userPublicIdPlaceholder": "Saisir l'identifiant public",
+    "linkUserDescription": "Ou partagez ce QR code ou cet identifiant d'employé avec le membre du personnel. Il pourra le scanner ou le saisir lors de son inscription pour lier son compte.",
+    "noAttendance": "Aucun enregistrement de présence",
+    "unlinkTitle": "Délier le compte utilisateur",
+    "unlinkConfirm": "Supprimer le lien entre cet employé et son compte utilisateur ? Il ne pourra plus consulter son tableau de bord.",
+    "userUnlinked": "Compte utilisateur délié",
+    "userUnlinkError": "Échec de la dissociation",
+    "deactivateTitle": "Désactiver l'employé",
+    "deactivateDescription": "Choisissez le dernier jour travaillé par cet employé. La présence ne sera plus suivie après cette date, mais son historique passé reste intact.",
+    "deactivateConfirm": "Désactiver",
+    "createSuccess": "Employé créé",
+    "createError": "Échec de la création de l'employé",
+    "username": "Nom d'utilisateur",
+    "usernameHint": "Identifiant unique pour les fiches du personnel BasilBook.",
+    "usernameUpsell": "Passez à Espresso pour lier les employés à BasilBook.",
+    "createShift": "Créer un horaire",
+    "userPublicId": "Identifiant public de l'utilisateur",
+    "userPublicIdHint": "L'employé trouvera son identifiant public sur sa page de profil.",
+    "linkedAtHint": "Le décompte des absences démarre à cette date. Effacez-la pour exclure cet employé du calcul des absences jusqu'à sa reliaison."
   },
   "workspace": {
     "label": "Espace de travail",
     "noWorkspace": "Aucun espace",
     "create": "Nouvel espace",
     "newPlaceholder": "Nom du restaurant",
-    "createFailed": "Échec de la création"
+    "createFailed": "Échec de la création",
+    "selectTitle": "Sélectionner un espace de travail",
+    "noWorkspacesTitle": "Aucun espace de travail",
+    "selectDescription": "Choisissez un espace de travail pour continuer",
+    "noWorkspacesDescription": "Créez un espace de travail ou demandez à votre employeur de vous lier"
   },
   "settings": {
     "deviceVerification": "Vérification de l'appareil",
@@ -515,7 +640,8 @@
     "apiKeyRevoked": "Révoquée",
     "apiKeyRevokeError": "Impossible de révoquer la clé",
     "billingCycle": "Cycle de facturation",
-    "checkoutUnavailable": "Le paiement est indisponible pour le moment"
+    "checkoutUnavailable": "Le paiement est indisponible pour le moment",
+    "annualSaving": "Économisez 17 % vs mensuel"
   },
   "checkin": {
     "deviceMismatch": "Le pointage de sortie doit être effectué depuis le même appareil que le pointage d'entrée",
@@ -560,7 +686,8 @@
     "manage": "Gérer",
     "back": "Retour",
     "submit": "Envoyer",
-    "copy": "Copier"
+    "copy": "Copier",
+    "add": "Ajouter"
   },
   "qrCodes": {
     "new": "Nouveau code QR",
@@ -659,7 +786,8 @@
     "apiTokens": {
       "title": "Débloquer les clés API",
       "description": "Générez des clés secrètes pour que BasilBook et vos propres outils puissent récupérer les pointages de cet espace."
-    }
+    },
+    "startTrial": "Commencer l'essai gratuit de 14 jours"
   },
   "faq": {
     "eyebrow": "FAQ",
@@ -697,9 +825,9 @@
     "a": {
       "whatIsDailybrew": "DailyBrew est une plateforme de suivi des présences du personnel conçue pour les restaurants. Elle propose le check-in par QR, la gestion des horaires, les périodes de fermeture et la gestion des demandes de congé, le tout dans un seul tableau de bord simple.",
       "whoIsItFor": "DailyBrew est conçu pour les propriétaires de restaurant, les managers et le personnel. Les propriétaires gèrent l'espace de travail, les horaires et les employés. Les managers ne reçoivent que les permissions que vous leur accordez — par exemple les approbations de congés, la supervision des présences, la gestion des employés, ou toute combinaison. Le personnel pointe à l'arrivée et au départ en scannant le code QR de l'espace.",
-      "mobileApp": "Le check-in du personnel fonctionne entièrement via le navigateur web mobile. Quand un employé scanne le code QR, une page de check-in optimisée pour mobile s'ouvre instantanément. Aucun téléchargement d'application n'est requis.",
+      "mobileApp": "Oui — DailyBrew est disponible sur l'App Store et le Play Store pour les propriétaires et les managers. Le personnel n'en a pas besoin : n'importe quel téléphone avec une caméra peut scanner le QR de l'espace de travail et pointer depuis le mobile web. L'application ajoute les notifications push, le pointage par toucher NFC, et la tolérance hors ligne pour les managers qui gèrent la salle.",
       "freePlan": "Le plan Gratuit inclut jusqu'à 10 employés actifs, le check-in par QR, le suivi des horaires, les périodes de fermeture et le tableau de bord des présences. Il est gratuit pour toujours, sans limite de temps.",
-      "espressoPlan": "Espresso prend en charge jusqu'à 20 employés et ajoute la gestion des demandes de congé, la restriction IP, la vérification d'appareil, le géorepérage, les horaires par jour, le rôle de manager avec permissions granulaires (jusqu'à 2), les notifications push et email, et les résumés de présence quotidiens.",
+      "espressoPlan": "Espresso prend en charge jusqu'à 20 employés et ajoute la gestion des demandes de congé, la restriction IP, la vérification d'appareil, le géorepérage, les horaires par jour, le rôle de manager avec permissions granulaires (jusqu'à 2), les notifications push, email et Telegram, et les résumés de présence quotidiens.",
       "espressoCost": "Espresso coûte 19,99 $ par mois, ou 199 $ par an si vous choisissez la facturation annuelle. Le plan annuel vous fait économiser 40,88 $ par rapport au paiement mensuel.",
       "cancelAnytime": "Oui, il n'y a aucun contrat ni période d'engagement. Vous pouvez annuler votre abonnement Espresso à tout moment depuis les Paramètres de votre tableau de bord. Après l'annulation, vous continuerez à avoir accès jusqu'à la fin de votre période de facturation actuelle.",
       "qrCheckin": "Chaque espace de travail dispose d'un code QR unique. Affichez-le à l'entrée de votre restaurant. Le personnel ouvre l'app DailyBrew, scanne le code QR, et appuie sur le bouton Check In pour enregistrer son arrivée. Il scanne à nouveau et appuie sur Check Out en partant.",
@@ -819,8 +947,8 @@
           "desc": "Les employés soumettent des demandes de congé (payées ou non, journée entière ou partielle). Les propriétaires approuvent ou refusent avec une note. Historique complet et suivi de statut."
         },
         "notifications": {
-          "title": "Notifications push et email",
-          "desc": "Notifications push et alertes email en temps réel pour les demandes de congé, approbations, changements d'horaire, fermetures et résumés quotidiens de présence."
+          "title": "Notifications push, email et Telegram",
+          "desc": "Notifications push, alertes email et messages Telegram en temps réel pour les demandes de congé, approbations, changements d'horaire, fermetures et résumés quotidiens de présence."
         }
       },
       "why": {
@@ -1024,7 +1152,7 @@
         },
         "notifications": {
           "title": "Notifications",
-          "desc": "Alertes push et email pour les demandes de congé, changements d'horaire, fermetures et résumés quotidiens."
+          "desc": "Alertes push, email et Telegram pour les demandes de congé, changements d'horaire, fermetures et résumés quotidiens."
         }
       }
     },
@@ -1148,7 +1276,7 @@
         "perDaySchedules": "Horaires par jour de la semaine",
         "manager": "Rôle de manager avec permissions granulaires (jusqu'à 2)",
         "basilbook": "<brand></brand> intégration + API",
-        "notifications": "Notifications push et email",
+        "notifications": "Notifications push, email et Telegram",
         "dailySummary": "Résumé quotidien des présences",
         "trial14": "Essai gratuit de 14 jours"
       }
@@ -1522,7 +1650,7 @@
             "label": "<brand></brand> intégration + API"
           },
           "notifications": {
-            "label": "Notifications push et email"
+            "label": "Notifications push, email et Telegram"
           },
           "manager": {
             "label": "Rôle de manager"
@@ -2409,7 +2537,20 @@
     "approvedRejectedSplit": "{{approved}} approuvées · {{rejected}} refusées",
     "dayCount_one": "{{count}} jour",
     "dayCount_other": "{{count}} jours",
-    "startsSoon": "Débute bientôt"
+    "startsSoon": "Débute bientôt",
+    "submitSuccess": "Demande de congé envoyée",
+    "submitError": "Échec de l'envoi de la demande de congé",
+    "submitDescription": "Sélectionnez les dates souhaitées et indiquez un motif.",
+    "employee": "Employé",
+    "selectEmployee": "Sélectionner un employé",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "partialDay": "Journée partielle",
+    "fromTime": "Du",
+    "toTime": "Au",
+    "reasonPlaceholder": "ex. Événement familial, rendez-vous médical...",
+    "typePaid": "Congé payé",
+    "typeUnpaid": "Congé sans solde"
   },
   "closure": {
     "empty": "Aucune période de fermeture définie",
@@ -2439,7 +2580,8 @@
     "endBeforeStart": "La date de fin doit être égale ou postérieure à la date de début",
     "loadError": "Impossible de charger les fermetures.",
     "editAria": "Modifier la fermeture",
-    "deleteAria": "Supprimer la fermeture"
+    "deleteAria": "Supprimer la fermeture",
+    "new": "Nouvelle fermeture"
   },
   "shift": {
     "description": "Définissez les heures de travail de votre restaurant. Assignez les employés aux horaires pour que DailyBrew puisse suivre les retards et départs anticipés automatiquement.",
@@ -2496,7 +2638,15 @@
     "dayOverrideRemoveError": "Échec de la suppression de l'exception du {{day}}",
     "overrideBadge": "exception",
     "removeOverrideAria": "Supprimer l'exception",
-    "dayOverrides": "Exceptions par jour"
+    "dayOverrides": "Exceptions par jour",
+    "selectEmployee": "Sélectionner un employé…",
+    "unassignTitle": "Retirer du service",
+    "unassignConfirm": "Retirer {{name}} du service {{shift}} ? Sa présence ne sera plus suivie par rapport à ce service.",
+    "unassign": "Retirer",
+    "daysAreSchedule": "Les jours laissés vides sont des jours de repos — le personnel n'a pas à pointer et ne sera pas compté absent. Les modifications s'appliquent aussi aux dates passées.",
+    "deleteTitle": "Supprimer le service",
+    "deleteConfirm": "Supprimer le service {{name}} ? Les employés qui y sont affectés seront désassignés.",
+    "createSuccess": "Service créé"
   },
   "charts": {
     "onTime": "À l'heure",
@@ -2602,7 +2752,8 @@
     "timeRules": "Horaire par jour de la semaine",
     "timeRulesEspresso": "Les horaires par jour nécessitent Espresso",
     "tuesday": "Mardi",
-    "wednesday": "Mercredi"
+    "wednesday": "Mercredi",
+    "dayOverrides": "Exceptions par jour"
   },
   "avatar": {
     "upload": "Téléverser une photo",
@@ -2646,7 +2797,8 @@
     "errors": {
       "message": "Veuillez saisir au moins 10 caractères.",
       "maxImages": "Vous pouvez joindre jusqu'à {{max}} images.",
-      "invalidType": "Seules les images PNG, JPEG, WebP ou GIF sont autorisées."
+      "invalidType": "Seules les images PNG, JPEG, WebP ou GIF sont autorisées.",
+      "sendFailed": "Impossible d'envoyer le retour. Veuillez réessayer."
     }
   },
   "tour": {

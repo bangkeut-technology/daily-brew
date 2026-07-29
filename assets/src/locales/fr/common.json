@@ -17,7 +17,8 @@
     "myLeaveRequests": "Mes demandes de congé",
     "userMenu": "Menu utilisateur",
     "topbar": "Barre de l'espace de travail",
-    "openMenu": "Ouvrir le menu"
+    "openMenu": "Ouvrir le menu",
+    "sidebar": "Navigation principale"
   },
   "notifications": {
     "title": "Notifications",
@@ -92,7 +93,11 @@
     "updateError": "Échec de la mise à jour du profil",
     "updatePassword": "Mettre à jour le mot de passe",
     "updateSuccess": "Profil mis à jour",
-    "yourPublicId": "Votre ID public"
+    "yourPublicId": "Votre ID public",
+    "deleteAccountDesc": "Supprimez définitivement votre compte et toutes les données associées. Cette action est irréversible.",
+    "deleteConfirmDesc": "Saisissez « DELETE » ci-dessous pour confirmer. Votre compte sera définitivement désactivé.",
+    "linkEmployeeDesc": "Saisissez un identifiant public d'employé pour lier votre compte à un espace de travail. Vous pouvez être lié à plusieurs espaces si vous travaillez dans différents restaurants.",
+    "unlinkConfirm": "Délier votre compte de {{name}} chez {{workspace}} ? Vous ne pourrez plus y pointer ni consulter vos présences."
   },
   "attendance": {
     "export": "Exporter",
@@ -152,7 +157,31 @@
     "employeeDescription": "Votre historique de pointage. Filtrez par période.",
     "ownerDescription": "Consultez les pointages de tous les employés. Filtrez par période ou par employé.",
     "recordCount_one": "{{count}} enregistrement",
-    "recordCount_other": "{{count}} enregistrements"
+    "recordCount_other": "{{count}} enregistrements",
+    "alreadyExistsSwitchToEdit": "Un enregistrement existe déjà pour ce jour — ouverture pour modification.",
+    "cannotClearCheckOut": "Cet enregistrement a un pointage de sortie — réactivez l'option. Pour corriger une heure erronée, modifiez-la plutôt que de la supprimer.",
+    "checkInTime": "Pointage d'entrée",
+    "checkOutTime": "Pointage de sortie",
+    "createDescription": "Enregistrez un pointage pour un jour où l'employé a oublié de scanner.",
+    "createError": "Échec de l'ajout de la présence",
+    "createReasonPlaceholder": "ex. le scanner QR était hors ligne — service confirmé avec l'employé",
+    "createSuccess": "Présence ajoutée",
+    "createTitle": "Ajouter une présence",
+    "deleteConfirm": "Supprimer",
+    "deleteError": "Échec de la suppression de la présence",
+    "deleteHint": "L'enregistrement reste dans le journal comme trace d'audit. Il disparaît des statistiques et des exports. Un nouveau scan ou une saisie manuelle le même jour le remplacera.",
+    "deleteReason": "Raison",
+    "deleteReasonPlaceholder": "ex. Mauvais jour — l'employé n'a pas travaillé ce service",
+    "deleteSuccess": "Présence supprimée",
+    "deleteTitle": "Supprimer la présence ?",
+    "editError": "Échec de la mise à jour de la présence",
+    "editReason": "Raison",
+    "editReasonPlaceholder": "ex. Oubli du pointage de sortie — confirmé avec le manager",
+    "editSuccess": "Présence mise à jour",
+    "editTitle": "Modifier la présence",
+    "hasCheckOut": "Pointage de sortie",
+    "originalScan": "À l'origine",
+    "selectEmployee": "Sélectionner un employé"
   },
   "auth": {
     "signIn": "Connexion",
@@ -165,7 +194,22 @@
     "hasAccount": "Déjà un compte ?",
     "orContinueWith": "Ou continuer avec",
     "google": "Google",
-    "apple": "Apple"
+    "apple": "Apple",
+    "backToSignIn": "Retour à la connexion",
+    "checkYourEmail": "Consultez vos emails",
+    "forgotPasswordDescription": "Saisissez l'adresse email associée à votre compte et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+    "forgotPasswordError": "Une erreur est survenue. Veuillez réessayer.",
+    "invalidResetToken": "Jeton de réinitialisation invalide ou manquant",
+    "newPassword": "Nouveau mot de passe",
+    "passwordMinLength": "Le mot de passe doit comporter au moins 8 caractères",
+    "passwordResetError": "Échec de la réinitialisation du mot de passe. Le lien a peut-être expiré.",
+    "passwordResetSuccess": "Mot de passe réinitialisé avec succès",
+    "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+    "resetLinkSent": "Si un compte existe pour cet email, un lien de réinitialisation est en route.",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "resetYourPassword": "Réinitialisez votre mot de passe",
+    "sendResetLink": "Envoyer le lien",
+    "setNewPassword": "Définir un nouveau mot de passe"
   },
   "dashboard": {
     "present": "Présents aujourd'hui",
@@ -174,7 +218,7 @@
     "absent": "Absents",
     "todayAttendance": "Présence du jour",
     "viewAll": "Tout voir",
-    "ofEmployees": "sur {count} employés",
+    "ofEmployees": "sur {{count}} employés",
     "emptyWelcome": "Bienvenue dans votre espace !",
     "emptySubtitle": "Votre restaurant est prêt. Ajoutez votre équipe pour commencer le suivi des présences.",
     "emptyAddEmployee": "Ajouter un employé",
@@ -235,7 +279,36 @@
     "inDays_other": "dans {{count}} jours",
     "setUpNfc": "Configurer le pointage NFC",
     "pending": "en attente",
-    "notCheckedInYet": "Vous n'avez pas encore pointé aujourd'hui."
+    "notCheckedInYet": "Vous n'avez pas encore pointé aujourd'hui.",
+    "becomeOwner": "Je possède un restaurant",
+    "becomeOwnerDesc": "Créez un espace de travail pour gérer votre personnel, vos services et les présences.",
+    "checkInTime": "Entrée",
+    "checkOutTime": "Sortie",
+    "checkedIn": "Pointé",
+    "chooseRole": "Choisissez comment vous souhaitez utiliser DailyBrew.",
+    "closedNow": "Fermé actuellement",
+    "completed": "Terminé",
+    "createWorkspace": "Créez votre espace de travail",
+    "createWorkspaceDesc": "Saisissez le nom de votre restaurant pour commencer.",
+    "getStarted": "Commencer avec DailyBrew",
+    "goToSettings": "Aller aux paramètres",
+    "lateLabel": "En retard",
+    "linkEmployee": "Je suis membre du personnel",
+    "linkEmployeeDesc": "Saisissez l'identifiant d'employé que votre employeur vous a donné pour lier votre compte.",
+    "myLeaveRequests": "Mes demandes de congé",
+    "noCheckinRequired": "Aucun pointage requis.",
+    "noEmployee": "Votre compte n'est pas encore lié à un profil d'employé.",
+    "noLeaveRequests": "Aucune demande de congé",
+    "noRecentAttendance": "Aucune donnée de présence récente",
+    "noShiftAssigned": "Aucun service assigné",
+    "noUpcomingClosures": "Aucune fermeture à venir",
+    "noWorkspace": "Aucun espace de travail lié",
+    "notYet": "Pas encore",
+    "onApprovedLeave": "Vous êtes en congé approuvé aujourd'hui",
+    "onTimeLabel": "À l'heure",
+    "readyToCheckIn": "Vous n'avez pas encore pointé aujourd'hui.",
+    "upcoming": "À venir",
+    "welcomeBack": "Bon retour"
   },
   "employee": {
     "add": "Ajouter un employé",
@@ -314,14 +387,51 @@
     "noneYet": "Aucun employé pour le moment.",
     "editAria": "Modifier {{name}}",
     "deleteAria": "Supprimer {{name}}",
-    "editPermissionsAria": "Modifier les permissions de {{name}}"
+    "editPermissionsAria": "Modifier les permissions de {{name}}",
+    "backToList": "Retour aux employés",
+    "createError": "Échec de la création de l'employé",
+    "createShift": "Créer un horaire",
+    "createSuccess": "Employé créé",
+    "deactivateConfirm": "Désactiver",
+    "deactivateDescription": "Choisissez le dernier jour travaillé par cet employé. La présence ne sera plus suivie après cette date, mais son historique passé reste intact.",
+    "deactivateTitle": "Désactiver l'employé",
+    "deleteConfirm": "Supprimer {{name}} ? Cette action est irréversible.",
+    "deleteError": "Échec de la suppression de l'employé",
+    "deleteSuccess": "Employé supprimé",
+    "deleteTitle": "Supprimer l'employé",
+    "dob": "Date de naissance",
+    "joinedAt": "Date d'entrée",
+    "lastDayWorked": "Dernier jour travaillé",
+    "linkByPublicId": "Lier par identifiant public",
+    "linkUser": "Lier un compte utilisateur",
+    "linkUserDescription": "Ou partagez ce QR code ou cet identifiant d'employé avec le membre du personnel. Il pourra le scanner ou le saisir lors de son inscription pour lier son compte.",
+    "linkedAt": "Début du suivi",
+    "linkedAtHint": "Le décompte des absences démarre à cette date. Effacez-la pour exclure cet employé du calcul des absences jusqu'à sa reliaison.",
+    "noAttendance": "Aucun enregistrement de présence",
+    "phoneNumber": "Numéro de téléphone",
+    "unlink": "Délier",
+    "unlinkConfirm": "Supprimer le lien entre cet employé et son compte utilisateur ? Il ne pourra plus consulter son tableau de bord.",
+    "unlinkTitle": "Délier le compte utilisateur",
+    "updateError": "Échec de la mise à jour de l'employé",
+    "updateSuccess": "Employé mis à jour",
+    "userLinkError": "Échec de la liaison. Vérifiez l'identifiant et réessayez.",
+    "userLinked": "Compte utilisateur lié",
+    "userPublicId": "Identifiant public de l'utilisateur",
+    "userPublicIdHint": "L'employé trouvera son identifiant public sur sa page de profil.",
+    "userPublicIdPlaceholder": "Saisir l'identifiant public",
+    "userUnlinkError": "Échec de la dissociation",
+    "userUnlinked": "Compte utilisateur délié"
   },
   "workspace": {
     "label": "Espace de travail",
     "noWorkspace": "Aucun espace",
     "create": "Nouvel espace",
     "newPlaceholder": "Nom du restaurant",
-    "createFailed": "Échec de la création"
+    "createFailed": "Échec de la création",
+    "noWorkspacesDescription": "Créez un espace de travail ou demandez à votre employeur de vous lier",
+    "noWorkspacesTitle": "Aucun espace de travail",
+    "selectDescription": "Choisissez un espace de travail pour continuer",
+    "selectTitle": "Sélectionner un espace de travail"
   },
   "settings": {
     "deviceVerification": "Vérification de l'appareil",
@@ -564,7 +674,8 @@
     "back": "Retour",
     "manage": "Gérer",
     "submit": "Envoyer",
-    "copy": "Copier"
+    "copy": "Copier",
+    "add": "Ajouter"
   },
   "qrCodes": {
     "new": "Nouveau code QR",
@@ -663,7 +774,8 @@
     "apiTokens": {
       "title": "Débloquer les clés API",
       "description": "Générez des clés secrètes pour que BasilBook et vos propres outils puissent récupérer les pointages de cet espace."
-    }
+    },
+    "startTrial": "Commencer l'essai gratuit de 14 jours"
   },
   "faq": {
     "eyebrow": "FAQ",
@@ -2576,7 +2688,18 @@
     "approvedRejectedSplit": "{{approved}} approuvées · {{rejected}} refusées",
     "dayCount_one": "{{count}} jour",
     "dayCount_other": "{{count}} jours",
-    "startsSoon": "Débute bientôt"
+    "startsSoon": "Débute bientôt",
+    "employee": "Employé",
+    "endDate": "Date de fin",
+    "fromTime": "Du",
+    "partialDay": "Journée partielle",
+    "reasonPlaceholder": "ex. Événement familial, rendez-vous médical...",
+    "selectEmployee": "Sélectionner un employé",
+    "startDate": "Date de début",
+    "submitDescription": "Sélectionnez les dates souhaitées et indiquez un motif.",
+    "submitError": "Échec de l'envoi de la demande de congé",
+    "submitSuccess": "Demande de congé envoyée",
+    "toTime": "Au"
   },
   "closure": {
     "empty": "Aucune période de fermeture définie",
@@ -2606,7 +2729,8 @@
     "endBeforeStart": "La date de fin doit être égale ou postérieure à la date de début",
     "loadError": "Impossible de charger les fermetures.",
     "editAria": "Modifier la fermeture",
-    "deleteAria": "Supprimer la fermeture"
+    "deleteAria": "Supprimer la fermeture",
+    "new": "Nouvelle fermeture"
   },
   "shift": {
     "description": "Définissez les heures de travail de votre restaurant. Assignez les employés aux horaires pour que DailyBrew puisse suivre les retards et départs anticipés automatiquement.",
@@ -2663,7 +2787,15 @@
     "dayOverrideRemoveError": "Échec de la suppression de l'exception du {{day}}",
     "overrideBadge": "exception",
     "removeOverrideAria": "Supprimer l'exception",
-    "dayOverrides": "Exceptions par jour"
+    "dayOverrides": "Exceptions par jour",
+    "createSuccess": "Service créé",
+    "daysAreSchedule": "Les jours laissés vides sont des jours de repos — le personnel n'a pas à pointer et ne sera pas compté absent. Les modifications s'appliquent aussi aux dates passées.",
+    "deleteConfirm": "Supprimer le service {{name}} ? Les employés qui y sont affectés seront désassignés.",
+    "deleteTitle": "Supprimer le service",
+    "selectEmployee": "Sélectionner un employé…",
+    "unassign": "Retirer",
+    "unassignConfirm": "Retirer {{name}} du service {{shift}} ? Sa présence ne sera plus suivie par rapport à ce service.",
+    "unassignTitle": "Retirer du service"
   },
   "onboarding": {
     "copyId": "Copier l'ID",
@@ -2779,7 +2911,8 @@
     "errors": {
       "message": "Veuillez saisir au moins 10 caractères.",
       "maxImages": "Vous pouvez joindre jusqu'à {{max}} images.",
-      "invalidType": "Seules les images PNG, JPEG, WebP ou GIF sont autorisées."
+      "invalidType": "Seules les images PNG, JPEG, WebP ou GIF sont autorisées.",
+      "sendFailed": "Impossible d'envoyer le retour. Veuillez réessayer."
     }
   },
   "charts": {
