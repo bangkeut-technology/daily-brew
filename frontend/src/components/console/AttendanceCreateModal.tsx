@@ -77,9 +77,21 @@ function CreateForm({ workspaceId, today, defaultDate, onOpenChange, onCollision
           onOpenChange(false);
         },
         onError: (err) => {
-          if (err instanceof AxiosError && err.response?.status === 409 && err.response.data) {
-            // The row already exists — hand off to the edit modal on that record.
-            onCollision(err.response.data as AttendanceRecord);
+          // The 409 body is `{ error, message, code, existing }` — the record
+          // is under `existing`, not the body itself. Handing over the wrapper
+          // opens the edit modal on an object with no publicId or date.
+          const existing =
+            err instanceof AxiosError && err.response?.status === 409
+              ? (err.response.data?.existing as AttendanceRecord | undefined)
+              : undefined;
+          if (existing) {
+            toast(
+              t(
+                "attendance.alreadyExistsSwitchToEdit",
+                "A record already exists for that day — opening it to edit.",
+              ),
+            );
+            onCollision(existing);
             onOpenChange(false);
             return;
           }
