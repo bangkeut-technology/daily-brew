@@ -9,8 +9,10 @@ import { X } from "lucide-react";
 import { toast } from "sonner";
 import { CustomSelect } from "@/components/shared/CustomSelect";
 import { CustomDatePicker } from "@/components/shared/CustomDatePicker";
-import { useCreateEmployee, useUpdateEmployee, type EmployeeInput } from "@/hooks/useEmployees";
+import { useUpdateEmployee, type EmployeeInput } from "@/hooks/useEmployees";
 import { useShifts } from "@/hooks/useShifts";
+import { usePlan } from "@/hooks/usePlan";
+import { useRoleContext } from "@/hooks/useRoleContext";
 import type { Employee } from "@/types/employee";
 
 const schema = z.object({
@@ -48,17 +50,27 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   workspaceId: string;
-  employee?: Employee | null;
+  /** Required — creation lives at /console/employees/new, not here. */
+  employee: Employee | null;
 }
 
 export function EmployeeFormModal({ open, onOpenChange, workspaceId, employee }: Props) {
-  const isEdit = !!employee;
-  const createEmployee = useCreateEmployee(workspaceId);
   const updateEmployee = useUpdateEmployee(workspaceId);
   const { data: shifts } = useShifts(workspaceId);
+  const { data: plan } = usePlan(workspaceId);
+  const { data: roleContext } = useRoleContext();
+  // Same three conditions the backend enforces on promotion: owner-only, plan
+  // allows managers, and the employee already has a linked user account.
+  // Offering the option without them just produces a 400 the user can't act on.
+  const canPickRole =
+    !!roleContext?.isOwner && !!plan?.canUseManagers && !!employee?.linkedUserPublicId;
   const shiftOptions = [
     { value: "", label: "No shift" },
-    ...(shifts ?? []).map((s) => ({ value: s.publicId, label: s.name })),
+    // Times disambiguate same-named shifts across per-day rules.
+    ...(shifts ?? []).map((s) => ({
+      value: s.publicId,
+      label: `${s.name} (${s.startTime} - ${s.endTime})`,
+    })),
   ];
 
   const {
@@ -90,41 +102,32 @@ export function EmployeeFormModal({ open, onOpenChange, workspaceId, employee }:
   }, [open, employee, reset]);
 
   const onSubmit = (values: FormValues) => {
+    if (!employee) return;
     const payload: EmployeeInput = {
       firstName: values.firstName,
       lastName: values.lastName,
       username: values.username || null,
       phoneNumber: values.phoneNumber || null,
       jobTitle: values.jobTitle || null,
-      role: values.role,
+      // Sending the current role back when it can't be changed here would let
+      // a stale form value fight the detail page's promotion.
+      role: canPickRole ? values.role : undefined,
       attendanceTracking: values.attendanceTracking,
       dob: values.dob || null,
       joinedAt: values.joinedAt || null,
       shiftPublicId: values.shiftPublicId || null,
     };
 
-    const onError = () => toast.error(`Could not ${isEdit ? "update" : "add"} employee`);
-
-    if (isEdit && employee) {
-      updateEmployee.mutate(
-        { publicId: employee.publicId, ...payload },
-        {
-          onSuccess: () => {
-            toast.success("Employee updated");
-            onOpenChange(false);
-          },
-          onError,
-        },
-      );
-    } else {
-      createEmployee.mutate(payload, {
+    updateEmployee.mutate(
+      { publicId: employee.publicId, ...payload },
+      {
         onSuccess: () => {
-          toast.success("Employee added");
+          toast.success("Employee updated");
           onOpenChange(false);
         },
-        onError,
-      });
-    }
+        onError: () => toast.error("Could not update employee"),
+      },
+    );
   };
 
   return (
@@ -134,10 +137,10 @@ export function EmployeeFormModal({ open, onOpenChange, workspaceId, employee }:
         <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-[460px] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-glass-border bg-glass-bg shadow-[0_16px_50px_rgba(107,66,38,0.15)] outline-none backdrop-blur-xl">
           <form onSubmit={handleSubmit(onSubmit)} className="p-6">
             <Dialog.Title className="font-serif text-[20px] font-semibold text-text-primary">
-              {isEdit ? "Edit employee" : "Add employee"}
+              Edit employee
             </Dialog.Title>
             <Dialog.Description className="mt-1 text-sm text-text-secondary">
-              {isEdit ? "Update this employee's details." : "Add a new member to your team."}
+              Update this employee&apos;s details.
             </Dialog.Description>
 
             <div className="mt-5 grid grid-cols-2 gap-3">
@@ -165,6 +168,12 @@ export function EmployeeFormModal({ open, onOpenChange, workspaceId, employee }:
                       id="role"
                       value={field.value}
                       onChange={field.onChange}
+                      disabled={!canPickRole}
+                      title={
+                        canPickRole
+                          ? undefined
+                          : "Only the owner can promote, on Espresso, once the employee has a linked user account."
+                      }
                       options={[
                         { value: "employee", label: "Employee" },
                         { value: "manager", label: "Manager" },
@@ -237,7 +246,7 @@ export function EmployeeFormModal({ open, onOpenChange, workspaceId, employee }:
                 disabled={isSubmitting}
                 className="cursor-pointer rounded-lg bg-coffee px-4 py-2 text-[15px] font-medium text-white transition-colors hover:bg-coffee-light disabled:opacity-50"
               >
-                {isEdit ? "Save changes" : "Add employee"}
+                Save changes
               </button>
             </div>
           </form>

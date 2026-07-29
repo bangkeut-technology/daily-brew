@@ -1,0 +1,475 @@
+"use client";
+
+import { useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Plus, Link2, AtSign } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { getWorkspacePublicId } from "@/lib/api";
+import { isValidPublicIdFormat } from "@/lib/publicId";
+import { useCreateEmployee, useEmployees } from "@/hooks/useEmployees";
+import { useShifts, useCreateShift } from "@/hooks/useShifts";
+import { usePlan } from "@/hooks/usePlan";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { GlassCard } from "@/components/shared/GlassCard";
+import { CustomSelect } from "@/components/shared/CustomSelect";
+import { CustomTimePicker } from "@/components/shared/CustomTimePicker";
+import { CustomDatePicker } from "@/components/shared/CustomDatePicker";
+import { JobTitleInput } from "@/components/shared/JobTitleInput";
+
+const createEmployeeSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  jobTitle: z.string().optional(),
+  phoneNumber: z.string().optional(),
+  username: z.string().optional(),
+  dob: z.string().optional(),
+  joinedAt: z.string().optional(),
+  shiftPublicId: z.string().optional(),
+  linkedUserPublicId: z
+    .string()
+    .optional()
+    .refine((v) => v === undefined || v.trim() === "" || isValidPublicIdFormat(v.trim()), {
+      message: "Public ID must be 12 chars using a–z (no i, l, o) and 2–9.",
+    }),
+  attendanceTracking: z.enum(["full", "none"]),
+});
+
+type CreateEmployeeForm = z.infer<typeof createEmployeeSchema>;
+
+/** Visual divider with a small label between form sections. */
+function SectionHeader({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex items-center gap-3 pt-1">
+      <span className="text-[11px] uppercase tracking-[1.5px] font-semibold text-text-tertiary">
+        {children}
+      </span>
+      <div className="flex-1 h-px bg-cream-3/60" />
+    </div>
+  );
+}
+
+const inputClassName =
+  "w-full px-3 py-2 rounded-lg text-[15.5px] bg-glass-bg border border-cream-3 text-text-primary outline-none focus:border-coffee transition-colors";
+
+export default function NewEmployeePage() {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const [workspaceId] = useState(() => getWorkspacePublicId() || "");
+  const createEmployee = useCreateEmployee(workspaceId);
+  const createShift = useCreateShift(workspaceId);
+  const { data: shifts } = useShifts(workspaceId);
+  const { data: plan } = usePlan(workspaceId);
+  const { data: existingEmployees } = useEmployees(workspaceId);
+  const workspaceJobTitles = (existingEmployees ?? [])
+    .map((e) => e.jobTitle)
+    .filter((v): v is string => !!v);
+
+  const [showShiftForm, setShowShiftForm] = useState(false);
+  const [newShiftName, setNewShiftName] = useState("");
+  const [newStartTime, setNewStartTime] = useState("08:00");
+  const [newEndTime, setNewEndTime] = useState("17:00");
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    trigger,
+    formState: { errors },
+  } = useForm<CreateEmployeeForm>({
+    resolver: zodResolver(createEmployeeSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      jobTitle: "",
+      phoneNumber: "",
+      username: "",
+      dob: "",
+      joinedAt: "",
+      shiftPublicId: "",
+      linkedUserPublicId: "",
+      attendanceTracking: "full",
+    },
+  });
+
+  const onSubmit = async (values: CreateEmployeeForm) => {
+    try {
+      const employee = await createEmployee.mutateAsync({
+        firstName: values.firstName,
+        lastName: values.lastName,
+        jobTitle: values.jobTitle || undefined,
+        phoneNumber: values.phoneNumber || undefined,
+        username: values.username || undefined,
+        dob: values.dob || undefined,
+        joinedAt: values.joinedAt || undefined,
+        shiftPublicId: values.shiftPublicId || undefined,
+        linkedUserPublicId: values.linkedUserPublicId || undefined,
+        attendanceTracking: values.attendanceTracking,
+        // Role is not set on creation — new employees always start as
+        // 'employee'. The backend rejects a manager without a linked user, so
+        // promotion happens from the detail page once linking is done.
+      });
+      toast.success(t("employee.createSuccess", "Employee created"));
+      router.push(`/console/employees/${employee.publicId}?created=1`);
+    } catch {
+      toast.error(t("employee.createError", "Failed to create employee"));
+    }
+  };
+
+  return (
+    <div className="page-enter">
+      <PageHeader
+        title={t("employee.add", "Add employee")}
+        help={{ href: "/guides/owner#step-owner-4", label: "How to add an employee" }}
+      />
+
+      <GlassCard hover={false}>
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-5">
+          {/* ── Identity ─────────────────────────────────────────── */}
+          <SectionHeader>{t("employee.sectionIdentity", "Identity")}</SectionHeader>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label
+                htmlFor="emp-firstName"
+                className="block text-[14px] font-medium text-text-secondary mb-1.5"
+              >
+                {t("employee.firstName", "First name")} *
+              </label>
+              <input
+                id="emp-firstName"
+                type="text"
+                {...register("firstName")}
+                className={inputClassName}
+              />
+              {errors.firstName && (
+                <p className="text-[13px] text-red mt-1">{errors.firstName.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="emp-lastName"
+                className="block text-[14px] font-medium text-text-secondary mb-1.5"
+              >
+                {t("employee.lastName", "Last name")} *
+              </label>
+              <input
+                id="emp-lastName"
+                type="text"
+                {...register("lastName")}
+                className={inputClassName}
+              />
+              {errors.lastName && (
+                <p className="text-[13px] text-red mt-1">{errors.lastName.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="emp-jobTitle"
+                className="block text-[14px] font-medium text-text-secondary mb-1.5"
+              >
+                {t("employee.jobTitle", "Job title")}
+              </label>
+              <JobTitleInput
+                id="emp-jobTitle"
+                value={watch("jobTitle") || ""}
+                onChange={(v) => setValue("jobTitle", v, { shouldDirty: true })}
+                placeholder={t("employee.jobTitlePlaceholder", "e.g. Cashier, Cook, Waiter")}
+                workspaceValues={workspaceJobTitles}
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="emp-phone"
+                className="block text-[14px] font-medium text-text-secondary mb-1.5"
+              >
+                {t("employee.phoneNumber", "Phone number")}
+              </label>
+              <input
+                id="emp-phone"
+                type="text"
+                {...register("phoneNumber")}
+                className={inputClassName}
+              />
+            </div>
+
+            {/* Group the two date fields side-by-side so DOB + Join date pair naturally. */}
+            <div>
+              <label
+                htmlFor="emp-dob"
+                className="block text-[14px] font-medium text-text-secondary mb-1.5"
+              >
+                {t("employee.dob", "Date of birth")}
+              </label>
+              <CustomDatePicker
+                id="emp-dob"
+                value={watch("dob") || ""}
+                onChange={(v) => setValue("dob", v)}
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="emp-joinedAt"
+                className="block text-[14px] font-medium text-text-secondary mb-1.5"
+              >
+                {t("employee.joinedAt", "Join date")}
+              </label>
+              <CustomDatePicker
+                id="emp-joinedAt"
+                value={watch("joinedAt") || ""}
+                onChange={(v) => setValue("joinedAt", v)}
+              />
+            </div>
+          </div>
+
+          {/* Username gets its own row because the BasilBook hint paragraph is
+              long and would unbalance the grid. */}
+          <div>
+            <label
+              htmlFor="emp-username"
+              className="flex items-center gap-1.5 text-[14px] font-medium text-text-secondary mb-1.5"
+            >
+              <AtSign size={12} />
+              {t("employee.username", "Username")}
+              {!plan?.isEspresso && (
+                <span className="text-[12px] font-medium px-1.5 py-0.5 rounded-full bg-amber/10 text-amber">
+                  Espresso
+                </span>
+              )}
+            </label>
+            {plan?.isEspresso ? (
+              <>
+                <input
+                  id="emp-username"
+                  type="text"
+                  {...register("username")}
+                  placeholder="e.g. vandeth.tho"
+                  className={cn(inputClassName, "font-mono")}
+                />
+                <p className="text-[12.5px] text-text-tertiary mt-1">
+                  {t("employee.usernameHint", "Unique identifier for BasilBook staff records.")}
+                </p>
+              </>
+            ) : (
+              <p className="text-[13px] text-text-tertiary">
+                {t(
+                  "employee.usernameUpsell",
+                  "Upgrade to Espresso to link employees with BasilBook.",
+                )}
+              </p>
+            )}
+          </div>
+
+          {/* ── Schedule ───────────────────────────────────────────
+              No Role picker on new-employee creation: new employees always
+              start as 'employee'. Promote from the detail page once they have
+              a linked user account. */}
+          <SectionHeader>{t("employee.sectionSchedule", "Schedule")}</SectionHeader>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label
+                htmlFor="emp-shift"
+                className="block text-[14px] font-medium text-text-secondary mb-1.5"
+              >
+                {t("employee.shift", "Shift")}
+              </label>
+              <CustomSelect
+                id="emp-shift"
+                value={watch("shiftPublicId") || ""}
+                onChange={(v) => setValue("shiftPublicId", v)}
+                options={[
+                  { value: "", label: t("employee.noShift", "No shift") },
+                  ...(shifts?.map((s) => ({
+                    value: s.publicId,
+                    label: `${s.name} (${s.startTime} - ${s.endTime})`,
+                  })) ?? []),
+                ]}
+                placeholder={t("employee.noShift", "No shift")}
+              />
+
+              {!showShiftForm ? (
+                <button
+                  type="button"
+                  onClick={() => setShowShiftForm(true)}
+                  className={cn(
+                    "mt-2 flex items-center gap-1 text-[14px] font-medium bg-transparent border-none cursor-pointer transition-colors p-0",
+                    // Amber when the workspace has no shifts at all — that's
+                    // the case where leaving to create one first hurts most.
+                    !shifts?.length ? "text-amber" : "text-coffee hover:text-coffee-light",
+                  )}
+                >
+                  <Plus size={13} />
+                  {t("employee.createShift", "Create a shift")}
+                </button>
+              ) : (
+                <div className="mt-2.5 rounded-lg border border-cream-3 bg-cream-3/20 p-3 space-y-2.5">
+                  <input
+                    id="inline-shift-name"
+                    name="inlineShiftName"
+                    type="text"
+                    value={newShiftName}
+                    onChange={(e) => setNewShiftName(e.target.value)}
+                    placeholder={t("shift.name", "Shift name (e.g. Morning)")}
+                    className={inputClassName}
+                  />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <label
+                        htmlFor="inline-shift-start"
+                        className="block text-[13px] text-text-tertiary mb-1"
+                      >
+                        {t("shift.startTime", "Start")}
+                      </label>
+                      <CustomTimePicker
+                        id="inline-shift-start"
+                        value={newStartTime}
+                        onChange={setNewStartTime}
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="inline-shift-end"
+                        className="block text-[13px] text-text-tertiary mb-1"
+                      >
+                        {t("shift.endTime", "End")}
+                      </label>
+                      <CustomTimePicker
+                        id="inline-shift-end"
+                        value={newEndTime}
+                        onChange={setNewEndTime}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 pt-1">
+                    <button
+                      type="button"
+                      disabled={createShift.isPending || !newShiftName.trim()}
+                      onClick={async () => {
+                        try {
+                          const shift = await createShift.mutateAsync({
+                            name: newShiftName.trim(),
+                            startTime: newStartTime,
+                            endTime: newEndTime,
+                          });
+                          setValue("shiftPublicId", shift.publicId);
+                          toast.success(t("shift.createSuccess", "Shift created"));
+                          setShowShiftForm(false);
+                          setNewShiftName("");
+                        } catch {
+                          toast.error(t("shift.createError", "Failed to create shift"));
+                        }
+                      }}
+                      className="px-3 py-1.5 rounded-md text-[14px] font-medium bg-coffee text-white border-none cursor-pointer transition-all hover:bg-coffee-light disabled:opacity-50"
+                    >
+                      {createShift.isPending ? t("common.loading") : t("common.create")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowShiftForm(false)}
+                      className="text-[14px] text-text-tertiary hover:text-text-secondary bg-transparent border-none cursor-pointer transition-colors"
+                    >
+                      {t("common.cancel")}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="emp-tracking"
+                className="block text-[14px] font-medium text-text-secondary mb-1.5"
+              >
+                {t("employee.attendanceTracking", "Attendance tracking")}
+              </label>
+              <CustomSelect
+                id="emp-tracking"
+                value={watch("attendanceTracking") ?? "full"}
+                onChange={(v) => setValue("attendanceTracking", v as "full" | "none")}
+                options={[
+                  { value: "full", label: t("employee.attendanceTrackingFull", "Tracked (default)") },
+                  {
+                    value: "none",
+                    label: t(
+                      "employee.attendanceTrackingNone",
+                      "Excluded — never counted as absent",
+                    ),
+                  },
+                ]}
+                placeholder=""
+              />
+              <p className="text-[12.5px] text-text-tertiary mt-1">
+                {t(
+                  "employee.attendanceTrackingHint",
+                  'Set "Excluded" for staff who help run the workspace but don\'t follow a shift (e.g. admin helpers). They can still check in to log times — they just won\'t be counted as absent.',
+                )}
+              </p>
+            </div>
+          </div>
+
+          {/* ── Linking ─────────────────────────────────────────── */}
+          <SectionHeader>{t("employee.sectionLinking", "Link user account")}</SectionHeader>
+
+          <div>
+            <label
+              htmlFor="emp-linkedUser"
+              className="flex items-center gap-1.5 text-[14px] font-medium text-text-secondary mb-1.5"
+            >
+              <Link2 size={12} />
+              {t("employee.userPublicId", "User public ID")}
+            </label>
+            <input
+              id="emp-linkedUser"
+              type="text"
+              {...register("linkedUserPublicId", {
+                onBlur: () => trigger("linkedUserPublicId"),
+              })}
+              placeholder={t("employee.userPublicIdPlaceholder", "Optional — link to a user account")}
+              className={cn(
+                inputClassName,
+                "font-mono",
+                errors.linkedUserPublicId && "border-red focus:border-red",
+              )}
+            />
+            {errors.linkedUserPublicId && (
+              <p className="text-[13px] text-red mt-1">{errors.linkedUserPublicId.message}</p>
+            )}
+            <p className="text-[12.5px] text-text-tertiary mt-1">
+              {t(
+                "employee.userPublicIdHint",
+                "The employee can find their public ID on their profile page.",
+              )}
+            </p>
+          </div>
+
+          <div className="flex gap-3 pt-3 border-t border-cream-3/60">
+            <button
+              type="submit"
+              disabled={createEmployee.isPending}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-coffee text-white border-none cursor-pointer transition-all duration-150 hover:bg-coffee-light disabled:opacity-50"
+            >
+              {createEmployee.isPending ? t("common.loading") : t("common.create")}
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push("/console/employees")}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-medium bg-glass-bg backdrop-blur-sm text-text-primary border border-cream-3 cursor-pointer transition-all duration-150 hover:bg-cream-3"
+            >
+              {t("common.cancel")}
+            </button>
+          </div>
+        </form>
+      </GlassCard>
+    </div>
+  );
+}

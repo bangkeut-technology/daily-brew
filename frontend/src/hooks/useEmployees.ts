@@ -16,18 +16,23 @@ export interface EmployeeInput {
   dob?: string | null;
   joinedAt?: string | null;
   shiftPublicId?: string | null;
+  /**
+   * Links the employee to a user account at creation time. The backend links
+   * before it reads `role`, which is why a manager can only be created when
+   * this is supplied — the create form doesn't offer the role at all.
+   */
+  linkedUserPublicId?: string | null;
 }
 
 /**
- * The detail page can additionally flip status, move the absent-baseline
- * anchor, and link/unlink the user account — none of which the create form
- * exposes. `null` on `linkedUserPublicId` unlinks.
+ * The detail page can additionally flip status and move the absent-baseline
+ * anchor — neither of which the create form exposes. `null` on
+ * `linkedUserPublicId` unlinks.
  */
 export interface EmployeeUpdateInput extends Partial<EmployeeInput> {
   active?: boolean;
   linkedAt?: string | null;
   leftAt?: string | null;
-  linkedUserPublicId?: string | null;
 }
 
 export function useEmployee(workspacePublicId: string, publicId: string) {
