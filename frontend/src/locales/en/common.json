@@ -17,7 +17,8 @@
     "adminPanel": "Admin panel",
     "userMenu": "User menu",
     "topbar": "Workspace bar",
-    "openMenu": "Open menu"
+    "openMenu": "Open menu",
+    "sidebar": "Main navigation"
   },
   "profile": {
     "workspaceCount_one": "{{count}} workspace",
@@ -88,7 +89,11 @@
     "updateError": "Failed to update profile",
     "updatePassword": "Update password",
     "updateSuccess": "Profile updated",
-    "yourPublicId": "Your public ID"
+    "yourPublicId": "Your public ID",
+    "linkEmployeeDesc": "Enter an employee public ID to link your account to a workspace. You can link to multiple workspaces if you work at different restaurants.",
+    "unlinkConfirm": "Unlink your account from {{name}} at {{workspace}}? You will no longer be able to check in or view your attendance there.",
+    "deleteAccountDesc": "Permanently delete your account and all associated data. This action cannot be undone.",
+    "deleteConfirmDesc": "Type \"DELETE\" below to confirm. Your account will be permanently deactivated."
   },
   "auth": {
     "signIn": "Sign in",
@@ -101,7 +106,30 @@
     "hasAccount": "Already have an account?",
     "orContinueWith": "Or continue with",
     "google": "Google",
-    "apple": "Apple"
+    "apple": "Apple",
+    "resetYourPassword": "Reset your password",
+    "forgotPasswordSubtitle": "We'll email you a link to set a new password.",
+    "backToSignIn": "Back to sign in",
+    "resetLinkSent": "If an account exists for that email, a reset link is on its way.",
+    "signInSubtitle": "Welcome back to DailyBrew.",
+    "createAccount": "Create an account",
+    "forgotPasswordShort": "Forgot?",
+    "resetLinkExpired": "This reset link is invalid or has expired.",
+    "setNewPassword": "Set a new password",
+    "resetPasswordSubtitle": "Choose a new password for your account.",
+    "invalidResetToken": "Invalid or missing reset token",
+    "newPassword": "New password",
+    "createYourAccount": "Create your account",
+    "signUpSubtitle": "Free for up to 10 active employees. No credit card required.",
+    "passwordMinLength": "Password must be at least 8 characters",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "passwordResetSuccess": "Password reset successfully",
+    "passwordResetError": "Failed to reset password. The link may have expired.",
+    "resetPassword": "Reset password",
+    "forgotPasswordError": "Something went wrong. Please try again.",
+    "checkYourEmail": "Check your email",
+    "forgotPasswordDescription": "Enter the email address associated with your account and we'll send you a link to reset your password.",
+    "sendResetLink": "Send reset link"
   },
   "onboarding": {
     "welcome": "Welcome to DailyBrew",
@@ -229,7 +257,36 @@
     "linkScanStarting": "Starting camera…",
     "linkInvalidQr": "That QR isn't a DailyBrew employee code. Try again.",
     "linkHelpTitle": "Where do I find my ID?",
-    "linkHelpBody": "Ask your employer to open DailyBrew → Employees → your name → Share. They'll see a QR you can scan, plus the ID you can paste here."
+    "linkHelpBody": "Ask your employer to open DailyBrew → Employees → your name → Share. They'll see a QR you can scan, plus the ID you can paste here.",
+    "noEmployee": "Your account is not linked to an employee profile yet.",
+    "welcomeBack": "Welcome back",
+    "noShiftAssigned": "No shift assigned",
+    "completed": "Completed",
+    "checkedIn": "Checked in",
+    "onApprovedLeave": "You are on approved leave today",
+    "noCheckinRequired": "No check-in required.",
+    "noUpcomingClosures": "No upcoming closures",
+    "myLeaveRequests": "My leave requests",
+    "getStarted": "Get started with DailyBrew",
+    "chooseRole": "Choose how you want to use DailyBrew.",
+    "becomeOwner": "I own a restaurant",
+    "becomeOwnerDesc": "Create a workspace to manage your staff, shifts, and attendance.",
+    "linkEmployee": "I'm a staff member",
+    "linkEmployeeDesc": "Enter the employee ID your employer gave you to link your account.",
+    "createWorkspace": "Create your workspace",
+    "createWorkspaceDesc": "Enter your restaurant name to get started.",
+    "checkInTime": "Check-in",
+    "lateLabel": "Late",
+    "checkOutTime": "Check-out",
+    "readyToCheckIn": "You have not checked in yet today.",
+    "closedNow": "Closed now",
+    "upcoming": "Upcoming",
+    "onTimeLabel": "On time",
+    "notYet": "Not yet",
+    "noRecentAttendance": "No recent attendance data",
+    "noWorkspace": "No workspace linked",
+    "noLeaveRequests": "No leave requests",
+    "goToSettings": "Go to settings"
   },
   "employee": {
     "add": "Add employee",
@@ -308,7 +365,46 @@
     "noneYet": "No employees yet.",
     "editAria": "Edit {{name}}",
     "deleteAria": "Remove {{name}}",
-    "editPermissionsAria": "Edit permissions for {{name}}"
+    "editPermissionsAria": "Edit permissions for {{name}}",
+    "updateSuccess": "Employee updated",
+    "updateError": "Failed to update employee",
+    "edit": "Edit employee",
+    "dob": "Date of birth",
+    "permissionsError": "Failed to update permissions",
+    "roleOwner": "Owner",
+    "deleteSuccess": "Employee deleted",
+    "deleteError": "Failed to delete employee",
+    "deleteTitle": "Delete employee",
+    "deleteConfirm": "Delete {{name}}? This cannot be undone.",
+    "userLinked": "User account linked",
+    "userLinkError": "Failed to link user. Check the ID and try again.",
+    "backToList": "Back to employees",
+    "phoneNumber": "Phone number",
+    "joinedAt": "Join date",
+    "linkedAt": "Tracking start",
+    "lastDayWorked": "Last day worked",
+    "linkUser": "Link user account",
+    "unlink": "Unlink",
+    "linkByPublicId": "Link by user public ID",
+    "userPublicIdPlaceholder": "Enter user public ID",
+    "linkUserDescription": "Or share this QR code or employee ID with the staff member. They can scan it or enter it during onboarding to link their account.",
+    "noAttendance": "No attendance records",
+    "unlinkTitle": "Unlink user account",
+    "unlinkConfirm": "Remove the link between this employee and their user account? They will no longer be able to see their own dashboard.",
+    "userUnlinked": "User account unlinked",
+    "userUnlinkError": "Failed to unlink user",
+    "deactivateTitle": "Deactivate employee",
+    "deactivateDescription": "Pick the last day this employee worked. Attendance won't be tracked after this date, but their past history stays intact.",
+    "deactivateConfirm": "Deactivate",
+    "createSuccess": "Employee created",
+    "createError": "Failed to create employee",
+    "username": "Username",
+    "usernameHint": "Unique identifier for BasilBook staff records.",
+    "usernameUpsell": "Upgrade to Espresso to link employees with BasilBook.",
+    "createShift": "Create a shift",
+    "userPublicId": "User public ID",
+    "userPublicIdHint": "The employee can find their public ID on their profile page.",
+    "linkedAtHint": "Absent count starts from this date. Clear it to exclude this employee from absent calc until they re-link."
   },
   "attendance": {
     "date": "Date",
@@ -368,7 +464,32 @@
     "employeeDescription": "Your check-in and check-out history. Filter by date range.",
     "ownerDescription": "View check-in and check-out records for all employees. Filter by date range or employee.",
     "recordCount_one": "{{count}} record",
-    "recordCount_other": "{{count}} records"
+    "recordCount_other": "{{count}} records",
+    "editSuccess": "Attendance updated",
+    "editError": "Failed to update attendance",
+    "editTitle": "Edit attendance",
+    "checkInTime": "Check-in",
+    "hasCheckOut": "Has check-out",
+    "checkOutTime": "Check-out",
+    "editReason": "Reason",
+    "editReasonPlaceholder": "e.g. Forgot to scan out — confirmed with manager",
+    "deleteConfirm": "Remove",
+    "createSuccess": "Attendance added",
+    "createTitle": "Add attendance",
+    "createDescription": "Record a check-in for a day the employee missed scanning.",
+    "selectEmployee": "Select employee",
+    "createReasonPlaceholder": "e.g. QR scanner was offline — confirmed shift with employee",
+    "deleteSuccess": "Attendance removed",
+    "deleteError": "Failed to remove attendance",
+    "deleteTitle": "Remove attendance?",
+    "deleteHint": "The record stays in the log as a tombstone for audit. It drops out of stats and exports. A new scan or manual entry on the same day will replace it.",
+    "deleteReason": "Reason",
+    "deleteReasonPlaceholder": "e.g. Wrong day — employee did not work this shift",
+    "upcoming": "Upcoming",
+    "originalScan": "Originally",
+    "cannotClearCheckOut": "This record has a check-out — turn the toggle back on. To fix a wrong time, edit it rather than removing it.",
+    "alreadyExistsSwitchToEdit": "A record already exists for that day — opening it to edit.",
+    "createError": "Failed to add attendance"
   },
   "leave": {
     "pending": "Pending",
@@ -410,7 +531,20 @@
     "approvedRejectedSplit": "{{approved}} approved · {{rejected}} rejected",
     "dayCount_one": "{{count}} day",
     "dayCount_other": "{{count}} days",
-    "startsSoon": "Starts soon"
+    "startsSoon": "Starts soon",
+    "submitSuccess": "Leave request submitted",
+    "submitError": "Failed to submit leave request",
+    "submitDescription": "Select the dates you need off and provide a reason.",
+    "employee": "Employee",
+    "selectEmployee": "Select an employee",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "partialDay": "Partial day",
+    "fromTime": "From",
+    "toTime": "To",
+    "reasonPlaceholder": "e.g. Family event, medical appointment...",
+    "typePaid": "Paid leave",
+    "typeUnpaid": "Unpaid leave"
   },
   "shifts": {
     "timeRules": "Day-of-week schedule",
@@ -424,7 +558,8 @@
     "thursday": "Thursday",
     "friday": "Friday",
     "saturday": "Saturday",
-    "sunday": "Sunday"
+    "sunday": "Sunday",
+    "dayOverrides": "Day overrides"
   },
   "settings": {
     "geofencing": "Geofencing",
@@ -622,7 +757,8 @@
     "apiKeyRevoked": "Revoked",
     "apiKeyRevokeError": "Could not revoke the key",
     "billingCycle": "Billing cycle",
-    "checkoutUnavailable": "Checkout is unavailable right now"
+    "checkoutUnavailable": "Checkout is unavailable right now",
+    "annualSaving": "Save 17% vs monthly"
   },
   "checkin": {
     "checkIn": "Check In",
@@ -651,7 +787,11 @@
     "noWorkspace": "No workspace",
     "create": "New workspace",
     "newPlaceholder": "Restaurant name",
-    "createFailed": "Failed to create workspace"
+    "createFailed": "Failed to create workspace",
+    "selectTitle": "Select a workspace",
+    "noWorkspacesTitle": "No workspace found",
+    "selectDescription": "Choose a workspace to continue",
+    "noWorkspacesDescription": "Create a workspace or ask your employer to link you"
   },
   "common": {
     "save": "Save",
@@ -674,7 +814,8 @@
     },
     "manage": "Manage",
     "submit": "Submit",
-    "copy": "Copy"
+    "copy": "Copy",
+    "add": "Add"
   },
   "qrCodes": {
     "new": "New QR code",
@@ -773,7 +914,8 @@
     "apiTokens": {
       "title": "Unlock API keys",
       "description": "Generate secret keys so BasilBook and your own tools can pull attendance from this workspace."
-    }
+    },
+    "startTrial": "Start 14-day free trial"
   },
   "faq": {
     "eyebrow": "FAQ",
@@ -811,9 +953,9 @@
     "a": {
       "whatIsDailybrew": "DailyBrew is a staff attendance tracking platform built for restaurants. It provides QR code check-in, shift management, closure periods, and leave request handling, all in one simple dashboard.",
       "whoIsItFor": "DailyBrew is designed for restaurant owners, managers, and staff. Owners manage the workspace, shifts, and employees. Managers receive only the permissions you grant them — for example leave approvals, attendance oversight, employee management, or any combination. Staff check in and out by scanning the workspace QR code.",
-      "mobileApp": "Staff check-in works entirely through the mobile web browser. When an employee scans their QR code, a mobile-optimized check-in page opens instantly. No app download is required.",
+      "mobileApp": "Yes — DailyBrew is on the App Store and Play Store for owners and managers. Staff don't need it: any phone with a camera can scan the workspace QR and check in from the mobile web. The app adds push notifications, NFC tap-to-check-in, and offline tolerance for managers running a floor.",
       "freePlan": "The Free plan includes up to 10 active employees, QR check-in, shift tracking, closure periods, and the attendance dashboard. It is free forever with no time limit.",
-      "espressoPlan": "Espresso supports up to 20 employees and adds leave request management, IP restriction, device verification, geofencing, per-day shift schedules, manager role with granular permissions (up to 2), push and email notifications, and daily attendance summaries.",
+      "espressoPlan": "Espresso supports up to 20 employees and adds leave request management, IP restriction, device verification, geofencing, per-day shift schedules, manager role with granular permissions (up to 2), push, email and Telegram notifications, and daily attendance summaries.",
       "espressoCost": "Espresso costs $19.99 per month, or $199 per year if you choose annual billing. The yearly plan saves you $40.88 compared to paying monthly.",
       "cancelAnytime": "Yes, there are no contracts or lock-in periods. You can cancel your Espresso subscription at any time from your dashboard Settings. After cancellation, you will continue to have access until the end of your current billing period.",
       "qrCheckin": "Each workspace has a unique QR code. Display it at your restaurant entrance. Staff open the DailyBrew app, scan the QR code, and tap the Check In button to record their arrival. They scan again and tap Check Out when they leave.",
@@ -933,8 +1075,8 @@
           "desc": "Employees submit leave requests (paid or unpaid, full or partial day). Owners approve or reject with a note. Full history and status tracking."
         },
         "notifications": {
-          "title": "Push & email notifications",
-          "desc": "Real-time push notifications and email alerts for leave requests, approvals, shift changes, closures, and daily attendance summaries."
+          "title": "Push, email & Telegram notifications",
+          "desc": "Real-time push notifications, email alerts and Telegram messages for leave requests, approvals, shift changes, closures, and daily attendance summaries."
         }
       },
       "why": {
@@ -1138,7 +1280,7 @@
         },
         "notifications": {
           "title": "Notifications",
-          "desc": "Push and email alerts for leave requests, shift changes, closures, and daily summaries."
+          "desc": "Push, email and Telegram alerts for leave requests, shift changes, closures, and daily summaries."
         }
       }
     },
@@ -1262,7 +1404,7 @@
         "perDaySchedules": "Per-day shift schedules",
         "manager": "Manager role with granular permissions (up to 2)",
         "basilbook": "<brand></brand> integration + API",
-        "notifications": "Push & email notifications",
+        "notifications": "Push, email & Telegram notifications",
         "dailySummary": "Daily attendance summary",
         "trial14": "14-day free trial"
       }
@@ -1636,7 +1778,7 @@
             "label": "<brand></brand> integration + API"
           },
           "notifications": {
-            "label": "Push & email notifications"
+            "label": "Push, email & Telegram notifications"
           },
           "manager": {
             "label": "Manager role"
@@ -2511,7 +2653,8 @@
     "endBeforeStart": "End date must be on or after the start date",
     "loadError": "Could not load closures.",
     "editAria": "Edit closure",
-    "deleteAria": "Delete closure"
+    "deleteAria": "Delete closure",
+    "new": "New closure"
   },
   "shift": {
     "description": "Define your restaurant's working hours. Assign employees to shifts so DailyBrew can track late arrivals and early departures automatically.",
@@ -2568,7 +2711,15 @@
     "dayOverrideRemoveError": "Failed to remove the {{day}} override",
     "overrideBadge": "override",
     "removeOverrideAria": "Remove override",
-    "dayOverrides": "Day overrides"
+    "dayOverrides": "Day overrides",
+    "selectEmployee": "Select employee…",
+    "unassignTitle": "Remove from shift",
+    "unassignConfirm": "Remove {{name}} from the {{shift}} shift? Their attendance will no longer be tracked against this shift.",
+    "unassign": "Remove",
+    "daysAreSchedule": "Days left blank are off-days — staff aren't expected to check in and won't be counted absent. Changes apply to past dates too.",
+    "deleteTitle": "Delete shift",
+    "deleteConfirm": "Delete the {{name}} shift? Employees assigned to this shift will be unassigned.",
+    "createSuccess": "Shift created"
   },
   "charts": {
     "onTime": "On time",
@@ -2646,7 +2797,8 @@
     "errors": {
       "message": "Please enter at least 10 characters.",
       "maxImages": "You can attach up to {{max}} images.",
-      "invalidType": "Only PNG, JPEG, WebP, or GIF images are allowed."
+      "invalidType": "Only PNG, JPEG, WebP, or GIF images are allowed.",
+      "sendFailed": "Could not send feedback. Please try again."
     }
   },
   "tour": {
