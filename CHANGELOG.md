@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.134.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.134.0...v1.134.1) (2026-07-29)
+
+
+### Bug Fixes
+
+* **next/console:** three deep-link and gating gaps, plus a broken 409 handoff ([#382](https://github.com/bangkeut-technology/daily-brew/issues/382)) ([ea1060a](https://github.com/bangkeut-technology/daily-brew/commit/ea1060a04ebfee3cbe4065a7e743eb245f3a548e))
+
 ## [1.134.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.133.0...v1.134.0) (2026-07-29)
 
 
