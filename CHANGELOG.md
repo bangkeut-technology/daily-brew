@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.129.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.128.0...v1.129.0) (2026-07-29)
+
+
+### Features
+
+* **next/console:** port the new-employee page and stop offering impossible promotions ([#370](https://github.com/bangkeut-technology/daily-brew/issues/370)) ([273fdf7](https://github.com/bangkeut-technology/daily-brew/commit/273fdf7eb53e9551d9ba10702dc5f6dd4ef1e310))
+
 ## [1.128.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.127.0...v1.128.0) (2026-07-29)
 
 
