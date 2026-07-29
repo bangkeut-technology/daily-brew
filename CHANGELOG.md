@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.131.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.130.0...v1.131.0) (2026-07-29)
+
+
+### Features
+
+* **next/console:** add the top bar, so multi-workspace users can switch again ([#374](https://github.com/bangkeut-technology/daily-brew/issues/374)) ([361a971](https://github.com/bangkeut-technology/daily-brew/commit/361a97158ca7dd877091e0683fbb45d29ef8e65a))
+
 ## [1.130.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.129.0...v1.130.0) (2026-07-29)
 
 
