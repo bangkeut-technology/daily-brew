@@ -2,6 +2,8 @@
 
 import { Copy, Nfc } from "lucide-react";
 import { toast } from "sonner";
+import { useFeatureStage } from "@/hooks/useFeatures";
+import { FeatureStageBadge } from "@/components/shared/FeatureStageBadge";
 
 /**
  * Builds the canonical Universal-Link / App-Link URL for an NFC tag. Owners
@@ -20,6 +22,7 @@ export function buildCheckinUrl(qrToken: string, kind: "ws" | "wqr" = "ws"): str
  */
 export function CheckinUrlRow({ qrToken, kind = "ws" }: { qrToken: string; kind?: "ws" | "wqr" }) {
   const url = buildCheckinUrl(qrToken, kind);
+  const nfcStage = useFeatureStage("nfc_checkin");
 
   const handleCopy = async () => {
     try {
@@ -38,6 +41,7 @@ export function CheckinUrlRow({ qrToken, kind = "ws" }: { qrToken: string; kind?
           <code className="min-w-0 flex-1 truncate rounded bg-cream-3/30 px-2 py-1 font-mono text-[12.5px] text-text-secondary">
             {url}
           </code>
+          {nfcStage && <FeatureStageBadge stage={nfcStage} />}
           <button
             type="button"
             onClick={handleCopy}

@@ -555,6 +555,11 @@ function EmptyWorkspaceView() {
   return (
     <div className="page-enter">
       <PageHeader title={t("nav.dashboard", "Dashboard")} />
+      {/* The first-run tour belongs here most of all: an owner with no
+          employees yet is exactly who it is written for. Joyride skips steps
+          whose target is absent, so the two dashboard-only steps sit out. */}
+      <GuidedTour />
+
       <div className="flex min-h-100 flex-col items-center justify-center rounded-2xl border-[1.5px] border-dashed border-cream-3 bg-glass-bg px-6 py-12 backdrop-blur-md">
         <Coffee size={48} className="mb-4 text-coffee/80" strokeWidth={1.5} />
         <h2 className="mb-2 text-center font-serif text-[22px] font-semibold text-text-primary">

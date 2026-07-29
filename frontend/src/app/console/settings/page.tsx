@@ -32,6 +32,7 @@ import {
   useWorkspaceTelegramLinkToken,
 } from "@/hooks/useWorkspaces";
 import { usePlan } from "@/hooks/usePlan";
+import { useFeatureStage } from "@/hooks/useFeatures";
 import { useDateFormat } from "@/hooks/useDateFormat";
 import type { ApiTokenCreated, WorkspaceSetting } from "@/types/workspace";
 import { PageHeader } from "@/components/shared/PageHeader";
@@ -43,6 +44,7 @@ import { ConfirmModal } from "@/components/shared/ConfirmModal";
 import { AvatarUploader } from "@/components/shared/AvatarUploader";
 import { CheckinUrlRow } from "@/components/console/CheckinUrlRow";
 import { PlanCard } from "@/components/console/PlanCard";
+import { FeatureStageBadge } from "@/components/shared/FeatureStageBadge";
 import { UpgradeModal } from "@/components/console/UpgradeModal";
 import { useUpgradeModal } from "@/hooks/useUpgradeModal";
 import { Skeleton } from "@/components/admin/AdminDataStates";
@@ -152,6 +154,7 @@ export default function SettingsPage() {
     );
   };
 
+  const nfcStage = useFeatureStage("nfc_checkin");
   const upgrade = useUpgradeModal();
 
   if (isLoading || !settings) {
@@ -348,6 +351,7 @@ export default function SettingsPage() {
                 "settings.ipRestrictionDesc",
                 "Only allow check-ins from your restaurant's network.",
               )}
+              id="settings-ip-restriction"
               locked={!canUseIp}
               onUpgrade={() => upgrade.openFor("ipRestriction")}
             >
@@ -407,6 +411,7 @@ export default function SettingsPage() {
                 "settings.deviceVerificationDesc",
                 "Bind each check-in to the employee's own device.",
               )}
+              id="settings-device-verification"
               locked={!canUseDevice}
               onUpgrade={() => upgrade.openFor("deviceVerification")}
               icon={<Smartphone size={14} className="text-amber" />}
@@ -424,6 +429,7 @@ export default function SettingsPage() {
                 "settings.geofencingDescFull",
                 "When enabled, staff can only check in when they are within a specified radius of your restaurant location.",
               )}
+              id="settings-geofencing"
               locked={!canUseGeo}
               onUpgrade={() => upgrade.openFor("geofencing")}
               icon={<MapPin size={14} className="text-amber" />}
@@ -457,6 +463,7 @@ export default function SettingsPage() {
                 "settings.tapCheckinDesc",
                 "Let staff check in by tapping the workspace link instead of scanning.",
               )}
+              id="settings-tap-checkin"
               locked={!canUseTap}
               onUpgrade={() => upgrade.openFor("tapCheckin")}
             >
@@ -472,9 +479,15 @@ export default function SettingsPage() {
                 "settings.nfcCheckinDesc",
                 "Accept taps from an NFC tag written with your check-in link.",
               )}
+              id="settings-nfc-checkin"
               locked={!canUseNfc}
               onUpgrade={() => upgrade.openFor("nfcCheckin")}
-              icon={<Nfc size={14} className="text-amber" />}
+              icon={
+                <span className="flex items-center gap-1.5">
+                  <Nfc size={14} className="text-amber" />
+                  {nfcStage && <FeatureStageBadge stage={nfcStage} />}
+                </span>
+              }
             >
               <Toggle
                 checked={canUseNfc && settings.nfcCheckinEnabled}
@@ -963,6 +976,7 @@ function ApiTokensCard({
 }
 
 function SettingRow({
+  id,
   title,
   description,
   locked,
@@ -970,6 +984,8 @@ function SettingRow({
   onUpgrade,
   children,
 }: {
+  /** Anchor target for `/console/settings#…` deep links from the guides. */
+  id?: string;
   title: string;
   description: string;
   /** Renders the Espresso pill and greys the control. */
@@ -980,7 +996,8 @@ function SettingRow({
   children: ReactNode;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 px-5 py-4">
+    // scroll-mt clears the fixed 56px top bar when jumped to via #anchor.
+    <div id={id} className="flex scroll-mt-20 items-center justify-between gap-4 px-5 py-4">
       <div>
         <p className="flex items-center gap-2 font-medium text-text-primary">
           {icon}
