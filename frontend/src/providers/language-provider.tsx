@@ -10,7 +10,11 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
 
   useEffect(() => {
-    const locale = user?.locale || sessionStorage.getItem("locale") || "en";
+    // An explicit choice (the top bar's LanguageSwitcher → sessionStorage)
+    // wins over the profile-stored locale. The other order looks equivalent
+    // but isn't: switching language after sign-in would silently snap back to
+    // the profile default on this provider's next render.
+    const locale = sessionStorage.getItem("locale") || user?.locale || "en";
     if (i18n.language !== locale) {
       void i18n.changeLanguage(locale);
     }

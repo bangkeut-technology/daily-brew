@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +18,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export function SignInForm() {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const {
@@ -38,13 +40,13 @@ export function SignInForm() {
 
   return (
     <AuthShell
-      title="Sign in"
-      subtitle="Welcome back to DailyBrew."
+      title={t("auth.signIn", "Sign in")}
+      subtitle={t("auth.signInSubtitle", "Welcome back to DailyBrew.")}
       footer={
         <>
           New here?{" "}
           <Link href="/sign-up" className="font-medium text-coffee no-underline hover:underline">
-            Create an account
+            {t("auth.createAccount", "Create an account")}
           </Link>
         </>
       }
@@ -55,7 +57,7 @@ export function SignInForm() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <label htmlFor="email" className="mb-1 block text-[13px] font-medium text-text-secondary">
-            Email
+            {t("auth.email", "Email")}
           </label>
           <input id="email" type="email" autoComplete="email" className={fieldClass} {...register("email")} />
           {errors.email && <p className="mt-1 text-[12.5px] text-red">{errors.email.message}</p>}
@@ -64,10 +66,10 @@ export function SignInForm() {
         <div>
           <div className="mb-1 flex items-center justify-between">
             <label htmlFor="password" className="block text-[13px] font-medium text-text-secondary">
-              Password
+              {t("auth.password", "Password")}
             </label>
             <Link href="/forgot-password" className="text-[12.5px] text-coffee no-underline hover:underline">
-              Forgot?
+              {t("auth.forgotPasswordShort", "Forgot?")}
             </Link>
           </div>
           <div className="relative">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,6 +27,7 @@ function readToken(): string {
 }
 
 export function ResetPasswordForm() {
+  const { t } = useTranslation();
   const [token] = useState<string>(readToken);
   const [done, setDone] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -41,29 +43,29 @@ export function ResetPasswordForm() {
       await apiAxios.post("/auth/reset-password", { token, password: values.password });
       setDone(true);
     } catch {
-      setFormError("This reset link is invalid or has expired.");
+      setFormError(t("auth.resetLinkExpired", "This reset link is invalid or has expired."));
     }
   };
 
   return (
     <AuthShell
-      title="Set a new password"
-      subtitle="Choose a new password for your account."
+      title={t("auth.setNewPassword", "Set a new password")}
+      subtitle={t("auth.resetPasswordSubtitle", "Choose a new password for your account.")}
       footer={
         <Link href="/sign-in" className="font-medium text-coffee no-underline hover:underline">
-          Back to sign in
+          {t("auth.backToSignIn", "Back to sign in")}
         </Link>
       }
     >
       {!token ? (
         <p className="rounded-lg bg-red/10 px-4 py-3 text-sm text-red">
-          This reset link is invalid or missing its token.
+          {t("auth.invalidResetToken", "Invalid or missing reset token")}
         </p>
       ) : done ? (
         <p className="rounded-lg bg-green/10 px-4 py-3 text-sm text-green">
           Your password has been reset.{" "}
           <Link href="/sign-in" className="font-medium underline">
-            Sign in
+            {t("auth.signIn", "Sign in")}
           </Link>
           .
         </p>
@@ -71,7 +73,7 @@ export function ResetPasswordForm() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <label htmlFor="password" className="mb-1 block text-[13px] font-medium text-text-secondary">
-              New password
+              {t("auth.newPassword", "New password")}
             </label>
             <input
               id="password"
@@ -84,7 +86,7 @@ export function ResetPasswordForm() {
           </div>
           <div>
             <label htmlFor="confirm" className="mb-1 block text-[13px] font-medium text-text-secondary">
-              Confirm password
+              {t("auth.confirmPassword", "Confirm password")}
             </label>
             <input
               id="confirm"

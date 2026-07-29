@@ -12,8 +12,6 @@ import {
   CalendarOff,
   QrCode,
   Settings,
-  UserCircle,
-  LogOut,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -55,17 +53,6 @@ function managerNav(permissions: ManagerPermission[]): NavItemDef[] {
 
 const EMPLOYEE_NAV: NavItemDef[] = [DASHBOARD, ATTENDANCE, LEAVE];
 
-function signOut() {
-  const locale = sessionStorage.getItem("locale") || "en";
-  // Real form POST so the browser follows the redirect and processes the
-  // Set-Cookie headers that clear the JWT + refresh cookies.
-  const form = document.createElement("form");
-  form.method = "POST";
-  form.action = `/api/v1/${locale}/auth/logout`;
-  document.body.appendChild(form);
-  form.submit();
-}
-
 export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const pathname = usePathname();
   const { t } = useTranslation();
@@ -78,12 +65,14 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
   return (
     <aside
       className={cn(
-        "fixed inset-y-0 left-0 z-50 flex w-[220px] flex-col border-r border-glass-border bg-cream-2 md:z-10 md:bg-glass-bg md:backdrop-blur-md",
+        "fixed bottom-0 left-0 top-0 z-50 flex w-[220px] flex-col border-r border-glass-border bg-cream-2 md:top-14 md:z-10 md:bg-glass-bg md:backdrop-blur-md",
         "transform transition-transform duration-300 ease-in-out md:translate-x-0",
         open ? "translate-x-0" : "-translate-x-full",
       )}
     >
-      <div className="flex items-center justify-between px-6 py-5">
+      {/* Brand lives in the top bar at md+; on mobile the drawer needs its
+          own header for the close affordance. */}
+      <div className="flex items-center justify-between px-6 py-5 md:hidden">
         <Link
           href="/console/dashboard"
           className="font-serif text-xl font-semibold text-coffee no-underline"
@@ -93,14 +82,14 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
         <button
           type="button"
           onClick={onClose}
-          aria-label="Close"
-          className="-mr-1 p-1 text-text-secondary transition-colors hover:text-text-primary md:hidden"
+          aria-label={t("common.close", "Close")}
+          className="-mr-1 p-1 text-text-secondary transition-colors hover:text-text-primary"
         >
           <X className="h-5 w-5" />
         </button>
       </div>
 
-      <nav className="flex-1 space-y-1 overflow-y-auto px-3">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-3 md:pt-3">
         {items.map((item) => {
           const active = pathname === item.to || pathname.startsWith(item.to + "/");
           const Icon = item.icon;
@@ -124,28 +113,6 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
           );
         })}
       </nav>
-
-      <Link
-        href="/console/profile"
-        className={cn(
-          "m-3 mb-0 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm no-underline transition-colors",
-          pathname === "/console/profile"
-            ? "bg-coffee text-white"
-            : "text-text-secondary hover:bg-cream-3 hover:text-text-primary",
-        )}
-      >
-        <UserCircle className="h-4 w-4" />
-        {t("nav.profile", "Profile")}
-      </Link>
-
-      <button
-        type="button"
-        onClick={signOut}
-        className="m-3 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-text-secondary transition-colors hover:bg-cream-3 hover:text-text-primary"
-      >
-        <LogOut className="h-4 w-4" />
-        {t("nav.signOut", "Sign out")}
-      </button>
     </aside>
   );
 }

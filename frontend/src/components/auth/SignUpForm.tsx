@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,6 +21,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export function SignUpForm() {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const {
@@ -44,13 +46,13 @@ export function SignUpForm() {
 
   return (
     <AuthShell
-      title="Create your account"
-      subtitle="Free for up to 10 active employees. No credit card required."
+      title={t("auth.createYourAccount", "Create your account")}
+      subtitle={t("auth.signUpSubtitle", "Free for up to 10 active employees. No credit card required.")}
       footer={
         <>
           Already have an account?{" "}
           <Link href="/sign-in" className="font-medium text-coffee no-underline hover:underline">
-            Sign in
+            {t("auth.signIn", "Sign in")}
           </Link>
         </>
       }
@@ -62,14 +64,14 @@ export function SignUpForm() {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label htmlFor="firstName" className="mb-1 block text-[13px] font-medium text-text-secondary">
-              First name
+              {t("employee.firstName", "First name")}
             </label>
             <input id="firstName" autoComplete="given-name" className={fieldClass} {...register("firstName")} />
             {errors.firstName && <p className="mt-1 text-[12.5px] text-red">{errors.firstName.message}</p>}
           </div>
           <div>
             <label htmlFor="lastName" className="mb-1 block text-[13px] font-medium text-text-secondary">
-              Last name
+              {t("employee.lastName", "Last name")}
             </label>
             <input id="lastName" autoComplete="family-name" className={fieldClass} {...register("lastName")} />
             {errors.lastName && <p className="mt-1 text-[12.5px] text-red">{errors.lastName.message}</p>}
@@ -78,7 +80,7 @@ export function SignUpForm() {
 
         <div>
           <label htmlFor="email" className="mb-1 block text-[13px] font-medium text-text-secondary">
-            Email
+            {t("auth.email", "Email")}
           </label>
           <input id="email" type="email" autoComplete="email" className={fieldClass} {...register("email")} />
           {errors.email && <p className="mt-1 text-[12.5px] text-red">{errors.email.message}</p>}
@@ -86,7 +88,7 @@ export function SignUpForm() {
 
         <div>
           <label htmlFor="password" className="mb-1 block text-[13px] font-medium text-text-secondary">
-            Password
+            {t("auth.password", "Password")}
           </label>
           <div className="relative">
             <input

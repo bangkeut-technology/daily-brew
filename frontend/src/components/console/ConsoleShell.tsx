@@ -2,12 +2,12 @@
 
 import React from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
 import { useRoleContext } from "@/hooks/useRoleContext";
 import { getWorkspacePublicId, clearWorkspacePublicId } from "@/lib/api";
 import type { ManagerPermission } from "@/types/auth";
 import { Sidebar } from "@/components/console/Sidebar";
+import { TopBar } from "@/components/console/TopBar";
 
 const STAFF_BLOCKED_ROUTES = [
   "/console/employees",
@@ -108,22 +108,7 @@ export function ConsoleShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen">
-      {/* Mobile top bar + off-canvas drawer; at md+ the sidebar is persistent. */}
-      <header className="fixed left-0 right-0 top-0 z-30 flex h-14 items-center border-b border-cream-3 bg-cream-2 px-4 md:hidden">
-        <button
-          type="button"
-          onClick={() => setMobileNavOpen(true)}
-          aria-label="Open menu"
-          aria-expanded={mobileNavOpen}
-          className="-ml-2 p-2 text-text-secondary transition-colors hover:text-text-primary"
-        >
-          <Menu size={22} />
-        </button>
-        <div className="flex flex-1 justify-center">
-          <span className="font-serif text-lg font-semibold text-coffee">DailyBrew</span>
-        </div>
-        <div className="w-9" aria-hidden />
-      </header>
+      <TopBar onOpenMobileNav={() => setMobileNavOpen(true)} />
 
       {mobileNavOpen && (
         <div
@@ -134,7 +119,7 @@ export function ConsoleShell({ children }: { children: React.ReactNode }) {
       )}
 
       <Sidebar open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
-      <main className="page-enter p-4 pt-18 md:ml-[220px] md:p-8 md:pt-8">{children}</main>
+      <main className="page-enter mt-14 p-4 md:ml-[220px] md:p-8">{children}</main>
     </div>
   );
 }
