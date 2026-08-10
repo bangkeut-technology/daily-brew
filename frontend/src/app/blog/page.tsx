@@ -11,10 +11,14 @@ export const metadata: Metadata = {
   alternates: { canonical: "/blog" },
 };
 
+// timeZone: "UTC" because `post.date` is date-only — `new Date("2026-05-29")`
+// parses as UTC midnight, and formatting that in the build host's local zone
+// would render the previous day anywhere west of Greenwich.
 const dateFormat = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
   month: "long",
   day: "numeric",
+  timeZone: "UTC",
 });
 
 export default function BlogIndex() {
@@ -38,7 +42,10 @@ export default function BlogIndex() {
               href={`/blog/${post.slug}`}
               className="glass-card block p-6 no-underline transition-transform"
             >
-              <time className="text-xs font-medium uppercase tracking-wide text-text-tertiary">
+              <time
+                dateTime={post.date}
+                className="text-xs font-medium uppercase tracking-wide text-text-tertiary"
+              >
                 {dateFormat.format(new Date(post.date))}
               </time>
               <h2 className="mt-2 font-serif text-xl font-semibold text-text-primary">

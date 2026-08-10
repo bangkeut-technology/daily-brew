@@ -10,12 +10,15 @@ import {
   FileText,
   Clock,
   CalendarOff,
+  Crown,
   QrCode,
   Settings,
   X,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getWorkspacePublicId } from "@/lib/api";
+import { usePlan } from "@/hooks/usePlan";
 import { useRoleContext } from "@/hooks/useRoleContext";
 import type { ManagerPermission } from "@/types/auth";
 
@@ -23,11 +26,18 @@ interface NavItemDef {
   to: string;
   icon: LucideIcon;
   label: string;
+  /** Marks a destination that needs Espresso, so the nav says so up front. */
+  espresso?: boolean;
 }
 
 const DASHBOARD: NavItemDef = { to: "/console/dashboard", icon: LayoutDashboard, label: "nav.dashboard" };
 const ATTENDANCE: NavItemDef = { to: "/console/attendance", icon: CalendarCheck, label: "nav.attendance" };
-const LEAVE: NavItemDef = { to: "/console/leave", icon: FileText, label: "nav.leaveRequests" };
+const LEAVE: NavItemDef = {
+  to: "/console/leave",
+  icon: FileText,
+  label: "nav.leaveRequests",
+  espresso: true,
+};
 
 function ownerNav(): NavItemDef[] {
   return [
@@ -51,12 +61,26 @@ function managerNav(permissions: ManagerPermission[]): NavItemDef[] {
   return items;
 }
 
-const EMPLOYEE_NAV: NavItemDef[] = [DASHBOARD, ATTENDANCE, LEAVE];
+/**
+ * A plain employee sees the same three destinations, but the labels are
+ * possessive — an employee's Attendance page shows only their own rows, and
+ * "My Attendance" says so before they open it.
+ */
+const EMPLOYEE_NAV: NavItemDef[] = [
+  DASHBOARD,
+  { ...ATTENDANCE, label: "nav.myAttendance" },
+  { ...LEAVE, label: "nav.myLeaveRequests" },
+];
 
 export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const pathname = usePathname();
   const { t } = useTranslation();
   const { data: roleContext } = useRoleContext();
+  const { data: plan } = usePlan(getWorkspacePublicId() || "");
+  const canUseLeaveRequests = plan?.canUseLeaveRequests ?? false;
+  // Without a workspace every destination but the dashboard bounces straight
+  // back (see ConsoleShell) — grey them out rather than let people bounce.
+  const hasWorkspace = !!getWorkspacePublicId();
 
   let items = EMPLOYEE_NAV;
   if (roleContext?.isOwner) items = ownerNav();
@@ -89,10 +113,36 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
         </button>
       </div>
 
-      <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-3 md:pt-3">
+      <nav aria-label={t("nav.sidebar", "Main navigation")} className="flex-1 space-y-1 overflow-y-auto px-3 pb-3 md:pt-3">
         {items.map((item) => {
           const active = pathname === item.to || pathname.startsWith(item.to + "/");
           const Icon = item.icon;
+          const disabled = !hasWorkspace && item.to !== "/console/dashboard";
+          const label = (
+            <>
+              <Icon className="h-4 w-4 shrink-0" />
+              <span className="flex-1">{t(item.label)}</span>
+              {item.espresso && !canUseLeaveRequests && (
+                <span className="flex items-center gap-1 text-[12px] font-semibold text-amber">
+                  <Crown size={12} className="opacity-60" />
+                  Espresso
+                </span>
+              )}
+            </>
+          );
+
+          if (disabled) {
+            return (
+              <div
+                key={item.to}
+                aria-disabled="true"
+                className="flex cursor-not-allowed select-none items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-text-tertiary/50"
+              >
+                {label}
+              </div>
+            );
+          }
+
           return (
             <Link
               key={item.to}
@@ -107,8 +157,7 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
                   : "text-text-secondary hover:bg-cream-3 hover:text-text-primary",
               )}
             >
-              <Icon className="h-4 w-4" />
-              {t(item.label)}
+              {label}
             </Link>
           );
         })}
