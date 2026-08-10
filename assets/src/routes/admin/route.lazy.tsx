@@ -1,7 +1,7 @@
 import { createLazyFileRoute, Link, Outlet, useLocation, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { useAuthenticationState } from '@/hooks/use-authentication';
-import { LayoutDashboard, ShieldCheck, LogOut, Building2, UserCircle, CreditCard, ScrollText, Smartphone, ToggleLeft, AlarmClock, Menu, X } from 'lucide-react';
+import { LayoutDashboard, ShieldCheck, LogOut, Building2, UserCircle, CreditCard, ScrollText, Smartphone, ToggleLeft, AlarmClock, TrendingDown, Menu, X } from 'lucide-react';
 import { LogoBrand } from '@/components/shared/Logo';
 import { cn } from '@/lib/utils';
 
@@ -14,6 +14,7 @@ const navItems = [
   { to: '/admin/workspaces', icon: Building2, label: 'Workspaces' },
   { to: '/admin/users', icon: UserCircle, label: 'Users' },
   { to: '/admin/subscriptions', icon: CreditCard, label: 'Subscriptions' },
+  { to: '/admin/churn', icon: TrendingDown, label: 'Churn' },
   { to: '/admin/mobile-app-config', icon: Smartphone, label: 'Mobile app' },
   { to: '/admin/feature-flags', icon: ToggleLeft, label: 'Feature flags' },
   { to: '/admin/cron', icon: AlarmClock, label: 'Cron' },
