@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.134.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.134.1...v1.134.2) (2026-08-10)
+
+
+### Bug Fixes
+
+* **next/console:** sidebar plan/role cues, and a date that could render a day early ([#384](https://github.com/bangkeut-technology/daily-brew/issues/384)) ([6d0bc06](https://github.com/bangkeut-technology/daily-brew/commit/6d0bc060c21508f82b8fb6b2bf45c9aa74d51a21))
+
 ## [1.134.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.134.0...v1.134.1) (2026-07-29)
 
 
