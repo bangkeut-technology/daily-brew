@@ -119,9 +119,12 @@ class WorkspaceService
     {
         $now = DateService::now();
 
-        // Cancel active subscription before deleting
+        // Cancel any subscription that hasn't already been cancelled — deliberately not gated on
+        // isActive(), which is active|trialing only. A past_due or paused subscription is still a
+        // live agreement at Paddle: skipping it left the workspace deleted here while Paddle kept
+        // dunning the customer, and left a "Past due" row for an account that no longer exists.
         $subscription = $this->subscriptionRepository->findByWorkspace($workspace);
-        if ($subscription !== null && $subscription->isActive()) {
+        if ($subscription !== null && $subscription->getStatus() !== SubscriptionStatusEnum::Canceled) {
             $this->cancelSubscription($subscription);
         }
 
@@ -159,7 +162,11 @@ class WorkspaceService
 
         // Mark as canceled locally regardless
         $subscription->setStatus(SubscriptionStatusEnum::Canceled);
-        $subscription->setCanceledAt(DateService::mutableNow());
+        // Keep the first cancellation date. Re-cancelling a row whose status drifted back (a late
+        // dunning webhook used to do exactly that) must not move the date churn reporting counts.
+        if ($subscription->getCanceledAt() === null) {
+            $subscription->setCanceledAt(DateService::mutableNow());
+        }
     }
 
     /**
