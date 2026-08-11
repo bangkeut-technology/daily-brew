@@ -124,7 +124,19 @@ task('frontend:spa:build', function () {
  */
 task('frontend:next:build', function () {
     cd('{{release_path}}/frontend');
-    run('npm ci', ['timeout' => 600]);
+    // `--legacy-peer-deps` for the same reason the SPA build above uses it:
+    // peer resolution is not reproducible across npm versions, and the host's
+    // npm is older than the one that writes package-lock.json locally.
+    // Concretely — next@16 pins @swc/helpers to exactly 0.5.15, while
+    // next-intl's @swc/core declares an *optional* peer of >=0.5.17. Nothing
+    // in the tree satisfies that peer, so a newer npm shrugs and a stricter
+    // one wants to add a nested @swc/helpers@0.5.23 to the lock — which
+    // `npm ci` is forbidden from doing, so it aborts the whole deploy
+    // ("Missing: @swc/helpers@0.5.23 from lock file", v1.138.0). The flag
+    // switches peer resolution off and installs exactly the locked tree,
+    // which is what a deploy wants anyway. Pinning the host's npm is the
+    // real cure; this keeps releases shipping until then.
+    run('npm ci --legacy-peer-deps', ['timeout' => 600]);
     run('npm run build', ['timeout' => 900]);
     // Per Next standalone docs: static + public aren't auto-copied. Fail
     // loudly if `next build` silently skipped standalone emission (e.g. OOM
