@@ -82,6 +82,15 @@ All entities carry `id`, `publicId` (UUID), `createdAt`, `updatedAt`.
 
 **Churn (`/admin/churn?days=30|90|365`).** `AdminChurnService` tracks two overlapping shapes: **paid churn** (`Subscription.canceledAt` stamped on a non-free plan — lost revenue) and **workspace churn** (`Workspace.deletedAt` — lost account). Deleting a workspace also cancels its subscription, so both counters see it; the timeline emits **one event per workspace** (a deletion carries the plan it was on, never a second `subscription_canceled` row). Rates are `churned ÷ (churned + still live)` — there's no historical subscription snapshot to use as a true period-start denominator. The page also lists **at-risk** workspaces: paying accounts with no check-in for 21+ days (never-active ones are excluded — that's activation, which the dashboard funnel covers).
 
+## Monorepo packages (`packages/`)
+
+Standalone libraries developed here via Composer **path repositories**, meant to be liftable into their own repos when they earn it. Their tests run as the `Packages` PHPUnit testsuite and must not depend on the application — no `App\` imports, no Symfony helpers in `tap-core`.
+
+- **`bangkeut/tap-core`** — framework-free tap credentials: a holder presents a credential to a terminal, the library says whether it's genuine, the host decides what it means. Two kinds share one wire envelope: **device assertions** (holder's device signs the terminal's nonce — unforgeable and unreplayable, needs an app) and **issued passes** (issuer signs once at issuance — verifiable offline with no app, bearer token, so anti-passback is the control). Byte layout in [packages/tap-core/SPEC.md](packages/tap-core/SPEC.md); `AssertionCodecTest` pins it because device/issuer SDKs in other languages check themselves against it.
+- **`bangkeut/tap-bundle`** — Symfony wiring only. No entities, no routes, no controllers: the host implements `CredentialStore`, `IssuerKeyStore` and `NonceStore`, and listens to `TapVerifiedEvent`. The bundle is registered in `config/bundles.php`; its services stay unused (and are removed at compile time) until an application implements those interfaces.
+
+Why the split: the same protocol serves shift check-in at a kiosk and admission at a conference door (an AmCham/EuroCham forum where the ticket *is* the pass), so no DailyBrew vocabulary — employee, shift, workspace — may leak into the core.
+
 ## Architecture
 
 Auth: JWT (LexikJWT) — email+password, Google OAuth, Apple OAuth. BasilBook: `basilbook` firewall + `BasilBookApiKeyAuthenticator` (`X-Api-Key`).

@@ -21,6 +21,12 @@
         <testsuite name="Project Test Suite">
             <directory>tests</directory>
         </testsuite>
+
+        <!-- Monorepo packages under packages/ are standalone libraries: their tests must keep
+             passing on their own, so they run here until the package moves to its own repo. -->
+        <testsuite name="Packages">
+            <directory>packages/*/tests</directory>
+        </testsuite>
     </testsuites>
 
     <source ignoreSuppressionOfDeprecations="true"

@@ -1,0 +1,25 @@
+{
+    "name": "bangkeut/tap-core",
+    "description": "Framework-free core for tap credentials: device assertions and issued passes, verified at a terminal, online or offline.",
+    "type": "library",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.4",
+        "ext-openssl": "*",
+        "psr/clock": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^13.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bangkeut\\Tap\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Bangkeut\\Tap\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable"
+}
