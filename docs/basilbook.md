@@ -96,8 +96,10 @@ curl "https://dailybrew.work/api/v1/basilbook/attendances?from=2026-04-01&to=202
 - Maximum range: 93 days
 - All active employees are included — username-less ones carry `username: null` and are joined on `publicId`; `publicId` is always present and stable across syncs — see [Identifiers](#identifiers)
 - Days with no attendance are omitted — absence = missing date
+- **Voided rows are omitted too.** When an owner/manager removes a bad attendance row, it is soft-deleted: the row stays in DailyBrew's database for audit, but the feed treats that day as absent, matching what the dashboard counts. A day that disappears between two syncs was voided — re-syncing a range is therefore authoritative, and an integrator should replace the range rather than merge into it.
 - `isLate` / `leftEarly` are always `false` if employee has no shift
-- If an owner/manager has manually overridden an attendance row, the returned `checkInAt`/`checkOutAt` reflect the **edited values**, not the original scan times (the override represents "what really happened"). Originals stay in the DB for audit but aren't exposed here.
+- If an owner/manager has manually overridden an attendance row, the returned `checkInAt`/`checkOutAt` reflect the **edited values**, not the original scan times (the override represents "what really happened"). Originals stay in the DB for audit but aren't exposed here. The same applies to rows created by hand to backfill a forgotten scan — they appear in the feed like any other record.
+- A workspace with no active employees short-circuits to `{ "employees": [], "from": ..., "to": ... }` — note that `workspace` and `timezone` are **absent** from that response, so don't read them unconditionally.
 
 ## Errors
 

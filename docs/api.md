@@ -1,8 +1,8 @@
 # API Reference
 
-Most routes live under `/api/v1/{locale}` where `{locale}` is `en`, `fr`, or `km` — the locale picks the response language for validation messages and translatable content. Two route families bypass the locale prefix because they're called by mobile apps or external systems where locale doesn't apply: QR check-in (`/api/v1/checkin/...`) and device token registration (`/api/v1/devices/...`).
+Most routes live under `/api/v1/{locale}` where `{locale}` is `en`, `fr`, or `km` — the locale picks the response language for validation messages and translatable content. Some route families bypass the locale prefix because they're called by mobile apps or external systems where locale doesn't apply: QR check-in (`/api/v1/checkin/...`), device token registration (`/api/v1/devices/...`), support (`/api/v1/support/...`), webhooks (`/api/v1/webhooks/...`), the BasilBook feed, and `POST /api/token/refresh` (which sits outside `/v1` entirely).
 
-Authentication is JWT (issued at login or OAuth callback, sent as the `BEARER` cookie) for everything tagged "authenticated". The BasilBook external API is the only exception — it uses the `X-Api-Key` header instead of JWT. Public routes (auth, webhooks, support) require no credentials.
+Authentication is JWT (issued at login or OAuth callback, sent as the `BEARER` cookie) for everything tagged "authenticated". The BasilBook external API is the only exception — it uses the `X-Api-Key` header instead of JWT. Public routes (auth, webhooks, support, feature flags) require no credentials. The `/admin` family additionally requires `ROLE_SUPER_ADMIN`.
 
 ## Response conventions
 
@@ -43,6 +43,55 @@ Date/time formatting in payloads is consistent throughout:
 - `POST /api/v1/{locale}/auth/google` / `POST /api/v1/{locale}/auth/apple` — OAuth token exchange; same `{ token, user }` success shape + cookies.
 - `POST /api/v1/{locale}/auth/logout` — invalidates the session, expires the `BEARER` + `refresh_token` cookies, **and deletes the refresh-token DB row** (read from cookie, falls back to JSON body `{ "refresh_token": "..." }` for mobile). Idempotent — no-op when the token is absent or already gone.
 - `POST /api/token/refresh` — **outside the `/v1` prefix**. Body: `{ "refresh_token": "..." }`. Returns `{ "token": "<new JWT>", "refresh_token": "<rotated token>" }`. `single_use: true` means every successful refresh deletes the consumed token and mints a new one; clients MUST persist the rotated `refresh_token` from the response. Scoped to its own `token_refresh` firewall (ahead of `^/api`) so the JWT cookie authenticator can't intercept — see CLAUDE.md "Refresh-token firewall" for the iOS-specific reason.
+- `POST /api/v1/{locale}/auth/forgot-password` — body `{ "email" }`. Always returns `200` `{ "message": "If an account exists, a reset link has been sent." }` — the response is deliberately identical for known and unknown addresses so it can't be used to enumerate accounts.
+- `POST /api/v1/{locale}/auth/reset-password` — body `{ "token", "password" }` (≥ 8 chars). `400` on an unknown or expired token. Returns `{ "message": "Password has been reset successfully" }`.
+
+## Users & account (authenticated)
+
+The caller's own account. `UserDTO` is the shape returned by `GET`/`PUT /users/me` and nested in the auth responses above (minus `currentWorkspacePublicId` / `avatarUrl` there):
+
+```json
+{
+  "publicId": "ab3k9mnp7qrs", "email": "owner@cafe.com",
+  "firstName": "Dara", "lastName": "Sok", "fullName": "Dara Sok",
+  "locale": "en", "onboardingCompleted": true,
+  "currentWorkspacePublicId": "cd4m8pqr2tuv",
+  "isSuperAdmin": false, "avatarUrl": "https://.../avatar.png"
+}
+```
+
+- `GET /api/v1/{locale}/users/me` — the `UserDTO` above.
+- `PUT /api/v1/{locale}/users/me` — partial update of `firstName`, `lastName`, `locale`. Returns the updated `UserDTO`.
+- `DELETE /api/v1/{locale}/users/me` — account deletion (soft). Soft-deletes every owned workspace via `AccountDeletionService`, clears the `BEARER` + `refresh_token` cookies, returns `{ "deleted": true }`.
+- `POST /api/v1/{locale}/users/me/change-password` — body `{ "currentPassword", "newPassword" }` (≥ 8 chars). `currentPassword` is only verified when the account already has one — OAuth-only accounts set their first password without it. `403` when the current password is wrong.
+- `POST /api/v1/{locale}/users/me/complete-onboarding` — `{ "onboardingCompleted": true }`.
+- `GET /api/v1/{locale}/users/me/current-workspace` — `{ "publicId", "name" }`, or `null` when none is selected.
+- `PUT /api/v1/{locale}/users/me/current-workspace` — body `{ "workspacePublicId": "..." | null }`. `204`-style `null` body on success, `404` for an unknown workspace.
+- `GET /api/v1/{locale}/users/me/role-context?workspaceId=` — the payload the console's route guards and sidebar are built from. `workspaceId` overrides the server-side `currentWorkspace` (the frontend passes its localStorage value).
+  ```json
+  {
+    "isOwner": false, "isEmployee": true, "isManager": true,
+    "managerPermissions": ["manage_leave", "manage_attendance"],
+    "onboardingCompleted": true,
+    "ownedWorkspaces": [{ "publicId": "...", "name": "Café One" }],
+    "employee": { "publicId": "...", "name": "Dara Sok", "photoUrl": "https://...", "workspacePublicId": "...", "workspaceName": "Café One" },
+    "linkedWorkspaces": [{ "workspacePublicId": "...", "workspaceName": "Café One", "employeePublicId": "...", "employeeName": "Dara Sok", "role": "manager" }]
+  }
+  ```
+- `POST /api/v1/{locale}/users/me/link-employee` — body `{ "employeePublicId" }`. Claims an unlinked employee record. Rejects when the record is already linked, or when the caller already holds an employee record in that workspace. Returns `{ publicId, name, workspaceName }`.
+- `POST /api/v1/{locale}/users/me/unlink-employee` — body `{ "employeePublicId" }`. Own link only (`403` otherwise); also clears `currentWorkspace` when it pointed at that workspace and the caller isn't its owner.
+
+### OAuth & Telegram connections
+
+- `GET /api/v1/{locale}/users/me/oauth` — `{ "google": true, "apple": false, "hasPassword": true }`.
+- `POST /api/v1/{locale}/users/me/oauth/{provider}` — `provider` is `google` or `apple`; body carries `{ "googleId" }` / `{ "appleId" }`. `409` when that provider identity already belongs to another account. Returns `{ "connected": true }`.
+- `DELETE /api/v1/{locale}/users/me/oauth/{provider}` — `{ "disconnected": true }`. `400` when it would leave the account with no way to sign in.
+- `POST /api/v1/{locale}/users/me/oauth/link-token` — mints a 5-minute JWT into an `OAUTH_LINK` cookie scoped to `/oauth/connect`, so the browser OAuth round-trip knows who is linking. The regular `BEARER` cookie can't be used: it's scoped to `/api/v1` and `SameSite=Lax`, so it wouldn't survive Apple's cross-site POST callback. Returns `{ "ok": true }` — call it and await it *before* redirecting to `/oauth/connect`.
+- `GET /api/v1/{locale}/profile/connect` — `{ "hasPassword", "googleConnected", "appleConnected" }`.
+- `POST /api/v1/{locale}/profile/connect/google` — body `{ "idToken" }` (verified against Google's tokeninfo endpoint). `POST .../apple` takes `{ "identityToken" }`. `401` on an invalid token, `409` when the identity is taken. `DELETE` on either unlinks.
+- `GET /api/v1/{locale}/users/me/telegram` — `{ "connected": true }`. The chat ID itself is never returned.
+- `POST /api/v1/{locale}/users/me/telegram/link-token` — `{ "token", "deepLink": "https://t.me/<bot>?start=<token>", "expiresInSeconds": 600 }`. The frontend opens the deep link and polls the status endpoint until it flips. `503` when no bot is configured on the server.
+- `DELETE /api/v1/{locale}/users/me/telegram` — `{ "disconnected": true }`.
 
 ## Workspaces (authenticated)
 
@@ -72,6 +121,17 @@ Date/time formatting in payloads is consistent throughout:
   }
   ```
   `totalEmployees` is the seat-limit count (includes `attendanceTracking=none`); `absent` is computed against the narrower tracked-and-scheduled baseline.
+- `GET /api/v1/{locale}/workspaces/{publicId}/dashboard/trends?days=14` — rolling-window series behind the dashboard charts. `days` is clamped to 1–30; the query actually reaches back `2 × days` so the previous-period deltas have a baseline. Scoped exactly like `/attendances/summary`: owners and managers with `manage_attendance` get the whole workspace, everyone else gets only their own history.
+  ```json
+  {
+    "from": "2026-05-29", "to": "2026-06-11", "days": 14,
+    "daily": [{ "date": "2026-06-11", "dayOfWeek": 4, "onTime": 7, "late": 1, "leave": 1, "absent": 2, "closed": false, "expected": 10, "attendanceRate": 80, "onTimeRate": 88 }],
+    "byWeekday": [{ "dayOfWeek": 1, "onTime": 12, "late": 2, "absent": 1, "present": 14, "onTimeRate": 86, "hasData": true }],
+    "topLate": [{ "employeePublicId": "...", "employeeName": "Dara Sok", "late": 4, "present": 12, "absent": 1, "lateRate": 33 }],
+    "totals": { "onTime": 90, "late": 8, "leave": 4, "absent": 12, "present": 98, "expected": 110, "attendanceRate": 89, "onTimeRate": 92, "previousAttendanceRate": 84, "previousOnTimeRate": 90 }
+  }
+  ```
+- `POST /api/v1/{locale}/workspaces/{publicId}/logo` — `multipart/form-data` with a `file` field (owner only). Returns `{ publicId, logoUrl }`. `DELETE` the same path removes it (`logoUrl` comes back `null`).
 - `GET /api/v1/{locale}/workspaces/{publicId}/plan` — plan + entitlement flags + subscription state:
   ```json
   {
@@ -132,6 +192,15 @@ Date/time formatting in payloads is consistent throughout:
 - `PUT /api/v1/{locale}/workspaces/{publicId}/employees/{publicId}` — update employee fields, including `role` for owner-only manager promotion/demotion. Promoting seeds `managerPermissions` with the defaults `[manage_leave, manage_attendance]` when the field is empty; demoting clears it. Returns the updated `EmployeeDTO`.
 - `PATCH /api/v1/{locale}/workspaces/{publicId}/employees/{publicId}/manager-permissions` — set the manager's permission list (owner only). Body: `{ "permissions": ["manage_employees", "manage_shifts", "manage_closures", "manage_leave", "manage_attendance"] }`. Unknown values are rejected. Returns the updated `EmployeeDTO`.
 - `DELETE /api/v1/{locale}/workspaces/{publicId}/employees/{publicId}` — soft-delete; `204`.
+- `POST /api/v1/{locale}/workspaces/{publicId}/employees/{publicId}/photo` — `multipart/form-data` with a `file` field. Owner or a manager with `manage_employees` (workspace-scoped — per-QR managers cannot). Returns the updated `EmployeeDTO`; `DELETE` on the same path clears `photoUrl`.
+
+## Media uploads
+
+Three endpoints accept `multipart/form-data` with a single `file` field instead of JSON — user avatar, workspace logo, and employee photo. All three return the owning resource with the resolved public URL (`avatarUrl` / `logoUrl` / `photoUrl`), and all three accept `DELETE` on the same path to clear the image. Uploads must be JPEG, PNG, or WebP and ≤ 5 MB; `AvatarImageProcessor` re-encodes every accepted file to a 512×512 JPEG (PNG/WebP transparency is flattened), so EXIF and the original encoding never reach disk. `400` with a message when the file is missing, too large, or not an accepted type.
+
+- `POST` / `DELETE /api/v1/{locale}/users/me/avatar` → `UserDTO`
+- `POST` / `DELETE /api/v1/{locale}/workspaces/{publicId}/logo` → `{ publicId, logoUrl }`
+- `POST` / `DELETE /api/v1/{locale}/workspaces/{publicId}/employees/{publicId}/photo` → `EmployeeDTO`
 
 ## Shifts (authenticated, scoped to workspace)
 
@@ -154,6 +223,17 @@ Date/time formatting in payloads is consistent throughout:
 - `POST /api/v1/{locale}/workspaces/{publicId}/shifts` — `201` `ShiftDTO`.
 - `PUT /api/v1/{locale}/workspaces/{publicId}/shifts/{publicId}` — updated `ShiftDTO`.
 - `DELETE /api/v1/{locale}/workspaces/{publicId}/shifts/{publicId}` — `204`.
+
+### Per-day time rules (Espresso)
+
+Nested under a shift. Reads only need `VIEW`; every write needs `MANAGE_SHIFTS` **and** the Espresso plan (`402` otherwise). A rule row is `{ "publicId", "dayOfWeek", "dayOfWeekLabel", "startTime", "endTime" }`.
+
+- `GET /api/v1/{locale}/workspaces/{publicId}/shifts/{shiftPublicId}/time-rules` — list.
+- `POST` the same path — body `{ "dayOfWeek": 1..7, "startTime": "HH:MM", "endTime": "HH:MM" }`. `201`. An out-of-range `dayOfWeek` is a `400`.
+- `PUT /api/v1/{locale}/workspaces/{publicId}/shifts/{shiftPublicId}/time-rules/{rulePublicId}` — body may carry `startTime` and/or `endTime`; the day is fixed at creation.
+- `DELETE` the same path — `204`.
+
+Remember the semantics: once a shift has **any** rule it is treated as that shift's complete schedule, and days without a rule become off-days. Deleting the last rule returns the shift to "default times, every day."
 
 ## Closures (authenticated, scoped to workspace)
 
@@ -229,6 +309,31 @@ Date/time formatting in payloads is consistent throughout:
 - `PATCH /api/v1/{locale}/workspaces/{publicId}/attendances/{attendancePublicId}` — owner / manager with `manage_attendance` override an existing row. Body: `{ "checkInAt"?: "HH:MM" | null, "checkOutAt"?: "HH:MM" | null, "reason" }`. Times are workspace-local; reason required (≤255 chars). First edit snapshots `originalCheckInAt`/`originalCheckOutAt`. Late/leftEarly recompute. Blocked (`400`) on voided rows. Returns the updated `AttendanceDTO` (with employee).
 - `DELETE /api/v1/{locale}/workspaces/{publicId}/attendances/{attendancePublicId}` — soft-void (owner / manager with `manage_attendance`). Body: `{ "reason" }` (≤255 chars). Returns the voided `AttendanceDTO` (with employee + populated `voidedAt`/`voidedByEmail`/`voidReason`).
 
+## Sub-QR codes (authenticated, Double Espresso)
+
+Additional QR codes ("sub-QRs") on top of the workspace's main `qrToken` — one per entrance, station, or branch, each with its own check-in rules and employee roster. Listing/reading needs `VIEW`; creating, editing, and deleting are **owner-only** (`WorkspaceVoter::EDIT`/`DELETE` on a `Workspace`-owned subject). Creating returns `402` when the plan isn't Double Espresso.
+
+```json
+{
+  "publicId": "...", "qrToken": "...", "name": "Kitchen door",
+  "manager": { "publicId": "...", "name": "Dara Sok" },
+  "assignedEmployees": [{ "publicId": "...", "name": "Sokha Pen" }],
+  "inheritIpSettings": true, "ipRestrictionEnabled": false, "allowedIps": null,
+  "inheritGeofencing": false, "geofencingEnabled": true,
+  "geofencingLatitude": 11.55, "geofencingLongitude": 104.92, "geofencingRadiusMeters": 80,
+  "inheritDeviceVerification": true, "deviceVerificationEnabled": false,
+  "createdAt": "2026-06-01T09:00:00+00:00", "updatedAt": "2026-06-01T09:00:00+00:00"
+}
+```
+
+- `GET /api/v1/{locale}/workspaces/{publicId}/qr-codes` — list.
+- `POST` the same path — body `{ "name", "managerPublicId"?, "assignedEmployeePublicIds"?: [], plus any of the inherit/override fields }`. `201`. `422` when the name is empty, the manager isn't an employee of this workspace or has no linked user, or an assigned employee belongs elsewhere.
+- `GET /api/v1/{locale}/workspaces/{publicId}/qr-codes/{qrCodePublicId}` — single QR code.
+- `PATCH` the same path — partial update of the same fields; `422` on the same validation failures.
+- `DELETE` the same path — `204`. Historical attendance keeps its rows (the `qrCode` FK is `ON DELETE SET NULL`).
+
+The three `inherit*` flags each govern one cluster — IP restriction, geofencing, device verification. When a flag is true the parent `WorkspaceSetting` value wins and the sibling override fields are ignored. Timezone is always inherited and cannot be overridden. In the UI this is worded as "Same as workspace" vs custom rules — never "inherit"/"override".
+
 ## API Tokens (authenticated, owner only)
 
 - `GET /api/v1/{locale}/workspaces/{publicId}/api-tokens` — list (active + revoked). The plain token value is **never** returned here.
@@ -269,9 +374,113 @@ Main QR routes by `/checkin/{workspaceQrToken}`; sub-QR (Double Espresso) by `/c
 - `POST /api/v1/devices` — register push notification token (Expo). Body `{ "token", "platform": "ios"|"android"|"web" }`.
 - `DELETE /api/v1/devices/{token}` — unregister; `204`.
 
+## Feature flags (public)
+
+- `GET /api/v1/{locale}/features?workspaceId=` — resolved state of every platform feature flag. Without `workspaceId` (anonymous visitors, marketing pages) only release-stage flags come back enabled.
+  ```json
+  {
+    "flags":  { "nfc_checkin": true, "nfc_writer": false },
+    "stages": { "nfc_checkin": "release" }
+  }
+  ```
+  `flags` lists every known flag; `stages` is deliberately restricted to the flags this workspace can actually see — naming the stage of a hidden flag would leak its existence. The frontend pairs the boolean with the stage to render an "Alpha" / "Beta" badge. See [architecture.md](./architecture.md#feature-flags--testing-tracks) for how stage and `Workspace.testingTrack` combine.
+
+## Support (public)
+
+- `GET /api/v1/support/config` — `{ "feedbackEnabled": true }`. Only the boolean crosses the wire, never the SupportDock key. The legacy SPA reads this from `window.__DAILYBREW__` instead; Next.js serves its own HTML and so asks here.
+- `GET /api/v1/support/faqs` — FAQ entries proxied from SupportDock.
+- `POST /api/v1/support/feedback` — body `{ "type": "bug"|"feature"|"question"|"general", "message", "name"?, "email"?, "subject"?, "source": "website"|"console", "page"?, "images"?: string[] }`. Up to 3 images, each a `data:image/(png|jpeg|webp|gif);base64,` URL. Returns `{ "submitted": true }`, or `502` when SupportDock rejects the relay. **Always call this rather than SupportDock directly** — the browser can't reach supportdock.io (CORS).
+
 ## Webhooks (public)
 
 - `POST /api/v1/webhooks/paddle` — Paddle subscription lifecycle webhook (signature-verified).
+- `POST /api/v1/webhooks/telegram?secret=` — Telegram bot updates. The `secret` query parameter is compared with `hash_equals` against the configured webhook secret; a mismatch (or an unconfigured secret) is rejected. Handles `/start <token>` (links the chat to a user or a workspace — both token shapes are signed with the app secret, and the `user:` prefix is part of the signed payload so only one verify call can accept a given token), `/chatid`, and `/help`.
+- `POST /api/v1/webhooks/mailgun/inbound` — inbound email → SupportDock feedback, posted by Mailgun as multipart form data. HMAC-verified via `timestamp`/`token`/`signature` (`403` on mismatch; verification is skipped when no signing key is configured). An empty body short-circuits to `{ "received": true, "skipped": "empty body" }`; the feedback type is inferred from the subject line.
+
+## Dev (dev environment only)
+
+- `POST /api/v1/dev/toggle-plan` — body `{ "workspacePublicId", "plan": "free"|"espresso"|"double_espresso" }`. Flips a workspace's plan without Paddle so plan gates can be exercised locally. `403` outside the dev environment. (In production the equivalent is the super-admin-only `PUT /admin/workspaces/{publicId}/plan`.)
+
+## Platform admin (authenticated, `ROLE_SUPER_ADMIN`)
+
+Internal staff endpoints under `/api/v1/{locale}/admin`, backing the `/admin/*` console. Every route requires `ROLE_SUPER_ADMIN` — there is no per-workspace scoping here, which is exactly why the role is bootstrapped only through the CLI (`php bin/console dailybrew:admin:promote-user <email>`) and every mutation is written to the audit log. Mutating endpoints call `AdminAuditService::record()`, which is wrap-and-log: an audit failure is swallowed rather than rolling back the action it describes.
+
+List endpoints share a pagination envelope — `{ "items": [...], "page": 1, "pageSize": N, "total": N }` — with `pageSize` 25 (workspaces, users, subscriptions) or 50 (audit log).
+
+### Dashboard
+
+- `GET /admin/dashboard` — platform-wide counters and 30-day series.
+  ```json
+  {
+    "totals": { "users": 412, "workspaces": 118, "employees": 940, "attendances": 51230, "subscriptions": 37 },
+    "activation": { "workspacesTotal": 118, "workspacesWithEmployees": 96, "workspacesWithAttendance": 74, "workspacesActiveLast7d": 51 },
+    "byPlan": { "free": 81, "espresso": 30, "double_espresso": 7 },
+    "byStatus": { "active": 34, "trialing": 3, "past_due": 0, "paused": 0, "canceled": 12 },
+    "growth": { "usersLast7d": 9, "usersLast30d": 41, "workspacesLast7d": 3, "workspacesLast30d": 14, "employeesLast7d": 22, "employeesLast30d": 88, "attendancesLast7d": 1840, "attendancesLast30d": 7900 },
+    "growthSeries": [{ "date": "2026-05-13", "users": 2, "workspaces": 1, "employees": 4, "attendances": 260 }],
+    "recentSignups": [{ "publicId": "...", "email": "...", "fullName": "...", "createdAt": "..." }],
+    "recentWorkspaces": [{ "publicId": "...", "name": "...", "owner": { "publicId": "...", "email": "..." }, "createdAt": "..." }],
+    "recentActivity": [{ "publicId": "...", "action": "promote_user", "actionLabel": "Promoted user", "actorEmail": "...", "targetType": "user", "targetPublicId": "...", "targetLabel": "...", "createdAt": "..." }]
+  }
+  ```
+  Two counting rules are worth knowing: `byPlan.free` is *derived* (active workspaces minus those on an active paid plan) because Free workspaces have no subscription row, and `totals.subscriptions` excludes `canceled` rows — those are tombstones, often from deleted workspaces, and would inflate the live count. `activation` is a strict funnel: each step is a subset of the one above it.
+
+### Workspaces
+
+- `GET /admin/workspaces?page=&search=&plan=&includeDeleted=` — `search` matches workspace name or owner email; `plan=free` matches "no subscription **or** a free-plan subscription"; `includeDeleted=1` surfaces soft-deleted rows. Each item: `{ publicId, name, owner{publicId,email,fullName}, plan, subscriptionStatus, currentPeriodEnd, isTrialing, employeeCount, lastActivityDate, createdAt, deletedAt, testingTrack }`.
+- `GET /admin/workspaces/{publicId}` — detail, adding an `activity` block (`lastActivityDate`, `attendancesTotal`, `attendancesLast7d`, `attendancesLast30d`, `linkedEmployeeCount`, `managerCount`), the full `subscription` object (including `paddleCustomerId`), a thin `settings` summary, and `qrCodeCount`. `linkedEmployeeCount` vs `employeeCount` is the onboarding drop-off: an employee with no linked user cannot check in at all.
+- `POST /admin/workspaces/{publicId}/restore` — undoes a soft-delete and un-deletes the workspace's employees. `409` when the workspace isn't deleted. Employee→user links severed at delete time stay severed — the owner re-links manually. Returns `{ publicId, deletedAt: null, restoredEmployees }`.
+- `POST /admin/workspaces/{publicId}/cancel-subscription` — force-cancels locally (and in Paddle where applicable). `409` when there's no subscription. Returns `{ status, canceledAt }`.
+- `PUT /admin/workspaces/{publicId}/plan` — body `{ "plan": "free"|"espresso"|"double_espresso" }`. Comps a workspace onto a plan without Paddle, creating the `Subscription` row if needed. **`409` when a Paddle subscription is attached** — billing's source of truth stays in Paddle, and a local override would fight the webhooks. Returns `{ publicId, plan }`.
+- `PUT /admin/workspaces/{publicId}/testing-track` — body `{ "track": "none"|"alpha"|"beta" }`. Opts the workspace into early access for feature-flagged surfaces. Returns `{ publicId, testingTrack }`.
+
+### Users
+
+- `GET /admin/users?page=&search=&superAdminOnly=` — `search` matches email, first, or last name. Items carry `{ publicId, email, fullName, firstName, lastName, isSuperAdmin, hasGoogle, hasApple, hasPassword, createdAt }`.
+- `GET /admin/users/{publicId}` — adds `locale`, `onboardingCompleted`, `updatedAt`, `ownedWorkspaces[]` (**including soft-deleted**, each with `deletedAt`) and `linkedWorkspaces[]`.
+- `POST /admin/users/{publicId}/promote` — grants `ROLE_SUPER_ADMIN`; `409` if already held. Returns `{ "isSuperAdmin": true }`.
+- `POST /admin/users/{publicId}/demote` — revokes it. `400` on self-demotion (so the last admin can't lock everyone out by accident), `409` when the user isn't a super admin.
+
+### Subscriptions, churn, audit log
+
+- `GET /admin/subscriptions?page=&status=&plan=` — paginated subscriptions with their workspace and owner, plus `isActive`, `isTrialing`, `trialDaysRemaining`, `currentPeriodEnd`, `trialEndsAt`, `canceledAt`, `paddleSubscriptionId`.
+- `GET /admin/churn?days=30|90|365&page=` — churn analytics (`days` defaults to 90). Anything outside the three options silently falls back to the default rather than `400`ing — it's a dashboard, and a stale bookmark shouldn't blank the page.
+  ```json
+  {
+    "windowDays": 30,
+    "summary": {
+      "paidChurned": 4, "paidChurnedLast30d": 2, "livePaid": 37,
+      "paidChurnRate": 9.8, "paidChurnRateLast30d": 5.1,
+      "workspacesDeleted": 6, "workspacesDeletedLast30d": 3, "liveWorkspaces": 118,
+      "workspaceChurnRate": 4.8, "avgLifetimeDays": 142
+    },
+    "series": [{ "month": "2026-06", "paidCanceled": 1, "workspacesDeleted": 2 }],
+    "events": { "items": [{ "id": "ws-...", "type": "workspace_deleted", "occurredAt": "...", "workspace": {...}, "owner": {...} }], "page": 1, "pageSize": 25, "total": 6 },
+    "dormant": [{ "publicId": "...", "name": "...", "ownerEmail": "...", "plan": "espresso", "lastActivity": "2026-05-02", "daysQuiet": 40 }],
+    "dormantAfterDays": 21
+  }
+  ```
+  Two overlapping shapes are tracked: **paid churn** (`Subscription.canceledAt` on a non-free plan — lost revenue) and **workspace churn** (`Workspace.deletedAt` — lost account). Deleting a workspace cancels its subscription, so both counters see it, but the timeline emits **one event per workspace** — a deletion carries the plan it was on rather than producing a second `subscription_canceled` row. Rates are `churned ÷ (churned + still live)`; there's no historical subscription snapshot to use as a true period-start denominator. `dormant` lists paying accounts with no check-in for 21+ days, excluding never-active ones (that's activation, which the dashboard funnel covers).
+- `GET /admin/audit-log?page=&action=&targetType=` — newest-first admin actions. Alongside `items`, the response carries `actions[]` and `targetTypes[]` (`{ value, label }` pairs straight from the enums) so the admin dropdowns can't drift out of sync with the backend. Each item: `{ publicId, action, actionLabel, actor{publicId,email}|null, actorEmail, targetType, targetPublicId, targetLabel, metadata, createdAt }` — `actorEmail` and `targetLabel` are snapshots taken at write time, so a row stays readable after the actor or target is deleted.
+
+### Feature flags & mobile app config
+
+- `GET /admin/feature-flags` — every `FeatureFlagEnum` case with its current stage, plus the `stages[]` catalog (`{ value, label, description }`). Items: `{ key, label, description, stage, stageLabel }`.
+- `PUT /admin/feature-flags/{flagKey}` — body `{ "stage": "dev"|"alpha"|"beta"|"release" }`. Creates the row on first write and flushes the service cache. `404` on an unknown flag, `400` on an invalid stage.
+- `GET /admin/mobile-app-config` — `{ iosTeamId, iosBundleId, androidPackage, androidSha256Fingerprints[], iosConfigured, androidConfigured }`. Backs the `/.well-known` association files for iOS universal links and Android App Links.
+- `PUT /admin/mobile-app-config` — partial update of the four editable fields; blank strings clear a field, and Android fingerprints are upper-cased and de-blanked. Audited.
+
+### Cron
+
+Surfaces the `dukecity/command-scheduler` store through the React admin console (the bundle's own Twig panel is deliberately not exposed). Every write path validates the command against `CronJobRegistry` — defence in depth on top of the bundle's namespace filter, narrowing to the specific commands that are safe to schedule from a UI.
+
+- `GET /admin/cron/jobs` — the allowlist for the command picker: `[{ command, label, description, suggestedCron }]`.
+- `GET /admin/cron/schedules` — schedules ordered enabled-first, each as `{ id, name, command, arguments, cronExpression, cronExpressionTranslated, disabled, locked, executeImmediately, priority, lastExecution, lastReturnCode, nextRunDate, lastRun }`.
+- `POST /admin/cron/schedules` — body `{ command, name, cronExpression, arguments?, priority?, disabled? }`. `201`. `400` when the command isn't allowlisted or name/expression are blank.
+- `PATCH /admin/cron/schedules/{id}` — partial update of the same fields (this is also how a schedule is enabled/disabled).
+- `DELETE /admin/cron/schedules/{id}` — `{ "deleted": true }`.
+- `POST /admin/cron/schedules/{id}/run` — runs the command immediately, in-process, so `CronRunSubscriber` records an `AdminCronRun` row and captures the output tail. Returns `{ exitCode, startedAt, finishedAt, outputTail }`; the run is attributed to the triggering admin.
+- `GET /admin/cron/runs?command=&limit=` — run history for one command (`command` required, `limit` clamped to 1–100, default 20). Each run: `{ publicId, command, startedAt, finishedAt, status, exitCode, outputTail, triggeredByEmail }`.
 
 ## BasilBook API
 

@@ -211,6 +211,15 @@ They have IP Address Lock — the right idea, bolted onto a generic time clock w
 
 ## 5. Site Architecture & Pages
 
+> **Shipped vs. planned (checked 2026-08-11).** The sitemap below is the *target*. What actually exists today — in both `assets/src/routes/` (SPA) and `frontend/src/app/[locale]/(marketing)/` (Next port), and enumerated in `SitemapController`:
+>
+> - **Live:** `/`, `/pricing`, `/features` (+ `/features/{device-verification, ip-restriction, geofencing, basilbook-integration}`), `/three-factor-attendance`, `/stop-buddy-punching`, `/device-verified-attendance`, `/how-it-works`, `/faq`, `/roles`, `/demo`, `/support`, `/guides` (+ `owner`, `employee`, `espresso`, `nfc`), `/blog` (+ posts), legal (`/privacy`, `/terms`, `/refund`, `/delete-account`), and auth entry pages.
+> - **Live industry pages:** `/cafes`, `/coffee-shops`, `/restaurants`, `/bars`, `/bakeries`, `/food-trucks`, `/retail`, `/small-shops`.
+> - **Live competitor pages:** `/vs-jibble`, `/vs-homebase`, `/vs-connecteam`, `/vs-clockify`, `/vs-buddy-punch`, `/vs-7shifts`.
+> - **Not built yet:** the standalone `/ip-verification`, `/tap-to-clock-in`, `/qr-code-attendance`, `/no-gps-attendance-app`, `/no-biometric-time-clock`, `/privacy-friendly-time-tracking`, `/staff-trust`, `/leave-management`, `/time-clock`, `/kiosk-mode`; every `/tools/*` calculator; every regional and `/leave-laws/*` page; the whole `/glossary/*` cluster; `/integrations/*`; the remaining industry pages (`/pubs`, `/quick-service-restaurants`, `/boutiques`, `/convenience-stores`); `/vs-deputy`, `/vs-when-i-work`, `/vs-checkinme`; and the mirrored `/{competitor}-alternative` URLs.
+>
+> Note that some capabilities the plan treats as page-worthy *do* ship in the product — IP restriction, device verification, and geofencing each have a `/features/*` page rather than the dedicated landing page named below, and NFC check-in ships behind a feature flag rather than a waitlist page. Re-read §5's priority table with that in mind: the P0 items are still mostly unbuilt.
+
 ### Recommended sitemap
 
 ```
@@ -399,6 +408,13 @@ Ranked by expected signup ROI:
 ---
 
 ## 8. Technical SEO
+
+> **Status and two corrections (2026-08-11).**
+>
+> - **#1 is underway, not done.** `frontend/` is a Next.js App Router build with `generateMetadata` on the marketing routes; when the staging banner landed, `next build` kept every marketing route at `○ Static` (only `/checkin/[qrToken]` was dynamic) — re-check that on the build output before relying on it. But the production proxy has **not** been flipped, so what search engines fetch today is still the SPA shell with server-rendered per-page meta from `SpaController` / `SeoMetaResolver`. The SSG payoff lands at cutover — see [deploy/CUTOVER.md](../deploy/CUTOVER.md).
+> - **#2 and #4 partly ship already.** Per-page title/description/canonical are server-rendered for the SPA today, and `SitemapController` generates the sitemap — as one file, not the partitioned set described below.
+> - **#6 is wrong for this architecture.** There is no `app.dailybrew.work`; the console lives at `dailybrew.work/console/*` on the same origin, which is deliberate — the JWT cookie is scoped to `/api/v1` and the whole refresh-token design depends on same-origin requests. Keep the console `noindex` by path instead of splitting the hostname.
+> - **#9 conflicts with a decision already made.** Putting Next on Vercel/Cloudflare with the Symfony backend on another origin was explicitly rejected in [the migration plan](./nextjs-migration-plan.md#2-target-topology-the-critical-decision): it forces `SameSite=None` cookies and CORS preflight, and would re-open the silent-logout class of bug fixed in 1.68.1. Edge caching, if wanted, goes *in front of* the single origin — not as a second origin.
 
 ### Priority order
 

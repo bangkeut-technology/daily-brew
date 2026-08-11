@@ -1,6 +1,10 @@
 # Phase 6 cutover runbook
 
-**Status:** prep complete; not executed.
+**Status:** §0 (staging subdomain) is **done** — `next.dailybrew.work` is live, served by
+`dailybrew-next-staging.service` on `127.0.0.1:3001` and refreshed on every push to `main`
+by `.github/workflows/deploy-staging-next.yaml`. §1 onward (the production flip) has **not**
+been executed; `dailybrew.work` still serves the legacy SPA. Read §0 as background for how
+staging is wired rather than as work still to do.
 **Owner:** whoever has SSH to the prod host.
 **Risk:** single nginx config change; rollback is a `cp` + `nginx -s reload`.
 
@@ -24,8 +28,10 @@ stays untouched. You QA the entire Next surface on the subdomain for as
 long as you like, then run §1–§2 against `dailybrew.work` with confidence.
 
 The Next surface on the subdomain includes the **in-progress Next
-console** (currently ~13% of SPA parity). The basic-auth gate in step 0.5
-keeps non-team visitors out while you bring console parity up to scratch.
+console**. Every console and admin route exists there now, but the screens
+were re-implemented rather than mechanically ported, so treat parity as
+unverified until each one has been checked against its SPA counterpart. The
+basic-auth gate in step 0.5 keeps non-team visitors out while you do that.
 
 **Two distinct Next processes** run side-by-side on the host:
 
