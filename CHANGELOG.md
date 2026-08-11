@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.137.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.137.0...v1.137.1) (2026-08-11)
+
+
+### Bug Fixes
+
+* **billing:** make cancellation terminal, and cancel on delete whatever is still live ([#394](https://github.com/bangkeut-technology/daily-brew/issues/394)) ([2770453](https://github.com/bangkeut-technology/daily-brew/commit/27704538b25e803e083e6fc541527387af0d50af))
+
 ## [1.137.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.136.0...v1.137.0) (2026-08-11)
 
 
