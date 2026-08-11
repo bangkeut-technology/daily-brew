@@ -505,9 +505,25 @@ Bootstrapping is deliberately awkward: the only way to mint the first super-admi
 
 Every mutating admin action is recorded through `AdminAuditService::record()`, which is **wrap-and-log**: the audit write happens after the action has already been flushed, and a failure is swallowed and logged rather than rolling back the thing it was describing. An unrecorded action is better than a lost one.
 
-Two admin capabilities are worth calling out because they cross into billing and execution:
+### How churn is measured
+
+`AdminChurnService` tracks two overlapping shapes, because they answer different questions:
+
+- **Paid churn** — `Subscription.canceledAt` stamped on a non-free plan. Lost revenue, whether or not the workspace survives.
+- **Workspace churn** — `Workspace.deletedAt`. The account is gone, paid or not.
+
+Deleting a workspace also cancels its subscription, so both counters see the same event. They keep both; the *timeline* deliberately emits one event per workspace — a deletion carries the plan it was on, rather than appearing twice as a deletion and a cancellation.
+
+Rates are `churned ÷ (churned + still live)`. That isn't a textbook churn rate, and the reason is worth knowing before someone "fixes" it: a true rate needs the number of live subscriptions at the *start* of the period, and there's no historical snapshot to read one from. This is the closest honest approximation available from present-tense data.
+
+The churn page and the dashboard block are the same numbers from the same service — the dashboard calls a narrowed `dashboardSummary()` (12-month series plus the 30-day headline, no timeline, no at-risk list) sharing that denominator. Anything new that wants churn should call it rather than recompute, so the views can't drift into disagreeing.
+
+The at-risk list is a leading indicator rather than a churn count: paying accounts with no check-in for 21+ days. Never-active workspaces are excluded — that's an activation failure, which the dashboard funnel already measures.
+
+### Admin capabilities that cross into billing and execution
 
 - **Plan overrides** (`PUT /admin/workspaces/{publicId}/plan`) comp a workspace onto a paid plan without Paddle, creating the `Subscription` row if needed — but refuse with `409` when a Paddle subscription is attached. Billing's source of truth stays in Paddle; a local override would fight the webhooks.
+- **`dailybrew:admin:repair-subscriptions`** cleans up rows whose status drifted away from their cancellation — the two billing bugs described under [Plans & Feature Gating](#plans--feature-gating) left some behind. It reports by default; `--apply` writes the local fixes; `--cancel-at-paddle` is the only flag that reaches Paddle and refuses to run without `--apply`, because on its own it reads like a preview while actually cancelling someone's subscription. Orphaned cancellations are dated from the workspace deletion rather than from now, so churn reporting doesn't re-churn a customer who left months ago.
 - **The cron console** surfaces the `dukecity/command-scheduler` store (its own Twig panel is not exposed). Every write path re-validates the command against `CronJobRegistry` — an allowlist narrower than the bundle's namespace filter — and "run now" executes in-process via the Symfony console Application so `CronRunSubscriber` records an `AdminCronRun` row with the output tail.
 
 ## Feature flags & testing tracks
