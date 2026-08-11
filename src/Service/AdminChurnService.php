@@ -186,6 +186,33 @@ final readonly class AdminChurnService
     }
 
     /**
+     * The churn block on the admin dashboard: the same 12-month trend the churn page draws, plus
+     * the 30-day headline. Deliberately narrower than build() — no timeline, no at-risk list, so
+     * the dashboard stays four cheap queries rather than pulling a page's worth of rows it would
+     * only throw away.
+     *
+     * @return array<string, mixed>
+     */
+    public function dashboardSummary(): array
+    {
+        $since30d = DateService::relative('-30 days');
+
+        $paidChurned30d = $this->subscriptionRepository->countPaidCanceledSince($since30d);
+        $livePaid = $this->subscriptionRepository->countLivePaid();
+
+        return [
+            'series' => $this->buildSeries(),
+            'paidCanceledLast30d' => $paidChurned30d,
+            'workspacesDeletedLast30d' => $this->workspaceRepository->countDeletedSince($since30d),
+            'livePaid' => $livePaid,
+            // Same denominator as the churn page: churned ÷ (churned + still live). There is no
+            // historical subscription snapshot to use as a true period-start count, and inventing
+            // one here would make the dashboard disagree with /admin/churn.
+            'paidChurnRateLast30d' => $this->rate($paidChurned30d, $livePaid + $paidChurned30d),
+        ];
+    }
+
+    /**
      * Last 12 calendar months, zero-filled, oldest first.
      *
      * @return array<int, array{month: string, paidCanceled: int, workspacesDeleted: int}>

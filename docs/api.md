@@ -415,6 +415,10 @@ List endpoints share a pagination envelope — `{ "items": [...], "page": 1, "pa
     "totals": { "users": 412, "workspaces": 118, "employees": 940, "attendances": 51230, "subscriptions": 37 },
     "activation": { "workspacesTotal": 118, "workspacesWithEmployees": 96, "workspacesWithAttendance": 74, "workspacesActiveLast7d": 51 },
     "byPlan": { "free": 81, "espresso": 30, "double_espresso": 7 },
+    "churn": {
+      "series": [{ "month": "2026-08", "paidCanceled": 1, "workspacesDeleted": 2 }],
+      "paidCanceledLast30d": 2, "workspacesDeletedLast30d": 3, "livePaid": 37, "paidChurnRateLast30d": 5.1
+    },
     "byStatus": { "active": 34, "trialing": 3, "past_due": 0, "paused": 0, "canceled": 12 },
     "growth": { "usersLast7d": 9, "usersLast30d": 41, "workspacesLast7d": 3, "workspacesLast30d": 14, "employeesLast7d": 22, "employeesLast30d": 88, "attendancesLast7d": 1840, "attendancesLast30d": 7900 },
     "growthSeries": [{ "date": "2026-05-13", "users": 2, "workspaces": 1, "employees": 4, "attendances": 260 }],
@@ -423,6 +427,8 @@ List endpoints share a pagination envelope — `{ "items": [...], "page": 1, "pa
     "recentActivity": [{ "publicId": "...", "action": "promote_user", "actionLabel": "Promoted user", "actorEmail": "...", "targetType": "user", "targetPublicId": "...", "targetLabel": "...", "createdAt": "..." }]
   }
   ```
+  `churn` is a narrowed view of the churn endpoint — the same 12-month series and the same `churned ÷ (churned + live)` rate, without the timeline or at-risk list, so the dashboard stays cheap and can't tell a different story from `/admin/churn`.
+
   Two counting rules are worth knowing: `byPlan.free` is *derived* (active workspaces minus those on an active paid plan) because Free workspaces have no subscription row, and `totals.subscriptions` excludes `canceled` rows — those are tombstones, often from deleted workspaces, and would inflate the live count. `activation` is a strict funnel: each step is a subset of the one above it.
 
 ### Workspaces
