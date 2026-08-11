@@ -129,6 +129,45 @@ class SubscriptionRepository extends AbstractRepository
         return $out;
     }
 
+    /**
+     * Rows that carry a cancellation date but don't say canceled — the shape a late Paddle status
+     * webhook used to produce by overwriting the status of an already-cancelled subscription.
+     *
+     * @return Subscription[]
+     */
+    public function findCanceledWithDriftedStatus(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->leftJoin('s.workspace', 'w')->addSelect('w')
+            ->leftJoin('w.owner', 'o')->addSelect('o')
+            ->where('s.canceledAt IS NOT NULL')
+            ->andWhere('s.status != :canceled')
+            ->setParameter('canceled', SubscriptionStatusEnum::Canceled)
+            ->orderBy('s.canceledAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Live subscriptions belonging to a deleted workspace. Until workspace deletion learned to
+     * cancel anything that wasn't active|trialing, a past_due or paused subscription survived the
+     * deletion — still billable at Paddle, attached to an account that no longer exists.
+     *
+     * @return Subscription[]
+     */
+    public function findLiveForDeletedWorkspaces(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->innerJoin('s.workspace', 'w')->addSelect('w')
+            ->leftJoin('w.owner', 'o')->addSelect('o')
+            ->where('w.deletedAt IS NOT NULL')
+            ->andWhere('s.status != :canceled')
+            ->setParameter('canceled', SubscriptionStatusEnum::Canceled)
+            ->orderBy('w.deletedAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
     private function paidCanceledSince(\DateTimeInterface $since): QueryBuilder
     {
         return $this->createQueryBuilder('s')

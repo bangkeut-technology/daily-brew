@@ -85,6 +85,10 @@ readonly class PaddleWebhookService
         $subscription->setStatus($this->mapStatus($data['status'] ?? 'active'));
         $subscription->setPaddleSubscriptionId($paddleSubId);
         $subscription->setPaddleCustomerId($data['customer_id'] ?? null);
+        // One row per workspace, so a customer who cancelled and came back reuses it. Clearing the
+        // cancellation is what makes that row live again — and is why the terminal guard on the
+        // other handlers can't strand a genuine re-subscribe.
+        $subscription->setCanceledAt(null);
 
         if (isset($data['current_billing_period']['ends_at'])) {
             $subscription->setCurrentPeriodEnd(DateService::mutableParse($data['current_billing_period']['ends_at']));
@@ -105,6 +109,7 @@ readonly class PaddleWebhookService
     {
         $subscription = $this->findByPaddleId($data['id'] ?? '');
         if ($subscription === null) return;
+        if ($this->isTerminated($subscription, 'subscription.updated')) return;
 
         $subscription->setStatus($this->mapStatus($data['status'] ?? 'active'));
 
@@ -144,6 +149,7 @@ readonly class PaddleWebhookService
     {
         $subscription = $this->findByPaddleId($data['id'] ?? '');
         if ($subscription === null) return;
+        if ($this->isTerminated($subscription, 'subscription.paused')) return;
 
         $subscription->setStatus(SubscriptionStatusEnum::Paused);
         $this->subscriptionRepository->flush();
@@ -153,6 +159,7 @@ readonly class PaddleWebhookService
     {
         $subscription = $this->findByPaddleId($data['id'] ?? '');
         if ($subscription === null) return;
+        if ($this->isTerminated($subscription, 'subscription.resumed')) return;
 
         $subscription->setStatus(SubscriptionStatusEnum::Active);
         $this->subscriptionRepository->flush();
@@ -162,6 +169,7 @@ readonly class PaddleWebhookService
     {
         $subscription = $this->findByPaddleId($data['id'] ?? '');
         if ($subscription === null) return;
+        if ($this->isTerminated($subscription, 'subscription.past_due')) return;
 
         $subscription->setStatus(SubscriptionStatusEnum::PastDue);
         $this->subscriptionRepository->flush();
@@ -174,6 +182,33 @@ readonly class PaddleWebhookService
             $this->logger->warning('Paddle subscription not found: ' . $paddleSubId);
         }
         return $subscription;
+    }
+
+    /**
+     * Cancellation is terminal for a Paddle subscription id — Paddle has no un-cancel, and a
+     * resume applies to a paused subscription, never a canceled one. So any status event arriving
+     * afterwards is either dunning that was already in flight or a retry, and acting on it would
+     * quietly resurrect a subscription the customer (or a workspace deletion) ended.
+     *
+     * Guarding on canceledAt rather than the status: it's the durable record of "we ended this",
+     * and rows that already drifted have it set while their status says otherwise.
+     *
+     * A genuine re-subscribe is unaffected — Paddle mints a new subscription id, which arrives as
+     * subscription.created and takes the row over there.
+     */
+    private function isTerminated(Subscription $subscription, string $eventType): bool
+    {
+        if ($subscription->getCanceledAt() === null) {
+            return false;
+        }
+
+        $this->logger->info('Ignoring {event} for a canceled subscription', [
+            'event' => $eventType,
+            'paddleSubscriptionId' => $subscription->getPaddleSubscriptionId(),
+            'canceledAt' => $subscription->getCanceledAt()->format('c'),
+        ]);
+
+        return true;
     }
 
     /**

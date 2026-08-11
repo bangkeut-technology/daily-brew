@@ -15,6 +15,7 @@ use App\Repository\WorkspaceSettingRepository;
 use App\Service\WorkspaceService;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
@@ -251,7 +252,7 @@ class WorkspaceServiceTest extends TestCase
         $this->assertNotNull($ws->getDeletedAt());
     }
 
-    public function testDeleteDoesNotCancelInactiveSubscription(): void
+    public function testDeleteDoesNotReCancelAnAlreadyCanceledSubscription(): void
     {
         $ws = new Workspace();
         $sub = (new Subscription())->setStatus(SubscriptionStatusEnum::Canceled);
@@ -263,6 +264,53 @@ class WorkspaceServiceTest extends TestCase
 
         // Already canceled — status stays canceled, no Paddle call.
         $this->assertSame(SubscriptionStatusEnum::Canceled, $sub->getStatus());
+    }
+
+    /**
+     * Deletion used to gate on isActive(), which is active|trialing only — so a subscription whose
+     * payment had already failed survived the deletion and kept dunning the customer at Paddle,
+     * for a workspace that no longer existed.
+     */
+    #[DataProvider('liveButNotActiveStatuses')]
+    public function testDeleteCancelsASubscriptionThatIsLiveButNotActive(SubscriptionStatusEnum $status): void
+    {
+        $ws = new Workspace();
+        $sub = (new Subscription())
+            ->setStatus($status)
+            ->setPaddleSubscriptionId('sub_paddle_123');
+        $this->subscriptionRepo->method('findByWorkspace')->willReturn($sub);
+
+        $this->httpClient->expects($this->once())
+            ->method('request')
+            ->with('POST', 'https://sandbox-api.paddle.com/subscriptions/sub_paddle_123/cancel', $this->anything());
+        $this->workspaceRepo->expects($this->once())->method('flush');
+
+        $this->svc->delete($ws);
+
+        $this->assertSame(SubscriptionStatusEnum::Canceled, $sub->getStatus());
+        $this->assertNotNull($sub->getCanceledAt());
+    }
+
+    /** @return iterable<string, array{0: SubscriptionStatusEnum}> */
+    public static function liveButNotActiveStatuses(): iterable
+    {
+        yield 'past due' => [SubscriptionStatusEnum::PastDue];
+        yield 'paused' => [SubscriptionStatusEnum::Paused];
+    }
+
+    public function testCancellingTwiceKeepsTheFirstCancellationDate(): void
+    {
+        // Churn counts by canceledAt, so a repair or a second cancel must not move a customer's
+        // departure to today and re-churn them in the current window.
+        $originally = new \DateTimeImmutable('2026-06-01 09:00:00');
+        $sub = (new Subscription())
+            ->setStatus(SubscriptionStatusEnum::PastDue)
+            ->setCanceledAt($originally);
+
+        $this->svc->forceCancelSubscription($sub);
+
+        $this->assertSame(SubscriptionStatusEnum::Canceled, $sub->getStatus());
+        $this->assertSame($originally, $sub->getCanceledAt());
     }
 
     public function testForceCancelSubscriptionIsNoOpOnAlreadyCanceled(): void
