@@ -41,6 +41,15 @@ A `CacheNonceStore` ships here for convenience. **Read its docblock before using
 gate** — PSR-6 has no compare-and-set, so a unique database constraint is the right backing where a
 double-open costs money.
 
+A fourth is optional. Implement `Bangkeut\Tap\Revocation\RevocationStore` if you issue passes that
+can be refunded, cancelled or lost — without one, the verifier is autowired with
+`NullRevocationStore` and a signed pass is good until it expires:
+
+```yaml
+services:
+    Bangkeut\Tap\Revocation\RevocationStore: '@App\Tap\DoctrineRevocationStore'
+```
+
 ## Verify a tap
 
 ```php
@@ -54,6 +63,21 @@ public function tap(Request $request, TapService $taps): JsonResponse
 
 `TapService` dispatches `TapVerifiedEvent` on success and `TapRejectedEvent` on refusal before
 rethrowing, so an audit listener sees every tap without each call site remembering to log.
+
+## Issuing passes
+
+Not wired here, on purpose: `PassIssuer` takes a private key, and this bundle has no business
+deciding where yours lives. Register it in the host, next to whatever already holds your secrets:
+
+```yaml
+services:
+    Bangkeut\Tap\Issuance\PassIssuer:
+        arguments:
+            $privateKeyPem: '%env(file:TAP_ISSUER_PRIVATE_KEY_FILE)%'
+```
+
+Everything else — who gets a pass, what it costs, how it reaches a phone — is application code. See
+[tap-core's README](../tap-core/README.md#issuing-a-pass).
 
 The verified event is the product seam: DailyBrew listens and records attendance; an event gate
 listens and admits an attendee. A listener that throws fails the tap — correct for "verified but not

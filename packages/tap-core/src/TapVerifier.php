@@ -17,9 +17,12 @@ use Bangkeut\Tap\Exception\NonceAlreadyUsed;
 use Bangkeut\Tap\Exception\PassExpired;
 use Bangkeut\Tap\Exception\PassNotYetValid;
 use Bangkeut\Tap\Exception\PassRecentlyUsed;
+use Bangkeut\Tap\Exception\PassRevoked;
 use Bangkeut\Tap\Exception\UnknownCredential;
 use Bangkeut\Tap\Exception\UnknownIssuer;
 use Bangkeut\Tap\Nonce\NonceStore;
+use Bangkeut\Tap\Revocation\NullRevocationStore;
+use Bangkeut\Tap\Revocation\RevocationStore;
 use Bangkeut\Tap\Signature\SignatureVerifier;
 use Psr\Clock\ClockInterface;
 
@@ -40,6 +43,8 @@ final readonly class TapVerifier
         private SignatureVerifier $signatures,
         private ClockInterface $clock,
         private TapPolicy $policy = new TapPolicy(),
+        /** Issued passes only — a device key is revoked by dropping it from the CredentialStore. */
+        private RevocationStore $revocations = new NullRevocationStore(),
         private AssertionCodec $codec = new AssertionCodec(),
     ) {
     }
@@ -119,6 +124,13 @@ final readonly class TapVerifier
         }
         if (!$verified) {
             throw new InvalidSignature('This pass was not signed by a trusted issuer key.');
+        }
+
+        // Checked after the signature — an unauthenticated forger shouldn't be able to probe which
+        // pass ids exist — and before the cooldown, so a withdrawn pass doesn't burn the
+        // anti-passback slot of whoever legitimately taps next.
+        if ($this->revocations->isRevoked($assertion->passId, $assertion->audienceId)) {
+            throw new PassRevoked('This pass has been withdrawn.');
         }
 
         // Anti-passback. A pass is a bearer token, so this is the only thing standing between one
