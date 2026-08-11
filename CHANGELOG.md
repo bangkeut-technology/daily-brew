@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.138.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.138.0...v1.138.1) (2026-08-11)
+
+
+### Bug Fixes
+
+* **deploy:** install the Next build with --legacy-peer-deps ([#399](https://github.com/bangkeut-technology/daily-brew/issues/399)) ([123b940](https://github.com/bangkeut-technology/daily-brew/commit/123b9400c365df77feb13ef7276459da22bc0f46))
+
 ## [1.138.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.137.1...v1.138.0) (2026-08-11)
 
 
