@@ -78,6 +78,37 @@ the same bookkeeping path can enforce anti-passback.
 `audienceId` must equal the terminal's audience, so a pass minted for one event cannot be presented
 at another even if both trust the same issuer key.
 
+`notBefore` and `notAfter` are unsigned 32-bit, so the representable window is 1970-01-01 to
+2106-02-07, and `notAfter` must be strictly greater than `notBefore`. Both bounds are inside the
+signature: an issuer that truncates a timestamp into range signs the truncated value, and the door
+enforces what was signed. Issuers must therefore refuse an out-of-range window rather than wrap it —
+`PassIssuer` is the reference implementation of that rule.
+
+Ids (`passId`, `audienceId`) are exactly 12 bytes with no length prefix, so their width is part of
+the format, not a convention. A verifier accepts any 12 bytes; an issuer should emit printable ASCII
+only, since these values end up in barcodes, URLs and log lines.
+
+## Revocation
+
+The envelope carries no revocation field, and cannot: an issued pass is signed once and then lives
+in a wallet the issuer can't reach. A pass that could say "I have been withdrawn" would be a pass
+whose holder could say otherwise.
+
+Revocation is therefore **out of band** — the terminal is told, not the credential. A verifier
+consults a revocation list scoped to the audience, after the signature verifies and before any
+anti-passback bookkeeping. Device assertions have no equivalent because they don't need one:
+dropping a key from the credential store revokes it.
+
+Two consequences a door has to live with:
+
+- **Offline enforcement is as fresh as the last sync.** A pass withdrawn during an outage is
+  admitted until the terminal syncs again. Refusing everyone the moment the network drops is worse.
+- **A list is a snapshot, not a log.** Sync by replacement, so that un-revoking (a reversed refund,
+  a badge found) can be expressed at all.
+
+The list is bounded by the event rather than by history: a revocation stops mattering once the pass
+it names falls outside its own validity window.
+
 ## Transport
 
 The bytes are transport-agnostic. Over NFC (Android HCE) they travel as an APDU response — 98 bytes
