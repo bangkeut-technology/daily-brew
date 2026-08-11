@@ -1,0 +1,30 @@
+{
+    "name": "bangkeut/tap-bundle",
+    "description": "Symfony integration for bangkeut/tap-core: autowired verifier, policy configuration and tap events.",
+    "type": "symfony-bundle",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.4",
+        "bangkeut/tap-core": "@dev",
+        "psr/cache": "^3.0",
+        "psr/clock": "^1.0",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/event-dispatcher": "^7.4|^8.0",
+        "symfony/http-kernel": "^7.4|^8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^13.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bangkeut\\TapBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Bangkeut\\TapBundle\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable"
+}
