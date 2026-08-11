@@ -123,6 +123,63 @@ export interface AdminUserDetail extends AdminUserRow {
 export type WorkspaceTestingTrack = "none" | "alpha" | "beta";
 export type WorkspacePlan = "free" | "espresso" | "double_espresso";
 
+/**
+ * Churn has two shapes and they overlap: a canceled subscription is lost
+ * revenue, a deleted workspace is a lost account, and deleting a workspace
+ * cancels its subscription. The counters keep both; the timeline emits one
+ * event per workspace (a deletion carries the plan it was on).
+ */
+export interface AdminChurnData {
+  windowDays: number;
+  summary: {
+    paidChurned: number;
+    paidChurnedLast30d: number;
+    livePaid: number;
+    paidChurnRate: number;
+    paidChurnRateLast30d: number;
+    workspacesDeleted: number;
+    workspacesDeletedLast30d: number;
+    liveWorkspaces: number;
+    workspaceChurnRate: number;
+    avgLifetimeDays: number | null;
+  };
+  series: AdminChurnPoint[];
+  events: AdminPagedResponse<AdminChurnEvent>;
+  dormant: AdminDormantWorkspace[];
+  /** Days of silence after which a paid workspace is listed as at risk. */
+  dormantAfterDays: number;
+}
+
+export interface AdminChurnPoint {
+  /** YYYY-MM */
+  month: string;
+  paidCanceled: number;
+  workspacesDeleted: number;
+}
+
+export interface AdminChurnEvent {
+  id: string;
+  type: "subscription_canceled" | "workspace_deleted";
+  occurredAt: string;
+  workspace: { publicId: string; name: string };
+  owner: { publicId: string; email: string } | null;
+  /** Null when a deleted workspace never had a subscription row. */
+  plan: WorkspacePlan | null;
+  wasPaid: boolean;
+  paddleSubscriptionId: string | null;
+  lifetimeDays: number;
+}
+
+export interface AdminDormantWorkspace {
+  publicId: string;
+  name: string;
+  ownerEmail: string | null;
+  plan: WorkspacePlan;
+  /** YYYY-MM-DD of the last check-in. */
+  lastActivity: string;
+  daysQuiet: number;
+}
+
 export interface AdminWorkspaceDetail {
   publicId: string;
   name: string;

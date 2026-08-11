@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiAxios } from "@/lib/api";
 import type {
   AdminAuditLogResponse,
+  AdminChurnData,
   AdminDashboardData,
   AdminFeatureFlagRow,
   AdminFeatureFlagStageOption,
@@ -112,6 +113,14 @@ export function useAdminSubscriptions(
     queryFn: async () =>
       (await apiAxios.get<AdminPagedResponse<AdminSubscriptionRow>>("/admin/subscriptions", { params }))
         .data,
+    placeholderData: (prev) => prev,
+  });
+}
+
+export function useAdminChurn(params: { days?: number; page?: number } = {}) {
+  return useQuery({
+    queryKey: ["admin", "churn", params],
+    queryFn: async () => (await apiAxios.get<AdminChurnData>("/admin/churn", { params })).data,
     placeholderData: (prev) => prev,
   });
 }
