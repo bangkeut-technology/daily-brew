@@ -192,9 +192,16 @@ php bin/console dailybrew:send-daily-summary      # run hourly; sends per worksp
 php bin/console dailybrew:scan-shift-summaries    # run every 5 min; shift start+30 / end+30 digests
 php bin/console dailybrew:admin:promote-user <email>   # idempotent; the only way to mint the first super-admin
 php bin/console dailybrew:seed-reviewer [--fresh]      # demo workspace, see below
+
+# Subscriptions whose status drifted away from their cancellation. Reports by default:
+php bin/console dailybrew:admin:repair-subscriptions
+php bin/console dailybrew:admin:repair-subscriptions --apply                     # fix locally
+php bin/console dailybrew:admin:repair-subscriptions --apply --cancel-at-paddle  # also cancel at Paddle
 ```
 
 The first two are also schedulable (and runnable on demand) from `/admin/cron`, which records each run with its exit code and output tail.
+
+`repair-subscriptions` is a one-off repair, not a routine: `--cancel-at-paddle` cancels real subscriptions, so it refuses to run without `--apply` and is never scheduled.
 
 ## Reviewer / Demo Accounts
 
