@@ -1,6 +1,15 @@
 # Next.js migration plan — DailyBrew frontend
 
-**Status:** draft for review · **Scope:** frontend only · **Owner:** TBD
+**Status:** accepted and in progress · **Scope:** frontend only · **Owner:** TBD
+
+> **Where this actually stands (2026-08-11).** This document is the original plan and is kept as the record of *why* the decisions were made — the topology, the big-bang choice, and the rejected alternatives all still hold. What has changed since it was written:
+>
+> - Every route in scope now **exists** in `frontend/src/app` — marketing/legal, blog, auth entry flows, check-in, the full `/console/*` tree, and the full `/admin/*` tree. Existence is not parity: the Next screens were re-implemented rather than mechanically ported, so each one still needs checking against the SPA screen and the Symfony controller it talks to before it can be trusted in production.
+> - The "open infra question" in §2 is closed. Deploy infra is checked in: `deploy/CUTOVER.md`, `deploy/nginx/*.example`, `deploy/systemd/dailybrew-next.service.example`, and a Deployer-based `deploy-atomic.yaml` that builds the Next standalone server on every release.
+> - A real staging mirror exists at `next.dailybrew.work` (its own systemd unit on port 3001, deployed by `deploy-staging-next.yaml`), sharing the production DB and API.
+> - The production cutover in §6/Phase 6 has **not** been performed — it's an nginx flip, and until an operator runs it the legacy SPA is what users get.
+>
+> See [architecture.md § Two frontends](./architecture.md#two-frontends) for the current topology.
 
 ## 1. Goal & scope
 
