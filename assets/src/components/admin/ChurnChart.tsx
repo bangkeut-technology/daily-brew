@@ -29,7 +29,7 @@ function monthLabel(month: string): string {
  * without any of the non-uniform-scale text distortion an SVG would need to
  * work around.
  */
-export function ChurnChart({ series }: { series: AdminChurnPoint[] }) {
+export function ChurnChart({ series, className }: { series: AdminChurnPoint[]; className?: string }) {
   if (series.length === 0) return null;
 
   const peak = series.reduce((acc, point) => Math.max(acc, point.paidCanceled, point.workspacesDeleted), 0);
@@ -37,7 +37,7 @@ export function ChurnChart({ series }: { series: AdminChurnPoint[] }) {
   const heightPct = (value: number) => (max === 0 ? 0 : (value / max) * 100);
 
   return (
-    <GlassCard hover={false}>
+    <GlassCard hover={false} className={className}>
       <div className="px-5 py-4">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2 text-text-tertiary">

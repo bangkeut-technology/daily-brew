@@ -16,6 +16,7 @@ use App\Repository\EmployeeRepository;
 use App\Repository\SubscriptionRepository;
 use App\Repository\UserRepository;
 use App\Repository\WorkspaceRepository;
+use App\Service\AdminChurnService;
 use App\Service\DateService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -34,6 +35,7 @@ class AdminDashboardController extends AbstractController
         AttendanceRepository $attendanceRepository,
         SubscriptionRepository $subscriptionRepository,
         AdminAuditLogRepository $auditRepository,
+        AdminChurnService $churnService,
     ): JsonResponse {
         $totalWorkspaces = $workspaceRepository->count(['deletedAt' => null]);
 
@@ -273,6 +275,7 @@ class AdminDashboardController extends AbstractController
             ],
             'byPlan' => $byPlan,
             'byStatus' => $byStatus,
+            'churn' => $churnService->dashboardSummary(),
             'growth' => [
                 'usersLast7d' => $usersLast7d,
                 'usersLast30d' => $usersLast30d,

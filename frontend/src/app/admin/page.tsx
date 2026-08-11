@@ -11,6 +11,7 @@ import {
   CreditCard,
   Crown,
   ScrollText,
+  TrendingDown,
   TrendingUp,
   UserCircle,
   Users,
@@ -19,6 +20,7 @@ import { useAdminDashboard } from "@/hooks/useAdmin";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { GrowthChart } from "@/components/admin/GrowthChart";
+import { ChurnChart } from "@/components/admin/ChurnChart";
 import { Skeleton } from "@/components/admin/AdminDataStates";
 import { cn } from "@/lib/utils";
 import { formatAdminDate } from "@/lib/adminDate";
@@ -155,6 +157,31 @@ export default function AdminDashboardPage() {
               </div>
             </div>
           </GlassCard>
+
+          {/* Churn — the counterweight to Growth above it */}
+          <GlassCard hover={false} className="mt-4">
+            <ListHeader icon={TrendingDown} label="Churn · last 30 days" href="/admin/churn" linkLabel="Churn detail" />
+            <div className="grid grid-cols-2 gap-3 px-5 pb-4 md:grid-cols-4">
+              <ChurnCell label="Paid churn rate" value={`${data.churn.paidChurnRateLast30d}%`} variant="red" />
+              <ChurnCell
+                label="Paid cancellations"
+                value={data.churn.paidCanceledLast30d.toLocaleString()}
+                variant="red"
+              />
+              <ChurnCell
+                label="Workspaces deleted"
+                value={data.churn.workspacesDeletedLast30d.toLocaleString()}
+                variant="purple"
+              />
+              <ChurnCell label="Still paying" value={data.churn.livePaid.toLocaleString()} variant="green" />
+            </div>
+          </GlassCard>
+
+          {/* 12-month churn trend — same component and scale as /admin/churn, so the
+              dashboard and the detail page can't tell different stories. */}
+          <div className="mt-4">
+            <ChurnChart series={data.churn.series} />
+          </div>
 
           <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
             <GlassCard hover={false}>
@@ -391,6 +418,35 @@ function StatusCell({
   );
 }
 
+/**
+ * Same shape as StatusCell, but the value is pre-formatted: the churn row mixes a percentage with
+ * counts, and a rate rendered through toLocaleString would lose its "%".
+ */
+function ChurnCell({
+  label,
+  value,
+  variant,
+}: {
+  label: string;
+  value: string;
+  variant: "red" | "purple" | "green";
+}) {
+  // Purple for workspaces matches the growth chart's workspaces line and ChurnChart's deleted
+  // series — one colour per thing counted, across every chart on this page.
+  const dotStyle = variant === "purple" ? { backgroundColor: "#A26FB5" } : undefined;
+  const dotClass = { red: "bg-red", purple: "", green: "bg-green" }[variant];
+
+  return (
+    <div className="rounded-xl bg-cream-3/40 px-3 py-2.5">
+      <div className="mb-1 flex items-center gap-1.5 text-xs text-text-tertiary">
+        <span className={cn("h-1.5 w-1.5 rounded-full", dotClass)} style={dotStyle} />
+        {label}
+      </div>
+      <div className="text-[20px] font-semibold leading-tight tabular-nums text-text-primary">{value}</div>
+    </div>
+  );
+}
+
 function ListHeader({
   icon: Icon,
   label,
@@ -459,6 +515,18 @@ function DashboardSkeleton() {
         <div className="space-y-3 px-5 py-4">
           <Skeleton className="h-3 w-1/5" />
           <Skeleton className="h-12" />
+        </div>
+      </GlassCard>
+      <GlassCard hover={false} className="mt-4">
+        <div className="space-y-3 px-5 py-4">
+          <Skeleton className="h-3 w-1/5" />
+          <Skeleton className="h-12" />
+        </div>
+      </GlassCard>
+      <GlassCard hover={false} className="mt-4">
+        <div className="space-y-3 px-5 py-4">
+          <Skeleton className="h-3 w-1/4" />
+          <Skeleton className="h-[160px]" />
         </div>
       </GlassCard>
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">

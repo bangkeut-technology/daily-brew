@@ -207,6 +207,45 @@ class AdminChurnServiceTest extends TestCase
         $this->assertSame(40, $result['dormant'][0]['daysQuiet']);
     }
 
+    public function testDashboardSummaryReportsTheSameRateTheChurnPageWould(): void
+    {
+        $this->subscriptions->method('countPaidCanceledSince')->willReturn(6);
+        $this->subscriptions->method('countLivePaid')->willReturn(94);
+        $this->workspaces->method('countDeletedSince')->willReturn(3);
+        $this->subscriptions->method('countPaidCanceledByMonthSince')->willReturn(['2026-08' => 6]);
+        $this->workspaces->method('countDeletedByMonthSince')->willReturn(['2026-08' => 3]);
+
+        $summary = $this->svc->dashboardSummary();
+
+        $this->assertSame(6, $summary['paidCanceledLast30d']);
+        $this->assertSame(3, $summary['workspacesDeletedLast30d']);
+        $this->assertSame(94, $summary['livePaid']);
+        // 6 / (6 + 94) — the same churned ÷ (churned + live) denominator build() uses, so the
+        // dashboard headline can't disagree with the churn page it links to.
+        $this->assertSame(6.0, $summary['paidChurnRateLast30d']);
+    }
+
+    public function testDashboardSummaryCarriesTwelveZeroFilledMonths(): void
+    {
+        $this->subscriptions->method('countPaidCanceledSince')->willReturn(0);
+        $this->subscriptions->method('countLivePaid')->willReturn(0);
+        $this->workspaces->method('countDeletedSince')->willReturn(0);
+        $this->subscriptions->method('countPaidCanceledByMonthSince')->willReturn(['2026-08' => 4]);
+        $this->workspaces->method('countDeletedByMonthSince')->willReturn([]);
+
+        $summary = $this->svc->dashboardSummary();
+
+        $this->assertCount(12, $summary['series']);
+        $this->assertSame('2025-09', $summary['series'][0]['month']);
+        $this->assertSame('2026-08', $summary['series'][11]['month']);
+        // Quiet months are still plotted — a gap in a bar chart reads as "no data", which is a
+        // different claim from "nobody churned".
+        $this->assertSame(0, $summary['series'][0]['paidCanceled']);
+        $this->assertSame(4, $summary['series'][11]['paidCanceled']);
+        // An empty denominator is 0.0, not a division by zero.
+        $this->assertSame(0.0, $summary['paidChurnRateLast30d']);
+    }
+
     private function workspace(string $name, string $createdAt, ?string $deletedAt = null): Workspace
     {
         // The entity stamps createdAt from the clock, so wind it back to give

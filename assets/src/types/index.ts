@@ -37,6 +37,13 @@ export interface AdminDashboardData {
     attendancesLast7d: number;
     attendancesLast30d: number;
   };
+  churn: {
+    series: AdminChurnPoint[];
+    paidCanceledLast30d: number;
+    workspacesDeletedLast30d: number;
+    livePaid: number;
+    paidChurnRateLast30d: number;
+  };
   growthSeries: {
     date: string;
     users: number;

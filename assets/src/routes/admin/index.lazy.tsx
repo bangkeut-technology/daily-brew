@@ -8,6 +8,7 @@ import {
   UserCircle,
   Users,
   TrendingUp,
+  TrendingDown,
   Coffee,
   Crown,
   ScrollText,
@@ -28,6 +29,7 @@ import type { AdminDashboardData } from '@/types';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlassCard } from '@/components/shared/GlassCard';
 import { Skeleton } from '@/components/admin/AdminDataStates';
+import { ChurnChart } from '@/components/admin/ChurnChart';
 import { cn } from '@/lib/utils';
 import { formatAdminDate, formatAdminDayMonth } from '@/lib/adminDate';
 
@@ -173,6 +175,33 @@ function AdminDashboardPage() {
             </div>
           </GlassCard>
 
+          {/* Churn — the counterweight to Growth above it */}
+          <GlassCard className="mt-4">
+            <ListHeader icon={TrendingDown} label="Churn · last 30 days" linkTo="/admin/churn" linkLabel="Churn detail" />
+            <div className="px-5 pb-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+              <ChurnCell
+                label="Paid churn rate"
+                value={`${data.churn.paidChurnRateLast30d}%`}
+                variant="red"
+              />
+              <ChurnCell
+                label="Paid cancellations"
+                value={data.churn.paidCanceledLast30d.toLocaleString()}
+                variant="red"
+              />
+              <ChurnCell
+                label="Workspaces deleted"
+                value={data.churn.workspacesDeletedLast30d.toLocaleString()}
+                variant="purple"
+              />
+              <ChurnCell label="Still paying" value={data.churn.livePaid.toLocaleString()} variant="green" />
+            </div>
+          </GlassCard>
+
+          {/* 12-month churn trend — same component and scale as /admin/churn, so the
+              dashboard and the detail page can't tell different stories. */}
+          <ChurnChart series={data.churn.series} className="mt-4" />
+
           {/* Recent activity / signups / workspaces */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
             <GlassCard>
@@ -304,6 +333,18 @@ function DashboardSkeleton() {
         <div className="px-5 py-4 space-y-3">
           <Skeleton className="h-3 w-1/5" />
           <Skeleton className="h-12" />
+        </div>
+      </GlassCard>
+      <GlassCard hover={false} className="mt-4">
+        <div className="px-5 py-4 space-y-3">
+          <Skeleton className="h-3 w-1/5" />
+          <Skeleton className="h-12" />
+        </div>
+      </GlassCard>
+      <GlassCard hover={false} className="mt-4">
+        <div className="px-5 py-4 space-y-3">
+          <Skeleton className="h-3 w-1/4" />
+          <Skeleton className="h-[160px]" />
         </div>
       </GlassCard>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
@@ -451,6 +492,35 @@ function StatusCell({
       <div className="text-[20px] font-semibold text-text-primary tabular-nums leading-tight">
         {value.toLocaleString()}
       </div>
+    </div>
+  );
+}
+
+/**
+ * Same shape as StatusCell, but the value is pre-formatted: the churn row mixes a percentage with
+ * counts, and a rate rendered through toLocaleString would lose its "%".
+ */
+function ChurnCell({
+  label,
+  value,
+  variant,
+}: {
+  label: string;
+  value: string;
+  variant: 'red' | 'purple' | 'green';
+}) {
+  // Purple for workspaces matches the growth chart's workspaces line and ChurnChart's deleted
+  // series — one colour per thing counted, across every chart on this page.
+  const dotStyle = { red: undefined, purple: { backgroundColor: '#A26FB5' }, green: undefined }[variant];
+  const dotClass = { red: 'bg-red', purple: '', green: 'bg-green' }[variant];
+
+  return (
+    <div className="rounded-xl bg-cream-3/40 px-3 py-2.5">
+      <div className="flex items-center gap-1.5 text-[12px] text-text-tertiary mb-1">
+        <span className={cn('w-1.5 h-1.5 rounded-full', dotClass)} style={dotStyle} />
+        {label}
+      </div>
+      <div className="text-[20px] font-semibold text-text-primary tabular-nums leading-tight">{value}</div>
     </div>
   );
 }
