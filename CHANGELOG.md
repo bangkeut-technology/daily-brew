@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.135.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.134.2...v1.135.0) (2026-08-11)
+
+
+### Features
+
+* **admin:** churn section — rates, monthly trend, timeline and at-risk accounts ([#386](https://github.com/bangkeut-technology/daily-brew/issues/386)) ([46bb6c9](https://github.com/bangkeut-technology/daily-brew/commit/46bb6c97dde665e671909d0423c4c9cb1f6d7bef))
+
 ## [1.134.2](https://github.com/bangkeut-technology/daily-brew/compare/v1.134.1...v1.134.2) (2026-08-10)
 
 
