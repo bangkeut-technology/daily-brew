@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.136.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.135.0...v1.136.0) (2026-08-11)
+
+
+### Features
+
+* **packages:** tap-core + tap-bundle — verify a credential presented at a terminal ([#388](https://github.com/bangkeut-technology/daily-brew/issues/388)) ([2cae90b](https://github.com/bangkeut-technology/daily-brew/commit/2cae90b2ddfa22d23e8dc6c225ea530d0d14a7f7))
+
 ## [1.135.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.134.2...v1.135.0) (2026-08-11)
 
 
