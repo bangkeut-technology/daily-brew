@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.137.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.136.0...v1.137.0) (2026-08-11)
+
+
+### Features
+
+* **tap-core:** mint issued passes, and be able to take one back ([#392](https://github.com/bangkeut-technology/daily-brew/issues/392)) ([f56a34c](https://github.com/bangkeut-technology/daily-brew/commit/f56a34c1b70d537e9cf1ee9434fe09143bf75e59))
+
 ## [1.136.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.135.0...v1.136.0) (2026-08-11)
 
 
