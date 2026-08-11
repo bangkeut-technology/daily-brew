@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.138.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.137.1...v1.138.0) (2026-08-11)
+
+
+### Features
+
+* **admin:** put churn on the dashboard, next to growth ([#396](https://github.com/bangkeut-technology/daily-brew/issues/396)) ([96c6f03](https://github.com/bangkeut-technology/daily-brew/commit/96c6f03c1d0507a30a2c7c0dead9a7a9ee8dac70))
+
 ## [1.137.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.137.0...v1.137.1) (2026-08-11)
 
 
