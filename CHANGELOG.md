@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.140.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.139.0...v1.140.0) (2026-08-12)
+
+
+### Features
+
+* **api:** signed attendance ingest for external systems ([#403](https://github.com/bangkeut-technology/daily-brew/issues/403)) ([ecb2181](https://github.com/bangkeut-technology/daily-brew/commit/ecb21811da2015aafb64989dadc9511f98fdde24))
+
 ## [1.139.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.138.1...v1.139.0) (2026-08-12)
 
 
