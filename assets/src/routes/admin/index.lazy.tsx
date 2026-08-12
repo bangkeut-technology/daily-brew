@@ -178,7 +178,7 @@ function AdminDashboardPage() {
           {/* Churn — the counterweight to Growth above it */}
           <GlassCard className="mt-4">
             <ListHeader icon={TrendingDown} label="Churn · last 30 days" linkTo="/admin/churn" linkLabel="Churn detail" />
-            <div className="px-5 pb-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="px-5 pb-4 grid grid-cols-2 md:grid-cols-5 gap-3">
               <ChurnCell
                 label="Paid churn rate"
                 value={`${data.churn.paidChurnRateLast30d}%`}
@@ -193,6 +193,11 @@ function AdminDashboardPage() {
                 label="Workspaces deleted"
                 value={data.churn.workspacesDeletedLast30d.toLocaleString()}
                 variant="purple"
+              />
+              <ChurnCell
+                label="Accounts deleted"
+                value={data.churn.usersDeletedLast30d.toLocaleString()}
+                variant="blue"
               />
               <ChurnCell label="Still paying" value={data.churn.livePaid.toLocaleString()} variant="green" />
             </div>
@@ -507,12 +512,17 @@ function ChurnCell({
 }: {
   label: string;
   value: string;
-  variant: 'red' | 'purple' | 'green';
+  variant: 'red' | 'purple' | 'blue' | 'green';
 }) {
-  // Purple for workspaces matches the growth chart's workspaces line and ChurnChart's deleted
-  // series — one colour per thing counted, across every chart on this page.
-  const dotStyle = { red: undefined, purple: { backgroundColor: '#A26FB5' }, green: undefined }[variant];
-  const dotClass = { red: 'bg-red', purple: '', green: 'bg-green' }[variant];
+  // Purple for workspaces and blue for users match the growth chart's lines and ChurnChart's
+  // bars — one colour per thing counted, across every chart on this page.
+  const dotStyle = {
+    red: undefined,
+    purple: { backgroundColor: '#A26FB5' },
+    blue: { backgroundColor: '#3B6FA0' },
+    green: undefined,
+  }[variant];
+  const dotClass = { red: 'bg-red', purple: '', blue: '', green: 'bg-green' }[variant];
 
   return (
     <div className="rounded-xl bg-cream-3/40 px-3 py-2.5">

@@ -10,6 +10,7 @@ use App\Entity\Workspace;
 use App\Enum\PlanEnum;
 use App\Enum\SubscriptionStatusEnum;
 use App\Repository\SubscriptionRepository;
+use App\Repository\UserRepository;
 use App\Repository\WorkspaceRepository;
 use App\Service\AdminChurnService;
 use App\Service\DateService;
@@ -26,6 +27,7 @@ class AdminChurnServiceTest extends TestCase
 
     private SubscriptionRepository&MockObject $subscriptions;
     private WorkspaceRepository&MockObject $workspaces;
+    private UserRepository&MockObject $users;
     private AdminChurnService $svc;
 
     protected function setUp(): void
@@ -33,7 +35,8 @@ class AdminChurnServiceTest extends TestCase
         DateService::setClock(new MockClock(self::NOW, new DateTimeZone('UTC')));
         $this->subscriptions = $this->createMock(SubscriptionRepository::class);
         $this->workspaces = $this->createMock(WorkspaceRepository::class);
-        $this->svc = new AdminChurnService($this->subscriptions, $this->workspaces);
+        $this->users = $this->createMock(UserRepository::class);
+        $this->svc = new AdminChurnService($this->subscriptions, $this->workspaces, $this->users);
     }
 
     protected function tearDown(): void
@@ -124,6 +127,72 @@ class AdminChurnServiceTest extends TestCase
         $this->assertFalse($events['items'][1]['wasPaid']);
     }
 
+    public function testUserChurnRateCountsDeletedAccountsAgainstLiveOnes(): void
+    {
+        $this->subscriptions->method('countPaidCanceledSince')->willReturn(0);
+        $this->subscriptions->method('countLivePaid')->willReturn(0);
+        $this->workspaces->method('countDeletedSince')->willReturn(0);
+        $this->workspaces->method('countLive')->willReturn(0);
+        $this->users->method('countDeletedSince')->willReturnCallback(
+            // -90 days is the window, -30 days the headline.
+            fn (\DateTimeInterface $since) => $since->format('Y-m-d') === '2026-07-11' ? 3 : 7,
+        );
+        $this->users->method('countLive')->willReturn(193);
+
+        $summary = $this->svc->build(90)['summary'];
+
+        $this->assertSame(7, $summary['usersDeleted']);
+        $this->assertSame(3, $summary['usersDeletedLast30d']);
+        $this->assertSame(193, $summary['liveUsers']);
+        // 7 / (193 + 7)
+        $this->assertSame(3.5, $summary['userChurnRate']);
+    }
+
+    public function testAccountDeletionWithoutAWorkspaceIsItsOwnEvent(): void
+    {
+        // An employee or manager with no workspace of their own: churn that
+        // neither the paid nor the workspace counter would ever have seen.
+        $user = $this->user('sous.chef@dailybrew.work', createdAt: '2026-06-01 00:00:00', deletedAt: '2026-08-06 09:00:00');
+
+        $this->workspaces->method('findDeletedSince')->willReturn([]);
+        $this->subscriptions->method('findByWorkspaces')->willReturn([]);
+        $this->subscriptions->method('findPaidCanceledSince')->willReturn([]);
+        $this->users->method('findDeletedSince')->willReturn([$user]);
+
+        $events = $this->svc->build(90)['events'];
+
+        $this->assertSame(1, $events['total']);
+        $event = $events['items'][0];
+        $this->assertSame('user_deleted', $event['type']);
+        // Nothing to link to, and no revenue was lost.
+        $this->assertNull($event['workspace']);
+        $this->assertNull($event['plan']);
+        $this->assertFalse($event['wasPaid']);
+        // The `_deleted_…` suffix is an implementation detail of freeing the
+        // unique email — admins need to recognise who left.
+        $this->assertSame('sous.chef@dailybrew.work', $event['owner']['email']);
+        // 2026-06-01 → 2026-08-06
+        $this->assertSame(66, $event['lifetimeDays']);
+    }
+
+    public function testOwnerDeletingTheirAccountDoesNotDoubleCountTheWorkspaceDeletion(): void
+    {
+        $owner = $this->user('owner@dailybrew.work', createdAt: '2026-01-10 08:00:00', deletedAt: '2026-08-01 09:30:00');
+        $workspace = $this->workspace('Brew & Co', createdAt: '2026-01-10 08:00:00', deletedAt: '2026-08-01 09:30:00', owner: $owner);
+
+        $this->workspaces->method('findDeletedSince')->willReturn([$workspace]);
+        $this->subscriptions->method('findByWorkspaces')->willReturn([]);
+        $this->subscriptions->method('findPaidCanceledSince')->willReturn([]);
+        $this->users->method('findDeletedSince')->willReturn([$owner]);
+
+        $events = $this->svc->build(90)['events'];
+
+        // The workspace deletion is the louder signal and already names the owner.
+        $this->assertSame(1, $events['total']);
+        $this->assertSame('workspace_deleted', $events['items'][0]['type']);
+        $this->assertSame('owner@dailybrew.work', $events['items'][0]['owner']['email']);
+    }
+
     public function testAverageLifetimeSpansEveryEventInTheWindow(): void
     {
         $a = $this->workspace('A', createdAt: '2026-07-01 00:00:00', deletedAt: '2026-07-11 00:00:00'); // 10 days
@@ -167,6 +236,7 @@ class AdminChurnServiceTest extends TestCase
     {
         $this->subscriptions->method('countPaidCanceledByMonthSince')->willReturn(['2026-07' => 3]);
         $this->workspaces->method('countDeletedByMonthSince')->willReturn(['2025-09' => 1, '2026-08' => 2]);
+        $this->users->method('countDeletedByMonthSince')->willReturn(['2026-08' => 5]);
 
         $series = $this->svc->build(90)['series'];
 
@@ -175,8 +245,10 @@ class AdminChurnServiceTest extends TestCase
         $this->assertSame('2026-08', $series[11]['month']);
         $this->assertSame(1, $series[0]['workspacesDeleted']);
         $this->assertSame(0, $series[0]['paidCanceled']);
+        $this->assertSame(0, $series[0]['usersDeleted']);
         $this->assertSame(3, $series[10]['paidCanceled']);
         $this->assertSame(2, $series[11]['workspacesDeleted']);
+        $this->assertSame(5, $series[11]['usersDeleted']);
     }
 
     public function testUnsupportedWindowFallsBackToNinetyDays(): void
@@ -214,11 +286,13 @@ class AdminChurnServiceTest extends TestCase
         $this->workspaces->method('countDeletedSince')->willReturn(3);
         $this->subscriptions->method('countPaidCanceledByMonthSince')->willReturn(['2026-08' => 6]);
         $this->workspaces->method('countDeletedByMonthSince')->willReturn(['2026-08' => 3]);
+        $this->users->method('countDeletedSince')->willReturn(4);
 
         $summary = $this->svc->dashboardSummary();
 
         $this->assertSame(6, $summary['paidCanceledLast30d']);
         $this->assertSame(3, $summary['workspacesDeletedLast30d']);
+        $this->assertSame(4, $summary['usersDeletedLast30d']);
         $this->assertSame(94, $summary['livePaid']);
         // 6 / (6 + 94) — the same churned ÷ (churned + live) denominator build() uses, so the
         // dashboard headline can't disagree with the churn page it links to.
@@ -246,14 +320,18 @@ class AdminChurnServiceTest extends TestCase
         $this->assertSame(0.0, $summary['paidChurnRateLast30d']);
     }
 
-    private function workspace(string $name, string $createdAt, ?string $deletedAt = null): Workspace
-    {
+    private function workspace(
+        string $name,
+        string $createdAt,
+        ?string $deletedAt = null,
+        ?User $owner = null,
+    ): Workspace {
         // The entity stamps createdAt from the clock, so wind it back to give
         // each workspace a real lifetime, then restore "now".
         DateService::setClock(new MockClock($createdAt, new DateTimeZone('UTC')));
         $workspace = (new Workspace())
             ->setName($name)
-            ->setOwner((new User())->setEmail('owner@dailybrew.work'));
+            ->setOwner($owner ?? (new User())->setEmail('owner@dailybrew.work'));
         DateService::setClock(new MockClock(self::NOW, new DateTimeZone('UTC')));
 
         if ($deletedAt !== null) {
@@ -261,6 +339,22 @@ class AdminChurnServiceTest extends TestCase
         }
 
         return $workspace;
+    }
+
+    private function user(string $email, string $createdAt, ?string $deletedAt = null): User
+    {
+        DateService::setClock(new MockClock($createdAt, new DateTimeZone('UTC')));
+        $user = (new User())->setEmail($email);
+        DateService::setClock(new MockClock(self::NOW, new DateTimeZone('UTC')));
+
+        if ($deletedAt !== null) {
+            // AccountDeletionService frees the unique email by suffixing it —
+            // reproduce that here so the display-name stripping is exercised.
+            $user->setEmail($email.'_deleted_42_1754800000');
+            $user->setDeletedAt(DateService::parse($deletedAt));
+        }
+
+        return $user;
     }
 
     private function subscription(Workspace $workspace, PlanEnum $plan, string $canceledAt): Subscription

@@ -5,26 +5,34 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\Subscription;
+use App\Entity\User;
 use App\Entity\Workspace;
 use App\Repository\SubscriptionRepository;
+use App\Repository\UserRepository;
 use App\Repository\WorkspaceRepository;
 
 /**
  * Platform-wide churn for the admin section: how many paying workspaces stopped
- * paying, how many workspaces were deleted outright, the monthly trend, the
- * event-by-event timeline, and the paid accounts that have gone quiet (the
- * leading indicator).
+ * paying, how many workspaces were deleted outright, how many people deleted
+ * their account, the monthly trend, the event-by-event timeline, and the paid
+ * accounts that have gone quiet (the leading indicator).
  *
- * Two shapes of churn are tracked separately on purpose:
+ * Three shapes of churn are tracked separately on purpose:
  *  - **paid churn** — a subscription's `canceledAt` was stamped. That's lost
  *    revenue whether or not the workspace itself survives.
  *  - **workspace churn** — the workspace was soft-deleted. The account is gone,
  *    paid or not.
+ *  - **user churn** — the person deleted their account (`User.deletedAt`). Not
+ *    every deleted user owned a workspace: employees and managers churn too,
+ *    and that never showed up in the two counters above.
  *
- * Deleting a workspace also cancels its subscription (see WorkspaceService),
- * so those two overlap. The counters keep both (each answers a different
- * question) but the timeline emits one event per workspace: a deleted workspace
- * shows up as a deletion carrying its plan, never as a separate cancellation.
+ * All three overlap: deleting a workspace also cancels its subscription, and
+ * deleting an account deletes the workspaces it owned (see
+ * AccountDeletionService). The counters keep all three (each answers a
+ * different question) but the timeline emits one event per churned thing,
+ * cheapest-signal-wins: a deleted workspace shows up as a deletion carrying its
+ * plan rather than a separate cancellation, and a deleted account only gets its
+ * own row when none of its workspaces were deleted in the same window.
  */
 final readonly class AdminChurnService
 {
@@ -45,6 +53,7 @@ final readonly class AdminChurnService
     public function __construct(
         private SubscriptionRepository $subscriptionRepository,
         private WorkspaceRepository $workspaceRepository,
+        private UserRepository $userRepository,
     ) {
     }
 
@@ -71,6 +80,12 @@ final readonly class AdminChurnService
             : $this->workspaceRepository->countDeletedSince($since30d);
         $liveWorkspaces = $this->workspaceRepository->countLive();
 
+        $usersDeleted = $this->userRepository->countDeletedSince($since);
+        $usersDeleted30d = $windowDays === 30
+            ? $usersDeleted
+            : $this->userRepository->countDeletedSince($since30d);
+        $liveUsers = $this->userRepository->countLive();
+
         $events = $this->buildEvents($since);
         $lifetimes = array_values(array_filter(
             array_column($events, 'lifetimeDays'),
@@ -92,6 +107,10 @@ final readonly class AdminChurnService
                 'workspacesDeletedLast30d' => $workspacesDeleted30d,
                 'liveWorkspaces' => $liveWorkspaces,
                 'workspaceChurnRate' => $this->rate($workspacesDeleted, $liveWorkspaces + $workspacesDeleted),
+                'usersDeleted' => $usersDeleted,
+                'usersDeletedLast30d' => $usersDeleted30d,
+                'liveUsers' => $liveUsers,
+                'userChurnRate' => $this->rate($usersDeleted, $liveUsers + $usersDeleted),
                 'avgLifetimeDays' => $lifetimes === []
                     ? null
                     : (int) round(array_sum($lifetimes) / count($lifetimes)),
@@ -109,8 +128,9 @@ final readonly class AdminChurnService
     }
 
     /**
-     * Cancellations and deletions merged into one newest-first timeline, with
-     * deletions winning whenever a workspace produced both.
+     * Cancellations, workspace deletions and account deletions merged into one
+     * newest-first timeline, with deletions winning whenever a workspace
+     * produced both.
      *
      * @return array<int, array<string, mixed>>
      */
@@ -122,6 +142,7 @@ final readonly class AdminChurnService
 
         $events = [];
         $deletedWorkspaceIds = [];
+        $ownersOfDeletedWorkspaces = [];
 
         foreach ($deletedWorkspaces as $workspace) {
             $deletedAt = $workspace->getDeletedAt();
@@ -129,6 +150,10 @@ final readonly class AdminChurnService
                 continue;
             }
             $deletedWorkspaceIds[$workspace->getPublicId()] = true;
+            $owner = $workspace->getOwner();
+            if ($owner !== null) {
+                $ownersOfDeletedWorkspaces[(string) $owner->getPublicId()] = true;
+            }
             $subscription = $subscriptionsByWorkspace[$workspace->getPublicId()] ?? null;
             $plan = $subscription?->getPlan()->value;
 
@@ -140,9 +165,9 @@ final readonly class AdminChurnService
                     'publicId' => (string) $workspace->getPublicId(),
                     'name' => $workspace->getName(),
                 ],
-                'owner' => $workspace->getOwner() ? [
-                    'publicId' => (string) $workspace->getOwner()->getPublicId(),
-                    'email' => $workspace->getOwner()->getEmail(),
+                'owner' => $owner ? [
+                    'publicId' => (string) $owner->getPublicId(),
+                    'email' => $this->displayEmail($owner->getEmail()),
                 ] : null,
                 'plan' => $plan,
                 'wasPaid' => $plan !== null && $plan !== 'free',
@@ -171,7 +196,7 @@ final readonly class AdminChurnService
                 ],
                 'owner' => $workspace->getOwner() ? [
                     'publicId' => (string) $workspace->getOwner()->getPublicId(),
-                    'email' => $workspace->getOwner()->getEmail(),
+                    'email' => $this->displayEmail($workspace->getOwner()->getEmail()),
                 ] : null,
                 'plan' => $subscription->getPlan()->value,
                 'wasPaid' => true,
@@ -180,9 +205,51 @@ final readonly class AdminChurnService
             ];
         }
 
+        /** @var User[] $deletedUsers */
+        $deletedUsers = $this->userRepository->findDeletedSince($since);
+        foreach ($deletedUsers as $user) {
+            $deletedAt = $user->getDeletedAt();
+            // An owner's account deletion cascades to their workspaces, and that
+            // deletion is the louder signal — don't report the same churn twice.
+            if ($deletedAt === null || isset($ownersOfDeletedWorkspaces[(string) $user->getPublicId()])) {
+                continue;
+            }
+
+            $events[] = [
+                'id' => 'user-'.$user->getPublicId(),
+                'type' => 'user_deleted',
+                'occurredAt' => $deletedAt->format('c'),
+                // Nothing to link to: the account may never have owned a workspace
+                // (employees and managers churn too), and any it did own is gone.
+                'workspace' => null,
+                'owner' => [
+                    'publicId' => (string) $user->getPublicId(),
+                    'email' => $this->displayEmail($user->getEmail()),
+                ],
+                'plan' => null,
+                'wasPaid' => false,
+                'paddleSubscriptionId' => null,
+                'lifetimeDays' => max(0, (int) $user->getCreatedAt()->diff($deletedAt)->days),
+            ];
+        }
+
         usort($events, static fn (array $a, array $b) => strcmp((string) $b['occurredAt'], (string) $a['occurredAt']));
 
         return $events;
+    }
+
+    /**
+     * Account deletion frees the unique email by suffixing it (`_deleted_12_170…`,
+     * see AccountDeletionService). Admins need to recognise who churned, so show
+     * the address they signed up with.
+     */
+    private function displayEmail(?string $email): ?string
+    {
+        if ($email === null) {
+            return null;
+        }
+
+        return preg_replace('/_deleted_\d+_\d+$/', '', $email);
     }
 
     /**
@@ -204,6 +271,7 @@ final readonly class AdminChurnService
             'series' => $this->buildSeries(),
             'paidCanceledLast30d' => $paidChurned30d,
             'workspacesDeletedLast30d' => $this->workspaceRepository->countDeletedSince($since30d),
+            'usersDeletedLast30d' => $this->userRepository->countDeletedSince($since30d),
             'livePaid' => $livePaid,
             // Same denominator as the churn page: churned ÷ (churned + still live). There is no
             // historical subscription snapshot to use as a true period-start count, and inventing
@@ -215,7 +283,7 @@ final readonly class AdminChurnService
     /**
      * Last 12 calendar months, zero-filled, oldest first.
      *
-     * @return array<int, array{month: string, paidCanceled: int, workspacesDeleted: int}>
+     * @return array<int, array{month: string, paidCanceled: int, workspacesDeleted: int, usersDeleted: int}>
      */
     private function buildSeries(): array
     {
@@ -224,6 +292,7 @@ final readonly class AdminChurnService
 
         $canceledByMonth = $this->subscriptionRepository->countPaidCanceledByMonthSince($seriesSince);
         $deletedByMonth = $this->workspaceRepository->countDeletedByMonthSince($seriesSince);
+        $usersDeletedByMonth = $this->userRepository->countDeletedByMonthSince($seriesSince);
 
         $series = [];
         $cursor = $seriesSince;
@@ -233,6 +302,7 @@ final readonly class AdminChurnService
                 'month' => $month,
                 'paidCanceled' => $canceledByMonth[$month] ?? 0,
                 'workspacesDeleted' => $deletedByMonth[$month] ?? 0,
+                'usersDeleted' => $usersDeletedByMonth[$month] ?? 0,
             ];
             $cursor = $cursor->modify('+1 month');
         }

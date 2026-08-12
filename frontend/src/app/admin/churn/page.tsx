@@ -45,15 +45,15 @@ export default function AdminChurnPage() {
   const emptyProps = {
     icon: TrendingDown,
     title: "No churn in this window",
-    hint: "Nobody canceled a paid plan or deleted a workspace. Widen the window to see further back.",
+    hint: "Nobody canceled a paid plan, deleted a workspace or deleted their account. Widen the window to see further back.",
   };
 
   return (
     <div className="page-enter">
       <PageHeader title="Churn" />
       <p className="-mt-2 mb-5 text-[15px] text-text-secondary">
-        Paid plans that stopped paying, workspaces that were deleted, and the paying accounts that
-        have gone quiet.
+        Paid plans that stopped paying, workspaces and accounts that were deleted, and the paying
+        accounts that have gone quiet.
       </p>
 
       <div className="mb-5 w-48">
@@ -72,7 +72,7 @@ export default function AdminChurnPage() {
 
       {summary && (
         <>
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
             <Tile
               label="Paid churn rate"
               value={`${summary.paidChurnRate}%`}
@@ -91,8 +91,15 @@ export default function AdminChurnPage() {
               label="Workspaces deleted"
               value={summary.workspacesDeleted.toLocaleString()}
               hint={`${summary.workspaceChurnRate}% of all workspaces`}
-              icon={UserMinus}
+              icon={Building2}
               accent="from-coffee to-amber"
+            />
+            <Tile
+              label="Accounts deleted"
+              value={summary.usersDeleted.toLocaleString()}
+              hint={`${summary.userChurnRate}% of all users · ${summary.usersDeletedLast30d.toLocaleString()} in the last 30 days`}
+              icon={UserMinus}
+              accent="from-blue to-coffee"
             />
             <Tile
               label="Avg lifetime"
@@ -104,9 +111,11 @@ export default function AdminChurnPage() {
           </div>
 
           <p className="mt-3 text-[11.5px] leading-snug text-text-tertiary">
-            Rates are churned ÷ (churned + still live) over the {windowLabel}. Deleting a workspace
-            also cancels its subscription, so a deleted paid account counts once in each rate — the
-            timeline below shows it as a single deletion.
+            Rates are churned ÷ (churned + still live) over the {windowLabel}. The three shapes
+            cascade — deleting an account deletes its workspaces, and deleting a workspace cancels
+            its subscription — so one departure counts once in each rate. The timeline below shows it
+            as a single event: the workspace deletion, with the owner&apos;s account deletion folded
+            into it.
           </p>
 
           <div className="mt-4">
@@ -168,15 +177,18 @@ export default function AdminChurnPage() {
               <div className="space-y-2">
                 {events.map((event) => (
                   <MobileCard key={event.id}>
-                    <Link
-                      href={`/admin/workspaces/${event.workspace.publicId}`}
-                      className="block truncate text-[14.5px] font-medium text-text-primary no-underline hover:text-coffee"
-                    >
-                      {event.workspace.name || "(unnamed)"}
-                    </Link>
-                    <p className="truncate text-[12.5px] text-text-tertiary">
-                      {event.owner?.email ?? "—"}
-                    </p>
+                    {event.workspace ? (
+                      <Link
+                        href={`/admin/workspaces/${event.workspace.publicId}`}
+                        className="block truncate text-[14.5px] font-medium text-text-primary no-underline hover:text-coffee"
+                      >
+                        {event.workspace.name || "(unnamed)"}
+                      </Link>
+                    ) : (
+                      // An account deletion has no workspace to point at — the person is the subject.
+                      <p className="truncate text-[14.5px] font-medium text-text-primary">Account</p>
+                    )}
+                    <OwnerLink owner={event.owner} className="truncate text-[12.5px]" />
                     <div className="mt-2 flex flex-wrap items-center gap-1.5">
                       <EventBadge type={event.type} />
                       {event.plan && <PlanBadge plan={event.plan} />}
@@ -214,15 +226,19 @@ export default function AdminChurnPage() {
                         className="border-t border-cream-3/60 transition-colors hover:bg-cream-3/20"
                       >
                         <td className="px-4 py-2.5">
-                          <Link
-                            href={`/admin/workspaces/${event.workspace.publicId}`}
-                            className="font-medium text-text-primary no-underline hover:text-coffee"
-                          >
-                            {event.workspace.name || "(unnamed)"}
-                          </Link>
+                          {event.workspace ? (
+                            <Link
+                              href={`/admin/workspaces/${event.workspace.publicId}`}
+                              className="font-medium text-text-primary no-underline hover:text-coffee"
+                            >
+                              {event.workspace.name || "(unnamed)"}
+                            </Link>
+                          ) : (
+                            <span className="text-text-tertiary">—</span>
+                          )}
                         </td>
-                        <td className="px-4 py-2.5 text-text-secondary">
-                          {event.owner?.email ?? "—"}
+                        <td className="px-4 py-2.5">
+                          <OwnerLink owner={event.owner} />
                         </td>
                         <td className="px-4 py-2.5">
                           <EventBadge type={event.type} />
@@ -294,27 +310,68 @@ function Tile({
   );
 }
 
+const EVENT_BADGES: Record<
+  AdminChurnEvent["type"],
+  { label: string; icon: IconType; className: string }
+> = {
+  workspace_deleted: {
+    label: "Workspace deleted",
+    icon: Building2,
+    className: "bg-red/12 text-red",
+  },
+  subscription_canceled: {
+    label: "Subscription canceled",
+    icon: CreditCard,
+    className: "bg-amber/15 text-amber",
+  },
+  user_deleted: { label: "Account deleted", icon: UserMinus, className: "bg-blue/12 text-blue" },
+};
+
 function EventBadge({ type }: { type: AdminChurnEvent["type"] }) {
-  const isDeletion = type === "workspace_deleted";
+  const { label, icon: Icon, className } = EVENT_BADGES[type];
   return (
     <span
       className={cn(
         "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2 py-0.5 text-[11.5px] font-medium",
-        isDeletion ? "bg-red/12 text-red" : "bg-amber/15 text-amber",
+        className,
       )}
     >
-      {isDeletion ? <Building2 size={11} /> : <CreditCard size={11} />}
-      {isDeletion ? "Workspace deleted" : "Subscription canceled"}
+      <Icon size={11} />
+      {label}
     </span>
   );
 }
 
-/** Mirrors the real layout (4 tiles, chart, at-risk card, table) so nothing reflows. */
+/**
+ * The person who churned. Deleted accounts keep their sign-up address (the
+ * `_deleted_…` suffix is stripped server-side) so support can still recognise
+ * who left, and the detail page still resolves for them.
+ */
+function OwnerLink({
+  owner,
+  className,
+}: {
+  owner: AdminChurnEvent["owner"];
+  className?: string;
+}) {
+  if (!owner) return <span className={cn("text-text-tertiary", className)}>—</span>;
+
+  return (
+    <Link
+      href={`/admin/users/${owner.publicId}`}
+      className={cn("text-text-secondary no-underline hover:text-coffee", className)}
+    >
+      {owner.email}
+    </Link>
+  );
+}
+
+/** Mirrors the real layout (5 tiles, chart, at-risk card, table) so nothing reflows. */
 function ChurnSkeleton() {
   return (
     <div aria-busy="true">
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
+        {Array.from({ length: 5 }).map((_, i) => (
           <GlassCard key={i} hover={false}>
             <div className="space-y-3 px-5 pb-4 pt-5">
               <Skeleton className="h-3 w-1/2" />
