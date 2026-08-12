@@ -7,9 +7,11 @@ namespace App\ApiController\Workspace;
 use App\ApiController\Trait\ApiResponseTrait;
 use App\Entity\ApiToken;
 use App\Entity\User;
+use App\Enum\ApiTokenScopeEnum;
 use App\Repository\ApiTokenRepository;
 use App\Repository\WorkspaceRepository;
 use App\Security\Voter\WorkspaceVoter;
+use App\Service\Integration\ApiTokenMinter;
 use App\Service\PlanService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -45,6 +47,9 @@ class ApiTokenController extends AbstractController
             'name' => $t->getName(),
             'prefix' => $t->getPrefix(),
             'active' => $t->isActive(),
+            'scopes' => $t->getScopeValues(),
+            // Tokens minted before request signing existed can read but never write.
+            'canSign' => $t->canSign(),
             'lastUsedAt' => $t->getLastUsedAt()?->format('c'),
             'revokedAt' => $t->getRevokedAt()?->format('c'),
             'createdAt' => $t->getCreatedAt()->format('c'),
@@ -58,7 +63,7 @@ class ApiTokenController extends AbstractController
         Request $request,
         #[CurrentUser] User $user,
         WorkspaceRepository $workspaceRepository,
-        ApiTokenRepository $apiTokenRepository,
+        ApiTokenMinter $apiTokenMinter,
         PlanService $planService,
     ): JsonResponse {
         $workspace = $workspaceRepository->findByPublicId($workspacePublicId);
@@ -78,16 +83,29 @@ class ApiTokenController extends AbstractController
             return $this->jsonError('Token name is required.', 422);
         }
 
-        ['entity' => $token, 'plainToken' => $plainToken] = ApiToken::create($workspace, $name);
+        // Unrecognised scopes are dropped rather than 422'd, but an empty result
+        // is not silently upgraded — a caller asking for nothing valid gets
+        // read-only, never write.
+        $scopes = ApiTokenScopeEnum::fromList($body['scopes'] ?? null);
+        if ($scopes === []) {
+            $scopes = [ApiTokenScopeEnum::ReadAttendance];
+        }
 
-        $apiTokenRepository->persist($token);
-        $apiTokenRepository->flush();
+        [
+            'token' => $token,
+            'plainToken' => $plainToken,
+            'plainSigningSecret' => $plainSigningSecret,
+        ] = $apiTokenMinter->mint($workspace, $name, $scopes);
 
         return $this->jsonCreated([
             'publicId' => $token->getPublicId(),
             'name' => $token->getName(),
             'prefix' => $token->getPrefix(),
-            'token' => $plainToken, // Only time the full token is returned
+            'scopes' => $token->getScopeValues(),
+            // Both secrets are returned exactly once, here. The token is stored as a
+            // digest and the signing secret encrypted; neither can be shown again.
+            'token' => $plainToken,
+            'signingSecret' => $plainSigningSecret,
             'createdAt' => $token->getCreatedAt()->format('c'),
         ]);
     }

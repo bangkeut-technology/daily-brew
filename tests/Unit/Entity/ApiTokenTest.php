@@ -6,6 +6,7 @@ namespace App\Tests\Unit\Entity;
 
 use App\Entity\ApiToken;
 use App\Entity\Workspace;
+use App\Enum\ApiTokenScopeEnum;
 use PHPUnit\Framework\TestCase;
 
 class ApiTokenTest extends TestCase
@@ -63,6 +64,46 @@ class ApiTokenTest extends TestCase
 
         $this->assertFalse($entity->isActive());
         $this->assertNotNull($entity->getRevokedAt());
+    }
+
+    public function testDefaultsToReadOnly(): void
+    {
+        ['entity' => $entity] = ApiToken::create(new Workspace(), 'tok');
+
+        // A token nobody scoped deliberately can read and nothing else. Write
+        // access to attendance is never the default.
+        $this->assertSame(['attendance:read'], $entity->getScopeValues());
+        $this->assertTrue($entity->hasScope(ApiTokenScopeEnum::ReadAttendance));
+        $this->assertFalse($entity->hasScope(ApiTokenScopeEnum::WriteAttendance));
+    }
+
+    public function testScopesAreStoredWithoutDuplicates(): void
+    {
+        ['entity' => $entity] = ApiToken::create(new Workspace(), 'tok', [
+            ApiTokenScopeEnum::WriteAttendance,
+            ApiTokenScopeEnum::ReadAttendance,
+            ApiTokenScopeEnum::WriteAttendance,
+        ]);
+
+        $this->assertSame(['attendance:write', 'attendance:read'], $entity->getScopeValues());
+    }
+
+    public function testATokenWithoutASigningSecretCannotSign(): void
+    {
+        ['entity' => $entity] = ApiToken::create(new Workspace(), 'tok');
+
+        // This is the shape every pre-signing token has after the migration.
+        $this->assertFalse($entity->canSign());
+
+        $entity->setSigningSecretEncrypted('encrypted-blob');
+        $this->assertTrue($entity->canSign());
+    }
+
+    public function testUnknownScopeValuesAreDroppedRatherThanTrusted(): void
+    {
+        $scopes = ApiTokenScopeEnum::fromList(['attendance:read', 'attendance:everything', 42, null]);
+
+        $this->assertSame([ApiTokenScopeEnum::ReadAttendance], $scopes);
     }
 
     public function testGenerateProducesUniqueTokens(): void

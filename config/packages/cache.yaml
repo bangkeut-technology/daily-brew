@@ -17,3 +17,12 @@ framework:
         # Namespaced pools use the above "app" backend by default
         #pools:
             #my.dedicated.cache: null
+
+        pools:
+            # Replay cache for signed integration requests. Filesystem-backed by
+            # default like the app cache — which an atomic deploy wipes, briefly
+            # widening the replay window to the 300s clock skew. Point this at
+            # Redis (or a path under shared/) on a host that cares.
+            integration.nonce.cache:
+                adapter: cache.app
+                default_lifetime: 600

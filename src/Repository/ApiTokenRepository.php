@@ -30,6 +30,22 @@ class ApiTokenRepository extends AbstractRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * Resolve a token by its public id — the key id a signed request carries.
+     * Unlike the hash lookup this identifier is not secret; it only selects
+     * which key verifies the signature.
+     */
+    public function findActiveByPublicId(string $publicId): ?ApiToken
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t.publicId = :publicId')
+            ->andWhere('t.revokedAt IS NULL')
+            ->setParameter('publicId', $publicId)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     /** @return ApiToken[] All tokens for a workspace (active + revoked). */
     public function findByWorkspace(Workspace $workspace): array
     {

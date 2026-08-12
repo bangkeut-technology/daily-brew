@@ -6,7 +6,6 @@ namespace App\Service;
 
 use App\Entity\Attendance;
 use App\Entity\Employee;
-use App\Entity\User;
 use App\Entity\Workspace;
 use App\Exception\AttendanceAlreadyExistsException;
 use App\Repository\AttendanceRepository;
@@ -18,6 +17,9 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  * to originalCheckInAt/originalCheckOutAt so they survive subsequent edits.
  *
  * Live check-ins flow through CheckinService instead.
+ *
+ * The actor is an `AuditActor` rather than a User because the same paths serve
+ * external integrations, which have a signing key instead of a person.
  */
 class AttendanceService
 {
@@ -33,7 +35,7 @@ class AttendanceService
      */
     public function override(
         Attendance $attendance,
-        User $actor,
+        AuditActor $actor,
         ?string $checkInAt,
         ?string $checkOutAt,
         bool $checkInProvided,
@@ -93,8 +95,8 @@ class AttendanceService
         }
 
         $attendance->setEditedAt(DateService::now());
-        $attendance->setEditedBy($actor);
-        $attendance->setEditedByEmail($actor->getEmail());
+        $attendance->setEditedBy($actor->user);
+        $attendance->setEditedByEmail($actor->label);
         $attendance->setEditReason($reason);
 
         $this->attendanceRepository->flush();
@@ -115,7 +117,7 @@ class AttendanceService
     public function create(
         Workspace $workspace,
         Employee $employee,
-        User $actor,
+        AuditActor $actor,
         string $date,
         ?string $checkInAt,
         ?string $checkOutAt,
@@ -170,8 +172,8 @@ class AttendanceService
                 $this->flagCalculator->recompute($existing, $employee, $wsTz);
 
                 $existing->setEditedAt(DateService::now());
-                $existing->setEditedBy($actor);
-                $existing->setEditedByEmail($actor->getEmail());
+                $existing->setEditedBy($actor->user);
+                $existing->setEditedByEmail($actor->label);
                 $existing->setEditReason($reason);
 
                 $this->attendanceRepository->flush();
@@ -193,8 +195,8 @@ class AttendanceService
 
         // A manual entry is an audited action — stamp who recorded it and why.
         $attendance->setEditedAt(DateService::now());
-        $attendance->setEditedBy($actor);
-        $attendance->setEditedByEmail($actor->getEmail());
+        $attendance->setEditedBy($actor->user);
+        $attendance->setEditedByEmail($actor->label);
         $attendance->setEditReason($reason);
 
         $this->attendanceRepository->persist($attendance);
@@ -212,7 +214,7 @@ class AttendanceService
      *
      * @throws BadRequestHttpException on missing/invalid reason or double-void
      */
-    public function void(Attendance $attendance, User $actor, string $reason): Attendance
+    public function void(Attendance $attendance, AuditActor $actor, string $reason): Attendance
     {
         $reason = trim($reason);
         if ($reason === '') {
@@ -226,8 +228,8 @@ class AttendanceService
         }
 
         $attendance->setVoidedAt(DateService::now());
-        $attendance->setVoidedBy($actor);
-        $attendance->setVoidedByEmail($actor->getEmail());
+        $attendance->setVoidedBy($actor->user);
+        $attendance->setVoidedByEmail($actor->label);
         $attendance->setVoidReason($reason);
 
         $this->attendanceRepository->flush();

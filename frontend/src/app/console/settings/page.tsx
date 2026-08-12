@@ -842,6 +842,8 @@ function ApiTokensCard({
   // Held in state because the server never returns the plaintext key again.
   const [created, setCreated] = useState<ApiTokenCreated | null>(null);
   const [revokeTarget, setRevokeTarget] = useState<string | null>(null);
+  // Write access is opt-in per key: a pull integration should never hold it.
+  const [canWrite, setCanWrite] = useState(false);
 
   return (
     <GlassCard hover={false}>
@@ -891,13 +893,20 @@ function ApiTokensCard({
             type="button"
             disabled={createToken.isPending || !name.trim()}
             onClick={() =>
-              createToken.mutate(name.trim(), {
+              createToken.mutate(
+                {
+                  name: name.trim(),
+                  scopes: canWrite ? ["attendance:read", "attendance:write"] : ["attendance:read"],
+                },
+                {
                 onSuccess: (data) => {
                   setCreated(data);
                   setName("");
+                  setCanWrite(false);
                 },
                 onError: () => toast.error(t("settings.apiKeyCreateError", "Could not create the key")),
-              })
+                },
+              )
             }
             className="flex items-center gap-1.5 rounded-lg bg-coffee px-4 py-2 text-[15px] font-medium text-white transition-colors hover:bg-coffee-light disabled:opacity-50"
           >
@@ -907,16 +916,64 @@ function ApiTokensCard({
         </div>
         )}
 
+        {canUse && (
+          <div className="flex items-start justify-between gap-3 rounded-xl border border-cream-3 bg-cream-3/10 p-3">
+            <div className="min-w-0">
+              <label
+                htmlFor="api-token-write"
+                className="cursor-pointer text-[13.5px] font-medium text-text-primary"
+              >
+                {t("settings.apiKeysWriteLabel", "Allow writing attendance")}
+              </label>
+              <p className="mt-0.5 text-[12.5px] leading-snug text-text-tertiary">
+                {t(
+                  "settings.apiKeysWriteHint",
+                  "Lets an external system record attendance. Write requests must be signed with the signing secret — the key alone will not do it.",
+                )}
+              </p>
+            </div>
+            <Toggle id="api-token-write" checked={canWrite} onChange={setCanWrite} />
+          </div>
+        )}
+
         {created && (
-          <div className="rounded-xl border border-green/20 bg-green/5 p-4">
-            <p className="mb-2 text-[13.5px] font-medium text-green">
-              {t("settings.apiKeyCreated", "Copy this key now — it won't be shown again.")}
+          <div className="space-y-3 rounded-xl border border-green/20 bg-green/5 p-4">
+            <p className="text-[13.5px] font-medium text-green">
+              {t(
+                "settings.apiKeyCreated",
+                "Copy these now — neither will be shown again.",
+              )}
             </p>
-            <div className="flex items-center gap-2">
-              <code className="min-w-0 flex-1 truncate rounded bg-glass-bg px-2 py-1 font-mono text-[13px] text-text-primary">
-                {created.token}
-              </code>
-              <CopyButton value={created.token} />
+            <div>
+              <p className="mb-1 text-[12.5px] font-medium text-text-secondary">
+                {t("settings.apiKeysKeyLabel", "API key")}
+              </p>
+              <div className="flex items-center gap-2">
+                <code className="min-w-0 flex-1 truncate rounded bg-glass-bg px-2 py-1 font-mono text-[13px] text-text-primary">
+                  {created.token}
+                </code>
+                <CopyButton value={created.token} />
+              </div>
+              <p className="mt-1 text-[11.5px] leading-snug text-text-tertiary">
+                {t("settings.apiKeysKeyHint", "Sent as the X-Api-Key header when reading.")}
+              </p>
+            </div>
+            <div>
+              <p className="mb-1 text-[12.5px] font-medium text-text-secondary">
+                {t("settings.apiKeysSigningSecretLabel", "Signing secret")}
+              </p>
+              <div className="flex items-center gap-2">
+                <code className="min-w-0 flex-1 truncate rounded bg-glass-bg px-2 py-1 font-mono text-[13px] text-text-primary">
+                  {created.signingSecret}
+                </code>
+                <CopyButton value={created.signingSecret} />
+              </div>
+              <p className="mt-1 text-[11.5px] leading-snug text-text-tertiary">
+                {t(
+                  "settings.apiKeysSigningSecretHint",
+                  "Signs write requests. Never sent over the wire — only the signature is.",
+                )}
+              </p>
             </div>
           </div>
         )}
@@ -926,7 +983,12 @@ function ApiTokensCard({
             {tokens.map((token) => (
               <div key={token.publicId} className="flex items-center gap-3 py-2.5">
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[15px] font-medium text-text-primary">{token.name}</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="truncate text-[15px] font-medium text-text-primary">{token.name}</p>
+                    {token.scopes?.includes("attendance:write") && (
+                      <StatusBadge label={t("settings.apiKeysWriteBadge", "Can write")} variant="amber" />
+                    )}
+                  </div>
                   <p className="font-mono text-[12.5px] text-text-tertiary">
                     {token.prefix}…
                     {token.lastUsedAt

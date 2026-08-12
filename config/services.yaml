@@ -31,6 +31,7 @@ parameters:
     telegram_webhook_secret:                 '%env(TELEGRAM_WEBHOOK_SECRET)%'
     telegram_bot_username:                   '%env(string:TELEGRAM_BOT_USERNAME)%'
     ga_measurement_id:                       '%env(string:GA_MEASUREMENT_ID)%'
+    api_token_encryption_key:                '%env(string:API_TOKEN_ENCRYPTION_KEY)%'
 
 services:
     _defaults:
@@ -65,6 +66,23 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
+
+    # The one secret the server must be able to read back (it verifies HMACs).
+    # Keyed explicitly rather than through a global bind: an argument named
+    # $encryptionKey is too generic to leave floating in the container.
+    App\Service\Integration\SecretCipher:
+        arguments:
+            $encryptionKey: '%api_token_encryption_key%'
+            $appSecret:     '%kernel.secret%'
+
+    App\Service\Integration\SignedRequestVerifier:
+        arguments:
+            $integrationNoncePool: '@integration.nonce.cache'
+
+    App\ApiController\Integration\AttendanceController:
+        tags: ['controller.service_arguments']
+        arguments:
+            $ingestLimiter: '@limiter.api_ingest'
 
     App\EventSubscriber\RateLimitSubscriber:
         arguments:

@@ -6,9 +6,12 @@ namespace App\ApiController\BasilBook;
 
 use App\ApiController\Trait\ApiResponseTrait;
 use App\DTO\EmployeeDTO;
+use App\Entity\ApiToken;
 use App\Entity\Workspace;
 use App\Repository\AttendanceRepository;
+use App\Enum\ApiTokenScopeEnum;
 use App\Repository\EmployeeRepository;
+use App\Security\ApiTokenAuthenticator;
 use App\Service\DateService;
 use App\Service\PlanService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,7 +22,8 @@ use Symfony\Component\Routing\Attribute\Route;
 /**
  * External API for BasilBook to retrieve attendance data.
  *
- * Authenticated via X-Api-Key header (BasilBookApiKeyAuthenticator).
+ * Authenticated via the X-Api-Key header (ApiTokenAuthenticator), and gated on
+ * the token carrying the attendance:read scope.
  * Only returns employees with a username (the BasilBook linking field).
  * Requires Espresso plan.
  */
@@ -35,10 +39,18 @@ class AttendanceController extends AbstractController
         EmployeeRepository $employeeRepository,
         PlanService $planService,
     ): JsonResponse {
-        /** @var Workspace $workspace */
-        $workspace = $request->attributes->get('_basilbook_workspace');
+        /** @var Workspace|null $workspace */
+        $workspace = $request->attributes->get(ApiTokenAuthenticator::ATTR_WORKSPACE);
+        $apiToken = $request->attributes->get(ApiTokenAuthenticator::ATTR_TOKEN);
         if ($workspace === null) {
             return $this->jsonError('Unauthorized', 401);
+        }
+
+        // Tokens back-filled by the scopes migration all carry attendance:read, so
+        // this can't break an existing integration — it only stops a key that was
+        // deliberately narrowed from silently keeping read access.
+        if ($apiToken instanceof ApiToken && !$apiToken->hasScope(ApiTokenScopeEnum::ReadAttendance)) {
+            return $this->jsonError('This API token is not allowed to read attendance.', 403);
         }
 
         // BasilBook integration requires Espresso plan (username field is Espresso-only)

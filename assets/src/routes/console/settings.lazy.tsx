@@ -187,6 +187,8 @@ function SettingsPage() {
   const revokeApiToken = useRevokeApiToken(currentWsId);
   const [apiTokenModalOpen, setApiTokenModalOpen] = useState(false);
   const [apiTokenName, setApiTokenName] = useState('BasilBook');
+  // Write access is opt-in per key: a pull integration should never hold it.
+  const [apiTokenCanWrite, setApiTokenCanWrite] = useState(false);
   const [newApiToken, setNewApiToken] = useState<ApiTokenCreated | null>(null);
   const [revokeTokenTarget, setRevokeTokenTarget] = useState<{ publicId: string; name: string } | null>(null);
 
@@ -1666,6 +1668,7 @@ function SettingsPage() {
                     type="button"
                     onClick={() => {
                       setApiTokenName('BasilBook');
+                      setApiTokenCanWrite(false);
                       setNewApiToken(null);
                       setApiTokenModalOpen(true);
                     }}
@@ -1726,6 +1729,9 @@ function SettingsPage() {
                               }
                               variant={tk.active ? 'green' : 'red'}
                             />
+                            {tk.scopes?.includes('attendance:write') && (
+                              <StatusBadge label={t('settings.apiKeysWriteBadge', 'Can write')} variant="amber" />
+                            )}
                           </div>
                           <p className="mt-1 text-[12.5px] text-text-tertiary font-mono">
                             {tk.prefix}…
@@ -1784,28 +1790,29 @@ function SettingsPage() {
                 <Dialog.Description className="text-[13.5px] text-text-tertiary leading-relaxed mb-4">
                   {t(
                     'settings.apiKeysCreatedDesc',
-                    "This is the only time you'll see the full key. Copy it now and paste it into BasilBook — we only store a hashed version.",
+                    "This is the only time you'll see these. Copy them now — we store the key as a hash and the signing secret encrypted, so neither can be shown again.",
                   )}
                 </Dialog.Description>
-                <div className="flex items-center gap-2 p-3 rounded-xl border border-cream-3 bg-cream-3/20">
-                  <code className="text-[13px] font-mono text-text-primary break-all flex-1">
-                    {newApiToken.token}
-                  </code>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      try {
-                        await navigator.clipboard.writeText(newApiToken.token);
-                        toast.success(t('settings.apiKeysCopied', 'API key copied'));
-                      } catch {
-                        toast.error(t('common.copyFailed', 'Failed to copy'));
-                      }
-                    }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13.5px] font-medium bg-coffee text-white border-none cursor-pointer flex-shrink-0"
-                  >
-                    <Copy size={12} />
-                    {t('settings.copy', 'Copy')}
-                  </button>
+                <SecretRow
+                  label={t('settings.apiKeysKeyLabel', 'API key')}
+                  hint={t('settings.apiKeysKeyHint', 'Sent as the X-Api-Key header when reading.')}
+                  value={newApiToken.token}
+                  copiedMessage={t('settings.apiKeysCopied', 'API key copied')}
+                  copyLabel={t('settings.copy', 'Copy')}
+                  copyFailedMessage={t('common.copyFailed', 'Failed to copy')}
+                />
+                <div className="mt-3">
+                  <SecretRow
+                    label={t('settings.apiKeysSigningSecretLabel', 'Signing secret')}
+                    hint={t(
+                      'settings.apiKeysSigningSecretHint',
+                      'Signs write requests. Never sent over the wire — only the signature is.',
+                    )}
+                    value={newApiToken.signingSecret}
+                    copiedMessage={t('settings.apiKeysSecretCopied', 'Signing secret copied')}
+                    copyLabel={t('settings.copy', 'Copy')}
+                    copyFailedMessage={t('common.copyFailed', 'Failed to copy')}
+                  />
                 </div>
                 <div className="mt-5 flex justify-end">
                   <button
@@ -1837,6 +1844,22 @@ function SettingsPage() {
                   maxLength={100}
                   className="w-full px-3 py-2 rounded-xl bg-glass-bg border border-cream-3 text-[14px] text-text-primary outline-none focus:border-coffee transition-colors"
                 />
+
+                <div className="mt-4 flex items-start justify-between gap-3 p-3 rounded-xl border border-cream-3 bg-cream-3/10">
+                  <div className="min-w-0">
+                    <label htmlFor="api-token-write" className="text-[13.5px] font-medium text-text-primary cursor-pointer">
+                      {t('settings.apiKeysWriteLabel', 'Allow writing attendance')}
+                    </label>
+                    <p className="mt-0.5 text-[12.5px] text-text-tertiary leading-snug">
+                      {t(
+                        'settings.apiKeysWriteHint',
+                        'Lets an external system record attendance. Write requests must be signed with the signing secret — the key alone will not do it.',
+                      )}
+                    </p>
+                  </div>
+                  <Toggle id="api-token-write" checked={apiTokenCanWrite} onChange={setApiTokenCanWrite} />
+                </div>
+
                 <div className="mt-5 flex justify-end gap-2">
                   <button
                     type="button"
@@ -1850,7 +1873,12 @@ function SettingsPage() {
                     disabled={!apiTokenName.trim() || createApiToken.isPending}
                     onClick={async () => {
                       try {
-                        const created = await createApiToken.mutateAsync(apiTokenName.trim());
+                        const created = await createApiToken.mutateAsync({
+                          name: apiTokenName.trim(),
+                          scopes: apiTokenCanWrite
+                            ? ['attendance:read', 'attendance:write']
+                            : ['attendance:read'],
+                        });
                         setNewApiToken(created);
                       } catch {
                         toast.error(t('settings.apiKeysCreateError', 'Could not generate the key'));
@@ -1986,6 +2014,54 @@ function SettingsPage() {
           feature={upgradeModal.feature}
         />
       )}
+    </div>
+  );
+}
+
+/**
+ * One secret, shown once. Separate rows for the key and the signing secret
+ * rather than one blob: they go to different places in the client's config, and
+ * a copy button that grabs both would land the wrong string in one of them.
+ */
+function SecretRow({
+  label,
+  hint,
+  value,
+  copyLabel,
+  copiedMessage,
+  copyFailedMessage,
+}: {
+  label: string;
+  hint: string;
+  value: string;
+  copyLabel: string;
+  copiedMessage: string;
+  copyFailedMessage: string;
+}) {
+  return (
+    <div className="p-3 rounded-xl border border-cream-3 bg-cream-3/20">
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="text-[12.5px] font-medium text-text-secondary">{label}</p>
+      </div>
+      <div className="mt-1.5 flex items-center gap-2">
+        <code className="text-[13px] font-mono text-text-primary break-all flex-1">{value}</code>
+        <button
+          type="button"
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(value);
+              toast.success(copiedMessage);
+            } catch {
+              toast.error(copyFailedMessage);
+            }
+          }}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13.5px] font-medium bg-coffee text-white border-none cursor-pointer flex-shrink-0"
+        >
+          <Copy size={12} />
+          {copyLabel}
+        </button>
+      </div>
+      <p className="mt-1.5 text-[11.5px] text-text-tertiary leading-snug">{hint}</p>
     </div>
   );
 }

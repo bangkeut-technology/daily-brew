@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiAxios } from '@/lib/apiAxios';
-import type { Workspace, WorkspaceSetting, ApiToken, ApiTokenCreated } from '@/types';
+import type { Workspace, WorkspaceSetting, ApiToken, ApiTokenCreated, ApiTokenScope } from '@/types';
 
 export function useWorkspaces() {
   return useQuery({
@@ -155,10 +155,10 @@ export function useApiTokens(workspacePublicId: string) {
 export function useCreateApiToken(workspacePublicId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (name: string) => {
+    mutationFn: async ({ name, scopes }: { name: string; scopes: ApiTokenScope[] }) => {
       const { data } = await apiAxios.post<ApiTokenCreated>(
         `/workspaces/${workspacePublicId}/api-tokens`,
-        { name },
+        { name, scopes },
       );
       return data;
     },
