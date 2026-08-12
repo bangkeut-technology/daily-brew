@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.139.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.138.1...v1.139.0) (2026-08-12)
+
+
+### Features
+
+* **admin:** track user churn and give the churn chart a real tooltip ([#401](https://github.com/bangkeut-technology/daily-brew/issues/401)) ([2b6d634](https://github.com/bangkeut-technology/daily-brew/commit/2b6d634fdd4967ceed4ca19f2fa2d800b7562195))
+
 ## [1.138.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.138.0...v1.138.1) (2026-08-11)
 
 
