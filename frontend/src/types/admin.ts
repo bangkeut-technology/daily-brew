@@ -29,6 +29,7 @@ export interface AdminDashboardData {
     series: AdminChurnPoint[];
     paidCanceledLast30d: number;
     workspacesDeletedLast30d: number;
+    usersDeletedLast30d: number;
     livePaid: number;
     paidChurnRateLast30d: number;
   };
@@ -131,10 +132,11 @@ export type WorkspaceTestingTrack = "none" | "alpha" | "beta";
 export type WorkspacePlan = "free" | "espresso" | "double_espresso";
 
 /**
- * Churn has two shapes and they overlap: a canceled subscription is lost
- * revenue, a deleted workspace is a lost account, and deleting a workspace
- * cancels its subscription. The counters keep both; the timeline emits one
- * event per workspace (a deletion carries the plan it was on).
+ * Churn has three shapes and they overlap: a canceled subscription is lost
+ * revenue, a deleted workspace is a lost account, a deleted user is a lost
+ * person — and each one cascades into the next. The counters keep all three;
+ * the timeline emits one event per churned thing (a workspace deletion carries
+ * the plan it was on, and an owner's account deletion doesn't repeat it).
  */
 export interface AdminChurnData {
   windowDays: number;
@@ -148,6 +150,10 @@ export interface AdminChurnData {
     workspacesDeletedLast30d: number;
     liveWorkspaces: number;
     workspaceChurnRate: number;
+    usersDeleted: number;
+    usersDeletedLast30d: number;
+    liveUsers: number;
+    userChurnRate: number;
     avgLifetimeDays: number | null;
   };
   series: AdminChurnPoint[];
@@ -162,13 +168,15 @@ export interface AdminChurnPoint {
   month: string;
   paidCanceled: number;
   workspacesDeleted: number;
+  usersDeleted: number;
 }
 
 export interface AdminChurnEvent {
   id: string;
-  type: "subscription_canceled" | "workspace_deleted";
+  type: "subscription_canceled" | "workspace_deleted" | "user_deleted";
   occurredAt: string;
-  workspace: { publicId: string; name: string };
+  /** Null on a `user_deleted` event — the person, not a workspace, is what churned. */
+  workspace: { publicId: string; name: string } | null;
   owner: { publicId: string; email: string } | null;
   /** Null when a deleted workspace never had a subscription row. */
   plan: WorkspacePlan | null;

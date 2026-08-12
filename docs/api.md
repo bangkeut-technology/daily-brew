@@ -416,8 +416,8 @@ List endpoints share a pagination envelope — `{ "items": [...], "page": 1, "pa
     "activation": { "workspacesTotal": 118, "workspacesWithEmployees": 96, "workspacesWithAttendance": 74, "workspacesActiveLast7d": 51 },
     "byPlan": { "free": 81, "espresso": 30, "double_espresso": 7 },
     "churn": {
-      "series": [{ "month": "2026-08", "paidCanceled": 1, "workspacesDeleted": 2 }],
-      "paidCanceledLast30d": 2, "workspacesDeletedLast30d": 3, "livePaid": 37, "paidChurnRateLast30d": 5.1
+      "series": [{ "month": "2026-08", "paidCanceled": 1, "workspacesDeleted": 2, "usersDeleted": 3 }],
+      "paidCanceledLast30d": 2, "workspacesDeletedLast30d": 3, "usersDeletedLast30d": 4, "livePaid": 37, "paidChurnRateLast30d": 5.1
     },
     "byStatus": { "active": 34, "trialing": 3, "past_due": 0, "paused": 0, "canceled": 12 },
     "growth": { "usersLast7d": 9, "usersLast30d": 41, "workspacesLast7d": 3, "workspacesLast30d": 14, "employeesLast7d": 22, "employeesLast30d": 88, "attendancesLast7d": 1840, "attendancesLast30d": 7900 },
@@ -458,15 +458,17 @@ List endpoints share a pagination envelope — `{ "items": [...], "page": 1, "pa
       "paidChurned": 4, "paidChurnedLast30d": 2, "livePaid": 37,
       "paidChurnRate": 9.8, "paidChurnRateLast30d": 5.1,
       "workspacesDeleted": 6, "workspacesDeletedLast30d": 3, "liveWorkspaces": 118,
-      "workspaceChurnRate": 4.8, "avgLifetimeDays": 142
+      "workspaceChurnRate": 4.8,
+      "usersDeleted": 9, "usersDeletedLast30d": 4, "liveUsers": 403, "userChurnRate": 2.2,
+      "avgLifetimeDays": 142
     },
-    "series": [{ "month": "2026-06", "paidCanceled": 1, "workspacesDeleted": 2 }],
+    "series": [{ "month": "2026-06", "paidCanceled": 1, "workspacesDeleted": 2, "usersDeleted": 3 }],
     "events": { "items": [{ "id": "ws-...", "type": "workspace_deleted", "occurredAt": "...", "workspace": {...}, "owner": {...} }], "page": 1, "pageSize": 25, "total": 6 },
     "dormant": [{ "publicId": "...", "name": "...", "ownerEmail": "...", "plan": "espresso", "lastActivity": "2026-05-02", "daysQuiet": 40 }],
     "dormantAfterDays": 21
   }
   ```
-  Two overlapping shapes are tracked: **paid churn** (`Subscription.canceledAt` on a non-free plan — lost revenue) and **workspace churn** (`Workspace.deletedAt` — lost account). Deleting a workspace cancels its subscription, so both counters see it, but the timeline emits **one event per workspace** — a deletion carries the plan it was on rather than producing a second `subscription_canceled` row. Rates are `churned ÷ (churned + still live)`; there's no historical subscription snapshot to use as a true period-start denominator. `dormant` lists paying accounts with no check-in for 21+ days, excluding never-active ones (that's activation, which the dashboard funnel covers).
+  Three overlapping shapes are tracked: **paid churn** (`Subscription.canceledAt` on a non-free plan — lost revenue), **workspace churn** (`Workspace.deletedAt` — lost account) and **user churn** (`User.deletedAt` — lost person, including employees and managers who never owned a workspace). They cascade — deleting an account deletes its workspaces, deleting a workspace cancels its subscription — so all three counters see the same departure, but the timeline emits **one event per churned thing**: a workspace deletion carries the plan it was on rather than producing a second `subscription_canceled` row, and a `user_deleted` event is emitted only when no workspace of that user's was deleted in the window. A `user_deleted` event carries `workspace: null` and `plan: null`; its `owner.email` is the sign-up address, with the `_deleted_…` suffix that account deletion adds stripped for display. Rates are `churned ÷ (churned + still live)`; there's no historical subscription snapshot to use as a true period-start denominator. `dormant` lists paying accounts with no check-in for 21+ days, excluding never-active ones (that's activation, which the dashboard funnel covers).
 - `GET /admin/audit-log?page=&action=&targetType=` — newest-first admin actions. Alongside `items`, the response carries `actions[]` and `targetTypes[]` (`{ value, label }` pairs straight from the enums) so the admin dropdowns can't drift out of sync with the backend. Each item: `{ publicId, action, actionLabel, actor{publicId,email}|null, actorEmail, targetType, targetPublicId, targetLabel, metadata, createdAt }` — `actorEmail` and `targetLabel` are snapshots taken at write time, so a row stays readable after the actor or target is deleted.
 
 ### Feature flags & mobile app config

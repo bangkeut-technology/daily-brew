@@ -507,12 +507,13 @@ Every mutating admin action is recorded through `AdminAuditService::record()`, w
 
 ### How churn is measured
 
-`AdminChurnService` tracks two overlapping shapes, because they answer different questions:
+`AdminChurnService` tracks three overlapping shapes, because they answer different questions:
 
 - **Paid churn** — `Subscription.canceledAt` stamped on a non-free plan. Lost revenue, whether or not the workspace survives.
 - **Workspace churn** — `Workspace.deletedAt`. The account is gone, paid or not.
+- **User churn** — `User.deletedAt`. The person is gone. Not every departing user owned a workspace: employees and managers churn too, and neither counter above ever saw them.
 
-Deleting a workspace also cancels its subscription, so both counters see the same event. They keep both; the *timeline* deliberately emits one event per workspace — a deletion carries the plan it was on, rather than appearing twice as a deletion and a cancellation.
+The three cascade — deleting an account deletes the workspaces it owned, and deleting a workspace cancels its subscription — so all three counters see the same departure. They keep all three; the *timeline* deliberately emits one event per churned thing, cheapest-signal-wins: a workspace deletion carries the plan it was on rather than appearing again as a cancellation, and an owner's account deletion is folded into that workspace deletion rather than repeating it. An account deletion only earns its own row when no workspace of theirs was deleted in the same window — which is exactly the case the other two counters were blind to.
 
 Rates are `churned ÷ (churned + still live)`. That isn't a textbook churn rate, and the reason is worth knowing before someone "fixes" it: a true rate needs the number of live subscriptions at the *start* of the period, and there's no historical snapshot to read one from. This is the closest honest approximation available from present-tense data.
 
