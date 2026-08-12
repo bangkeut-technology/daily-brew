@@ -587,22 +587,34 @@ export interface PlanDetails {
   paddleSubscriptionId: string | null;
 }
 
+/** Matches ApiTokenScopeEnum. */
+export type ApiTokenScope = 'attendance:read' | 'attendance:write';
+
 export interface ApiToken {
   publicId: string;
   name: string;
   prefix: string;
   active: boolean;
+  scopes: ApiTokenScope[];
+  /** False on keys minted before request signing existed — they can read, never write. */
+  canSign: boolean;
   lastUsedAt: string | null;
   revokedAt: string | null;
   createdAt: string;
 }
 
-/** Create response — `token` (the full plaintext key) is returned only once. */
+/**
+ * Create response. Both `token` (the bearer key) and `signingSecret` (the HMAC
+ * key for signed writes) are returned exactly once and never again — the first
+ * is stored as a digest, the second encrypted.
+ */
 export interface ApiTokenCreated {
   publicId: string;
   name: string;
   prefix: string;
+  scopes: ApiTokenScope[];
   token: string;
+  signingSecret: string;
   createdAt: string;
 }
 

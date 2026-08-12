@@ -8,3 +8,9 @@ framework:
             policy: fixed_window
             limit: 10
             interval: '1 hour'
+        # External ingest, per API key. Generous enough for a turnstile syncing
+        # a shift's worth of taps, tight enough that a runaway client is capped.
+        api_ingest:
+            policy: sliding_window
+            limit: 120
+            interval: '1 minute'

@@ -16,6 +16,7 @@ use App\Service\Attendance\AttendanceExportService;
 use App\Service\Attendance\AttendanceRowBuilder;
 use App\Service\Attendance\AttendanceSummaryBuilder;
 use App\Service\AttendanceService;
+use App\Service\AuditActor;
 use App\Service\DateService;
 use App\Service\PlanService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -326,7 +327,7 @@ class AttendanceController extends AbstractController
 
         $attendanceService->override(
             attendance: $attendance,
-            actor: $user,
+            actor: AuditActor::forUser($user),
             checkInAt: $checkIn,
             checkOutAt: $checkOut,
             checkInProvided: $checkInProvided,
@@ -391,7 +392,7 @@ class AttendanceController extends AbstractController
             $attendance = $attendanceService->create(
                 workspace: $workspace,
                 employee: $employee,
-                actor: $user,
+                actor: AuditActor::forUser($user),
                 date: $date,
                 checkInAt: $checkIn,
                 checkOutAt: $checkOut,
@@ -441,7 +442,7 @@ class AttendanceController extends AbstractController
         $data = json_decode($request->getContent(), true);
         $reason = is_array($data) && is_string($data['reason'] ?? null) ? $data['reason'] : '';
 
-        $attendanceService->void($attendance, $user, $reason);
+        $attendanceService->void($attendance, AuditActor::forUser($user), $reason);
 
         $wsTz = new \DateTimeZone($workspace->getSetting()?->getTimezone() ?? 'UTC');
         return $this->jsonSuccess(AttendanceDTO::fromEntity($attendance, includeEmployee: true, tz: $wsTz)->toArray());

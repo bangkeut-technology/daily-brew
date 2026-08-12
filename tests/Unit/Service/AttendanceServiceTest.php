@@ -15,6 +15,7 @@ use App\Exception\AttendanceAlreadyExistsException;
 use App\Repository\AttendanceRepository;
 use App\Service\AttendanceFlagCalculator;
 use App\Service\AttendanceService;
+use App\Service\AuditActor;
 use App\Service\DateService;
 use App\Service\PlanService;
 use DateTimeImmutable;
@@ -60,7 +61,8 @@ class AttendanceServiceTest extends TestCase
             checkIn: '2026-04-10 09:00:00',
             checkOut: null,
         );
-        $actor = (new User())->setEmail('owner@example.com');
+        $user = (new User())->setEmail('owner@example.com');
+        $actor = AuditActor::forUser($user);
 
         $this->attendanceRepo->expects($this->once())->method('flush');
 
@@ -78,7 +80,7 @@ class AttendanceServiceTest extends TestCase
         $this->assertTrue($attendance->isEdited());
         $this->assertSame('owner@example.com', $attendance->getEditedByEmail());
         $this->assertSame('Forgot to scan out', $attendance->getEditReason());
-        $this->assertSame($actor, $attendance->getEditedBy());
+        $this->assertSame($user, $attendance->getEditedBy());
     }
 
     public function testFirstEditSnapshotsOriginalScanTimes(): void
@@ -248,7 +250,8 @@ class AttendanceServiceTest extends TestCase
     public function testManualCreateRecordsCheckInWithAuditFields(): void
     {
         [$workspace, $employee] = $this->buildWorkspaceEmployee();
-        $actor = (new User())->setEmail('owner@example.com');
+        $user = (new User())->setEmail('owner@example.com');
+        $actor = AuditActor::forUser($user);
 
         $this->attendanceRepo->expects($this->once())->method('persist');
         $this->attendanceRepo->expects($this->once())->method('flush');
@@ -271,7 +274,7 @@ class AttendanceServiceTest extends TestCase
         $this->assertTrue($attendance->isEdited());
         $this->assertSame('owner@example.com', $attendance->getEditedByEmail());
         $this->assertSame('Backfill — QR was down', $attendance->getEditReason());
-        $this->assertSame($actor, $attendance->getEditedBy());
+        $this->assertSame($user, $attendance->getEditedBy());
     }
 
     public function testManualCreateWithCheckOutStoresBothTimes(): void
@@ -457,7 +460,8 @@ class AttendanceServiceTest extends TestCase
             checkIn: '2026-04-10 09:00:00',
             checkOut: '2026-04-10 17:00:00',
         );
-        $actor = (new User())->setEmail('owner@example.com');
+        $user = (new User())->setEmail('owner@example.com');
+        $actor = AuditActor::forUser($user);
 
         $this->attendanceRepo->expects($this->once())->method('flush');
 
@@ -466,7 +470,7 @@ class AttendanceServiceTest extends TestCase
         $this->assertTrue($attendance->isVoided());
         $this->assertSame('owner@example.com', $attendance->getVoidedByEmail());
         $this->assertSame('Wrong day', $attendance->getVoidReason());
-        $this->assertSame($actor, $attendance->getVoidedBy());
+        $this->assertSame($user, $attendance->getVoidedBy());
         // Scan times are preserved on the tombstone — voiding is reversible.
         $this->assertSame('09:00', $attendance->getCheckInAt()?->format('H:i'));
         $this->assertSame('17:00', $attendance->getCheckOutAt()?->format('H:i'));
@@ -564,9 +568,9 @@ class AttendanceServiceTest extends TestCase
 
     // ── Helpers ──────────────────────────────────────────────────────
 
-    private function actor(): User
+    private function actor(): AuditActor
     {
-        return (new User())->setEmail('manager@example.com');
+        return AuditActor::forUser((new User())->setEmail('manager@example.com'));
     }
 
     /**

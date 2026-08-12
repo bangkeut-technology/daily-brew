@@ -28,7 +28,7 @@ All entities carry `id`, `publicId` (UUID), `createdAt`, `updatedAt`.
 - **LeaveRequest** — employee, startDate, endDate, startTime/endTime (both null = full day), reason, type (paid/unpaid), status, reviewedAt
 - **WorkspaceQrCode** (Double Espresso) — workspace (CASCADE), qrToken (unique), name, manager (Employee, nullable, ON DELETE SET NULL, linked user required), assignedEmployees M:N. Inherit flags+overrides: `inheritIpSettings`, `inheritGeofencing`, `inheritDeviceVerification`. Timezone always inherited.
 - **DeviceToken** — Expo token (unique), platform (ios/android/web), user (CASCADE)
-- **ApiToken** — prefix (8), tokenHash (SHA-256, unique), name, workspace, lastUsedAt, revokedAt. Plain never stored. Format `db_`+45 alphanum.
+- **ApiToken** — prefix (8), tokenHash (SHA-256, unique), name, workspace, scopes (JSON, `ApiTokenScopeEnum`), signingSecret (encrypted, nullable on pre-signing tokens), lastUsedAt, revokedAt. Plain token never stored. Format `db_`+45 alphanum; signing secret `dbs_`+64 hex.
 - **AdminAuditLog** — actor (ON DELETE SET NULL), actorEmail/targetLabel snapshots, action, targetType/PublicId.
 
 ## Business rules
@@ -115,9 +115,13 @@ Warm cafe glassmorphism, dark mode with coffee tones. **Palette** (light→dark)
 
 **Hard rules:** `cn()` from `@/lib/utils` (not template-literal classNames). Never native `<select>`, `<input type="date"|"time">`, checkboxes, `confirm`/`alert`/`prompt` — use Custom* / Toggle / ConfirmModal. Edit/delete buttons always visible — no `opacity-0 group-hover:opacity-100`. Inputs always have `id`+`name`; labels use `htmlFor`. `bg-glass-bg` not `bg-white/30`; sentence case; serif for titles only. Espresso-gated toggles render OFF when plan doesn't support them. Timezone selector from `Intl.supportedValuesOf('timeZone')` with DST-aware offset.
 
-## BasilBook integration
+## External API (BasilBook pull + signed ingest)
 
-Cross-product link via Employee `username` (Espresso). Tokens at `/api/v1/{locale}/workspaces/{id}/api-tokens`. Pull: `GET /api/v1/basilbook/attendances?from=&to=` with `X-Api-Key`. Max 93 days, **all active employees** (username-less ones carry `username: null` — joined on `publicId`), times in workspace TZ, absent + voided days omitted. Each employee carries the full `EmployeeDTO` shape minus `linkedUserEmail`/`phoneNumber`, plus a `records[]` array; `username` (mutable, nullable linking key) and `publicId` (stable, immutable public employee ID — not the internal DB id — recommended long-term join key). See [docs/basilbook.md](./docs/basilbook.md).
+Cross-product link via Employee `username` (Espresso). Tokens at `/api/v1/{locale}/workspaces/{id}/api-tokens` — each carries **scopes** (`ApiTokenScopeEnum`: `attendance:read` default, `attendance:write` opt-in) and a **signing secret** (32 bytes, encrypted at rest with `SecretCipher` under `API_TOKEN_ENCRYPTION_KEY`, falling back to an HKDF of `APP_SECRET`). Both secrets are returned exactly once, at mint. `ApiTokenAuthenticator` (was `BasilBookApiKeyAuthenticator`) covers `^/api/v1/(basilbook|integrations)` and accepts either a bearer `X-Api-Key` or a signature.
+
+**Write ingest** (`POST /api/v1/integrations/attendances`, Espresso, `attendance:write`): **signed requests only** — a bearer key travels on every request and a captured one is replayable, which is not acceptable for records payroll reconciles against. HMAC-SHA256 over `v1\n{ts}\n{nonce}\n{METHOD}\n{path}\n{sha256(body)}`, ±300s skew, per-key nonce replay cache, `hash_equals`. Every failure returns the *same* 401 so the endpoint can't enumerate keys. The token cannot be its own HMAC key (only its digest is stored) — hence the separate encrypted secret. Writes reuse `AttendanceService::create` and are audited via `AuditActor::forApiToken()`, which leaves `editedBy` null and snapshots `editedByEmail` as `api-token:{name}`. See [docs/attendance-ingest.md](./docs/attendance-ingest.md).
+
+Pull: `GET /api/v1/basilbook/attendances?from=&to=` with `X-Api-Key` (needs `attendance:read`). Max 93 days, **all active employees** (username-less ones carry `username: null` — joined on `publicId`), times in workspace TZ, absent + voided days omitted. Each employee carries the full `EmployeeDTO` shape minus `linkedUserEmail`/`phoneNumber`, plus a `records[]` array; `username` (mutable, nullable linking key) and `publicId` (stable, immutable public employee ID — not the internal DB id — recommended long-term join key). See [docs/basilbook.md](./docs/basilbook.md).
 
 ## Commands
 

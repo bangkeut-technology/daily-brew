@@ -6,6 +6,8 @@ The link is the **Employee `username`** field — the workspace owner sets it on
 
 Authentication is per-workspace API tokens (`db_` + 45 alphanumeric, SHA-256 hashed at rest, plain token shown once at creation). Tokens are revocable from the workspace settings page; revoking kills BasilBook's access without affecting any other integration or the owner's own login session.
 
+Tokens carry **scopes**. This pull needs `attendance:read`, which every existing token has and which is what a new token gets by default. `attendance:write` is a separate opt-in for the [attendance ingest endpoint](./attendance-ingest.md) — a pull integration should not hold it, and writing additionally requires signing each request with the token's signing secret rather than sending the key.
+
 ## Identifiers
 
 Each employee in the response carries two identifiers, and they serve different purposes:

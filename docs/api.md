@@ -338,12 +338,14 @@ The three `inherit*` flags each govern one cluster — IP restriction, geofencin
 
 - `GET /api/v1/{locale}/workspaces/{publicId}/api-tokens` — list (active + revoked). The plain token value is **never** returned here.
   ```json
-  [{ "publicId": "...", "name": "BasilBook", "prefix": "db_a1b2c", "active": true, "lastUsedAt": "2026-06-10T12:00:00+00:00", "revokedAt": null, "createdAt": "2026-06-01T09:00:00+00:00" }]
+  [{ "publicId": "...", "name": "BasilBook", "prefix": "db_a1b2c", "active": true, "scopes": ["attendance:read"], "canSign": true, "lastUsedAt": "2026-06-10T12:00:00+00:00", "revokedAt": null, "createdAt": "2026-06-01T09:00:00+00:00" }]
   ```
-- `POST /api/v1/{locale}/workspaces/{publicId}/api-tokens` — generate (Espresso+). Body `{ "name": "BasilBook" }`. Returns `201` — **the only time the full token is returned**:
+  `canSign` is false on tokens minted before request signing existed — they can read, never write, and gaining write access means minting a new one.
+- `POST /api/v1/{locale}/workspaces/{publicId}/api-tokens` — generate (Espresso+). Body `{ "name": "BasilBook", "scopes": ["attendance:read"] }`. Returns `201` — **the only time either secret is returned**:
   ```json
-  { "publicId": "...", "name": "BasilBook", "prefix": "db_a1b2c", "token": "db_<45 alphanum>", "createdAt": "2026-06-11T09:00:00+00:00" }
+  { "publicId": "...", "name": "BasilBook", "prefix": "db_a1b2c", "scopes": ["attendance:read"], "token": "db_<45 alphanum>", "signingSecret": "dbs_<64 hex>", "createdAt": "2026-06-11T09:00:00+00:00" }
   ```
+  `scopes` accepts `attendance:read` and `attendance:write`; unrecognised values are dropped, and a request naming none valid gets read-only rather than an upgrade. `token` is the bearer key for reads; `signingSecret` is the HMAC key for [signed writes](./attendance-ingest.md) and never travels on the wire. The token is stored as a digest and the secret encrypted — neither can be shown again.
 - `DELETE /api/v1/{locale}/workspaces/{publicId}/api-tokens/{tokenPublicId}` — revoke; `204`. `409` if already revoked.
 
 ## QR Check-in (authenticated, no locale)
@@ -492,7 +494,7 @@ Surfaces the `dukecity/command-scheduler` store through the React admin console 
 
 ## BasilBook API
 
-External attendance pull for the BasilBook accounting integration. Uses `X-Api-Key` instead of JWT (the key resolves to its workspace via `BasilBookApiKeyAuthenticator`), and has **no locale prefix**. Espresso-gated (`403` otherwise). Issue the key with the [API Tokens](#api-tokens-authenticated-owner-only) endpoints above.
+External attendance pull for the BasilBook accounting integration. Uses `X-Api-Key` instead of JWT (the key resolves to its workspace via `ApiTokenAuthenticator`), requires the token to carry the `attendance:read` scope, and has **no locale prefix**. Espresso-gated (`403` otherwise). Issue the key with the [API Tokens](#api-tokens-authenticated-owner-only) endpoints above.
 
 - `GET /api/v1/basilbook/attendances?from=YYYY-MM-DD&to=YYYY-MM-DD` — attendance for the range, grouped per employee. Only employees with a `username` are returned; voided rows and absent days are omitted; times are in the workspace timezone. Both `from` and `to` are required and the range may not exceed **93 days**.
   ```json
@@ -517,3 +519,21 @@ External attendance pull for the BasilBook accounting integration. Uses `X-Api-K
 Each employee carries two identifiers: `username` (the owner-assigned, **mutable** linking key the feed is keyed by) and `publicId` (DailyBrew's **stable, immutable** public employee ID — not the internal DB id). Match on `username` for the initial import, then key off `publicId` for subsequent syncs so a later rename doesn't orphan accumulated history.
 
 See [basilbook.md](./basilbook.md) for the full field reference, the identifier/linking model, and token lifecycle.
+
+## Integrations API (signed, no locale)
+
+Attendance **ingest** for external systems — a turnstile, a POS, another HR tool. Same firewall as the BasilBook pull, but writes require a *signed* request rather than a bearer key: the key travels on every request and a captured one is replayable, which is not an acceptable trade for the records payroll is reconciled against. Full scheme and client examples in [attendance-ingest.md](./attendance-ingest.md).
+
+- `POST /api/v1/integrations/attendances` — record one attendance row. Espresso+, requires the `attendance:write` scope and a valid signature; rate limited to 120/minute per key.
+
+  Headers: `X-DB-Key-Id` (the token's `publicId`), `X-DB-Timestamp` (unix seconds, ±300s), `X-DB-Nonce` (≥16 chars, unique per key), `X-DB-Signature` (`v1=` + HMAC-SHA256 over `v1\n{ts}\n{nonce}\n{METHOD}\n{path}\n{sha256(body)}`).
+
+  ```json
+  { "employeePublicId": "m4rt2wq8xkph", "date": "2026-08-12", "checkInAt": "08:57", "checkOutAt": "17:04", "reason": "Turnstile #3" }
+  ```
+
+  `employeePublicId` or `username` identifies the employee (public id wins if both are sent). Times are workspace-local `HH:MM`; validation runs through `AttendanceService::create`, the same path the console uses, so future dates are rejected, late/left-early flags are recomputed, and a voided row is resurrected in place. Returns `201` with the `AttendanceDTO`.
+
+  Errors: `401` for every signature failure — unknown key, bad signature, stale timestamp, replayed nonce — deliberately indistinguishable so the endpoint can't be used to enumerate keys, and also for an unsigned request even from a key that holds the scope. `403` is a missing scope or a plan below Espresso, `404` an unknown employee, `422` a validation failure, `429` the rate limit (with `Retry-After`), and `409` means a live record already exists for that `(employee, date)` — the body carries that record so the client can `PATCH` it rather than blindly overwrite.
+
+  Writes are audited like any manager edit, but with no user attached: `editedByEmail` reads `api-token:{name}`.

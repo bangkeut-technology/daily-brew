@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Tests\Unit\ApiController\BasilBook;
 
 use App\ApiController\BasilBook\AttendanceController;
+use App\Entity\ApiToken;
 use App\Entity\Attendance;
 use App\Entity\Employee;
 use App\Entity\Workspace;
+use App\Enum\ApiTokenScopeEnum;
 use App\Repository\AttendanceRepository;
 use App\Repository\EmployeeRepository;
+use App\Security\ApiTokenAuthenticator;
 use App\Service\PlanService;
 use DateTimeImmutable;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -22,7 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
  * identifier that survives a username rename. These tests pin that contract.
  *
  * The controller's list() reads its workspace from a request attribute (set by
- * BasilBookApiKeyAuthenticator) and calls no container-bound helpers, so it can
+ * ApiTokenAuthenticator) and calls no container-bound helpers, so it can
  * be exercised as a plain unit with mocked repositories.
  */
 #[AllowMockObjectsWithoutExpectations]
@@ -144,6 +147,28 @@ class AttendanceControllerTest extends TestCase
         (new \ReflectionProperty($entity, 'id'))->setValue($entity, $id);
 
         return $entity;
+    }
+
+    public function testATokenWithoutTheReadScopeIsRefused(): void
+    {
+        $workspace = (new Workspace())->setName('The Daily Grind');
+        ['entity' => $token] = ApiToken::create($workspace, 'Write-only', [ApiTokenScopeEnum::WriteAttendance]);
+
+        $request = new Request(query: ['from' => '2026-04-01', 'to' => '2026-04-30']);
+        $request->attributes->set(ApiTokenAuthenticator::ATTR_WORKSPACE, $workspace);
+        $request->attributes->set(ApiTokenAuthenticator::ATTR_TOKEN, $token);
+
+        $planService = $this->createMock(PlanService::class);
+        $planService->method('isAtLeastEspresso')->willReturn(true);
+
+        $response = (new AttendanceController())->list(
+            $request,
+            $this->createMock(AttendanceRepository::class),
+            $this->createMock(EmployeeRepository::class),
+            $planService,
+        );
+
+        $this->assertSame(403, $response->getStatusCode());
     }
 
     /**

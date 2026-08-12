@@ -75,6 +75,43 @@ class EmployeeRepository extends AbstractRepository
     }
 
     /**
+     * Resolve one employee inside a workspace by their stable public id. Used by
+     * the integrations ingest, where "not in this workspace" and "doesn't exist"
+     * must be indistinguishable — an external caller has no business learning
+     * that a public id exists somewhere else on the platform.
+     */
+    public function findOneActiveByPublicIdAndWorkspace(string $publicId, Workspace $workspace): ?Employee
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.publicId = :publicId')
+            ->andWhere('e.workspace = :ws')
+            ->andWhere('e.deletedAt IS NULL')
+            ->setParameter('publicId', $publicId)
+            ->setParameter('ws', $workspace)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * Same, by the BasilBook `username` link key. Mutable, so it's the fallback
+     * rather than the recommended join — but a caller that only holds a username
+     * shouldn't be forced to sync public ids first.
+     */
+    public function findOneActiveByUsernameAndWorkspace(string $username, Workspace $workspace): ?Employee
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.username = :username')
+            ->andWhere('e.workspace = :ws')
+            ->andWhere('e.deletedAt IS NULL')
+            ->setParameter('username', $username)
+            ->setParameter('ws', $workspace)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
      * Employees whose active window overlaps the given date range — i.e. either
      * still active, or deactivated on/after `from`. Used by attendance list /
      * summary so historical absent/present rows for deactivated employees stay

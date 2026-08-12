@@ -26,7 +26,7 @@ dailybrew_api_v1_:
     resource:
         path: '../src/ApiController/'
         namespace: App\ApiController
-        exclude: '../src/ApiController/{Checkin,Device,Paddle,Dev,BasilBook,Support,Telegram}'
+        exclude: '../src/ApiController/{Checkin,Device,Paddle,Dev,BasilBook,Integration,Support,Telegram}'
     type: attribute
     prefix: /api/v1/{_locale}
     requirements:
@@ -79,6 +79,16 @@ dailybrew_api_v1_basilbook_:
     resource:
         path: '../src/ApiController/BasilBook/'
         namespace: App\ApiController\BasilBook
+    type: attribute
+    prefix: /api/v1
+    name_prefix: dailybrew_api_v1_
+    options:
+        strict_requirements: true
+
+dailybrew_api_v1_integrations_:
+    resource:
+        path: '../src/ApiController/Integration/'
+        namespace: App\ApiController\Integration
     type: attribute
     prefix: /api/v1
     name_prefix: dailybrew_api_v1_

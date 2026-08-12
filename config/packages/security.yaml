@@ -39,11 +39,14 @@ security:
             provider: daily_brew_user_provider
             context:  'dailybrew'
 
-        basilbook:
-            pattern: '^/api/v1/basilbook'
+        # External integrations: the BasilBook pull feed and the signed ingest
+        # endpoints. One authenticator serves both — bearer key for reads,
+        # request signature for writes.
+        integrations:
+            pattern: '^/api/v1/(basilbook|integrations)'
             stateless: true
             custom_authenticators:
-                - App\Security\BasilBookApiKeyAuthenticator
+                - App\Security\ApiTokenAuthenticator
             provider: daily_brew_user_provider
 
         # Dedicated firewall for the refresh endpoint. Must come BEFORE the
@@ -95,6 +98,8 @@ security:
         - path: '^/api/token/refresh'
           roles: PUBLIC_ACCESS
         - path: '^/api/v1/basilbook'
+          roles: IS_AUTHENTICATED_FULLY
+        - path: '^/api/v1/integrations'
           roles: IS_AUTHENTICATED_FULLY
         - path: '^/api/v1/webhooks'
           roles: PUBLIC_ACCESS
