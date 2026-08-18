@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.141.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.140.0...v1.141.0) (2026-08-18)
+
+
+### Features
+
+* **attendance:** support shifts that run past midnight ([#407](https://github.com/bangkeut-technology/daily-brew/issues/407)) ([6223d33](https://github.com/bangkeut-technology/daily-brew/commit/6223d33c3f44633e5c8c0edee5d2239148cb62e1))
+
 ## [1.140.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.139.0...v1.140.0) (2026-08-12)
 
 
