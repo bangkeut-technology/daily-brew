@@ -273,7 +273,7 @@ Remember the semantics: once a shift has **any** rule it is treated as that shif
 ```json
 {
   "publicId": "...", "date": "2026-06-11",
-  "checkInAt": "08:03", "checkOutAt": "16:01", "isLate": true, "leftEarly": false,
+  "checkInAt": "08:03", "checkOutAt": "16:01", "checkOutNextDay": false, "isLate": true, "leftEarly": false,
   "editedAt": null, "editedByEmail": null, "editReason": null,
   "originalCheckInAt": null, "originalCheckOutAt": null,
   "voidedAt": null, "voidedByEmail": null, "voidReason": null,

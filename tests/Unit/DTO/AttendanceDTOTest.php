@@ -102,6 +102,62 @@ class AttendanceDTOTest extends TestCase
         $this->assertNull($array['shiftName'], 'No shift attached → shiftName key present but null');
     }
 
+    // ── Overnight shifts ────────────────────────────────────────────
+
+    public function testCheckOutOnTheSameDayIsNotFlaggedAsNextDay(): void
+    {
+        $dto = AttendanceDTO::fromEntity($this->attendance(
+            date: '2026-04-10',
+            checkIn: '2026-04-10 09:05:00',
+            checkOut: '2026-04-10 17:30:00',
+        ));
+
+        $this->assertFalse($dto->checkOutNextDay);
+        $this->assertFalse($dto->toArray()['checkOutNextDay']);
+    }
+
+    public function testOvernightCheckOutIsFlaggedAsNextDay(): void
+    {
+        // 18:00 → 02:00. Without the flag a consumer subtracting the two clock
+        // times gets minus sixteen hours.
+        $dto = AttendanceDTO::fromEntity($this->attendance(
+            date: '2026-04-10',
+            checkIn: '2026-04-10 18:00:00',
+            checkOut: '2026-04-11 02:00:00',
+        ));
+
+        $this->assertTrue($dto->checkOutNextDay);
+        $this->assertSame('18:00', $dto->checkInAt);
+        $this->assertSame('02:00', $dto->checkOutAt);
+    }
+
+    public function testNextDayIsDecidedInTheWorkspaceTimezoneNotUtc(): void
+    {
+        // 19:30 UTC on the 10th is 02:30 on the 11th in Phnom Penh (UTC+7) —
+        // the same instant is "next day" only once it is read locally.
+        $att = $this->attendance(
+            date: '2026-04-10',
+            checkIn: '2026-04-10 11:00:00',
+            checkOut: '2026-04-10 19:30:00',
+        );
+
+        $this->assertFalse(AttendanceDTO::fromEntity($att)->checkOutNextDay);
+        $this->assertTrue(
+            AttendanceDTO::fromEntity($att, tz: new DateTimeZone('Asia/Phnom_Penh'))->checkOutNextDay,
+        );
+    }
+
+    public function testAMissingCheckOutIsNeverNextDay(): void
+    {
+        $dto = AttendanceDTO::fromEntity($this->attendance(
+            date: '2026-04-10',
+            checkIn: '2026-04-10 18:00:00',
+            checkOut: null,
+        ));
+
+        $this->assertFalse($dto->checkOutNextDay);
+    }
+
     private function attendance(
         string $date,
         ?string $checkIn,

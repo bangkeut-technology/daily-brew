@@ -13,6 +13,8 @@ final readonly class AttendanceDTO
         public string  $date,
         public ?string $checkInAt,
         public ?string $checkOutAt,
+        /** The check-out happened after midnight — it belongs to the day after `date`. */
+        public bool    $checkOutNextDay,
         public bool    $isLate,
         public bool    $leftEarly,
         public string  $status = 'present',
@@ -42,11 +44,21 @@ final readonly class AttendanceDTO
         $editedAt = $a->getEditedAt();
         $voidedAt = $a->getVoidedAt();
 
+        // An overnight shift's check-out is stamped on the day after the row it
+        // belongs to. `checkOutAt` alone ("02:00" against an 18:00 check-in)
+        // reads as a day that ran backwards, so the flag says so outright.
+        $checkOut = $a->getCheckOutAt();
+        $checkOutNextDay = $checkOut !== null
+            && \DateTimeImmutable::createFromInterface($checkOut)
+                ->setTimezone($tz ?? new \DateTimeZone('UTC'))
+                ->format('Y-m-d') > $a->getDate()->format('Y-m-d');
+
         return new self(
             publicId: (string) $a->getPublicId(),
             date: $a->getDate()->format('Y-m-d'),
             checkInAt: $formatTime($a->getCheckInAt()),
-            checkOutAt: $formatTime($a->getCheckOutAt()),
+            checkOutAt: $formatTime($checkOut),
+            checkOutNextDay: $checkOutNextDay,
             // Stats fields are presentationally cleared on voided rows so the
             // "Late" / "Left early" pills don't render on a tombstone.
             isLate: $a->isLate() && !$a->isVoided(),
@@ -75,6 +87,7 @@ final readonly class AttendanceDTO
             'date' => $this->date,
             'checkInAt' => $this->checkInAt,
             'checkOutAt' => $this->checkOutAt,
+            'checkOutNextDay' => $this->checkOutNextDay,
             'isLate' => $this->isLate,
             'leftEarly' => $this->leftEarly,
             'status' => $this->status,
