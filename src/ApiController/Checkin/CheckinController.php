@@ -74,6 +74,7 @@ class CheckinController extends AbstractController
                 'checkedOut' => $attendance?->getCheckOutAt() !== null,
                 'checkInAt' => $attendance?->getCheckInAt() ? (clone $attendance->getCheckInAt())->setTimezone($tz)->format('H:i') : null,
                 'checkOutAt' => $attendance?->getCheckOutAt() ? (clone $attendance->getCheckOutAt())->setTimezone($tz)->format('H:i') : null,
+                'checkOutNextDay' => $attendance !== null && $this->isCheckOutNextDay($attendance, $tz),
                 'isLate' => $attendance?->isLate() ?? false,
             ],
         ]);
@@ -126,6 +127,10 @@ class CheckinController extends AbstractController
         return $this->jsonSuccess([
             'checkInAt' => $attendance->getCheckInAt() ? (clone $attendance->getCheckInAt())->setTimezone($tz)->format('H:i') : null,
             'checkOutAt' => $attendance->getCheckOutAt() ? (clone $attendance->getCheckOutAt())->setTimezone($tz)->format('H:i') : null,
+            // Overnight shift: the check-out clock time belongs to the day after
+            // the row, so a client showing "18:00 → 02:00" can say which day.
+            'checkOutNextDay' => $this->isCheckOutNextDay($attendance, $tz),
+            'date' => $attendance->getDate()?->format('Y-m-d'),
             'isLate' => $attendance->isLate(),
             'leftEarly' => $attendance->hasLeftEarly(),
             'verification' => $this->verificationPayload($settings),
@@ -167,6 +172,7 @@ class CheckinController extends AbstractController
                 'checkedOut' => $attendance?->getCheckOutAt() !== null,
                 'checkInAt' => $attendance?->getCheckInAt() ? (clone $attendance->getCheckInAt())->setTimezone($tz)->format('H:i') : null,
                 'checkOutAt' => $attendance?->getCheckOutAt() ? (clone $attendance->getCheckOutAt())->setTimezone($tz)->format('H:i') : null,
+                'checkOutNextDay' => $attendance !== null && $this->isCheckOutNextDay($attendance, $tz),
                 'isLate' => $attendance?->isLate() ?? false,
             ],
         ]);
@@ -211,6 +217,10 @@ class CheckinController extends AbstractController
         return $this->jsonSuccess([
             'checkInAt' => $attendance->getCheckInAt() ? (clone $attendance->getCheckInAt())->setTimezone($tz)->format('H:i') : null,
             'checkOutAt' => $attendance->getCheckOutAt() ? (clone $attendance->getCheckOutAt())->setTimezone($tz)->format('H:i') : null,
+            // Overnight shift: the check-out clock time belongs to the day after
+            // the row, so a client showing "18:00 → 02:00" can say which day.
+            'checkOutNextDay' => $this->isCheckOutNextDay($attendance, $tz),
+            'date' => $attendance->getDate()?->format('Y-m-d'),
             'isLate' => $attendance->isLate(),
             'leftEarly' => $attendance->hasLeftEarly(),
             'verification' => $this->verificationPayload($settings),
@@ -226,6 +236,23 @@ class CheckinController extends AbstractController
      *
      * @return array{location: bool, device: bool, network: bool}
      */
+    /**
+     * Did this check-out land on the calendar day after the attendance's own
+     * date? True only for a shift that runs past midnight — the row stays filed
+     * under the day the shift started, so the clock time alone reads backwards.
+     */
+    private function isCheckOutNextDay(\App\Entity\Attendance $attendance, \DateTimeZone $tz): bool
+    {
+        $checkOut = $attendance->getCheckOutAt();
+        $date = $attendance->getDate();
+        if ($checkOut === null || $date === null) {
+            return false;
+        }
+
+        return \DateTimeImmutable::createFromInterface($checkOut)->setTimezone($tz)->format('Y-m-d')
+            > $date->format('Y-m-d');
+    }
+
     private function verificationPayload(EffectiveCheckinSettings $settings): array
     {
         return [

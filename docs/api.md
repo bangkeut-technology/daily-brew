@@ -383,14 +383,15 @@ Main QR routes by `/checkin/{workspaceQrToken}`; sub-QR (Double Espresso) by `/c
     "employeeName": "Dara Sok", "shiftName": "Morning", "shiftStart": "08:00", "shiftEnd": "16:00",
     "onLeave": false, "leaveIsFullDay": false,
     "workspaceTapCheckinEnabled": true, "workspaceNfcCheckinEnabled": false,
-    "today": { "date": "2026-06-11", "checkedIn": true, "checkedOut": false, "checkInAt": "08:03", "checkOutAt": null, "isLate": true }
+    "today": { "date": "2026-06-11", "checkedIn": true, "checkedOut": false, "checkInAt": "08:03", "checkOutAt": null, "checkOutNextDay": false, "isLate": true }
   }
   ```
   `today.date` is the day the open row belongs to. It is normally the current workspace-local date, but for someone part-way through an overnight shift at 01:00 it is **yesterday** — that is the row the next scan will check out of. Clients should show the punch against `today.date` rather than assuming the current date, and must not treat `checkedIn: true` with an earlier `date` as stale state. `shiftStart` / `shiftEnd` come from the shift's defaults; `shiftEnd < shiftStart` means the shift ends the next day.
 - `POST /api/v1/checkin/{workspaceQrToken}` — perform check-in/out. Body (all optional): `{ "latitude", "longitude", "deviceId", "deviceName", "origin": "nfc"? }`. Pipeline: closure → leave → IP → device → geofence → create/update → late/early. Returns:
   ```json
   {
-    "checkInAt": "08:03", "checkOutAt": null, "isLate": true, "leftEarly": false,
+    "date": "2026-06-11", "checkInAt": "08:03", "checkOutAt": null, "checkOutNextDay": false,
+    "isLate": true, "leftEarly": false,
     "verification": { "location": false, "device": true, "network": true }
   }
   ```
