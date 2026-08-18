@@ -383,14 +383,21 @@ Main QR routes by `/checkin/{workspaceQrToken}`; sub-QR (Double Espresso) by `/c
     "employeeName": "Dara Sok", "shiftName": "Morning", "shiftStart": "08:00", "shiftEnd": "16:00",
     "onLeave": false, "leaveIsFullDay": false,
     "workspaceTapCheckinEnabled": true, "workspaceNfcCheckinEnabled": false,
-    "today": { "date": "2026-06-11", "checkedIn": true, "checkedOut": false, "checkInAt": "08:03", "checkOutAt": null, "checkOutNextDay": false, "isLate": true }
+    "today": {
+      "date": "2026-06-11", "checkedIn": true, "checkedOut": false,
+      "checkInAt": "08:03", "checkOutAt": null, "checkOutNextDay": false,
+      "checkInAtIso": "2026-06-11T01:03:00+00:00", "checkOutAtIso": null,
+      "isLate": true
+    }
   }
   ```
+  `checkInAtIso` / `checkOutAtIso` are the same punches as absolute instants. The `HH:MM` fields are for display; anything measuring **elapsed** time must use the ISO ones, because a wall-clock string can't be turned back into a moment without the workspace's zone and the right calendar day — and an overnight shift is precisely when those disagree.
   `today.date` is the day the open row belongs to. It is normally the current workspace-local date, but for someone part-way through an overnight shift at 01:00 it is **yesterday** — that is the row the next scan will check out of. Clients should show the punch against `today.date` rather than assuming the current date, and must not treat `checkedIn: true` with an earlier `date` as stale state. `shiftStart` / `shiftEnd` come from the shift's defaults; `shiftEnd < shiftStart` means the shift ends the next day.
 - `POST /api/v1/checkin/{workspaceQrToken}` — perform check-in/out. Body (all optional): `{ "latitude", "longitude", "deviceId", "deviceName", "origin": "nfc"? }`. Pipeline: closure → leave → IP → device → geofence → create/update → late/early. Returns:
   ```json
   {
     "date": "2026-06-11", "checkInAt": "08:03", "checkOutAt": null, "checkOutNextDay": false,
+    "checkInAtIso": "2026-06-11T01:03:00+00:00", "checkOutAtIso": null,
     "isLate": true, "leftEarly": false,
     "verification": { "location": false, "device": true, "network": true }
   }
