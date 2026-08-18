@@ -12,6 +12,7 @@ DailyBrew helps restaurant owners manage their team's daily attendance through Q
 - Device verification — same device must check in and check out, prevents one phone checking in multiple employees
 - New-device anomaly alerts — a check-in from an unrecognised device pings the owner (Telegram + push)
 - Shift and closure management, including per-day shift schedules (a shift with per-day rules *is* its complete schedule; unlisted days are off-days)
+- Overnight shifts — set an end time earlier than the start (18:00–02:00) and the night is tracked as one day, filed under the day it began; the after-midnight scan checks out rather than starting a new day
 - Leave request workflow — employees submit (full-day or partial-day with time range), owners approve/reject, employees can cancel pending requests
 - Attendance corrections with a full audit trail — managers can backfill a forgotten scan, fix a wrong time, or void a bad row; originals are snapshotted and every edit records who, when, and why
 - Per-employee attendance tracking modes — admin helpers and flexible-hours staff can be excluded from the absent count without losing their check-in times
