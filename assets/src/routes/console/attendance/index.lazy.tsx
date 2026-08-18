@@ -127,8 +127,8 @@ function ganttCell(day: AttendanceDayStatus, hasShift: boolean): GanttCellSpec {
       if (day.isLate)
         return { kind: 'badge', code: 'Lt', bg: 'bg-amber/15', text: 'text-amber', title: `Late \u2014 ${day.checkInAt || ''}` };
       if (day.leftEarly)
-        return { kind: 'badge', code: 'LfE', bg: 'bg-amber/15', text: 'text-amber', title: `Left early \u2014 ${day.checkOutAt || ''}` };
-      return { kind: 'badge', code: 'Pre', bg: 'bg-green/12', text: 'text-green', title: `Present \u2014 ${day.checkInAt || ''}${day.checkOutAt ? ` \u2192 ${day.checkOutAt}` : ''}` };
+        return { kind: 'badge', code: 'LfE', bg: 'bg-amber/15', text: 'text-amber', title: `Left early \u2014 ${day.checkOutAt || ''}${day.checkOutNextDay ? ' +1' : ''}` };
+      return { kind: 'badge', code: 'Pre', bg: 'bg-green/12', text: 'text-green', title: `Present \u2014 ${day.checkInAt || ''}${day.checkOutAt ? ` \u2192 ${day.checkOutAt}${day.checkOutNextDay ? ' +1' : ''}` : ''}` };
     case 'absent':
       return hasShift
         ? { kind: 'badge', code: 'Abs', bg: 'bg-red/12', text: 'text-red', title: 'Absent' }
@@ -681,6 +681,7 @@ function AttendancePage() {
                   date={fmtDate(a.date)}
                   time={a.checkInAt}
                   checkOut={a.checkOutAt}
+                  checkOutNextDay={a.checkOutNextDay}
                   isLate={a.isLate}
                   leftEarly={a.leftEarly}
                   status={a.status}
@@ -943,6 +944,14 @@ function SummaryCard({
                         <span>
                           {day.checkInAt}
                           {day.checkOutAt ? ` \u2192 ${day.checkOutAt}` : ''}
+                          {day.checkOutAt && day.checkOutNextDay && (
+                            <span
+                              title={t('attendance.nextDayTooltip', 'Checked out the next day')}
+                              className="ml-1 text-[11px] font-sans font-medium text-amber align-super"
+                            >
+                              {t('attendance.nextDay', '+1')}
+                            </span>
+                          )}
                         </span>
                         {day.editedAt && (
                           <span

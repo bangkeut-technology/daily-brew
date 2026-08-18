@@ -18,6 +18,7 @@ use App\Service\CheckinService;
 use App\Service\AttendanceFlagCalculator;
 use App\Service\DateService;
 use App\Service\PlanService;
+use App\Service\Shift\ShiftScheduleResolver;
 use DateTimeImmutable;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -34,6 +35,7 @@ class CheckinServiceTest extends TestCase
     private ClosurePeriodRepository&Stub $closureRepo;
     private LeaveRequestRepository&Stub $leaveRepo;
     private PlanService&Stub $planService;
+    private ShiftScheduleResolver $scheduleResolver;
     private CheckinService $svc;
 
     protected function setUp(): void
@@ -42,6 +44,7 @@ class CheckinServiceTest extends TestCase
         $this->closureRepo = $this->createStub(ClosurePeriodRepository::class);
         $this->leaveRepo = $this->createStub(LeaveRequestRepository::class);
         $this->planService = $this->createStub(PlanService::class);
+        $this->scheduleResolver = new ShiftScheduleResolver($this->planService);
 
         // Defaults — most tests don't care about these gates.
         $this->closureRepo->method('findActiveOnDate')->willReturn(null);
@@ -52,7 +55,8 @@ class CheckinServiceTest extends TestCase
             $this->attendanceRepo,
             $this->closureRepo,
             $this->leaveRepo,
-            new AttendanceFlagCalculator($this->planService),
+            new AttendanceFlagCalculator($this->scheduleResolver),
+            $this->scheduleResolver,
         );
     }
 
@@ -555,7 +559,8 @@ class CheckinServiceTest extends TestCase
             $this->attendanceRepo,
             $this->closureRepo,
             $this->leaveRepo,
-            new AttendanceFlagCalculator($this->planService),
+            new AttendanceFlagCalculator($this->scheduleResolver),
+            $this->scheduleResolver,
         );
     }
 }

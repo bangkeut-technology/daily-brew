@@ -272,7 +272,7 @@ class AttendanceExportService
         return match ($status) {
             'present' => [
                 'code' => !empty($day['isLate']) ? 'Lt' : (!empty($day['leftEarly']) ? 'LfE' : 'Pre'),
-                'time' => $this->timeRange($day['checkInAt'] ?? null, $day['checkOutAt'] ?? null),
+                'time' => $this->timeRange($day['checkInAt'] ?? null, $day['checkOutAt'] ?? null, !empty($day['checkOutNextDay'])),
                 'status' => (!empty($day['isLate']) || !empty($day['leftEarly'])) ? 'flag' : 'present',
             ],
             'absent' => $shiftName !== null
@@ -281,22 +281,28 @@ class AttendanceExportService
             'leave' => ['code' => 'Lv', 'time' => null, 'status' => 'leave'],
             'off' => ['code' => 'Off', 'time' => null, 'status' => 'off'],
             'closure' => ['code' => 'C', 'time' => null, 'status' => 'closure'],
-            'voided' => ['code' => 'Vd', 'time' => $this->timeRange($day['checkInAt'] ?? null, $day['checkOutAt'] ?? null), 'status' => 'voided'],
+            'voided' => ['code' => 'Vd', 'time' => $this->timeRange($day['checkInAt'] ?? null, $day['checkOutAt'] ?? null, !empty($day['checkOutNextDay'])), 'status' => 'voided'],
             default => ['code' => '', 'time' => null, 'status' => 'upcoming'],
         };
     }
 
     /**
      * Formats a check-in/check-out pair for a cell: "09:00–17:30", or just
-     * "09:00" when there's no check-out yet (forgotten / still on shift).
+     * "09:00" when there's no check-out yet (forgotten / still on shift). An
+     * overnight shift gets a "+1" marker — "18:00–02:00" on its own would look
+     * like a day that ran backwards.
      */
-    private function timeRange(?string $checkIn, ?string $checkOut): ?string
+    private function timeRange(?string $checkIn, ?string $checkOut, bool $checkOutNextDay = false): ?string
     {
         if ($checkIn === null) {
             return null;
         }
 
-        return $checkOut !== null ? $checkIn . '–' . $checkOut : $checkIn;
+        if ($checkOut === null) {
+            return $checkIn;
+        }
+
+        return $checkIn . '–' . $checkOut . ($checkOutNextDay ? ' +1' : '');
     }
 
     private function timezone(Workspace $workspace): string

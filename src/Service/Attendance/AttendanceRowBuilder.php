@@ -75,6 +75,17 @@ class AttendanceRowBuilder
             return \DateTimeImmutable::createFromInterface($dt)->setTimezone($wsTz)->format('H:i');
         };
 
+        // An overnight shift's check-out is stamped on the calendar day after
+        // the row it belongs to. The time alone ("02:00") reads as if someone
+        // left before they arrived, so the row carries a flag and the UI shows
+        // it as next-day.
+        $isNextDay = static function (?\DateTimeInterface $dt, string $dateStr) use ($wsTz): bool {
+            if ($dt === null) {
+                return false;
+            }
+            return \DateTimeImmutable::createFromInterface($dt)->setTimezone($wsTz)->format('Y-m-d') > $dateStr;
+        };
+
         // Index attendance by "employeeId_date"
         $attendanceMap = [];
         foreach ($attendances as $a) {
@@ -152,6 +163,7 @@ class AttendanceRowBuilder
                         'date' => $dateStr,
                         'checkInAt' => $formatTime($a->getCheckInAt()),
                         'checkOutAt' => $formatTime($a->getCheckOutAt()),
+                        'checkOutNextDay' => $isNextDay($a->getCheckOutAt(), $dateStr),
                         'isLate' => $a->isLate() && !$a->isVoided(),
                         'leftEarly' => $a->hasLeftEarly() && !$a->isVoided(),
                         // Voided rows still surface in the list (with badge) so
@@ -187,6 +199,7 @@ class AttendanceRowBuilder
                         'date' => $dateStr,
                         'checkInAt' => null,
                         'checkOutAt' => null,
+                        'checkOutNextDay' => false,
                         'isLate' => false,
                         'leftEarly' => false,
                         'status' => $status,

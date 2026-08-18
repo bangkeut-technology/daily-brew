@@ -181,7 +181,9 @@
     "editTitle": "Modifier la présence",
     "hasCheckOut": "Pointage de sortie",
     "originalScan": "À l'origine",
-    "selectEmployee": "Sélectionner un employé"
+    "selectEmployee": "Sélectionner un employé",
+    "nextDay": "+1",
+    "nextDayTooltip": "Départ pointé le lendemain"
   },
   "auth": {
     "signIn": "Connexion",
@@ -2803,7 +2805,10 @@
     "selectEmployee": "Sélectionner un employé…",
     "unassign": "Retirer",
     "unassignConfirm": "Retirer {{name}} du service {{shift}} ? Sa présence ne sera plus suivie par rapport à ce service.",
-    "unassignTitle": "Retirer du service"
+    "unassignTitle": "Retirer du service",
+    "nextDay": "+1",
+    "endsNextDay": "Se termine le lendemain — la présence reste au jour où le service a commencé.",
+    "endsNextDayTooltip": "Se termine le lendemain"
   },
   "onboarding": {
     "copyId": "Copier l'ID",

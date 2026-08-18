@@ -116,6 +116,14 @@ export function AttendanceSummaryCard({
                         <span>
                           {day.checkInAt}
                           {day.checkOutAt ? ` → ${day.checkOutAt}` : ""}
+                          {day.checkOutAt && day.checkOutNextDay && (
+                            <span
+                              title={t("attendance.nextDayTooltip", "Checked out the next day")}
+                              className="ml-1 align-super font-sans text-[11px] font-medium text-amber"
+                            >
+                              {t("attendance.nextDay", "+1")}
+                            </span>
+                          )}
                         </span>
                         {day.editedAt && (
                           <span

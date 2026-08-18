@@ -181,7 +181,9 @@
     "editTitle": "កែវត្តមាន",
     "hasCheckOut": "មានពេលចេញ",
     "originalScan": "ដើមឡើយ",
-    "selectEmployee": "ជ្រើសរើសបុគ្គលិក"
+    "selectEmployee": "ជ្រើសរើសបុគ្គលិក",
+    "nextDay": "+1",
+    "nextDayTooltip": "បានចេញនៅថ្ងៃបន្ទាប់"
   },
   "auth": {
     "signIn": "ចូល",
@@ -2875,7 +2877,10 @@
     "selectEmployee": "ជ្រើសរើសបុគ្គលិក…",
     "unassign": "ដកចេញ",
     "unassignConfirm": "ដក {{name}} ចេញពីវេន {{shift}}? វត្តមានរបស់គេនឹងលែងត្រូវតាមដានធៀបនឹងវេននេះទៀតហើយ។",
-    "unassignTitle": "ដកចេញពីវេន"
+    "unassignTitle": "ដកចេញពីវេន",
+    "nextDay": "+1",
+    "endsNextDay": "បញ្ចប់នៅថ្ងៃបន្ទាប់ — វត្តមាននៅតែជាប់នឹងថ្ងៃដែលវេនបានចាប់ផ្តើម។",
+    "endsNextDayTooltip": "បញ្ចប់នៅថ្ងៃបន្ទាប់"
   },
   "avatar": {
     "upload": "បញ្ចូលរូបភាព",

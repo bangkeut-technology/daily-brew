@@ -24,6 +24,7 @@ import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { useUpgradeModal } from '@/hooks/useUpgradeModal';
 import { ChevronDown, ChevronUp, Crown, Clock, Pencil, Trash2, Plus, Users, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { shiftCrossesMidnight } from '@/lib/shiftTime';
 import type { Shift, Employee, ShiftTimeRule } from '@/types';
 
 export const Route = createLazyFileRoute('/console/shifts/')({
@@ -136,6 +137,11 @@ function ShiftsPage() {
                 <CustomTimePicker value={endTime} onChange={setEndTime} />
               </div>
             </div>
+            {shiftCrossesMidnight(startTime, endTime) && (
+              <p className="text-[12.5px] text-amber">
+                {t('shift.endsNextDay', 'Ends the next day — attendance stays on the day the shift started.')}
+              </p>
+            )}
             <div className="flex items-center gap-2">
               <button
                 type="submit"
@@ -359,6 +365,11 @@ function ShiftCard({
                   <CustomTimePicker value={editEndTime} onChange={setEditEndTime} />
                 </div>
               </div>
+              {shiftCrossesMidnight(editStartTime, editEndTime) && (
+                <p className="text-[12.5px] text-amber">
+                  {t('shift.endsNextDay', 'Ends the next day — attendance stays on the day the shift started.')}
+                </p>
+              )}
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleSaveEdit}
@@ -383,6 +394,14 @@ function ShiftCard({
                   <div className="flex items-center gap-1.5 text-[15px] font-mono tabular-nums text-text-secondary">
                     <Clock size={13} className="text-amber" />
                     {shift.startTime} &ndash; {shift.endTime}
+                    {shiftCrossesMidnight(shift.startTime, shift.endTime) && (
+                      <span
+                        title={t('shift.endsNextDayTooltip', 'Ends the next day')}
+                        className="text-[11px] font-sans font-medium text-amber"
+                      >
+                        {t('shift.nextDay', '+1')}
+                      </span>
+                    )}
                   </div>
                   <span className="text-[12.5px] font-medium px-2 py-0.5 rounded-full bg-amber/10 text-amber">
                     {durationHours}h{durationMins > 0 ? ` ${durationMins}m` : ''}
@@ -642,6 +661,14 @@ function DayRow({
         <CustomTimePicker value={ruleStart} onChange={setRuleStart} className="w-25" />
         <span className="text-[13px] text-text-tertiary">&ndash;</span>
         <CustomTimePicker value={ruleEnd} onChange={setRuleEnd} className="w-25" />
+        {shiftCrossesMidnight(ruleStart, ruleEnd) && (
+          <span
+          title={t('shift.endsNextDayTooltip', 'Ends the next day')}
+          className="text-[11px] font-medium text-amber"
+        >
+          {t('shift.nextDay', '+1')}
+        </span>
+        )}
         <div className="flex items-center gap-1 ml-auto">
           <button
             onClick={handleSave}
@@ -671,6 +698,14 @@ function DayRow({
         <span className="text-[14px] font-mono text-text-secondary tabular-nums">
           {existingRule.startTime} &ndash; {existingRule.endTime}
         </span>
+        {shiftCrossesMidnight(existingRule.startTime, existingRule.endTime) && (
+          <span
+          title={t('shift.endsNextDayTooltip', 'Ends the next day')}
+          className="text-[11px] font-medium text-amber"
+        >
+          {t('shift.nextDay', '+1')}
+        </span>
+        )}
         <span className="text-[11.5px] font-medium px-1.5 py-px rounded-full bg-coffee/8 text-coffee ml-1">
           override
         </span>

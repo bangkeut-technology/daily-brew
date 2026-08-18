@@ -18,6 +18,7 @@ use App\Service\AttendanceService;
 use App\Service\AuditActor;
 use App\Service\DateService;
 use App\Service\PlanService;
+use App\Service\Shift\ShiftScheduleResolver;
 use DateTimeImmutable;
 use DateTimeZone;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -32,16 +33,19 @@ class AttendanceServiceTest extends TestCase
 {
     private AttendanceRepository&MockObject $attendanceRepo;
     private PlanService&Stub $planService;
+    private ShiftScheduleResolver $scheduleResolver;
     private AttendanceService $svc;
 
     protected function setUp(): void
     {
         $this->attendanceRepo = $this->createMock(AttendanceRepository::class);
         $this->planService = $this->createStub(PlanService::class);
+        $this->scheduleResolver = new ShiftScheduleResolver($this->planService);
 
         $this->svc = new AttendanceService(
             $this->attendanceRepo,
-            new AttendanceFlagCalculator($this->planService),
+            new AttendanceFlagCalculator($this->scheduleResolver),
+            $this->scheduleResolver,
         );
 
         DateService::setClock(new MockClock('2026-04-10 18:00:00', new DateTimeZone('UTC')));
@@ -567,6 +571,123 @@ class AttendanceServiceTest extends TestCase
     }
 
     // ── Helpers ──────────────────────────────────────────────────────
+
+    // ── Overnight shifts ────────────────────────────────────────────
+
+    public function testManualEntryRollsAnOvernightCheckOutOntoTheNextDay(): void
+    {
+        // The operator types what the clock said: in at 18:00, out at 02:00.
+        // Both belong to the 2026-04-10 row, but the check-out happened on the
+        // 11th — without the roll this is rejected as "check-out before check-in"
+        // and there is no way to record the night at all.
+        [$workspace, $employee] = $this->buildWorkspaceEmployee(shift: ['start' => '18:00:00', 'end' => '02:00:00']);
+        $this->attendanceRepo->method('findByEmployeeAndDate')->willReturn(null);
+
+        $attendance = $this->svc->create(
+            $workspace,
+            $employee,
+            $this->actor(),
+            '2026-04-10',
+            '18:00',
+            '02:00',
+            'Broken QR reader',
+        );
+
+        $this->assertSame('2026-04-10 18:00', $attendance->getCheckInAt()->format('Y-m-d H:i'));
+        $this->assertSame('2026-04-11 02:00', $attendance->getCheckOutAt()->format('Y-m-d H:i'));
+        $this->assertFalse($attendance->hasLeftEarly(), 'Worked the full night');
+    }
+
+    public function testManualEntryStillRejectsABackwardsCheckOutOnADayShift(): void
+    {
+        // 09:00–17:00 does not cross midnight, so "out at 02:00" is a typo, not
+        // a night shift — the operator should see the error rather than have the
+        // service silently invent a 17-hour day.
+        [$workspace, $employee] = $this->buildWorkspaceEmployee(shift: ['start' => '09:00:00', 'end' => '17:00:00']);
+        $this->attendanceRepo->method('findByEmployeeAndDate')->willReturn(null);
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('Check-out must be at or after check-in.');
+
+        $this->svc->create(
+            $workspace,
+            $employee,
+            $this->actor(),
+            '2026-04-10',
+            '09:00',
+            '02:00',
+            'Typo incoming',
+        );
+    }
+
+    public function testOverrideRollsAnOvernightCheckOutOntoTheNextDay(): void
+    {
+        // Closing out a forgotten check-out on a night shift.
+        $attendance = $this->buildAttendance(
+            checkIn: '2026-04-10 18:00:00',
+            checkOut: null,
+            shift: ['start' => '18:00:00', 'end' => '02:00:00'],
+        );
+
+        $this->svc->override(
+            $attendance,
+            $this->actor(),
+            checkInAt: null,
+            checkOutAt: '02:00',
+            checkInProvided: false,
+            checkOutProvided: true,
+            reason: 'Forgot to scan out',
+        );
+
+        $this->assertSame('2026-04-11 02:00', $attendance->getCheckOutAt()->format('Y-m-d H:i'));
+        $this->assertFalse($attendance->hasLeftEarly());
+    }
+
+    public function testOverrideFlagsAnEarlyDepartureOnAnOvernightShift(): void
+    {
+        $attendance = $this->buildAttendance(
+            checkIn: '2026-04-10 18:00:00',
+            checkOut: null,
+            shift: ['start' => '18:00:00', 'end' => '02:00:00'],
+        );
+
+        $this->svc->override(
+            $attendance,
+            $this->actor(),
+            checkInAt: null,
+            checkOutAt: '00:30',
+            checkInProvided: false,
+            checkOutProvided: true,
+            reason: 'Went home early',
+        );
+
+        $this->assertSame('2026-04-11 00:30', $attendance->getCheckOutAt()->format('Y-m-d H:i'));
+        $this->assertTrue($attendance->hasLeftEarly(), '00:30 is 90 minutes short of the 02:00 end');
+    }
+
+    public function testOverrideLeavesASameDayCheckOutAlone(): void
+    {
+        // Fixing a night-shift row to an earlier *same-day* time must not roll:
+        // 20:00 is after the 18:00 check-in, so it means the 10th.
+        $attendance = $this->buildAttendance(
+            checkIn: '2026-04-10 18:00:00',
+            checkOut: '2026-04-11 02:00:00',
+            shift: ['start' => '18:00:00', 'end' => '02:00:00'],
+        );
+
+        $this->svc->override(
+            $attendance,
+            $this->actor(),
+            checkInAt: null,
+            checkOutAt: '20:00',
+            checkInProvided: false,
+            checkOutProvided: true,
+            reason: 'Sent home sick',
+        );
+
+        $this->assertSame('2026-04-10 20:00', $attendance->getCheckOutAt()->format('Y-m-d H:i'));
+        $this->assertTrue($attendance->hasLeftEarly());
+    }
 
     private function actor(): AuditActor
     {

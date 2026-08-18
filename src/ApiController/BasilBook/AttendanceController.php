@@ -108,6 +108,18 @@ class AttendanceController extends AbstractController
             return \DateTimeImmutable::createFromInterface($dt)->setTimezone($wsTz)->format('H:i');
         };
 
+        // An overnight shift's check-out is stamped on the day after the record
+        // it belongs to. `checkOutAt` alone would make a 18:00–02:00 night look
+        // like negative hours to whatever reconciles this feed, so the record
+        // says outright that the check-out is on the following day.
+        $isNextDay = static function (?\DateTimeInterface $dt, string $dateStr) use ($wsTz): bool {
+            if ($dt === null) {
+                return false;
+            }
+
+            return \DateTimeImmutable::createFromInterface($dt)->setTimezone($wsTz)->format('Y-m-d') > $dateStr;
+        };
+
         // Group attendance per employee, keyed by internal id (the username can
         // be null, so it can't be the array key). Each employee carries the full
         // EmployeeDTO shape (so BasilBook sees the same fields as the console)
@@ -133,10 +145,12 @@ class AttendanceController extends AbstractController
                 continue;
             }
 
+            $dateStr = $attendance->getDate()->format('Y-m-d');
             $result[$emp->getId()]['records'][] = [
-                'date' => $attendance->getDate()->format('Y-m-d'),
+                'date' => $dateStr,
                 'checkInAt' => $formatTime($attendance->getCheckInAt()),
                 'checkOutAt' => $formatTime($attendance->getCheckOutAt()),
+                'checkOutNextDay' => $isNextDay($attendance->getCheckOutAt(), $dateStr),
                 'isLate' => $attendance->isLate(),
                 'leftEarly' => $attendance->hasLeftEarly(),
             ];

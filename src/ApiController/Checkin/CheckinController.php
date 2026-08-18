@@ -66,6 +66,10 @@ class CheckinController extends AbstractController
             'workspaceNfcCheckinEnabled' => ($workspace->getSetting()?->isNfcCheckinEnabled() ?? false)
                 && $featureFlagService->isEnabledForWorkspace(FeatureFlagEnum::NfcCheckin, $workspace),
             'today' => [
+                // The row an overnight worker is standing in at 01:00 is
+                // yesterday's — the key stays `today` for the mobile clients,
+                // but `date` says which day the punch actually belongs to.
+                'date' => $attendance?->getDate()?->format('Y-m-d'),
                 'checkedIn' => $attendance?->getCheckInAt() !== null,
                 'checkedOut' => $attendance?->getCheckOutAt() !== null,
                 'checkInAt' => $attendance?->getCheckInAt() ? (clone $attendance->getCheckInAt())->setTimezone($tz)->format('H:i') : null,
@@ -155,6 +159,10 @@ class CheckinController extends AbstractController
             'onLeave' => $approvedLeave !== null,
             'leaveIsFullDay' => $approvedLeave?->isFullDay() ?? false,
             'today' => [
+                // The row an overnight worker is standing in at 01:00 is
+                // yesterday's — the key stays `today` for the mobile clients,
+                // but `date` says which day the punch actually belongs to.
+                'date' => $attendance?->getDate()?->format('Y-m-d'),
                 'checkedIn' => $attendance?->getCheckInAt() !== null,
                 'checkedOut' => $attendance?->getCheckOutAt() !== null,
                 'checkInAt' => $attendance?->getCheckInAt() ? (clone $attendance->getCheckInAt())->setTimezone($tz)->format('H:i') : null,

@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { ChevronDown, ChevronUp, Clock, Pencil, Plus, Trash2, Users, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { shiftCrossesMidnight } from "@/lib/shiftTime";
 import { useUpdateEmployee } from "@/hooks/useEmployees";
 import {
   useCreateShiftTimeRule,
@@ -160,6 +161,14 @@ export function ShiftCard({
                   />
                 </div>
               </div>
+              {shiftCrossesMidnight(editStartTime, editEndTime) && (
+                <p className="text-[12.5px] text-amber">
+                  {t(
+                    "shift.endsNextDay",
+                    "Ends the next day — attendance stays on the day the shift started.",
+                  )}
+                </p>
+              )}
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -186,6 +195,14 @@ export function ShiftCard({
                   <div className="flex items-center gap-1.5 font-mono text-[15px] tabular-nums text-text-secondary">
                     <Clock size={13} className="text-amber" />
                     {shift.startTime} &ndash; {shift.endTime}
+                    {shiftCrossesMidnight(shift.startTime, shift.endTime) && (
+                      <span
+                        title={t("shift.endsNextDayTooltip", "Ends the next day")}
+                        className="font-sans text-[11px] font-medium text-amber"
+                      >
+                        {t("shift.nextDay", "+1")}
+                      </span>
+                    )}
                   </div>
                   <span className="rounded-full bg-amber/10 px-2 py-0.5 text-[12.5px] font-medium text-amber">
                     {shiftDuration(shift.startTime, shift.endTime)}
@@ -440,6 +457,14 @@ function DayRow({
         <CustomTimePicker value={ruleStart} onChange={setRuleStart} className="w-25" />
         <span className="text-[13px] text-text-tertiary">&ndash;</span>
         <CustomTimePicker value={ruleEnd} onChange={setRuleEnd} className="w-25" />
+        {shiftCrossesMidnight(ruleStart, ruleEnd) && (
+          <span
+          title={t("shift.endsNextDayTooltip", "Ends the next day")}
+          className="text-[11px] font-medium text-amber"
+        >
+          {t("shift.nextDay", "+1")}
+        </span>
+        )}
         <div className="ml-auto flex items-center gap-1">
           <button
             type="button"
@@ -470,6 +495,14 @@ function DayRow({
         <span className="font-mono text-sm tabular-nums text-text-secondary">
           {existingRule.startTime} &ndash; {existingRule.endTime}
         </span>
+        {shiftCrossesMidnight(existingRule.startTime, existingRule.endTime) && (
+          <span
+          title={t("shift.endsNextDayTooltip", "Ends the next day")}
+          className="text-[11px] font-medium text-amber"
+        >
+          {t("shift.nextDay", "+1")}
+        </span>
+        )}
         <span className="ml-1 rounded-full bg-coffee/8 px-1.5 py-px text-[11.5px] font-medium text-coffee">
           {t("shift.overrideBadge", "override")}
         </span>
