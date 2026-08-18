@@ -16,6 +16,8 @@ interface AttendanceRowProps {
   shift: string | null;
   time: string | null;
   checkOut: string | null;
+  /** Overnight shift: the check-out clock time belongs to the following day. */
+  checkOutNextDay?: boolean;
   isLate: boolean;
   leftEarly: boolean;
   index: number;
@@ -37,6 +39,7 @@ export function AttendanceRow({
   shift,
   time,
   checkOut,
+  checkOutNextDay,
   isLate,
   leftEarly,
   index,
@@ -133,6 +136,14 @@ export function AttendanceRow({
           <>
             {time}
             {checkOut ? ` → ${checkOut}` : ""}
+            {checkOut && checkOutNextDay && (
+              <span
+                title={t("attendance.nextDayTooltip", "Checked out the next day")}
+                className="ml-1 align-super font-sans text-[11px] font-medium text-amber"
+              >
+                {t("attendance.nextDay", "+1")}
+              </span>
+            )}
           </>
         )}
       </div>

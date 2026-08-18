@@ -66,10 +66,23 @@ class CheckinController extends AbstractController
             'workspaceNfcCheckinEnabled' => ($workspace->getSetting()?->isNfcCheckinEnabled() ?? false)
                 && $featureFlagService->isEnabledForWorkspace(FeatureFlagEnum::NfcCheckin, $workspace),
             'today' => [
+                // The row an overnight worker is standing in at 01:00 is
+                // yesterday's — the key stays `today` for the mobile clients,
+                // but `date` says which day the punch actually belongs to.
+                'date' => $attendance?->getDate()?->format('Y-m-d'),
                 'checkedIn' => $attendance?->getCheckInAt() !== null,
                 'checkedOut' => $attendance?->getCheckOutAt() !== null,
                 'checkInAt' => $attendance?->getCheckInAt() ? (clone $attendance->getCheckInAt())->setTimezone($tz)->format('H:i') : null,
                 'checkOutAt' => $attendance?->getCheckOutAt() ? (clone $attendance->getCheckOutAt())->setTimezone($tz)->format('H:i') : null,
+                'checkOutNextDay' => $attendance !== null && $this->isCheckOutNextDay($attendance, $tz),
+                // Absolute instants alongside the wall-clock strings. A client
+                // can render "18:00" from the latter, but it cannot rebuild the
+                // moment from it — that needs the workspace's zone *and* the
+                // right calendar day, which is exactly what an overnight shift
+                // makes ambiguous. Anything measuring elapsed time (the shift
+                // widgets, the Live Activity timer) reads these.
+                'checkInAtIso' => $attendance?->getCheckInAt()?->format(\DateTimeInterface::ATOM),
+                'checkOutAtIso' => $attendance?->getCheckOutAt()?->format(\DateTimeInterface::ATOM),
                 'isLate' => $attendance?->isLate() ?? false,
             ],
         ]);
@@ -122,6 +135,12 @@ class CheckinController extends AbstractController
         return $this->jsonSuccess([
             'checkInAt' => $attendance->getCheckInAt() ? (clone $attendance->getCheckInAt())->setTimezone($tz)->format('H:i') : null,
             'checkOutAt' => $attendance->getCheckOutAt() ? (clone $attendance->getCheckOutAt())->setTimezone($tz)->format('H:i') : null,
+            // Overnight shift: the check-out clock time belongs to the day after
+            // the row, so a client showing "18:00 → 02:00" can say which day.
+            'checkOutNextDay' => $this->isCheckOutNextDay($attendance, $tz),
+            'date' => $attendance->getDate()?->format('Y-m-d'),
+            'checkInAtIso' => $attendance->getCheckInAt()?->format(\DateTimeInterface::ATOM),
+            'checkOutAtIso' => $attendance->getCheckOutAt()?->format(\DateTimeInterface::ATOM),
             'isLate' => $attendance->isLate(),
             'leftEarly' => $attendance->hasLeftEarly(),
             'verification' => $this->verificationPayload($settings),
@@ -155,10 +174,23 @@ class CheckinController extends AbstractController
             'onLeave' => $approvedLeave !== null,
             'leaveIsFullDay' => $approvedLeave?->isFullDay() ?? false,
             'today' => [
+                // The row an overnight worker is standing in at 01:00 is
+                // yesterday's — the key stays `today` for the mobile clients,
+                // but `date` says which day the punch actually belongs to.
+                'date' => $attendance?->getDate()?->format('Y-m-d'),
                 'checkedIn' => $attendance?->getCheckInAt() !== null,
                 'checkedOut' => $attendance?->getCheckOutAt() !== null,
                 'checkInAt' => $attendance?->getCheckInAt() ? (clone $attendance->getCheckInAt())->setTimezone($tz)->format('H:i') : null,
                 'checkOutAt' => $attendance?->getCheckOutAt() ? (clone $attendance->getCheckOutAt())->setTimezone($tz)->format('H:i') : null,
+                'checkOutNextDay' => $attendance !== null && $this->isCheckOutNextDay($attendance, $tz),
+                // Absolute instants alongside the wall-clock strings. A client
+                // can render "18:00" from the latter, but it cannot rebuild the
+                // moment from it — that needs the workspace's zone *and* the
+                // right calendar day, which is exactly what an overnight shift
+                // makes ambiguous. Anything measuring elapsed time (the shift
+                // widgets, the Live Activity timer) reads these.
+                'checkInAtIso' => $attendance?->getCheckInAt()?->format(\DateTimeInterface::ATOM),
+                'checkOutAtIso' => $attendance?->getCheckOutAt()?->format(\DateTimeInterface::ATOM),
                 'isLate' => $attendance?->isLate() ?? false,
             ],
         ]);
@@ -203,6 +235,12 @@ class CheckinController extends AbstractController
         return $this->jsonSuccess([
             'checkInAt' => $attendance->getCheckInAt() ? (clone $attendance->getCheckInAt())->setTimezone($tz)->format('H:i') : null,
             'checkOutAt' => $attendance->getCheckOutAt() ? (clone $attendance->getCheckOutAt())->setTimezone($tz)->format('H:i') : null,
+            // Overnight shift: the check-out clock time belongs to the day after
+            // the row, so a client showing "18:00 → 02:00" can say which day.
+            'checkOutNextDay' => $this->isCheckOutNextDay($attendance, $tz),
+            'date' => $attendance->getDate()?->format('Y-m-d'),
+            'checkInAtIso' => $attendance->getCheckInAt()?->format(\DateTimeInterface::ATOM),
+            'checkOutAtIso' => $attendance->getCheckOutAt()?->format(\DateTimeInterface::ATOM),
             'isLate' => $attendance->isLate(),
             'leftEarly' => $attendance->hasLeftEarly(),
             'verification' => $this->verificationPayload($settings),
@@ -218,6 +256,23 @@ class CheckinController extends AbstractController
      *
      * @return array{location: bool, device: bool, network: bool}
      */
+    /**
+     * Did this check-out land on the calendar day after the attendance's own
+     * date? True only for a shift that runs past midnight — the row stays filed
+     * under the day the shift started, so the clock time alone reads backwards.
+     */
+    private function isCheckOutNextDay(\App\Entity\Attendance $attendance, \DateTimeZone $tz): bool
+    {
+        $checkOut = $attendance->getCheckOutAt();
+        $date = $attendance->getDate();
+        if ($checkOut === null || $date === null) {
+            return false;
+        }
+
+        return \DateTimeImmutable::createFromInterface($checkOut)->setTimezone($tz)->format('Y-m-d')
+            > $date->format('Y-m-d');
+    }
+
     private function verificationPayload(EffectiveCheckinSettings $settings): array
     {
         return [

@@ -489,7 +489,9 @@
     "originalScan": "Originally",
     "cannotClearCheckOut": "This record has a check-out — turn the toggle back on. To fix a wrong time, edit it rather than removing it.",
     "alreadyExistsSwitchToEdit": "A record already exists for that day — opening it to edit.",
-    "createError": "Failed to add attendance"
+    "createError": "Failed to add attendance",
+    "nextDay": "+1",
+    "nextDayTooltip": "Checked out the next day"
   },
   "leave": {
     "pending": "Pending",
@@ -2727,7 +2729,10 @@
     "daysAreSchedule": "Days left blank are off-days — staff aren't expected to check in and won't be counted absent. Changes apply to past dates too.",
     "deleteTitle": "Delete shift",
     "deleteConfirm": "Delete the {{name}} shift? Employees assigned to this shift will be unassigned.",
-    "createSuccess": "Shift created"
+    "createSuccess": "Shift created",
+    "nextDay": "+1",
+    "endsNextDay": "Ends the next day — attendance stays on the day the shift started.",
+    "endsNextDayTooltip": "Ends the next day"
   },
   "charts": {
     "onTime": "On time",

@@ -478,7 +478,9 @@
     "editTitle": "Edit attendance",
     "hasCheckOut": "Has check-out",
     "originalScan": "Originally",
-    "selectEmployee": "Select employee"
+    "selectEmployee": "Select employee",
+    "nextDay": "+1",
+    "nextDayTooltip": "Checked out the next day"
   },
   "leave": {
     "pending": "Pending",
@@ -2875,7 +2877,10 @@
     "selectEmployee": "Select employee…",
     "unassign": "Remove",
     "unassignConfirm": "Remove {{name}} from the {{shift}} shift? Their attendance will no longer be tracked against this shift.",
-    "unassignTitle": "Remove from shift"
+    "unassignTitle": "Remove from shift",
+    "nextDay": "+1",
+    "endsNextDay": "Ends the next day — attendance stays on the day the shift started.",
+    "endsNextDayTooltip": "Ends the next day"
   },
   "avatar": {
     "upload": "Upload photo",

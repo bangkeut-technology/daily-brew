@@ -14,6 +14,8 @@ export interface AttendanceRecord {
   date: string;
   checkInAt: string | null;
   checkOutAt: string | null;
+  /** The check-out happened after midnight — it belongs to the day after `date`. */
+  checkOutNextDay?: boolean;
   isLate: boolean;
   leftEarly: boolean;
   status?: AttendanceStatus;
@@ -39,6 +41,8 @@ export interface AttendanceDayStatus {
   /** Workspace-local HH:MM, already formatted by the API. */
   checkInAt?: string | null;
   checkOutAt?: string | null;
+  /** The check-out happened after midnight — it belongs to the day after `date`. */
+  checkOutNextDay?: boolean;
   isLate?: boolean;
   leftEarly?: boolean;
   leaveType?: "paid" | "unpaid";

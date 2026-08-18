@@ -11,6 +11,7 @@ use App\Repository\AttendanceRepository;
 use App\Repository\ClosurePeriodRepository;
 use App\Repository\LeaveRequestRepository;
 use App\Service\Checkin\EffectiveCheckinSettings;
+use App\Service\Shift\ShiftScheduleResolver;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -19,11 +20,21 @@ class CheckinService
     /** Source tag for an NFC tag tap. Distinguishes a tap from a QR scan / button press. */
     public const SOURCE_NFC = 'nfc';
 
+    /**
+     * How long after an overnight shift's end a scan still counts as closing
+     * that shift rather than opening a new day. A bar that closes at 02:00 has
+     * people cleaning up for a while; four hours covers that without swallowing
+     * the next morning's genuine check-in. Past this window the row is left
+     * open for a manager to fix, which is the pre-existing behavior.
+     */
+    private const OVERNIGHT_CHECKOUT_GRACE_MINUTES = 240;
+
     public function __construct(
         private AttendanceRepository $attendanceRepository,
         private ClosurePeriodRepository $closurePeriodRepository,
         private LeaveRequestRepository $leaveRequestRepository,
         private AttendanceFlagCalculator $flagCalculator,
+        private ShiftScheduleResolver $scheduleResolver,
         private ?AttendanceAnomalyDetector $anomalyDetector = null,
         private ?NotificationService $notificationService = null,
     ) {}
@@ -46,7 +57,11 @@ class CheckinService
 
         $wsTz = new \DateTimeZone($settings->timezone);
         $nowUtc = DateService::now();
-        $today = DateService::today($wsTz);
+        // Which day's row this scan belongs to. Normally today — but someone on
+        // an 18:00–02:00 shift who taps at 02:10 is finishing *yesterday*, and
+        // bucketing that punch under today would open a bogus second row and
+        // leave yesterday's forever un-closed.
+        $attendanceDay = $this->resolveAttendanceDay($employee, $wsTz, $nowUtc);
 
         // NFC double-tap guard: a single tap on an NTAG sticker can fire two
         // browser navigations in rapid succession (the phone wakes the screen,
@@ -59,7 +74,7 @@ class CheckinService
         if ($source === self::SOURCE_NFC) {
             $cooldownMinutes = $workspace?->getSetting()?->getNfcCheckinIntervalMinutes() ?? 0;
             if ($cooldownMinutes > 0) {
-                $existing = $this->attendanceRepository->findByEmployeeAndDate($employee, $today);
+                $existing = $this->attendanceRepository->findByEmployeeAndDate($employee, $attendanceDay);
                 if ($existing !== null && !$existing->isVoided() && $existing->getCheckInAt() !== null) {
                     $lastPunchAt = $existing->getCheckOutAt() ?? $existing->getCheckInAt();
                     $diffSeconds = $nowUtc->getTimestamp() - $lastPunchAt->getTimestamp();
@@ -100,19 +115,19 @@ class CheckinService
         }
 
         // Closure check
-        $closure = $this->closurePeriodRepository->findActiveOnDate($workspace, $today);
+        $closure = $this->closurePeriodRepository->findActiveOnDate($workspace, $attendanceDay);
         if ($closure !== null) {
             throw new BadRequestHttpException('Restaurant is closed today (' . $closure->getName() . ')');
         }
 
         // Approved full-day leave check
-        $approvedLeave = $this->leaveRequestRepository->findApprovedForEmployeeOnDate($employee, $today);
+        $approvedLeave = $this->leaveRequestRepository->findApprovedForEmployeeOnDate($employee, $attendanceDay);
         if ($approvedLeave !== null && $approvedLeave->isFullDay()) {
             throw new BadRequestHttpException('You are on approved leave today');
         }
 
         // Find or create attendance
-        $attendance = $this->attendanceRepository->findByEmployeeAndDate($employee, $today);
+        $attendance = $this->attendanceRepository->findByEmployeeAndDate($employee, $attendanceDay);
         // A voided row is a tombstone holding the (employee, date) slot — treat
         // it as if no row existed for check-in purposes. Resurrect by wiping
         // void + scan state, then run the fresh check-in path.
@@ -125,7 +140,7 @@ class CheckinService
                 $existing = $this->attendanceRepository->findByDeviceIdAndDateExcludingEmployee(
                     $workspace,
                     $deviceId,
-                    $today,
+                    $attendanceDay,
                     $employee,
                 );
                 if ($existing !== null) {
@@ -147,7 +162,7 @@ class CheckinService
                     ->setEditedAt(null)->setEditedBy(null)->setEditedByEmail(null)->setEditReason(null);
             }
             $attendance->setQrCode($qrCode);
-            $attendance->setDate($today);
+            $attendance->setDate($attendanceDay);
             $attendance->setCheckInAt($nowUtc);
             $attendance->setCheckInLat($latitude);
             $attendance->setCheckInLng($longitude);
@@ -216,14 +231,69 @@ class CheckinService
     public function getStatus(Employee $employee): ?Attendance
     {
         $tz = new \DateTimeZone($employee->getWorkspace()?->getSetting()?->getTimezone() ?? 'UTC');
+        // Same day resolution as checkin() — otherwise someone mid-way through
+        // an overnight shift would be told they are not checked in, and the app
+        // would offer them a "Check in" button that opens a second row.
         $attendance = $this->attendanceRepository->findByEmployeeAndDate(
             $employee,
-            DateService::today($tz)
+            $this->resolveAttendanceDay($employee, $tz, DateService::now()),
         );
         // A voided row is a tombstone — for the employee's "today" status it
         // didn't happen, so they read as not-checked-in until they scan again
         // (which resurrects the row via checkin()'s tombstone path).
         return $attendance?->isVoided() ? null : $attendance;
+    }
+
+    /**
+     * Decide which calendar day a punch made *now* belongs to.
+     *
+     * Answer is "today" in every case except one: the employee is part-way
+     * through a shift that started yesterday and runs past midnight. Then the
+     * open row from yesterday is the one this scan should close, because that
+     * is the day the work is being credited to.
+     *
+     * The look-back is deliberately narrow — all of these must hold:
+     *   - the employee's shift *as scheduled yesterday* crosses midnight (a
+     *     per-day rule can make Friday overnight and Saturday not);
+     *   - yesterday's row exists, is not voided, and is still open;
+     *   - now is no later than that shift's end plus a grace window.
+     *
+     * If any of them fails we fall through to today, which is exactly the
+     * behavior that shipped before overnight shifts were supported.
+     */
+    private function resolveAttendanceDay(
+        Employee $employee,
+        \DateTimeZone $wsTz,
+        \DateTimeImmutable $nowUtc,
+    ): \DateTimeImmutable {
+        $today = DateService::today($wsTz);
+
+        $shift = $employee->getShift();
+        if ($shift === null) {
+            return $today;
+        }
+
+        $yesterday = $today->modify('-1 day');
+        $times = $this->scheduleResolver->resolveFor($shift, $yesterday);
+        if ($times === null || !$times->crossesMidnight()) {
+            return $today;
+        }
+
+        $openRow = $this->attendanceRepository->findByEmployeeAndDate($employee, $yesterday);
+        if ($openRow === null
+            || $openRow->isVoided()
+            || $openRow->getCheckInAt() === null
+            || $openRow->getCheckOutAt() !== null
+        ) {
+            return $today;
+        }
+
+        // Now is on `today`, i.e. one day past the shift day — hence the +1440.
+        $localNow = $nowUtc->setTimezone($wsTz);
+        $minutesSinceShiftDay = 1440 + (int) $localNow->format('G') * 60 + (int) $localNow->format('i');
+        $deadline = ($times->endMinutes() ?? 1440) + self::OVERNIGHT_CHECKOUT_GRACE_MINUTES;
+
+        return $minutesSinceShiftDay <= $deadline ? $yesterday : $today;
     }
 
     /**

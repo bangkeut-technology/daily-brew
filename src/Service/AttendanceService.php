@@ -9,6 +9,7 @@ use App\Entity\Employee;
 use App\Entity\Workspace;
 use App\Exception\AttendanceAlreadyExistsException;
 use App\Repository\AttendanceRepository;
+use App\Service\Shift\ShiftScheduleResolver;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
@@ -26,6 +27,7 @@ class AttendanceService
     public function __construct(
         private readonly AttendanceRepository $attendanceRepository,
         private readonly AttendanceFlagCalculator $flagCalculator,
+        private readonly ShiftScheduleResolver $scheduleResolver,
     ) {}
 
     /**
@@ -67,7 +69,7 @@ class AttendanceService
             ? $this->parseTimeOnDate($checkInAt, $date, $wsTz, 'checkInAt')
             : $attendance->getCheckInAt();
         $newCheckOut = $checkOutProvided
-            ? $this->parseTimeOnDate($checkOutAt, $date, $wsTz, 'checkOutAt')
+            ? $this->parseCheckOut($checkOutAt, $date, $wsTz, $attendance->getEmployee(), $newCheckIn)
             : $attendance->getCheckOutAt();
 
         if ($newCheckIn === null && $newCheckOut !== null) {
@@ -146,7 +148,7 @@ class AttendanceService
         if ($checkIn === null) {
             throw new BadRequestHttpException('A check-in time is required.');
         }
-        $checkOut = $this->parseTimeOnDate($checkOutAt, $dateImmutable, $wsTz, 'checkOutAt');
+        $checkOut = $this->parseCheckOut($checkOutAt, $dateImmutable, $wsTz, $employee, $checkIn);
         if ($checkOut !== null && $checkOut < $checkIn) {
             throw new BadRequestHttpException('Check-out must be at or after check-in.');
         }
@@ -235,6 +237,51 @@ class AttendanceService
         $this->attendanceRepository->flush();
 
         return $attendance;
+    }
+
+    /**
+     * Parse a check-out entered as workspace-local "HH:MM" against an
+     * attendance date, rolling it onto the following day when the employee's
+     * shift for that date runs past midnight.
+     *
+     * Operators type what the clock said — "02:00" for someone who finished at
+     * two in the morning — and the row they are editing is still filed under
+     * the day the shift started. Without the roll, that check-out lands eight
+     * hours *before* the 18:00 check-in and the edit is rejected outright,
+     * leaving no way at all to record an overnight day by hand.
+     *
+     * Inferred from the shift rather than taken as a request flag: a check-out
+     * before the check-in is only meaningful when the schedule says the shift
+     * spans midnight, and inferring it keeps both frontends unchanged. An
+     * employee with no shift (or a day-shift one) still gets the old rejection.
+     */
+    private function parseCheckOut(
+        ?string $hhmm,
+        \DateTimeImmutable $date,
+        \DateTimeZone $wsTz,
+        ?Employee $employee,
+        ?\DateTimeImmutable $checkIn,
+    ): ?\DateTimeImmutable {
+        $checkOut = $this->parseTimeOnDate($hhmm, $date, $wsTz, 'checkOutAt');
+
+        if ($checkOut === null || $checkIn === null || $checkOut >= $checkIn) {
+            return $checkOut;
+        }
+
+        $shift = $employee?->getShift();
+        if ($shift === null) {
+            return $checkOut;
+        }
+
+        $times = $this->scheduleResolver->resolveFor($shift, $date);
+        if ($times === null || !$times->crossesMidnight()) {
+            return $checkOut;
+        }
+
+        // Re-parse against the next calendar day rather than adding 24 hours to
+        // the UTC instant — a DST change in the workspace timezone would make
+        // those two answers differ, and "02:00 local" is what was meant.
+        return $this->parseTimeOnDate($hhmm, $date->modify('+1 day'), $wsTz, 'checkOutAt');
     }
 
     private function parseTimeOnDate(?string $hhmm, \DateTimeImmutable $date, \DateTimeZone $wsTz, string $field): ?\DateTimeImmutable

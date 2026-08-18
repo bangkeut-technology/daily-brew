@@ -178,7 +178,9 @@
     "originalScan": "À l'origine",
     "cannotClearCheckOut": "Cet enregistrement a un pointage de sortie — réactivez l'option. Pour corriger une heure erronée, modifiez-la plutôt que de la supprimer.",
     "alreadyExistsSwitchToEdit": "Un enregistrement existe déjà pour ce jour — ouverture pour modification.",
-    "createError": "Échec de l'ajout de la présence"
+    "createError": "Échec de l'ajout de la présence",
+    "nextDay": "+1",
+    "nextDayTooltip": "Départ pointé le lendemain"
   },
   "auth": {
     "signIn": "Connexion",
@@ -2654,7 +2656,10 @@
     "daysAreSchedule": "Les jours laissés vides sont des jours de repos — le personnel n'a pas à pointer et ne sera pas compté absent. Les modifications s'appliquent aussi aux dates passées.",
     "deleteTitle": "Supprimer le service",
     "deleteConfirm": "Supprimer le service {{name}} ? Les employés qui y sont affectés seront désassignés.",
-    "createSuccess": "Service créé"
+    "createSuccess": "Service créé",
+    "nextDay": "+1",
+    "endsNextDay": "Se termine le lendemain — la présence reste au jour où le service a commencé.",
+    "endsNextDayTooltip": "Se termine le lendemain"
   },
   "charts": {
     "onTime": "À l'heure",

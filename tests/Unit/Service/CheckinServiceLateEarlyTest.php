@@ -19,6 +19,7 @@ use App\Service\Checkin\EffectiveCheckinSettings;
 use App\Service\CheckinService;
 use App\Service\DateService;
 use App\Service\PlanService;
+use App\Service\Shift\ShiftScheduleResolver;
 use DateTimeImmutable;
 use DateTimeZone;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -39,6 +40,7 @@ class CheckinServiceLateEarlyTest extends TestCase
     private ClosurePeriodRepository&Stub $closureRepo;
     private LeaveRequestRepository&Stub $leaveRepo;
     private PlanService&Stub $planService;
+    private ShiftScheduleResolver $scheduleResolver;
     private CheckinService $svc;
 
     protected function setUp(): void
@@ -47,6 +49,7 @@ class CheckinServiceLateEarlyTest extends TestCase
         $this->closureRepo = $this->createStub(ClosurePeriodRepository::class);
         $this->leaveRepo = $this->createStub(LeaveRequestRepository::class);
         $this->planService = $this->createStub(PlanService::class);
+        $this->scheduleResolver = new ShiftScheduleResolver($this->planService);
 
         $this->closureRepo->method('findActiveOnDate')->willReturn(null);
         $this->leaveRepo->method('findApprovedForEmployeeOnDate')->willReturn(null);
@@ -56,7 +59,8 @@ class CheckinServiceLateEarlyTest extends TestCase
             $this->attendanceRepo,
             $this->closureRepo,
             $this->leaveRepo,
-            new AttendanceFlagCalculator($this->planService),
+            new AttendanceFlagCalculator($this->scheduleResolver),
+            $this->scheduleResolver,
         );
     }
 

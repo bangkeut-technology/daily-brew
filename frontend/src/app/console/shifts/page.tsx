@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Clock, Crown, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { getWorkspacePublicId } from "@/lib/api";
+import { shiftCrossesMidnight } from "@/lib/shiftTime";
 import { useCreateShift, useDeleteShift, useShifts } from "@/hooks/useShifts";
 import { useEmployees } from "@/hooks/useEmployees";
 import { usePlan } from "@/hooks/usePlan";
@@ -128,6 +129,14 @@ export default function ShiftsPage() {
                 <CustomTimePicker id="shift-end" value={endTime} onChange={setEndTime} />
               </div>
             </div>
+            {shiftCrossesMidnight(startTime, endTime) && (
+              <p className="text-[12.5px] text-amber">
+                {t(
+                  "shift.endsNextDay",
+                  "Ends the next day — attendance stays on the day the shift started.",
+                )}
+              </p>
+            )}
             <div className="flex items-center gap-2">
               <button
                 type="submit"

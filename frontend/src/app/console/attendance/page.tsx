@@ -361,6 +361,7 @@ export default function AttendancePage() {
                 date={fmtDate(a.date)}
                 time={a.checkInAt}
                 checkOut={a.checkOutAt}
+                checkOutNextDay={a.checkOutNextDay}
                 isLate={a.isLate}
                 leftEarly={a.leftEarly}
                 status={a.status}

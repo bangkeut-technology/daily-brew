@@ -65,6 +65,7 @@ curl "https://dailybrew.work/api/v1/basilbook/attendances?from=2026-04-01&to=202
           "date": "2026-04-01",
           "checkInAt": "08:02",
           "checkOutAt": "17:05",
+          "checkOutNextDay": false,
           "isLate": false,
           "leftEarly": false
         }
@@ -88,6 +89,7 @@ curl "https://dailybrew.work/api/v1/basilbook/attendances?from=2026-04-01&to=202
 | `records[].date` | string | Calendar date (YYYY-MM-DD) |
 | `records[].checkInAt` | string \| null | Check-in time (HH:mm in workspace TZ) |
 | `records[].checkOutAt` | string \| null | Check-out time (HH:mm in workspace TZ) |
+| `records[].checkOutNextDay` | boolean | The check-out happened on the **day after** `date` — an overnight shift. See [Overnight shifts](#overnight-shifts) |
 | `records[].isLate` | boolean | Late relative to shift start |
 | `records[].leftEarly` | boolean | Left before shift end |
 
@@ -100,8 +102,44 @@ curl "https://dailybrew.work/api/v1/basilbook/attendances?from=2026-04-01&to=202
 - Days with no attendance are omitted — absence = missing date
 - **Voided rows are omitted too.** When an owner/manager removes a bad attendance row, it is soft-deleted: the row stays in DailyBrew's database for audit, but the feed treats that day as absent, matching what the dashboard counts. A day that disappears between two syncs was voided — re-syncing a range is therefore authoritative, and an integrator should replace the range rather than merge into it.
 - `isLate` / `leftEarly` are always `false` if employee has no shift
+- **A record can span two calendar days.** See [Overnight shifts](#overnight-shifts) — `checkOutNextDay: true` means `checkOutAt` is a time on `date + 1`.
 - If an owner/manager has manually overridden an attendance row, the returned `checkInAt`/`checkOutAt` reflect the **edited values**, not the original scan times (the override represents "what really happened"). Originals stay in the DB for audit but aren't exposed here. The same applies to rows created by hand to backfill a forgotten scan — they appear in the feed like any other record.
 - A workspace with no active employees short-circuits to `{ "employees": [], "from": ..., "to": ... }` — note that `workspace` and `timezone` are **absent** from that response, so don't read them unconditionally.
+
+## Overnight shifts
+
+A restaurant whose Shift B runs 18:00–02:00 produces records where the
+check-out clock time is *earlier* than the check-in:
+
+```json
+{
+  "date": "2026-04-10",
+  "checkInAt": "18:00",
+  "checkOutAt": "02:00",
+  "checkOutNextDay": true,
+  "isLate": false,
+  "leftEarly": false
+}
+```
+
+The record stays filed under the day the shift **started** — that is the day the
+work is credited to, and it is the day DailyBrew's own reports, exports and
+absence calculations use. Only one record exists for the night; there is no
+matching row on the 11th.
+
+Compute hours as:
+
+```
+minutes = (checkOutMinutes + (checkOutNextDay ? 1440 : 0)) - checkInMinutes
+```
+
+Subtracting the raw clock times would give **−16 hours** for the example above.
+An integrator that ignores `checkOutNextDay` will silently mis-total every night
+shift, so treat the flag as required, not optional.
+
+`checkOutNextDay` is always `false` when `checkOutAt` is `null` (still on shift,
+or a forgotten scan). It is derived from the stored timestamps, not from the
+shift configuration — so it stays correct even if the shift is later edited.
 
 ## Errors
 

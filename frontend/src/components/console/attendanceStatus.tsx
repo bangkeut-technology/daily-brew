@@ -118,7 +118,7 @@ export function ganttCell(day: AttendanceDayStatus, hasShift: boolean): GanttCel
           code: "LfE",
           bg: "bg-amber/15",
           text: "text-amber",
-          title: `Left early — ${day.checkOutAt || ""}`,
+          title: `Left early — ${day.checkOutAt || ""}${day.checkOutNextDay ? " +1" : ""}`,
         };
       }
       return {
@@ -126,7 +126,7 @@ export function ganttCell(day: AttendanceDayStatus, hasShift: boolean): GanttCel
         code: "Pre",
         bg: "bg-green/12",
         text: "text-green",
-        title: `Present — ${day.checkInAt || ""}${day.checkOutAt ? ` → ${day.checkOutAt}` : ""}`,
+        title: `Present — ${day.checkInAt || ""}${day.checkOutAt ? ` → ${day.checkOutAt}${day.checkOutNextDay ? " +1" : ""}` : ""}`,
       };
     case "absent":
       // Without a shift there's no expectation to miss, so an "absent" day is

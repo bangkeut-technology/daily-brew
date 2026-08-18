@@ -94,6 +94,16 @@ class AttendanceSummaryBuilder
             return \DateTimeImmutable::createFromInterface($dt)->setTimezone($wsTz)->format('H:i');
         };
 
+        // An overnight shift's check-out carries the next calendar day — see
+        // AttendanceRowBuilder for why the grid has to say so explicitly.
+        $isNextDay = static function (?\DateTimeInterface $dt, string $dateStr) use ($wsTz): bool {
+            if ($dt === null) {
+                return false;
+            }
+
+            return \DateTimeImmutable::createFromInterface($dt)->setTimezone($wsTz)->format('Y-m-d') > $dateStr;
+        };
+
         $wsTodayStr = DateService::today($wsTz)->format('Y-m-d');
         $perDayRulesActive = $this->planService->canUseShiftTimeRules($workspace);
 
@@ -156,6 +166,7 @@ class AttendanceSummaryBuilder
                             'attendancePublicId' => (string) $a->getPublicId(),
                             'checkInAt' => $formatTime($a->getCheckInAt()),
                             'checkOutAt' => $formatTime($a->getCheckOutAt()),
+                            'checkOutNextDay' => $isNextDay($a->getCheckOutAt(), $dateStr),
                             'isLate' => $a->isLate(),
                             'leftEarly' => $a->hasLeftEarly(),
                             'editedAt' => $a->getEditedAt()?->format(\DateTimeInterface::ATOM),
@@ -178,6 +189,7 @@ class AttendanceSummaryBuilder
                             'attendancePublicId' => (string) $a->getPublicId(),
                             'checkInAt' => $formatTime($a->getOriginalCheckInAt() ?? $a->getCheckInAt()),
                             'checkOutAt' => $formatTime($a->getOriginalCheckOutAt() ?? $a->getCheckOutAt()),
+                            'checkOutNextDay' => $isNextDay($a->getOriginalCheckOutAt() ?? $a->getCheckOutAt(), $dateStr),
                             'voidedByEmail' => $a->getVoidedByEmail(),
                             'voidReason' => $a->getVoidReason(),
                         ];

@@ -219,6 +219,8 @@ Three endpoints accept `multipart/form-data` with a single `file` field instead 
 
 `dayOfWeek` is ISO (1 = Monday … 7 = Sunday). A shift with any `timeRules` is treated as its complete schedule (Espresso).
 
+**An `endTime` earlier than `startTime` means the shift runs past midnight** — `18:00`–`02:00` is a night shift, not an invalid one. There is no separate overnight flag; the times themselves say it, for the shift defaults and for each per-day rule independently (Friday can be overnight while Saturday is not). See [Overnight shifts](#overnight-shifts) for what that changes about attendance.
+
 - `GET /api/v1/{locale}/workspaces/{publicId}/shifts` — list of `ShiftDTO`.
 - `POST /api/v1/{locale}/workspaces/{publicId}/shifts` — `201` `ShiftDTO`.
 - `PUT /api/v1/{locale}/workspaces/{publicId}/shifts/{publicId}` — updated `ShiftDTO`.
@@ -271,7 +273,7 @@ Remember the semantics: once a shift has **any** rule it is treated as that shif
 ```json
 {
   "publicId": "...", "date": "2026-06-11",
-  "checkInAt": "08:03", "checkOutAt": "16:01", "isLate": true, "leftEarly": false,
+  "checkInAt": "08:03", "checkOutAt": "16:01", "checkOutNextDay": false, "isLate": true, "leftEarly": false,
   "editedAt": null, "editedByEmail": null, "editReason": null,
   "originalCheckInAt": null, "originalCheckOutAt": null,
   "voidedAt": null, "voidedByEmail": null, "voidReason": null,
@@ -283,7 +285,7 @@ Remember the semantics: once a shift has **any** rule it is treated as that shif
   ```json
   [{
     "publicId": "...", "employeePublicId": "...", "employeeName": "Dara Sok", "shiftName": "Morning",
-    "date": "2026-06-11", "checkInAt": "08:03", "checkOutAt": "16:01",
+    "date": "2026-06-11", "checkInAt": "08:03", "checkOutAt": "16:01", "checkOutNextDay": false,
     "isLate": true, "leftEarly": false, "status": "present",
     "editedAt": null, "editedByEmail": null, "editReason": null,
     "originalCheckInAt": null, "originalCheckOutAt": null,
@@ -295,19 +297,42 @@ Remember the semantics: once a shift has **any** rule it is treated as that shif
   [{
     "employeePublicId": "...", "employeeName": "Dara Sok", "shiftName": "Morning",
     "days": [
-      { "date": "2026-06-11", "status": "present", "attendancePublicId": "...", "checkInAt": "08:03", "checkOutAt": "16:01", "isLate": true, "leftEarly": false, "editedAt": null, "editedByEmail": null, "editReason": null, "originalCheckInAt": null, "originalCheckOutAt": null },
+      { "date": "2026-06-11", "status": "present", "attendancePublicId": "...", "checkInAt": "08:03", "checkOutAt": "16:01", "checkOutNextDay": false, "isLate": true, "leftEarly": false, "editedAt": null, "editedByEmail": null, "editReason": null, "originalCheckInAt": null, "originalCheckOutAt": null },
       { "date": "2026-06-12", "status": "leave", "leaveType": "paid" },
       { "date": "2026-06-13", "status": "off" }
     ]
   }]
   ```
 - `GET /api/v1/{locale}/workspaces/{publicId}/attendances/export.xlsx?from=&to=&employeePublicId=` — binary `.xlsx` download (Espresso+). `GET .../export.pdf` is the same as a PDF. Both `402` without the plan.
-- `POST /api/v1/{locale}/workspaces/{publicId}/attendances` — manual entry (owner / manager with `manage_attendance`, workspace-scoped only). Body: `{ "employeePublicId", "date": "YYYY-MM-DD", "checkInAt": "HH:MM", "checkOutAt"?: "HH:MM" | null, "reason" }`. Returns `201` `AttendanceDTO` (with employee). On `(employee, date)` collision against a non-voided row, returns **`409`** with the existing record so the client can switch to editing:
+- `POST /api/v1/{locale}/workspaces/{publicId}/attendances` — manual entry (owner / manager with `manage_attendance`, workspace-scoped only). Body: `{ "employeePublicId", "date": "YYYY-MM-DD", "checkInAt": "HH:MM", "checkOutAt"?: "HH:MM" | null, "reason" }`. Returns `201` `AttendanceDTO` (with employee). A `checkOutAt` earlier than `checkInAt` is rolled onto the next day when the employee's shift for that date is overnight, and rejected otherwise — see [Overnight shifts](#overnight-shifts). On `(employee, date)` collision against a non-voided row, returns **`409`** with the existing record so the client can switch to editing:
   ```json
   { "error": true, "message": "...", "code": 409, "existing": { /* AttendanceDTO */ } }
   ```
-- `PATCH /api/v1/{locale}/workspaces/{publicId}/attendances/{attendancePublicId}` — owner / manager with `manage_attendance` override an existing row. Body: `{ "checkInAt"?: "HH:MM" | null, "checkOutAt"?: "HH:MM" | null, "reason" }`. Times are workspace-local; reason required (≤255 chars). First edit snapshots `originalCheckInAt`/`originalCheckOutAt`. Late/leftEarly recompute. Blocked (`400`) on voided rows. Returns the updated `AttendanceDTO` (with employee).
+- `PATCH /api/v1/{locale}/workspaces/{publicId}/attendances/{attendancePublicId}` — owner / manager with `manage_attendance` override an existing row. Body: `{ "checkInAt"?: "HH:MM" | null, "checkOutAt"?: "HH:MM" | null, "reason" }`. Times are workspace-local; reason required (≤255 chars). First edit snapshots `originalCheckInAt`/`originalCheckOutAt`. Late/leftEarly recompute. Same overnight roll as `POST`. Blocked (`400`) on voided rows. Returns the updated `AttendanceDTO` (with employee).
 - `DELETE /api/v1/{locale}/workspaces/{publicId}/attendances/{attendancePublicId}` — soft-void (owner / manager with `manage_attendance`). Body: `{ "reason" }` (≤255 chars). Returns the voided `AttendanceDTO` (with employee + populated `voidedAt`/`voidedByEmail`/`voidReason`).
+
+### Overnight shifts
+
+A shift whose `endTime` is earlier than its `startTime` (e.g. `18:00`–`02:00`) runs into the next
+calendar day. Attendance is still filed under **the day the shift started** — one row per night, not
+two — so the check-out timestamp belongs to `date + 1`.
+
+- **Check-in.** A scan after midnight closes the previous day's still-open row when that day's shift
+  crossed midnight and the scan is within four hours of the shift end. Outside that window (or when
+  the row is already closed, voided, or the shift isn't overnight) the scan opens today's row, exactly
+  as before. The status endpoints resolve the same way, so a worker mid-shift at 01:00 is reported as
+  checked in against *yesterday's* row — `today.date` names which day that is.
+- **Flags.** `isLate` / `leftEarly` are computed in minutes from midnight of the shift day, so a
+  `02:00` check-out reads as 1560 (“26:00”) and compares correctly against the `02:00` end. Per-day
+  rules are resolved against the shift day too, never the calendar day a punch landed on.
+- **Reading times.** Log rows, `summary` days, and the BasilBook feed carry
+  `checkOutNextDay: boolean`. When `true`, `checkOutAt` is a clock time on `date + 1`; subtracting it
+  from `checkInAt` without adding 1440 minutes yields a negative day. It is `false` whenever
+  `checkOutAt` is `null`.
+- **Writing times.** `POST` / `PATCH` take the clock times as read. A `checkOutAt` earlier than
+  `checkInAt` is rolled onto the following day **only** when the employee's shift for that date is
+  overnight; for a day shift it stays a `400`, because that's a typo rather than a night. An employee
+  with no shift assigned has nothing to infer from, so the rejection stands there too.
 
 ## Sub-QR codes (authenticated, Double Espresso)
 
@@ -358,13 +383,22 @@ Main QR routes by `/checkin/{workspaceQrToken}`; sub-QR (Double Espresso) by `/c
     "employeeName": "Dara Sok", "shiftName": "Morning", "shiftStart": "08:00", "shiftEnd": "16:00",
     "onLeave": false, "leaveIsFullDay": false,
     "workspaceTapCheckinEnabled": true, "workspaceNfcCheckinEnabled": false,
-    "today": { "checkedIn": true, "checkedOut": false, "checkInAt": "08:03", "checkOutAt": null, "isLate": true }
+    "today": {
+      "date": "2026-06-11", "checkedIn": true, "checkedOut": false,
+      "checkInAt": "08:03", "checkOutAt": null, "checkOutNextDay": false,
+      "checkInAtIso": "2026-06-11T01:03:00+00:00", "checkOutAtIso": null,
+      "isLate": true
+    }
   }
   ```
+  `checkInAtIso` / `checkOutAtIso` are the same punches as absolute instants. The `HH:MM` fields are for display; anything measuring **elapsed** time must use the ISO ones, because a wall-clock string can't be turned back into a moment without the workspace's zone and the right calendar day — and an overnight shift is precisely when those disagree.
+  `today.date` is the day the open row belongs to. It is normally the current workspace-local date, but for someone part-way through an overnight shift at 01:00 it is **yesterday** — that is the row the next scan will check out of. Clients should show the punch against `today.date` rather than assuming the current date, and must not treat `checkedIn: true` with an earlier `date` as stale state. `shiftStart` / `shiftEnd` come from the shift's defaults; `shiftEnd < shiftStart` means the shift ends the next day.
 - `POST /api/v1/checkin/{workspaceQrToken}` — perform check-in/out. Body (all optional): `{ "latitude", "longitude", "deviceId", "deviceName", "origin": "nfc"? }`. Pipeline: closure → leave → IP → device → geofence → create/update → late/early. Returns:
   ```json
   {
-    "checkInAt": "08:03", "checkOutAt": null, "isLate": true, "leftEarly": false,
+    "date": "2026-06-11", "checkInAt": "08:03", "checkOutAt": null, "checkOutNextDay": false,
+    "checkInAtIso": "2026-06-11T01:03:00+00:00", "checkOutAtIso": null,
+    "isLate": true, "leftEarly": false,
     "verification": { "location": false, "device": true, "network": true }
   }
   ```
@@ -509,7 +543,7 @@ External attendance pull for the BasilBook accounting integration. Uses `X-Api-K
       "name": "John Doe",
       "shiftName": "Morning",
       "records": [
-        { "date": "2026-04-01", "checkInAt": "08:02", "checkOutAt": "17:05", "isLate": false, "leftEarly": false }
+        { "date": "2026-04-01", "checkInAt": "08:02", "checkOutAt": "17:05", "checkOutNextDay": false, "isLate": false, "leftEarly": false }
       ]
     }]
   }

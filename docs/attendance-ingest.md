@@ -121,7 +121,7 @@ unsigned request even from a key that holds `attendance:write`.
 | `username`          | one of   | The BasilBook link key. Mutable — accepted, but `employeePublicId` wins if both are sent. |
 | `date`              | yes      | `YYYY-MM-DD`, workspace-local calendar date.                           |
 | `checkInAt`         | yes      | `HH:MM`, workspace-local.                                              |
-| `checkOutAt`        | no       | `HH:MM`, workspace-local. Must be ≥ `checkInAt`.                       |
+| `checkOutAt`        | no       | `HH:MM`, workspace-local. Must be ≥ `checkInAt` — **unless the employee's shift for that date runs past midnight**, see [Overnight shifts](#overnight-shifts). |
 | `reason`            | yes      | ≤255 chars. Lands in the audit trail; make the client send something meaningful, e.g. `"Turnstile #3"`. |
 
 Times stay workspace-local `HH:MM` rather than ISO-8601 instants so the whole thing reuses
@@ -129,6 +129,23 @@ Times stay workspace-local `HH:MM` rather than ISO-8601 instants so the whole th
 rejected, check-out ≥ check-in, flags recomputed through `AttendanceFlagCalculator`, voided rows
 resurrected in place). A machine client would arguably prefer an instant; that's a `v2` field, not a
 reason to fork the validation.
+
+### Overnight shifts
+
+A turnstile at a bar sends `{"date": "2026-08-12", "checkInAt": "18:00", "checkOutAt": "02:00"}`.
+That check-out is on the 13th, and the record is still filed under the 12th — the day the shift
+started, which is the day the work is credited to.
+
+Send the clock times as they were read. The service rolls the check-out onto the following day when
+the employee's shift **for that date** crosses midnight, and rejects it as a backwards range when the
+shift does not — a day-shift employee with a `02:00` check-out is a bug in the sending system, not a
+night. There is no `checkOutNextDay` input field: the shift is the authority, so a client can't
+declare a 26-hour day by mistake. The pull feed *does* return `checkOutNextDay` on the way out (see
+[basilbook.md](./basilbook.md#overnight-shifts)).
+
+Consequence worth knowing: an employee with **no shift assigned** cannot have an overnight day
+ingested — there is nothing to infer overnight-ness from, so the `422` stands. Assign the shift
+first.
 
 Employee resolution: must belong to the token's workspace and not be soft-deleted, else `404`.
 

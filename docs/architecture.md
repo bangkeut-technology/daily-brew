@@ -46,6 +46,8 @@ src/
     Dashboard/            # Trend tallies behind the dashboard charts
     Image/                # Avatar/logo/photo processing
     Seo/                  # Server-rendered meta resolution
+    Shift/                # ShiftScheduleResolver — which times apply on a given day
+                          # (per-day rules, overnight detection)
   Security/               # WorkspaceVoter, BasilBookApiKeyAuthenticator
   Enum/                   # Plan, ManagerPermission, FeatureFlagStage, WorkspaceTestingTrack, …
   EventSubscriber/        # Exception handling, rate limiting
@@ -355,7 +357,8 @@ flowchart TD
     B -- Yes --> D[Resolve employee from user + workspace]
     D --> E{Employee found?}
     E -- No --> F[403 Not registered]
-    E -- Yes --> G{On approved full-day leave?}
+    E -- Yes --> AD[Resolve attendance day]
+    AD --> G{On approved full-day leave?}
     G -- Yes --> H[Block check-in: on leave]
     G -- No --> I{Closure today?}
     I -- Yes --> J[Block: workspace closed]
@@ -383,6 +386,15 @@ flowchart TD
     V --> AB[Compute isLate from shift]
     AA --> AC[Compute leftEarly from shift]
 ```
+
+**Resolve attendance day** is the first step and is usually a no-op: the punch belongs to the
+workspace-local date. The exception is an overnight shift — someone on `18:00`–`02:00` scanning at
+02:10 is *finishing* the previous day, so the resolver returns yesterday and the scan closes that
+row instead of opening a second one. Every gate after it (leave, closure, device) is evaluated
+against the resolved day, not the wall-clock date. `CheckinService::resolveAttendanceDay()` only
+looks back when yesterday's shift crossed midnight, yesterday's row is still open and not voided,
+and the scan is within four hours of that shift's end; otherwise it falls through to today. See the
+**Overnight shifts** rule in `CLAUDE.md` and [api.md](./api.md#overnight-shifts).
 
 ### Leave Request Flow
 
