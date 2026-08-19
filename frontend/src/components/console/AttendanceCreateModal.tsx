@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { CustomSelect } from "@/components/shared/CustomSelect";
 import { CustomTimePicker } from "@/components/shared/CustomTimePicker";
+import { NextDayBadge } from "@/components/shared/NextDayBadge";
 import { CustomDatePicker } from "@/components/shared/CustomDatePicker";
 import { Toggle } from "@/components/shared/Toggle";
 import { useEmployees } from "@/hooks/useEmployees";
@@ -61,6 +62,12 @@ function CreateForm({ workspaceId, today, defaultDate, onOpenChange, onCollision
     .map((e) => ({ value: e.publicId, label: e.name }));
 
   const canSave = employeePublicId && date && checkInAt && reason.trim().length > 0;
+
+  // A check-out earlier than the check-in means the shift ran past midnight —
+  // the backend rolls it onto date + 1 (AttendanceService::parseCheckOut), but
+  // only when the employee's shift for that date is actually overnight. Say so
+  // here so "02:00" doesn't look like it will land eight hours before the start.
+  const checkOutIsNextDay = hasCheckout && checkOutAt < checkInAt;
 
   const submit = () => {
     create.mutate(
@@ -151,9 +158,18 @@ function CreateForm({ workspaceId, today, defaultDate, onOpenChange, onCollision
           <div>
             <label htmlFor="co" className="mb-1 block text-[13px] font-medium text-text-secondary">
               {t("attendance.checkOutTime", "Check-out")}
+              {checkOutIsNextDay && <NextDayBadge />}
             </label>
             <CustomTimePicker id="co" value={checkOutAt} onChange={setCheckOutAt} />
           </div>
+        )}
+        {checkOutIsNextDay && (
+          <p className="-mt-1 text-[12.5px] leading-relaxed text-text-tertiary">
+            {t(
+              "attendance.nextDayHint",
+              "Check-out lands on the next day. Only accepted when the employee's shift that day runs past midnight.",
+            )}
+          </p>
         )}
         <div>
           <label htmlFor="reason" className="mb-1 block text-[13px] font-medium text-text-secondary">

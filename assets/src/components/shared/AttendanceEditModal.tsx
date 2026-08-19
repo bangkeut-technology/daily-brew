@@ -4,6 +4,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { toast } from 'sonner';
 import { Trash2, X } from 'lucide-react';
 import { CustomTimePicker } from './CustomTimePicker';
+import { NextDayBadge } from './NextDayBadge';
 import { Toggle } from './Toggle';
 import { CheckinVerification } from './CheckinVerification';
 import { useOverrideAttendance } from '@/hooks/queries/useAttendance';
@@ -56,6 +57,12 @@ export function AttendanceEditModal({
   // Block wiping a real check-out: if the record already had one, the toggle
   // can't be used to clear it (a typo is fixed by editing the time, not removing it).
   const clearingExistingCheckOut = attendance.checkOutAt !== null && !hasCheckOut;
+
+  // A check-out earlier than the check-in means the shift ran past midnight —
+  // the backend rolls it onto date + 1 (AttendanceService::parseCheckOut), but
+  // only when the employee's shift for that date is actually overnight. Say so
+  // here so "02:00" doesn't look like it will land eight hours before the start.
+  const checkOutIsNextDay = hasCheckOut && checkOutAt < checkInAt;
 
   const handleSubmit = async () => {
     const trimmed = reason.trim();
@@ -119,10 +126,20 @@ export function AttendanceEditModal({
               <div>
                 <label htmlFor="att-edit-out" className="block text-[13px] font-medium text-text-secondary mb-1">
                   {t('attendance.checkOutTime', 'Check-out')}
+                  {checkOutIsNextDay && <NextDayBadge />}
                 </label>
                 <CustomTimePicker value={checkOutAt} onChange={setCheckOutAt} className={hasCheckOut ? '' : 'opacity-50 pointer-events-none'} />
               </div>
             </div>
+
+            {checkOutIsNextDay && (
+              <p className="text-[13px] text-text-tertiary leading-relaxed -mt-1">
+                {t(
+                  'attendance.nextDayHint',
+                  "Check-out lands on the next day. Only accepted when the employee's shift that day runs past midnight.",
+                )}
+              </p>
+            )}
 
             <div className="flex items-center gap-2">
               <Toggle id="att-has-checkout" checked={hasCheckOut} onChange={setHasCheckOut} />

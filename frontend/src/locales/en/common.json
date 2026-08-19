@@ -491,7 +491,8 @@
     "alreadyExistsSwitchToEdit": "A record already exists for that day — opening it to edit.",
     "createError": "Failed to add attendance",
     "nextDay": "+1",
-    "nextDayTooltip": "Checked out the next day"
+    "nextDayTooltip": "Checked out the next day",
+    "nextDayHint": "Check-out lands on the next day. Only accepted when the employee's shift that day runs past midnight."
   },
   "leave": {
     "pending": "Pending",

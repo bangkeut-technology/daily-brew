@@ -480,7 +480,8 @@
     "originalScan": "Originally",
     "selectEmployee": "Select employee",
     "nextDay": "+1",
-    "nextDayTooltip": "Checked out the next day"
+    "nextDayTooltip": "Checked out the next day",
+    "nextDayHint": "Check-out lands on the next day. Only accepted when the employee's shift that day runs past midnight."
   },
   "leave": {
     "pending": "Pending",
