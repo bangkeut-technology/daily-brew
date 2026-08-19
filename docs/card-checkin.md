@@ -274,11 +274,12 @@ sellable to.
 
 **Not built:**
 
-- **The kiosk.** No code in either repository. It must read the tag, sign its
-  requests, stamp its own `tappedAt`, queue while offline, and show the person
-  in front of it what happened. This decides the cost per location and therefore
-  who the feature is sellable to.
-- **Mobile.** No card management in the app.
+- **The kiosk.** No code in any repository. Designed in
+  [docs/kiosk.md](./kiosk.md) — the tap loop, the two-clocks problem,
+  provisioning, and hardware options costed rather than chosen. The hardware
+  choice decides the cost per location and therefore who the feature is sellable
+  to, and everything else waits on it.
+- **Mobile.** Card management ships in the app (daily-brew-mobile#56).
 
 ## Deliberately out of scope
 
