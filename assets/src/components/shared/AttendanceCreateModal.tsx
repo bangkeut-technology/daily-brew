@@ -6,6 +6,7 @@ import { X } from 'lucide-react';
 import { CustomTimePicker } from './CustomTimePicker';
 import { CustomSelect } from './CustomSelect';
 import { CustomDatePicker } from './CustomDatePicker';
+import { NextDayBadge } from './NextDayBadge';
 import { Toggle } from './Toggle';
 import { Avatar } from './Avatar';
 import { useCreateAttendance } from '@/hooks/queries/useAttendance';
@@ -53,6 +54,12 @@ export function AttendanceCreateModal({
   const employeeOptions = employees.map((e) => ({ value: e.publicId, label: e.name }));
 
   const canSubmit = !!employeePublicId && !!reason.trim() && !create.isPending;
+
+  // A check-out earlier than the check-in means the shift ran past midnight —
+  // the backend rolls it onto date + 1 (AttendanceService::parseCheckOut), but
+  // only when the employee's shift for that date is actually overnight. Say so
+  // here so "02:00" doesn't look like it will land eight hours before the start.
+  const checkOutIsNextDay = hasCheckOut && checkOutAt < checkInAt;
 
   const handleSubmit = async () => {
     if (!employeePublicId || !reason.trim()) return;
@@ -143,10 +150,20 @@ export function AttendanceCreateModal({
               <div>
                 <label htmlFor="att-create-out" className="block text-[13px] font-medium text-text-secondary mb-1">
                   {t('attendance.checkOutTime', 'Check-out')}
+                  {checkOutIsNextDay && <NextDayBadge />}
                 </label>
                 <CustomTimePicker value={checkOutAt} onChange={setCheckOutAt} className={hasCheckOut ? '' : 'opacity-50 pointer-events-none'} />
               </div>
             </div>
+
+            {checkOutIsNextDay && (
+              <p className="text-[13px] text-text-tertiary leading-relaxed -mt-1">
+                {t(
+                  'attendance.nextDayHint',
+                  "Check-out lands on the next day. Only accepted when the employee's shift that day runs past midnight.",
+                )}
+              </p>
+            )}
 
             <div className="flex items-center gap-2">
               <Toggle id="att-create-has-checkout" checked={hasCheckOut} onChange={setHasCheckOut} />

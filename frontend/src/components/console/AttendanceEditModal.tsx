@@ -6,6 +6,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import { toast } from "sonner";
 import { CustomTimePicker } from "@/components/shared/CustomTimePicker";
+import { NextDayBadge } from "@/components/shared/NextDayBadge";
 import { Toggle } from "@/components/shared/Toggle";
 import { formatTimeInTz } from "@/lib/timezone";
 import { useOverrideAttendance } from "@/hooks/useAttendance";
@@ -89,6 +90,12 @@ function EditForm({
 
   // A wrong check-out is fixed by editing it, not by clearing it (CLAUDE.md UI guard).
   const clearingRealCheckout = hadCheckout && !hasCheckout;
+
+  // A check-out earlier than the check-in means the shift ran past midnight —
+  // the backend rolls it onto date + 1 (AttendanceService::parseCheckOut), but
+  // only when the employee's shift for that date is actually overnight. Say so
+  // here so "02:00" doesn't look like it will land eight hours before the start.
+  const checkOutIsNextDay = hasCheckout && checkOutAt < checkInAt;
   const canSave = reason.trim().length > 0 && !clearingRealCheckout;
 
   const submit = () => {
@@ -145,9 +152,18 @@ function EditForm({
           <div>
             <label htmlFor="co" className="mb-1 block text-[13px] font-medium text-text-secondary">
               {t("attendance.checkOutTime", "Check-out")}
+              {checkOutIsNextDay && <NextDayBadge />}
             </label>
             <CustomTimePicker id="co" value={checkOutAt} onChange={setCheckOutAt} />
           </div>
+        )}
+        {checkOutIsNextDay && (
+          <p className="-mt-1 text-[12.5px] leading-relaxed text-text-tertiary">
+            {t(
+              "attendance.nextDayHint",
+              "Check-out lands on the next day. Only accepted when the employee's shift that day runs past midnight.",
+            )}
+          </p>
         )}
 
         <div>

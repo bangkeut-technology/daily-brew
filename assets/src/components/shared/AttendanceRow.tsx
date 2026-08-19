@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Avatar } from './Avatar';
+import { NextDayBadge } from './NextDayBadge';
 import { StatusBadge } from './StatusBadge';
 import { cn } from '@/lib/utils';
 import type { AttendanceStatus } from '@/types';
@@ -133,14 +134,7 @@ export function AttendanceRow({
             <>
               {time}
               {checkOut ? ` → ${checkOut}` : ''}
-              {checkOut && checkOutNextDay && (
-                <span
-                  title={t('attendance.nextDayTooltip', 'Checked out the next day')}
-                  className="ml-1 text-[11px] font-sans font-medium text-amber align-super"
-                >
-                  {t('attendance.nextDay', '+1')}
-                </span>
-              )}
+              {checkOut && checkOutNextDay && <NextDayBadge className="align-super" />}
             </>
           )}
       </div>

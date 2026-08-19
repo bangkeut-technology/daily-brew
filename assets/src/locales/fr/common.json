@@ -183,7 +183,8 @@
     "originalScan": "À l'origine",
     "selectEmployee": "Sélectionner un employé",
     "nextDay": "+1",
-    "nextDayTooltip": "Départ pointé le lendemain"
+    "nextDayTooltip": "Départ pointé le lendemain",
+    "nextDayHint": "Le départ tombe le lendemain. Accepté uniquement si le service de l'employé ce jour-là dépasse minuit."
   },
   "auth": {
     "signIn": "Connexion",
