@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.142.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.142.0...v1.142.1) (2026-08-19)
+
+
+### Bug Fixes
+
+* **admin:** stop the churn tooltip being clipped by its card ([#410](https://github.com/bangkeut-technology/daily-brew/issues/410)) ([27383f4](https://github.com/bangkeut-technology/daily-brew/commit/27383f489697196674784915c4f7c11684f226ad))
+
 ## [1.142.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.141.0...v1.142.0) (2026-08-19)
 
 
