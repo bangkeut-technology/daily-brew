@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.145.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.145.0...v1.145.1) (2026-08-19)
+
+
+### Bug Fixes
+
+* **settings:** let the console mint a card check-in API key ([#422](https://github.com/bangkeut-technology/daily-brew/issues/422)) ([fe8254f](https://github.com/bangkeut-technology/daily-brew/commit/fe8254ff8f01258955f2c8f01eab6ef930ded7fa))
+
 ## [1.145.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.144.0...v1.145.0) (2026-08-19)
 
 
