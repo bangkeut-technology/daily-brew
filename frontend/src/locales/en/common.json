@@ -769,7 +769,28 @@
     "apiKeyRevokeError": "Could not revoke the key",
     "billingCycle": "Billing cycle",
     "checkoutUnavailable": "Checkout is unavailable right now",
-    "annualSaving": "Save 17% vs monthly"
+    "annualSaving": "Save 17% vs monthly",
+    "cardCheckin": "Card check-in",
+    "cardCheckinDesc": "For staff without a phone. Each employee gets a card they tap on a kiosk at the door — no app and no account needed. A card is a key: whoever holds it can clock in with it, so keep the kiosk somewhere you can see it.",
+    "issueCard": "Issue a card",
+    "issue": "Issue",
+    "cardLabel": "Card name",
+    "cardLabelPlaceholder": "e.g. Blue card",
+    "noCards": "No cards yet — issue one above, then hold a blank card to the kiosk to write it.",
+    "cardIssueError": "Could not issue that card",
+    "cardRevokeError": "Could not revoke that card",
+    "cardRevoked": "Card revoked",
+    "cardRevokedBy": "Revoked by {{email}}",
+    "cardRevokedBadge": "Revoked",
+    "revokeCard": "Revoke card",
+    "revokeCardTitle": "Revoke this card?",
+    "revokeCardDesc": "The kiosk stops accepting it the next time it syncs. This cannot be undone — a replacement is a new card.",
+    "revokeCardReason": "e.g. Lost — left in a taxi",
+    "cardIssuedTitle": "Card issued",
+    "cardIssuedDesc": "{{name}} · {{label}}",
+    "cardIssuedOnce": "Write this to the card now. It is shown once and cannot be retrieved later — if you lose it, revoke the card and issue a new one.",
+    "cardPass": "Card data",
+    "cardWritten": "I've written the card"
   },
   "checkin": {
     "checkIn": "Check In",
@@ -926,7 +947,11 @@
       "title": "Unlock API keys",
       "description": "Generate secret keys so BasilBook and your own tools can pull attendance from this workspace."
     },
-    "startTrial": "Start 14-day free trial"
+    "startTrial": "Start 14-day free trial",
+    "cardCheckin": {
+      "title": "Card check-in is an Espresso feature",
+      "description": "Give staff without a phone a card to tap at a kiosk — no app, no account. Upgrade to issue cards."
+    }
   },
   "faq": {
     "eyebrow": "FAQ",

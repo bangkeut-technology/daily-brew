@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import {
   Copy,
+  CreditCard,
   Crown,
   KeyRound,
   MapPin,
@@ -19,6 +20,8 @@ import { QRCodeSVG } from "qrcode.react";
 import { apiAxios, clearWorkspacePublicId, getWorkspacePublicId } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useUpdateWorkspaceSettings, useWorkspaceSettings } from "@/hooks/useWorkspaceSettings";
+import { useEmployees } from "@/hooks/useEmployees";
+import { CardCheckinSection } from "@/components/console/CardCheckinSection";
 import { useRemoveWorkspaceLogo, useUploadWorkspaceLogo } from "@/hooks/useWorkspaceLogo";
 import {
   useApiTokens,
@@ -73,6 +76,7 @@ export default function SettingsPage() {
 
   const { data: workspace } = useWorkspace(wsId);
   const { data: settings, isLoading } = useWorkspaceSettings(wsId);
+  const { data: employees } = useEmployees(wsId);
   const { data: plan } = usePlan(wsId);
   const update = useUpdateWorkspaceSettings(wsId);
   const updateWorkspace = useUpdateWorkspace();
@@ -176,6 +180,7 @@ export default function SettingsPage() {
   const canUseGeo = plan?.canUseGeofencing ?? false;
   const canUseTap = plan?.canUseTapCheckin ?? false;
   const canUseNfc = plan?.canUseNfcCheckin ?? false;
+  const canUseCard = plan?.canUseCardCheckin ?? false;
   const canUseTelegram = plan?.canUseTelegramNotifications ?? false;
 
   return (
@@ -474,6 +479,23 @@ export default function SettingsPage() {
               />
             </SettingRow>
             <SettingRow
+              title={t("settings.cardCheckin", "Card check-in")}
+              description={t(
+                "settings.cardCheckinDesc",
+                "For staff without a phone. Each employee gets a card they tap on a kiosk at the door — no app and no account needed. A card is a key: whoever holds it can clock in with it, so keep the kiosk somewhere you can see it.",
+              )}
+              id="settings-card-checkin"
+              locked={!canUseCard}
+              onUpgrade={() => upgrade.openFor("cardCheckin")}
+              icon={<CreditCard size={14} className="text-amber" />}
+            >
+              <Toggle
+                checked={canUseCard && settings.cardCheckinEnabled}
+                disabled={!canUseCard || update.isPending}
+                onChange={(v) => save({ cardCheckinEnabled: v })}
+              />
+            </SettingRow>
+            <SettingRow
               title={t("settings.nfcCheckin", "NFC check-in")}
               description={t(
                 "settings.nfcCheckinDesc",
@@ -497,6 +519,15 @@ export default function SettingsPage() {
             </SettingRow>
           </div>
         </GlassCard>
+
+        {canUseCard && settings.cardCheckinEnabled && (
+          <CardCheckinSection
+            workspacePublicId={wsId}
+            employees={(employees ?? [])
+              .filter((e) => e.active)
+              .map((e) => ({ publicId: e.publicId, name: e.name }))}
+          />
+        )}
 
         <TelegramCard
           workspaceId={wsId}

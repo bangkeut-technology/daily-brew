@@ -4,6 +4,7 @@ import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useTranslation } from "react-i18next";
 import {
+  CreditCard,
   Crown,
   Globe,
   MapPin,
@@ -66,6 +67,11 @@ const featureConfig: Record<
     icon: MousePointerClick,
     titleKey: "upgrade.tapCheckin.title",
     descKey: "upgrade.tapCheckin.description",
+  },
+  cardCheckin: {
+    icon: CreditCard,
+    titleKey: "upgrade.cardCheckin.title",
+    descKey: "upgrade.cardCheckin.description",
   },
   nfcCheckin: {
     icon: Nfc,

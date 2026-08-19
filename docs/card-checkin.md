@@ -270,7 +270,7 @@ sellable to.
 | Kiosk ingest | `POST /api/v1/integrations/card-taps`, signed, scope `checkin:tap` |
 | Card management | `/workspaces/{ws}/employee-cards` — GET, POST, DELETE, gated on `manage_employees` |
 | Plan gate | `PlanService::canUseCardCheckin()` — Espresso and above |
-| Console UI (SPA) | Settings → Card check-in — toggle, issue form, card list, revoke |
+| Console UI | Settings → Card check-in — toggle, issue form, card list, revoke. Both frontends. |
 
 **Not built:**
 
@@ -278,8 +278,6 @@ sellable to.
   requests, stamp its own `tappedAt`, queue while offline, and show the person
   in front of it what happened. This decides the cost per location and therefore
   who the feature is sellable to.
-- **The Next.js port of the settings section.** The legacy SPA is what production
-  serves, and that is where the screen lives today.
 - **Mobile.** No card management in the app.
 
 ## Deliberately out of scope
