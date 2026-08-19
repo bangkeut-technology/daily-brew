@@ -98,7 +98,11 @@ export function ChurnChart({ series }: { series: AdminChurnPoint[] }) {
   const active = activeIndex === null ? null : series[activeIndex];
 
   return (
-    <GlassCard hover={false}>
+    // overflow-visible: the hover tooltip is anchored above the plot area and
+    // GlassCard clips by default, which sliced the top off it (month heading +
+    // first series row). It escapes upward over an earlier sibling card, so no
+    // stacking-context surprises.
+    <GlassCard hover={false} className="overflow-visible">
       <div className="px-5 py-4">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2 text-text-tertiary">
