@@ -38,6 +38,7 @@ import { useUploadWorkspaceLogo, useRemoveWorkspaceLogo } from '@/hooks/queries/
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { CustomSelect } from '@/components/shared/CustomSelect';
 import { CardCheckinCard } from '@/components/settings/CardCheckinCard';
+import { KioskPairingQr } from '@/components/settings/KioskPairingQr';
 import { Toggle } from '@/components/shared/Toggle';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { CheckinUrlRow } from '@/components/shared/CheckinUrlRow';
@@ -1837,6 +1838,12 @@ function SettingsPage() {
                     copyFailedMessage={t('common.copyFailed', 'Failed to copy')}
                   />
                 </div>
+                {/* Only for a key that can actually run a kiosk — pairing anything
+                    else would hand a terminal credentials it can't punch with. */}
+                {newApiToken.scopes?.includes('checkin:tap') && currentWsId && (
+                  <KioskPairingQr token={newApiToken} workspacePublicId={currentWsId} />
+                )}
+
                 <div className="mt-5 flex justify-end">
                   <button
                     type="button"

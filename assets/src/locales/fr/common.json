@@ -665,7 +665,11 @@
     "cardWritten": "J'ai écrit la carte",
     "apiKeysTapLabel": "Autoriser les pointages par carte",
     "apiKeysTapHint": "Pour une borne qui envoie les pointages par carte. Comme pour l'écriture des présences, chaque requête doit être signée.",
-    "apiKeysTapBadge": "Pointages carte"
+    "apiKeysTapBadge": "Pointages carte",
+    "kioskPairTitle": "Associer une borne",
+    "kioskPairHint": "Nommez cette porte, puis scannez le code avec la borne. Le code contient la clé et le secret de signature — traitez-le comme la clé elle-même.",
+    "kioskTerminalId": "Nom de la porte",
+    "kioskTerminalIdHint": "Deux bornes portant le même nom partagent leur délai anti-répétition. Donnez un nom propre à chaque porte."
   },
   "checkin": {
     "deviceMismatch": "Le pointage de sortie doit être effectué depuis le même appareil que le pointage d'entrée",

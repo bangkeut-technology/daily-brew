@@ -126,30 +126,50 @@ check-in** scope (`checkin:tap`). Both secrets are shown exactly once, at mint.
 terminal: the same card at a *different* door is not blocked, which is right for
 a two-entrance restaurant. Two kiosks sharing a `terminalId` share a cooldown.
 
-**Getting those three values into the box is the unsolved part of this design.**
-Typing an API token on a wall-mounted tablet is miserable. Options, none picked:
+**Decided: a QR rendered by the console**, read by the kiosk's camera on first
+run. Typing a 48-character key and a 68-character secret onto a wall-mounted
+tablet is miserable enough that operators would find a worse way.
 
-- **QR from the console.** The console renders the credentials as a QR; the
-  kiosk reads it with its own camera on first run. Simple, and the secret never
-  goes near a keyboard — but it does mean a secret sits on a screen briefly.
-- **A short-lived pairing code.** The kiosk shows a 6-digit code, the operator
-  types it into the console, the server hands the kiosk its credentials. Nicer,
-  and needs a new endpoint pair plus a pairing-code table.
-- **Configured at install.** Whoever installs the hardware sets it up once via a
-  local config screen. Fine for a supplier-installed terminal, bad for
-  self-serve.
+It is built. Minting a key with the card check-in scope shows a **Pair a kiosk**
+panel in the same modal that already displays both secrets — the only place they
+are ever visible — with a field for the door name.
 
-The second is the right answer if kiosks are ever sold at volume. The first is
-the right answer for the first ten customers.
+The QR encodes, following the existing `dailybrew:` scheme so a scanner can route
+on the prefix without parsing the body:
 
-## Hardware, costed rather than chosen
+```
+dailybrew:kiosk:{base64url(JSON)}
+```
 
-This is the decision everything else waits on, because it sets the price per
-location and therefore who can be sold the feature.
+```json
+{
+  "v": 1,
+  "api": "https://dailybrew.work/api/v1",
+  "ws": "wsp3kq7m2xzn",
+  "key": "db_…",
+  "secret": "dbs_…",
+  "terminal": "front-door-01"
+}
+```
+
+The API base travels with the credentials so one build of the kiosk works
+against production and the staging mirror without a rebuild.
+
+**The credentials are in the clear inside that QR — the code *is* the key.** That
+is the accepted trade for not typing them, and it is why the panel renders only
+in the mint modal and says so. A short-lived pairing code (kiosk shows six
+digits, operator types them into the console, server hands over the credentials)
+is the better answer if kiosks are ever sold at volume; it needs a new endpoint
+pair and a pairing-code table, and is deliberately deferred.
+
+## Hardware
+
+**Decided: a dedicated Android app on a cheap tablet with an NFC reader.** Full
+control of the screen, the queue and kiosk mode, at the cost of a second app to
+build and ship. The alternatives, for the record:
 
 | Option | Rough cost/location | Trade |
 |---|---|---|
-| **Dedicated Android app on cheap tablet** | tablet + NFC reader, low hundreds | Full control of the screen and the queue. Needs a second app to build and ship, plus MDM-ish concerns (kiosk mode, auto-restart, updates). |
 | **Repurposed phone running the existing app in a kiosk mode** | whatever's in the drawer | Cheapest to start and reuses the Expo app, its i18n and its API layer. Awkward as a permanent fixture: battery, screen timeout, and a phone in kiosk mode is still a phone. |
 | **Off-the-shelf NFC terminal** | higher, plus per-unit lead time | Purpose-built, mounts properly, survives a kitchen. Least control over the software, and the vendor's SDK becomes a dependency. |
 
@@ -175,14 +195,12 @@ anything richer.
 
 ## Open questions
 
-1. **Hardware**, per above. Everything else follows from it.
-2. **Provisioning flow** — QR, pairing code, or install-time config.
-3. **Does the kiosk show names?** Showing "Sokha — checked in" is good feedback
+1. **Does the kiosk show names?** Showing "Sokha — checked in" is good feedback
    and also displays who is at work to anyone standing there. A workspace toggle
    may be wanted.
-4. **Anti-passback tuning.** `pass_reuse_cooldown_seconds` is 60 and is a guess.
+2. **Anti-passback tuning.** `pass_reuse_cooldown_seconds` is 60 and is a guess.
    It wants validating against a real service change-over, where a crew tapping
    in sequence is normal and must not trip anything.
-5. **Multiple kiosks per workspace** work today (per-terminal anti-passback), but
+3. **Multiple kiosks per workspace** work today (per-terminal anti-passback), but
    nothing in the console lists which terminals exist or when each was last seen.
    A terminal registry would make a fleet supportable.
