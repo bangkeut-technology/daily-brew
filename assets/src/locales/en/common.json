@@ -779,7 +779,11 @@
     "cardWritten": "I've written the card",
     "apiKeysTapLabel": "Allow card check-in taps",
     "apiKeysTapHint": "For a kiosk terminal that submits card taps. Like writing attendance, every request must be signed.",
-    "apiKeysTapBadge": "Card taps"
+    "apiKeysTapBadge": "Card taps",
+    "kioskPairTitle": "Pair a kiosk",
+    "kioskPairHint": "Name this door, then scan the code with the kiosk. The code contains the key and the signing secret — treat it like the key itself.",
+    "kioskTerminalId": "Door name",
+    "kioskTerminalIdHint": "Two kiosks sharing a name share their repeat-tap cooldown. Give each door its own."
   },
   "checkin": {
     "checkIn": "Check In",
