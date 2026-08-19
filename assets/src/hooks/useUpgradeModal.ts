@@ -8,6 +8,7 @@ export type EspressoFeature =
   | 'shiftTimeRules'
   | 'telegramNotifications'
   | 'tapCheckin'
+  | 'cardCheckin'
   | 'nfcCheckin'
   | 'apiTokens';
 
