@@ -16,6 +16,7 @@ export interface WorkspaceSetting {
   telegramCheckinAlertsEnabled: boolean;
   pushCheckinAlertsEnabled: boolean;
   tapCheckinEnabled: boolean;
+  cardCheckinEnabled: boolean;
   nfcCheckinEnabled: boolean;
   nfcCheckinIntervalMinutes: number;
 }

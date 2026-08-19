@@ -20,6 +20,7 @@ export interface PlanDetails {
   canUseManagers: boolean;
   canUseTelegramNotifications: boolean;
   canUseTapCheckin: boolean;
+  canUseCardCheckin: boolean;
   canUseNfcCheckin: boolean;
   canUseSubQrCodes: boolean;
   canExportAttendance: boolean;
