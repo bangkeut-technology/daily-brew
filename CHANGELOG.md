@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.142.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.141.0...v1.142.0) (2026-08-19)
+
+
+### Features
+
+* **attendance:** mark a next-day check-out while it is being entered ([#409](https://github.com/bangkeut-technology/daily-brew/issues/409)) ([7e4308a](https://github.com/bangkeut-technology/daily-brew/commit/7e4308a8db9029ccaf69cf0c7317e8d47738f843))
+
 ## [1.141.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.140.0...v1.141.0) (2026-08-18)
 
 
