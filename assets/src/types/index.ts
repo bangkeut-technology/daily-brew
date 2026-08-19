@@ -594,7 +594,7 @@ export interface PlanDetails {
 }
 
 /** Matches ApiTokenScopeEnum. */
-export type ApiTokenScope = 'attendance:read' | 'attendance:write';
+export type ApiTokenScope = 'attendance:read' | 'attendance:write' | 'checkin:tap';
 
 export interface ApiToken {
   publicId: string;

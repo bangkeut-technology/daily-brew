@@ -191,6 +191,7 @@ function SettingsPage() {
   const [apiTokenName, setApiTokenName] = useState('BasilBook');
   // Write access is opt-in per key: a pull integration should never hold it.
   const [apiTokenCanWrite, setApiTokenCanWrite] = useState(false);
+  const [apiTokenCanTap, setApiTokenCanTap] = useState(false);
   const [newApiToken, setNewApiToken] = useState<ApiTokenCreated | null>(null);
   const [revokeTokenTarget, setRevokeTokenTarget] = useState<{ publicId: string; name: string } | null>(null);
 
@@ -1687,6 +1688,7 @@ function SettingsPage() {
                     onClick={() => {
                       setApiTokenName('BasilBook');
                       setApiTokenCanWrite(false);
+                      setApiTokenCanTap(false);
                       setNewApiToken(null);
                       setApiTokenModalOpen(true);
                     }}
@@ -1749,6 +1751,9 @@ function SettingsPage() {
                             />
                             {tk.scopes?.includes('attendance:write') && (
                               <StatusBadge label={t('settings.apiKeysWriteBadge', 'Can write')} variant="amber" />
+                            )}
+                            {tk.scopes?.includes('checkin:tap') && (
+                              <StatusBadge label={t('settings.apiKeysTapBadge', 'Card taps')} variant="amber" />
                             )}
                           </div>
                           <p className="mt-1 text-[12.5px] text-text-tertiary font-mono">
@@ -1878,6 +1883,24 @@ function SettingsPage() {
                   <Toggle id="api-token-write" checked={apiTokenCanWrite} onChange={setApiTokenCanWrite} />
                 </div>
 
+                {/* Card check-in terminals authenticate with a key like any other
+                    integration; without this scope a kiosk cannot be provisioned
+                    at all. */}
+                <div className="mt-3 flex items-start justify-between gap-3 p-3 rounded-xl border border-cream-3 bg-cream-3/10">
+                  <div className="min-w-0">
+                    <label htmlFor="api-token-tap" className="text-[13.5px] font-medium text-text-primary cursor-pointer">
+                      {t('settings.apiKeysTapLabel', 'Allow card check-in taps')}
+                    </label>
+                    <p className="mt-0.5 text-[12.5px] text-text-tertiary leading-snug">
+                      {t(
+                        'settings.apiKeysTapHint',
+                        'For a kiosk terminal that submits card taps. Like writing attendance, every request must be signed.',
+                      )}
+                    </p>
+                  </div>
+                  <Toggle id="api-token-tap" checked={apiTokenCanTap} onChange={setApiTokenCanTap} />
+                </div>
+
                 <div className="mt-5 flex justify-end gap-2">
                   <button
                     type="button"
@@ -1893,9 +1916,11 @@ function SettingsPage() {
                       try {
                         const created = await createApiToken.mutateAsync({
                           name: apiTokenName.trim(),
-                          scopes: apiTokenCanWrite
-                            ? ['attendance:read', 'attendance:write']
-                            : ['attendance:read'],
+                          scopes: [
+                            'attendance:read',
+                            ...(apiTokenCanWrite ? (['attendance:write'] as const) : []),
+                            ...(apiTokenCanTap ? (['checkin:tap'] as const) : []),
+                          ],
                         });
                         setNewApiToken(created);
                       } catch {
