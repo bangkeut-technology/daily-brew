@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.146.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.145.1...v1.146.0) (2026-08-19)
+
+
+### Features
+
+* **settings:** pair a kiosk by scanning a QR ([#425](https://github.com/bangkeut-technology/daily-brew/issues/425)) ([e4bf86b](https://github.com/bangkeut-technology/daily-brew/commit/e4bf86b24bc3e0d3298717b58f98fa0e4cd6e272))
+
 ## [1.145.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.145.0...v1.145.1) (2026-08-19)
 
 
