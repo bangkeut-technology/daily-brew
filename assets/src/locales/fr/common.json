@@ -640,7 +640,29 @@
     "apiKeyRevoked": "Révoquée",
     "apiKeyRevokeError": "Impossible de révoquer la clé",
     "billingCycle": "Cycle de facturation",
-    "checkoutUnavailable": "Le paiement est indisponible pour le moment"
+    "checkoutUnavailable": "Le paiement est indisponible pour le moment",
+    "cardCheckin": "Pointage par carte",
+    "enableCardCheckin": "Autoriser le pointage en présentant une carte",
+    "cardCheckinDesc": "Pour le personnel sans téléphone. Chaque employé reçoit une carte qu'il présente à une borne à l'entrée — sans application ni compte. Une carte est une clé : quiconque la détient peut pointer avec, alors gardez la borne dans votre champ de vision.",
+    "issueCard": "Émettre une carte",
+    "issue": "Émettre",
+    "cardLabel": "Nom de la carte",
+    "cardLabelPlaceholder": "ex. Carte bleue",
+    "noCards": "Aucune carte pour l'instant — émettez-en une ci-dessus, puis présentez une carte vierge à la borne pour l'écrire.",
+    "cardIssueError": "Impossible d'émettre cette carte",
+    "cardRevokeError": "Impossible de révoquer cette carte",
+    "cardRevoked": "Carte révoquée",
+    "cardRevokedBy": "Révoquée par {{email}}",
+    "cardRevokedBadge": "Révoquée",
+    "revokeCard": "Révoquer la carte",
+    "revokeCardTitle": "Révoquer cette carte ?",
+    "revokeCardDesc": "La borne cessera de l'accepter à sa prochaine synchronisation. Action irréversible — un remplacement est une nouvelle carte.",
+    "revokeCardReason": "ex. Perdue — oubliée dans un taxi",
+    "cardIssuedTitle": "Carte émise",
+    "cardIssuedDesc": "{{name}} · {{label}}",
+    "cardIssuedOnce": "Écrivez ceci sur la carte maintenant. Affiché une seule fois et impossible à récupérer ensuite — en cas de perte, révoquez la carte et émettez-en une nouvelle.",
+    "cardPass": "Données de la carte",
+    "cardWritten": "J'ai écrit la carte"
   },
   "checkin": {
     "deviceMismatch": "Le pointage de sortie doit être effectué depuis le même appareil que le pointage d'entrée",
@@ -786,7 +808,11 @@
       "title": "Débloquer les clés API",
       "description": "Générez des clés secrètes pour que BasilBook et vos propres outils puissent récupérer les pointages de cet espace."
     },
-    "startTrial": "Commencer l'essai gratuit de 14 jours"
+    "startTrial": "Commencer l'essai gratuit de 14 jours",
+    "cardCheckin": {
+      "title": "Le pointage par carte est une fonctionnalité Espresso",
+      "description": "Donnez au personnel sans téléphone une carte à présenter à une borne — sans application ni compte. Passez à la version supérieure pour émettre des cartes."
+    }
   },
   "faq": {
     "eyebrow": "FAQ",

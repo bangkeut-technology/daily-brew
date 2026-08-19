@@ -63,7 +63,8 @@ All entities carry `id`, `publicId` (UUID), `createdAt`, `updatedAt`.
 - **`KioskCheckinSettings` disables device verification and geofencing** for card taps: a kiosk is one device shared by everyone (the first tap would bind it and lock out the crew) and it has no GPS (the pipeline 403s when geofencing is on and coordinates are missing). **IP restriction stays on** and is the control that carries the weight.
 - Both claims (`CardTapRepository::claim`, `TapNonceRepository::claim`) go through **DBAL, not the ORM** — a unique violation inside `EntityManager::flush()` closes the manager, and "already claimed" is a routine answer on this path.
 - Revocation is the only way to take a card back (`EmployeeCardRevocationStore`); **an unknown pass id counts as revoked**, and the store fails closed. Cards are issued/revoked via `/workspaces/{ws}/employee-cards`, gated on `manage_employees` — handing someone a credential is employee administration, not an attendance correction.
-- **Not built:** the kiosk app itself, console UI, mobile card management.
+- **Console UI** lives in Settings → Card check-in (`assets/src/components/settings/CardCheckinCard.tsx`): the toggle, an issue form, and the cards in circulation. `CardPassModal` shows the pass **once** — the bytes are derived from the card row plus the workspace key and never stored, so a card that was never written to a tag is re-issued, not recovered.
+- **Not built:** the kiosk app itself, the Next.js port of the settings section, mobile card management.
 
 **Attendance tracking modes** (`Employee.attendanceTracking`):
 - `full` (default) — counted in `DashboardService` absent calc, late/leftEarly flags fire when shift assigned. On Espresso, the absent baseline narrows further to employees whose shift is scheduled today (`countAttendanceTrackedAndScheduledOn`) so off-day employees don't inflate it.

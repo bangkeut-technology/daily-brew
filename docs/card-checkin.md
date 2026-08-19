@@ -1,6 +1,6 @@
 # Card check-in
 
-**Status: the server side is implemented; the kiosk and the console UI are not.**
+**Status: the server side and the console UI are implemented; the kiosk is not.**
 Cards can be issued, revoked and tapped over the API today — see
 **Implementation status** below for exactly what exists and what a working
 deployment still needs.
@@ -270,6 +270,7 @@ sellable to.
 | Kiosk ingest | `POST /api/v1/integrations/card-taps`, signed, scope `checkin:tap` |
 | Card management | `/workspaces/{ws}/employee-cards` — GET, POST, DELETE, gated on `manage_employees` |
 | Plan gate | `PlanService::canUseCardCheckin()` — Espresso and above |
+| Console UI (SPA) | Settings → Card check-in — toggle, issue form, card list, revoke |
 
 **Not built:**
 
@@ -277,8 +278,8 @@ sellable to.
   requests, stamp its own `tappedAt`, queue while offline, and show the person
   in front of it what happened. This decides the cost per location and therefore
   who the feature is sellable to.
-- **Console UI.** Cards are issued over the API; there is no screen for it yet,
-  and no place to show the pass bytes to whoever writes the tag.
+- **The Next.js port of the settings section.** The legacy SPA is what production
+  serves, and that is where the screen lives today.
 - **Mobile.** No card management in the app.
 
 ## Deliberately out of scope

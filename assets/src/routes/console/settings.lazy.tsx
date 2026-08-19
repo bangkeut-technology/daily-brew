@@ -37,6 +37,7 @@ import { AvatarUploader } from '@/components/shared/AvatarUploader';
 import { useUploadWorkspaceLogo, useRemoveWorkspaceLogo } from '@/hooks/queries/useWorkspaceLogo';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { CustomSelect } from '@/components/shared/CustomSelect';
+import { CardCheckinCard } from '@/components/settings/CardCheckinCard';
 import { Toggle } from '@/components/shared/Toggle';
 import { ConfirmModal } from '@/components/shared/ConfirmModal';
 import { CheckinUrlRow } from '@/components/shared/CheckinUrlRow';
@@ -161,6 +162,7 @@ function SettingsPage() {
 
   // Button check-in state
   const [tapCheckinEnabled, setTapCheckinEnabled] = useState(false);
+  const [cardCheckinEnabled, setCardCheckinEnabled] = useState(false);
 
   // NFC check-in state
   const [nfcCheckinEnabled, setNfcCheckinEnabled] = useState(false);
@@ -245,6 +247,7 @@ function SettingsPage() {
       setDateFormat(settings.dateFormat || 'DD/MM/YYYY');
       setDeviceVerificationEnabled(settings.deviceVerificationEnabled);
       setTapCheckinEnabled(settings.tapCheckinEnabled);
+      setCardCheckinEnabled(settings.cardCheckinEnabled);
       setNfcCheckinEnabled(settings.nfcCheckinEnabled);
       setNfcCheckinIntervalMinutes(settings.nfcCheckinIntervalMinutes ?? 15);
       setTelegramEnabled(settings.telegramNotificationsEnabled);
@@ -279,6 +282,7 @@ function SettingsPage() {
         telegramCheckinAlertsEnabled: telegramEnabled && telegramCheckinAlertsEnabled,
         pushCheckinAlertsEnabled,
         tapCheckinEnabled,
+        cardCheckinEnabled,
         nfcCheckinEnabled,
         nfcCheckinIntervalMinutes,
       });
@@ -1178,6 +1182,20 @@ function SettingsPage() {
               )}
             </div>
           </GlassCard>
+        )}
+
+        {/* Card check-in — physical cards tapped at a kiosk, for staff with no phone */}
+        {currentWsId && (
+          <CardCheckinCard
+            workspacePublicId={currentWsId}
+            employees={(employees ?? []).map((e) => ({ publicId: e.publicId, name: e.name }))}
+            enabled={cardCheckinEnabled}
+            onEnabledChange={setCardCheckinEnabled}
+            canUseCardCheckin={plan?.canUseCardCheckin ?? false}
+            onUpgrade={() => upgradeModal.openFor('cardCheckin')}
+            onSave={handleSaveSettings}
+            saving={updateSettings.isPending}
+          />
         )}
 
         {/* NFC check-in settings */}

@@ -3,7 +3,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { usePaddle } from '@/hooks/usePaddle';
-import {
+import { CreditCard,
   Crown,
   Globe,
   MapPin,
@@ -34,6 +34,7 @@ const featureConfig: Record<EspressoFeature, { icon: LucideIcon; titleKey: strin
   shiftTimeRules: { icon: Clock, titleKey: 'upgrade.shiftTimeRules.title', descKey: 'upgrade.shiftTimeRules.description' },
   telegramNotifications: { icon: Send, titleKey: 'upgrade.telegramNotifications.title', descKey: 'upgrade.telegramNotifications.description' },
   tapCheckin: { icon: MousePointerClick, titleKey: 'upgrade.tapCheckin.title', descKey: 'upgrade.tapCheckin.description' },
+  cardCheckin: { icon: CreditCard, titleKey: 'upgrade.cardCheckin.title', descKey: 'upgrade.cardCheckin.description' },
   nfcCheckin: { icon: Nfc, titleKey: 'upgrade.nfcCheckin.title', descKey: 'upgrade.nfcCheckin.description' },
   apiTokens: { icon: KeyRound, titleKey: 'upgrade.apiTokens.title', descKey: 'upgrade.apiTokens.description' },
 };
