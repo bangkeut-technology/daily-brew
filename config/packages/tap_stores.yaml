@@ -1,0 +1,8 @@
+# Binds the host's implementations of the tap-core interfaces. The bundle
+# autowires CredentialStore, IssuerKeyStore and NonceStore; RevocationStore is
+# optional there and mandatory here, so it is aliased explicitly.
+services:
+    Bangkeut\Tap\Credential\CredentialStore: '@App\Tap\NoDeviceCredentialStore'
+    Bangkeut\Tap\Credential\IssuerKeyStore: '@App\Tap\WorkspaceIssuerKeyStore'
+    Bangkeut\Tap\Nonce\NonceStore: '@App\Tap\DoctrineNonceStore'
+    Bangkeut\Tap\Revocation\RevocationStore: '@App\Tap\EmployeeCardRevocationStore'

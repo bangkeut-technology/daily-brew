@@ -84,6 +84,11 @@ services:
         arguments:
             $ingestLimiter: '@limiter.api_ingest'
 
+    App\ApiController\Integration\CardTapController:
+        tags: ['controller.service_arguments']
+        arguments:
+            $ingestLimiter: '@limiter.api_ingest'
+
     App\EventSubscriber\RateLimitSubscriber:
         arguments:
             $authLoginLimiter:    '@limiter.auth_login'

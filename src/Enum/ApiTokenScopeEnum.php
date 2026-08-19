@@ -21,11 +21,15 @@ enum ApiTokenScopeEnum: string
     /** Record attendance from outside — requires a signed request. */
     case WriteAttendance = 'attendance:write';
 
+    /** Submit card taps from a kiosk terminal — requires a signed request. */
+    case TapCheckin = 'checkin:tap';
+
     public function label(): string
     {
         return match ($this) {
             self::ReadAttendance => 'Read attendance',
             self::WriteAttendance => 'Write attendance',
+            self::TapCheckin => 'Card check-in',
         };
     }
 
@@ -34,6 +38,7 @@ enum ApiTokenScopeEnum: string
         return match ($this) {
             self::ReadAttendance => 'Pull attendance records for this workspace.',
             self::WriteAttendance => 'Record attendance from an external system. Requires request signing.',
+            self::TapCheckin => 'Submit card taps from a kiosk terminal. Requires request signing.',
         };
     }
 
