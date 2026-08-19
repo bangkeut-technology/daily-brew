@@ -683,6 +683,20 @@ final class SeoMetaResolver
                 'បើកការកំណត់តែមួយ ហើយ DailyBrew នឹងផ្ញើការជូនដំណឹង Telegram ភ្លាមៗនៅពេលបុគ្គលិកចូលរួម ឬចេញ។ លក្ខណៈពិសេស Espresso+ បិទតាមលំនាំដើម — ប្រេកង់ខ្ពស់គឺមានចេតនា។',
             ],
         ],
+        '/blog/overnight-shifts' => [
+            'en' => [
+                'Shifts that run past midnight: one night, one row',
+                "A bar shift that starts at 18:00 and ends at 02:00 is one night's work, not two broken days. Here's how DailyBrew files it, why a 02:00 scan still closes last night, and what the +1 marker means.",
+            ],
+            'fr' => [
+                'Les services qui dépassent minuit : une nuit, une seule ligne',
+                "Un service de bar qui commence à 18:00 et se termine à 02:00 est une nuit de travail, pas deux journées cassées. Voici comment DailyBrew l'enregistre, pourquoi un pointage à 02:00 clôture encore la veille, et ce que signifie le repère +1.",
+            ],
+            'km' => [
+                'វេនដែលឆ្លងកាត់អធ្រាត្រ៖ មួយយប់ មួយជួរ',
+                'វេនបារដែលចាប់ផ្តើមម៉ោង 18:00 ហើយបញ្ចប់ម៉ោង 02:00 គឺជាការងារមួយយប់ មិនមែនជាថ្ងៃខូចពីរទេ។ នេះជារបៀបដែល DailyBrew កត់ត្រាវា ហេតុអ្វីការស្កេនម៉ោង 02:00 នៅតែបិទយប់មុន និងអត្ថន័យនៃសញ្ញា +1។',
+            ],
+        ],
         '/blog/the-new-device-alert' => [
             'en' => [
                 "The new-device alert: when a check-in looks fine but isn't",

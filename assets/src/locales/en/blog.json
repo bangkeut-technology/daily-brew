@@ -94,5 +94,32 @@
     "notThis": "This isn't device verification. The toggle just decides whether you <em>hear</em> about each check-in — it doesn't change which check-ins are <em>allowed</em>. DailyBrew's device verification (a separate Espresso feature) enforces same-day consistency: within a single day, one device per employee, and the check-out has to come from the same device as the check-in. Tomorrow that same employee can use a different phone — no problem, the constraint is per-day, not per-lifetime. That keeps active buddy punching from succeeding silently. The live alerts let you watch it work.",
     "h2Noise": "A note on noise",
     "noise": "If you turn this on and find yourself ignoring the pings, that's a signal to turn it off. Notifications you ignore train your brain to ignore the <em>channel</em>, which means the actually-urgent things (new-device alerts, leave requests) blend in. We left it off by default for that reason. Use it when the live feedback matters, mute it when it doesn't."
+  },
+  "overnightShifts": {
+    "lead1": "If your kitchen closes at midnight and the crew finishes at two, DailyBrew used to make a mess of the night. The 18:00 check-in landed on Tuesday, the 02:00 check-out landed on Wednesday, and neither day looked like a shift anyone had actually worked.",
+    "lead2": "That's fixed. Here's the shape of it.",
+    "h2OneRow": "One night, one row",
+    "oneRow1": "The whole feature rests on a single decision: <strong>an overnight shift is filed under the day it started.</strong> Tuesday 18:00 → 02:00 is a Tuesday row, even though half the work happened on Wednesday.",
+    "oneRow2": "That's the day the work is credited to, and it's the day every report, export, and absence calculation already keys on. Splitting the night into two rows would give you two half-days that both look wrong — a Tuesday that stops at midnight, and a Wednesday that starts at two in the morning with nobody scheduled.",
+    "h2NoSwitch": "There is no “overnight” switch",
+    "noSwitch1": "Nothing to enable, nothing to tick. A shift runs past midnight when its <strong>end time is earlier than its start time</strong>. Set <code>18:00 → 02:00</code> and DailyBrew reads it as overnight. Set <code>09:00 → 17:00</code> and it doesn't.",
+    "noSwitch2": "The same is true day by day. On Espresso, where a shift can carry per-day times, Friday can run <code>18:00 → 02:00</code> while Saturday runs <code>10:00 → 18:00</code> — each day is read on its own terms. And because it's nothing more than the times you already set, overnight shifts work on every plan, free tier included.",
+    "h2Scanning": "Scanning out at two in the morning",
+    "scanning1": "Staff do nothing different: they scan the same QR code they always do.",
+    "scanning2": "When someone whose shift ran past midnight scans <em>after</em> midnight and last night's row is still open, that scan <strong>closes last night</strong> rather than opening a new day. The mobile app knows before they tap — it offers “check out”, not “check in”.",
+    "scanning3": "The window isn't unlimited. It runs until four hours after the shift's end time. Scan at 02:15 after a 02:00 finish and last night closes cleanly. Turn up at 09:00 the next morning instead, and that's a fresh day's check-in — last night's missing check-out is left open for an owner to correct by hand.",
+    "h2Marker": "The +1 marker",
+    "marker1": "Everywhere a check-out time appears — the attendance log, the monthly grid, the xlsx and PDF exports, the API feed — an overnight check-out carries a small amber <strong>+1</strong>.",
+    "marker2": "Without it, <code>18:00 → 02:00</code> reads as minus sixteen hours. With it, you can see at a glance which rows crossed the date line.",
+    "h2ByHand": "Adding one by hand",
+    "byHand1": "Somebody forgot to scan. Open <strong>Add attendance</strong>, pick the date the shift <em>started</em>, and type <code>18:00</code> and <code>02:00</code>.",
+    "byHand2": "You never enter a date for the check-out. Type the time the clock actually said, and the <strong>+1</strong> appears next to the field to confirm the check-out lands on the following day.",
+    "byHand3": "It's accepted only when that employee's shift for that date genuinely runs past midnight. For someone on <code>09:00 → 17:00</code>, a <code>02:00</code> check-out is a typo — and we still say so, rather than quietly recording a sixteen-hour day.",
+    "h2Flags": "Late and left-early still work",
+    "flags1": "Attendance flags compare punches against the shift times, measured from the attendance date's own midnight. So a 02:00 finish the next morning counts as “26:00” and compares correctly against an 02:00 shift end.",
+    "flags2": "Scan in at 18:20 on an 18:00 start and you're late. Leave at 01:30 on an 02:00 finish and you left early. Same rules as any other shift — they simply no longer stop at the day boundary.",
+    "h2Unchanged": "What it doesn't change",
+    "unchanged1": "No new column, no new flag, no migration, nothing to back-fill. The times say it: an end before a start means the shift runs past midnight.",
+    "unchanged2": "And shift edits stay retroactive, exactly as they've always been. Change a shift from <code>18:00 → 23:00</code> to <code>18:00 → 02:00</code> today, and past nights are re-read under the new schedule — the same way editing any shift or closure has always worked."
   }
 }

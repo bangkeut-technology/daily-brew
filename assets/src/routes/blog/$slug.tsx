@@ -8,12 +8,14 @@ import { ThreeFactorAttendancePost } from '@/components/blog/three-factor-attend
 import { TheBuddyPunchingTaxPost } from '@/components/blog/the-buddy-punching-tax';
 import { TheNewDeviceAlertPost } from '@/components/blog/the-new-device-alert';
 import { LiveCheckinAlertsOnTelegramPost } from '@/components/blog/live-checkin-alerts-on-telegram';
+import { OvernightShiftsPost } from '@/components/blog/overnight-shifts';
 
 const POST_COMPONENTS: Record<string, () => React.ReactElement> = {
   'three-factor-attendance': ThreeFactorAttendancePost,
   'the-buddy-punching-tax': TheBuddyPunchingTaxPost,
   'the-new-device-alert': TheNewDeviceAlertPost,
   'live-checkin-alerts-on-telegram': LiveCheckinAlertsOnTelegramPost,
+  'overnight-shifts': OvernightShiftsPost,
 };
 
 export const Route = createFileRoute('/blog/$slug')({

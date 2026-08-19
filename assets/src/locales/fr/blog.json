@@ -94,5 +94,32 @@
     "notThis": "Ce n'est pas de la vérification d'appareil. Le commutateur décide seulement si vous <em>entendez</em> parler de chaque pointage — il ne change pas quels pointages sont <em>autorisés</em>. La vérification d'appareil de DailyBrew (une fonctionnalité Espresso distincte) applique la cohérence sur une journée : en un seul jour, un appareil par employé, et la sortie doit venir du même appareil que l'entrée. Demain ce même employé peut utiliser un téléphone différent — pas de problème, la contrainte est par jour, pas à vie. Cela empêche le pointage par procuration actif de réussir en silence. Les alertes en direct vous permettent de le voir fonctionner.",
     "h2Noise": "Une note sur le bruit",
     "noise": "Si vous activez ça et vous vous surprenez à ignorer les pings, c'est un signal pour le désactiver. Les notifications que vous ignorez entraînent votre cerveau à ignorer le <em>canal</em>, ce qui signifie que les choses vraiment urgentes (alertes de nouvel appareil, demandes de congé) se mélangent. On l'a laissé désactivé par défaut pour cette raison. Utilisez-le quand le feedback en direct compte, coupez-le quand il ne compte pas."
+  },
+  "overnightShifts": {
+    "lead1": "Si votre cuisine ferme à minuit et que l'équipe termine à deux heures, DailyBrew faisait jusqu'ici un beau gâchis de la nuit. Le pointage d'arrivée de 18:00 tombait le mardi, celui de départ de 02:00 le mercredi, et aucune des deux journées ne ressemblait à un service réellement travaillé.",
+    "lead2": "C'est corrigé. Voici comment cela fonctionne.",
+    "h2OneRow": "Une nuit, une seule ligne",
+    "oneRow1": "Toute la fonctionnalité repose sur une seule décision : <strong>un service de nuit est enregistré sous le jour où il a commencé.</strong> Mardi 18:00 → 02:00 est une ligne du mardi, même si la moitié du travail a eu lieu le mercredi.",
+    "oneRow2": "C'est le jour auquel le travail est imputé, et c'est le jour sur lequel chaque rapport, export et calcul d'absence s'appuie déjà. Découper la nuit en deux lignes donnerait deux demi-journées qui semblent toutes deux fausses — un mardi qui s'arrête à minuit, et un mercredi qui commence à deux heures du matin sans personne au planning.",
+    "h2NoSwitch": "Il n'y a pas de commutateur « nuit »",
+    "noSwitch1": "Rien à activer, rien à cocher. Un service dépasse minuit lorsque son <strong>heure de fin est antérieure à son heure de début</strong>. Réglez <code>18:00 → 02:00</code> et DailyBrew le lit comme un service de nuit. Réglez <code>09:00 → 17:00</code> et non.",
+    "noSwitch2": "Il en va de même jour par jour. Sur Espresso, où un service peut avoir des horaires par jour, le vendredi peut aller de <code>18:00 → 02:00</code> tandis que le samedi va de <code>10:00 → 18:00</code> — chaque jour est lu selon ses propres horaires. Et comme il ne s'agit que des heures que vous avez déjà définies, les services de nuit fonctionnent sur toutes les formules, y compris la gratuite.",
+    "h2Scanning": "Pointer son départ à deux heures du matin",
+    "scanning1": "Le personnel ne fait rien de différent : il scanne le même QR code que d'habitude.",
+    "scanning2": "Lorsqu'une personne dont le service a dépassé minuit scanne <em>après</em> minuit et que la ligne de la veille est encore ouverte, ce scan <strong>clôture la nuit précédente</strong> au lieu d'ouvrir une nouvelle journée. L'application mobile le sait avant même le geste — elle propose « pointer le départ », pas « pointer l'arrivée ».",
+    "scanning3": "La fenêtre n'est pas illimitée : elle court jusqu'à quatre heures après l'heure de fin du service. Un scan à 02:15 après une fin à 02:00 clôture proprement la nuit. Arriver plutôt à 09:00 le lendemain matin, et c'est un pointage d'arrivée d'une nouvelle journée — le départ manquant de la veille reste ouvert, à corriger à la main par le propriétaire.",
+    "h2Marker": "Le repère +1",
+    "marker1": "Partout où une heure de départ apparaît — le journal de présence, la grille mensuelle, les exports xlsx et PDF, le flux API — un départ de nuit porte un petit <strong>+1</strong> ambre.",
+    "marker2": "Sans lui, <code>18:00 → 02:00</code> se lit comme moins seize heures. Avec lui, vous voyez d'un coup d'œil quelles lignes ont franchi le changement de date.",
+    "h2ByHand": "En ajouter un à la main",
+    "byHand1": "Quelqu'un a oublié de scanner. Ouvrez <strong>Ajouter une présence</strong>, choisissez la date à laquelle le service a <em>commencé</em>, et saisissez <code>18:00</code> et <code>02:00</code>.",
+    "byHand2": "Vous ne saisissez jamais de date pour le départ. Tapez l'heure qu'indiquait l'horloge, et le <strong>+1</strong> apparaît à côté du champ pour confirmer que le départ tombe le lendemain.",
+    "byHand3": "Ce n'est accepté que si le service de cet employé ce jour-là dépasse réellement minuit. Pour quelqu'un en <code>09:00 → 17:00</code>, un départ à <code>02:00</code> est une faute de frappe — et nous le disons toujours, plutôt que d'enregistrer discrètement une journée de seize heures.",
+    "h2Flags": "Les retards et départs anticipés fonctionnent toujours",
+    "flags1": "Les indicateurs de présence comparent les pointages aux horaires du service, mesurés depuis le minuit de la date de présence elle-même. Une fin à 02:00 le lendemain matin compte donc comme « 26:00 » et se compare correctement à une fin de service à 02:00.",
+    "flags2": "Pointez à 18:20 pour un début à 18:00 et vous êtes en retard. Partez à 01:30 pour une fin à 02:00 et vous êtes parti tôt. Les mêmes règles que pour tout autre service — elles ne s'arrêtent simplement plus à la frontière du jour.",
+    "h2Unchanged": "Ce que cela ne change pas",
+    "unchanged1": "Aucune nouvelle colonne, aucun nouvel indicateur, aucune migration, rien à reprendre rétroactivement. Les horaires le disent : une fin avant un début signifie que le service dépasse minuit.",
+    "unchanged2": "Et les modifications de service restent rétroactives, exactement comme toujours. Passez aujourd'hui un service de <code>18:00 → 23:00</code> à <code>18:00 → 02:00</code>, et les nuits passées sont relues selon le nouvel horaire — comme la modification de n'importe quel service ou fermeture l'a toujours fait."
   }
 }
