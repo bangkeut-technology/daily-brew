@@ -1,9 +1,9 @@
-# Card check-in (design)
+# Card check-in
 
-**Status: design only. Nothing in this document is built.** `packages/tap-core` and
-`packages/tap-bundle` exist and are tested; the bundle is registered in `config/bundles.php` but its
-services are removed at compile time because no application class implements the store interfaces
-yet. This document describes what implementing them would look like.
+**Status: the server side is implemented; the kiosk and the console UI are not.**
+Cards can be issued, revoked and tapped over the API today — see
+**Implementation status** below for exactly what exists and what a working
+deployment still needs.
 
 A physical card, linked to an employee, tapped against a kiosk at the door. No phone, no account, no
 app, no install for the employee.
@@ -255,6 +255,31 @@ The largest unknown, and the only piece with no code anywhere in either reposito
 Whether that is a dedicated Android app, a repurposed phone, or an off-the-shelf terminal is the
 first thing to decide, because it determines the cost per location and therefore who the feature is
 sellable to.
+
+## Implementation status
+
+**Built** (Espresso-gated, `WorkspaceSetting.cardCheckinEnabled` off by default):
+
+| Piece | Where |
+|---|---|
+| `EmployeeCard`, `WorkspaceIssuerKey`, `CardTap`, `TapNonce` | `src/Entity/`, migration `Version20260819120000` |
+| Issue / revoke / key rotation | `App\Service\Card\CardIssuanceService` |
+| Tap → attendance | `App\Service\Card\CardTapService` |
+| The four store implementations | `src/Tap/`, bound in `config/packages/tap_stores.yaml` |
+| Verification policy | `config/packages/bangkeut_tap.yaml` — anti-passback at 60s |
+| Kiosk ingest | `POST /api/v1/integrations/card-taps`, signed, scope `checkin:tap` |
+| Card management | `/workspaces/{ws}/employee-cards` — GET, POST, DELETE, gated on `manage_employees` |
+| Plan gate | `PlanService::canUseCardCheckin()` — Espresso and above |
+
+**Not built:**
+
+- **The kiosk.** No code in either repository. It must read the tag, sign its
+  requests, stamp its own `tappedAt`, queue while offline, and show the person
+  in front of it what happened. This decides the cost per location and therefore
+  who the feature is sellable to.
+- **Console UI.** Cards are issued over the API; there is no screen for it yet,
+  and no place to show the pass bytes to whoever writes the tag.
+- **Mobile.** No card management in the app.
 
 ## Deliberately out of scope
 

@@ -21,6 +21,14 @@ class CheckinService
     public const SOURCE_NFC = 'nfc';
 
     /**
+     * Source tag for a card tapped at a kiosk. Not subject to the NFC
+     * double-tap guard: that one absorbs a phone firing two navigations from a
+     * single tap, while a kiosk's duplicate suppression is the CardTap replay
+     * guard, which the card path applies before it ever gets here.
+     */
+    public const SOURCE_CARD = 'card';
+
+    /**
      * How long after an overnight shift's end a scan still counts as closing
      * that shift rather than opening a new day. A bar that closes at 02:00 has
      * people cleaning up for a while; four hours covers that without swallowing

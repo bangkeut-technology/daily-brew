@@ -1,0 +1,23 @@
+# Tap verification policy. See docs/card-checkin.md.
+bangkeut_tap:
+    policy:
+        # Device assertions only — nothing issues them yet. Left at the library
+        # defaults so the seam stays ready rather than being tuned blind.
+        max_age_seconds: 120
+        max_future_skew_seconds: 30
+        nonce_ttl_seconds: 900
+
+        # Anti-passback, and the setting that carries the weight of the whole
+        # bearer-credential trade: the same card at the same door inside this
+        # window is refused. The library default of 0 is right for a re-entry
+        # friendly event door and wrong for a shift kiosk, where it is the only
+        # thing standing between one card and a queue of friends.
+        #
+        # Sixty seconds is a starting point, not a measured value — it needs
+        # validating against a real service change-over, where a crew tapping in
+        # sequence is normal and must not trip anything.
+        pass_reuse_cooldown_seconds: 60
+
+        # A kiosk that lost wifi for a day must still be able to hand over what
+        # it recorded.
+        batch_max_age_seconds: 86400

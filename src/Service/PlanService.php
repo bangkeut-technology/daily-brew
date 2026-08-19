@@ -100,6 +100,16 @@ class PlanService
         return $this->isAtLeastEspresso($workspace);
     }
 
+    /**
+     * Card check-in — a physical card tapped at a kiosk, for staff with no
+     * phone and no account. Sits with device verification, IP restriction and
+     * geofencing: the same tier, and the same kind of control.
+     */
+    public function canUseCardCheckin(Workspace $workspace): bool
+    {
+        return $this->isAtLeastEspresso($workspace);
+    }
+
     public function canUseNfcCheckin(Workspace $workspace): bool
     {
         if (!$this->featureFlagService->isEnabledForWorkspace(FeatureFlagEnum::NfcCheckin, $workspace)) {
@@ -189,6 +199,7 @@ class PlanService
             'canUseManagers' => $this->canUseManagers($workspace),
             'canUseTelegramNotifications' => $this->canUseTelegramNotifications($workspace),
             'canUseTapCheckin' => $this->canUseTapCheckin($workspace),
+            'canUseCardCheckin' => $this->canUseCardCheckin($workspace),
             'canUseNfcCheckin' => $this->canUseNfcCheckin($workspace),
             'canUseSubQrCodes' => $this->canUseSubQrCodes($workspace),
             'canExportAttendance' => $this->canExportAttendance($workspace),

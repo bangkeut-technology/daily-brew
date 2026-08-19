@@ -81,6 +81,14 @@ class WorkspaceSetting extends AbstractBaseEntity
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $tapCheckinEnabled = false;
 
+    /**
+     * Card check-in: employees tap a physical card at a kiosk. Off by default —
+     * turning it on means cards in circulation are accepted at the door, which
+     * is an owner's decision, not a consequence of upgrading a plan.
+     */
+    #[ORM\Column]
+    private bool $cardCheckinEnabled = false;
+
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $nfcCheckinEnabled = false;
 
@@ -269,6 +277,20 @@ class WorkspaceSetting extends AbstractBaseEntity
     public function setTapCheckinEnabled(bool $tapCheckinEnabled): static
     {
         $this->tapCheckinEnabled = $tapCheckinEnabled;
+        return $this;
+    }
+
+    // ── Card check-in ─────────────────────────────────────────
+
+    public function isCardCheckinEnabled(): bool
+    {
+        return $this->cardCheckinEnabled;
+    }
+
+    public function setCardCheckinEnabled(bool $cardCheckinEnabled): static
+    {
+        $this->cardCheckinEnabled = $cardCheckinEnabled;
+
         return $this;
     }
 

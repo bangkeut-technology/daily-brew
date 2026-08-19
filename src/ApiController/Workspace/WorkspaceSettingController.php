@@ -159,6 +159,16 @@ class WorkspaceSettingController extends AbstractController
             $setting->setTapCheckinEnabled(false);
         }
 
+        // Card check-in (Espresso gated)
+        if (isset($data['cardCheckinEnabled']) && $data['cardCheckinEnabled']) {
+            if (!$planService->canUseCardCheckin($workspace)) {
+                return $this->jsonError('Card check-in requires the Espresso plan', 402);
+            }
+            $setting->setCardCheckinEnabled(true);
+        } elseif (isset($data['cardCheckinEnabled'])) {
+            $setting->setCardCheckinEnabled(false);
+        }
+
         // NFC check-in (Espresso gated)
         if (isset($data['nfcCheckinEnabled']) && $data['nfcCheckinEnabled']) {
             if (!$planService->canUseNfcCheckin($workspace)) {
@@ -311,6 +321,7 @@ class WorkspaceSettingController extends AbstractController
             'telegramCheckinAlertsEnabled' => $setting?->isTelegramCheckinAlertsEnabled() ?? false,
             'pushCheckinAlertsEnabled' => $setting?->isPushCheckinAlertsEnabled() ?? false,
             'tapCheckinEnabled' => $setting?->isTapCheckinEnabled() ?? false,
+            'cardCheckinEnabled' => $setting?->isCardCheckinEnabled() ?? false,
             'nfcCheckinEnabled' => $setting?->isNfcCheckinEnabled() ?? false,
             'nfcCheckinIntervalMinutes' => $setting?->getNfcCheckinIntervalMinutes() ?? 15,
         ];
