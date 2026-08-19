@@ -19,6 +19,14 @@ export interface BlogPost {
  */
 export const POSTS: BlogPost[] = [
   {
+    slug: "overnight-shifts",
+    title: "Shifts that run past midnight: one night, one row",
+    description:
+      "A bar shift that starts at 18:00 and ends at 02:00 is one night's work, not two broken days. Here's how DailyBrew files it, why a 02:00 scan still closes last night, and what the +1 marker means.",
+    date: "2026-08-19",
+    tags: ["overnight-shifts", "attendance", "feature"],
+  },
+  {
     slug: "live-checkin-alerts-on-telegram",
     title: "Live check-in alerts: a Telegram toggle for owners who want every clock-in",
     description:

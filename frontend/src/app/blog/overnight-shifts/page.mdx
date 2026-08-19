@@ -1,0 +1,78 @@
+import { JsonLd } from "@/components/JsonLd";
+import { articleSchema } from "@/lib/schema";
+
+export const metadata = {
+  title: "Shifts that run past midnight: one night, one row",
+  description:
+    "A bar shift that starts at 18:00 and ends at 02:00 is one night's work, not two broken days. Here's how DailyBrew files it, why a 02:00 scan still closes last night, and what the +1 marker means.",
+  alternates: { canonical: "/blog/overnight-shifts" },
+  openGraph: {
+    type: "article",
+    url: "/blog/overnight-shifts",
+    title: "Shifts that run past midnight: one night, one row",
+    description:
+      "18:00 → 02:00 is one night's work, not two broken days. How DailyBrew files an overnight shift, and what the +1 marker means.",
+  },
+};
+
+<JsonLd
+  data={articleSchema({
+    title: "Shifts that run past midnight: one night, one row",
+    description:
+      "18:00 → 02:00 is one night's work, not two broken days. How DailyBrew files an overnight shift, and what the +1 marker means.",
+    url: "https://dailybrew.work/blog/overnight-shifts",
+    datePublished: "2026-08-19",
+  })}
+/>
+
+# Shifts that run past midnight: one night, one row
+
+If your kitchen closes at midnight and the crew finishes at two, DailyBrew used to make a mess of the night. The 18:00 check-in landed on Tuesday, the 02:00 check-out landed on Wednesday, and neither day looked like a shift anyone had actually worked.
+
+That's fixed. Here's the shape of it.
+
+## One night, one row
+
+The whole feature rests on a single decision: **an overnight shift is filed under the day it started.** Tuesday 18:00 → 02:00 is a Tuesday row, even though half the work happened on Wednesday.
+
+That's the day the work is credited to, and it's the day every report, export, and absence calculation already keys on. Splitting the night into two rows would give you two half-days that both look wrong — a Tuesday that stops at midnight, and a Wednesday that starts at two in the morning with nobody scheduled.
+
+## There is no "overnight" switch
+
+Nothing to enable, nothing to tick. A shift runs past midnight when its **end time is earlier than its start time**. Set `18:00 → 02:00` and DailyBrew reads it as overnight. Set `09:00 → 17:00` and it doesn't.
+
+The same is true day by day. On Espresso, where a shift can carry per-day times, Friday can run `18:00 → 02:00` while Saturday runs `10:00 → 18:00` — each day is read on its own terms. And because it's nothing more than the times you already set, overnight shifts work on every plan, free tier included.
+
+## Scanning out at two in the morning
+
+Staff do nothing different: they scan the same QR code they always do.
+
+When someone whose shift ran past midnight scans *after* midnight and last night's row is still open, that scan **closes last night** rather than opening a new day. The mobile app knows before they tap — it offers "check out", not "check in".
+
+The window isn't unlimited. It runs until four hours after the shift's end time. Scan at 02:15 after a 02:00 finish and last night closes cleanly. Turn up at 09:00 the next morning instead, and that's a fresh day's check-in — last night's missing check-out is left open for an owner to correct by hand.
+
+## The +1 marker
+
+Everywhere a check-out time appears — the attendance log, the monthly grid, the xlsx and PDF exports, the API feed — an overnight check-out carries a small amber **+1**.
+
+Without it, `18:00 → 02:00` reads as minus sixteen hours. With it, you can see at a glance which rows crossed the date line.
+
+## Adding one by hand
+
+Somebody forgot to scan. Open **Add attendance**, pick the date the shift *started*, and type `18:00` and `02:00`.
+
+You never enter a date for the check-out. Type the time the clock actually said, and the **+1** appears next to the field to confirm the check-out lands on the following day.
+
+It's accepted only when that employee's shift for that date genuinely runs past midnight. For someone on `09:00 → 17:00`, a `02:00` check-out is a typo — and we still say so, rather than quietly recording a sixteen-hour day.
+
+## Late and left-early still work
+
+Attendance flags compare punches against the shift times, measured from the attendance date's own midnight. So a 02:00 finish the next morning counts as "26:00" and compares correctly against an 02:00 shift end.
+
+Scan in at 18:20 on an 18:00 start and you're late. Leave at 01:30 on an 02:00 finish and you left early. Same rules as any other shift — they simply no longer stop at the day boundary.
+
+## What it doesn't change
+
+No new column, no new flag, no migration, nothing to back-fill. The times say it: an end before a start means the shift runs past midnight.
+
+And shift edits stay retroactive, exactly as they've always been. Change a shift from `18:00 → 23:00` to `18:00 → 02:00` today, and past nights are re-read under the new schedule — the same way editing any shift or closure has always worked.
