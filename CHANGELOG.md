@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.143.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.142.1...v1.143.0) (2026-08-19)
+
+
+### Features
+
+* **checkin:** card check-in at a kiosk, gated to Espresso ([#416](https://github.com/bangkeut-technology/daily-brew/issues/416)) ([885ea67](https://github.com/bangkeut-technology/daily-brew/commit/885ea67973d4f82d7d0fdbb83b097e1a39566d3e))
+
 ## [1.142.1](https://github.com/bangkeut-technology/daily-brew/compare/v1.142.0...v1.142.1) (2026-08-19)
 
 
