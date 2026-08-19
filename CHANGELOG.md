@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.144.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.143.0...v1.144.0) (2026-08-19)
+
+
+### Features
+
+* **settings:** issue and revoke check-in cards from the console ([#418](https://github.com/bangkeut-technology/daily-brew/issues/418)) ([3fb4893](https://github.com/bangkeut-technology/daily-brew/commit/3fb489318f3849302a8266c5ec71e7b2a8c378d3))
+
 ## [1.143.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.142.1...v1.143.0) (2026-08-19)
 
 
