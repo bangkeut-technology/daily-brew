@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.145.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.144.0...v1.145.0) (2026-08-19)
+
+
+### Features
+
+* **settings:** card check-in in the Next console ([#420](https://github.com/bangkeut-technology/daily-brew/issues/420)) ([bf63540](https://github.com/bangkeut-technology/daily-brew/commit/bf635403aca998d1fa43443008bc53e04f6a36e8))
+
 ## [1.144.0](https://github.com/bangkeut-technology/daily-brew/compare/v1.143.0...v1.144.0) (2026-08-19)
 
 
