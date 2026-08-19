@@ -662,7 +662,10 @@
     "cardIssuedDesc": "{{name}} · {{label}}",
     "cardIssuedOnce": "Écrivez ceci sur la carte maintenant. Affiché une seule fois et impossible à récupérer ensuite — en cas de perte, révoquez la carte et émettez-en une nouvelle.",
     "cardPass": "Données de la carte",
-    "cardWritten": "J'ai écrit la carte"
+    "cardWritten": "J'ai écrit la carte",
+    "apiKeysTapLabel": "Autoriser les pointages par carte",
+    "apiKeysTapHint": "Pour une borne qui envoie les pointages par carte. Comme pour l'écriture des présences, chaque requête doit être signée.",
+    "apiKeysTapBadge": "Pointages carte"
   },
   "checkin": {
     "deviceMismatch": "Le pointage de sortie doit être effectué depuis le même appareil que le pointage d'entrée",

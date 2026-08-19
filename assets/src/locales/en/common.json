@@ -776,7 +776,10 @@
     "cardIssuedDesc": "{{name}} · {{label}}",
     "cardIssuedOnce": "Write this to the card now. It is shown once and cannot be retrieved later — if you lose it, revoke the card and issue a new one.",
     "cardPass": "Card data",
-    "cardWritten": "I've written the card"
+    "cardWritten": "I've written the card",
+    "apiKeysTapLabel": "Allow card check-in taps",
+    "apiKeysTapHint": "For a kiosk terminal that submits card taps. Like writing attendance, every request must be signed.",
+    "apiKeysTapBadge": "Card taps"
   },
   "checkin": {
     "checkIn": "Check In",
