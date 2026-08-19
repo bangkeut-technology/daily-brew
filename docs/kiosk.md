@@ -1,8 +1,10 @@
 # The kiosk (design)
 
-**Status: design only. No kiosk code exists in any repository.** Everything it
-talks to is built and running — see [docs/card-checkin.md](./card-checkin.md) for
-the server side, which is complete.
+**Status: being built** in
+[bangkeut-technology/dailybrew-kiosk](https://github.com/bangkeut-technology/dailybrew-kiosk)
+— the protocol core, the queue, the screens and the NFC read all exist, and
+nothing has run on hardware yet. The server side it talks to is complete; see
+[docs/card-checkin.md](./card-checkin.md).
 
 The kiosk is the box on the wall. An employee holds a card to it, it says
 "Sokha — checked in, 06:32", and attendance is recorded. That is the entire
@@ -105,7 +107,7 @@ The screen is the product. It should say, in the workspace's language:
 | State | Shows |
 |---|---|
 | Idle | The time, and "Hold your card here" |
-| Accepted | Name, whether this was in or out, and the time recorded |
+| Accepted | **Name**, whether this was in or out, and the time. Names are shown: it is the feedback that makes a tap feel like it worked, at the cost of being readable by anyone at the door — accepted for a device in a staff area. |
 | Accepted offline | Name is unavailable — say "Recorded" and the time, not a guess |
 | Refused | Why, in a sentence a person can act on ("This card was withdrawn — see your manager") |
 | Not a DailyBrew card | "Card not recognised" — never a stack trace or a hex dump |
@@ -195,12 +197,9 @@ anything richer.
 
 ## Open questions
 
-1. **Does the kiosk show names?** Showing "Sokha — checked in" is good feedback
-   and also displays who is at work to anyone standing there. A workspace toggle
-   may be wanted.
-2. **Anti-passback tuning.** `pass_reuse_cooldown_seconds` is 60 and is a guess.
+1. **Anti-passback tuning.** `pass_reuse_cooldown_seconds` is 60 and is a guess.
    It wants validating against a real service change-over, where a crew tapping
    in sequence is normal and must not trip anything.
-3. **Multiple kiosks per workspace** work today (per-terminal anti-passback), but
+2. **Multiple kiosks per workspace** work today (per-terminal anti-passback), but
    nothing in the console lists which terminals exist or when each was last seen.
    A terminal registry would make a fleet supportable.
